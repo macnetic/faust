@@ -1,0 +1,7 @@
+namespace Faust
+{
+	template<typename FPP, FDevice DEV>
+		TransformHelperGen<FPP,DEV>::TransformHelperGen() : is_transposed(false), is_conjugate(false), is_sliced(false), is_fancy_indexed(false), transform(std::make_shared<Transform<FPP,DEV>>())
+	{
+	}
+}

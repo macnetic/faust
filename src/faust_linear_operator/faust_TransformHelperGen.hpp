@@ -449,4 +449,15 @@ namespace Faust
 			return pth;
 
 		}
+
+	template<typename FPP, FDevice DEV>
+		TransformHelper<FPP,DEV>* TransformHelperGen<FPP,DEV>::clone()
+		{
+			auto clone = new TransformHelper<FPP,DEV>(this->transform->getData(), /* lambda_ */(FPP)1.0, /*optimizedCopy*/false, /*cloning_fact*/ true, /*internal_call*/ true);
+			auto th = dynamic_cast<TransformHelper<FPP,DEV>*>(this);
+			clone->copy_transconj_state(*th);
+			clone->copy_slice_state(*th);
+			clone->copy_mul_mode_state(*th);
+			return clone;
+		}
 }

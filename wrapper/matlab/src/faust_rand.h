@@ -41,9 +41,10 @@
 /*  approximations of matrices and applications", Journal of Selected       */
 /*  Topics in Signal Processing, 2016.                                      */
 /*  <https://hal.archives-ouvertes.fr/hal-01167948v1>                       */
-#ifndef __MEX_FAUST_DISP__
-#define __MEX_FAUST_DISP__
+#ifndef __MEX_FAUST_RAND__
+#define __MEX_FAUST_RAND__
 template <typename SCALAR, FDevice DEV>
-void faust_disp(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs);
-#include "faust_disp.hpp"
+void faust_rand(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs);
+#include "faust_rand.hpp"
 #endif
+

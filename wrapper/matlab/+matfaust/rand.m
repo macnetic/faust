@@ -126,6 +126,7 @@ function F = rand(M, N, varargin)
 	min_dim_size = min(num_rows, num_cols);
 	max_dim_size = max(num_rows, num_cols);
 	argc = length(varargin);
+	dev = 'cpu';
 	if(argc > 0)
 		for i=1:2:argc
 			if(argc > i)
@@ -181,9 +182,14 @@ function F = rand(M, N, varargin)
 					else
 						per_row = tmparg;
 					end
-
+				case 'dev'
+					if(argc == i || ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu'))
+						error('dev keyword argument is not followed by a valid value: cpu, gpu*.')
+					else
+						dev = tmparg;
+					end
 				otherwise
-					if((isstr(varargin{i}) || ischar(varargin{i}))  && (~ strcmp(tmparg, 'dense') && ~ strcmp(tmparg, 'sparse') && ~ strcmp(tmparg, 'mixed') && ~ strcmp(tmparg, 'real') && ~ strcmp(tmparg, 'complex')))
+					if((isstr(varargin{i}) || ischar(varargin{i}))  && ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu') && ~ strcmp(tmparg, 'dense') && ~ strcmp(tmparg, 'sparse') && ~ strcmp(tmparg, 'mixed') && ~ strcmp(tmparg, 'real') && ~ strcmp(tmparg, 'complex'))
 						error([ tmparg ' unrecognized argument'])
 					end
 			end
@@ -207,15 +213,25 @@ function F = rand(M, N, varargin)
 		error('field has an unknown char array value.')
 	end
 	e = MException('FAUST:OOM', 'Out of Memory');
-	if(field == COMPLEX)
-		core_obj = mexFaustCplx('rand', num_rows, num_cols, fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
-		is_real = false;
-	else %if(field == REAL)
-		core_obj = mexFaustReal('rand', num_rows, num_cols, fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
-		is_real = true;
+	if(strcmp(dev, 'cpu'))
+		if(field == COMPLEX)
+			core_obj = mexFaustCplx('rand', num_rows, num_cols, fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
+			is_real = false;
+		else %if(field == REAL)
+			core_obj = mexFaustReal('rand', num_rows, num_cols, fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
+			is_real = true;
+		end
+	else
+		if(field == COMPLEX)
+			core_obj = mexFaustGPUCplx('rand', num_rows, num_cols, fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
+			is_real = false;
+		else %if(field == REAL)
+			core_obj = mexFaustGPUReal('rand', num_rows, num_cols, fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
+			is_real = true;
+		end
 	end
 	if(core_obj == 0)
 		throw(e)
 	end
-	F = matfaust.Faust(core_obj, is_real);
+	F = matfaust.Faust(core_obj, is_real, dev);
 end

@@ -72,6 +72,7 @@ namespace Faust
 	template<FDevice DEVICE> class BlasHandle;
 	template<FDevice DEVICE> class SpBlasHandle;
 	template<typename FPP, FDevice DEVICE> class TransformHelper;
+	template<typename FPP, FDevice DEVICE> class TransformHelperGen;
 
 
 	// forward definition of friend function
@@ -123,6 +124,7 @@ namespace Faust
 				//void get_facts(std::vector<MatSparse<FPP,Cpu> >& sparse_facts)const{sparse_facts = data;}
 				//void get_facts(std::vector<MatDense<FPP,Cpu> >& facts)const;
 
+
 				faust_unsigned_int size()const{return data.size();}
 				void size(int size_)const{ data.resize(size_);}
 
@@ -132,7 +134,7 @@ namespace Faust
 				/** \brief Perform the product of all factorized matrix. */
 				MatDense<FPP,Cpu> get_product(const char opThis='N', const bool isConj=false)const;
 				void get_product(MatDense<FPP,Cpu> &, const char opThis='N', const bool isConj=false)const;
-                MatDense<FPP,Cpu> get_product(BlasHandle<Cpu> blas_handle,SpBlasHandle<Cpu> spblas_handle)const;
+				MatDense<FPP,Cpu> get_product(BlasHandle<Cpu> blas_handle,SpBlasHandle<Cpu> spblas_handle)const;
 
 
 				/** \brief return a copy of the factor of index id
@@ -195,7 +197,7 @@ namespace Faust
 
 				 * \param conjugate (optional): to conjugate the factor before pushing (works only if copying==true).
 				 * \param copying (optional): true to duplicate the factor in memory and push the copy. Otherwise the same pointer is pushed.
-				*/
+				 */
 				void push_back(const MatGeneric<FPP,Cpu>* M, const bool optimizedCopy=false, const bool conjugate=false, const bool copying=true);
 
 
@@ -207,11 +209,11 @@ namespace Faust
 				 if False, the dynamic type stay the same
 				 (default value false)*/
 				void push_first(const MatGeneric<FPP,Cpu>* M, const bool optimizedCopy=false, const bool conjugate=false, const bool copying=true);
-                void insert(faust_unsigned_int i, MatGeneric<FPP,Cpu>* M);
-                void pop_back();
-                void pop_front();
-                void erase(faust_unsigned_int i);
-                void resize(faust_unsigned_int size);
+				void insert(faust_unsigned_int i, MatGeneric<FPP,Cpu>* M);
+				void pop_back();
+				void pop_front();
+				void erase(faust_unsigned_int i);
+				void resize(faust_unsigned_int size);
 				//void pop_back(MatGeneric<FPP,Cpu>* M);
 				//void pop_first(MatGeneric<FPP,Cpu>* M);
 				//void pop_first(MatGeneric<FPP,Cpu>* M) const;
@@ -305,12 +307,14 @@ namespace Faust
 #endif
 
 		// should be used very carefully for testing purpose only
-        // (it allows memory leaks)
+		// (it allows memory leaks)
 		void disable_dtor() { this->dtor_disabled = true; }
 		void enable_dtor() { this->dtor_disabled = false; }
 			private:
 		void disable_data_deletion() { this->dtor_delete_data = false; }
 		void enable_data_deletion() { this->dtor_delete_data = true; }
+
+		std::vector<MatGeneric<FPP,Cpu>*> getData() {return data;};
 
 			private:
 		long long int totalNonZeros;
@@ -329,6 +333,7 @@ namespace Faust
 		friend Vect<FPP,Cpu> operator*<>(const Transform<FPP,Cpu>& f, const Vect<FPP,Cpu>& v);
 		friend MatDense<FPP,Cpu> operator*<>(const Transform<FPP,Cpu>& f, const MatDense<FPP,Cpu>& M);
 		friend TransformHelper<FPP,Cpu>;
+		friend TransformHelperGen<FPP,Cpu>;
 		};
 
 }

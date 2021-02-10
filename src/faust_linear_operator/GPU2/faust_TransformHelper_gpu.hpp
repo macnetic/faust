@@ -147,10 +147,19 @@ namespace Faust
 		{
 			return this->transform->get_product(this->isTransposed2char(), this->is_conjugate);
 		}
+
 	template<typename FPP>
 		void TransformHelper<FPP,GPU2>::get_product(MatDense<FPP,GPU2>& M, int prod_mod/*=-1*/)
 		{
-			return this->transform->get_product(M, this->isTransposed2char(), this->is_conjugate);
+			this->transform->get_product(M, this->isTransposed2char(), this->is_conjugate);
+		}
+
+	template<typename FPP>
+		void TransformHelper<FPP,GPU2>::get_product(MatDense<FPP,Cpu>& M, int prod_mod/*=-1*/)
+		{
+			MatDense<FPP,GPU2> gpuM;
+			this->get_product(gpuM, prod_mod);
+			M = gpuM.tocpu();
 		}
 
 	template<typename FPP>
@@ -475,7 +484,6 @@ namespace Faust
 			TransformHelper<FPP,Cpu> th;
 			this->tocpu(th);
 			auto thn = th.normalize(meth);
-			int flag;
 			auto gpu_thn = new TransformHelper<FPP,GPU2>(*thn, -1, nullptr);
 			delete thn;
 			return gpu_thn;
@@ -569,11 +577,8 @@ namespace Faust
 	template<typename FPP>
 	TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::clone(int32_t dev_id/*=-1*/, void* stream/*=nullptr*/)
 	{
-		auto clone = new TransformHelper<FPP,GPU2>(this->transform->getData(), /* lambda_ */(FPP)1.0, /*optimizedCopy*/false, /*cloning_fact*/ true, /*internal_call*/ true);
-		clone->is_transposed = this->is_transposed;
-		clone->is_conjugate = this->is_conjugate;
-		//TODO: slice etc
-		return clone;
+		//TODO: take the requested device into account
+		return this->clone();
 	}
 
 	template<typename FPP>
@@ -616,7 +621,30 @@ namespace Faust
 			return gpu_faust;
 		}
 
+	template<typename FPP>
+	void TransformHelper<FPP,GPU2>::get_fact(const faust_unsigned_int id,
+			int* rowptr,
+			int* col_ids,
+			FPP* elts,
+			faust_unsigned_int* nnz,
+			faust_unsigned_int* num_rows,
+			faust_unsigned_int* num_cols,
+			const bool transpose /* = false*/) const
+	{
+		this->transform->get_fact(this->is_transposed?this->size()-id-1:id, rowptr, col_ids, elts, nnz, num_rows, num_cols, this->is_transposed ^ transpose);
+		if(this->is_conjugate)
+			Faust::conjugate(elts, *nnz);
+	}
 
+	template<typename FPP>
+		void TransformHelper<FPP,GPU2>::get_fact(const faust_unsigned_int id,
+				FPP* elts,
+				faust_unsigned_int* num_rows,
+				faust_unsigned_int* num_cols,
+				const bool transpose /* = false*/) const
+		{
+			TransformHelperGen<FPP,GPU2>::get_fact(id, elts, num_rows, num_cols, transpose);
+		}
 }
 
 #include "faust_TransformHelper_cat_gpu.hpp"

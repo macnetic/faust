@@ -206,6 +206,7 @@ classdef Faust
 				end
 				F = matfaust.Faust(faust_factors, varargin{2:end});
 			elseif(ismatrix(varargin{1}) && nargin == 1)
+				% create a Faust from a matrix (single factor)
 				c = cell(1, 1);
 				c{1} = varargin{1};
 				F = matfaust.Faust(c, varargin{2:end});
@@ -213,18 +214,18 @@ classdef Faust
 				% create a Faust from another one but not with the same
 				% handle to set inside the FaustCore object (matrix)
 				oF = varargin{1};
-				F.matrix = FaustCore(varargin{2}, oF.isReal);
+				F.matrix = FaustCore(varargin{2}, oF.isReal, oF.dev);
 				F.isReal = oF.isReal;
 				F.dev = oF.dev;
 			elseif(isa(varargin{1}, 'integer') && islogical(varargin{2}))
 				% create a Faust directly with the c++ object handler/pointer without any pre-existing Faust
-				F.matrix = FaustCore(varargin{1}, varargin{2});
 				F.isReal = varargin{2};
 				if(nargin >= 3)
-					F.dev = varargin{3}
+					F.dev = varargin{3};
 				else
-					F.dev = 'cpu'
+					F.dev = 'cpu';
 				end
+				F.matrix = FaustCore(varargin{1}, varargin{2}, F.dev);
 				% hack to raise an error in case of non-consistent handle and isReal arg.
 				try
 					n = numfactors(F);
@@ -1029,7 +1030,7 @@ classdef Faust
 				if (floor(i) ~= i)
 					error('factors second argument (indice) must either be real positive integers or logicals.');
 				end
-				factors{j} = call_mex(F, 'get_fact', i);
+				factors{j} = call_mex(F, 'factors', i);
 			end
 			if(length(factors) > 1)
 				factors = matfaust.Faust(factors);
@@ -1105,45 +1106,6 @@ classdef Faust
 			rfactors = factors(F, i:numfactors(F));
 		end
 
-		%=====================================================================
-		%> @brief DEPRECATED (Use Faust.factors) Returns the i-th factor of F.
-		%>
-		%> @b Usage
-		%>
-		%> &nbsp;&nbsp;&nbsp; @b factor = get_factor_nonopt(F, i)
-		%>
-		%> @param F the Faust object.
-		%> @param i the factor index.
-		%>
-		%> @retval factor the i-th factor as a dense matrix.
-		%>
-		%> @b Example
-		%> @code
-		%>	F = matfaust.rand(5, 10)
-		%>	f1 = get_factor_nonopt(F, 1)
-		%> @endcode
-		%> <p>@b See @b also Faust.numfactors
-		%=====================================================================
-		function factor = get_factor_nonopt(F, i)
-			%% GET_FACT Ith factor of the Faust.
-			%
-			% A=get_factor_nonopt(F,i) return the i factor A of the Faust F as a full storage matrix.
-			%
-			% Example of use :
-			% A=get_factor_nonopt(F,1) returns the 1st factor of the Faust F.
-			% A=get_factor_nonopt(F,4) returns the 4th factor of the Faust F.
-			%
-			% See also numfactors.
-
-			if (~isa(i,'double'))
-				error('get_fact second argument (indice) must either be real positive integers or logicals.');
-			end
-
-			if (floor(i) ~= i)
-				error('get_fact second argument (indice) must either be real positive integers or logicals.');
-			end
-			factor = call_mex(F, 'get_fact_nonopt', i);
-		end
 
 		%==========================================================================================
 		%> @brief The number of factors of F.
@@ -1165,7 +1127,7 @@ classdef Faust
 		%> <p>@b See @b also Faust.factors.
 		%==========================================================================================
 		function num_factors = numfactors(F)
-			num_factors = call_mex(F, 'get_nb_factor');
+			num_factors = call_mex(F, 'numfactors');
 		end
 
 		%==========================================================================================
@@ -1989,11 +1951,7 @@ classdef Faust
 		%> @retval Fc: the Faust clone.
 		%================================================================
 		function Fc = clone(F)
-			facs = {};
-			for i=1:numfactors(F)
-				facs = [ facs {factors(F,i)} ];
-			end
-			Fc = matfaust.Faust(facs);
+			Fc = matfaust.Faust(F, call_mex(F, 'copy'));
 		end
 
 	end

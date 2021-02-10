@@ -234,6 +234,14 @@ namespace Faust
 			int* getColInd(){if(mat.IsRowMajor) return mat.innerIndexPtr(); else{handleError(m_className,"getColInd : matrix is not in rowMajor");}}
 			bool isRowMajor() const{return mat.IsRowMajor;}
 
+			void copyRowPtr(size_t* out_rowptr) const;
+			void copyRowPtr(int* out_rowptr) const;
+			void copyColInd(size_t* out_colInd) const;
+			void copyColInd(int* out_colInd) const;
+			void copyValuePtr(FPP* out_values) const;
+			template <typename U>
+			void copyBufs(U* out_rowptr, U* out_colind, FPP* out_values) const;
+
 			// Virtual Function (inherited method from MatGeneric)
 			MatType getType() const{ return MatType::Sparse;}
 

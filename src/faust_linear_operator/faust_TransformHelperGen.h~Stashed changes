@@ -1,0 +1,35 @@
+#ifndef __FAUST_TRANSFORM_HELPER_DEVICE__
+#define __FAUST_TRANSFORM_HELPER_DEVICE__
+#include "faust_Slice.h"
+#include <memory>
+
+namespace Faust
+{
+	template<typename FPP,FDevice DEVICE> class Transform;
+	template<typename FPP,FDevice DEVICE> class TransformHelper;
+	template<typename FPP,FDevice DEVICE> class Vect;
+	template<typename FPP,FDevice DEVICE> class MatDense;
+	template<typename FPP,FDevice DEVICE> class MatGeneric;
+
+	template<typename FPP, FDevice DEV>
+	class TransformHelperGen
+	{
+		public:
+		TransformHelperGen();
+
+		protected:
+			bool is_transposed;
+			bool is_conjugate;
+			bool is_sliced;
+			Slice slices[2];
+			bool is_fancy_indexed;
+			faust_unsigned_int * fancy_indices[2];
+			faust_unsigned_int fancy_num_rows;
+			faust_unsigned_int fancy_num_cols;
+			std::shared_ptr<Transform<FPP,DEV>> transform;
+	};
+}
+#include "faust_TransformHelperGen.hpp"
+#endif
+
+

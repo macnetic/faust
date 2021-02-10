@@ -66,6 +66,15 @@
 #include "new_faust.h"
 #include "faust_disp.h"
 #include "faust_delete.h"
+#include "faust_size.h"
+#include "faust_full.h"
+#include "faust_norm.h"
+#include "faust_normalize.h"
+#include "faust_copy.h"
+#include "faust_nbytes.h"
+#include "faust_numfactors.h"
+#include "faust_factors.h"
+#include "faust_rand.h"
 
 typedef @FAUST_SCALAR@ SCALAR;
 typedef @FAUST_FPP@ FPP;
@@ -120,42 +129,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		if (nrhs < 2)
 			mexErrMsgTxt("Second input should be a class instance handle.");
 
-		if(!strcmp("rand", cmd)){
-			if(nlhs!=1)
-				mexErrMsgTxt("rand(): 1 variable result is expected.");
-			if(nrhs < 6)
-				mexErrMsgTxt("rand(): wrong number of arguments (must be 6 to 7)");
-			//printf("mexFaust.cpp rand(): retrieving arguments\n");
-			int num_rows = mxGetScalar(prhs[1]), num_cols =mxGetScalar(prhs[2]);
-			faust_unsigned_int t = (faust_unsigned_int) mxGetScalar(prhs[3]),
-							   min_num_factors = (faust_unsigned_int) mxGetScalar(prhs[4]),
-							   max_num_factors = (faust_unsigned_int) mxGetScalar(prhs[5]),
-							   min_dim_size = (faust_unsigned_int) mxGetScalar(prhs[6]),
-							   max_dim_size = (faust_unsigned_int) mxGetScalar(prhs[7]);
-			float density = (float) mxGetScalar(prhs[8]);
-			bool per_row = (bool) mxGetScalar(prhs[9]);
-
-			//printf("mexFaust.cpp rand(): faust creation\n");
-			Faust::TransformHelper<SCALAR,Cpu>* F = Faust::TransformHelper<SCALAR,Cpu>::randFaust(
-					num_rows,
-					num_cols,
-					RandFaustType(t),
-					min_num_factors,
-					max_num_factors,
-					min_dim_size,
-					max_dim_size,
-					density,
-					per_row);
-
-			if(F) //not NULL
-				plhs[0]=convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(F);
-			else {
-				plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
-				double* ptr_out = (double*) mxGetData(plhs[0]);
-				ptr_out[0]=(double) 0;
-			}
+		if(!strcmp("rand", cmd))
+		{
+			faust_rand<FPP,Cpu>(prhs, nrhs, plhs, nlhs);
 			return;
-
 		}
 		//TODO: hadamard, fourier, and proxs must be in there own mex function (one for hadamard and fourier, another for the prox)
 		if(!strcmp("hadamard", cmd)){
@@ -370,13 +347,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 		if (!strcmp("size",cmd))
 		{
-			const size_t SIZE_B1 = core_ptr->getNbRow();
-			const size_t SIZE_B2 = core_ptr->getNbCol();
-			const mwSize dims[2]={1,2};
-			plhs[0]=mxCreateNumericArray(2,dims,mxDOUBLE_CLASS,mxREAL);
-			double* ptr_out = (double*) mxGetData(plhs[0]);
-			ptr_out[0]=(double) SIZE_B1;
-			ptr_out[1]=(double) SIZE_B2;
+
+			faust_size<SCALAR,Cpu>(prhs, nrhs, plhs, nlhs);
 			return;
 		}
 
@@ -398,65 +370,22 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			return;
 		}
 
-		// get_fact : return the id factor of the faust
-		if (!strcmp("get_fact_nonopt", cmd))
-		{
-			if (nlhs > 1 || nrhs != 3)
-			{
-				mexErrMsgTxt("get_factor_nonopt : incorrect number of arguments.");
-			}
-			int id_fact = (faust_unsigned_int) (mxGetScalar(prhs[2])-1);
-
-			Faust::MatDense<SCALAR,Cpu> dense_factor = core_ptr->get_fact(id_fact);
-
-			//*conversion to mxArray*/
-			plhs[0]=FaustMat2mxArray(dense_factor);
-			return;
-		}
-
 		// get_fact : return the id-th factor of the faust
-		if (!strcmp("get_fact", cmd))
+		if (!strcmp("factors", cmd))
 		{
-			if (nlhs > 1 || nrhs != 3)
-			{
-				mexErrMsgTxt("get_factor : incorrect number of arguments.");
-			}
-			int id_fact = (faust_unsigned_int) (mxGetScalar(prhs[2])-1);
-
-			if(core_ptr->is_fact_sparse(id_fact))
-				plhs[0] = transformFact2SparseMxArray(id_fact,core_ptr);
-			else
-				plhs[0] = transformFact2FullMxArray(id_fact,core_ptr);
+			faust_factors<SCALAR, Cpu>(prhs, nrhs, plhs, nlhs);
 			return;
 		}
 
-		if (!strcmp("get_nb_factor", cmd))
+		if (!strcmp("numfactors", cmd))
 		{
-			if (nlhs != 1 || nrhs != 2)
-			{
-				mexErrMsgTxt("get_nb_factor : incorrect number of arguments.");
-			}
-
-			faust_unsigned_int nb_fact = core_ptr->size();
-			plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
-			double* ptr_out = (double*) mxGetData(plhs[0]);
-			ptr_out[0]=(double) nb_fact;
+			faust_numfactors<SCALAR, Cpu>(prhs, nrhs, plhs, nlhs);
 			return;
-
-
 		}
 
 		if (!strcmp("nbytes", cmd))
 		{
-			if (nlhs != 1 || nrhs != 2)
-			{
-				mexErrMsgTxt("get_nb_factor : incorrect number of arguments.");
-			}
-
-			faust_unsigned_int nbytes = core_ptr->getNBytes();
-			plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
-			double* ptr_out = (double*) mxGetData(plhs[0]);
-			ptr_out[0]= (double) nbytes;
+			faust_nbytes<SCALAR, Cpu>(prhs, nrhs, plhs, nlhs);
 			return;
 		}
 
@@ -466,122 +395,34 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			return;
 		}
 
-
 		if (!strcmp("full",cmd))
 		{
-
-			if (nlhs != 1 || nrhs != 2)
-				mexErrMsgTxt("full: Unexpected arguments");
-			if(core_ptr->size() == 0)
-				mexErrMsgTxt("full : empty faust core");
-
-			faust_unsigned_int nbRowOp,nbColOp;
-			const size_t SIZE_B1 = core_ptr->getNbRow();
-			const size_t SIZE_B2 = core_ptr->getNbCol();
-			Faust::MatDense<SCALAR,Cpu> prod=core_ptr->get_product();
-			const mwSize dims[2]={SIZE_B1,SIZE_B2};
-
-
-			plhs[0] = FaustMat2mxArray(prod);
+			faust_full<SCALAR,Cpu>(prhs, nrhs, plhs, nlhs);
 			return;
 		}
 
-		// compute the 2-norm of the faust
 		if (!strcmp("norm",cmd))
 		{
-			if (nlhs != 1 || nrhs > 5 || nrhs < 3)
-				mexErrMsgTxt("norm: Unexpected arguments");
-			if(core_ptr->size() == 0)
-				mexErrMsgTxt("norm : empty faust core");
-
-			double precision =  0.001;
-			double norm_faust;
-			int nbr_iter_max=100;
-			int flag;
-			int ord = (int) mxGetScalar(prhs[2]);
-
-			if(nrhs > 3)
-				// the treshold come before
-				precision = mxGetScalar(prhs[3]); //mxGetUint32s not available before mat2019
-			if(nrhs > 4)
-			{
-				nbr_iter_max = (int) mxGetScalar(prhs[4]);
-				if(nbr_iter_max < 0 || nbr_iter_max > 1000000000)
-				{
-					mexWarnMsgTxt("Invalid max_num_its value, go back to default value.");
-					nbr_iter_max=100;
-				}
-			}
-
-			if(ord==2)
-				norm_faust = (double) core_ptr->spectralNorm(nbr_iter_max,precision,flag);
-			else if(ord==1)
-				norm_faust = (double) core_ptr->normL1();
-			else if(ord == -(1<<(32-1))) //that's the value for 'inf' in matlab
-				// a constant from c-c++ would be better
-				norm_faust = (double) core_ptr->normInf();
-			else
-				mexErrMsgTxt("norm : invalid norm order.");
-
-			plhs[0]=mxCreateDoubleScalar(norm_faust);
-
+			faust_norm<SCALAR,Cpu>(prhs, nrhs, plhs, nlhs);
 			return;
 		}
 
 		if(!strcmp("normfro", cmd))
 		{
-			if (nlhs != 1 || nrhs != 2)
-				mexErrMsgTxt("normfro: Unexpected arguments");
-			if(core_ptr->size() == 0)
-				mexErrMsgTxt("normfro : empty faust core");
-
-
-			double norm_faust;
-
-			norm_faust = core_ptr->normFro();
-
-			plhs[0]=mxCreateDoubleScalar(norm_faust);
-
+			faust_norm_fro<SCALAR,Cpu>(prhs, nrhs, plhs, nlhs);
 			return;
-
 		}
 
 		if(!strcmp("normalize", cmd))
 		{
-			int ord = (int) mxGetScalar(prhs[2]);
-			Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->normalize(ord);
-			plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
+			faust_normalize<SCALAR,Cpu>(prhs, nrhs, plhs, nlhs);
 			return;
 		}
 
 		if (!strcmp("copy",cmd))
 		{
-
-
-
-			if (nlhs > 1)
-				mexErrMsgTxt("copy : too much output argument");
-			else
-			{
-				//Faust::Timer t1,t2,t3;
-				//t1.start();
-				//				Faust::Transform<SCALAR,Cpu>* F = new Faust::Transform<SCALAR,Cpu>((*core_ptr));
-				//t1.stop();
-				//t2.start();
-				//(*F).transpose();
-				//t2.stop();
-				//t3.start();
-				//				plhs[0]=convertPtr2Mat<Faust::Transform<SCALAR,Cpu> >(F);
-				//				plhs[0]=convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(F);
-				//t3.stop();
-				//std::cout<<"t1 new : "<<t1.get_time()<<std::endl;
-				//std::cout<<"t2 transpose : "<<t2.get_time()<<std::endl;
-				//std::cout<<"t3 convertPtrMat : "<<t3.get_time()<<std::endl;
-				TransformHelper<SCALAR,Cpu>* th = new TransformHelper<SCALAR,Cpu>(core_ptr);
-				plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
-			}
+			faust_copy<SCALAR,Cpu>(prhs, nrhs, plhs, nlhs);
 			return;
-
 		}
 
 
@@ -631,8 +472,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 					mexErrMsgTxt("impossibility to multiply a real Faust with complex matrix");
 
 				mxArray2Ptr(inMatlabMatrix, ptr_data);
-
-				// Si inMatlabMatrix est un vecteur
 
 				if(nbColA == 1)
 				{

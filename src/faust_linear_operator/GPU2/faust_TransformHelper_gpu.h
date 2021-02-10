@@ -38,6 +38,7 @@ namespace Faust
 				std::string to_string() const;
 				MatDense<FPP,GPU2> get_product(int prod_mod=-1);
 				void get_product(MatDense<FPP,GPU2>& M, int prod_mod=-1);
+				void get_product(MatDense<FPP,Cpu>& M, int prod_mod=-1);
 				MatDense<FPP,GPU2> multiply(const MatDense<FPP,GPU2> &A, const bool transpose=false, const bool conjugate=false);
 				MatDense<FPP,Cpu> multiply(const Faust::MatDense<FPP,Cpu> &A, const bool transpose=false, const bool conjugate=false);
 				TransformHelper<FPP,GPU2>* multiply(const FPP& a);
@@ -73,6 +74,19 @@ namespace Faust
 				TransformHelper<FPP,GPU2>* optimize_time(const bool transp=false, const bool inplace=false, const int nsamples=1);
 				TransformHelper<FPP,GPU2>* optimize(const bool transp=false);
 				TransformHelper<FPP,GPU2>* clone(int32_t dev_id=-1, void* stream=nullptr);
+				void get_fact(const faust_unsigned_int id,
+						int* rowptr,
+						int* col_ids,
+						FPP* elts,
+						faust_unsigned_int* nnz,
+						faust_unsigned_int* num_rows,
+						faust_unsigned_int* num_cols,
+						const bool transpose /* = false*/) const;
+				void get_fact(const faust_unsigned_int id,
+						FPP* elts,
+						faust_unsigned_int* num_rows,
+						faust_unsigned_int* num_cols,
+						const bool transpose  = false) const;
 
 				void save_mat_file(const char* filepath) const;
 				static TransformHelper<FPP,GPU2>* hadamardFaust(unsigned int n, const bool norma=true);

@@ -38,12 +38,12 @@
 /*                                                                          */
 /*                              References:                                 */
 /*  [1] Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse       */
-/*  approximations of matrices and applications", Journal of Selected       */
+/*  apfactorsimations of matrices and applications", Journal of Selected       */
 /*  Topics in Signal Processing, 2016.                                      */
 /*  <https://hal.archives-ouvertes.fr/hal-01167948v1>                       */
-#ifndef __MEX_FAUST_DISP__
-#define __MEX_FAUST_DISP__
+#ifndef __MEX_FAUST_FACTORS__
+#define __MEX_FAUST_FACTORS__
 template <typename SCALAR, FDevice DEV>
-void faust_disp(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs);
-#include "faust_disp.hpp"
+void faust_factors(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs);
+#include "faust_factors.hpp"
 #endif

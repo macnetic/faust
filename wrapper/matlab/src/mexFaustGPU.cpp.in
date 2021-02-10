@@ -64,8 +64,17 @@
 #include "new_faust.h"
 #include "faust_disp.h"
 #include "faust_delete.h"
+#include "faust_size.h"
+#include "faust_full.h"
+#include "faust_norm.h"
+#include "faust_normalize.h"
+#include "faust_copy.h"
+#include "faust_nbytes.h"
+#include "faust_numfactors.h"
+#include "faust_factors.h"
 #include "faust_gpu_mod_utils.h"
 #include "faust_TransformHelper_gpu.h"
+#include "faust_rand.h"
 
 typedef @FAUST_SCALAR@ SCALAR;
 typedef @FAUST_FPP@ FPP;
@@ -100,13 +109,30 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 		if (!strcmp("new", cmd))
 			new_faust<SCALAR,GPU2>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("rand", cmd))
+			faust_rand<FPP,GPU2>(prhs, nrhs, plhs, nlhs);
 		else if (! strcmp("disp",cmd))
 			faust_disp<SCALAR,GPU2>(prhs, nrhs, plhs, nlhs);
 		else if (!strcmp("delete", cmd))
-		{
-			faust_delete<SCALAR,Cpu>(prhs, nrhs, plhs, nlhs);
-		}
-
+			faust_delete<SCALAR,GPU2>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("size", cmd))
+			faust_size<SCALAR,GPU2>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("full", cmd))
+			faust_full<SCALAR,GPU2>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("norm", cmd))
+			faust_norm<SCALAR,GPU2>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("normfro", cmd))
+			faust_norm_fro<SCALAR,GPU2>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("normalize", cmd))
+			faust_normalize<SCALAR,GPU2>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("copy", cmd))
+			faust_copy<SCALAR,GPU2>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("nbytes", cmd))
+			faust_nbytes<SCALAR, GPU2>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("numfactors", cmd))
+			faust_numfactors<SCALAR, GPU2>(prhs, nrhs, plhs, nlhs);
+		else if (!strcmp("factors", cmd))
+			faust_factors<SCALAR, GPU2>(prhs, nrhs, plhs, nlhs);
 
 	}
 	catch (const std::exception& e)

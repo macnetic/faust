@@ -46,11 +46,12 @@ classdef FaustCore < handle
 	properties (SetAccess = public, Hidden = false)
 		objectHandle; % Handle to the underlying C++ class instance
 		isRealFlag;
+		dev;
 	end
 	methods
 		%% Constructor - Create a new C++ class instance
 		function this = FaustCore(varargin)
-			if(nargin == 2) && ~iscell(varargin{1}) %&& isa(varargin{1}, 'handle'))
+			if(nargin == 3) && ~iscell(varargin{1}) %&& isa(varargin{1}, 'handle'))
 				%if(~ isvalid(varargin{1}))
 				%    error('FaustCore: invalid handle to copy passed to the constructor.')
 				%end
@@ -59,12 +60,14 @@ classdef FaustCore < handle
 					error('FaustCore: invalid argument 2 (isReal) passed to the constructor, must be equal to 0 or 1');
 				end
 				this.isRealFlag = varargin{2};
+				this.dev = varargin{3};
 			elseif(nargin >= 1)
 				factors = varargin{1};
 				scale = varargin{2};
 				optCopy = varargin{3};
 				isRealFlag = varargin{4};
-				onGPU = ~ strcmp(varargin{5}, 'cpu');
+				this.dev = varargin{5};
+				onGPU = startsWith(this.dev, 'gpu');
 				% varargin{2} is lambda (optional)
 				% varargin{3} is optimizedCopy boolean (not documented).
 				if(onGPU)
@@ -88,10 +91,19 @@ classdef FaustCore < handle
 		function delete(this)
 			% destructor delete the faust
 			if(isa(this.objectHandle, 'integer'))
-				if (this.isRealFlag)
-					mexFaustReal('delete', this.objectHandle);
+				if(startsWith(this.dev, 'gpu'))
+					if (this.isRealFlag)
+						mexFaustGPUReal('delete', this.objectHandle);
+					else
+						mexFaustGPUCplx('delete', this.objectHandle);
+					end
+
 				else
-					mexFaustCplx('delete', this.objectHandle);
+					if (this.isRealFlag)
+						mexFaustReal('delete', this.objectHandle);
+					else
+						mexFaustCplx('delete', this.objectHandle);
+					end
 				end
 			end
 		end

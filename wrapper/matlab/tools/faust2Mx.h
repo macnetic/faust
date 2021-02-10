@@ -84,6 +84,8 @@ mxArray*  FaustMat2mxArray(const Faust::MatDense<FPP,Cpu>& M);
 template<typename FPP>
 mxArray*  FaustMat2mxArray(const Faust::MatDense<std::complex<FPP>,Cpu>& M);
 
+template<typename FPP>
+mxArray*  FaustSpMat2mxArray(const Faust::MatSparse<FPP,Cpu>& M);
 
 
 
@@ -108,17 +110,17 @@ template<typename FPP>
 void DisplayParams(const Faust::Params<FPP,Cpu> & params);
 
 
-template<typename FPP>
-mxArray* transformFact2SparseMxArray(faust_unsigned_int id, Faust::TransformHelper<FPP,Cpu>* core_ptr);
+template<typename FPP, FDevice DEV>
+mxArray* transformFact2SparseMxArray(faust_unsigned_int id, Faust::TransformHelper<FPP,DEV>* core_ptr);
 
-template<typename FPP>
-mxArray* transformFact2SparseMxArray(faust_unsigned_int id, Faust::TransformHelper<complex<FPP>,Cpu>* core_ptr);
+template<typename FPP, FDevice DEV>
+mxArray* transformFact2SparseMxArray(faust_unsigned_int id, Faust::TransformHelper<complex<FPP>,DEV>* core_ptr);
 
-template<typename FPP>
-mxArray* transformFact2FullMxArray(faust_unsigned_int id, Faust::TransformHelper<FPP,Cpu>* core_ptr);
+template<typename FPP, FDevice DEV>
+mxArray* transformFact2FullMxArray(faust_unsigned_int id, Faust::TransformHelper<FPP,DEV>* core_ptr);
 
-template<typename FPP>
-mxArray* transformFact2FullMxArray(faust_unsigned_int id, Faust::TransformHelper<complex<FPP>,Cpu>* core_ptr);
+template<typename FPP, FDevice DEV>
+mxArray* transformFact2FullMxArray(faust_unsigned_int id, Faust::TransformHelper<complex<FPP>,DEV>* core_ptr);
 
 template<typename FPP>
 void mxArray2Scalar(const mxArray* scalar, typename std::enable_if<std::is_floating_point<FPP>::value,FPP>::type* out);

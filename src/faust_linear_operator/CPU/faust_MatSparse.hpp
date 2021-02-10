@@ -1147,6 +1147,48 @@ size_t Faust::MatSparse<FPP,Cpu>::getNBytes() const
 	return this->getNonZeros()*(sizeof(FPP)+sizeof(int))+(this->getNbRow()+1)*sizeof(int);
 }
 
+template<typename FPP>
+void Faust::MatSparse<FPP,Cpu>::copyRowPtr(size_t* out_rowptr) const
+{
+	auto rowptr = getRowPtr();
+	for(int i=0;i<=this->getNbRow();i++)
+		out_rowptr[i] = rowptr[i];
+}
+
+template<typename FPP>
+void Faust::MatSparse<FPP,Cpu>::copyRowPtr(int* out_rowptr) const
+{
+	memcpy(out_rowptr, getRowPtr(), sizeof(int)*(this->getNbRow()+1));
+}
+
+template<typename FPP>
+void Faust::MatSparse<FPP,Cpu>::copyColInd(size_t* out_colInd) const
+{
+	auto colind = getColInd();
+	for(int i=0;i<this->getNonZeros();i++)
+		out_colInd[i] = colind[i];
+}
+
+template<typename FPP>
+void Faust::MatSparse<FPP,Cpu>::copyColInd(int* out_colInd) const
+{
+	memcpy(out_colInd, getColInd(), sizeof(int)*this->getNonZeros());
+}
+
+template<typename FPP>
+void Faust::MatSparse<FPP,Cpu>::copyValuePtr(FPP* out_values) const
+{
+	memcpy(out_values, getValuePtr(), sizeof(FPP)*this->getNonZeros());
+}
+
+template<typename FPP>
+template<typename U>
+void Faust::MatSparse<FPP,Cpu>::copyBufs(U* out_rowptr, U* out_colind, FPP* out_values) const
+{
+	copyValuePtr(out_values);
+	copyRowPtr(out_rowptr);
+	copyColInd(out_colind);
+}
 
 
 #endif

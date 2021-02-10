@@ -11,6 +11,5 @@ void faust_disp(const mxArray **prhs, const int nrhs, mxArray **plhs, const int 
 	// matlab terminal doesn't receive the mex lib std output
 	// we must use mexPrintf() to display content
 	mexPrintf(core_ptr->to_string().c_str());
-	return;
 }
 

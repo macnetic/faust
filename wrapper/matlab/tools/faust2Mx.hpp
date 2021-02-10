@@ -73,23 +73,6 @@ mxArray*  FaustMat2mxArray(const Faust::MatDense<FPP,Cpu>& M)
 	row = M.getNbRow();
 	col = M.getNbCol();
 
-	/*mxMat = mxCreateDoubleMatrix(row,col,mxREAL);
-	  double* mxMatdata = mxGetPr(mxMat);
-
-	  if (typeid(double) == typeid(FPP))
-	  memcpy(mxMatdata,M.getData(),sizeof(double)*row*col);			
-
-	  else
-	  {
-	  double*	 mat_ptr = (double *) mxCalloc(row*col,sizeof(double));
-	  for (int i=0;i<row*col;i++)
-	  {
-	  mat_ptr[i] = (double) M.getData()[i];
-	  }
-	  memcpy(mxMatdata,mat_ptr,sizeof(double)*row*col);
-	  mxFree(mat_ptr);
-
-	  }*/
 	const mwSize dims[3]={(mwSize)row,(mwSize)col};
 	if(typeid(FPP)==typeid(float))
 	{
@@ -103,7 +86,7 @@ mxArray*  FaustMat2mxArray(const Faust::MatDense<FPP,Cpu>& M)
 	}
 
 	FPP*    ptr_out = static_cast<FPP*> (mxGetData(mxMat));
-	memcpy(ptr_out, M.getData(),row*col*sizeof(FPP));	
+	memcpy(ptr_out, M.getData(), row*col*sizeof(FPP));
 
 
 	return mxMat;
@@ -271,9 +254,34 @@ void setCellFacts(mxArray **  cellFacts,std::vector<Faust::MatDense<FPP,Cpu> >& 
 
 }
 
+template<typename FPP>
+mxArray*  FaustSpMat2mxArray(const Faust::MatSparse<FPP,Cpu>& M)
+{
+	faust_unsigned_int nnz = M.getNonZeros();
+	mxArray* sparseMat = mxCreateSparse(M.getNbRow(),
+			M.getNbCol(),
+			nnz,
+			mxREAL);
+	mwIndex* ir = mxGetIr(sparseMat);
+	mwIndex* jc = mxGetJc(sparseMat);
+	FPP* pr = static_cast<FPP*>(mxGetPr(sparseMat));
+	// sadly we can't do a direct copy into ir and jc because MatSparse uses int type for indices
+	// (not mwIndex which is in fact a size_t)
+	// so we need to copy in intermediate buffers and then affect their elements
+	// into jc, ir
+	auto tM = M;
+	// transpose M because matlab is in CSC format while Faust is in CSR
+	tM.transpose();
+//	tM.copyRowPtr(jc);
+//	tM.copyColInd(ir);
+//	tM.copyValuePtr(pr);
+	tM.copyBufs(jc, ir, pr);
+	return sparseMat;
+}
 
-	template<typename FPP>
-mxArray* transformFact2SparseMxArray(faust_unsigned_int id, Faust::TransformHelper<FPP,Cpu>* core_ptr)
+
+	template<typename FPP, FDevice DEV>
+mxArray* transformFact2SparseMxArray(faust_unsigned_int id, Faust::TransformHelper<FPP, DEV>* core_ptr)
 {
 	mxArray* sparseMat = mxCreateSparse(core_ptr->get_fact_nb_rows(id),
 			core_ptr->get_fact_nb_cols(id),
@@ -320,8 +328,8 @@ mxArray* transformFact2SparseMxArray(faust_unsigned_int id, Faust::TransformHelp
 	return sparseMat;
 }
 
-template<typename FPP>
-mxArray* transformFact2SparseMxArray(faust_unsigned_int id, Faust::TransformHelper<complex<FPP>,Cpu>* core_ptr)
+template<typename FPP, FDevice DEV>
+mxArray* transformFact2SparseMxArray(faust_unsigned_int id, Faust::TransformHelper<complex<FPP>,DEV>* core_ptr)
 {
 	mxArray* sparseMat = mxCreateSparse(core_ptr->get_fact_nb_rows(id),
 			core_ptr->get_fact_nb_cols(id),
@@ -348,8 +356,8 @@ mxArray* transformFact2SparseMxArray(faust_unsigned_int id, Faust::TransformHelp
 	return sparseMat;
 }
 
-template<typename FPP>
-mxArray* transformFact2FullMxArray(faust_unsigned_int id, Faust::TransformHelper<FPP,Cpu>* core_ptr)
+template<typename FPP, FDevice DEV>
+mxArray* transformFact2FullMxArray(faust_unsigned_int id, Faust::TransformHelper<FPP,DEV>* core_ptr)
 {
 	const mwSize dim_sizes[2] = {core_ptr->get_fact_nb_rows(id),
 			core_ptr->get_fact_nb_cols(id)};
@@ -367,8 +375,8 @@ mxArray* transformFact2FullMxArray(faust_unsigned_int id, Faust::TransformHelper
 }
 
 
-template<typename FPP>
-mxArray* transformFact2FullMxArray(faust_unsigned_int id, Faust::TransformHelper<complex<FPP>,Cpu>* core_ptr)
+template<typename FPP, FDevice DEV>
+mxArray* transformFact2FullMxArray(faust_unsigned_int id, Faust::TransformHelper<complex<FPP>,DEV>* core_ptr)
 {
 	const mwSize dim_sizes[2] = {core_ptr->get_fact_nb_rows(id),
 		core_ptr->get_fact_nb_cols(id)};
@@ -402,6 +410,7 @@ mxArray* transformFact2FullMxArray(faust_unsigned_int id, Faust::TransformHelper
 	// in real and imaginary part to copy, directly copy into mxArray with get_fact() in the pointer returned by mxComplexSingles()/mxComplexDoubles()
 	return fullMat;
 }
+
 template<class FPP>
 void  mxArray2Scalar(const mxArray* scalar, typename std::enable_if<std::is_floating_point<FPP>::value, FPP>::type* out)
 {
