@@ -75,13 +75,12 @@
 #include "faust_numfactors.h"
 #include "faust_factors.h"
 #include "faust_rand.h"
+#include "faust_save.h"
 
 typedef @FAUST_SCALAR@ SCALAR;
 typedef @FAUST_FPP@ FPP;
 
 using namespace Faust;
-
-void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray **args);
 
 template<typename T>
 void fourierFaust(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
@@ -131,7 +130,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 		if(!strcmp("rand", cmd))
 		{
-			faust_rand<FPP,Cpu>(prhs, nrhs, plhs, nlhs);
+			faust_rand<SCALAR,Cpu>(prhs, nrhs, plhs, nlhs);
 			return;
 		}
 		//TODO: hadamard, fourier, and proxs must be in there own mex function (one for hadamard and fourier, another for the prox)
@@ -501,7 +500,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		}
 
 		if(!strcmp("save", cmd))
-			return save(convertMat2Ptr<Faust::TransformHelper<SCALAR,Cpu> >(prhs[1]), nrhs-2, &prhs[2]);
+			return faust_save<FPP,Cpu>(prhs, nrhs, plhs, nlhs);
 
 		if(!strcmp("transpose", cmd)) { //TODO: verify no arguments passed or 
 			Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->transpose();
@@ -694,32 +693,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	{
 		mexErrMsgTxt(e.what());
 	}
-}
-
-void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray **args)
-{
-	const size_t MAX_PATH_SIZE=512;
-	char filepath[MAX_PATH_SIZE];
-	// args[0] must be the filepath
-    // args[1] must be the boolean for tranposing or not at write time
-	// nargs the number of arguments in args (must be 2)
-    if(nargs != 1){
-            mexErrMsgTxt("The number of arguments for the save function is not valid.");
-            return;
-        }
-        if(mxGetString(args[0], filepath, sizeof(filepath)) || strlen(filepath) == 0){
-            mexErrMsgTxt("The filepath is not valid.");
-            return;
-        }
-        //	printf("save: filepath = %s, nargs = %d\n", filepath, nargs);
-		try
-		{
-			core_ptr->save_mat_file(filepath/*, mxGetScalar(args[1])*/);
-		}
-		catch(exception& e)
-		{
-			mexErrMsgTxt("Failed to save the file.");
-		}
 }
 
 template<typename T>

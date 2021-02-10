@@ -400,9 +400,9 @@ mxArray* transformFact2FullMxArray(faust_unsigned_int id, Faust::TransformHelper
 	}
 	else
 	{
-		const complex<FPP>* src_data_ptr;
+		complex<FPP>* src_data_ptr;
 		//not calling the same prototype of get_fact() called in transpose case (and real version of this function)
-		core_ptr->get_fact(id, &src_data_ptr, &num_rows, &num_cols);
+		core_ptr->get_fact(id, src_data_ptr, &num_rows, &num_cols);
 		splitComplexPtr(src_data_ptr, num_rows*num_cols, data_ptr, img_data_ptr, core_ptr->isConjugate());//let conjugate to false because it's handled internally by get_fact()
 
 	}

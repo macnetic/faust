@@ -75,6 +75,7 @@
 #include "faust_gpu_mod_utils.h"
 #include "faust_TransformHelper_gpu.h"
 #include "faust_rand.h"
+#include "faust_save.h"
 
 typedef @FAUST_SCALAR@ SCALAR;
 typedef @FAUST_FPP@ FPP;
@@ -110,7 +111,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		if (!strcmp("new", cmd))
 			new_faust<SCALAR,GPU2>(prhs, nrhs, plhs, nlhs);
 		else if(!strcmp("rand", cmd))
-			faust_rand<FPP,GPU2>(prhs, nrhs, plhs, nlhs);
+			faust_rand<SCALAR,GPU2>(prhs, nrhs, plhs, nlhs);
 		else if (! strcmp("disp",cmd))
 			faust_disp<SCALAR,GPU2>(prhs, nrhs, plhs, nlhs);
 		else if (!strcmp("delete", cmd))
@@ -133,6 +134,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			faust_numfactors<SCALAR, GPU2>(prhs, nrhs, plhs, nlhs);
 		else if (!strcmp("factors", cmd))
 			faust_factors<SCALAR, GPU2>(prhs, nrhs, plhs, nlhs);
+		else if (!strcmp("save", cmd))
+			faust_save<SCALAR, GPU2>(prhs, nrhs, plhs, nlhs);
 
 	}
 	catch (const std::exception& e)
