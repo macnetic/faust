@@ -76,6 +76,10 @@
 #include "faust_TransformHelper_gpu.h"
 #include "faust_rand.h"
 #include "faust_save.h"
+#include "faust_conj.h"
+#include "faust_transpose.h"
+#include "faust_ctranspose.h"
+
 
 typedef @FAUST_SCALAR@ SCALAR;
 typedef @FAUST_FPP@ FPP;
@@ -136,6 +140,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			faust_factors<SCALAR, GPU2>(prhs, nrhs, plhs, nlhs);
 		else if (!strcmp("save", cmd))
 			faust_save<SCALAR, GPU2>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("conj", cmd))
+			faust_conj<SCALAR,GPU2>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("transpose", cmd))
+			faust_transpose<SCALAR,GPU2>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("ctranspose", cmd))
+			faust_ctranspose<SCALAR,GPU2>(prhs, nrhs, plhs, nlhs);
 
 	}
 	catch (const std::exception& e)

@@ -76,6 +76,10 @@
 #include "faust_factors.h"
 #include "faust_rand.h"
 #include "faust_save.h"
+#include "faust_conj.h"
+#include "faust_transpose.h"
+#include "faust_ctranspose.h"
+
 
 typedef @FAUST_SCALAR@ SCALAR;
 typedef @FAUST_FPP@ FPP;
@@ -500,18 +504,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		}
 
 		if(!strcmp("save", cmd))
-			return faust_save<FPP,Cpu>(prhs, nrhs, plhs, nlhs);
+			return faust_save<SCALAR,Cpu>(prhs, nrhs, plhs, nlhs);
 
-		if(!strcmp("transpose", cmd)) { //TODO: verify no arguments passed or 
-			Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->transpose();
-			plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
-#ifdef FAUST_VERBOSE
-			printf("new ptr for Faust transpose's TransformHelper obj=%p\n", th);
-			printf("transpose()\n");
-			printf("isTransposed()=%d\n",th->isTransposed());
-#endif
-			return;
-		}
+
 
 		if(!strcmp("optimize_storage", cmd)) { //TODO: verify no arguments passed or 
 			if(nrhs != 3)
@@ -565,28 +560,19 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			return;
 		}
 
-		if(!strcmp("conj", cmd)) { //TODO: verify no arguments passed or 
-			Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->conjugate();
-			plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
-#ifdef FAUST_VERBOSE
-			printf("new ptr for Faust conjugate's TransformHelper obj=%p\n", th);
-			printf("conjugate()\n");
-			printf("isConjugate()=%d\n",th->isConjugate());
-#endif
+		if(!strcmp("conj", cmd)) {
+			faust_conj<SCALAR,Cpu>(prhs, nrhs, plhs, nlhs);
+			return;
+		}
+
+		if(!strcmp("transpose", cmd)) {
+			faust_transpose<SCALAR,Cpu>(prhs, nrhs, plhs, nlhs);
 			return;
 		}
 
 		if(!strcmp("ctranspose", cmd)) {
-			Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->adjoint();
-			plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
-#ifdef FAUST_VERBOSE
-			printf("new ptr for Faust conjugate's TransformHelper obj=%p\n", th);
-			printf("conjugate()\n");
-			printf("isConjugate()=%d\n",th->isConjugate());
-			printf("isTransposed()=%d\n", th->isTransposed());
-#endif
+			faust_ctranspose<SCALAR,Cpu>(prhs, nrhs, plhs, nlhs);
 			return;
-
 		}
 
 		if(!strcmp("subsref", cmd)){
