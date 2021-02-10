@@ -162,7 +162,6 @@ namespace Faust
 			TransformHelper<FPP,Cpu>* adjoint() const;
 			TransformHelper<FPP,Cpu>* vertcat(const TransformHelper<FPP,Cpu>*);
 			TransformHelper<FPP,Cpu>* horzcat(const TransformHelper<FPP,Cpu>*);
-			bool isConjugate() const;
 			double normL1() const;
 			double normFro() const;
 			double normInf() const;

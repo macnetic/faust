@@ -42,6 +42,7 @@ namespace Faust
 
 			const char isTransposed2char() const;
 			bool isTransposed() const;
+			bool isConjugate() const;
 			void enable_gpu_meth_for_mul(){}; //TODO: remove later (it is only a special case of TransformHelper Cpu)
 
 			virtual faust_unsigned_int size() const=0;

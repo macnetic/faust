@@ -966,14 +966,6 @@ template<typename FPP>
 
 
 template<typename FPP>
-	bool TransformHelper<FPP,Cpu>::isConjugate() const
-	{
-		return this->is_conjugate;
-	}
-
-
-
-template<typename FPP>
 	double TransformHelper<FPP,Cpu>::normL1() const {
 		return this->transform->normL1(this->is_transposed);
 	}

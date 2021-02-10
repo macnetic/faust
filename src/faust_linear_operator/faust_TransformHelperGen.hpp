@@ -460,4 +460,10 @@ namespace Faust
 			clone->copy_mul_mode_state(*th);
 			return clone;
 		}
+
+	template<typename FPP, FDevice DEV>
+		bool TransformHelperGen<FPP,DEV>::isConjugate() const
+		{
+			return this->is_conjugate;
+		}
 }
