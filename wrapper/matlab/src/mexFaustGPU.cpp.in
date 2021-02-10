@@ -79,7 +79,12 @@
 #include "faust_conj.h"
 #include "faust_transpose.h"
 #include "faust_ctranspose.h"
-
+#include "faust_nnz.h"
+#include "faust_pruneout.h"
+#include "faust_optimize_storage.h"
+#include "faust_optimize.h"
+#include "faust_optimize_time.h"
+#include "faust_multiply.h"
 
 typedef @FAUST_SCALAR@ SCALAR;
 typedef @FAUST_FPP@ FPP;
@@ -122,6 +127,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			faust_delete<SCALAR,GPU2>(prhs, nrhs, plhs, nlhs);
 		else if(!strcmp("size", cmd))
 			faust_size<SCALAR,GPU2>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("nnz", cmd))
+			faust_nnz<SCALAR, GPU2>(prhs, nrhs, plhs, nlhs);
 		else if(!strcmp("full", cmd))
 			faust_full<SCALAR,GPU2>(prhs, nrhs, plhs, nlhs);
 		else if(!strcmp("norm", cmd))
@@ -146,6 +153,16 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			faust_transpose<SCALAR,GPU2>(prhs, nrhs, plhs, nlhs);
 		else if(!strcmp("ctranspose", cmd))
 			faust_ctranspose<SCALAR,GPU2>(prhs, nrhs, plhs, nlhs);
+		else if(! strcmp("pruneout", cmd))
+			faust_pruneout<SCALAR, GPU2>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("optimize_storage", cmd))
+			faust_optimize_storage<SCALAR, GPU2>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("optimize_time", cmd))
+			faust_optimize_time<SCALAR, GPU2>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("optimize", cmd))
+			faust_optimize<SCALAR, GPU2>(prhs, nrhs, plhs, nlhs);
+		else if (!strcmp("multiply", cmd))
+			faust_multiply<SCALAR, GPU2>(prhs, nrhs, plhs, nlhs);
 
 	}
 	catch (const std::exception& e)
