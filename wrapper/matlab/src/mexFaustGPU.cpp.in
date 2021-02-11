@@ -85,6 +85,11 @@
 #include "faust_optimize.h"
 #include "faust_optimize_time.h"
 #include "faust_multiply.h"
+#include "faust_mul_faust.h"
+#include "faust_mul_scalar.h"
+#include "faust_cat.h"
+#include "faust_subsref.h"
+#include "faust_prox.h"
 
 typedef @FAUST_SCALAR@ SCALAR;
 typedef @FAUST_FPP@ FPP;
@@ -163,7 +168,22 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			faust_optimize<SCALAR, GPU2>(prhs, nrhs, plhs, nlhs);
 		else if (!strcmp("multiply", cmd))
 			faust_multiply<SCALAR, GPU2>(prhs, nrhs, plhs, nlhs);
-
+		else if (!strcmp("mul_faust", cmd))
+			faust_mul_faust<SCALAR, GPU2>(prhs, nrhs, plhs, nlhs);
+		else if (!strcmp("mul_scalar", cmd))
+			faust_mul_scalar<SCALAR, GPU2, FPP>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("horzcat", cmd))
+			faust_horzcat<SCALAR,GPU2>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("vertcat", cmd))
+			faust_vertcat<SCALAR,GPU2>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("subsref", cmd))
+			faust_subsref<SCALAR,GPU2>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("subsref_byvec", cmd))
+			faust_subsref_byvec<SCALAR,GPU2>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("prox", cmd))
+			faust_prox<SCALAR,GPU2>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("prox_blockdiag", cmd))
+			faust_prox_blockdiag<SCALAR,GPU2>(prhs, nrhs, plhs, nlhs);
 	}
 	catch (const std::exception& e)
 	{

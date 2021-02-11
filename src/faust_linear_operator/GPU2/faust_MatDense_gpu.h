@@ -127,7 +127,8 @@ namespace Faust
 				MatDense<FPP,GPU2>* get_rows(faust_unsigned_int* row_ids, faust_unsigned_int n) const;
 				MatDense<FPP,GPU2>* get_cols(faust_unsigned_int start_col_id, faust_unsigned_int num_cols) const;
 				MatDense<FPP,GPU2>* get_cols(faust_unsigned_int* col_ids, faust_unsigned_int n) const;
-
+				void copyBuf(FPP* dst_cpu_buf, const void* stream=nullptr) const;
+				bool isReal() const;
 
 			protected:
 				gm_DenseMat_t gpu_mat;

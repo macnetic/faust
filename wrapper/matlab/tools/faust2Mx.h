@@ -79,8 +79,8 @@ mxArray*  FaustVec2mxArray(const Faust::Vect<std::complex<FPP>,Cpu>& v);
 *  \param[out] mxArray* : pointer to the mxArray* (matlab format) representing a dense matrix  
 *  \tparam[in] M : Faust::MatDense<FPP,Cpu>  
 */
-template<typename FPP>
-mxArray*  FaustMat2mxArray(const Faust::MatDense<FPP,Cpu>& M);
+template<typename FPP, FDevice DEV>
+mxArray*  FaustMat2mxArray(const Faust::MatDense<FPP,DEV>& M);
 template<typename FPP>
 mxArray*  FaustMat2mxArray(const Faust::MatDense<std::complex<FPP>,Cpu>& M);
 

@@ -458,6 +458,8 @@ namespace Faust
 
 			size_t getNBytes() const;
 
+			void copyBuf(FPP* dst_buf) const;
+
 			/**
 			 * \brief Returns the nonzeros indices.
 			 */

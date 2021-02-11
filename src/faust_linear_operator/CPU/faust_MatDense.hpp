@@ -4,7 +4,7 @@
 /*  of the project : <http://faust.inria.fr>                         */
 /*                                                                          */
 /*                              License:                                    */
-/*  Copyright (2019):    Hakim Hadj-Djilani, Nicolas Bellot, Adrien Leman, Thomas Gautrais,      */
+/*  Copyright (2021):    Hakim Hadj-Djilani, Nicolas Bellot, Adrien Leman, Thomas Gautrais,      */
 /*                      Luc Le Magoarou, Remi Gribonval                     */
 /*                      INRIA Rennes, FRANCE                                */
 /*                      http://www.inria.fr/                                */
@@ -1090,6 +1090,13 @@ void MatDense<FPP,Cpu>::normalize()
 	else
 		throw std::domain_error("the norm is zero, can't normalize");
 }
+
+	template<typename FPP>
+void MatDense<FPP,Cpu>::copyBuf(FPP* dst_buf) const
+{
+	memcpy(dst_buf, getData(), sizeof(FPP)*this->getNbCol()*this->getNbRow());
+}
+
 
 template<typename FPP>
 Vect<FPP,Cpu> MatDense<FPP,Cpu>::get_col(faust_unsigned_int id) const

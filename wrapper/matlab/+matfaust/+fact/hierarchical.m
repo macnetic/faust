@@ -139,6 +139,7 @@ function varargout = hierarchical(M, p, varargin)
 	mex_params = p.to_mex_struct();
 	backend = 2016;
 	nargin = length(varargin);
+	gpu = false;
 	if(nargin > 0)
 		for i=1:nargin
 			switch(varargin{i})

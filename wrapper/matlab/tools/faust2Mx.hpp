@@ -62,8 +62,8 @@
 
 
 
-template<typename FPP>
-mxArray*  FaustMat2mxArray(const Faust::MatDense<FPP,Cpu>& M)
+template<typename FPP, FDevice DEV>
+mxArray*  FaustMat2mxArray(const Faust::MatDense<FPP,DEV>& M)
 {
 	if (!M.isReal())
 		mexErrMsgTxt("FaustMat2mxArray : Faust::MatDense must be real");
@@ -86,8 +86,9 @@ mxArray*  FaustMat2mxArray(const Faust::MatDense<FPP,Cpu>& M)
 	}
 
 	FPP*    ptr_out = static_cast<FPP*> (mxGetData(mxMat));
-	memcpy(ptr_out, M.getData(), row*col*sizeof(FPP));
+//	memcpy(ptr_out, M.getData(), row*col*sizeof(FPP));
 
+	M.copyBuf(ptr_out);
 
 	return mxMat;
 

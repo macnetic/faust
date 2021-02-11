@@ -724,7 +724,7 @@ classdef Faust
 					end
 				end
 			end
-			G = matfaust.Faust(F, call_mex(F, 'pruneout', thres, npasses, only_forward))
+			G = matfaust.Faust(F, call_mex(F, 'pruneout', thres, npasses, only_forward));
 		end
 
 		%=====================================================================
