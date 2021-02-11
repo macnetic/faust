@@ -54,19 +54,44 @@ function F = dft(n, varargin)
 	if(log2n>31)
 		error('Can''t handle a FFT Faust of order larger than 2^31')
 	end
-	if(length(varargin) > 0)
-		if(~ islogical(varargin{1}))
-			error('wht optional second argument must be a boolean');
+	normed = true; % normalization by default
+	dev = 'cpu';
+	argc = length(varargin);
+	if(argc > 0)
+		for i=1:2:argc
+			if(argc > i)
+				% next arg (value corresponding to the key varargin{i})
+				tmparg = varargin{i+1};
+			end
+			switch(varargin{i})
+				case 'normed'
+					if(argc == i || ~ islogical(tmparg))
+						error('normed keyword argument is not followed by a logical')
+					else
+						per_row = tmparg;
+					end
+				case 'dev'
+					if(argc == i || ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu'))
+						error('dev keyword argument is not followed by a valid value: cpu, gpu*.')
+					else
+						dev = tmparg;
+					end
+				otherwise
+					if((isstr(varargin{i}) || ischar(varargin{i}))  && ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu'))
+						error([ tmparg ' unrecognized argument'])
+					end
+			end
 		end
-		normed = varargin{1};
-	else
-		normed = true; % normalization by default
 	end
-	core_obj = mexFaustCplx('fourier', log2n, normed);
+	if(strcmp(dev, 'cpu'))
+		core_obj = mexFaustCplx('fourier', log2n, normed);
+	else
+		core_obj = mexFaustGPUCplx('fourier', log2n, normed);
+	end
 	is_real = false;
 	e = MException('FAUST:OOM', 'Out of Memory');
 	if(core_obj == 0)
 		throw(e)
 	end
-	F = matfaust.Faust(core_obj, is_real);
+	F = matfaust.Faust(core_obj, is_real, dev);
 end

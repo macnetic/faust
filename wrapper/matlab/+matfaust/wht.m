@@ -7,10 +7,12 @@
 %> @b Usage
 %>
 %> &nbsp;&nbsp;&nbsp; @b H = wht(n) <br/>
-%> &nbsp;&nbsp;&nbsp; @b H = wht(n, normed)
+%> &nbsp;&nbsp;&nbsp; @b H = wht(n, 'normed', bool)
+%> &nbsp;&nbsp;&nbsp; @b H = wht(n, 'normed', bool, 'dev', str) str might be 'cpu' or 'gpu'.
 %>
 %> @param n the power of two exponent for a Hadamard matrix of order n and a factorization into log2(n) factors.
-%> @param normed: (optional) true (by default) to normalize the returned Faust as if Faust.normalize() was called, false otherwise.
+%> @param 'normed',bool: (optional) true (by default) to normalize the returned Faust as if Faust.normalize() was called, false otherwise.
+%> @param 'dev',str: (optional) 'cpu' to create a CPU Faust (default choice) and 'gpu' for a GPU Faust.
 %>
 %> @retval H the Faust implementing the Hadamard transform of dimension n.
 %>
@@ -19,7 +21,7 @@
 %> % in a matlab terminal
 %> >> import matfaust.*
 %> >> H = wht(1024) % is equal to
-%> >> H = normalize(wht(1024, false))
+%> >> H = normalize(wht(1024, 'normed', false, 'dev', 'cpu'))
 %> @endcode
 %>
 %>
@@ -50,19 +52,44 @@ function H = wht(n, varargin)
 	if(log2n > 31)
 		error('Can''t handle a Hadamard Faust of order larger than 2^31')
 	end
-	if(length(varargin) > 0)
-		if(~ islogical(varargin{1}))
-			error('wht optional second argument must be a boolean');
+	normed = true; % normalization by default
+	dev = 'cpu';
+	argc = length(varargin);
+	if(argc > 0)
+		for i=1:2:argc
+			if(argc > i)
+				% next arg (value corresponding to the key varargin{i})
+				tmparg = varargin{i+1};
+			end
+			switch(varargin{i})
+				case 'normed'
+					if(argc == i || ~ islogical(tmparg))
+						error('normed keyword argument is not followed by a logical')
+					else
+						per_row = tmparg;
+					end
+				case 'dev'
+					if(argc == i || ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu'))
+						error('dev keyword argument is not followed by a valid value: cpu, gpu*.')
+					else
+						dev = tmparg;
+					end
+				otherwise
+					if((isstr(varargin{i}) || ischar(varargin{i}))  && ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu'))
+						error([ tmparg ' unrecognized argument'])
+					end
+			end
 		end
-		normed = varargin{1};
-	else
-		normed = true; % normalization by default
 	end
-	core_obj = mexFaustReal('hadamard', log2n, normed);
+	if(strcmp(dev, 'cpu'))
+		core_obj = mexFaustReal('hadamard', log2n, normed);
+	else
+		core_obj = mexFaustGPUReal('hadamard', log2n, normed);
+	end
 	is_real = true;
 	e = MException('FAUST:OOM', 'Out of Memory');
 	if(core_obj == 0)
 		throw(e)
 	end
-	H = matfaust.Faust(core_obj, is_real);
+	H = matfaust.Faust(core_obj, is_real, dev);
 end

@@ -12,10 +12,11 @@
 /* by FaustCore class (tools/FaustCore.m) and Faust.m                       */
 /*                                                                          */
 /*  For more information on the FAuST Project, please visit the website     */
+/* Update: it works the same for mexFaustGPUReal and mexFaustGPUCplx */
 /*  of the project : <http://faust.inria.fr>                         */
 /*                                                                          */
 /*                              License:                                    */
-/*  Copyright (2020):  	Hakim HADJ-DJILANI                                  */
+/*  Copyright (2021):  	Hakim HADJ-DJILANI                                  */
 /*  			Nicolas Bellot, Adrien Leman, Thomas Gautrais,      */
 /*                      Luc Le Magoarou, Remi Gribonval                     */
 /*                      INRIA Rennes, FRANCE                                */
@@ -63,6 +64,10 @@
 #include "faust_Timer.h"
 #include <complex>
 #include <memory>
+#ifdef USE_GPU_MOD
+#include "faust_gpu_mod_utils.h"
+#include "faust_TransformHelper_gpu.h"
+#endif
 #include "new_faust.h"
 #include "faust_disp.h"
 #include "faust_delete.h"
@@ -85,37 +90,31 @@
 #include "faust_optimize.h"
 #include "faust_optimize_time.h"
 #include "faust_multiply.h"
+#include "faust_mul_faust.h"
+#include "faust_mul_scalar.h"
+#include "faust_cat.h"
+#include "faust_subsref.h"
+#include "faust_prox.h"
+#include "faust_isreal.h"
+#include "faust_fourier.h"
+#include "faust_hadamard.h"
+#include "faust_eye.h"
+#cmakedefine DEV @DEV@
+#cmakedefine DEV_IS_CPU
+#ifdef DEV_IS_CPU
+#include "enable_gpu_mod.h"
+#endif
 
 typedef @FAUST_SCALAR@ SCALAR;
 typedef @FAUST_FPP@ FPP;
 
 using namespace Faust;
 
-template<typename T>
-void fourierFaust(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
-
-
-template<typename T>
-void hadamardFaust(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
-
-template<typename T>
-void eyeFaust(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
-
-
-void* enable_gpu_mod(const char* libpath, const char* backend, const bool silent);
-
-// prhs[0] : name of command :
-//    "delete" to delete the Faust::Transform<SCALAR> object dynamically allocated previously
-//    "multiply" to multiply the Faust::Transform<SCALAR> object by a vector or a matrix
-
-// prhs[1] : address of the Faust::TransformHelper<SCALAR> object dynamically allocated previously
-
-// prhs[2] (only necessary if prhs[0] matches "multiply") : vector or matrix A to multiply by the Faust::TransformHelper<SCALAR> object
-
-
-
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
+#ifdef USE_GPU_MOD
+	Faust::enable_gpu_mod();
+#endif
 #ifdef FAUST_VERBOSE
 	if (typeid(SCALAR) == typeid(float))
 	{
@@ -136,445 +135,90 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		// Check there is a second input, which should be the class instance handle
 		if (nrhs < 2)
 			mexErrMsgTxt("Second input should be a class instance handle.");
-
-		if(!strcmp("rand", cmd))
-		{
-			faust_rand<SCALAR,Cpu>(prhs, nrhs, plhs, nlhs);
-			return;
-		}
-		//TODO: hadamard, fourier, and proxs must be in there own mex function (one for hadamard and fourier, another for the prox)
-		if(!strcmp("hadamard", cmd)){
-			hadamardFaust<SCALAR>(nlhs, plhs, nrhs, prhs);
-			return;
-		}
-
-		if(!strcmp("fourier", cmd))
-		{
-			fourierFaust<complex<FPP>>(nlhs, plhs, nrhs, prhs);
-			return;
-		}
-
-		if(!strcmp("eye", cmd))
-		{
-			eyeFaust<SCALAR>(nlhs, plhs, nrhs, prhs);
-			return;
-		}
-
-		if(!strcmp("prox", cmd))
-		{
-			if(nlhs!=1)
-				mexErrMsgTxt("prox(): 1 output variable is expected.");
-			if(nrhs < 4)
-				mexErrMsgTxt("prox(): wrong number of arguments (must be 4)");
-
-			unsigned int constraint_type = (unsigned int) mxGetScalar(prhs[2]);
-			bool const is_param_scalar = (1u == mxGetNumberOfElements(prhs[3]));
-			double scal_param;
-			const mxArray* mxMat_in = prhs[1];
-
-			const size_t nrows_mat = mxGetM(mxMat_in);
-			const size_t ncols_mat = mxGetN(mxMat_in);
-			SCALAR* mat_data = NULL;
-			mxArray2Ptr(mxMat_in, mat_data);
-			Faust::MatDense<SCALAR, Cpu> mat(mat_data, nrows_mat, ncols_mat);
-			std::unique_ptr<Faust::MatDense<SCALAR, Cpu>> mat_param = nullptr;
-			bool normalized = true, pos = false;
-
-			if(is_param_scalar)
-			{
-				scal_param = mxGetScalar(prhs[3]);
-			}
-			else
-			{
-				mxArray2Ptr(prhs[3], mat_data);
-				// constraint matrix has normally same dim as constrainted matrix (TODO: must be checked from matlab code)
-				// it's verified in C++
-				mat_param = std::unique_ptr<Faust::MatDense<SCALAR, Cpu>>(new Faust::MatDense<SCALAR, Cpu>(mat_data, nrows_mat, ncols_mat));
-			}
-
-			if(nrhs > 4)
-			{
-				normalized = (bool) mxGetScalar(prhs[4]);
-			}
-
-			if(nrhs > 5)
-			{
-				pos = (bool) mxGetScalar(prhs[5]);
-			}
-
-
-			try
-			{
-				switch(constraint_type)
-				{
-					case CONSTRAINT_NAME_SP:
-						Faust::prox_sp(mat, (faust_unsigned_int) scal_param, normalized, pos);
-						break;
-					case CONSTRAINT_NAME_SPCOL:
-						Faust::prox_spcol(mat, (faust_unsigned_int) scal_param, normalized, pos);
-						break;
-					case CONSTRAINT_NAME_SPLIN:
-						Faust::prox_splin(mat, (faust_unsigned_int) scal_param, normalized, pos);
-						break;
-					case CONSTRAINT_NAME_SPLINCOL:
-						Faust::prox_splincol(mat, (faust_unsigned_int) scal_param, normalized, pos);
-						break;
-					case CONSTRAINT_NAME_SP_POS:
-						Faust::prox_sp_pos(mat, (faust_unsigned_int) scal_param, normalized, pos);
-						break;
-					case CONSTRAINT_NAME_NORMLIN:
-						Faust::prox_normlin(mat, scal_param, normalized, pos);
-						break;
-					case CONSTRAINT_NAME_NORMCOL:
-						Faust::prox_normcol(mat, scal_param, normalized, pos);
-						break;
-					case CONSTRAINT_NAME_CONST:
-						Faust::prox_const(mat, *mat_param, normalized, pos);
-						break;
-					case CONSTRAINT_NAME_BLKDIAG:
-						//not impl. yet in cpp core (but the prox is)
-						break;
-					case CONSTRAINT_NAME_SUPP:
-						Faust::prox_supp(mat, *mat_param, normalized, pos);
-						break;
-					case CONSTRAINT_NAME_CIRC:
-						Faust::prox_circ(mat, normalized, pos);
-						break;
-					case CONSTRAINT_NAME_TOEPLITZ:
-						Faust::prox_toeplitz(mat, normalized, pos);
-						break;
-					case CONSTRAINT_NAME_HANKEL:
-						Faust::prox_hankel(mat, normalized, pos);
-						break;
-					case CONSTRAINT_NAME_SKPERM:
-						Faust::prox_skperm(mat, (faust_unsigned_int) scal_param, normalized, pos);
-						break;
-					default:
-						mexErrMsgTxt("Unknown constraint name/type.");
-				}
-				plhs[0] = FaustMat2mxArray(mat);
-			}
-			catch(std::domain_error& e)
-			{
-				mexErrMsgTxt("Can't normalize because norm is zero.");
-			}
-			// if(mat_param != nullptr)
-			//	delete mat_param;
-			return;
-		}
-
-		if(!strcmp("prox_blockdiag", cmd))
-		{
-			if(nlhs!=1)
-				mexErrMsgTxt("prox_blockdiag(): 1 output variable is expected.");
-			if(nrhs < 4)
-				mexErrMsgTxt("prox_blockdiag(): wrong number of arguments (must be 4)");
-
-			SCALAR* mat_data = NULL;
-			const mxArray* mxMat_in = prhs[1];
-			const mxArray* mx_m_ptr = prhs[2], *mx_n_ptr = prhs[3];
-			double * m_ptr = NULL, *n_ptr = NULL;
-			size_t nblocks;
-
-			const size_t nrows_mat = mxGetM(mxMat_in);
-			const size_t ncols_mat = mxGetN(mxMat_in);
-			mxArray2Ptr(mxMat_in, mat_data);
-			Faust::MatDense<SCALAR, Cpu> mat(mat_data, nrows_mat, ncols_mat);
-
-			mxArray2Ptr<double>(mx_n_ptr, n_ptr);
-			mxArray2Ptr<double>(mx_m_ptr, m_ptr);
-
-			std::vector<faust_unsigned_int> m_vec;
-			std::vector<faust_unsigned_int> n_vec;
-			bool normalized = (bool) mxGetScalar(prhs[2]);
-			bool pos = (bool) mxGetScalar(prhs[3]);
-
-			nblocks = mxGetM(mx_m_ptr);
-			if(nblocks == 1 && mxGetN(mx_n_ptr) > 1)
-				nblocks = mxGetN(mx_n_ptr);
-			if(mxGetM(mx_m_ptr) != nblocks && mxGetN(mx_n_ptr) != nblocks)
-				mexErrMsgTxt("the number of row and col offsets must agree.");
-
-			for(int i = 0; i < nblocks; i++)
-			{
-				m_vec.push_back((faust_unsigned_int)(m_ptr[i]));
-				n_vec.push_back((faust_unsigned_int)(n_ptr[i]));
-			}
-			// Faust::MatDense<FPP,Cpu> & M, std::vector<faust_unsigned_int> & m_vec, std::vector<faust_unsigned_int>& n_vec, const bool normalized /* default to false */, const bool pos
-			//
-			try
-			{
-				Faust::prox_blockdiag(mat, m_vec, n_vec, normalized, pos);
-			}
-			catch(std::domain_error& e)
-			{
-				mexErrMsgTxt("Can't normalize because norm is zero.");
-			}
-
-			plhs[0] = FaustMat2mxArray(mat);
-			return;
-		}
-
-
-		if (!strcmp("enable_gpu_mod", cmd))
-		{
-			char libpath[1024];
-			char backend[32];
-			bool silent;
-			if(nrhs < 4)
-				mexErrMsgTxt("enable_gpu_mod received a bad number of arguments.");
-
-			mxGetString(prhs[1], libpath, sizeof(libpath));
-			mxGetString(prhs[2], backend, sizeof(backend));
-			silent = (bool) mxGetScalar(prhs[3]);
-			enable_gpu_mod(libpath, backend, silent);
-			return;
-		}
-
-		// New
 		if (!strcmp("new", cmd))
-		{
-			new_faust<SCALAR,Cpu>(prhs, nrhs, plhs, nlhs);
-			return;
-		}
-
-		// Delete
-		if (!strcmp("delete", cmd))
-		{
-			// Destroy the C++ object
-			faust_delete<SCALAR,Cpu>(prhs, nrhs, plhs, nlhs);
-			return;
-		}
-
-
-		// Get the class instance pointer from the second input
-		Faust::TransformHelper<SCALAR,Cpu>* core_ptr = convertMat2Ptr<Faust::TransformHelper<SCALAR,Cpu> >(prhs[1]);
-#ifdef FAUST_VERBOSE
-		printf("cmd = %s, core_ptr = %p\n", cmd, core_ptr);
+			new_faust<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("rand", cmd))
+			faust_rand<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
+		else if (! strcmp("disp",cmd))
+			faust_disp<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
+		else if (!strcmp("delete", cmd))
+			faust_delete<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("size", cmd))
+			faust_size<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
+		else if (!strcmp("isReal",cmd))
+			faust_isreal<SCALAR,Cpu>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("nnz", cmd))
+			faust_nnz<SCALAR, DEV>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("full", cmd))
+			faust_full<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("norm", cmd))
+			faust_norm<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("normfro", cmd))
+			faust_norm_fro<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("normalize", cmd))
+			faust_normalize<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("copy", cmd))
+			faust_copy<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("nbytes", cmd))
+			faust_nbytes<SCALAR, DEV>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("numfactors", cmd))
+			faust_numfactors<SCALAR, DEV>(prhs, nrhs, plhs, nlhs);
+		else if (!strcmp("factors", cmd))
+			faust_factors<SCALAR, DEV>(prhs, nrhs, plhs, nlhs);
+		else if (!strcmp("save", cmd))
+			faust_save<SCALAR, DEV>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("conj", cmd))
+			faust_conj<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("transpose", cmd))
+			faust_transpose<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("ctranspose", cmd))
+			faust_ctranspose<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
+		else if(! strcmp("pruneout", cmd))
+			faust_pruneout<SCALAR, DEV>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("optimize_storage", cmd))
+			faust_optimize_storage<SCALAR, DEV>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("optimize_time", cmd))
+			faust_optimize_time<SCALAR, DEV>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("optimize", cmd))
+			faust_optimize<SCALAR, DEV>(prhs, nrhs, plhs, nlhs);
+		else if (!strcmp("multiply", cmd))
+			faust_multiply<SCALAR, DEV>(prhs, nrhs, plhs, nlhs);
+		else if (!strcmp("mul_faust", cmd))
+			faust_mul_faust<SCALAR, DEV>(prhs, nrhs, plhs, nlhs);
+		else if (!strcmp("mul_scalar", cmd))
+			faust_mul_scalar<SCALAR, DEV, FPP>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("horzcat", cmd))
+			faust_horzcat<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("vertcat", cmd))
+			faust_vertcat<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("subsref", cmd))
+			faust_subsref<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("subsref_byvec", cmd))
+			faust_subsref_byvec<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
+		/********** TODO: should move in a specific mex *****/
+		else if(!strcmp("prox", cmd))
+			faust_prox<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("prox_blockdiag", cmd))
+			faust_prox_blockdiag<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
+		/*********************************************************/
+		else if(!strcmp("set_FM_mul_mode", cmd))
+			// def in module faust_optimize
+			set_FM_mul_mode<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("set_Fv_mul_mode", cmd))
+			// def in module faust_optimize
+			set_Fv_mul_mode<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("fourier", cmd))
+			faust_fourier<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("hadamard", cmd))
+			faust_hadamard<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("eye", cmd))
+			faust_eye<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
+#ifdef DEV_IS_CPU
+		else if (!strcmp("enable_gpu_mod", cmd))
+			enable_gpu_mod(prhs, nrhs, plhs, nlhs);
 #endif
-
-		if (!strcmp("size",cmd))
-		{
-
-			faust_size<SCALAR,Cpu>(prhs, nrhs, plhs, nlhs);
-			return;
-		}
-
-		if (!strcmp("isReal",cmd))
-		{
-			plhs[0] = mxCreateDoubleScalar((double) core_ptr->isReal());
-			return;
-		}
-
-		if (!strcmp("nnz",cmd))
-		{
-			faust_nnz<SCALAR, Cpu>(prhs, nrhs, plhs, nlhs);
-			return;
-		}
-
-		// get_fact : return the id-th factor of the faust
-		if (!strcmp("factors", cmd))
-		{
-			faust_factors<SCALAR, Cpu>(prhs, nrhs, plhs, nlhs);
-			return;
-		}
-
-		if (!strcmp("numfactors", cmd))
-		{
-			faust_numfactors<SCALAR, Cpu>(prhs, nrhs, plhs, nlhs);
-			return;
-		}
-
-		if (!strcmp("nbytes", cmd))
-		{
-			faust_nbytes<SCALAR, Cpu>(prhs, nrhs, plhs, nlhs);
-			return;
-		}
-
-		if (! strcmp("disp",cmd))
-		{
-			faust_disp<SCALAR,Cpu>(prhs, nrhs, plhs, nlhs);
-			return;
-		}
-
-		if (!strcmp("full",cmd))
-		{
-			faust_full<SCALAR,Cpu>(prhs, nrhs, plhs, nlhs);
-			return;
-		}
-
-		if (!strcmp("norm",cmd))
-		{
-			faust_norm<SCALAR,Cpu>(prhs, nrhs, plhs, nlhs);
-			return;
-		}
-
-		if(!strcmp("normfro", cmd))
-		{
-			faust_norm_fro<SCALAR,Cpu>(prhs, nrhs, plhs, nlhs);
-			return;
-		}
-
-		if(!strcmp("normalize", cmd))
-		{
-			faust_normalize<SCALAR,Cpu>(prhs, nrhs, plhs, nlhs);
-			return;
-		}
-
-		if (!strcmp("copy",cmd))
-		{
-			faust_copy<SCALAR,Cpu>(prhs, nrhs, plhs, nlhs);
-			return;
-		}
-
-		if (!strcmp("multiply", cmd))
-		{
-			faust_multiply<SCALAR, Cpu>(prhs, nrhs, plhs, nlhs);
-			return;
-		}
-
-		if(!strcmp("save", cmd))
-			return faust_save<SCALAR,Cpu>(prhs, nrhs, plhs, nlhs);
-
-
-
-		if(!strcmp("optimize_storage", cmd)) {
-			faust_optimize_storage<SCALAR, Cpu>(prhs, nrhs, plhs, nlhs);
-			return;
-		}
-
-		if(!strcmp("optimize", cmd)) {
-			faust_optimize<SCALAR, Cpu>(prhs, nrhs, plhs, nlhs);
-			return;
-		}
-
-		if(!strcmp("optimize_time", cmd))
-		{
-			faust_optimize_time<SCALAR, Cpu>(prhs, nrhs, plhs, nlhs);
-			return;
-
-		}
-
-		if(! strcmp("pruneout", cmd))
-		{
-			faust_pruneout<SCALAR, Cpu>(prhs, nrhs, plhs, nlhs);
-			return;
-		}
-
-		if(!strcmp("conj", cmd)) {
-			faust_conj<SCALAR,Cpu>(prhs, nrhs, plhs, nlhs);
-			return;
-		}
-
-		if(!strcmp("transpose", cmd)) {
-			faust_transpose<SCALAR,Cpu>(prhs, nrhs, plhs, nlhs);
-			return;
-		}
-
-		if(!strcmp("ctranspose", cmd)) {
-			faust_ctranspose<SCALAR,Cpu>(prhs, nrhs, plhs, nlhs);
-			return;
-		}
-
-		if(!strcmp("subsref", cmd)){
-			int start_row_id = (int) mxGetScalar(prhs[2]);
-			int end_row_id = (int) mxGetScalar(prhs[3]);
-			int start_col_id = (int) mxGetScalar(prhs[4]);
-			int end_col_id = (int) mxGetScalar(prhs[5]);
-			Faust::TransformHelper<SCALAR, Cpu>* th = core_ptr->slice(start_row_id-1, end_row_id, start_col_id-1, end_col_id);
-			plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
-			return;
-		}
-
-		if(!strcmp("subsref_byvec", cmd))
-		{
-			unsigned long int *row_pr;
-			row_pr = (unsigned long int*) mxGetData(prhs[2]);
-
-			unsigned long int *col_pr;
-			col_pr = (unsigned long int*) mxGetData(prhs[3]);
-
-			Faust::TransformHelper<SCALAR, Cpu>* th = core_ptr->fancy_index(row_pr, mxGetNumberOfElements(prhs[2]), col_pr, mxGetNumberOfElements(prhs[3]));
-			plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
-			return;
-		}
-
-		if(!strcmp("mul_faust", cmd)) {
-			Faust::TransformHelper<SCALAR,Cpu>* right_term = convertMat2Ptr<Faust::TransformHelper<SCALAR,Cpu> >(prhs[2]);
-			if(right_term->getNbRow() != core_ptr->getNbCol()) mexErrMsgTxt("The dimensions of the two Fausts must agree.");
-			Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->multiply(right_term);
-			plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
-#ifdef FAUST_VERBOSE
-			printf("new ptr for Faust multiply's TransformHelper obj=%p\n", th);
-			printf("multiply(\"faust\")\n");
-			printf("isConjugate()=%d\n",th->isConjugate());
-			printf("isTransposed()=%d\n", th->isTransposed());
-#endif
-			return;
-
-		}
-
-		if(!strcmp("mul_scalar", cmd)) {
-			//complex Faust times real scalar OK
-			//complex Faust times complex oK
-			//real Faust times complex NOT OK
-			//real Faust times real OK
-			if(mxIsComplex(prhs[2]) && (typeid(SCALAR) == typeid(double) || typeid(SCALAR) == typeid(float)))
-				mexErrMsgTxt("You cannot multiply a real Faust by a complex scalar (not yet implemented).");
-
-			SCALAR scalar;
-			mxArray2Scalar<FPP>(prhs[2], &scalar);
-			Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->multiply(scalar);
-			plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
-			return;
-		}		//     // Call the various class methods
-
-		if(!strcmp("vertcat", cmd)) {
-			//TODO: check number of args and results
-			Faust::TransformHelper<SCALAR,Cpu>* right_term = convertMat2Ptr<Faust::TransformHelper<SCALAR,Cpu> >(prhs[2]);
-			if(right_term->getNbCol() != core_ptr->getNbCol()) mexErrMsgTxt("The dimensions of the two Fausts must agree.");
-			Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->vertcat(right_term);
-			plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
-#ifdef FAUST_VERBOSE
-			printf("new ptr for Faust vert-concatened TransformHelper obj=%p\n", th);
-			printf("isConjugate()=%d\n",th->isConjugate());
-			printf("isTransposed()=%d\n", th->isTransposed());
-#endif
-			return;
-
-		}
-
-		if(!strcmp("horzcat", cmd)) {
-			//TODO: check number of args and results
-			Faust::TransformHelper<SCALAR,Cpu>* right_term = convertMat2Ptr<Faust::TransformHelper<SCALAR,Cpu> >(prhs[2]);
-			if(right_term->getNbRow() != core_ptr->getNbRow()) mexErrMsgTxt("The dimensions of the two Fausts must agree.");
-			Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->horzcat(right_term);
-			plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
-#ifdef FAUST_VERBOSE
-			printf("new ptr for Faust hor-concatened TransformHelper obj=%p\n", th);
-			printf("isConjugate()=%d\n",th->isConjugate());
-			printf("isTransposed()=%d\n", th->isTransposed());
-#endif
-			return;
-
-		}
-
-		if(!strcmp("set_FM_mul_mode", cmd))
-		{
-			const int mode = (int) mxGetScalar(prhs[2]);
-			core_ptr->set_FM_mul_mode(mode);
-			return;
-		}
-
-		if(!strcmp("set_Fv_mul_mode", cmd))
-		{
-			const int mode = (int) mxGetScalar(prhs[2]);
-			core_ptr->set_Fv_mul_mode(mode);
-			return;
-		}
-
-		// Got here, so command not recognized
-		mexErrMsgTxt("Command not recognized.");
+		else
+			mexErrMsgTxt("Command not recognized.");
 	}
 	catch (const std::exception& e)
 	{
@@ -582,77 +226,4 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	}
 }
 
-template<typename T>
-void fourierFaust(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
-{
-	if(nlhs!=1)
-		mexErrMsgTxt("mex dft(): too many left hand side variables.");
-	if(nrhs < 3)
-		mexErrMsgTxt("mex dft(): wrong number of arguments (must be 3)");
-	unsigned int n  = (unsigned int) mxGetScalar(prhs[1]);
-	bool norma = (bool) mxGetScalar(prhs[2]);
 
-	//printf("mexFaust.cpp hadamard(): faust creation\n");
-	Faust::TransformHelper<complex<FPP>,Cpu>* F = Faust::TransformHelper<complex<FPP>,Cpu>::fourierFaust(n, norma);
-	//H->display();
-	if(F) //not NULL
-		plhs[0]=convertPtr2Mat<Faust::TransformHelper<complex<FPP>,Cpu> >(F);
-	else {
-		plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
-		double* ptr_out = (double*) mxGetData(plhs[0]);
-		ptr_out[0]=(double) 0;
-	}
-
-}
-
-template<typename T>
-void hadamardFaust(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
-{
-	if(nlhs!=1)
-		mexErrMsgTxt("mex wht(): too many left hand side variables.");
-	if(nrhs < 3)
-		mexErrMsgTxt("mex wht(): wrong number of arguments (must be 3)");
-	unsigned int n  = (unsigned int) mxGetScalar(prhs[1]);
-	bool norma = (bool) mxGetScalar(prhs[2]);
-
-	//printf("mexFaust.cpp hadamard(): faust creation\n");
-	Faust::TransformHelper<T,Cpu>* H = Faust::TransformHelper<T,Cpu>::hadamardFaust(n, norma);
-	//H->display();
-	if(H) //not NULL
-		plhs[0]=convertPtr2Mat<Faust::TransformHelper<T,Cpu> >(H);
-	else {
-		plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
-		double* ptr_out = (double*) mxGetData(plhs[0]);
-		ptr_out[0]=(double) 0;
-	}
-
-}
-
-template<typename T>
-void eyeFaust(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
-{
-	if(nlhs != 1)
-		mexErrMsgTxt("eye(): too many left hand side variables.");
-	unsigned int n, m;
-	n = mxGetScalar(prhs[1]);
-	m = mxGetScalar(prhs[2]);
-	Faust::TransformHelper<SCALAR,Cpu>* eye = Faust::TransformHelper<SCALAR,Cpu>::eyeFaust(n, m);
-	if(eye) // not NULL
-		plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu>>(eye);
-	else
-	{
-		plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
-		double* ptr_out = (double*) mxGetData(plhs[0]);
-		ptr_out[0]=(double) 0;
-	}
-	return;
-}
-
-void* enable_gpu_mod(const char* libpath, const char* backend, const bool silent)
-{
-#ifdef USE_GPU_MOD
-	return Faust::enable_gpu_mod(libpath, silent);
-#else
-	return nullptr;
-#endif
-}

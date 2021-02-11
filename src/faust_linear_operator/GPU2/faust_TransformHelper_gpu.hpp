@@ -344,13 +344,13 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		void TransformHelper<FPP,GPU2>::set_FM_mul_mode() const
+		void TransformHelper<FPP,GPU2>::set_FM_mul_mode(const int mul_order_opt_mode, const bool silent/*=false*/) const
 		{
 			throw std::runtime_error("set_FM_mul_mode is yet to implement in Faust C++ core for GPU.");
 		}
 
 	template<typename FPP>
-		void TransformHelper<FPP,GPU2>::set_Fv_mul_mode() const
+		void TransformHelper<FPP,GPU2>::set_Fv_mul_mode(const int Fv_mul_mode) const
 		{
 			throw std::runtime_error("set_Fv_mul_mode is yet to implement in Faust C++ core for GPU.");
 		}

@@ -52,6 +52,7 @@
 %> @param 'field', str	(optional) str is either 'real' or 'complex' to set the Faust field.
 %>                  The default value is 'real'.
 %>
+%> @param 'dev', 'gpu or 'cpu' (optional) to create the random Faust on CPU or GPU (by default on CPU).
 %>
 %>
 %> @retval F the random Faust.

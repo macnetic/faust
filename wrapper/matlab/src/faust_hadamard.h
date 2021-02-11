@@ -41,15 +41,9 @@
 /*  approximations of matrices and applications", Journal of Selected       */
 /*  Topics in Signal Processing, 2016.                                      */
 /*  <https://hal.archives-ouvertes.fr/hal-01167948v1>                       */
-#ifndef __MEX_FAUST_OPTIMIZE__
-#define __MEX_FAUST_OPTIMIZE__
+#ifndef __MEX_FAUST_hadamard__
+#define __MEX_FAUST_hadamard__
 template <typename SCALAR, FDevice DEV>
-void faust_optimize(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs);
-
-template <typename SCALAR, FDevice DEV>
-void set_FM_mul_mode(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs);
-template <typename SCALAR, FDevice DEV>
-void set_Fv_mul_mode(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs);
-
-#include "faust_optimize.hpp"
+void faust_hadamard(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs);
+#include "faust_hadamard.hpp"
 #endif

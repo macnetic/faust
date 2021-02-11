@@ -4,8 +4,9 @@
 %> @b Usage
 %>
 %> &nbsp;&nbsp;&nbsp; @b eye(m,n) or eye([m,n]) forms a M-by-N Faust F = Faust(speye(M,N)).<br/>
-%> &nbsp;&nbsp;&nbsp; @b eye(m) is a short for eye(m,n).<br/>
-%> &nbsp;&nbsp;&nbsp; @b eye(S, 'complex') or eye(S, 'complex') or eye(S, 'complex') with S the size, does the same as above but returns a complex Faust.</br>
+%> &nbsp;&nbsp;&nbsp; @b eye(m) is a short for eye(m,m).<br/>
+%> &nbsp;&nbsp;&nbsp; @b eye(S, 'complex') with S the size, does the same as above but returns a complex Faust.</br>
+%> &nbsp;&nbsp;&nbsp; @b eye(S, 'complex', 'dev', 'gpu') or eye(S, 'dev', 'gpu') same as above but creates the Faust on GPU.</br>
 %>
 %> @b Example
 %> @code
@@ -96,32 +97,49 @@ function F = eye(varargin)
 	else
 		error('Size inputs must be numeric.')
 	end
-	la = varargin{nargin};
-	if(nargin ~= 1 && ~ isnumeric(la) && (ischar(la) || ischar(cell2mat(la))))
-		% F = Faust(sparse(1:m, 1:n, 1+eps(1)*j)); % hack to avoid passing through a full matrix
-		if(strcmp(la,'complex'))
-			% F = Faust(eye(m,n,'like', sparse(1,1,1+i)));
-			core_obj = mexFaustCplx('eye', m, n);
-			is_real = false;
-		elseif(strcmp(la, 'real'))
-			% F = Faust(speye(m,n));
-			core_obj = mexFaustReal('eye', m, n);
-			is_real = true;
-		else
-			if(iscell(la))
-				la = cell2mat(la)
+	dev = 'cpu';
+	argc = length(varargin);
+	is_real = true;
+	if(argc > 0)
+		for i=2:1:argc
+			if(argc > i)
+				% next arg (value corresponding to the key varargin{i})
+				tmparg = varargin{i+1};
 			end
-			error(['Unknown option: ' la])
+			switch(varargin{i})
+				case 'complex'
+					is_real = false;
+				case 'real'
+					is_real = true;
+				case 'dev'
+					if(argc == i || ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu'))
+						error('dev keyword argument is not followed by a valid value: cpu, gpu*.')
+					else
+						dev = tmparg;
+					end
+				otherwise
+					if((isstr(varargin{i}) || ischar(varargin{i}))  && ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu') && ~ strcmp(tmparg, 'complex'))
+						error([ tmparg ' unrecognized argument'])
+					end
+			end
+		end
+	end
+	if(strcmp(dev, 'cpu'))
+		if(is_real)
+			core_obj = mexFaustReal('eye', m, n);
+		else
+			core_obj = mexFaustCplx('eye', m, n);
 		end
 	else
-		% F = Faust(speye(m,n));
-		core_obj = mexFaustReal('eye', m, n);
-		is_real = true;
+		if(is_real)
+			core_obj = mexFaustGPUReal('eye', m, n);
+		else
+			core_obj = mexFaustGPUCplx('eye', m, n);
+		end
 	end
 	e = MException('FAUST:OOM', 'Out of Memory');
 	if(core_obj == 0)
 		throw(e)
 	end
-	F = matfaust.Faust(core_obj, is_real);
-
+	F = matfaust.Faust(core_obj, is_real, dev);
 end

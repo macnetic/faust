@@ -466,4 +466,10 @@ namespace Faust
 		{
 			return this->is_conjugate;
 		}
+
+	template<typename FPP, FDevice DEV>
+		bool TransformHelperGen<FPP,DEV>::isReal() const
+		{
+			return typeid(FPP) == typeid(double) || typeid(FPP) == typeid(float);
+		}
 }

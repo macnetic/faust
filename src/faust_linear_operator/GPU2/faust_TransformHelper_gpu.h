@@ -63,8 +63,8 @@ namespace Faust
 				TransformHelper<FPP,Cpu>* tocpu() const;
 				TransformHelper<FPP,GPU2>* vertcat(const TransformHelper<FPP,GPU2>*);
 				TransformHelper<FPP,GPU2>* horzcat(const TransformHelper<FPP,GPU2>*);
-				void set_FM_mul_mode() const;
-				void set_Fv_mul_mode() const;
+				void set_FM_mul_mode(const int mul_order_opt_mode, const bool silent=false) const;
+				void set_Fv_mul_mode(const int Fv_mul_mode) const;
 				faust_unsigned_int get_total_nnz() const;
 //				faust_unsigned_int get_fact_nnz(const faust_unsigned_int id) const;
 				TransformHelper<FPP,GPU2>* normalize(const int meth /* 1 for 1-norm, 2 for 2-norm (2-norm), -1 for inf-norm */) const;

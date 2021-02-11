@@ -11,3 +11,20 @@ void faust_optimize(const mxArray **prhs, const int nrhs, mxArray **plhs, const 
 	plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,DEV> >(th);
 }
 
+template <typename SCALAR, FDevice DEV>
+void set_FM_mul_mode(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs)
+{
+	Faust::TransformHelper<SCALAR,DEV>* core_ptr = convertMat2Ptr<Faust::TransformHelper<SCALAR,DEV> >(prhs[1]);
+	const int mode = (int) mxGetScalar(prhs[2]);
+	core_ptr->set_FM_mul_mode(mode);
+	return;
+}
+
+template <typename SCALAR, FDevice DEV>
+void set_Fv_mul_mode(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs)
+{
+	Faust::TransformHelper<SCALAR,DEV>* core_ptr = convertMat2Ptr<Faust::TransformHelper<SCALAR,DEV> >(prhs[1]);
+	const int mode = (int) mxGetScalar(prhs[2]);
+	core_ptr->set_Fv_mul_mode(mode);
+	return;
+}

@@ -704,12 +704,6 @@ namespace Faust {
 		}
 
 	template<typename FPP>
-		bool TransformHelper<FPP,Cpu>::isReal() const
-		{
-			return this->transform->isReal();
-		}
-
-	template<typename FPP>
 		faust_unsigned_int TransformHelper<FPP,Cpu>::get_total_nnz() const
 		{
 			return this->transform->get_total_nnz();
