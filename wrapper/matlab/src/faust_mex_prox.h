@@ -47,5 +47,5 @@ template <typename SCALAR, FDevice DEV>
 void faust_prox(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs);
 template <typename SCALAR, FDevice DEV>
 void faust_prox_blockdiag(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs);
-#include "faust_prox.hpp"
+#include "faust_mex_prox.hpp"
 #endif

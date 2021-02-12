@@ -1,5 +1,4 @@
 #include "class_handle.hpp"
-#include "faust_TransformHelper.h"
 template <typename SCALAR, FDevice DEV>
 void faust_prox(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs)
 {

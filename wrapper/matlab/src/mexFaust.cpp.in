@@ -94,7 +94,7 @@
 #include "faust_mul_scalar.h"
 #include "faust_cat.h"
 #include "faust_subsref.h"
-#include "faust_prox.h"
+#include "faust_mex_prox.h"
 #include "faust_isreal.h"
 #include "faust_fourier.h"
 #include "faust_hadamard.h"
