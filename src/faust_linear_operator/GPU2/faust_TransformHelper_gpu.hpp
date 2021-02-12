@@ -451,15 +451,20 @@ namespace Faust
 	template<typename FPP>
 		void TransformHelper<FPP,GPU2>::tocpu(TransformHelper<FPP,Cpu>& cpu_transf) const
 		{
-            //TODO: tocpu support of arguments transpose and conjugate
+			//TODO: tocpu support of arguments transpose and conjugate
 			auto t = this->transform->tocpu();
 			for(auto fac: t)
-            {
+			{
 				cpu_transf.push_back(fac, false, false);
-            }
-            cpu_transf.is_transposed = this->is_transposed;
-            cpu_transf.is_conjugate = this->is_conjugate;
-            //TODO: slice etc.
+			}
+			cpu_transf.is_transposed = this->is_transposed;
+			cpu_transf.is_conjugate = this->is_conjugate;
+			cpu_transf.is_sliced = this->is_sliced;
+			if(this->is_sliced)
+			{
+				cpu_transf.slices[0].copy(this->slices[0]);
+				cpu_transf.slices[1].copy(this->slices[1]);
+			}
 		}
 
 	template<typename FPP>

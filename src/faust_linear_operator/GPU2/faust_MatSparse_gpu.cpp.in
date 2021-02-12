@@ -184,13 +184,19 @@ namespace Faust
 	template<>
 		void MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::tocpu(MatSparse<@FAUST_SCALAR_FOR_GM@, Cpu> & sp_mat) const
 		{
-			int32_t nrows, ncols, nnz;
+			int32_t nrows = getNbRow(), ncols = getNbCol(), nnz = getNonZeros();
 			auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
-			if(sp_mat.getNonZeros() != getNonZeros() || sp_mat.getNbRow() != getNbRow() || sp_mat.getNbCol() != getNbCol())
+			if(sp_mat.getNonZeros() != nnz || sp_mat.getNbRow() != nrows || sp_mat.getNbCol() != ncols)
 			{
-				sp_mat.resize(getNonZeros(), getNbRow(), getNbCol());
+				sp_mat.resize(nnz, nrows, ncols);
 			}
 			tocpu(sp_mat.getRowPtr(), sp_mat.getColInd(), sp_mat.getValuePtr());
+			// although the above tocpu copy works perfectly if sp_mat is copied later with the MatSparse Cpu copy ctor
+			// then there is a segfault on the underlying SparseMatrix eigen object (why?)
+			// workaround: copy the buffer in a clean new MatSparse to avoid later issues
+			// mitigations: normally the copy to cpu is just to verify what's on the GPU memory so the performance is not so important
+			//TOFIX
+			sp_mat = MatSparse<@FAUST_SCALAR_FOR_GM@,Cpu>(nnz, nrows, ncols, sp_mat.getValuePtr(), sp_mat.getRowPtr(), sp_mat.getColInd());
 		}
 
 

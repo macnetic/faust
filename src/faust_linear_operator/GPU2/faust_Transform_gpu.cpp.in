@@ -593,10 +593,6 @@ void Faust::Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::get_fact(const faust_unsigned
 					cpu_msparse = new MatSparse<@FAUST_SCALAR_FOR_GM@,Cpu>();
 					cpu_msparse->resize(gpu_msparse->getNonZeros(), gpu_msparse->getNbRow(), gpu_msparse->getNbCol());
 					gpu_msparse->tocpu(*cpu_msparse);
-//					auto msparse2dense = new MatDense<@FAUST_SCALAR_FOR_GM@,Cpu>(*cpu_msparse);
-//					delete cpu_msparse;
-					//TODO: fix the bug and remove the workaround (MatSparse conversion to MatDense)
-//					cpu_transf.push_back(msparse2dense, false, false, false);
 					cpu_transf.push_back(cpu_msparse, false, false, false);
 				}
 				else
