@@ -426,8 +426,8 @@ namespace Faust
 				}
 				else
 				{ // storage size is the main criterion
-					sparse_weight = fac->getNBytes();
-					if(sparse_weight < fac->getNBytes())
+					sparse_weight = fac->getNonZeros()*(sizeof(FPP)+sizeof(int))+(fac->getNbRow()+1)*sizeof(int);
+					if(sparse_weight <= fac->getNBytes())
 					{
 						// choose CSR format
 						if(dfac)
