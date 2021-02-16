@@ -1,7 +1,7 @@
 import sys
 import unittest
 from pyfaust import (rand as frand, Faust, vstack, hstack, isFaust, dot,
-                     concatenate, pinv, eye, dft, wht)
+                     concatenate, pinv, eye, dft, wht, is_gpu_mod_enabled)
 from numpy.random import randint
 import numpy as np
 from scipy.sparse import csr_matrix
@@ -323,7 +323,9 @@ class PyfaustSimpleTest(unittest.TestCase):
 
     def test_optimize_time(self):
         print("Faust.optimize_time")
-        if dev == 'cpu':
+        # test only if CPU and no gpu_mod enabled
+        # anyway the method is not yet implemented for GPU
+        if dev == 'cpu' and not is_gpu_mod_enabled():
            oF = self.F.optimize_time()
            self._assertAlmostEqual(oF, self.F)
 
@@ -385,6 +387,15 @@ class PyfaustSimpleTest(unittest.TestCase):
         self._assertAlmostEqual(eye(self.nrows, self.ncols),
                                 np.eye(self.nrows,
                                        self.ncols))
+
+def run_tests(_dev, _field):
+    global dev, field
+    dev = _dev
+    field = _field
+    suite = unittest.makeSuite(PyfaustSimpleTest, 'test')
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
 
 if __name__ == "__main__":
     nargs = len(sys.argv)
