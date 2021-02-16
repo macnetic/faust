@@ -47,6 +47,10 @@ cdef extern from "FaustCoreCpp.h":
         FaustCoreCppGPU[FPP]* vertcatn_gpu(FaustCoreCppGPU[FPP]**, size_t n) const
         FaustCoreCppGPU[FPP]* horzcat_gpu(FaustCoreCppGPU[FPP]*) const
         FaustCoreCppGPU[FPP]* horzcatn_gpu(FaustCoreCppGPU[FPP]**, size_t n) const
+        FaustCoreCppGPU[FPP]* swap_cols_gpu(const unsigned int id1, const unsigned int id2,
+                                const bool permutation, const bool inplace);
+        FaustCoreCppGPU[FPP]* swap_rows_gpu(const unsigned int id1, const unsigned int id2,
+                                const bool permutation, const bool inplace);
         void device_gpu(char*) const
         FaustCoreCppGPU[FPP]* slice_gpu(unsigned int, unsigned int, unsigned int,
                                     unsigned int) const

@@ -122,6 +122,20 @@ FaustCoreCppGPU<FPP>* FaustCoreCppGPU<FPP>::zpruneout_gpu(const int nnz_tres, co
 }
 
     template<typename FPP>
+FaustCoreCppGPU<FPP>* FaustCoreCppGPU<FPP>::swap_cols_gpu(const unsigned int id1, const unsigned int id2,
+            const bool permutation, const bool inplace)
+{
+	return (FaustCoreCppGPU<FPP>*) FaustCoreCpp<FPP, GPU2>::swap_cols(id1, id2, permutation, inplace);
+}
+
+    template<typename FPP>
+FaustCoreCppGPU<FPP>* FaustCoreCppGPU<FPP>::swap_rows_gpu(const unsigned int id1, const unsigned int id2,
+            const bool permutation, const bool inplace)
+{
+	return (FaustCoreCppGPU<FPP>*) FaustCoreCpp<FPP, GPU2>::swap_rows(id1, id2, permutation, inplace);
+}
+
+    template<typename FPP>
 FaustCoreCppGPU<FPP>* FaustCoreCppGPU<FPP>::clone_gpu(int dev_id/*=-1*/) const
 {
     Faust::TransformHelper<FPP,GPU2>* th = this->transform->clone(dev_id);

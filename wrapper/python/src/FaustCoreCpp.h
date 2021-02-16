@@ -118,6 +118,7 @@ class FaustCoreCpp
     FaustCoreCpp<FPP,DEV>* conjugate()const;
     FaustCoreCpp<FPP,DEV>* adjoint()const;
     FaustCoreCpp<FPP,DEV>* zpruneout(const int nnz_tres, const int npasses, const bool only_forward);
+    FaustCoreCpp<FPP,DEV>* clone() const;
 	void device(char* dev) const;
     ~FaustCoreCpp();
     static FaustCoreCpp<FPP,DEV>* randFaust(unsigned int t,
@@ -169,6 +170,10 @@ class FaustCoreCppGPU: public FaustCoreCpp<FPP, GPU2>
 		FaustCoreCppGPU<FPP>* optimize_storage_gpu(const bool time=false);
 		FaustCoreCppGPU<FPP>* optimize_gpu(const bool transp=false);
 		FaustCoreCppGPU<FPP>* optimize_time_gpu(const bool transp=false, const bool inplace=false, const int nsamples=1);
+        FaustCoreCppGPU<FPP>* swap_rows_gpu(const unsigned int id1, const unsigned int id2,
+            const bool permutation, const bool inplace);
+        FaustCoreCppGPU<FPP>* swap_cols_gpu(const unsigned int id1, const unsigned int id2,
+            const bool permutation, const bool inplace);
 		void device_gpu(char* dev) const;
 		static FaustCoreCppGPU<FPP>* randFaustGPU(
                 unsigned int t,

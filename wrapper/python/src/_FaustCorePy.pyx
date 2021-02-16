@@ -149,6 +149,15 @@ cdef class FaustCore:
         #else:
         #TODO: raise error for undefined object here
 
+    def clone(self, *args, **kwargs):
+        core = FaustCore(core=True)
+        if(self._isReal):
+            core.core_faust_dbl = self.core_faust_dbl.clone()
+        else:
+            core.core_faust_cplx = self.core_faust_cplx.clone()
+        core._isReal = self._isReal
+        return core
+
     @staticmethod
     def _is_gpu_mod_enabled():
         return FaustCoreCy._is_gpu_mod_enabled()

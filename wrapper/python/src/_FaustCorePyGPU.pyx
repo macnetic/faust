@@ -724,6 +724,50 @@ cdef class FaustCoreGPU:
             self = (<FaustCoreGPU?>self)._ascomplex()
         return self._horzcatn(Fs)
 
+    def swap_cols(self, id1, id2, permutation, inplace):
+        if(inplace):
+            if(self._isReal):
+                self.core_faust_dbl.swap_cols_gpu(id1, id2,
+                                              permutation, inplace)
+            else:
+                self.core_faust_cplx.swap_cols_gpu(id1, id2,
+                                               permutation,
+                                               inplace)
+
+            return self
+        core = FaustCoreGPU(core=True)
+        if(self._isReal):
+            core.core_faust_dbl = self.core_faust_dbl.swap_cols_gpu(id1, id2,
+                                                                permutation, inplace)
+        else:
+            core.core_faust_cplx = self.core_faust_cplx.swap_cols_gpu(id1, id2,
+                                                                  permutation,
+                                                                  inplace)
+        core._isReal = self._isReal
+        return core
+
+    def swap_rows(self, id1, id2, permutation, inplace):
+        if(inplace):
+            if(self._isReal):
+                self.core_faust_dbl.swap_rows_gpu(id1, id2,
+                                              permutation, inplace)
+            else:
+                self.core_faust_cplx.swap_rows_gpu(id1, id2,
+                                               permutation,
+                                               inplace)
+
+            return self
+        core = FaustCoreGPU(core=True)
+        if(self._isReal):
+            core.core_faust_dbl = self.core_faust_dbl.swap_rows_gpu(id1, id2,
+                                                                permutation, inplace)
+        else:
+            core.core_faust_cplx = self.core_faust_cplx.swap_rows_gpu(id1, id2,
+                                                                  permutation,
+                                                                  inplace)
+        core._isReal = self._isReal
+        return core
+
     def device(self):
         cdef char c_str[256]
         if(self._isReal):

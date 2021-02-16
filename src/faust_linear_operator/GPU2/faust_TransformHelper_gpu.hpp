@@ -583,7 +583,7 @@ namespace Faust
 	TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::clone(int32_t dev_id/*=-1*/, void* stream/*=nullptr*/)
 	{
 		//TODO: take the requested device into account
-		return this->clone();
+		return TransformHelperGen<FPP,GPU2>::clone();
 	}
 
 	template<typename FPP>
@@ -625,6 +625,36 @@ namespace Faust
 			delete cpu_faust;
 			return gpu_faust;
 		}
+
+template<typename FPP>
+	TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::swap_rows(const faust_unsigned_int id1,
+			const faust_unsigned_int id2,
+			const bool permutation/*=false*/,
+			const bool inplace/*=false*/,
+			const bool check_transpose/*=true*/)
+	{
+			TransformHelper<FPP,Cpu> th;
+			this->tocpu(th);
+			auto thn = th.swap_rows(id1, id2, permutation, inplace, check_transpose);
+			auto gpu_thn = new TransformHelper<FPP,GPU2>(*thn, -1, nullptr);
+			delete thn;
+			return gpu_thn;
+	}
+
+template<typename FPP>
+	TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::swap_cols(const faust_unsigned_int id1,
+			const faust_unsigned_int id2,
+			const bool permutation/*=false*/,
+			const bool inplace/*=false*/,
+			const bool check_transpose/*=true*/)
+	{
+		TransformHelper<FPP,Cpu> th;
+		this->tocpu(th);
+		auto thn = th.swap_cols(id1, id2, permutation, inplace, check_transpose);
+		auto gpu_thn = new TransformHelper<FPP,GPU2>(*thn, -1, nullptr);
+		delete thn;
+		return gpu_thn;
+	}
 
 	template<typename FPP>
 	void TransformHelper<FPP,GPU2>::get_fact(const faust_unsigned_int id,

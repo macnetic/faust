@@ -63,6 +63,16 @@ namespace Faust
 				TransformHelper<FPP,Cpu>* tocpu() const;
 				TransformHelper<FPP,GPU2>* vertcat(const TransformHelper<FPP,GPU2>*);
 				TransformHelper<FPP,GPU2>* horzcat(const TransformHelper<FPP,GPU2>*);
+				TransformHelper<FPP,GPU2>* swap_cols(const faust_unsigned_int id1,
+						const faust_unsigned_int id2,
+						const bool permutation=false,
+						const bool inplace=false,
+						const bool check_transpose=true);
+				TransformHelper<FPP,GPU2>* swap_rows(const faust_unsigned_int id1,
+						const faust_unsigned_int id2,
+						const bool permutation=false,
+						const bool inplace=false,
+						const bool check_transpose=true);
 				void set_FM_mul_mode(const int mul_order_opt_mode, const bool silent=false) const;
 				void set_Fv_mul_mode(const int Fv_mul_mode) const;
 				faust_unsigned_int get_total_nnz() const;

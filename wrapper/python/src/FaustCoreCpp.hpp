@@ -569,6 +569,14 @@ FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::swap_rows(const unsigned int id1, 
 }
 
 template<typename FPP, FDevice DEV>
+FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP, DEV>::clone() const
+{
+    Faust::TransformHelper<FPP,DEV>* th = this->transform->clone();
+    auto core = new FaustCoreCpp<FPP, DEV>(th);
+    return core;
+}
+
+template<typename FPP, FDevice DEV>
 FaustCoreCpp<FPP,DEV>::~FaustCoreCpp()
 {
     if(transform) delete transform;

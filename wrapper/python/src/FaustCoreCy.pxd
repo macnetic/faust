@@ -111,6 +111,7 @@ cdef extern from "FaustCoreCpp.h":
         FaustCoreCpp[FPP]* mul_faust(FaustCoreCpp[FPP]*)
         FaustCoreCpp[FPP]* mul_scal(FPP scal)
         void device(char*) const
+        FaustCoreCpp[FPP]* clone()
         @staticmethod
         FaustCoreCpp[FPP]* randFaust(int faust_nrows, int faust_ncols,
                                      unsigned int t,

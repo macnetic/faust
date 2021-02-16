@@ -560,12 +560,12 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             max_ncols = np.max([a.shape[1] for a in args if isinstance(a,
                                                                        (Faust,
                                                                         *array_types))])
-            F = F@Faust(np.ones(1, max_ncols))
+            F = F@Faust(np.ones(1, max_ncols), dev=F.device)
             if(F.shape[0] == 1):
                 max_nrows = np.max([a.shape[0] for a in args if isinstance(a,
                                                                            (Faust,
                                                                             *array_types))])
-            F = Faust(np.ones(max_nrows, 1))@F
+            F = Faust(np.ones(max_nrows, 1), dev=F.device)@F
         def scalar2Faust(G):
             if isinstance(G, int):
                 G = float(G)
@@ -574,16 +574,17 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             G, Gdtype = (float(G), np.float) if isinstance(G, np.float) else (G,
                                                                               np.complex)
             return Faust([np.ones((F.shape[0], 1))*G,
-                          np.ones((1, F.shape[1])).astype(Gdtype)])
+                          np.ones((1, F.shape[1])).astype(Gdtype)],
+                         dev=F.device)
         def broadcast_to_F(G):
             if G.shape[0] == 1:
                 if G.shape[1] != F.shape[1]:
                     raise ve
-                G = Faust(np.ones((F.shape[0], 1))) @ G
+                G = Faust(np.ones((F.shape[0], 1)), dev=F.device) @ G
             elif G.shape[1] == 1:
                 if G.shape[0] != F.shape[0]:
                     raise ve
-                G = G @ Faust(np.ones((1, F.shape[1])))
+                G = G @ Faust(np.ones((1, F.shape[1])), dev=F.device)
             return G
         # prepare the list of Fausts
         largs = []
@@ -600,9 +601,9 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                 if(G.size == 1):
                     G = scalar2Faust(G.reshape(1,)[0])
                 if G.ndim == 1:
-                    G = Faust([np.ones((F.shape[0], 1)), G.reshape(1, G.size)])
+                    G = Faust([np.ones((F.shape[0], 1)), G.reshape(1, G.size)], dev=F.device)
                 else:
-                    G = broadcast_to_F(Faust(G))
+                    G = broadcast_to_F(Faust(G, dev=F.device))
             elif isinstance(G,(int, float, np.complex)):
                 G = scalar2Faust(G)
             largs.append(G)
@@ -611,7 +612,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         id_vstack = np.vstack([id for i in range(0,
                                        len(largs)+1)])
         C = F.concatenate(*largs, axis=1)
-        F = C@Faust(id_vstack)
+        F = C@Faust(id_vstack, dev=F.device)
         return F
 
     def __radd__(F,lhs_op):
@@ -893,7 +894,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                     return F*(float(A.squeeze()))
             if A.ndim == 1 and A.size == F.shape[1] \
             or A.ndim == 2 and A.shape[0] == 1:
-                return F@Faust(np.diag(A.squeeze()))
+                return F@Faust(np.diag(A.squeeze()), dev=F.device)
         # A is a Faust, a numpy.ndarray (eg. numpy.matrix) or anything
         warnings.warn("The * is deprecated as a matrix product and will soon"
                       " be removed")
@@ -918,7 +919,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                     return F*(float(lhs_op.squeeze()))
             if lhs_op.ndim == 1 and lhs_op.size == F.shape[1] \
             or lhs_op.ndim == 2 and lhs_op.shape[0] == 1:
-                return F@Faust(np.diag(lhs_op.squeeze()))
+                return F@Faust(np.diag(lhs_op.squeeze()), dev=F.device)
         warnings.warn("The * is deprecated as a matrix product and will soon"
                       " be removed")
         try:
@@ -1049,7 +1050,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         largs = []
         for i,G in enumerate(args):
             if(isinstance(G, (np.ndarray, csr_matrix, csc_matrix))):
-                G = Faust(G)
+                G = Faust(G, dev=F.device)
             if(not isinstance(G, Faust)): raise ValueError("You can't concatenate a "
                                                            "Faust with something "
                                                            "that is not a Faust, "
@@ -1598,7 +1599,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         if(len(factors) == 1):
             return factors[0]
         else:
-            return pyfaust.Faust(factors)
+            return pyfaust.Faust(factors, dev=F.device)
 
     def right(F, i):
         """
@@ -2075,29 +2076,33 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
     def copy(F, dev='cpu'):
         """
+        clone alias function (here just to mimic numpy API).
 
         <b/> See also Faust.clone
         """
         check_dev(dev)
         return F.clone(dev)
 
-    def clone(F, dev='cpu'):
+    def clone(F, dev=None):
         """
         Clones the Faust (in a new memory space).
 
         Args:
-            dev: 'cpu' to clone on CPU RAM, 'gpu:id' to clone on the GPU device #id (e.g. gpu:0).
+            dev (optional): 'cpu' to clone on CPU RAM, 'gpu[:id]' to clone on
+            the GPU device #id (e.g. gpu:0). By default (None), the device is
+            the F.device.
+
+        NOTE: id suffix is a future feature that remains to implement.
 
         Returns:
             The Faust clone.
         """
+        if dev == None:
+            dev = F.device
         check_dev(dev)
-        if F.device == 'gpu':
-             clone_F = Faust(core_obj=F.m_faust.clone(dev))
-             return clone_F
-        else:
-            return Faust([F.factors(i) for i in range(F.numfactors())], dev=dev)
-
+        # dev is 'gpu[:id]' or 'cpu'
+        clone_F = Faust(core_obj=F.m_faust.clone(dev))
+        return clone_F
 
     def sum(F, axis=None, **kwargs):
         """
@@ -2147,6 +2152,8 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                   [129.63603461]])
 
         """
+        if axis == None:
+            axis = (0,1)
         is_tuple = isinstance(axis, tuple)
         is_int = isinstance(axis, int)
         is_tuple_or_int = is_tuple or is_int
@@ -2154,9 +2161,9 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
            (not isinstance(axis[0], int) or not isinstance(axis[1], int)):
             raise TypeError("axis must be int or tuple of ints")
         if axis == None or axis == 0 or is_tuple and 0 in axis:
-            F = Faust(np.ones((1, F.shape[0])))@F
+            F = Faust(np.ones((1, F.shape[0])), dev=F.device)@F
         if axis == 1 or is_tuple and 1 in axis:
-            F = F@Faust(np.ones((F.shape[1], 1)))
+            F = F@Faust(np.ones((F.shape[1], 1)), dev=F.device)
         if is_tuple and len([i for i in axis if i < 0
                              or i > 1]) or is_int and (axis < 0 or axis > 1):
             raise ValueError("axis "+str(axis)+" is out of bounds for a Faust "
@@ -2240,22 +2247,22 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                             " differ.")
 
         if weights.shape == F.shape:
-            aF = Faust([(weights[:,0].T).reshape(1,F.shape[0])])*F[:,0]
+            aF = Faust([(weights[:,0].T).reshape(1,F.shape[0])], dev=F.device)*F[:,0]
             for i in range(1,F.shape[1]):
                 aF = pyfaust.hstack((aF, Faust([(weights[:,i].T).reshape(1,
-                                                                         F.shape[0])])*F[:,i]))
+                                                                         F.shape[0])], dev=F.device)*F[:,i]))
             sum_weights = 1/np.sum(weights, axis=axis)
-            aFw =  aF[:,0]*Faust([sum_weights[0].reshape(1,1)])
+            aFw =  aF[:,0]*Faust([sum_weights[0].reshape(1,1)], dev=F.device)
             for i in range(1, sum_weights.shape[0]):
                 aFw = pyfaust.hstack((aFw,
-                                      aF[:,i]*Faust([sum_weights[i].reshape(1,1)])))
+                                      aF[:,i]*Faust([sum_weights[i].reshape(1,1)], dev=F.device)))
             if(returned):
                 return (aFw, sum_weights)
             return aFw
 
         if axis == 1 or isinstance(axis, tuple) and 1 in axis:
             if weights.shape[0] == F.shape[1]:
-                aF = F*Faust(weights.reshape(weights.size, 1))
+                aF = F*Faust(weights.reshape(weights.size, 1), dev=F.device)
             else:
                 raise ValueError("ValueError: Length of weights not compatible"
                                  " with specified axis 1.")
@@ -2266,7 +2273,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             if weights.ndim == 1:
                 weightsM = weights.reshape(1, weights.size)
             if weightsM.shape[1] == F.shape[0]:
-                aF = Faust(weightsM)*F
+                aF = Faust(weightsM, dev=F.device)*F
             else:
                 raise ValueError("ValueError: Length of weights not compatible"
                                  " with axis 0.")
@@ -2711,8 +2718,12 @@ def is_gpu_mod_enabled():
     return _FaustCorePy.FaustCore._is_gpu_mod_enabled()
 
 def check_dev(dev):
-    if dev.startswith('gpu') and not is_gpu_mod_enabled():
-        raise Exception('GPU device is not available on your environment.')
+    if dev.startswith('gpu'):
+        if not is_gpu_mod_enabled():
+            raise Exception('GPU device is not available on your environment.')
+    elif dev != 'cpu':
+        raise ValueError("dev must be 'cpu' or 'gpu[:id]'")
+
 
 # experimental block start
 import torch
