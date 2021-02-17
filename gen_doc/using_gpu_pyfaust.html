@@ -14261,14 +14261,14 @@ a.anchor-link {
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h1 id="Using-The-GPU-FA&#181;ST-API">Using The GPU FA&#181;ST API<a class="anchor-link" href="#Using-The-GPU-FA&#181;ST-API">&#182;</a></h1><p>In this notebook we'll see quickly how to leverage the GPU computing power with pyfaust.<br>
 Since pyfaust 2.9.0 the API has been modified to make the GPU available directly from the python wrapper.
-Indeed, a GPU module (aka <code>gpu_mod</code>) has been developed for this purpose.</p>
+Indeed, an independent GPU module (aka <code>gpu_mod</code>) has been developed for this purpose.</p>
 <p>The first question you might ask is: does it work on my computer? Here is the answer: the loading of this module is quite transparent, if an NVIDIA GPU is available and CUDA is properly installed on your system, you have normally nothing to do except installing pyfaust to get the GPU implementations at your fingertips. We'll see at the end of this notebook how to load manually the module and how to get further information in case of an error.</p>
 <p>It is worthy to note two drawbacks about the pyfaust GPU support:</p>
 <ul>
 <li>Mac OS X is not supported because NVIDIA has stopped to support this OS.</li>
 <li>On Windows and Linux, the pyfaust GPU support is currently limited to CUDA 9.2 version.</li>
 </ul>
-<p>In addition to these drawbacks, please notice that the GPU module support is still considered in beta status as the code is relatively young and still evolving. However the API shouldn't change / evolve that much in a near future.</p>
+<p>In addition to these drawbacks, please notice that the GPU module support is still considered in beta status as the code is relatively young and still evolving. However the API shouldn't evolve that much in a near future.</p>
 
 </div>
 </div>
