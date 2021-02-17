@@ -1944,14 +1944,32 @@ classdef Faust
 				cF = matfaust.Faust(facs);
 			end
 		end
+
 		%================================================================
 		%> Clones the Faust (in a new memory space).
 		%===
 		%>
 		%> @retval Fc: the Faust clone.
 		%================================================================
-		function Fc = clone(F)
-			Fc = matfaust.Faust(F, call_mex(F, 'copy'));
+		function Fc = clone(F, varargin)
+			%%
+			if(nargin > 1)
+				dev = varargin{1};
+			else
+				dev = F.dev;
+			end
+			if(strcmp(dev, F.dev))
+				Fc = matfaust.Faust(F, call_mex(F, 'copy'));
+			else if(strcmp(dev, 'cpu')) % F.device == gpu
+				Fc = matfaust.Faust(call_mex(F, 'clone_gpu2cpu'), F.isreal, 'cpu');
+			else % dev == gpu
+				func_name = 'clone_cpu2gpu';
+				if(F.isReal)
+					Fc = matfaust.Faust(mexFaustGPUReal(func_name, F.matrix.objectHandle, varargin{:}), F.isreal, 'gpu');
+				else
+					Fc = matfaust.Faust(mexFaustGPUCplx(func_name, F.matrix.objectHandle, varargin{:}), F.isreal, 'gpu');
+				end
+			end
 		end
 
 		%================================================================

@@ -103,6 +103,8 @@
 #cmakedefine DEV_IS_CPU
 #ifdef DEV_IS_CPU
 #include "enable_gpu_mod.h"
+#else
+#include "faust_clone.h"
 #endif
 
 typedef @FAUST_SCALAR@ SCALAR;
@@ -216,6 +218,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 #ifdef DEV_IS_CPU
 		else if (!strcmp("enable_gpu_mod", cmd))
 			enable_gpu_mod(prhs, nrhs, plhs, nlhs);
+#else
+		else if(!strcmp("clone_cpu2gpu", cmd))
+			faust_clone_cpu2gpu<SCALAR, DEV>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("clone_gpu2cpu", cmd))
+			faust_clone_gpu2cpu<SCALAR, DEV>(prhs, nrhs, plhs, nlhs);
 #endif
 		else
 			mexErrMsgTxt("Command not recognized.");
