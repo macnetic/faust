@@ -1954,6 +1954,16 @@ classdef Faust
 			Fc = matfaust.Faust(F, call_mex(F, 'copy'));
 		end
 
+		%================================================================
+		%> Returns the Faust device ('cpu' or 'gpu').
+		%===
+		%>
+		%> @retval dev: the Faust device.
+		%================================================================
+		function dev = device(F)
+			dev = F.dev
+		end
+
 	end
 	methods(Access = public, Hidden = true)
 		function set_FM_mul_mode(self, mode)
