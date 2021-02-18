@@ -545,7 +545,6 @@ class runtimecmp:
         #tight_layout()
         show(block=False)
 
-# experimental block start
 class hadamard:
     """
         The demo for the hierarchical factorization of Hadamard matrices.
@@ -567,7 +566,7 @@ class hadamard:
     _fig_norm = 'Hadamard-norm.png'
     _HAD_DENSE, _HAD_FAUST, _HAD_TRANS_DENSE, _HAD_TRANS_FAUST = range(0,4)
     _NUM_TIME_TYPES = 4
-    _log2_dims = arange(6,13)
+    _log2_dims = arange(6,15)
     _dims = 2**_log2_dims
     _norm_log2_dims = arange(6,12)
     _norm_dims = 2**_norm_log2_dims
@@ -585,7 +584,7 @@ class hadamard:
         Topics in Signal Processing, 2016.
 
         """
-        from pyfaust import FaustFactory, wht
+        from pyfaust import wht
         from pyfaust.factparams import ParamsHierarchical, ConstraintInt, \
         ConstraintName, StoppingCriterion
         from pyfaust.fact import hierarchical
@@ -593,7 +592,7 @@ class hadamard:
         # generate a Hadamard transform and factorize its full matrix
         n = hadamard._n
         d = 2**n
-        H = wht(n)
+        H = wht(d)
         full_H = H.toarray()
 
         params = ParamsHierarchical([ConstraintInt(ConstraintName(ConstraintName.SPLINCOL),d,d,2)
@@ -694,12 +693,12 @@ class hadamard:
 
     @staticmethod
     def _create_hadamard_fausts_mats(dims, log2_dims):
-        from pyfaust import FaustFactory, wht
+        from pyfaust import wht
         had_mats = []
         had_fausts = []
         for k in range(0, len(log2_dims)):
             print("\rHadamard dims processed: ", dims[0:k+1], end='')
-            F = wht(log2_dims[k])
+            F = wht(2**log2_dims[k])
             had_fausts += [ F ]
             had_mats += [ F.toarray() ]
         print()
@@ -996,7 +995,6 @@ class hadamard:
         h.fig_norm_hadamard(input_dir, output_dir)
         h.fig_fact(input_dir, output_dir)
         h.fig_speedup_hadamard()
-# experimental block end
 
 class bsl:
     """

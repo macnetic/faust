@@ -1960,7 +1960,7 @@ classdef Faust
 			end
 			if(strcmp(dev, F.dev))
 				Fc = matfaust.Faust(F, call_mex(F, 'copy'));
-			else if(strcmp(dev, 'cpu')) % F.device == gpu
+			elseif(strcmp(dev, 'cpu')) % F.device == gpu
 				Fc = matfaust.Faust(call_mex(F, 'clone_gpu2cpu'), F.isreal, 'cpu');
 			else % dev == gpu
 				func_name = 'clone_cpu2gpu';

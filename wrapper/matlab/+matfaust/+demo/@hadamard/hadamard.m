@@ -1,4 +1,3 @@
-% experimental block start
 %% Description demo_fact_hadamard
 %
 %  This demo hierarchically factorizes the Hadamard dictionary and then
@@ -263,6 +262,7 @@ classdef hadamard
 
 
 		end
+
 		%======================================================================
 		%> This demo makes some time comparison between the 2-norm of the Hadamard matrix and its Faust representation for different dimension of the Hadamard matrix.
 		%===
@@ -430,6 +430,7 @@ classdef hadamard
 
 
 		end
+
 		%===============================================================================
 		%> This demo makes some time comparison between (Hadamard matrix)-vector multiplication and (Hadamard factorisation i.e a FAuST)-vector multiplication for different dimension of the Hadamard matrix.
 		%===============================================================================
@@ -437,7 +438,7 @@ classdef hadamard
 			import matfaust.Faust
 
 			nb_mult=500;
-			Ms=6:12;
+			Ms=6:14;
 			ns=2.^Ms;
 			nb_dim=length(Ms);
 			threshold=10^(-10);
@@ -627,4 +628,3 @@ classdef hadamard
 	end
 
 end
-% experimental block end
