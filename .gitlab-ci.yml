@@ -583,6 +583,8 @@ pypi_pub:
       artifacts: true
     - job: pkg_win_purepy_release
       artifacts: true
+    - job: pkg_macos_purepy_release_extra_pyver
+      artifacts: true
     - job: test_nux_purepy_release
     - job: test_win_purepy_pkg
     - job: test_macos_purepy_release
