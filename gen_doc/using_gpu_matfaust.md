@@ -1,5 +1,7 @@
 # Using The GPU FAµST API
 
+**NOTE**: this documentation will be converted to a Matlab Live Script as soon as possible. However, all the content is illustrated with code snippets and outputs as you would find in a Live Script.
+
 __Sections in this tutorial:__  
 
 1. <a href="#1" >Creating a GPU Faust object</a>  

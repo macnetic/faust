@@ -61,6 +61,10 @@ if(BUILD_DOCUMENTATION)
         #list(GET <list> <element index> [<index> ...] <out-var>)
         list(GET PYTHON_EXES -1 PY3_EXE)
         set(GLOB_PATTS "'${PROJECT_BINARY_DIR}/doc/html/namespacepyfaust_*.html';'${PROJECT_BINARY_DIR}/doc/html/namespacematfaust_*.html'")
+	if(NOT PY3_EXE)
+		# workaround in case BUILD_WRAPPER_PYTHON is OFF which implies PY3_EXE is not set
+		set(PY3_EXE python3)
+	endif()
         add_custom_target(doc_exclu_class_filtering ALL ${PY3_EXE}
             ${PROJECT_BINARY_DIR}/doc/filterout_excluded_classes.py ${GLOB_PATTS} DEPENDS doc WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/doc COMMENT "Filter out the non-documented classes")
     	if(BUILD_WRAPPER_MATLAB)
@@ -156,6 +160,7 @@ if(BUILD_DOCUMENTATION)
 	configure_file(${FAUST_DOC_SRC_DIR}/Faust_factorization.mlx.html ${PROJECT_BINARY_DIR}/doc/html/Faust_factorization.mlx.html COPYONLY)
 	configure_file(${FAUST_DOC_SRC_DIR}/Use_of_Faust_objects_in_algorithms.mlx ${PROJECT_BINARY_DIR}/doc/html/Use_of_Faust_objects_in_algorithms.mlx COPYONLY)
 	configure_file(${FAUST_DOC_SRC_DIR}/Use_of_Faust_objects_in_algorithms.mlx.html ${PROJECT_BINARY_DIR}/doc/html/Use_of_Faust_objects_in_algorithms.mlx.html COPYONLY)
+	configure_file(${FAUST_DOC_SRC_DIR}/using_gpu_matfaust.html ${PROJECT_BINARY_DIR}/doc/html/using_gpu_matfaust.html COPYONLY)
 
 	configure_file(${FAUST_DOC_SRC_DIR}/faust_projectors.mlx ${PROJECT_BINARY_DIR}/doc/html/faust_projectors.mlx COPYONLY)
 	configure_file(${FAUST_DOC_SRC_DIR}/faust_projectors.mlx.html ${PROJECT_BINARY_DIR}/doc/html/faust_projectors.mlx.html COPYONLY)
