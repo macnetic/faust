@@ -57,7 +57,7 @@ Nevertheless, it could be useful to check that it really worked and set the envi
 
 To test whether the FAµST Matlab wrapper auto-setup succeeded at install stage, you can open a terminal and type:
 
-	matlab -nodisplay -nojvm -r "matfaust.rand(10, 10, 1, 10, .5, 'dense', 'complex')"
+	matlab -nodisplay -nojvm -r "matfaust.rand(10, 10, 'num_factors', 1, 'density', .5, 'fac_type', 'dense', 'field', 'complex')"
 
 Note: if Matlab is not set in your PATH environment variable you need to replace `matlab' with its full path
 	(e.g. on macOS /Applications/Matlab/MATLAB_R2018b.app/bin/matlab)
@@ -78,7 +78,7 @@ Then launch the script that is responsible to add FAµST location in your Matlab
 
 	>> setup_FAUST
 	>> % then test again FAµST
-	>> matfaust.rand(10, 10, 1, 10, .5, 'dense', 'complex')
+	>> matfaust.rand(10, 10, 'num_factors', 1, 'dim_sizes', 10, 'density', .5, 'fac_type', 'dense', 'field', 'complex')
 
 For that change to be applied permanently, you need to automatize the `addpath()' call made by setup_FAUST.<br/>
 For that purpose:

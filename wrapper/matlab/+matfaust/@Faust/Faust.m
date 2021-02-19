@@ -553,7 +553,7 @@ classdef Faust
 		%> @b Example
 		%> @code
 		%>   % in a matlab terminal
-		%>   >> F = matfaust.rand(10^5, 10^5, 2, 10^5, 10^-4, 'sparse')
+		%>   >> F = matfaust.rand(10^5, 10^5, 'num_factors', 2, 'density', 10^-4, 'fac_type', 'sparse')
 		%>   Faust size 100000x100000, density 0.00018, nnz_sum 1800000, 2 factor(s):
 		%>   - FACTOR 0 (real) SPARSE, size 100000x100000, density 9e-05, nnz 900000
 		%>   - FACTOR 1 (real) SPARSE, size 100000x100000, density 9e-05, nnz 900000
@@ -1077,7 +1077,7 @@ classdef Faust
 		%>
 		%> @Example
 		%> @code
-		%> >> F = matfaust.rand(5,[5, 10])
+		%> >> F = matfaust.rand(7,7, 'dim_sizes', [7, 10])
 		%>
 		%> F =
 		%>
@@ -1373,7 +1373,7 @@ classdef Faust
 		%> @b Example
 		%> @code
 		%> % in a matlab terminal
-		%> >> F = matfaust.rand(50, 100, 2, [50, 100], .5)
+		%> >> F = matfaust.rand(50, 100, 'num_factors', 2, 'dim_sizes', [50, 100], 'density', .5)
 		%> >> norm(F)
 		%> ans =
 		%> 436.4094
