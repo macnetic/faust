@@ -409,6 +409,14 @@ pkg_linux_purepy_release:
         - linux
         - tux_packager
 
+pkg_linux_purepy_release_extra_pyver:
+    extends: .pkg_purepy_release
+    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a", BUILD_MULTITHREAD: "ON", NOPY2: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "../gpu_mod", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", PYTHON_PATH: '/usr/local/bin/python3.9', JOB_PYTHON: 'python3.9'}
+    tags:
+        - linux
+        - tux_packager
+
+
 pkg_linux_purepy_release_torch_linked:
     extends: pkg_linux_purepy_release
     variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a", BUILD_MULTITHREAD: "ON", NOPY2: "ON", FAUST_TORCH: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "/opt/local/libtorch/share/cmake/Torch;../gpu_mod", EXPERIMENTAL_PKG: "OFF"}
@@ -546,6 +554,15 @@ test_nux_purepy_release:
   tags:
     - linux
 
+test_nux_purepy_release_extra_pyver:
+  variables: {JOB_PYTHON: 'python3.9'}
+  extends: .test_unix_purepy_pkg
+  needs:
+    - job: pkg_linux_purepy_release_extra_pyver
+      artifacts: true
+  tags:
+    - linux
+
 test_win_purepy_pkg:
   variables: {JOB_PYTHON: 'py'}
   stage: pkg_test
@@ -572,8 +589,8 @@ pypi_pub:
     - python3 -m pip install --user twine
     - cd build/wrapper/python/dist/
     - find
-    - NUX_WHL=$(ls *linux*x86_64.whl)
-    - mv $NUX_WHL ${NUX_WHL%-*}-manylinux1_x86_64.whl # proper format for pypi (just linux is not accepted)
+    - NUX_WHLS=$(ls *linux*x86_64.whl)
+    - for NUX_WHL in $NUX_WHLS; do mv $NUX_WHL ${NUX_WHL%-*}-manylinux1_x86_64.whl; done # proper format for pypi (just linux is not accepted)
     - TOKEN=$(echo $PYPI_TOKEN | base64 -d)
     - echo -e "__token__\n$TOKEN" | python3 -m twine upload *.whl
   needs:
@@ -581,11 +598,14 @@ pypi_pub:
       artifacts: true
     - job: pkg_linux_purepy_release
       artifacts: true
+    - job: pkg_linux_purepy_release_extra_pyver
+      artifacts: true
     - job: pkg_win_purepy_release
       artifacts: true
     - job: pkg_macos_purepy_release_extra_pyver
       artifacts: true
     - job: test_nux_purepy_release
+    - job: test_nux_purepy_release_extra_pyver
     - job: test_win_purepy_pkg
     - job: test_macos_purepy_release
     - job: test_macos_purepy_release_extra_pyver
