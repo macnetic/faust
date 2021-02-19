@@ -202,9 +202,9 @@ classdef quickstart
 		%============================================================
 		function factorize_matrix()
 			% number of row of the matrix
-			dim1 = 100;
+			dim1 = 500;
 			% number of column of the matrix
-			dim2 = 200;
+			dim2 = 1000;
 			% matrix to factorize
 			A = rand(dim1,dim2);
 
@@ -219,8 +219,7 @@ classdef quickstart
 
 			%% factorization (create Faust from matrix A)
 			faust_A = faust_decompose(A,params);
-
-
+			faust_A = optimize_memory(faust_A);
 
 			%% speed-up multiplication
 			y=zeros(dim2,1);

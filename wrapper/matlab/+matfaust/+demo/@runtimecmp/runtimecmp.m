@@ -186,7 +186,7 @@ classdef runtimecmp
 			t_dense(1,:,:)=[];
 
 			runPath=which(mfilename);
-			pathname = 'output'
+			pathname = 'output';
 			if(~ exist(pathname))
 				mkdir(pathname)
 			end
@@ -206,7 +206,7 @@ classdef runtimecmp
 		%=========================================================================
 		function Fig_runtime_comparison()
 			runPath=which(mfilename);
-			pathname = 'output'
+			pathname = 'output';
 			matfile = fullfile(pathname, 'runtime_comparison.mat');
 			if (not(exist(matfile)))
 				error('run runtime_comparison.m before Fig_runtime_comparison.m');
