@@ -2,10 +2,12 @@
 
 # Frequently Asked Question
 
-[1. why did I get a file-not-found error when running demos or examples ?](#one)
+[1. Why did I get a file-not-found error when running demos or examples?](#one)  
+[2. How can I launch the integrated unit tests of pyfaust?](#two)  
+[3. How to launch the demos with pyfaust?](#three)  
 
 \anchor one
-## 1. why did I get a file-not-found error when running demos or examples ?
+## 1. Why did I get a file-not-found error when running demos or examples?
 
 
 For example, running this matlab command if quickstart.mat file is not found you'll get the following error:
@@ -72,4 +74,109 @@ Second, run these commands to download and uncompress the data:
         Uncompressing zip archive to /opt/local/faust/matlab/data
 
 If finally you still don't manage to retrieve the data, please write an [email](index.html) with all the details (at least the version of FAµST, the installer used and of course your system).
+
+\anchor two
+## 2. How can I launch the integrated unit tests of pyfaust?
+
+That's actually quite simple, if pyfaust is properly installed, you just have to type this command in a terminal:
+
+	python -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'real')"
+	# in some cases, it could be python3 or python3* instead of python
+
+Note: in the above test, the Faust class is tested for the CPU C++ backend and real Faust objects (i.e. dtype == np.float). If you want to test GPU complex Faust, just replace the arguments as this: ``run_tests('gpu', 'complex')``.
+
+\anchor three
+## 3. How to launch the demos with pyfaust?
+
+You might run all the demos at once or one by one. In the former case you should run this python code:
+
+	>>> from pyfaust.demo import runall
+	>>> runall()
+
+Note: the raw result are then in output files located in the directory ``pyfaust.demo.DEFT_RESULTS_DIR``.
+
+To generate the figures that go by default into ``pyfaust.demo.DEFT_FIG_DIR``, you have to type in a python terminal or insert in a python script the following instructions:
+
+	>>> from pyfaust.demo import allfigs
+	>>> allfigs()
+
+To launch the demo one by one, you can pick the command in your interest below:
+
+For the [BSL](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1demo_1_1bsl.html) demo:
+
+	>>> from pyfaust.demo import bsl
+	>>> bsl.run() # runs the experiment
+	>>> bsl.fig() # generates the figures
+
+For the [DFT](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1demo_1_1fft.html) demo:
+
+	>>> from pyfaust.demo import fft
+	>>> fft.speed_up_fourier()
+	>>> fft.fig_speedup_fourier()
+
+For the [Hadamard](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1demo_1_1hadamard.html) demo:
+
+	>>> from pyfaust.demo import hadamard
+	>>> hadamard.run_fact()
+	>>> hadamard.run_speedup_hadamard()
+	>>> hadamard.run_norm_hadamard()
+	>>> hadamard.figs()
+
+For the [runtime comparison](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1demo_1_1runtimecmp.html) demo:
+
+	>>> from pyfaust.demo import runtimecmp
+	>>> runtimecmp.run()
+	>>> runtimecmp.fig()
+
+And for the last and simplest demo, the [quickstart script](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1demo_1_1quickstart.html):
+
+	>>> from pyfaust.demo import quickstart
+	>>> quickstart.run()
+
+\anchor four
+## 4. How can I launch the integrated unit tests of matfaust?
+
+TODO
+
+\anchor five
+## 5. How to launch the demos with matfaust?
+
+You might run all the demos at once or one by one. In the former case you should run this matlab code:
+
+>> import matfaust.demo.runall
+>> runall()
+
+Note: the raw result are then in output files located in the directory ``./output``.
+
+To launch the demo one by one, you can pick the command in your interest below:
+
+
+For the [BSL](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacematfaust_1_1demo.html) demo:
+
+	>> import matfaust.demo.bsl.*
+	>> BSL()
+	>> Fig_BSL()
+
+For the [DFT](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1demo_1_1fft.html) demo:
+
+	>> import matfaust.demo.fft.speed_up_fourier
+	>> speed_up_fourier
+
+For the [Hadamard](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1demo_1_1hadamard.html) demo:
+
+	>> import matfaust.demo.hadamard
+	>> hadamard.speed_up_hadamard()
+
+For the [runtime comparison](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1demo_1_1runtimecmp.html) demo:
+
+	>> import matfaust.demo.runtimecmp
+	>> runtimecmp.runtime_comparison
+	>> runtimecmp.Fig_runtime_comparison
+
+And for the last and simplest demo, the [quickstart script](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1demo_1_1quickstart.html):
+
+	>> import matfaust.demo.quickstart
+	>> quickstart.quick_start()
+	>> quickstart.factorize_matrix()
+	>> quickstart.construct_Faust_from_factors()
 
