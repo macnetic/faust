@@ -391,7 +391,7 @@ class runtimecmp:
 
                 for l in range(0,runtimecmp._nb_facts_len):
                     nf = runtimecmp._nb_facts[l]
-                    F = frand(nf , dim, 1./(nf*rcg),
+                    F = frand(dim, dim, nf, density=1./(nf*rcg),
                                           per_row=runtimecmp._constraint, fac_type='sparse')
                     assert(F.rcg() == rcg)
                     fausts[j,k,l] = F
