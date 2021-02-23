@@ -1,6 +1,7 @@
 # -*- coding: @PYTHON_ENCODING@ -*-
 # @PYFAUST_LICENSE_HEADER@
 # @TORCH_LIBS_LOADING@
+# @MACOS_OMP_LIB_LOADING@
 
 ## @package pyfaust @brief @b The @b FAuST @b Python @b Wrapper
 
