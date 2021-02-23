@@ -5,6 +5,7 @@ variables:
     DURL: "https://gitlab.inria.fr/faustgrp/gforge_files/-/raw/master/"
     DFILE: "faust_data-2.6.0.zip"
     JOB_PYTHON: "python3" # if set again in job, it hides this one (precedence: https://docs.gitlab.com/13.6/ee/ci/variables/#priority-of-environment-variables)
+    WIN_PY_VER: '3.7' #default python version used to build python wrapper on windows
 
 .ctest_template: &ctest_script
     script:
@@ -463,8 +464,10 @@ pkg_linux_purepy_release_torch_linked:
           # only python3 for windows
           #- 'start %PYTHON2_PATH% setup.py bdist_wheel'
           #- 'start %PYTHON2_PATH% setup.py bdist_egg'
-        - 'call "%PYTHON_PATH%" setup.py bdist_wheel'
-        - 'call "%PYTHON_PATH%" setup.py bdist_egg'
+          #- 'call "%PYTHON_PATH%" setup.py bdist_wheel'
+          #- 'call "%PYTHON_PATH%" setup.py bdist_egg'
+        - py -%WIN_PY_VER% setup.py bdist_wheel
+        - py -%WIN_PY_VER% setup.py bdist_egg
     artifacts:
         paths:
             - build\wrapper\python\dist
@@ -490,6 +493,16 @@ pkg_win_purepy_rev:
 pkg_win_purepy_release:
     extends: .pkg_win_purepy
     variables: {BUILD_CONFIG: "Release", GIT_SUBMODULE_STRATEGY: recursive, EXPERIMENTAL_PKG: "OFF"}
+    before_script:
+        - 'set VERSION=%CI_COMMIT_TAG%'
+    artifacts:
+        expire_in: '50 yrs'
+    only:
+        - tags
+
+pkg_win_purepy_release_extra_pyver:
+    extends: .pkg_win_purepy
+    variables: {BUILD_CONFIG: "Release", GIT_SUBMODULE_STRATEGY: recursive, EXPERIMENTAL_PKG: "OFF", WIN_PY_VER: '3.9'}
     before_script:
         - 'set VERSION=%CI_COMMIT_TAG%'
     artifacts:
@@ -570,11 +583,11 @@ test_win_purepy_pkg:
     - 'cd build\wrapper\python\dist'
     - 'dir /B pyfaust*.whl > pkg_name.txt'
     - 'set /p PKG_NAME=<pkg_name.txt'
-    - '%JOB_PYTHON% -m venv test_pyfaust-%CI_COMMIT_TAG%'
+    - '%JOB_PYTHON% -%WIN_PY_VER% -m venv test_pyfaust-%CI_COMMIT_TAG%'
     - 'call test_pyfaust-%CI_COMMIT_TAG%\Scripts\activate'
-    - 'pip install %PKG_NAME%'
-    - '%JOB_PYTHON% -c "import pyfaust; print(pyfaust.version()); print(pyfaust.rand(5,5).toarray());"'
-    - '%JOB_PYTHON% -c "import pyfaust.tests; pyfaust.tests.run_tests(\"cpu\", \"real\")"'
+    - '%JOB_PYTHON% -%WIN_PY_VER% -m pip install %PKG_NAME%'
+    - '%JOB_PYTHON% -%WIN_PY_VER% -c "import pyfaust; print(pyfaust.version()); print(pyfaust.rand(5,5).toarray());"'
+    - '%JOB_PYTHON% -%WIN_PY_VER% -c "import pyfaust.tests; pyfaust.tests.run_tests(\"cpu\", \"real\")"'
   needs:
     - job: pkg_win_purepy_release
       artifacts: true
@@ -582,6 +595,13 @@ test_win_purepy_pkg:
     - tags
   tags:
     - win10
+
+test_win_purepy_pkg_extra_pyver:
+  extends: test_win_purepy_pkg
+  variables: {JOB_PYTHON: 'py', WIN_PY_VER: '3.9'}
+  needs:
+    - job: pkg_win_purepy_release_extra_pyver
+      artifacts: true
 
 pypi_pub:
   stage: pkg_pub
@@ -602,6 +622,8 @@ pypi_pub:
       artifacts: true
     - job: pkg_win_purepy_release
       artifacts: true
+    - job: pkg_win_purepy_release_extra_pyver
+      artifacts: true
     - job: pkg_macos_purepy_release_extra_pyver
       artifacts: true
     - job: test_nux_purepy_release
@@ -609,6 +631,7 @@ pypi_pub:
     - job: test_win_purepy_pkg
     - job: test_macos_purepy_release
     - job: test_macos_purepy_release_extra_pyver
+    - job: test_win_purepy_pkg_extra_pyver
   only:
     - tags
   tags:
