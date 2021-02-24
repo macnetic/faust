@@ -182,8 +182,8 @@ function(filter_experimental_code PY_INPUT PY_OUTPUT)
 		"${FILTER_SCRIPT}"
 		"${FILTERED_OUT_PY}"
 		"${FILTERED_OUT_PY}"
-		"--no-empty")
-	if(NOT EXISTS ${FILTERED_OUT_PY})
+		"--no-empty" OUTPUT_VARIABLE FILTER_OUTPUT)
+	if (NOT FILTER_OUTPUT MATCHES "deleting" AND NOT EXISTS ${FILTERED_OUT_PY}) # if the file is empty it is deleted by the python script
 		message(FATAL_ERROR "Filtering failed.")
 	endif()
 endfunction(filter_experimental_code)
