@@ -764,8 +764,12 @@ template<typename FPP>
 		else if(ds_mat = dynamic_cast<MatDense<FPP,Cpu>*>(&M_))
 		{
 			if(! (ds_fact = dynamic_cast<MatDense<FPP,Cpu>*>(fact)))
-				throw std::runtime_error("A dense factor can't be updated with a dense factor");
+				throw std::runtime_error("A dense factor can't be updated with a sparse factor");
 			*ds_fact = *ds_mat;
+		}
+		else
+		{
+			throw std::runtime_error("Only MatSparse and MatDense are accepted by TransformHelper::update().");
 		}
 		fact->set_id(M.is_id());
 		update_total_nnz();
