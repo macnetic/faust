@@ -94,6 +94,94 @@ void Faust::prox_sp(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k, const boo
 	if(normalized) M.normalize();
 }
 
+template<typename FPP> faust_unsigned_int Faust::sparse_size(faust_unsigned_int nnz, faust_unsigned_int nrows)
+{
+	//TODO: move elsewhere
+	auto size = nnz*(sizeof(FPP)+sizeof(int)) + (nrows + 1) * sizeof(int);
+	return size;
+}
+
+template<typename FPP> faust_unsigned_int Faust::dense_size(faust_unsigned_int nrows, faust_unsigned_int ncols)
+{
+	//TODO: move elsewhere
+	auto size = nrows*ncols*sizeof(FPP);
+	return size;
+}
+
+template<typename FPP>
+Faust::MatGeneric<FPP,Cpu>* Faust::prox_sp(Faust::MatDense<FPP,Cpu> & M, Faust::MatSparse<FPP, Cpu> & spM, faust_unsigned_int k, const bool normalized /* true by deft */, const bool pos, const MatType forcedType/*=None*/)
+{
+	// M is the dense matrix on which to compute projection
+	// M is also the output matrix if k is high enough
+	// otherwise spM is used as output
+	// The output matrix is returned as a MatGeneric (as explained it could be MatSparse or MatDense)
+	const faust_unsigned_int dim1 = M.getNbRow();
+	const faust_unsigned_int dim2 = M.getNbCol();
+	const faust_unsigned_int nnz = M.getNonZeros();
+
+	auto out_is_dense = sparse_size<FPP>(k, dim1) > dense_size<FPP>(dim1, dim2) && forcedType == None || forcedType == Dense;
+
+	if(pos) Faust::pre_prox_pos(M);
+
+	const faust_unsigned_int numel = dim1*dim2;
+
+	if (k < numel /* && k < M.getNonZeros()*/)
+	{
+		const std::vector<FPP> vec(M.getData(), M.getData()+numel);
+		std::vector<int> index;
+		Faust::sort_idx(vec, index, k);
+		index.erase(index.begin()+k, index.end());
+
+		if(out_is_dense)
+		{
+			M.setZeros();
+			for (int i=0 ; i<index.size() ; i++)
+				M.getData()[index[i]] = vec[index[i]];
+
+			if(normalized) M.normalize();
+			return &M;
+		}
+		else
+		{
+			FPP *values = new FPP[index.size()];
+			unsigned int *row_ids = new unsigned int[index.size()];
+			unsigned int *col_ids = new unsigned int[index.size()];
+
+
+
+			std::vector<Eigen::Triplet<FPP> > tripletList;
+			for (int i=0 ; i<index.size() ; i++)
+			{
+				values[i] = vec[index[i]];
+				row_ids[i] = index[i]%dim1;
+				col_ids[i] = index[i]/dim1;
+			}
+
+			if(normalized)
+			{
+				Faust::Vect<FPP,Cpu> nvalues(index.size(), values);
+				nvalues.normalize();
+				values = nvalues.getData();
+			}
+			spM = MatSparse<FPP,Cpu>(row_ids, col_ids, values, dim1, dim2, index.size());
+			delete[] row_ids;
+			delete[] col_ids;
+			delete[] values;
+			return &spM;
+		}
+	}
+	else
+	{
+		if(sparse_size<FPP>(M.getNonZeros(), dim1) > dense_size<FPP>(dim1, dim2))
+			return &M;
+		else
+		{
+			spM = M;
+			return &spM;
+		}
+	}
+}
+
 template<typename FPP>
 void Faust::prox_spcol(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k, const bool normalized /* deft to true */, const bool pos)
 {

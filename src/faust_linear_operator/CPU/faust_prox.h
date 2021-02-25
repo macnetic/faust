@@ -100,7 +100,15 @@ namespace Faust
 	template<typename FPP>
 		void prox_skperm(MatDense<FPP, Cpu> & M,const unsigned int k,  const bool normalized=true, const bool pos=false);
 
-
+	template<typename FPP> faust_unsigned_int sparse_size(faust_unsigned_int nnz, faust_unsigned_int nrows);
+	template<typename FPP> faust_unsigned_int dense_size(faust_unsigned_int nrows, faust_unsigned_int ncols);
+	/**
+	 * Decides which output format to use when appliying the SP prox. op. to M. Either M or spM is the output, it depends on the byte size. The minimum memory fingerprint is targeted.
+	 *
+	 *  \param forcedType: used to choose explicitely the output format with values Sparse or Dense (MatSparse or MatDense).
+	 */
+	template<typename FPP>
+		MatGeneric<FPP,Cpu>* prox_sp(MatDense<FPP,Cpu> & M, MatSparse<FPP, Cpu> & spM, faust_unsigned_int k, const bool normalized=true, const bool pos=false, const MatType forcedType=None);
 }
 
 #include "faust_prox.hpp"

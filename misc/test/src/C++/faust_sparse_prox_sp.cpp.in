@@ -1,0 +1,78 @@
+#include "faust_MatDense.h"
+#include "faust_MatSparse.h"
+#include "faust_prox.h"
+#include <iostream>
+
+/** \brief unitary test for MatDense conjugate
+*/
+
+typedef @TEST_FPP@ FPP;
+
+
+using namespace Faust;
+using namespace std;
+
+void print_mat_data(MatDense<FPP,Cpu>& mat)
+{
+	int nrows = mat.getNbRow(), ncols = mat.getNbCol();
+	for (int i=0;i < nrows; i++)
+	{
+		for(int j=0;j < ncols; j++)
+			cout << mat.getData()[j*nrows+i] << " ";
+		cout << endl;
+	}
+}
+
+int main(int argc, char* argv[])
+{
+	faust_unsigned_int dim1 = 204;
+	faust_unsigned_int dim2 = 204;
+
+	MatDense<FPP,Cpu>* M;
+	MatDense<FPP,Cpu> M_copy;
+	M = MatDense<FPP,Cpu>::randMat(dim1,dim2);
+	*M *= FPP(100);
+	MatDense<FPP,Cpu> dM = *M;
+	MatSparse<FPP,Cpu> spM;
+	MatGeneric<FPP,Cpu>* G;
+
+	auto num_its = 300;
+
+	auto k = 1632;
+
+
+	std::chrono::time_point<std::chrono::steady_clock> sparse_prox_start, sparse_prox_end, dense_prox_start, dense_prox_end;
+	std::chrono::duration<double> sparse_prox_dur, dense_prox_dur;
+
+	for(int i=0; i < num_its; i++)
+	{
+		sparse_prox_start = std::chrono::steady_clock::now();
+		G = prox_sp(dM, spM, k, /* normalized */ false);
+		sparse_prox_end = std::chrono::steady_clock::now();
+//		G->Display();
+//		cout << G->norm() << endl;
+		MatDense<FPP,Cpu> spM2d(*dynamic_cast<MatSparse<FPP,Cpu>*>(G));
+//		spM2d.Display();
+//		print_mat_data(spM2d);
+		sparse_prox_dur += sparse_prox_end-sparse_prox_start;
+		dense_prox_start = std::chrono::steady_clock::now();
+		dM = *M;
+		prox_sp(dM, k, /* normalized */ false);
+		spM = dM;
+		dense_prox_end = std::chrono::steady_clock::now();
+//		cout <<dM.norm() << endl;
+//		print_mat_data(dM);
+//		dM.Display();
+		dense_prox_dur += dense_prox_end-dense_prox_start;
+		dM -= spM2d;
+		auto err = dM.norm();
+//		cout << "err:" << err << endl;
+		assert(err < 1e-6);
+		dM = *M;
+	}
+
+	cout << "sparse sp prox time:" << sparse_prox_dur.count() << endl;
+	cout << "dense sp prox time:" << dense_prox_dur.count() << endl;
+
+	return 0;
+}

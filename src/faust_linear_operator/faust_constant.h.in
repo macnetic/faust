@@ -92,7 +92,8 @@ enum MatType
 {
    Dense, 
    Sparse, 
-   Diag
+   Diag,
+   None
 };
 
 
