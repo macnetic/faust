@@ -186,10 +186,10 @@ Faust::MatSparse<FPP,Cpu>::MatSparse(const faust_unsigned_int nnz_, const faust_
 	for (int i=0;i<dim1_;i++)
 	{
 		nb_elt_rowi = row_ptr[i+1]-row_ptr[i];
-		//std::cout<<"nb_elt "<< nb_elt_colj<<" col "<<j<<std::endl;
+//		std::cout<<"nb_elt "<< nb_elt_colj<<" col "<<j<<std::endl;
 		for (int j = 0;j<nb_elt_rowi;j++)
 		{
-			//std::cout<<"i : "<<id_row[i+nbEltIns]<<" j :"<<j<<" value : "<<value[i+nbEltIns]<<std::endl;
+//			std::cout<<"i : "<<i <<" j :"<< id_col[j+nbEltIns]<<" value : "<<value[j+nbEltIns]<<std::endl;
 			if(transpose)
 				tripletList.push_back(Eigen::Triplet<FPP>((int) id_col[j+nbEltIns], i, (FPP) value[j+nbEltIns]));
 			else
@@ -339,7 +339,27 @@ void Faust::MatSparse<FPP,Cpu>::set(const faust_unsigned_int nnz_, const faust_u
 	nnz = nnz_;
 }
 
+template<typename FPP>
+Faust::MatSparse<FPP,Cpu>::MatSparse(const unsigned int* rowidx, const unsigned int* colidx, const FPP* values, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_, faust_unsigned_int nnz)
+{
+	vector<Eigen::Triplet<FPP> > tripletList;
+	tripletList.reserve(nnz);
+	for(int i=0 ; i<nnz ; i++)
+		tripletList.push_back(Eigen::Triplet<FPP>(rowidx[i], colidx[i], values[i]));
+	mat.resize(dim1_, dim2_);
+	mat.setFromTriplets(tripletList.begin(), tripletList.end());
+	mat.makeCompressed();
+	this->nnz = mat.nonZeros();
+}
 
+template<typename FPP>
+Faust::MatSparse<FPP,Cpu>::MatSparse(std::vector<Eigen::Triplet<FPP>> &tripletList, const faust_unsigned_int dim1, const faust_unsigned_int dim2)
+{
+	mat.resize(dim1, dim2);
+	mat.setFromTriplets(tripletList.begin(), tripletList.end());
+	mat.makeCompressed();
+	this->nnz = mat.nonZeros();
+}
 
 	template<typename FPP>
 Faust::MatSparse<FPP,Cpu>::MatSparse(const vector<int>& rowidx, const vector<int>& colidx, const vector<FPP>& values, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_)

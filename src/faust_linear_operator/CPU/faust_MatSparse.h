@@ -160,6 +160,22 @@ namespace Faust
 			//!	\param dim2_ : number of column of the matrix
 			MatSparse(const std::vector<int>& rowidx, const std::vector<int>& colidx, const std::vector<FPP>& values, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_);
 
+			//! \brief Constructor
+			//	WARNING: using this constructor is discounraged because rowidx, colidx, values are not necessarily safe, its the responsibility of the caller to check their allocation space according to values.size().
+			//!	\param rowidx : row indices with for all k < values.size(), M[rowidx[k]][colidx[k]] = values[k];
+			//!	\param colidx : column indices with for all k < values.size(), M[rowidx[k]][colidx[k]] = values[k];
+			//!	\param values : nonzeros of the matrix (should be nnz).
+			//!	\param dim1_ : number of row of the matrix
+			//!	\param dim2_ : number of column of the matrix
+			MatSparse(const unsigned int* rowidx, const unsigned int* colidx, const FPP* values, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_, faust_unsigned_int nnz);
+
+
+			//! \brief Constructor
+			// \param tripletList: STL triplets (row_id, col_id, nonzero_value) used to define the matrix tripletList.size() is the nnz of the matrix.
+			//!	\param dim1 : number of row of the matrix
+			//!	\param dim2 : number of column of the matrix
+			MatSparse(std::vector<Eigen::Triplet<FPP>> &tripletList, const faust_unsigned_int dim1, const faust_unsigned_int dim2);
+
 			//!  \brief Constructor
 			//	WARNING: using this constructor is discounraged because rowidx, colidx are not necessarily safe, its the responsibility of the caller to check their allocation space according to values.size().
 			//!	\param rowidx : row indices with for all k < values.size(), M[rowidx[k]][colidx[k]] = values[k];
