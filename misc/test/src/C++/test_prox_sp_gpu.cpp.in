@@ -1,0 +1,84 @@
+#include "faust_MatDense.h"
+#include "faust_MatDense_gpu.h"
+#include "faust_prox_gpu.h"
+#include <iostream>
+
+/** \brief unitary test for MatDense conjugate
+*/
+
+typedef @TEST_FPP@ FPP;
+
+
+using namespace Faust;
+using namespace std;
+
+//void print_mat_data(MatDense<FPP,Cpu>& mat)
+//{
+//	int nrows = mat.getNbRow(), ncols = mat.getNbCol();
+//	for (int i=0;i < nrows; i++)
+//	{
+//		for(int j=0;j < ncols; j++)
+//			cout << mat.getData()[j*nrows+i] << " ";
+//		cout << endl;
+//	}
+//}
+
+int main(int argc, char* argv[])
+{
+	Faust::enable_gpu_mod();
+	faust_unsigned_int dim1 = 204;
+	faust_unsigned_int dim2 = 204;
+
+
+	auto num_its = 30000;
+
+	auto k = dim1/10;
+
+	if(argc > 1)
+	{
+		num_its = std::atoi(argv[1]);
+		if(argc > 2)
+		{
+			dim1 = dim2 = std::atoi(argv[2]);
+			if(argc > 3)
+			{
+				k = std::atoi(argv[3]);
+			}
+		}
+	}
+
+	MatDense<FPP,Cpu>* M;
+	MatDense<FPP,GPU2> M1, M2;
+	M = MatDense<FPP,Cpu>::randMat(dim1,dim2);
+	*M *= FPP(100);
+	M1 = *M;
+	M2 = *M;
+
+
+	std::chrono::time_point<std::chrono::steady_clock> pure_gpu_prox_start, pure_gpu_prox_end, gpu_cpu_rt_prox_start, gpu_cpu_rt_prox_end;
+	std::chrono::duration<double> pure_gpu_prox_dur, gpu_cpu_rt_prox_dur;
+
+	for(int i=0; i < num_its; i++)
+	{
+		pure_gpu_prox_start = std::chrono::steady_clock::now();
+		prox_sp(M1, k, /* normalized */ false, /* pos*/ false, /* pure_gpu */ true);
+		pure_gpu_prox_end = std::chrono::steady_clock::now();
+		pure_gpu_prox_dur += pure_gpu_prox_end-pure_gpu_prox_start;
+
+		gpu_cpu_rt_prox_start = std::chrono::steady_clock::now();
+		prox_sp(M2, k, /* normalized */ false, /* pos*/ false, /* pure_gpu */ false);
+		gpu_cpu_rt_prox_end = std::chrono::steady_clock::now();
+		gpu_cpu_rt_prox_dur += gpu_cpu_rt_prox_end-gpu_cpu_rt_prox_start;
+		M1 -= M2;
+		auto err = M1.norm();
+//		cout << "err:" << err << endl;
+		assert(err < 1e-6);
+		M1 = *M;
+		M2 = *M;
+	}
+
+	cout << "pure gpu prox time:" << pure_gpu_prox_dur.count() << endl;
+	cout << "gpu2cpu round-trip prox time:" << gpu_cpu_rt_prox_dur.count() << endl;
+
+	return 0;
+}

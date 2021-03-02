@@ -47,11 +47,18 @@
 namespace Faust
 {
 	template<typename FPP>
-		void prox_sp(MatDense<FPP,GPU2> & M, faust_unsigned_int k, const bool normalized/*=true*/, const bool pos/*=false*/)
+		void prox_sp(MatDense<FPP,GPU2> & M, faust_unsigned_int k, const bool normalized/*=true*/, const bool pos/*=false*/, const bool pure_gpu/*=true*/)
 		{
-			MatDense<FPP,Cpu> cpuM = M.tocpu();
-			prox_sp(cpuM, k, normalized, pos);
-			M = cpuM;
+			if(pure_gpu)
+			{
+				M.prox_sp(k, normalized, pos);
+			}
+			else
+			{
+				MatDense<FPP,Cpu> cpuM = M.tocpu();
+				prox_sp(cpuM, k, normalized, pos);
+				M = cpuM;
+			}
 		}
 
 	template<typename FPP>
