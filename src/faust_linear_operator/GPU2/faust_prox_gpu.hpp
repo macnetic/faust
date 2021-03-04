@@ -70,19 +70,33 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		void prox_spcol(MatDense<FPP,GPU2> & M, faust_unsigned_int k, const bool normalized/*=true*/, const bool pos/*=false*/)
+		void prox_spcol(MatDense<FPP,GPU2> & M, faust_unsigned_int k, const bool normalized/*=true*/, const bool pos/*=false*/, const bool pure_gpu/*=true*/)
 		{
-			MatDense<FPP,Cpu> cpuM = M.tocpu();
-			prox_spcol(cpuM, k, normalized, pos);
-			M = cpuM;
+			if(pure_gpu)
+			{
+				M.prox_spcol(k, normalized, pos);
+			}
+			else
+			{
+				MatDense<FPP,Cpu> cpuM = M.tocpu();
+				prox_spcol(cpuM, k, normalized, pos);
+				M = cpuM;
+			}
 		}
 
 	template<typename FPP>
-		void prox_splin(MatDense<FPP,GPU2> & M,faust_unsigned_int k, const bool normalized/*=true*/, const bool pos/*=false*/)
+		void prox_splin(MatDense<FPP,GPU2> & M,faust_unsigned_int k, const bool normalized/*=true*/, const bool pos/*=false*/, const bool pure_gpu/*=true*/)
 		{
-			MatDense<FPP,Cpu> cpuM = M.tocpu();
-			prox_splin(cpuM, k, normalized, pos);
-			M = cpuM;
+			if(pure_gpu)
+			{
+				M.prox_splin(k, normalized, pos);
+			}
+			else
+			{
+				MatDense<FPP,Cpu> cpuM = M.tocpu();
+				prox_splin(cpuM, k, normalized, pos);
+				M = cpuM;
+			}
 		}
 
 	template<typename FPP>

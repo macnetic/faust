@@ -130,6 +130,8 @@ namespace Faust
 				void copyBuf(FPP* dst_cpu_buf, const void* stream=nullptr) const;
 				bool isReal() const;
 				void prox_sp(int32_t k, bool normalized=false, bool pos=false) const;
+				void prox_spcol(int32_t k, bool normalized=false, bool pos=false) const;
+				void prox_splin(int32_t k, bool normalized=false, bool pos=false) const;
 
 			protected:
 				gm_DenseMat_t gpu_mat;
