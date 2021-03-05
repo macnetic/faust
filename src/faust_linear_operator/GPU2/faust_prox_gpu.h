@@ -56,11 +56,11 @@ namespace Faust
 	template<typename FPP>
 		void prox_sp_pos(MatDense<FPP, GPU2> & M,faust_unsigned_int k, const bool normalized=true, const bool pos=false );
 	template<typename FPP>
-		void prox_spcol(MatDense<FPP,GPU2> & M,faust_unsigned_int k, const bool normalized=true, const bool pos=false);
+		void prox_spcol(MatDense<FPP,GPU2> & M,faust_unsigned_int k, const bool normalized=true, const bool pos=false, const bool pure_gpu=true);
 	template<typename FPP>
 		void prox_splin(MatDense<FPP,GPU2> & M,faust_unsigned_int k, const bool normalized=true, const bool pos=false, const bool pure_gpu=true);
 	template<typename FPP>
-		void prox_splincol(MatDense<FPP,GPU2> &M,faust_unsigned_int k, const bool normalized=true, const bool pos=false, const bool pure_gpu=true);
+		void prox_splincol(MatDense<FPP,GPU2> &M,faust_unsigned_int k, const bool normalized=true, const bool pos=false);
 	template<typename FPP>
 		void prox_supp(MatDense<FPP,GPU2> & M, const MatDense<FPP,GPU2> & supp, const bool normalized=true, const bool pos=false);
 	template<typename FPP>
