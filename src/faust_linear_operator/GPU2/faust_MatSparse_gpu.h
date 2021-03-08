@@ -69,7 +69,7 @@ namespace Faust
 
 				void tocpu(MatSparse<FPP,Cpu> &sp_mat) const;
 				void tocpu(int* row_ptr, int* col_ind, FPP* value_ptr, int* nrows=nullptr, int* ncols=nullptr, int* nnz=nullptr) const;
-				Real<FPP> norm();
+				Real<FPP> norm() const;
 				void transpose();
 				void adjoint();
 				void conjugate();

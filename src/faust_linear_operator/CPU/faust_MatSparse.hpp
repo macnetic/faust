@@ -183,21 +183,24 @@ Faust::MatSparse<FPP,Cpu>::MatSparse(const faust_unsigned_int nnz_, const faust_
 	int nb_elt_rowi;
 	//std::cout<<"SPMAT CONSTRUCTOR"<<std::endl;
 	//std::cout<<"row "<< dim1_<<" col "<<dim2_<<std::endl;
-	for (int i=0;i<dim1_;i++)
+	if(nnz_ > 0)
 	{
-		nb_elt_rowi = row_ptr[i+1]-row_ptr[i];
-//		std::cout<<"nb_elt "<< nb_elt_colj<<" col "<<j<<std::endl;
-		for (int j = 0;j<nb_elt_rowi;j++)
+		for (int i=0;i<dim1_;i++)
 		{
-//			std::cout<<"i : "<<i <<" j :"<< id_col[j+nbEltIns]<<" value : "<<value[j+nbEltIns]<<std::endl;
-			if(transpose)
-				tripletList.push_back(Eigen::Triplet<FPP>((int) id_col[j+nbEltIns], i, (FPP) value[j+nbEltIns]));
-			else
-				tripletList.push_back(Eigen::Triplet<FPP>(i,(int) id_col[j+nbEltIns], (FPP) value[j+nbEltIns]));
+			nb_elt_rowi = row_ptr[i+1]-row_ptr[i];
+			//		std::cout<<"nb_elt "<< nb_elt_colj<<" col "<<j<<std::endl;
+			for (int j = 0;j<nb_elt_rowi;j++)
+			{
+				//			std::cout<<"i : "<<i <<" j :"<< id_col[j+nbEltIns]<<" value : "<<value[j+nbEltIns]<<std::endl;
+				if(transpose)
+					tripletList.push_back(Eigen::Triplet<FPP>((int) id_col[j+nbEltIns], i, (FPP) value[j+nbEltIns]));
+				else
+					tripletList.push_back(Eigen::Triplet<FPP>(i,(int) id_col[j+nbEltIns], (FPP) value[j+nbEltIns]));
+			}
+			nbEltIns += nb_elt_rowi;
 		}
-		nbEltIns += nb_elt_rowi;
+		mat.setFromTriplets(tripletList.begin(), tripletList.end());
 	}
-	mat.setFromTriplets(tripletList.begin(), tripletList.end());
 }
 
 

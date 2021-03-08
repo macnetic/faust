@@ -44,6 +44,7 @@ namespace Faust
 			virtual Faust::MatGeneric<FPP,GPU2>* get_cols(faust_unsigned_int* col_ids, faust_unsigned_int num_cols) const=0;
 
 			virtual void Display() const=0;
+			virtual Real<FPP> norm() const=0;
 			MatGeneric();
 
 			virtual ~MatGeneric();

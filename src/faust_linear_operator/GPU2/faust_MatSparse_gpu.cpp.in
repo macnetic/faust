@@ -202,7 +202,7 @@ namespace Faust
 
 
 	template<>
-		Real<@FAUST_SCALAR_FOR_GM@> Faust::MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::norm()
+		Real<@FAUST_SCALAR_FOR_GM@> Faust::MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::norm() const
 		{
 			auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 			return spm_funcs->norm_frob(gpu_mat);
