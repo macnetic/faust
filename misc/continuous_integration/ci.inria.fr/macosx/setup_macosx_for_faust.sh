@@ -17,7 +17,9 @@ echo 'export PATH=/opt/local/bin:$PATH' >> /Users/ci/.bash_profile
 curl --output /usr/local/bin/gitlab-runner https://gitlab-runner-downloads.s3.amazonaws.com/v11.9.2/binaries/gitlab-runner-darwin-amd64
 chmod +x /usr/local/bin/gitlab-runner
 echo 'export PATH=/usr/local/bin:$PATH' >> /Users/ci/.bash_profile # not even necessary
-su ci -c "echo -e 'https://gitlab.inria.fr\nqkZqbRdu2swFVqCCfxpF\n'macosx-$(date +%m-%d-%Y)'\nmacos,matlab\nshell' | /usr/local/bin/gitlab-runner register" 
+echo -n "enter gitlab FAµST token (https://gitlab.inria.fr/faustgrp/faust/-/settings/ci_cd):"
+read TOKEN
+su ci -c "echo -e 'https://gitlab.inria.fr\n'$TOKEN'\n'macosx-$(date +%m-%d-%Y)'\nmacos,matlab\nshell' | /usr/local/bin/gitlab-runner register" 
 su ci -c "gitlab-runner install" # to run as ci # installed here: /Users/ci/Library/LaunchAgents/gitlab-runner.plist
 su ci -c "gitlab-runner start"
 
@@ -54,6 +56,7 @@ echo "First, a DATA storage volume must be created and attached to the VM instan
 echo "Finally add matlab to the PATH."
 echo "It is also useful to symlink the matlab binary in /usr/bin/ for the root user env. to be OK for installing/testing the pkg (postinstall script needs to find matlab)."
 echo "Other need about matlab OpenMP: you need to copy the library as for example: ciosx:~ ci$ cp /Volumes/Untitled/MATLAB_R2018b.app/sys/os/maci64/libiomp5.dylib /opt/local/lib/libomp/"
+echo "ABOUT SUDO: add this line in /etc/sudoers: ci ALL=(ALL:ALL) NOPASSWD: ALL (this way the runner won't need to type the password for running commands as root)"
 #echo "WARNING: the matlab installer link is likely to fail"
 #wget "https://esd.mathworks.com/R2018b/R2018b/installers/web/matlab_R2018b_maci64.dmg.zip?__gda__=1608282997_72bccb4cda14022857f8691914aea21a&dl_id=aYudAe6N&ext=.zip" || echo "the link failed, please update."
 #mv matlab_R2018b_maci64.dmg.zip\?__gda__\=1608282997_72bccb4cda14022857f8691914aea21a\&dl_id\=aYudAe6N\&ext\=.zip matlab_R2018b_maci64.dmg.zip
