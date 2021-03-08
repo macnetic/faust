@@ -64,7 +64,11 @@ namespace Faust
 				const unsigned int norm2_max_iter=FAUST_NORM2_MAX_ITER,
 				const bool constant_step_size=false, const Real<FPP> step_size=FAUST_PRECISION,
 				const bool on_gpu=false,
-				const bool is_verbose=false);
+				const bool is_verbose=false,
+				/* id argument is useful to identify the palm4msa call.
+				 * For example, hierarchical use it to indicate the number of the current factorization.
+				 * */
+				const int id=0);
 
 	/**
 	 * \brief Fill S with nfacts eye() matrices.

@@ -102,7 +102,7 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
 		}
 		else tmp_sparse = nullptr;
 		Faust::palm4msa2(*tmp_dense, Si_cons, Si_th, lambda_, p.stop_crit_2facts, is_update_way_R2L , use_csr, packing_RL, compute_2norm_on_array,
-				norm2_threshold, norm2_max_iter, constant_step_size, step_size, on_gpu, p.isVerbose);
+				norm2_threshold, norm2_max_iter, constant_step_size, step_size, on_gpu, p.isVerbose, i+1);
 		if(tmp_sparse != nullptr)
 			// the Si factor has been converted into a MatDense in the memory
 			// storage
@@ -138,7 +138,7 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
 
 		// global optimization
 		Faust::palm4msa2(A, glo_cons, *S, glo_lambda, p.stop_crit_global ,is_update_way_R2L, use_csr, packing_RL, compute_2norm_on_array,
-				norm2_threshold, norm2_max_iter, constant_step_size, step_size, on_gpu, p.isVerbose);
+				norm2_threshold, norm2_max_iter, constant_step_size, step_size, on_gpu, p.isVerbose, i+1);
 	}
 	lambda = glo_lambda;
 	return S;

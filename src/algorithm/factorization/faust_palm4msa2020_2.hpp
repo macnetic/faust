@@ -134,7 +134,7 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 		const unsigned int norm2_max_iter,
 		const bool constant_step_size, const Real<FPP> step_size,
 		const bool on_gpu /*=false*/,
-		const bool is_verbose/*=false*/)
+		const bool is_verbose/*=false*/, const int id/*=0*/)
 {
 	std::chrono::time_point<std::chrono::high_resolution_clock> spectral_stop, spectral_start;
 	std::chrono::duration<double> spectral_duration = std::chrono::duration<double>::zero();
@@ -299,8 +299,11 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 			}
 			// really update now
 			constraints[f_id]->project<FPP,DEVICE,Real<FPP>>(D);
+
+
 			if(use_csr && dcur_fac != nullptr || !use_csr && scur_fac != nullptr)
 				throw std::runtime_error("Current factor is inconsistent with use_csr.");
+
 			if(use_csr)
 			{
 				spD = D;
@@ -322,8 +325,10 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 		//		Faust::MatDense<FPP,DEVICE> A_H_S = A_H_S_.get_product();
 		Real<FPP> trr = std::real(A_H_S.trace());
 		Real<FPP> n = S.normFro();
-		lambda = trr/(n*n);
-		//		std::cout << "debug lambda: " << lambda << std::endl;
+		if(std::numeric_limits<Real<FPP>>::epsilon() >= n)
+			throw std::runtime_error("Faust Frobenius norm is zero, can't compute lambda.");
+		lambda = trr/(n*n); //TODO: raise exception if n == 0
+//		std::cout << "debug lambda: " << lambda << std::endl;
 		i++;
 	}
 	S.update_total_nnz();
