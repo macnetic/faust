@@ -31,9 +31,9 @@ int main(int argc, char* argv[])
 	faust_unsigned_int dim1 = 204;
 	faust_unsigned_int dim2 = 204;
 
-//	auto MatrixFilename = "D.mat";
-//	Faust::MatDense<FPP,Cpu> D;
-//    init_faust_mat_from_matio(D,MatrixFilename,"D");
+	//	auto MatrixFilename = "D.mat";
+	//	Faust::MatDense<FPP,Cpu> D;
+	//    init_faust_mat_from_matio(D,MatrixFilename,"D");
 
 	auto num_its = 60;
 
@@ -69,9 +69,9 @@ int main(int argc, char* argv[])
 	MatDense<FPP,GPU2> M1, M2;
 
 	M = MatDense<FPP,Cpu>::randMat(dim1,dim2);
-//	M = &D;
-//	M->Display();
-//	*M *= FPP(100);
+	//	M = &D;
+	//	M->Display();
+	//	*M *= FPP(100);
 	M1 = *M;
 	M2 = *M;
 
@@ -81,37 +81,41 @@ int main(int argc, char* argv[])
 
 	for(int i=0; i < num_its; i++)
 	{
-		pure_gpu_prox_start = std::chrono::steady_clock::now();
-		prox_sp(M1, k, /* normalized */ true, /* pos*/ false, /* pure_gpu */ true);
-		pure_gpu_prox_end = std::chrono::steady_clock::now();
-		pure_gpu_prox_dur += pure_gpu_prox_end-pure_gpu_prox_start;
-
-		gpu_cpu_rt_prox_start = std::chrono::steady_clock::now();
-		prox_sp(M2, k, /* normalized */ true, /* pos*/ false, /* pure_gpu */ false);
-		gpu_cpu_rt_prox_end = std::chrono::steady_clock::now();
-		gpu_cpu_rt_prox_dur += gpu_cpu_rt_prox_end-gpu_cpu_rt_prox_start;
-		assert(M1.getNonZeros() == M2.getNonZeros());
-
-		M1 -= M2;
-		auto err = M1.norm();
-#ifdef DEBUG
-		if(i == 0)
+		for(int pos=0;pos < 2; pos++)
 		{
-			cout << "M1 norm:" << M1.norm() << endl;
-			M1.Display();
-			cout << "M2 norm:" << M2.norm() << endl;
-			M2.Display();
-			cout << "err:" << err << endl;
-		}
+			pure_gpu_prox_start = std::chrono::steady_clock::now();
+			prox_sp(M1, k, /* normalized */ true, /* pos*/ pos, /* pure_gpu */ true);
+			pure_gpu_prox_end = std::chrono::steady_clock::now();
+			pure_gpu_prox_dur += pure_gpu_prox_end-pure_gpu_prox_start;
+
+			gpu_cpu_rt_prox_start = std::chrono::steady_clock::now();
+			prox_sp(M2, k, /* normalized */ true, /* pos*/ pos, /* pure_gpu */ false);
+			gpu_cpu_rt_prox_end = std::chrono::steady_clock::now();
+			gpu_cpu_rt_prox_dur += gpu_cpu_rt_prox_end-gpu_cpu_rt_prox_start;
+			assert(M1.getNonZeros() == M2.getNonZeros());
+
+			M1 -= M2;
+			auto err = M1.norm();
+#ifdef DEBUG
+			if(i == 0)
+			{
+				cout << "M1 norm:" << M1.norm() << endl;
+				M1.Display();
+				cout << "M2 norm:" << M2.norm() << endl;
+				M2.Display();
+				cout << "err:" << err << endl;
+			}
 #endif
-		assert(err < 1e-6);
-		M1 = *M;
-		M2 = *M;
+			assert(err < 1e-6);
+			M1 = *M;
+			M2 = *M;
+		}
 	}
 
 	cout << "pure gpu prox time:" << pure_gpu_prox_dur.count() << endl;
 	cout << "gpu2cpu round-trip prox time:" << gpu_cpu_rt_prox_dur.count() << endl;
 	cout << "pure gpu speedup: " << gpu_cpu_rt_prox_dur.count()/pure_gpu_prox_dur.count() << endl;
 
+	delete M;
 	return 0;
 }

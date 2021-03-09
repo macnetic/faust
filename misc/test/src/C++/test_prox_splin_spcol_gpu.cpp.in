@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
 	std::cout << "M nrows: " << dim1 << std::endl;
 	std::cout << "M ncols: " << dim2 << std::endl;
 	std::cout << (row_or_col==1?"prox_spcol":"prox_splin") << " k: " << k << std::endl;
-	std::cout << "benchmark num_its: " << num_its << std::endl;
+	std::cout << "benchmark num_its (* 2 for pos==true and pos==false): " << num_its << std::endl;
 
 	MatDense<FPP,Cpu>* M;
 	MatDense<FPP,GPU2> M1, M2;
@@ -64,32 +64,39 @@ int main(int argc, char* argv[])
 
 	for(int i=0; i < num_its; i++)
 	{
-		pure_gpu_prox_start = std::chrono::steady_clock::now();
-		if(row_or_col)
-			prox_spcol(M1, k, /* normalized */ true, /* pos*/ false, /* pure_gpu */ true);
-		else
-			prox_splin(M1, k, /* normalized */ true, /* pos*/ false, /* pure_gpu */ true);
-		pure_gpu_prox_end = std::chrono::steady_clock::now();
-		pure_gpu_prox_dur += pure_gpu_prox_end-pure_gpu_prox_start;
+		for(int pos=0;pos < 2; pos++)
+		{
+			pure_gpu_prox_start = std::chrono::steady_clock::now();
+			if(row_or_col)
+				prox_spcol(M1, k, /* normalized */ true, /* pos*/ pos, /* pure_gpu */ true);
+			else
+				prox_splin(M1, k, /* normalized */ true, /* pos*/ pos, /* pure_gpu */ true);
+			pure_gpu_prox_end = std::chrono::steady_clock::now();
+			pure_gpu_prox_dur += pure_gpu_prox_end-pure_gpu_prox_start;
 
-		gpu_cpu_rt_prox_start = std::chrono::steady_clock::now();
-		if(row_or_col)
-			prox_spcol(M2, k, /* normalized */ true, /* pos*/ false, /* pure_gpu */ false);
-		else
-			prox_splin(M2, k, /* normalized */ true, /* pos*/ false, /* pure_gpu */ false);
-		gpu_cpu_rt_prox_end = std::chrono::steady_clock::now();
-		gpu_cpu_rt_prox_dur += gpu_cpu_rt_prox_end-gpu_cpu_rt_prox_start;
-		M1 -= M2;
-		auto err = M1.norm();
-//		cout << "err:" << err << endl;
-		assert(err < 1e-6);
-		M1 = *M;
-		M2 = *M;
+			gpu_cpu_rt_prox_start = std::chrono::steady_clock::now();
+			if(row_or_col)
+				prox_spcol(M2, k, /* normalized */ true, /* pos*/ pos, /* pure_gpu */ false);
+			else
+				prox_splin(M2, k, /* normalized */ true, /* pos*/ pos, /* pure_gpu */ false);
+			gpu_cpu_rt_prox_end = std::chrono::steady_clock::now();
+			gpu_cpu_rt_prox_dur += gpu_cpu_rt_prox_end-gpu_cpu_rt_prox_start;
+			cout << "M1.norm():" << M1.norm() << " nnz:"  << M1.getNonZeros() << endl;
+			cout << "M2.norm():" << M2.norm() << " nnz:"  << M2.getNonZeros() << endl;
+			M1 -= M2;
+			auto err = M1.norm();
+			cout << "err:" << err << endl;
+			assert(err < 1e-6);
+			M1 = *M;
+			M2 = *M;
+		}
 	}
 
 	cout << "pure gpu prox time:" << pure_gpu_prox_dur.count() << endl;
 	cout << "gpu2cpu round-trip prox time:" << gpu_cpu_rt_prox_dur.count() << endl;
 	cout << "pure gpu speedup: " << gpu_cpu_rt_prox_dur.count()/pure_gpu_prox_dur.count() << endl;
+
+	delete M;
 
 	return 0;
 }

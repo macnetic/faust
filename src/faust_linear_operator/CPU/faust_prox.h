@@ -102,11 +102,17 @@ namespace Faust
 
 	template<typename FPP> faust_unsigned_int sparse_size(faust_unsigned_int nnz, faust_unsigned_int nrows);
 	template<typename FPP> faust_unsigned_int dense_size(faust_unsigned_int nrows, faust_unsigned_int ncols);
-	/**
-	 * Decides which output format to use when appliying the SP prox. op. to M. Either M or spM is the output, it depends on the byte size. The minimum memory fingerprint is targeted.
-	 *
-	 *  \param forcedType: used to choose explicitely the output format with values Sparse or Dense (MatSparse or MatDense).
-	 */
+    /**
+     * Decides which output format to use when appliying the SP prox. op. to M. Either M or spM is the output, it depends on the byte sizes. The minimum memory fingerprint is targeted.
+     *
+     *  \param M: the input matrix to project (which could be the output too, if dense format is chosen).
+     *  \param spM: the output matrix if eventually the format is the output format is sparse.
+     *  \param k: the sparsity parameter (pseudo-)norm_1 of the output matrix.
+     *  \param normalized: true to normalize the output matrix.
+     *  \param pos: true to filter negative values of M before applying the de prox.
+     *  \param forcedType: used to choose explicitely the output format with values Sparse or Dense (MatSparse or MatDense).
+     * \return the prox image as a MatGeneric matrix.
+     */
 	template<typename FPP>
 		MatGeneric<FPP,Cpu>* prox_sp(MatDense<FPP,Cpu> & M, MatSparse<FPP, Cpu> & spM, faust_unsigned_int k, const bool normalized=true, const bool pos=false, const MatType forcedType=None);
 }

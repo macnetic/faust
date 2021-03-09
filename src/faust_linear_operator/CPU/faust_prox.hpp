@@ -387,9 +387,9 @@ Faust::pre_prox_pos(MatDense<FPP,Cpu> & M)
 	//	bool is_cplx = typeid(ptr_data[0])==typeid(std::complex<double>())||typeid(ptr_data[0])==typeid(std::complex<float>());
 	//don't want to duplicate the function for all realizations of template we need
 	//so we use a little trick to make the code valid for double/float and complex<double>/complex<float>
-	bool is_cplx = std::is_same<FPP,complex<double>>::value || std::is_same<FPP, complex<float>>::value;
+	bool is_real = std::is_same<FPP, Real<FPP>>::value;
 	for (int i=0;i<(M.getNbRow() * M.getNbCol());i++)
-		if (!is_cplx && std::complex<float>(ptr_data[i]).real() < 0)
+		if (is_real && std::complex<float>(ptr_data[i]).real() < 0)
 			ptr_data[i]=0;
 }
 
