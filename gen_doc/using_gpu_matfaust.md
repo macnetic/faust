@@ -352,15 +352,19 @@ When running on GPU, the matrix to factorize is copied in GPU memory and almost 
 First please copy the following function in the appropriate filename ``factorize_MEG.m`` into in the current working directory of Matlab (or by adding the destination directory to your path by calling ``addpath``).
 
 			function [MEG16, total_time, err] = factorize_MEG(dev)
-				import matfaust.fact.hierarchical
-				MEG = matrix.'
-				num_facts = 9;
-				k = 10;
-				s = 8;
-				tic
-				MEG16 = hierarchical(MEG, {'rectmat', num_facts, k, s}, 'backend', 2020, 'gpu', dev == 'gpu');
-				total_time = toc;
-				err = norm(MEG16-MEG, 'fro')/norm(MEG, 'fro');
+			    import matfaust.fact.hierarchical
+			    import matfaust.factparams.ParamsHierarchicalRectMat
+			    load('matrix_MEG.mat')
+			    MEG = matrix.';
+			    num_facts = 9;
+			    k = 10;
+			    s = 8;
+			    tic
+			    p = ParamsHierarchicalRectMat.createParams(MEG, {'rectmat', num_facts, k, s});
+			    p.use_csr = false;
+			    MEG16 = hierarchical(MEG, p, 'backend', 2020, 'gpu', strcmp('dev', 'gpu'));
+			    total_time = toc;
+			    err = norm(MEG16-MEG, 'fro')/norm(MEG, 'fro');
 			end
 
 **Warning: THE COMPUTATION CAN LAST THIRTY MINUTES OR SO ON CPU**
@@ -432,7 +436,7 @@ And for the comparison here are the results I got on Tesla V100 GPU:
 
 			total_time =
 
-			  320.0904
+			  49.49
 
 
 			err =

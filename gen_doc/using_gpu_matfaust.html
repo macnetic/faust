@@ -377,12 +377,16 @@ When running on GPU, the matrix to factorize is copied in GPU memory and almost 
 
 <pre><code>        function [MEG16, total_time, err] = factorize_MEG(dev)
             import matfaust.fact.hierarchical
-            MEG = matrix.'
+            import matfaust.factparams.ParamsHierarchicalRectMat
+            load('matrix_MEG.mat')
+            MEG = matrix.';
             num_facts = 9;
             k = 10;
             s = 8;
             tic
-            MEG16 = hierarchical(MEG, {'rectmat', num_facts, k, s}, 'backend', 2020, 'gpu', dev == 'gpu');
+            p = ParamsHierarchicalRectMat.createParams(MEG, {'rectmat', num_facts, k, s});
+            p.use_csr = false;
+            MEG16 = hierarchical(MEG, p, 'backend', 2020, 'gpu', strcmp('dev', 'gpu'));
             total_time = toc;
             err = norm(MEG16-MEG, 'fro')/norm(MEG, 'fro');
         end
@@ -456,7 +460,7 @@ When running on GPU, the matrix to factorize is copied in GPU memory and almost 
 
         total_time =
 
-          320.0904
+          49.49
 
 
         err =
