@@ -2102,7 +2102,11 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             dev = F.device
         check_dev(dev)
         # dev is 'gpu[:id]' or 'cpu'
-        clone_F = Faust(core_obj=F.m_faust.clone(dev))
+        if F.device == 'gpu':
+            clone_F = Faust(core_obj=F.m_faust.clone(dev))
+        else:
+            clone_F = Faust([F.factors(i) for i in
+                          range(F.numfactors())], dev=dev)
         return clone_F
 
     def sum(F, axis=None, **kwargs):
