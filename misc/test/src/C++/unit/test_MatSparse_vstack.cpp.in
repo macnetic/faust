@@ -1,0 +1,38 @@
+#include "faust_MatSparse.h"
+
+#include <complex>
+#include <random>
+#include <iostream>
+
+using namespace Faust;
+using namespace std;
+typedef @TEST_FPP@ FPP;
+
+
+int main()
+{
+
+	MatSparse<FPP,Cpu>* M1 = MatSparse<FPP,Cpu>::randMat(3, 4, .5);
+	MatSparse<FPP,Cpu>* M2 = MatSparse<FPP,Cpu>::randMat(13, 4, .5);
+	MatSparse<FPP,Cpu> M;
+	M.vstack(*M1, *M2);
+	cout << "M1:" << endl;
+	M1->Display();
+	cout << "M2:" << endl;
+	M2->Display();
+	cout << "M:" << endl;
+	M.Display();
+	assert(M.getNbCol() == M1->getNbCol() && M.getNbCol() == M2->getNbCol());
+	assert(M.getNbRow() == M1->getNbRow() + M2->getNbRow());
+	assert(M1->getNonZeros()+M2->getNonZeros() == M.getNonZeros());
+	FPP* buf = new FPP[M.getNonZeros()];
+	memcpy(buf, M1->getValuePtr(), sizeof(FPP)*M1->getNonZeros());
+	memcpy(buf+M1->getNonZeros(), M2->getValuePtr(), sizeof(FPP)*M2->getNonZeros());
+	MatDense<FPP,Cpu> Mds(buf, M.getNonZeros(), 1);
+	assert(abs(Mds.norm()-M.norm()) < 1e-1);
+	for(int i=0;i < M.getNonZeros(); i++)
+//		cout << M.getValuePtr()[i] << " " << buf[i] << endl;
+		assert(abs(M.getValuePtr()[i] - buf[i] < 1e-6));
+	delete [] buf;
+	return 0;
+}

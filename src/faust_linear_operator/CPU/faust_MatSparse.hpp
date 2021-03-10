@@ -1213,5 +1213,82 @@ void Faust::MatSparse<FPP,Cpu>::copyBufs(U* out_rowptr, U* out_colind, FPP* out_
 	copyColInd(out_colind);
 }
 
+template<typename FPP>
+void Faust::MatSparse<FPP,Cpu>::vstack(MatSparse<FPP, Cpu>& top, MatSparse<FPP, Cpu>& bottom)
+{
+	auto tncols = top.getNbCol();
+	auto bncols = bottom.getNbCol();
+	auto tnrows = top.getNbRow();
+	auto bnrows = bottom.getNbRow();
+	auto tnnz = top.getNonZeros();
+	auto bnnz = bottom.getNonZeros();
+	auto nrows = tnrows+bnrows;
+	auto nnz = tnnz + bnnz;
+	if(tncols != bncols)
+		throw std::runtime_error("vstack error: dimensions must agree.");
+	if(this->getNbCol() != tncols || this->getNbRow() != nrows || this->getNonZeros() != nnz)
+		resize(nnz, nrows, tncols);
+	// copy column indices
+	memcpy(getColInd(), top.getColInd(), sizeof(int)*tnnz);
+	memcpy(getColInd()+tnnz, bottom.getColInd(), sizeof(int)*bnnz);
+	// copy values
+	memcpy(getValuePtr(), top.getValuePtr(), sizeof(FPP)*tnnz);
+	memcpy(getValuePtr()+tnnz, bottom.getValuePtr(), sizeof(FPP)*bnnz);
+	// build rowptr
+	memcpy(getRowPtr(), top.getRowPtr(), sizeof(FPP)*tnrows+1);
+	int *rowptr, *browptr, row_offset = *(top.getRowPtr()+tnrows);
+	int j = tnrows;
+	//TODO: openmp
+//#pragma omp parallel for
+	for(int i=1;i < bnrows; i++)
+	{
+		rowptr = getRowPtr()+tnrows+i;
+		browptr = bottom.getRowPtr()+i;
+		*rowptr = *browptr+row_offset;
+	}
+}
+
+template<typename FPP>
+void Faust::MatSparse<FPP,Cpu>::hstack(MatSparse<FPP, Cpu>& left, MatSparse<FPP, Cpu>& right)
+{
+	auto lncols = left.getNbCol();
+	auto rncols = right.getNbCol();
+	auto lnrows = left.getNbRow();
+	auto rnrows = right.getNbRow();
+	auto lnnz = left.getNonZeros();
+	auto rnnz = right.getNonZeros();
+	auto nrows = lnrows;
+	auto ncols = lncols + rncols;
+	auto nnz = lnnz + rnnz;
+	int *rowptr = getRowPtr(), *lrowptr = left.getRowPtr(), *rrowptr = right.getRowPtr();
+	if(lnrows != rnrows)
+		throw std::runtime_error("vstack error: dimensions must agree.");
+	if(this->getNbCol() != lncols || this->getNbRow() != nrows || this->getNonZeros() != nnz)
+		resize(nnz, nrows, ncols);
+	// copy column indices
+	memcpy(getColInd(), left.getColInd(), sizeof(int)*lnnz);
+	int *colind = getColInd()+lnnz;
+	//TODO: openmp
+//#pragma omp parallel for
+	for(int i=0;i<rnnz;i++)
+	{
+		*colind = *(right.getColInd()+i)+lncols;
+		colind++;
+	}
+	// copy values
+	memcpy(getValuePtr(), left.getValuePtr(), sizeof(FPP)*lnnz);
+	memcpy(getValuePtr()+lnnz, right.getValuePtr(), sizeof(FPP)*rnnz);
+	// build rowptr
+	//TODO: openmp
+//#pragma omp parallel for
+	for(int i=0;i <= nrows; i++)
+	{
+		*rowptr = *lrowptr + *rrowptr;
+		rowptr++;
+		lrowptr++;
+		rrowptr++;
+	}
+}
+
 
 #endif

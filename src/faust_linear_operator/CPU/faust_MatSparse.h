@@ -347,6 +347,16 @@ namespace Faust
 
 			std::list<std::pair<int,int>> nonzeros_indices() const;
 
+			/**
+			 * \brief Concatenates vertically top and bottom matrices, resizing this if necessary.
+			 */
+			void vstack(MatSparse<FPP, Cpu>& top, MatSparse<FPP, Cpu>& bottom);
+
+			/**
+			 * \brief Concatenates horizontally left and right matrices, resizing this if necessary.
+			 */
+			void hstack(MatSparse<FPP, Cpu>& left, MatSparse<FPP, Cpu>& right);
+
 			static MatSparse<FPP, Cpu>* randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, double density);
 			//\param : per_row means the density applies for each line rather than globally for the matrix
 			static MatSparse<FPP, Cpu>* randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, double density, bool per_row);
