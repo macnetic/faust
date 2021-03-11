@@ -18,7 +18,7 @@
 <li><a href="#3" >Manipulating GPU Fausts and CPU interoperability</a></li>
 <li><a href="#4" >Benchmarking your GPU with matfaust!</a></li>
 <li><a href="#5" >Running some FAµST algorithms on GPU</a></li>
-<li><a href="#6" >Manually loading the pyfaust GPU module</a></li>
+<li><a href="#6" >Manually loading the matfaust GPU module</a></li>
 </ol>
 
 
@@ -40,7 +40,7 @@ Indeed, a independent GPU module (aka <code>gpu_mod</code>) has been developed f
 
 <h3><a name="1">1. Creating a GPU Faust object</a></h3>
 
-<p>Let&rsquo;s start with some basic Faust creation on the GPU. Almost all the ways of creating a Faust object in CPU memory are also available to create a GPU Faust.
+<p>Let&rsquo;s start with some basic Faust creations on the GPU. Almost all the ways of creating a Faust object in CPU memory are also available to create a GPU Faust.
 First of all, creating a Faust using the constructor works seamlessly on GPU, the only need is to specify the <code>dev</code> keyword argument, as follows:</p>
 
 <pre><code>        import matfaust.Faust
@@ -470,9 +470,9 @@ When running on GPU, the matrix to factorize is copied in GPU memory and almost 
 
 <p>As you see it&rsquo;s far faster than with the CPU!</p>
 
-<h3><a name="6">6. Manually loading the pyfaust GPU module</a></h3>
+<h3><a name="6">6. Manually loading the matfaust GPU module</a></h3>
 
-<p>If something goes wrong when trying to use the GPU pyfaust extension, here is how to manually load the module and obtain more information.</p>
+<p>If something goes wrong when trying to use the GPU matfaust extension, here is how to manually load the module and obtain more information.</p>
 
 <p>The key is the function <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacematfaust.html#a75568ecea590cd9f9cd14dce87bfdc84">enable_gpu_mod</a>.<br/>
 This function allows to give another try to <code>gpu_mod</code> loading with the verbose mode enabled.</p>

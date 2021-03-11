@@ -9,7 +9,7 @@ __Sections in this tutorial:__
 3. <a href="#3" >Manipulating GPU Fausts and CPU interoperability</a>  
 4. <a href="#4" >Benchmarking your GPU with matfaust!</a>  
 5. <a href="#5" >Running some FAµST algorithms on GPU</a>  
-6. <a href="#6" >Manually loading the pyfaust GPU module</a>
+6. <a href="#6" >Manually loading the matfaust GPU module</a>
 
 In this tutorial we'll see quickly how to leverage the GPU computing power with matfaust.
 Since matfaust 3.0.0 the API has been modified to make the GPU available directly from the Matlab wrapper.
@@ -26,7 +26,7 @@ In addition to these drawbacks, please notice that the GPU module support is sti
 
 ### <a name="1">1. Creating a GPU Faust object</a>
 
-Let's start with some basic Faust creation on the GPU. Almost all the ways of creating a Faust object in CPU memory are also available to create a GPU Faust.
+Let's start with some basic Faust creations on the GPU. Almost all the ways of creating a Faust object in CPU memory are also available to create a GPU Faust.
 First of all, creating a Faust using the constructor works seamlessly on GPU, the only need is to specify the ``dev`` keyword argument, as follows:
 
 			import matfaust.Faust
@@ -445,9 +445,9 @@ And for the comparison here are the results I got on Tesla V100 GPU:
 
 As you see it's far faster than with the CPU!
 
-### <a name="6">6. Manually loading the pyfaust GPU module</a>
+### <a name="6">6. Manually loading the matfaust GPU module</a>
 
-If something goes wrong when trying to use the GPU pyfaust extension, here is how to manually load the module and obtain more information.
+If something goes wrong when trying to use the GPU matfaust extension, here is how to manually load the module and obtain more information.
 
 The key is the function [enable_gpu_mod](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacematfaust.html#a75568ecea590cd9f9cd14dce87bfdc84).  
 This function allows to give another try to ``gpu_mod`` loading with the verbose mode enabled.
