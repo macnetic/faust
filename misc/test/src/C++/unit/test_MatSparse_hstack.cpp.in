@@ -18,21 +18,32 @@ int main()
 	M.hstack(*M1, *M2);
 	cout << "M1:" << endl;
 	M1->Display();
+	M1->print_bufs("M1");
 	cout << "M2:" << endl;
 	M2->Display();
+	M2->print_bufs("M2");
 	cout << "M:" << endl;
 	M.Display();
+	M.print_bufs("M");
 	assert(M.getNbRow() == M1->getNbRow() && M.getNbRow() == M2->getNbRow());
 	assert(M.getNbCol() == M1->getNbCol() + M2->getNbCol());
 	assert(M1->getNonZeros()+M2->getNonZeros() == M.getNonZeros());
-	FPP* buf = new FPP[M.getNonZeros()];
-	memcpy(buf, M1->getValuePtr(), sizeof(FPP)*M1->getNonZeros());
-	memcpy(buf+M1->getNonZeros(), M2->getValuePtr(), sizeof(FPP)*M2->getNonZeros());
-	MatDense<FPP,Cpu> Mds(buf, M.getNonZeros(), 1);
-	assert(abs(Mds.norm()-M.norm()) < 1e-1);
-	for(int i=0;i < M.getNonZeros(); i++)
-//		cout << M.getValuePtr()[i] << " " << buf[i] << endl;
-		assert(abs(M.getValuePtr()[i] - buf[i] < 1e-6));
-	delete [] buf;
+	M1->print_asarray("M1");
+	M2->print_asarray("M2");
+	M.print_asarray("M");
+	MatDense<FPP,Cpu> Mds(M);
+	MatDense<FPP,Cpu> M1ds(*M1);
+	MatDense<FPP,Cpu> M2ds(*M2);
+	for(int i=0;i<M.getNbRow();i++)
+	{
+		for(int j=0;j<M1ds.getNbCol();j++)
+		{
+			assert(Mds.getData()[i+Mds.getNbRow()*j] == M1ds.getData()[i+Mds.getNbRow()*j]);
+		}
+		for(int j=0;j<M2ds.getNbCol();j++)
+		{
+			assert(Mds.getData()[i+Mds.getNbRow()*(j+M1ds.getNbCol())] == M2ds.getData()[i+Mds.getNbRow()*j]);
+		}
+	}
 	return 0;
 }

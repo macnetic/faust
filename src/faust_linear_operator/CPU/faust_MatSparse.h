@@ -50,6 +50,7 @@
 #include "faust_MatGeneric.h"
 #include "faust_Vect.h"
 #include "faust_SpBlasHandle.h"
+#include <iostream>
 
 
 #include "faust_Transform.h"
@@ -323,6 +324,8 @@ namespace Faust
 			//! \brief multiply this by M into this.
 			void multiplyRight(MatSparse<FPP,Cpu> const & M);
 
+			void scalarMultiply(const FPP& lambda);
+
 			//! \brief Converts the Matrix to a matio variable, especially useful for writing into a file with libmatio. The variable is encoded in full matrix format (on the contrary to toMatVarIOVar() which keeps the sparse representation).
 			// \param transpose: set to true to obtain the matio variable for the transpose Matrix.
 			// \param conjugate: set it to true to obtain the matio variable for the conjugate Matrix.
@@ -357,6 +360,8 @@ namespace Faust
 			 */
 			void hstack(MatSparse<FPP, Cpu>& left, MatSparse<FPP, Cpu>& right);
 
+			void print_bufs(const std::string name="");
+			void print_asarray(const std::string name/*=""*/);
 			static MatSparse<FPP, Cpu>* randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, double density);
 			//\param : per_row means the density applies for each line rather than globally for the matrix
 			static MatSparse<FPP, Cpu>* randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, double density, bool per_row);

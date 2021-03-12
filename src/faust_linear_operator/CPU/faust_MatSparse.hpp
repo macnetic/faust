@@ -203,6 +203,12 @@ Faust::MatSparse<FPP,Cpu>::MatSparse(const faust_unsigned_int nnz_, const faust_
 	}
 }
 
+	template<typename FPP>
+void Faust::MatSparse<FPP,Cpu>::scalarMultiply(const FPP& lambda)
+{
+	*this *= lambda;
+}
+
 
 template<typename FPP>
 void Faust::MatSparse<FPP,Cpu>::multiply(Faust::MatDense<FPP,Cpu> & M, char opThis) const
@@ -1223,29 +1229,36 @@ void Faust::MatSparse<FPP,Cpu>::vstack(MatSparse<FPP, Cpu>& top, MatSparse<FPP, 
 	auto tnnz = top.getNonZeros();
 	auto bnnz = bottom.getNonZeros();
 	auto nrows = tnrows+bnrows;
+	auto ncols = tncols;
 	auto nnz = tnnz + bnnz;
 	if(tncols != bncols)
 		throw std::runtime_error("vstack error: dimensions must agree.");
-	if(this->getNbCol() != tncols || this->getNbRow() != nrows || this->getNonZeros() != nnz)
-		resize(nnz, nrows, tncols);
+	if(this->getNbCol() != ncols || this->getNbRow() != nrows || this->getNonZeros() != nnz)
+		resize(nnz, nrows, ncols);
 	// copy column indices
-	memcpy(getColInd(), top.getColInd(), sizeof(int)*tnnz);
-	memcpy(getColInd()+tnnz, bottom.getColInd(), sizeof(int)*bnnz);
-	// copy values
-	memcpy(getValuePtr(), top.getValuePtr(), sizeof(FPP)*tnnz);
-	memcpy(getValuePtr()+tnnz, bottom.getValuePtr(), sizeof(FPP)*bnnz);
+	if(tnnz > 0)
+	{
+		memcpy(getColInd(), top.getColInd(), sizeof(int)*tnnz);
+		memcpy(getValuePtr(), top.getValuePtr(), sizeof(FPP)*tnnz);
+	}
+	if(bnnz > 0)
+	{
+		memcpy(getColInd()+tnnz, bottom.getColInd(), sizeof(int)*bnnz);
+		memcpy(getValuePtr()+tnnz, bottom.getValuePtr(), sizeof(FPP)*bnnz);
+	}
 	// build rowptr
-	memcpy(getRowPtr(), top.getRowPtr(), sizeof(FPP)*tnrows+1);
+	memcpy(getRowPtr(), top.getRowPtr(), sizeof(int)*tnrows+1);
 	int *rowptr, *browptr, row_offset = *(top.getRowPtr()+tnrows);
 	int j = tnrows;
 	//TODO: openmp
 //#pragma omp parallel for
-	for(int i=1;i < bnrows; i++)
+	for(int i=1;i <= bnrows; i++)
 	{
 		rowptr = getRowPtr()+tnrows+i;
 		browptr = bottom.getRowPtr()+i;
 		*rowptr = *browptr+row_offset;
 	}
+
 }
 
 template<typename FPP>
@@ -1260,35 +1273,63 @@ void Faust::MatSparse<FPP,Cpu>::hstack(MatSparse<FPP, Cpu>& left, MatSparse<FPP,
 	auto nrows = lnrows;
 	auto ncols = lncols + rncols;
 	auto nnz = lnnz + rnnz;
-	int *rowptr = getRowPtr(), *lrowptr = left.getRowPtr(), *rrowptr = right.getRowPtr();
+	int lrow_count, rrow_count, tot_count;
+	int *rowptr, *lrowptr = left.getRowPtr(), *rrowptr = right.getRowPtr();
 	if(lnrows != rnrows)
-		throw std::runtime_error("vstack error: dimensions must agree.");
-	if(this->getNbCol() != lncols || this->getNbRow() != nrows || this->getNonZeros() != nnz)
+		throw std::runtime_error("hstack error: dimensions must agree.");
+	if(this->getNbCol() != ncols || this->getNbRow() != nrows || this->getNonZeros() != nnz)
 		resize(nnz, nrows, ncols);
-	// copy column indices
-	memcpy(getColInd(), left.getColInd(), sizeof(int)*lnnz);
-	int *colind = getColInd()+lnnz;
-	//TODO: openmp
-//#pragma omp parallel for
-	for(int i=0;i<rnnz;i++)
+	tot_count = 0;
+	int i;
+	//TODO : openmp ?
+	for(i=0;i<nrows;i++)
 	{
-		*colind = *(right.getColInd()+i)+lncols;
-		colind++;
+		rrow_count = rrowptr[i+1]-rrowptr[i];
+		lrow_count = lrowptr[i+1]-lrowptr[i];
+		memcpy(getValuePtr()+tot_count, left.getValuePtr()+lrowptr[i], sizeof(FPP)*lrow_count);
+		memcpy(getValuePtr()+tot_count+lrow_count, right.getValuePtr()+rrowptr[i], sizeof(FPP)*rrow_count);
+		memcpy(this->getColInd()+tot_count, left.getColInd()+lrowptr[i], sizeof(int)*lrow_count);
+		for(int j=0;j<rrow_count;j++)
+		{
+			this->getColInd()[tot_count+lrow_count+j] = right.getColInd()[rrowptr[i]+j]+lncols;
+		}
+		getRowPtr()[i] = tot_count;
+		tot_count += lrow_count + rrow_count;
 	}
-	// copy values
-	memcpy(getValuePtr(), left.getValuePtr(), sizeof(FPP)*lnnz);
-	memcpy(getValuePtr()+lnnz, right.getValuePtr(), sizeof(FPP)*rnnz);
-	// build rowptr
-	//TODO: openmp
-//#pragma omp parallel for
-	for(int i=0;i <= nrows; i++)
-	{
-		*rowptr = *lrowptr + *rrowptr;
-		rowptr++;
-		lrowptr++;
-		rrowptr++;
-	}
+	getRowPtr()[i] = tot_count;
 }
 
+template<typename FPP>
+void Faust::MatSparse<FPP,Cpu>::print_bufs(const std::string name/*=""*/)
+{
+	std::cout << "======" << std::endl;
+	std::cout << name << " data: ";
+	for(int i=0;i<this->getNonZeros();i++)
+		std::cout << *(this->getValuePtr()+i) << " ";
+	std::cout <<	std::endl;
+	std::cout << name << " colind: ";
+	for(int i=0;i<this->getNonZeros();i++)
+		std::cout << *(this->getColInd()+i) << " ";
+	std::cout << std::endl;
+	std::cout << name << " rowptr: ";
+	for(int i=0;i<this->getNbRow()+1;i++)
+		std::cout << *(this->getRowPtr()+i) << " ";
+	std::cout << "======" << std::endl;
+}
+
+template<typename FPP>
+void Faust::MatSparse<FPP, Cpu>::print_asarray(const std::string name/*=""*/)
+{
+	MatDense<FPP,Cpu> A(*this);
+	std::cout << "======" << std::endl;
+	std::cout << name << ": " << std::endl;
+	for(int i=0;i <this->getNbRow();i++)
+	{
+		for(int j=0;j < this->getNbCol();j++)
+			std:cout << *(A.getData()+j*A.getNbRow()+i) << " ";
+		std::cout << std::endl;
+	}
+	std::cout << "======" << std::endl;
+}
 
 #endif

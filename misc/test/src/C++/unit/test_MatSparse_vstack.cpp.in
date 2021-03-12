@@ -31,7 +31,6 @@ int main()
 	MatDense<FPP,Cpu> Mds(buf, M.getNonZeros(), 1);
 	assert(abs(Mds.norm()-M.norm()) < 1e-1);
 	for(int i=0;i < M.getNonZeros(); i++)
-//		cout << M.getValuePtr()[i] << " " << buf[i] << endl;
 		assert(abs(M.getValuePtr()[i] - buf[i] < 1e-6));
 	delete [] buf;
 	return 0;
