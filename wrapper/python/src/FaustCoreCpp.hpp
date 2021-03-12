@@ -577,6 +577,23 @@ FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP, DEV>::clone() const
 }
 
 template<typename FPP, FDevice DEV>
+FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::polyBasis(
+        unsigned int L_nrows, unsigned int L_ncols,
+        int* L_rowptr,
+        int* L_colind,
+        FPP* L_vals,
+        unsigned int L_nnz,
+        unsigned int K)
+{
+    Faust::MatSparse<FPP, DEV> L(L_nnz, L_nrows, L_ncols, L_vals, L_rowptr, L_colind);
+    Faust::TransformHelper<FPP,DEV>* th = Faust::basisChebyshev(&L, K);
+    if(!th) return NULL;
+    FaustCoreCpp<FPP,DEV>* core = new FaustCoreCpp<FPP,DEV>(th);
+    return core;
+}
+
+
+template<typename FPP, FDevice DEV>
 FaustCoreCpp<FPP,DEV>::~FaustCoreCpp()
 {
     if(transform) delete transform;

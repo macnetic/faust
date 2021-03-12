@@ -3,6 +3,7 @@
 ## @package pyfaust.poly @brief This module provides polynomials as Faust objects.
 
 import scipy.sparse as sp
+import _FaustCorePy
 from scipy.sparse import csr_matrix
 from pyfaust import (Faust, isFaust, eye as feye, vstack as fvstack, hstack as
                      fhstack)
@@ -68,6 +69,14 @@ def basis(L, K, basis_name, ret_gen=False, dev='cpu', T0=None):
     """
     if basis_name.lower() == 'chebyshev':
         return Chebyshev(L, K, ret_gen=ret_gen, dev=dev, T0=T0)
+
+
+def basis_cpp(L, K, basis_name, ret_gen=False, dev='cpu', T0=None):
+    """
+
+    """
+    F = Faust(core_obj=_FaustCorePy.FaustCore.polyBasis(L, K))
+    return F
 
 
 def poly(coeffs, L=None, basis=Chebyshev, dev='cpu'):

@@ -50,6 +50,7 @@
 #include "faust_TransformHelper_gpu.h"
 #endif
 #include "faust_TransformHelper.h"
+#include "faust_TransformHelperPoly.h"
 #include <cstring>
 
 template<typename FPP, FDevice DEV=Cpu>
@@ -133,6 +134,7 @@ class FaustCoreCpp
     static FaustCoreCpp<FPP,DEV>* hadamardFaust(unsigned int n, const bool norma);
     static FaustCoreCpp<FPP,DEV>* fourierFaust(unsigned int n, const bool norma);
     static FaustCoreCpp<FPP,DEV>* eyeFaust(unsigned int n, unsigned int m);
+    static FaustCoreCpp<FPP, DEV>* polyBasis(unsigned int L_nrows, unsigned int L_ncols, int* L_rowptr, int* L_colind, FPP* L_vals, unsigned int L_nnz, unsigned int K);
 
     protected :
     Faust::TransformHelper<FPP,DEV> *transform;

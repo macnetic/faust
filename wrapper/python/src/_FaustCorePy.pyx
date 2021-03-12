@@ -257,6 +257,36 @@ cdef class FaustCore:
             core._isReal = False
         return core
 
+    @staticmethod
+    def polyBasis(L, K):
+        cdef int[:] colind_view, rowptr_view
+        cdef double[:] dbl_vals_view
+        cdef complex[:] cplx_vals_view
+        core = FaustCore(core=True)
+        colind_view = L.indices
+        rowptr_view = L.indptr
+        if L.dtype == np.complex:
+            cplx_vals_view = L.data
+            core.core_faust_cplx = \
+            FaustCoreCy.FaustCoreCpp[complex].polyBasis(L.shape[0], L.shape[1],
+                                                       &rowptr_view[0],
+                                                       &colind_view[0],
+                                                       &cplx_vals_view[0],
+                                                       L.nnz,
+                                                       K)
+            core._isReal = False
+        else:
+            dbl_vals_view = L.data
+            core.core_faust_dbl = \
+            FaustCoreCy.FaustCoreCpp[double].polyBasis(L.shape[0], L.shape[1],
+                                                       &rowptr_view[0],
+                                                       &colind_view[0],
+                                                       &dbl_vals_view[0],
+                                                       L.nnz,
+                                                       K)
+            core._isReal = True
+        return core
+
     def shape(self):
         cdef unsigned int nbrow = 0
         cdef unsigned int nbcol = 0
