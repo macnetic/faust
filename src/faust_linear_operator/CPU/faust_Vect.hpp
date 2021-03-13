@@ -167,8 +167,9 @@ template<typename FPP>
 void Faust::Vect<FPP,Cpu>::operator-=(const FPP alpha)
 {
    FPP*const ptr_data = getData();
+//#pragma omp parallel for
    for (int i=0 ; i<size() ; i++)
-      ptr_data[i] += alpha;
+      ptr_data[i] -= alpha;
 }
 
 template<typename FPP>
@@ -191,7 +192,8 @@ void Faust::Vect<FPP,Cpu>::operator-=(const Faust::Vect<FPP,Cpu>& v)
 	   handleError(m_className,"operator-= : dimensions are in conflict");
    }
    FPP*const ptr_data = getData();
-   FPP*const v_ptr_data = getData();
+   const FPP* v_ptr_data = v.getData();
+//#pragma omp parallel for
    for (int i=0 ; i<size() ; i++)
       ptr_data[i] -= v_ptr_data[i];
 }
