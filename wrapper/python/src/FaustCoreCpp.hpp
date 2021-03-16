@@ -190,6 +190,34 @@ void FaustCoreCpp<FPP,DEV>::multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* v
 }
 
 template<typename FPP, FDevice DEV>
+void FaustCoreCpp<FPP,DEV>::polyCoeffs(int d, int n, const FPP* basisX, const FPP* coeffs, FPP* out) const
+{
+    Faust::TransformHelperPoly<FPP> *transform_poly = dynamic_cast<Faust::TransformHelperPoly<FPP>*>(this->transform);
+    if(nullptr)
+        throw std::runtime_error("polyCoeffs can only be used on a Poly. specialized Faust.");
+    transform_poly->poly(d, n, basisX, coeffs, out);
+}
+
+template<typename FPP>
+void polyCoeffs(int d, int K, int n, const FPP* basisX, const FPP* coeffs, FPP* out)
+{
+    Faust::poly(d, K, n, basisX, coeffs, out);
+}
+
+template<typename FPP, FDevice DEV>
+FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::polyCoeffs(const FPP* coeffs)
+{
+    //verify if transform is a TransformHelperPoly otherwise raise an exception
+    Faust::TransformHelperPoly<FPP> *transform_poly = dynamic_cast<Faust::TransformHelperPoly<FPP>*>(this->transform);
+    if(nullptr)
+        throw std::runtime_error("polyCoeffs can only be used on a Poly. specialized Faust.");
+    Faust::TransformHelper<FPP,DEV>* th = transform_poly->polyFaust(coeffs);
+    FaustCoreCpp<FPP,DEV>* core = new FaustCoreCpp<FPP,DEV>(th);
+    return core;
+}
+
+
+template<typename FPP, FDevice DEV>
 void FaustCoreCpp<FPP,DEV>::set_FM_mul_mode(const int mode)
 {
     this->transform->set_FM_mul_mode(mode);

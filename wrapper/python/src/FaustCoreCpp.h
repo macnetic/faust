@@ -120,6 +120,8 @@ class FaustCoreCpp
     FaustCoreCpp<FPP,DEV>* adjoint()const;
     FaustCoreCpp<FPP,DEV>* zpruneout(const int nnz_tres, const int npasses, const bool only_forward);
     FaustCoreCpp<FPP,DEV>* clone() const;
+    void polyCoeffs(int d, int n, const FPP* basisX, const FPP* coeffs, FPP* out) const;
+    FaustCoreCpp<FPP,DEV>* polyCoeffs(const FPP* coeffs);
 	void device(char* dev) const;
     ~FaustCoreCpp();
     static FaustCoreCpp<FPP,DEV>* randFaust(unsigned int t,
@@ -139,6 +141,9 @@ class FaustCoreCpp
     protected :
     Faust::TransformHelper<FPP,DEV> *transform;
 };
+
+template<typename FPP>
+void polyCoeffs(int d, int K, int n, const FPP* basisX, const FPP* coeffs, FPP* out);
 
 #ifdef USE_GPU_MOD
 template<typename FPP>

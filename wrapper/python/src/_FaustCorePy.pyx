@@ -558,6 +558,24 @@ cdef class FaustCore:
             self = (<FaustCore?>self)._ascomplex()
         return self._horzcatn(Fs)
 
+    def polyCoeffs(self, coeffs):
+        core = FaustCore(core=True)
+        core._isReal = self._isReal
+        cdef double[:] cview
+        cdef complex[:] cview_cplx
+
+        if self._isReal:
+            cview = coeffs
+        else:
+            cview_cplx = coeffs
+
+        if(self._isReal):
+            core.core_faust_dbl = self.core_faust_dbl.polyCoeffs(&cview[0])
+        else:
+            core.core_faust_cplx = self.core_faust_cplx.polyCoeffs(&cview_cplx[0])
+        return core
+
+
     # Left-Multiplication by a Faust F
     # y=multiply(F,M) is equivalent to y=F*M
     def multiply(self,M):
@@ -2437,6 +2455,95 @@ cdef class FaustFact:
                                                           " has failed.");
 
         return core, np.real(_out_buf[0])
+
+def polyCoeffs(d, basisX, coeffs):
+    if not isinstance(basisX, np.ndarray):
+        raise ValueError('input basisX must be a numpy.ndarray')
+    #TODO: raise exception if not real nor complex
+    isReal = (basisX.dtype == np.double)
+    K = coeffs.size-1
+    n = basisX.shape[1]
+    if(isReal):
+       basisX=basisX.astype(float,'F')
+       if not basisX.dtype=='float':
+           raise ValueError('input basisX must be a double array')
+    else:
+       basisX=basisX.astype(complex,'F')
+       if(basisX.dtype not in ['complex', 'complex128', 'complex64'] ): #could fail if complex128 etc.
+           raise ValueError('input basisX must be complex array')
+    if not basisX.flags['F_CONTIGUOUS']:
+        raise ValueError('input basisX must be Fortran contiguous (column major '
+                        'order)')
+
+    ndim_M=basisX.ndim
+
+    if (ndim_M > 2) | (ndim_M < 1):
+        raise ValueError('input basisX invalid number of dimensions')
+    check_matrix(isReal, basisX)
+    ndim_M=basisX.ndim
+    cdef unsigned int nbrow_x=basisX.shape[0]
+    cdef unsigned int nbcol_x #can't be assigned because we don't know yet if the input vector is 1D or 2D
+
+    cdef unsigned int nbrow_y=d
+    cdef unsigned int nbcol_y=n
+
+    cdef double[:] bxview_1D
+    cdef double[:,:] bxview_2D
+    cdef complex[:] bxview_1D_cplx
+    cdef complex[:,:] bxview_2D_cplx
+
+    cdef double[:] cview
+    cdef complex[:] cview_cplx
+
+    cdef y
+    cdef double[:,:] yview
+    cdef complex[:,:] yview_cplx
+
+    if ndim_M == 1:
+        nbcol_x=1
+        if(isReal):
+            bxview_1D = basisX
+        else:
+            bxview_1D_cplx = basisX
+    else:
+        nbcol_x=basisX.shape[1]
+        if(isReal):
+            bxview_2D=basisX
+        else:
+            bxview_2D_cplx=basisX
+
+    # TODO: make some sanity checks on argument sizes
+
+    if isReal:
+        cview = coeffs
+    else:
+        cview_cplx = coeffs
+
+    if(isReal):
+        y = np.empty((nbrow_y,nbcol_y), dtype='d',order='F')
+        yview = y
+    else:
+        y = np.empty((nbrow_y, nbcol_y), dtype='complex', order='F')
+        yview_cplx = y
+
+    #void polyCoeffs(int d, int K, int n, const FPP* basisX, const FPP* coeffs, FPP* out) const;
+    if ndim_M == 1:
+        if(isReal):
+            FaustCoreCy.polyCoeffs(d, K, n, &bxview_1D[0],
+                       &cview[0], &yview[0,0])
+        else:
+            FaustCoreCy.polyCoeffs(d, K, n, &bxview_1D_cplx[0],
+                       &cview_cplx[0], &yview_cplx[0,0])
+        y = np.squeeze(y) # we want a single dim. (but we created two
+        # above)
+    else:
+        if(isReal):
+            FaustCoreCy.polyCoeffs(d, K, n, &bxview_2D[0,0],
+                       &cview[0], &yview[0,0])
+        else:
+            FaustCoreCy.polyCoeffs(d, K, n, &bxview_2D_cplx[0,0],
+                       &cview_cplx[0], &yview_cplx[0,0])
+    return y
 
 import sys, os, pyfaust
 # tries to load the libgm library silently,

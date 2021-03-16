@@ -2,12 +2,15 @@
 # @PYFAUST_LICENSE_HEADER@
 ## @package pyfaust.poly @brief This module provides polynomials as Faust objects.
 
+import _FaustCorePy
 import scipy.sparse as sp
+import numpy as np
 import _FaustCorePy
 from scipy.sparse import csr_matrix
 from pyfaust import (Faust, isFaust, eye as feye, vstack as fvstack, hstack as
                      fhstack)
 from scipy.sparse.linalg import eigsh
+import threading
 
 
 def Chebyshev(L, K, ret_gen=False, dev='cpu', T0=None):
@@ -50,7 +53,7 @@ def Chebyshev(L, K, ret_gen=False, dev='cpu', T0=None):
         return _chebyshev(L, K, T0, T1, rR, dev)
 
 
-def basis(L, K, basis_name, ret_gen=False, dev='cpu', T0=None):
+def basis(L, K, basis_name, ret_gen=False, dev='cpu', T0=None, impl="native"):
     """
     Builds the Faust of the polynomial basis defined on the symmetric matrix L.
 
@@ -63,30 +66,33 @@ def basis(L, K, basis_name, ret_gen=False, dev='cpu', T0=None):
         polynomial itself (the generator starts from the the
         K+1-degree polynomial, and allows this way to compute the next
         polynomial simply with the instruction: next(generator)).
+        impl: "native" (by default) for the C++ impl., "py" for the Python
+        impl.
 
     Returns:
         The Faust of the K+1 Chebyshev polynomials.
     """
     if basis_name.lower() == 'chebyshev':
-        return Chebyshev(L, K, ret_gen=ret_gen, dev=dev, T0=T0)
+        if impl == "native":
+            F = FaustPoly(core_obj=_FaustCorePy.FaustCore.polyBasis(L, K))
+            return F
+        elif impl == "py":
+            return Chebyshev(L, K, ret_gen=ret_gen, dev=dev, T0=T0)
+        else:
+            raise ValueError(impl+" is an unknown implementation.")
+    else:
+        raise ValueError(basis_name+" is not a valid basis name")
 
 
-def basis_cpp(L, K, basis_name, ret_gen=False, dev='cpu', T0=None):
-    """
 
-    """
-    F = Faust(core_obj=_FaustCorePy.FaustCore.polyBasis(L, K))
-    return F
-
-
-def poly(coeffs, L=None, basis=Chebyshev, dev='cpu'):
+def poly(coeffs, basis='chebyshev', L=None, dev='cpu', impl='native'):
     """
         Returns the linear combination of the polynomials defined by basis.
 
         Args:
             coeffs: the linear combination coefficients (numpy.array).
-            basis: either the function to build the polynomials basis on L or the Faust of
-            polynomials if already built externally.
+            basis: either the name of the polynomial basis to build on L or the Faust of
+            polynomials if already built externally or an equivalent np.ndarray.
             L: the symmetric matrix on which the polynomials are built, can't be None
             if basis is a function (not a Faust).
             dev: the device to instantiate the returned Faust ('cpu' or 'gpu').
@@ -95,20 +101,79 @@ def poly(coeffs, L=None, basis=Chebyshev, dev='cpu'):
             The linear combination Faust.
     """
     K = coeffs.size-1
-    if isFaust(basis):
-        F = basis
-        if F.device != dev:
-            F = F.clone(dev=dev)
-    else:
+    if isinstance(basis, str):
         if L is None:
             raise ValueError('The L matrix must be set to build the'
                              ' polynomials.')
-        F = poly(L, K, dev=dev)
-    Id = sp.eye(L.shape[1], format="csr")
-    scoeffs = sp.hstack(tuple(Id*coeffs[i] for i in range(0, K+1)),
-                        format="csr")
-    Fc = Faust(scoeffs, dev=dev) @ F
-    return Fc
+        F = basis(L, K, basis, dev=dev, impl=impl)
+    if isFaust(basis):
+        F = basis
+    elif not isinstance(basis, np.ndarray):
+        print("type", type(basis))
+        raise TypeError('basis is neither a str neither a Faust nor'
+                        ' a numpy.ndarray')
+    else:
+        F = basis
+    if impl == 'py':
+        if isFaust(F):
+            Id = sp.eye(L.shape[1], format="csr")
+            scoeffs = sp.hstack(tuple(Id*coeffs[i] for i in range(0, K+1)),
+                                format="csr")
+            Fc = Faust(scoeffs, dev=dev) @ F
+            return Fc
+        else:
+           # F is a np.ndarray
+           return _poly_arr_py(coeffs, F, L, dev=dev)
+    elif impl == 'native':
+        if isFaust(F):
+            Fc = poly_Faust_cpp(coeffs, F)
+            if F.device != dev:
+                Fc = Fc.clone(dev=dev)
+            return Fc
+        else:
+            return _poly_arr_cpp(coeffs, F, L, dev='cpu')
+    else:
+        raise ValueError(impl+" is an unknown implementation.")
+
+def _poly_arr_py(coeffs, basisX, L, dev='cpu'):
+    """
+    """
+    mt = True # multithreading
+    n = basisX.shape[1]
+    d = L.shape[0]
+    K_plus_1 = int(basisX.shape[0]/d)
+    Y = np.empty((d, n))
+    if n == 1:
+        Y[:, 0] = basisX[:, 0].reshape(K_plus_1, d).T @ coeffs
+    elif mt:
+        nthreads = 4
+        threads = []
+        def apply_coeffs(i, n):
+            for i in range(i,n,nthreads):
+                Y[:, i] = basisX[:, i].reshape(K_plus_1, d).T @ coeffs
+        for i in range(0,nthreads):
+            t = threading.Thread(target=apply_coeffs, args=([i,n]))
+            threads.append(t)
+            t.start()
+        for i in range(0,nthreads):
+           threads[i].join()
+    else:
+         for i in range(n):
+                Y[:, i] = basisX[:, i].reshape(K_plus_1, d).T @ coeffs
+# other way:
+#	Y = coeff[0] * basisX[0:d,:]
+#	for i in range(1,K+1):
+#		Y += (basisX[d*i:(i+1)*d, :] * coeff[i])
+    return Y
+
+def _poly_arr_cpp(coeffs, basisX, L, dev='cpu'):
+    d = L.shape[0]
+    Y = _FaustCorePy.polyCoeffs(d, basisX, coeffs)
+    return Y
+
+def _poly_Faust_cpp(coeffs, basisFaust, dev='cpu'):
+    Y = basisFaust.m_faust.polyCoeffs(coeffs)
+    return Y
 
 
 def _chebyshev(L, K, T0, T1, rR, dev='cpu'):
@@ -223,4 +288,10 @@ def _build_consistent_tuple(arrays):
         return tuple(_arrays)
     else:
         return arrays
+
+class FaustPoly(Faust):
+
+    def __init__(self, *args, **kwargs):
+        super(FaustPoly, self).__init__(*args, **kwargs)
+
 # experimental block end

@@ -40,6 +40,7 @@
 from libcpp cimport bool, complex
 
 cdef extern from "FaustCoreCpp.h":
+    void polyCoeffs[FPP](int d, int K, int n, const FPP* basisX, const FPP* coeffs, FPP* out)
     cdef cppclass FaustCoreCpp[FPP]:
         FaustCoreCpp()
         void Display() const
@@ -112,6 +113,8 @@ cdef extern from "FaustCoreCpp.h":
         FaustCoreCpp[FPP]* mul_scal(FPP scal)
         void device(char*) const
         FaustCoreCpp[FPP]* clone()
+        void polyCoeffs(int d, int n, const FPP* basisX, const FPP* coeffs, FPP* out) const
+        FaustCoreCpp[FPP]* polyCoeffs(const FPP* coeffs) const
         @staticmethod
         FaustCoreCpp[FPP]* randFaust(int faust_nrows, int faust_ncols,
                                      unsigned int t,
@@ -133,6 +136,7 @@ cdef extern from "FaustCoreCpp.h":
         FaustCoreCpp[FPP]* fourierFaust(unsigned int n, const bool norma)
         @staticmethod
         FaustCoreCpp[FPP]* eyeFaust(unsigned int n, unsigned int m)
+
 
 # TODO: all the headers below should be in their own pxd file FaustFact.pxd
 cdef extern from "FaustFact.h":
