@@ -20,11 +20,19 @@ namespace Faust
 					const bool internal_call) : TransformHelper<FPP,Cpu>(facts, lambda_, optimizedCopy, cloning_fact, internal_call) {}
 
 			Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> x, const bool transpose=false, const bool conjugate=false);
-//						MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> A, const bool transpose=false, const bool conjugate=false);
+			MatDense<FPP, Cpu> multiply(MatDense<FPP,Cpu> X, const bool transpose=false, const bool conjugate=false);
+			Vect<FPP, Cpu> poly(MatDense<FPP,Cpu> & basisX, Vect<FPP, Cpu> coeffs);
+			MatDense<FPP, Cpu> poly(int n, MatDense<FPP,Cpu> & basisX, Vect<FPP, Cpu> coeffs);
+			void poly(int d, int n, const FPP* basisX, const FPP* coeffs, FPP* out);
+			TransformHelper<FPP, Cpu>* polyFaust(const FPP* coeffs);
 		};
 
 	template<typename FPP>
 		TransformHelper<FPP, Cpu>* basisChebyshev(MatSparse<FPP,Cpu>* L, int32_t K);
+
+	template<typename FPP>
+		void poly(int d, int K, int n, const FPP* basisX, const FPP* coeffs, FPP* out);
+
 }
 #include "faust_TransformHelperPoly.hpp"
 #endif
