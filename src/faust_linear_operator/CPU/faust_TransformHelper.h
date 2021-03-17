@@ -100,9 +100,11 @@ namespace Faust
 #endif
 
 			void copy_mul_mode_state(const TransformHelper<FPP,Cpu>& th);
-			virtual Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> x, const bool transpose=false, const bool conjugate=false);
+			virtual Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> &x, const bool transpose=false, const bool conjugate=false);
+			virtual Vect<FPP,Cpu> multiply(const FPP* x, const bool transpose=false, const bool conjugate=false);
+			virtual void multiply(const FPP* x, FPP* y, const bool transpose=false, const bool conjugate=false);
 			//			MatDense<FPP,Cpu> multiply(const MatDense<FPP,Cpu> A) const;
-			virtual MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> A, const bool transpose=false, const bool conjugate=false);
+			virtual MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> &A, const bool transpose=false, const bool conjugate=false);
 			void update_total_nnz();
 			void set_FM_mul_mode(const int mul_order_opt_mode, const bool silent=false);
 			void set_Fv_mul_mode(const int mode);

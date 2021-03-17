@@ -268,7 +268,7 @@ namespace Faust
 				 *! \tparam  x :  the vector to be multiplied
 				 *! \tparam opThis : character
 				 */
-				Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> x,const char opThis) const;
+				Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> &x,const char opThis) const;
 
 				Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu>& x) const
 				{
@@ -283,7 +283,7 @@ namespace Faust
 				 *! \tparam  x :  the vector to be multiplied
 				 *! \tparam opThis : character
 				 */
-				MatDense<FPP,Cpu> multiply(MatDense<FPP,Cpu> A,const char opThis='N') const;
+				MatDense<FPP,Cpu> multiply(const MatDense<FPP,Cpu> &A,const char opThis='N') const;
 
 				MatSparse<FPP,Cpu> multiply(const MatSparse<FPP,Cpu> A,const char opThis='N') const;
 

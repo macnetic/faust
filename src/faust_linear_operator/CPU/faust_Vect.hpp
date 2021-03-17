@@ -211,7 +211,7 @@ template<typename FPP>
 void Faust::Vect<FPP,Cpu>::operator-=(const FPP* v_data)
 {
    FPP*const ptr_data = getData();
-#pragma omp parallel for
+//#pragma omp parallel for
    for (int i=0 ; i<size() ; i++)
       ptr_data[i] -= v_data[i];
 }

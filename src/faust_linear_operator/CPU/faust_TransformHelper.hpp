@@ -183,7 +183,7 @@ namespace Faust {
 
 
 	template<typename FPP>
-		Vect<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const Vect<FPP,Cpu> x, const bool transpose, const bool conjugate)
+		Vect<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const Vect<FPP,Cpu> &x, const bool transpose, const bool conjugate)
 		{
 			this->is_transposed ^= transpose;
 			this->is_conjugate ^= conjugate;
@@ -191,15 +191,41 @@ namespace Faust {
 			if(this->Fv_mul_mode == GPU_MOD && gpu_faust != nullptr)
 					return gpu_faust->multiply(x, this->is_transposed, this->is_conjugate);
 #endif
-			Vect<FPP,Cpu> v = this->transform->multiply(x, this->isTransposed2char());
+			Vect<FPP,Cpu> v = std::move(this->transform->multiply(x, this->isTransposed2char()));
 			this->is_transposed ^= transpose;
 			this->is_conjugate ^= conjugate;
 			return v;
 		}
 
+	template<typename FPP>
+		Vect<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const FPP *x, const bool transpose, const bool conjugate)
+		{
+			int x_size;
+			// assuming that x size is valid, infer it from this size
+			if(this->is_transposed && transpose || ! this->is_transposed && ! transpose)
+				x_size = this->getNbCol();
+			else
+				x_size = this->getNbRow();
+			Vect<FPP, Cpu> vx(x_size, x);
+			return std::move(this->multiply(vx, transpose, conjugate));
+		}
 
 	template<typename FPP>
-		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const MatDense<FPP,Cpu> A, const bool transpose, const bool conjugate)
+		void TransformHelper<FPP,Cpu>::multiply(const FPP *x, FPP* y, const bool transpose, const bool conjugate)
+		{
+			int x_size;
+			// assuming that x size is valid, infer it from this size
+			if(this->is_transposed && transpose || ! this->is_transposed && ! transpose)
+				x_size = this->getNbCol();
+			else
+				x_size = this->getNbRow();
+			Vect<FPP, Cpu> vx(x_size, x);
+			auto y_vec = std::move(this->multiply(vx, transpose, conjugate));
+			memcpy(y, y_vec.getData(), sizeof(FPP)*y_vec.size());
+		}
+
+	template<typename FPP>
+		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const MatDense<FPP,Cpu> &A, const bool transpose, const bool conjugate)
 		{
 			this->is_transposed ^= transpose;
 			this->is_conjugate ^= conjugate;

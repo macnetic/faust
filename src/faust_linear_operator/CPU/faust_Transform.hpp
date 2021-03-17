@@ -1076,7 +1076,7 @@ void Faust::Transform<FPP,Cpu>::adjoint()
 }
 
 template<typename FPP>
-Faust::Vect<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::Vect<FPP,Cpu> x,const char opThis) const{
+Faust::Vect<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::Vect<FPP,Cpu> &x,const char opThis) const{
 #ifdef __COMPILE_TIMERS__
 	if (this->t_multiply_vector.size() != this->data.size())
 		handleError(m_className,"multiply : invalid t_multiply_vector size to measure time");
@@ -1117,7 +1117,7 @@ Faust::Vect<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::Vect<FPP,C
 		}
 
 	}
-	return vec;
+	return std::move(vec);
 
 
 
@@ -1166,7 +1166,7 @@ Faust::MatSparse<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::MatSp
 }
 
 template<typename FPP>
-Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::MatDense<FPP,Cpu> A,const char opThis) const
+Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const MatDense<FPP,Cpu> &A, const char opThis) const
 {
 
 
