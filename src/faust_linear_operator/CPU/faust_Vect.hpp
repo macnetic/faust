@@ -56,6 +56,23 @@ for (int i=0;i<dim;i++)
 	vec[i]=v(i);
 }
 
+template<typename FPP>
+Faust::Vect<FPP,Cpu>::Vect(const Faust::Vect<FPP,Cpu>& v) : dim(v.dim), vec(v.vec)
+{
+}
+
+template<typename FPP>
+Faust::Vect<FPP,Cpu>::Vect(const faust_unsigned_int dim_, const FPP* data_) : dim(dim_), vec(dim_)
+{
+		memcpy(getData(), data_, dim*sizeof(FPP));
+}
+
+template<typename FPP>
+Faust::Vect<FPP,Cpu>::Vect(Faust::Vect<FPP,Cpu>&& v)
+{
+	vec = std::move(v.vec);
+	dim = v.dim;
+}
 
 template<typename FPP>
 bool Faust::Vect<FPP,Cpu>::equality(Faust::Vect<FPP,Cpu> const &x, FPP precision) const
@@ -98,11 +115,6 @@ bool Faust::Vect<FPP,Cpu>::isReal() const
 
 
 
-template<typename FPP>
-Faust::Vect<FPP,Cpu>::Vect(const faust_unsigned_int dim_, const FPP* data_) : dim(dim_), vec(dim_)
-{
-		memcpy(getData(), data_, dim*sizeof(FPP));
-}
 
 template<typename FPP>
 void Faust::Vect<FPP,Cpu>::setOnes()
@@ -191,14 +203,18 @@ void Faust::Vect<FPP,Cpu>::operator-=(const Faust::Vect<FPP,Cpu>& v)
    {
 	   handleError(m_className,"operator-= : dimensions are in conflict");
    }
-   FPP*const ptr_data = getData();
-   const FPP* v_ptr_data = v.getData();
-//#pragma omp parallel for
-   for (int i=0 ; i<size() ; i++)
-      ptr_data[i] -= v_ptr_data[i];
+	return *(this) -= v.getData();
 }
 
 
+template<typename FPP>
+void Faust::Vect<FPP,Cpu>::operator-=(const FPP* v_data)
+{
+   FPP*const ptr_data = getData();
+#pragma omp parallel for
+   for (int i=0 ; i<size() ; i++)
+      ptr_data[i] -= v_data[i];
+}
 
 template<typename FPP>
 FPP Faust::Vect<FPP,Cpu>::mean_relative_error(const Faust::Vect<FPP,Cpu>& v_ref)
@@ -233,19 +249,28 @@ void Faust::Vect<FPP,Cpu>::operator=(Faust::Vect<FPP1,Cpu> const& y)
 {
 
 	resize(y.dim);
+//#pragma omp parallel for
 	for (int i=0;i<dim;i++)
 		vec[i]=y(i);
 
 }
 
-
 template<typename FPP>
-void Faust::Vect<FPP,Cpu>::operator=(Faust::Vect<FPP,Cpu> const& y)
+Faust::Vect<FPP,Cpu>& Faust::Vect<FPP,Cpu>::operator=(const Faust::Vect<FPP,Cpu>& y)
 {
-	  vec = y.vec;
-	  dim = y.dim;
+	if(this->size() != y.size())
+		this->resize(y.size());
+	memcpy(this->getData(), y.getData(), y.size()*sizeof(FPP));
+	return *this;
 }
 
+template<typename FPP>
+Faust::Vect<FPP,Cpu>& Faust::Vect<FPP,Cpu>::operator=(Faust::Vect<FPP,Cpu>&& y)
+{
+	this->vec = std::move(y.vec);
+	this->dim = y.dim;
+	return *this;
+}
 
 template <typename FPP>
 FPP Faust::Vect<FPP,Cpu>::dot(const Faust::Vect<FPP,Cpu>& v) const

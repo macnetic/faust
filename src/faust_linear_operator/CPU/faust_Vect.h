@@ -118,9 +118,10 @@ namespace Faust
         // template<typename U>
         // Vect(const Vect<U>& v) : dim(v.dim), vec(v.vec){}
         template<typename FPP1>
-        Vect(const Vect<FPP1,Cpu> & v);
-        Vect(const Vect<FPP,Cpu> & v) : dim(v.dim), vec(v.vec){}
+        Vect(const Vect<FPP1,Cpu>& v); // copy-convert scalar ctor
+		Vect(const Vect<FPP,Cpu>& v); //copy ctor
         Vect(const faust_unsigned_int dim_, const FPP* data_);
+		Vect(Vect<FPP,Cpu>&& v); //move ctor
 
         FPP* getData(){return vec.data();}
 
@@ -161,8 +162,9 @@ namespace Faust
 
 
         template<typename FPP1>
-        void operator=(Vect<FPP1,Cpu> const& y);
-        void operator=(Vect<FPP,Cpu> const& y);
+        void operator=(Vect<FPP1,Cpu> const& y); // copy assignment from different scalar type
+        Vect<FPP,Cpu>& operator=(const Vect<FPP,Cpu>& y); // copy assignment
+        Vect<FPP,Cpu>& operator=(Vect<FPP,Cpu>&& y); // move assignment
 
         void operator*=(const FPP alpha);
         void operator+=(const FPP alpha);
@@ -170,6 +172,7 @@ namespace Faust
 
         void operator+=(const Vect<FPP,Cpu> & v);
         void operator-=(const Vect<FPP,Cpu> & v);
+		void operator-=(const FPP* v_data);
 
         FPP mean_relative_error(const Vect<FPP,Cpu> & v);
 
