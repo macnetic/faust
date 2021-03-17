@@ -2,25 +2,11 @@
 #include "faust_linear_algebra.h"
 namespace Faust
 {
-	template<typename FPP>
-	Vect<FPP,Cpu> TransformHelperPoly<FPP>::multiply(const Vect<FPP,Cpu> &x, const bool transpose/*=false*/, const bool conjugate/*=false*/)
-	{
-		return std::move(this->multiply(x.getData(), transpose, conjugate));
-	}
 
 	template<typename FPP>
-	Vect<FPP,Cpu> TransformHelperPoly<FPP>::multiply(const FPP* x, const bool transpose/*=false*/, const bool conjugate/*=false*/)
+	Vect<FPP,Cpu> TransformHelperPoly<FPP>::multiply(const Vect<FPP,Cpu> x, const bool transpose/*=false*/, const bool conjugate/*=false*/)
 	{
-		int d = L.getNbRow();
-		int K = this->size();
-		Vect<FPP, Cpu> v0(d*(K+1));
-		multiply(x, v0.getData(), transpose, conjugate);
-		return std::move(v0);
-	}
 
-	template<typename FPP>
-	void TransformHelperPoly<FPP>::multiply(const FPP* x, FPP* y, const bool transpose/*=false*/, const bool conjugate/*=false*/)
-	{
 //		std::cout << "TransformHelperPoly<FPP>::multiply(Vect)" << std::endl;
 		/**
 		 * Recurrence relation (k=1 to K):
@@ -36,22 +22,25 @@ namespace Faust
 		 * Fx = [v_{0, K} ; v_{1, K} ; v_{2, K}]
 		 */
 		int d = L.getNbRow();
-		Vect<FPP,Cpu> v2, tmp;
+		Vect<FPP,Cpu> v1(d), v2, tmp;
 		int K = this->size();
+		Vect<FPP, Cpu> v0(d*(K+1));
 		// seeing how basisChebyshev method is instantiating this class
 		// K can't be strictly lower than two
-		v2 = L*Vect<FPP,Cpu>(d, x);//L*x
-		memcpy(y, x, sizeof(FPP)*d);
-		memcpy(y+d, v2.getData(), sizeof(FPP)*d);
-		for(int i=3;i<=K+1;i++)
+		memcpy(v1.getData(), x.getData(), sizeof(FPP)*d);
+		v2 = L*x;
+		for(int i=2;i<=K;i++)
 		{
-			int offset = d*(i-3);
+			memcpy(v0.getData()+d*(i-2), v1.getData(), sizeof(FPP)*d);
+			tmp = v1;
+			v1 = v2;
 			//			gemv(L, v2, tmp, FPP(1), FPP(-1));
-			//			v2 = twoL*v2;
-			v2.multiplyLeft(twoL);
-			v2 -= y+offset;
-			memcpy(y+d*(i-1), v2.getData(), sizeof(FPP)*d);
+			v2 = twoL*v2;
+			v2 -= tmp;
 		}
+		memcpy(v0.getData()+d*(K-1), v1.getData(), sizeof(FPP)*d);
+		memcpy(v0.getData()+d*K, v2.getData(), sizeof(FPP)*d);
+		return v0;
 	}
 
 // Slower method but kept commented here until further tests
@@ -91,7 +80,7 @@ namespace Faust
 //			}
 
 	template<typename FPP>
-			MatDense<FPP, Cpu> TransformHelperPoly<FPP>::multiply(const MatDense<FPP,Cpu> &X, const bool transpose/*=false*/, const bool conjugate/*=false*/)
+			MatDense<FPP, Cpu> TransformHelperPoly<FPP>::multiply(MatDense<FPP,Cpu> X, const bool transpose/*=false*/, const bool conjugate/*=false*/)
 			{
 				//				std::cout << "TransformHelperPoly<FPP>::multiply(MatDense)" << std::endl;
 				int d = L.getNbRow();
@@ -238,9 +227,7 @@ namespace Faust
 			{
 				Vect<FPP,Cpu> _coeffs(K_plus_1, coeffs);
 				MatDense<FPP,Cpu> basisXi(d, K_plus_1);
-				// reshape a d_K_plus_1 vector into a d*K_plus_1 matrix
 				memcpy(basisXi.getData(), basisX+d_K_plus_1*i, sizeof(FPP)*d_K_plus_1);
-				// compute the linear combination
 				_coeffs.multiplyLeft(basisXi);
 				memcpy(out+i*d, _coeffs.getData(), sizeof(FPP)*d);
 			}
