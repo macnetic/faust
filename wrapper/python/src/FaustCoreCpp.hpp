@@ -191,6 +191,16 @@ void FaustCoreCpp<FPP,DEV>::multiply(FPP* value_y,int nbrow_y,int nbcol_y, const
         memcpy(value_y,Y.getData(),sizeof(FPP)*nbrow_y*nbcol_y);
     }
 }
+template<typename FPP, FDevice DEV>
+ FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::polyNext() const
+{
+    Faust::TransformHelperPoly<FPP> *transform_poly = dynamic_cast<Faust::TransformHelperPoly<FPP>*>(this->transform);
+    if(nullptr)
+        throw std::runtime_error("polyCoeffs can only be used on a Poly. specialized Faust.");
+    auto th = transform_poly->next();
+    FaustCoreCpp<FPP,DEV>* core = new FaustCoreCpp<FPP,DEV>(th);
+    return core;
+}
 
 template<typename FPP, FDevice DEV>
 void FaustCoreCpp<FPP,DEV>::polyCoeffs(int d, int n, const FPP* basisX, const FPP* coeffs, FPP* out) const

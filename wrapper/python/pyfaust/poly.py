@@ -75,7 +75,11 @@ def basis(L, K, basis_name, ret_gen=False, dev='cpu', T0=None, impl="native"):
     if basis_name.lower() == 'chebyshev':
         if impl == "native":
             F = FaustPoly(core_obj=_FaustCorePy.FaustCore.polyBasis(L, K))
-            return F
+            if ret_gen:
+                g = F._generator()
+                return F, g
+            else:
+                return F
         elif impl == "py":
             return Chebyshev(L, K, ret_gen=ret_gen, dev=dev, T0=T0)
         else:
@@ -293,5 +297,12 @@ class FaustPoly(Faust):
 
     def __init__(self, *args, **kwargs):
         super(FaustPoly, self).__init__(*args, **kwargs)
+
+    def _generator(self):
+        F = self
+        while True:
+            F_next = FaustPoly(core_obj=F.m_faust.polyNext())
+            F = F_next
+            yield F
 
 # experimental block end

@@ -575,6 +575,14 @@ cdef class FaustCore:
             core.core_faust_cplx = self.core_faust_cplx.polyCoeffs(&cview_cplx[0])
         return core
 
+    def polyNext(self):
+        core = FaustCore(core=True)
+        core._isReal = self._isReal
+        if(self._isReal):
+            core.core_faust_dbl = self.core_faust_dbl.polyNext()
+        else:
+            core.core_faust_cplx = self.core_faust_cplx.polyNext()
+        return core
 
     # Left-Multiplication by a Faust F
     # y=multiply(F,M) is equivalent to y=F*M
