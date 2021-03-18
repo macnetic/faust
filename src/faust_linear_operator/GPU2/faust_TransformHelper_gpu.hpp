@@ -323,6 +323,23 @@ namespace Faust
 		}
 
 	template<typename FPP>
+		void TransformHelper<FPP,GPU2>::multiply(const FPP* cpu_in_buf, FPP* cpu_out_buf, const bool transpose /* deft to false */, const bool conjugate/*=false*/)
+		{
+			this->is_transposed ^= transpose;
+			this->is_conjugate ^= conjugate;
+			int32_t in_vec_size;
+			if(this->is_transposed)
+				in_vec_size = this->getNbRow();
+			else
+				in_vec_size = this->getNbCol();
+			Vect<FPP,GPU2> gpu_A(in_vec_size, cpu_in_buf);
+			Vect<FPP,GPU2> v = this->multiply(gpu_A , transpose, conjugate); //TODO: handle transpose and conjugate
+			this->is_transposed ^= transpose;
+			this->is_conjugate ^= conjugate;
+			v.tocpu(cpu_out_buf);
+		}
+
+	template<typename FPP>
 		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::multiply(const FPP& a)
 		{
 			const vector<MatGeneric<FPP,GPU2>*>& vec = this->transform->data; //TransformHelper is a friend class of Transform // we can access private attribute data

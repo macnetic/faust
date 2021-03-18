@@ -152,7 +152,7 @@ void FaustCoreCpp<FPP,DEV>::multiply(FPP* y_data, int y_nrows, int y_ncols, FPP*
 }
 
 template<typename FPP, FDevice DEV>
-void FaustCoreCpp<FPP,DEV>::multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,int nbrow_x,int nbcol_x)const
+void FaustCoreCpp<FPP,DEV>::multiply(FPP* value_y,int nbrow_y,int nbcol_y, const FPP* value_x,int nbrow_x,int nbcol_x)const
 {
 
 

@@ -141,6 +141,12 @@ namespace Faust
 			}
 
 		template<>
+			void Vect<FSFG,GPU2>::tocpu(FSFG* cpu_buf, const void* stream/*=nullptr*/) const
+			{
+				MatDense<FSFG,GPU2>::tocpu(cpu_buf, stream);
+			}
+
+		template<>
 			void Vect<FSFG,GPU2>::Display() const
 			{
 				Vect<FSFG, Cpu> v = tocpu();

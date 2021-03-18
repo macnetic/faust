@@ -41,6 +41,7 @@ namespace Faust
 			FPP mean() const;
 			void Display() const;
 			Vect<FPP, Cpu> tocpu(const void* stream=nullptr) const;
+			void tocpu(FPP* cpu_buf, const void* stream=nullptr) const;
 			void setValues(const FPP& val);
 			FPP mean_relative_error(const Vect<FPP,GPU2>& ref_vec) const;
 			// delete parent methods that don't apply to a vector

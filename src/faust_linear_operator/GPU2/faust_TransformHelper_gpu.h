@@ -45,6 +45,7 @@ namespace Faust
 				TransformHelper<FPP,GPU2>* multiply(const TransformHelper<FPP,GPU2>*);
 				Vect<FPP,GPU2> multiply(const Faust::Vect<FPP,GPU2>& a, const bool transpose=false, const bool conjugate=false);
 				Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> &x, const bool transpose=false, const bool conjugate=false);
+				void multiply(const FPP* x, FPP* y, const bool transpose=false, const bool conjugate=false);
 				Real<FPP> normFro() const;
 				Real<FPP> normL1() const;
 				Real<FPP> normInf() const;
