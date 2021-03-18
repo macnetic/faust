@@ -1,5 +1,7 @@
 #include <cstdlib>
 #include "faust_linear_algebra.h"
+#include "Eigen/Core"
+
 namespace Faust
 {
 	template<typename FPP>
@@ -233,16 +235,13 @@ namespace Faust
 		{
 			auto K_plus_1 = K+1;
 			auto d_K_plus_1 = d*K_plus_1;
-			#pragma omp parallel for
+//			#pragma omp parallel for // most likely counterproductive to use OpenMP here, Eigen is already multithreading scalar product in the loop
 			for(int i=0;i<n;i++)
 			{
-				Vect<FPP,Cpu> _coeffs(K_plus_1, coeffs);
-				MatDense<FPP,Cpu> basisXi(d, K_plus_1);
-				// reshape a d_K_plus_1 vector into a d*K_plus_1 matrix
-				memcpy(basisXi.getData(), basisX+d_K_plus_1*i, sizeof(FPP)*d_K_plus_1);
-				// compute the linear combination
-				_coeffs.multiplyLeft(basisXi);
-				memcpy(out+i*d, _coeffs.getData(), sizeof(FPP)*d);
+				Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>> mat_basisX(const_cast<FPP*>(basisX+d_K_plus_1*i), d, K_plus_1); //constcast is not dangerous, no modification is done later
+				Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>> vec_coeffs(const_cast<FPP*>(coeffs), K_plus_1);
+				Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>> vec_out(out, K_plus_1);
+				vec_out.block(0,i,d,1) = mat_basisX*vec_coeffs;
 			}
 		}
 }
