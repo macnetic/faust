@@ -96,6 +96,7 @@ namespace Faust
    void gemv(const MatDense<FPP,Cpu> & A,const Vect<FPP,Cpu> & x,Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);
 
 	template<typename FPP,FDevice DEVICE> class Transform;
+	template<typename FPP> class TransformHelperPoly;
 
 
 
@@ -110,6 +111,7 @@ namespace Faust
 		friend class MatDense<FPP,Cpu>;
 //		friend void  MatDiag<FPP>::multiply(Vect<FPP,Cpu> & vec, char opThis) const;
 
+		friend TransformHelperPoly<FPP>; // TODO: limit to needed member functions only
 
         public :
         Vect() : dim(0), vec() {}

@@ -38,21 +38,23 @@ namespace Faust
 			 * Fx = [v_{0, K} ; v_{1, K} ; v_{2, K}]
 			 */
 			int d = L->getNbRow();
-			Vect<FPP,Cpu> v2, tmp;
 			int K = this->size();
 			// seeing how basisChebyshev method is instantiating this class
 			// K can't be strictly lower than two
-			v2 = *L*Vect<FPP,Cpu>(d, x);//L*x
+
+			Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>> x_vec(const_cast<FPP*>(x), d);
 			memcpy(y, x, sizeof(FPP)*d);
-			memcpy(y+d, v2.getData(), sizeof(FPP)*d);
+			Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>>v2(const_cast<FPP*>(y+d), d);
+			v2 = L->mat*x_vec;
 			for(int i=3;i<=K+1;i++)
 			{
 				int offset = d*(i-3);
 				//			gemv(L, v2, tmp, FPP(1), FPP(-1));
 				//			v2 = twoL*v2;
-				v2.multiplyLeft(*twoL);
-				v2 -= y+offset;
-				memcpy(y+d*(i-1), v2.getData(), sizeof(FPP)*d);
+				Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>>v2_(const_cast<FPP*>(y+d*(i-2)), d);
+				Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>>v2__(const_cast<FPP*>(y+d*(i-1)), d);
+				Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>>y_vec(const_cast<FPP*>(y+offset), d);
+				v2__ = L->mat*v2_*2-y_vec;
 			}
 		}
 
@@ -170,8 +172,6 @@ namespace Faust
 			//TODO: use reference manager to avoid copies
 			basisP->L = L;
 			ref_man.acquire(L);
-			basisP->twoL = twoL;
-			ref_man.acquire(twoL);
 			basisP->rR = rR;
 			ref_man.acquire(rR);
 			return basisP;
@@ -229,7 +229,6 @@ namespace Faust
 		std::cout << "~TransformHelperPoly()" << std::endl;
 #endif
 		ref_man.release(L);
-		ref_man.release(twoL);
 		ref_man.release(rR);
 	}
 
@@ -240,10 +239,9 @@ namespace Faust
 			MatSparse<FPP,Cpu> *T1, *T2;
 			auto d = L->getNbRow();
 			MatSparse<FPP,Cpu> Id, twoL, minus_Id, *rR, R, zero;
-			std::vector<MatGeneric<FPP,Cpu>*> facts(K);
+			std::vector<MatGeneric<FPP,Cpu>*> facts(K); //normally it'd be K+1 but T0 is ignored
 			if(K == 0)
 				return TransformHelper<FPP,Cpu>::eyeFaust(d,d);
-			facts.resize(K); //normally it'd be K+1 but T0 is ignored
 			// build the chebyshev polynomials by factor
 			// K > 1 ignore the first one (for T0 0-degree), which is the identity
 			// Identity
@@ -272,14 +270,24 @@ namespace Faust
 			T2 = new MatSparse<FPP,Cpu>();
 			T2->vstack(Id, *rR);
 			facts[K-2] = T2;
-			// T3 to TK
-#pragma omp parallel for private(Id, zero, R)
+//			 T3 to TK
+//#pragma omp parallel for private(Id, zero, R)
 			for(int i=3;i<K+1;i++)
 			{
-				Id.resize(i*d, i*d, i*d);
+				auto id = i*d;
+				Id.resize(id, id, id);
 				Id.setEyes();
-				zero.resize(0, d, (i-2)*d);
-				R.hstack(zero, *rR);
+				zero.conservativeResize(d, (i-2)*d);
+				if(i == 3)
+				{
+					R.hstack(zero, *rR);
+				}
+				else
+				{
+					R.conservativeResize(d, rR->getNbCol()+(i-2)*d);
+					for(int i=0;i<R.getNonZeros();i++)
+						R.getColInd()[i] += d;
+				}
 				auto Ti = new MatSparse<FPP,Cpu>();
 				Ti->vstack(Id, R);
 				facts[K-i] = Ti;
@@ -290,9 +298,6 @@ namespace Faust
 					/* internal_call */ true);
 			basisP->L = new MatSparse<FPP,Cpu>(*L);
 			Faust::TransformHelperPoly<FPP>::ref_man.acquire(basisP->L);
-			basisP->twoL = new MatSparse<FPP,Cpu>(*L);
-			*(basisP->twoL) *= 2;
-			Faust::TransformHelperPoly<FPP>::ref_man.acquire(basisP->twoL);
 			basisP->rR = rR;
 			Faust::TransformHelperPoly<FPP>::ref_man.acquire(rR);
 			return basisP;

@@ -20,7 +20,6 @@ namespace Faust
 
 			static RefManager ref_man;
 			MatSparse<FPP, Cpu> *L;
-			MatSparse<FPP, Cpu> *twoL;
 			MatSparse<FPP, Cpu> *rR;
 			public:
 			TransformHelperPoly(const std::vector<MatGeneric<FPP,Cpu> *>& facts,
