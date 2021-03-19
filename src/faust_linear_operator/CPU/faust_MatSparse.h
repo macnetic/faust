@@ -94,6 +94,7 @@ namespace Faust
 	template<typename FPP, FDevice DEVICE, typename FPP2> class GivensFGFT;
 	template<typename FPP, FDevice DEVICE, typename FPP2> class GivensFGFTParallel;
 	template<typename FPP, FDevice DEVICE, typename FPP2> class GivensFGFTComplex;
+	template<typename FPP> class TransformHelperPoly;
 	//TODO: simplify/remove the friendship by adding/using a public setter to is_ortho
 	//template<typename FPP> void wht_factors(unsigned int n, std::vector<MatGeneric<FPP,Cpu>*>&  factors, const bool, const bool);
 	template<typename FPP>
@@ -117,6 +118,7 @@ namespace Faust
 			friend GivensFGFTComplex<FPP,Cpu, double>;
 			friend GivensFGFTComplex<FPP,Cpu, float>;
 			friend TransformHelper<FPP,Cpu>; // TODO: limit to needed member functions only
+			friend TransformHelperPoly<FPP>; // TODO: limit to needed member functions only
 			friend void wht_factors<>(unsigned int n, std::vector<MatGeneric<FPP,Cpu>*>&  factors, const bool, const bool);
 			friend class MatDense<FPP,Cpu>;
 			//friend void MatDense<FPP,Cpu>::operator+=(const MatSparse<FPP,Cpu>& S);
@@ -197,6 +199,10 @@ namespace Faust
 			void set(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_, const FPP* value, const size_t* id_row, const size_t* col_ptr);
 			void resize(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_);
 			void resize(const faust_unsigned_int dim1_, const faust_unsigned_int dim2_){mat.resize(dim1_,dim2_);update_dim();}
+			/**
+			 * Resizes without erasing the previous values contrary to what resize() does.
+			 */
+			void conservativeResize(const faust_unsigned_int dim1_, const faust_unsigned_int dim2_){mat.conservativeResize(dim1_, dim2_); update_dim();}
 			void setZeros(){mat.setZero();nnz=0;}
 			void setEyes();
 			void transpose();

@@ -1247,7 +1247,7 @@ void Faust::MatSparse<FPP,Cpu>::vstack(MatSparse<FPP, Cpu>& top, MatSparse<FPP, 
 		memcpy(getValuePtr()+tnnz, bottom.getValuePtr(), sizeof(FPP)*bnnz);
 	}
 	// build rowptr
-	memcpy(getRowPtr(), top.getRowPtr(), sizeof(int)*tnrows+1);
+	memcpy(getRowPtr(), top.getRowPtr(), sizeof(int)*(tnrows+1));
 	int *rowptr, *browptr, row_offset = *(top.getRowPtr()+tnrows);
 	int j = tnrows;
 	//TODO: openmp
@@ -1258,7 +1258,6 @@ void Faust::MatSparse<FPP,Cpu>::vstack(MatSparse<FPP, Cpu>& top, MatSparse<FPP, 
 		browptr = bottom.getRowPtr()+i;
 		*rowptr = *browptr+row_offset;
 	}
-
 }
 
 template<typename FPP>
@@ -1282,6 +1281,7 @@ void Faust::MatSparse<FPP,Cpu>::hstack(MatSparse<FPP, Cpu>& left, MatSparse<FPP,
 	tot_count = 0;
 	int i;
 	//TODO : openmp ?
+//#pragma omp parallel for
 	for(i=0;i<nrows;i++)
 	{
 		rrow_count = rrowptr[i+1]-rrowptr[i];
