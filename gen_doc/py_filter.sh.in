@@ -5,4 +5,5 @@
 py_filterout_namespace.py pyfaust.__init__. pyfaust.factparams. pyfaust.demo. \
 pyfaust.tools. pyfaust.fact. \
 pyfaust.factparams.ConstraintMat \
-pyfaust.proj.
+pyfaust.proj. \
+pyfaust.poly.
