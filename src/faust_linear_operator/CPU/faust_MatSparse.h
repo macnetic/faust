@@ -367,7 +367,7 @@ namespace Faust
 			void hstack(MatSparse<FPP, Cpu>& left, MatSparse<FPP, Cpu>& right);
 
 			void print_bufs(const std::string name="");
-			void print_asarray(const std::string name/*=""*/);
+			void print_asarray(const std::string name="");
 			static MatSparse<FPP, Cpu>* randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, double density);
 			//\param : per_row means the density applies for each line rather than globally for the matrix
 			static MatSparse<FPP, Cpu>* randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, double density, bool per_row);

@@ -57,17 +57,18 @@ Faust::MatSparse<FPP,Cpu>::MatSparse() :
 	mat(Eigen::SparseMatrix<FPP,Eigen::RowMajor>(0,0)),
 	nnz(0){}
 
-	template<typename FPP>
-	Faust::MatSparse<FPP,Cpu>::MatSparse(const Faust::MatSparse<FPP,Cpu>& M) :
-		Faust::MatGeneric<FPP,Cpu>(M.getNbRow(),M.getNbCol(), M.is_ortho, M.is_identity),
-		mat(M.mat),
-		nnz(M.mat.nonZeros()) { }
+template<typename FPP>
+Faust::MatSparse<FPP,Cpu>::MatSparse(const Faust::MatSparse<FPP,Cpu>& M) :
+	Faust::MatGeneric<FPP,Cpu>(M.getNbRow(),M.getNbCol(), M.is_ortho, M.is_identity)
+{
+	*this = M;
+}
 
-		template<typename FPP>
-		Faust::MatSparse<FPP,Cpu>::MatSparse(const faust_unsigned_int dim1_, const faust_unsigned_int dim2_) :
-			Faust::MatGeneric<FPP,Cpu>(dim1_,dim2_),
-			mat(Eigen::SparseMatrix<FPP,Eigen::RowMajor>(dim1_,dim2_)),
-			nnz(0)
+template<typename FPP>
+Faust::MatSparse<FPP,Cpu>::MatSparse(const faust_unsigned_int dim1_, const faust_unsigned_int dim2_) :
+	Faust::MatGeneric<FPP,Cpu>(dim1_,dim2_),
+	mat(Eigen::SparseMatrix<FPP,Eigen::RowMajor>(dim1_,dim2_)),
+	nnz(0)
 {
 	resize(nnz, this->dim1, this->dim2);
 }
@@ -572,9 +573,15 @@ void Faust::MatSparse<FPP,Cpu>::adjoint()
 	template<typename FPP>
 void Faust::MatSparse<FPP,Cpu>::operator=(const Faust::MatSparse<FPP,Cpu>& M)
 {
-	mat = M.mat;
-	mat.makeCompressed();
-	update_dim();
+//	mat = M.mat;
+//	mat.makeCompressed();
+//	update_dim();
+	if(this->getNbRow() != M.getNbRow() || this->getNbCol() != M.getNbCol() || this->getNonZeros() != M.getNonZeros())
+		resize(M.getNonZeros(),M.getNbRow(),M.getNbCol());
+	memcpy(this->getValuePtr(), M.getValuePtr(), M.getNonZeros()*sizeof(FPP));
+	memcpy(this->getColInd(), M.getColInd(), M.getNonZeros()*sizeof(int));
+	memcpy(this->getRowPtr(), M.getRowPtr(), (M.getNbRow()+1)*sizeof(int));
+
 	this->is_ortho = M.is_ortho;
 }
 
@@ -1314,7 +1321,7 @@ void Faust::MatSparse<FPP,Cpu>::print_bufs(const std::string name/*=""*/)
 	std::cout << name << " rowptr: ";
 	for(int i=0;i<this->getNbRow()+1;i++)
 		std::cout << *(this->getRowPtr()+i) << " ";
-	std::cout << "======" << std::endl;
+	std::cout << std::endl << "======" << std::endl;
 }
 
 template<typename FPP>
