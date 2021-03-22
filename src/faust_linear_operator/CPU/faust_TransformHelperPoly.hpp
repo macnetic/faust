@@ -180,29 +180,25 @@ namespace Faust
 			//            Id = sp.eye(L.shape[1], format="csr")
 			//				            scoeffs = sp.hstack(tuple(Id*coeffs[i] for i in range(0, K+1)),
 			//									                                format="csr")
+			std::vector<MatGeneric<FPP,Cpu>*> facts(this->size()+1);
 			MatSparse<FPP,Cpu> Id, Id1;
-			MatSparse<FPP,Cpu> coeffDiags;
+			MatSparse<FPP,Cpu> coeffDiags, tmp;
 			auto d = L->getNbRow();
-			int K = this->size()-1;
 			Id.resize(d, d, d);
 			Id.setEyes();
-			auto Id0 = Id;
-			Id0 *= coeffs[0];
-			for(int i=1;i < K+1; i++)
+			coeffDiags = Id;
+			coeffDiags *= coeffs[0];
+			for(int i=1;i < this->size(); i++)
 			{
 				Id1 = Id;
 				Id1 *= coeffs[i];
-				MatSparse<FPP,Cpu> coeffDiags;
-				coeffDiags.hstack(Id0, Id1);
-				Id0 = coeffDiags;
+				tmp.hstack(coeffDiags, Id1); //TODO: hstack/vstack to concatenate "this" to argument matrix
+				coeffDiags = tmp;
 			}
-			std::vector<MatGeneric<FPP,Cpu>*> facts(this->size()+1);
-			facts.resize(this->size()+1);
-			facts[0] = new MatSparse<FPP,Cpu>(Id0);
-			for(int i=1;i<=K+1;i++)
-			{
+			coeffDiags.set_id(false);
+			facts[0] = new MatSparse<FPP,Cpu>(coeffDiags);
+			for(int i=1;i <= this->size();i++)
 				facts[i] = this->get_gen_fact_nonconst(i-1);
-			}
 			return new TransformHelper<FPP,Cpu>(facts, (FPP) 1.0,
 					/* optimizedCopy */ false,
 					/* cloning_fact */ false,
