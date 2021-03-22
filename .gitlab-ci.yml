@@ -585,9 +585,9 @@ test_win_purepy_pkg:
     - 'set /p PKG_NAME=<pkg_name.txt'
     - '%JOB_PYTHON% -%WIN_PY_VER% -m venv test_pyfaust-%CI_COMMIT_TAG%'
     - 'call test_pyfaust-%CI_COMMIT_TAG%\Scripts\activate'
-    - '%JOB_PYTHON% -%WIN_PY_VER% -m pip install %PKG_NAME%'
-    - '%JOB_PYTHON% -%WIN_PY_VER% -c "import pyfaust; print(pyfaust.version()); print(pyfaust.rand(5,5).toarray());"'
-    - '%JOB_PYTHON% -%WIN_PY_VER% -c "import pyfaust.tests; pyfaust.tests.run_tests(\"cpu\", \"real\")"'
+    - python -m pip install %PKG_NAME%
+    - python -c "import pyfaust; print(pyfaust.version()); print(pyfaust.rand(5,5).toarray());"
+    - python -c "import pyfaust.tests; pyfaust.tests.run_tests(\"cpu\", \"real\")"
   needs:
     - job: pkg_win_purepy_release
       artifacts: true
