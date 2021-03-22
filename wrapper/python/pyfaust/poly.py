@@ -1,5 +1,6 @@
 # experimental block start
 # @PYFAUST_LICENSE_HEADER@
+
 ## @package pyfaust.poly @brief This module provides polynomials as Faust objects.
 
 import _FaustCorePy
@@ -13,96 +14,206 @@ from scipy.sparse.linalg import eigsh
 import threading
 
 
-def Chebyshev(L, K, ret_gen=False, dev='cpu', T0=None):
+def Chebyshev(L, K, ret_gen=False, dev='cpu', T0=None, impl="native"):
     """
-    Builds the Faust of the Chebyshev polynomial basis defined on the symmetric matrix L.
+    Builds the Faust of the Chebyshev polynomial basis defined on the sparse matrix L.
 
     Args:
-        L: the symmetric matrix.
+        L: the sparse scipy matrix in CSR format (scipy.sparse.csr_matrix).
+           L can aslo be a Faust if impl is "py".
         K: the degree of the last polynomial, i.e. the K+1 first polynomials are built.
-        dev: the destination device of the polynomial Faust.
+        dev: the device to instantiate the returned Faust ('cpu' or 'gpu').
+        'gpu' is not available yet for impl='native'.
         ret_gen: to return a generator of polynomials in addition to the
         polynomial itself (the generator starts from the the
         K+1-degree polynomial, and allows this way to compute the next
         polynomial simply with the instruction: next(generator)).
-        T0: to define the 0-degree polynomial as something else than the
-        identity.
+        T0: to define the 0-degree polynomial as something else than the identity.
+        impl: "native" (by default) for the C++ impl., "py" for the Python impl.
 
     Returns:
         The Faust of the K+1 Chebyshev polynomials.
+
+    Example:
+        >>> from pyfaust.poly import Chebyshev
+        >>> from scipy.sparse import random
+        >>> L = random(50, 50, .02, format='csr')
+        >>> L = L@L.T
+        >>> K = 3
+        >>> F = Chebyshev(L, K)
+        >>> F
+        Faust size 200x50, density 0.0654, nnz_sum 654, 4 factor(s):
+        - FACTOR 0 (real) SPARSE, size 200x150, density 0.00893333, nnz 268
+        - FACTOR 1 (real) SPARSE, size 150x100, density 0.0145333, nnz 218
+        - FACTOR 2 (real) SPARSE, size 100x50, density 0.0236, nnz 118
+        - FACTOR 3 (real) SPARSE, size 50x50, density 0.02, nnz 50
+
+        >>> F, gen = Chebyshev(L, K, ret_gen=True)
+        >>> F
+        Faust size 200x50, density 0.0684, nnz_sum 684, 4 factor(s):
+        - FACTOR 0 (real) SPARSE, size 200x150, density 0.00926667, nnz 278
+        - FACTOR 1 (real) SPARSE, size 150x100, density 0.0152, nnz 228
+        - FACTOR 2 (real) SPARSE, size 100x50, density 0.0256, nnz 128
+        - FACTOR 3 (real) SPARSE, size 50x50, density 0.02, nnz 50
+
+         Generate the next basis (the one with one additional dimension,
+         whose the polynomial greatest degree is K+1 = 4)
+
+        >>> G = next(gen)
+        >>> G
+        Faust size 250x50, density 0.08096, nnz_sum 1012, 5 factor(s):
+        - FACTOR 0 (real) SPARSE, size 250x200, density 0.00656, nnz 328
+        - FACTOR 1 (real) SPARSE, size 200x150, density 0.00926667, nnz 278
+        - FACTOR 2 (real) SPARSE, size 150x100, density 0.0152, nnz 228
+        - FACTOR 3 (real) SPARSE, size 100x50, density 0.0256, nnz 128
+        - FACTOR 4 (real) SPARSE, size 50x50, density 0.02, nnz 50
+
+        The factors 0 to 3 of G are views of the same factors of F.
+        They are not duplicated in memory
     """
-    if not isinstance(L, csr_matrix) and not isFaust(L):
-        L = csr_matrix(L)
-    twoL = 2*L
-    d = L.shape[0]
-    # Id = sp.eye(d, format="csr")
-    Id = _eyes_like(L, d)
-    if isinstance(T0, type(None)):
-        T0 = Id
-    T1 = _vstack((Id, L))
-    rR = _hstack((-1*Id, twoL))
-    if ret_gen or isFaust(L):
-        g = _chebyshev_gen(L, T0, T1, rR, dev)
-        for i in range(0, K):
-            next(g)
-        if ret_gen:
-            return next(g), g
+    if impl == "py":
+        if not isinstance(L, csr_matrix) and not isFaust(L):
+            L = csr_matrix(L)
+        twoL = 2*L
+        d = L.shape[0]
+        # Id = sp.eye(d, format="csr")
+        Id = _eyes_like(L, d)
+        if isinstance(T0, type(None)):
+            T0 = Id
+        T1 = _vstack((Id, L))
+        rR = _hstack((-1*Id, twoL))
+        if ret_gen or isFaust(L):
+            g = _chebyshev_gen(L, T0, T1, rR, dev)
+            for i in range(0, K):
+                next(g)
+            if ret_gen:
+                return next(g), g
+            else:
+                return next(g)
         else:
-            return next(g)
+            return _chebyshev(L, K, T0, T1, rR, dev)
+    elif impl == "native":
+        F = FaustPoly(core_obj=_FaustCorePy.FaustCore.polyBasis(L, K))
+        if ret_gen:
+            g = F._generator()
+            return F, g
+        else:
+            return F
     else:
-        return _chebyshev(L, K, T0, T1, rR, dev)
+        raise ValueError(impl+" is an unknown implementation.")
+
 
 
 def basis(L, K, basis_name, ret_gen=False, dev='cpu', T0=None, impl="native"):
     """
-    Builds the Faust of the polynomial basis defined on the symmetric matrix L.
+    Builds the Faust of the polynomial basis defined on the sparse matrix L.
 
     Args:
-        L: the symmetric matrix.
+        L: the sparse scipy matrix in CSR format (scipy.sparse.csr_matrix).
+           L can aslo be a Faust if impl is "py".
         K: the degree of the last polynomial, i.e. the K+1 first polynomials are built.
         basis_name: 'chebyshev', and others yet to come.
-        dev: the destination device of the polynomial Faust.
+        dev: the device to instantiate the returned Faust ('cpu' or 'gpu').
+        'gpu' is not available yet for impl='native'.
         ret_gen: to return a generator of polynomials in addition to the
         polynomial itself (the generator starts from the the
         K+1-degree polynomial, and allows this way to compute the next
         polynomial simply with the instruction: next(generator)).
-        impl: "native" (by default) for the C++ impl., "py" for the Python
-        impl.
+        impl: "native" (by default) for the C++ impl., "py" for the Python impl.
 
     Returns:
-        The Faust of the K+1 Chebyshev polynomials.
+        The Faust of the basis composed of the K+1 orthogonal polynomials.
+
+    Example:
+        >>> from pyfaust.poly import basis
+        >>> from scipy.sparse import random
+        >>> L = random(50, 50, .02, format='csr')
+        >>> L = L@L.T
+        >>> K = 3
+        >>> F = basis(L, K, 'chebyshev')
+        >>> F
+        Faust size 200x50, density 0.0654, nnz_sum 654, 4 factor(s):
+        - FACTOR 0 (real) SPARSE, size 200x150, density 0.00893333, nnz 268
+        - FACTOR 1 (real) SPARSE, size 150x100, density 0.0145333, nnz 218
+        - FACTOR 2 (real) SPARSE, size 100x50, density 0.0236, nnz 118
+        - FACTOR 3 (real) SPARSE, size 50x50, density 0.02, nnz 50
+
+        >>> F, gen = basis(L, K, 'chebyshev', ret_gen=True)
+        >>> F
+        Faust size 200x50, density 0.0684, nnz_sum 684, 4 factor(s):
+        - FACTOR 0 (real) SPARSE, size 200x150, density 0.00926667, nnz 278
+        - FACTOR 1 (real) SPARSE, size 150x100, density 0.0152, nnz 228
+        - FACTOR 2 (real) SPARSE, size 100x50, density 0.0256, nnz 128
+        - FACTOR 3 (real) SPARSE, size 50x50, density 0.02, nnz 50
+
+         Generate the next basis (the one with one additional dimension,
+         whose the polynomial greatest degree is K+1 = 4)
+
+        >>> G = next(gen)
+        >>> G
+        Faust size 250x50, density 0.08096, nnz_sum 1012, 5 factor(s):
+        - FACTOR 0 (real) SPARSE, size 250x200, density 0.00656, nnz 328
+        - FACTOR 1 (real) SPARSE, size 200x150, density 0.00926667, nnz 278
+        - FACTOR 2 (real) SPARSE, size 150x100, density 0.0152, nnz 228
+        - FACTOR 3 (real) SPARSE, size 100x50, density 0.0256, nnz 128
+        - FACTOR 4 (real) SPARSE, size 50x50, density 0.02, nnz 50
+
+        The factors 0 to 3 of G are views of the same factors of F.
+        They are not duplicated in memory.
+
     """
     if basis_name.lower() == 'chebyshev':
-        if impl == "native":
-            F = FaustPoly(core_obj=_FaustCorePy.FaustCore.polyBasis(L, K))
-            if ret_gen:
-                g = F._generator()
-                return F, g
-            else:
-                return F
-        elif impl == "py":
-            return Chebyshev(L, K, ret_gen=ret_gen, dev=dev, T0=T0)
-        else:
-            raise ValueError(impl+" is an unknown implementation.")
+        return Chebyshev(L, K, ret_gen=ret_gen, dev=dev, T0=T0, impl=impl)
     else:
         raise ValueError(basis_name+" is not a valid basis name")
 
 
-
 def poly(coeffs, basis='chebyshev', L=None, dev='cpu', impl='native'):
     """
-        Returns the linear combination of the polynomials defined by basis.
+        Computes the linear combination of the polynomials defined by basis.
 
         Args:
-            coeffs: the linear combination coefficients (numpy.array).
-            basis: either the name of the polynomial basis to build on L or the Faust of
-            polynomials if already built externally or an equivalent np.ndarray.
-            L: the symmetric matrix on which the polynomials are built, can't be None
-            if basis is a function (not a Faust).
+            coeffs: the linear combination coefficients (vector as a numpy.ndarray).
+            basis: either the name of the polynomial basis to build on L or the
+            basis if already built externally (as a FaustPoly or an equivalent
+            np.ndarray).
+            L: the sparse scipy matrix in CSR format (scipy.sparse.csr_matrix).
+            L can aslo be a Faust if impl is "py". It can't be None if basis is not a FaustPoly or a numpy.ndarray.
             dev: the device to instantiate the returned Faust ('cpu' or 'gpu').
+            'gpu' is not available yet for impl='native'.
 
         Returns:
-            The linear combination Faust.
+            The linear combination Faust or np.ndarray depending on if basis is itself a Faust or a np.ndarray.
+
+        Example:
+            >>> import numpy as np
+            >>> from pyfaust.poly import basis, poly
+            >>> from scipy.sparse import random
+            >>> K = 3
+            >>> L = random(50, 50, .02, format='csr')
+            >>> L = L@L.T
+            >>> F = basis(L, K, 'chebyshev')
+            >>> coeffs = np.array([.5, 1, 2, 3])
+            >>> G = poly(coeffs, F)
+            >>> G
+            Faust size 50x50, density 0.3608, nnz_sum 902, 5 factor(s):
+            - FACTOR 0 (real) SPARSE, size 50x200, density 0.02, nnz 200
+            - FACTOR 1 (real) SPARSE, size 200x150, density 0.00946667, nnz 284
+            - FACTOR 2 (real) SPARSE, size 150x100, density 0.0156, nnz 234
+            - FACTOR 3 (real) SPARSE, size 100x50, density 0.0268, nnz 134
+            - FACTOR 4 (real) SPARSE, size 50x50, density 0.02, nnz 50
+
+            Above G is a Faust because F is too.
+            Below the full array of the Faust F is passed, so an array is returned into GA.
+            >>> GA = poly(coeffs, F.toarray())
+            >>> type(GA)
+            numpy.ndarray
+
+            But of course they are equal:
+
+            >>> np.allclose(GA, G.toarray())
+            True
+
     """
     K = coeffs.size-1
     if isinstance(basis, str):
@@ -113,38 +224,40 @@ def poly(coeffs, basis='chebyshev', L=None, dev='cpu', impl='native'):
     if isFaust(basis):
         F = basis
     elif not isinstance(basis, np.ndarray):
-        print("type", type(basis))
         raise TypeError('basis is neither a str neither a Faust nor'
                         ' a numpy.ndarray')
     else:
         F = basis
+    if L == None:
+        d = F.shape[1]
+    else:
+        d = L.shape[0]
     if impl == 'py':
         if isFaust(F):
-            Id = sp.eye(L.shape[1], format="csr")
+            Id = sp.eye(d, format="csr")
             scoeffs = sp.hstack(tuple(Id*coeffs[i] for i in range(0, K+1)),
                                 format="csr")
             Fc = Faust(scoeffs, dev=dev) @ F
             return Fc
         else:
            # F is a np.ndarray
-           return _poly_arr_py(coeffs, F, L, dev=dev)
+           return _poly_arr_py(coeffs, F, d, dev=dev)
     elif impl == 'native':
         if isFaust(F):
-            Fc = poly_Faust_cpp(coeffs, F)
+            Fc = _poly_Faust_cpp(coeffs, F)
             if F.device != dev:
                 Fc = Fc.clone(dev=dev)
             return Fc
         else:
-            return _poly_arr_cpp(coeffs, F, L, dev='cpu')
+            return _poly_arr_cpp(coeffs, F, d, dev='cpu')
     else:
         raise ValueError(impl+" is an unknown implementation.")
 
-def _poly_arr_py(coeffs, basisX, L, dev='cpu'):
+def _poly_arr_py(coeffs, basisX, d, dev='cpu'):
     """
     """
     mt = True # multithreading
     n = basisX.shape[1]
-    d = L.shape[0]
     K_plus_1 = int(basisX.shape[0]/d)
     Y = np.empty((d, n))
     if n == 1:
@@ -170,13 +283,12 @@ def _poly_arr_py(coeffs, basisX, L, dev='cpu'):
 #		Y += (basisX[d*i:(i+1)*d, :] * coeff[i])
     return Y
 
-def _poly_arr_cpp(coeffs, basisX, L, dev='cpu'):
-    d = L.shape[0]
+def _poly_arr_cpp(coeffs, basisX, d, dev='cpu'):
     Y = _FaustCorePy.polyCoeffs(d, basisX, coeffs)
     return Y
 
 def _poly_Faust_cpp(coeffs, basisFaust, dev='cpu'):
-    Y = basisFaust.m_faust.polyCoeffs(coeffs)
+    Y = Faust(core_obj=basisFaust.m_faust.polyCoeffs(coeffs))
     return Y
 
 
@@ -294,7 +406,14 @@ def _build_consistent_tuple(arrays):
         return arrays
 
 class FaustPoly(Faust):
+    """
+    Subclass of Faust specialized for orthogonal polynomial basis.
 
+    This class is used only for the native implementation of the poly functions.
+
+    NOTE: it is not advisable to use this class directly.
+
+    """
     def __init__(self, *args, **kwargs):
         super(FaustPoly, self).__init__(*args, **kwargs)
 
