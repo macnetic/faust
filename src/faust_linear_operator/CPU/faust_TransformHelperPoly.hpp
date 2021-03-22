@@ -14,7 +14,7 @@ namespace Faust
 		Vect<FPP,Cpu> TransformHelperPoly<FPP>::multiply(const FPP* x, const bool transpose/*=false*/, const bool conjugate/*=false*/)
 		{
 			int d = L->getNbRow();
-			int K = this->size();
+			int K = this->size()-1;
 			Vect<FPP, Cpu> v0(d*(K+1));
 			multiply(x, v0.getData(), transpose, conjugate);
 			return std::move(v0);
@@ -38,23 +38,22 @@ namespace Faust
 			 * Fx = [v_{0, K} ; v_{1, K} ; v_{2, K}]
 			 */
 			int d = L->getNbRow();
-			int K = this->size();
-			// seeing how basisChebyshev method is instantiating this class
-			// K can't be strictly lower than two
+			int K = this->size()-1;
 
-			Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>> x_vec(const_cast<FPP*>(x), d);
 			memcpy(y, x, sizeof(FPP)*d);
+			if(K == 0)
+				return;
+			Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>> x_vec(const_cast<FPP*>(x), d);
 			Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>>v2(const_cast<FPP*>(y+d), d);
 			v2 = L->mat*x_vec;
+			if(K == 1) // not necessary but clearer
+				return;
 			for(int i=3;i<=K+1;i++)
 			{
-				int offset = d*(i-3);
-				//			gemv(L, v2, tmp, FPP(1), FPP(-1));
-				//			v2 = twoL*v2;
+				Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>>new_v2_(const_cast<FPP*>(y+d*(i-1)), d);
 				Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>>v2_(const_cast<FPP*>(y+d*(i-2)), d);
-				Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>>v2__(const_cast<FPP*>(y+d*(i-1)), d);
-				Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>>y_vec(const_cast<FPP*>(y+offset), d);
-				v2__ = L->mat*v2_*2-y_vec;
+				Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>>v1_(const_cast<FPP*>(y+d*(i-3)), d);
+				new_v2_ = L->mat*v2_*2-v1_;
 			}
 		}
 
@@ -99,7 +98,7 @@ namespace Faust
 		{
 			//				std::cout << "TransformHelperPoly<FPP>::multiply(MatDense)" << std::endl;
 			int d = L->getNbRow();
-			int K = this->size();
+			int K = this->size()-1;
 			int n = X.getNbCol();
 			MatDense<FPP,Cpu> V0_ord(d*(K+1), n);
 			auto scale = (K+1)*d;
@@ -132,27 +131,26 @@ namespace Faust
 	template<typename FPP>
 		void TransformHelperPoly<FPP>::poly(int d, int n, const FPP* basisX, const FPP* coeffs, FPP* out)
 		{
-			int K = this->size();
+			int K = this->size()-1;
 			Faust::poly(d, K, n, basisX, coeffs, out);
 		}
 
 	template<typename FPP>
 		TransformHelper<FPP, Cpu>* TransformHelperPoly<FPP>::next()
 		{
-			int K = this->size();
+			int K = this->size()-1;
 			return next(K+1);
 		}
 
 	template<typename FPP>
 		TransformHelper<FPP, Cpu>* TransformHelperPoly<FPP>::next(int K)
 		{
-			auto old_K = this->size();
+			auto old_K = this->size()-1;
 			auto d = L->getNbRow();
 			MatSparse<FPP,Cpu> Id, zero, R;
-			std::vector<MatGeneric<FPP,Cpu>*> facts(K);
-			facts.resize(K);
-			for(int i=0;i<old_K;i++)
-				facts[K-i-1] = this->get_gen_fact_nonconst(old_K-1-i);
+			std::vector<MatGeneric<FPP,Cpu>*> facts(K+1);
+			for(int i=0;i<old_K+1;i++)
+				facts[K-i] = this->get_gen_fact_nonconst(old_K-i);
 #pragma omp parallel for private(Id, zero, R)
 			for(int i=old_K+1;i <= K; i++)
 			{
@@ -169,7 +167,6 @@ namespace Faust
 					/* optimizedCopy */ false,
 					/* cloning_fact */ false,
 					/* internal_call */ true);
-			//TODO: use reference manager to avoid copies
 			basisP->L = L;
 			ref_man.acquire(L);
 			basisP->rR = rR;
@@ -186,12 +183,11 @@ namespace Faust
 			MatSparse<FPP,Cpu> Id, Id1;
 			MatSparse<FPP,Cpu> coeffDiags;
 			auto d = L->getNbRow();
-			int K = this->size();
+			int K = this->size()-1;
 			Id.resize(d, d, d);
 			Id.setEyes();
 			auto Id0 = Id;
 			Id0 *= coeffs[0];
-			// K >= 2
 			for(int i=1;i < K+1; i++)
 			{
 				Id1 = Id;
@@ -200,10 +196,10 @@ namespace Faust
 				coeffDiags.hstack(Id0, Id1);
 				Id0 = coeffDiags;
 			}
-			std::vector<MatGeneric<FPP,Cpu>*> facts(K+1);
-			facts.resize(K+1);
+			std::vector<MatGeneric<FPP,Cpu>*> facts(this->size()+1);
+			facts.resize(this->size()+1);
 			facts[0] = new MatSparse<FPP,Cpu>(Id0);
-			for(int i=1;i<=K;i++)
+			for(int i=1;i<=K+1;i++)
 			{
 				facts[i] = this->get_gen_fact_nonconst(i-1);
 			}
@@ -239,58 +235,58 @@ namespace Faust
 			MatSparse<FPP,Cpu> *T1, *T2;
 			auto d = L->getNbRow();
 			MatSparse<FPP,Cpu> Id, twoL, minus_Id, *rR, R, zero;
-			std::vector<MatGeneric<FPP,Cpu>*> facts(K); //normally it'd be K+1 but T0 is ignored
-			if(K == 0)
-				return TransformHelper<FPP,Cpu>::eyeFaust(d,d);
-			// build the chebyshev polynomials by factor
-			// K > 1 ignore the first one (for T0 0-degree), which is the identity
+			std::vector<MatGeneric<FPP,Cpu>*> facts(K+1); //normally it'd be K+1 but T0 is ignored except if K==0
 			// Identity
 			Id.resize(d, d, d);
 			Id.setEyes();
-			// T1
-			T1 = new MatSparse<FPP,Cpu>();
-			T1->vstack(Id, *L);
-			facts[K-1] = T1;
-			if(K == 1)
-				return new TransformHelper<FPP,Cpu>(facts, (FPP)1.0,
-						/* optimizedCopy */ false,
-						/* cloning_fact */ false,
-						/* internal_call */ true);
-			// rR block
-			twoL = *L;
-			twoL *= FPP(2);
-			minus_Id.resize(d,d,d);
-			minus_Id.setEyes();
-			minus_Id *= FPP(-1);
-			rR = new MatSparse<FPP,Cpu>();
-			rR->hstack(minus_Id, twoL);
-			// T2
-			Id.resize(2*d, 2*d, 2*d);
-			Id.setEyes();
-			T2 = new MatSparse<FPP,Cpu>();
-			T2->vstack(Id, *rR);
-			facts[K-2] = T2;
-//			 T3 to TK
-//#pragma omp parallel for private(Id, zero, R)
-			for(int i=3;i<K+1;i++)
+			facts[K] = new MatSparse<FPP,Cpu>(Id);
+			if (K > 0)
 			{
-				auto id = i*d;
-				Id.resize(id, id, id);
-				Id.setEyes();
-				zero.conservativeResize(d, (i-2)*d);
-				if(i == 3)
+				// build the chebyshev polynomials by factor
+				// K >= 1 ignore the first one (for T0 0-degree), which is the identity
+				// T1
+				T1 = new MatSparse<FPP,Cpu>();
+				T1->vstack(Id, *L);
+				facts[K-1] = T1;
+				// rR block
+				twoL = *L;
+				twoL *= FPP(2);
+				minus_Id.resize(d,d,d);
+				minus_Id.setEyes();
+				minus_Id *= FPP(-1);
+				rR = new MatSparse<FPP,Cpu>();
+				rR->hstack(minus_Id, twoL);
+				if (K > 1)
 				{
-					R.hstack(zero, *rR);
+					// T2
+					Id.resize(2*d, 2*d, 2*d);
+					Id.setEyes();
+					T2 = new MatSparse<FPP,Cpu>();
+					T2->vstack(Id, *rR);
+					facts[K-2] = T2;
+					//			 T3 to TK
+					//#pragma omp parallel for private(Id, zero, R)
+					for(int i=3;i<K+1;i++)
+					{
+						auto id = i*d;
+						Id.resize(id, id, id);
+						Id.setEyes();
+						zero.conservativeResize(d, (i-2)*d);
+						if(i == 3)
+						{
+							R.hstack(zero, *rR);
+						}
+						else
+						{
+							R.conservativeResize(d, rR->getNbCol()+(i-2)*d);
+							for(int i=0;i<R.getNonZeros();i++)
+								R.getColInd()[i] += d;
+						}
+						auto Ti = new MatSparse<FPP,Cpu>();
+						Ti->vstack(Id, R);
+						facts[K-i] = Ti;
+					}
 				}
-				else
-				{
-					R.conservativeResize(d, rR->getNbCol()+(i-2)*d);
-					for(int i=0;i<R.getNonZeros();i++)
-						R.getColInd()[i] += d;
-				}
-				auto Ti = new MatSparse<FPP,Cpu>();
-				Ti->vstack(Id, R);
-				facts[K-i] = Ti;
 			}
 			auto basisP = new TransformHelperPoly<FPP>(facts, (FPP)1.0,
 					/* optimizedCopy */ false,
