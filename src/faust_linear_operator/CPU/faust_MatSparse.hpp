@@ -573,16 +573,12 @@ void Faust::MatSparse<FPP,Cpu>::adjoint()
 	template<typename FPP>
 void Faust::MatSparse<FPP,Cpu>::operator=(const Faust::MatSparse<FPP,Cpu>& M)
 {
-//	mat = M.mat;
-//	mat.makeCompressed();
-//	update_dim();
-	if(this->getNbRow() != M.getNbRow() || this->getNbCol() != M.getNbCol() || this->getNonZeros() != M.getNonZeros())
-		resize(M.getNonZeros(),M.getNbRow(),M.getNbCol());
-	memcpy(this->getValuePtr(), M.getValuePtr(), M.getNonZeros()*sizeof(FPP));
-	memcpy(this->getColInd(), M.getColInd(), M.getNonZeros()*sizeof(int));
-	memcpy(this->getRowPtr(), M.getRowPtr(), (M.getNbRow()+1)*sizeof(int));
+	mat = M.mat;
+	mat.makeCompressed();
+	update_dim();
 
 	this->is_ortho = M.is_ortho;
+	this->is_identity = M.is_identity;
 }
 
 
@@ -1339,4 +1335,12 @@ void Faust::MatSparse<FPP, Cpu>::print_asarray(const std::string name/*=""*/)
 	std::cout << "======" << std::endl;
 }
 
+	template<typename FPP>
+void Faust::copy_sp_mat(Faust::MatSparse<FPP,Cpu>& src, Faust::MatSparse<FPP, Cpu>& dst)
+{
+	dst.resize(src.getNonZeros(),src.getNbRow(),src.getNbCol());
+	memcpy(dst.getValuePtr(), src.getValuePtr(), src.getNonZeros()*sizeof(FPP));
+	memcpy(dst.getColInd(), src.getColInd(), src.getNonZeros()*sizeof(int));
+	memcpy(dst.getRowPtr(), src.getRowPtr(), (src.getNbRow()+1)*sizeof(int));
+}
 #endif

@@ -419,6 +419,9 @@ namespace Faust
 
 		};
 
+	template<typename FPP>
+		void copy_sp_mat(MatSparse<FPP,Cpu>& src, MatSparse<FPP, Cpu>& dst);
+
 }
 
 #include "faust_MatSparse.hpp"
