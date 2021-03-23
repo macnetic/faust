@@ -146,6 +146,9 @@ foreach(SCALAR_AND_FSUFFIX double:Real std::complex<double>:Cplx) # TODO: float 
 		configure_file(${FAUST_MATLAB_DOC_SRC_DIR}/mexfgftgivens.m.in ${FAUST_MATLAB_DOC_SRC_DIR}/mexfgftgivens${FSUFFIX}.m COPYONLY)
 		configure_file(${FAUST_MATLAB_DOC_SRC_DIR}/mexsvdtj.m.in ${FAUST_MATLAB_DOC_SRC_DIR}/mexsvdtj${FSUFFIX}.m COPYONLY)
 	endif()
+
+	configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexPoly.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexPoly${FSUFFIX}.cpp @ONLY)
+	configure_file(${FAUST_MATLAB_DOC_SRC_DIR}/mexPoly.m.in ${FAUST_MATLAB_DOC_SRC_DIR}/mexPoly${FSUFFIX}.m @ONLY)
 endforeach()
 
 file(GLOB CPP_MEX_FILES "${FAUST_MATLAB_MEX_SRC_DIR}/*.cpp")

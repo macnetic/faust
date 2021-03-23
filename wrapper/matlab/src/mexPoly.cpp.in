@@ -1,0 +1,122 @@
+/****************************************************************************/
+/*                              Description:                                */
+/*  For more information on the FAuST Project, please visit the website     */
+/*  of the project : <http://faust.inria.fr>                                */
+/*                                                                          */
+/*                              License:                                    */
+/*  Copyright (2021):   Hakim HADJ-DJILANI,									*/
+/*  					Nicolas Bellot, Adrien Leman, Thomas Gautrais,      */
+/*                      Luc Le Magoarou, Remi Gribonval                     */
+/*                      INRIA Rennes, FRANCE                                */
+/*                      http://www.inria.fr/                                */
+/*                                                                          */
+/*  The FAuST Toolbox is distributed under the terms of INRIA.              */
+/*																			*/
+/*  This program is distributed in the hope that it will be useful, but     */
+/*  WITHOUT ANY WARRANTY; without even the implied warranty of              */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                    */
+/*                                                                          */
+/*  More information about license: http://faust.inria.fr                   */
+/*                                                                          */
+/*                             Contacts:                                    */
+/*      Nicolas Bellot  : nicolas.bellot@inria.fr                           */
+/*      Adrien Leman    : adrien.leman@inria.fr                             */
+/*      Thomas Gautrais : thomas.gautrais@inria.fr                          */
+/*      Luc Le Magoarou : luc.le-magoarou@inria.fr                          */
+/*      Remi Gribonval  : remi.gribonval@inria.fr                           */
+/*                                                                          */
+/*                              References:                                 */
+/*  [1] Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse       */
+/*  approximations of matrices and applications", Journal of Selected       */
+/*  Topics in Signal Processing, 2016.                                      */
+/*  <https://hal.archives-ouvertes.fr/hal-01167948v1>                       */
+
+
+#include "mex.h"
+#include "faust_TransformHelper.h"
+#include "faust_TransformHelperPoly.h"
+#include "class_handle.hpp"
+#include "mx2Faust.h"
+#include "faust2Mx.h"
+
+//normally Givens is only for double, float scalars
+// update: complex matrices are available with GivensFGFTComplex
+typedef @FAUST_SCALAR@ FPP;
+
+using namespace Faust;
+
+void fgft_givens(const mxArray* matlab_matrix, int J, int t, double tol, unsigned int verbosity, bool rel_err,  int order, const bool enable_large_Faust, mxArray **plhs);
+
+void fgft_givens_cplx(const mxArray* matlab_matrix, int J, int t, double tol, unsigned int verbosity, bool rel_err, int order, const bool enable_large_Faust, mxArray **plhs);
+
+
+void get_sp_mat(const mxArray * mxMat, MatSparse<FPP, Cpu>* faustMat)
+{
+	if (mxIsSparse(mxMat))
+	{
+		mxArray2FaustspMat(mxMat, *faustMat);
+	}
+	else
+	{
+		mexErrMsgTxt("chebyshev mex error: the matrix must be sparse");
+	}
+}
+
+void chebyshev(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+{
+	int K;
+	MatSparse<FPP, Cpu> L;
+	MatSparse<FPP, Cpu> opt_T0;
+	MatSparse<FPP, Cpu> *T0 = nullptr;
+
+	if(nrhs >= 2)
+	{
+		get_sp_mat(prhs[1], &L);
+
+		if(nrhs >= 3)
+			K = (int) mxGetScalar(prhs[2]);
+		else
+			mexErrMsgTxt("chebyshev mex error: K argument is mandatory");
+
+		// optional T0 matrix
+		if(nrhs >= 4)
+		{
+			get_sp_mat(prhs[3], &opt_T0);
+			T0 = &opt_T0;
+		}
+
+		auto thp = Faust::basisChebyshev(&L, K, T0);
+
+		if(thp) //not NULL
+			plhs[0] = convertPtr2Mat<Faust::TransformHelper<FPP, Cpu> >(thp);
+		else {
+			plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
+			double* ptr_out = (double*) mxGetData(plhs[0]);
+			ptr_out[0] = (double) 0;
+		}
+	}
+	else
+		mexErrMsgTxt("chebyshev mex error: missing matrix argument");
+}
+
+void poly(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+{
+}
+
+void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+{
+
+	char func[256];
+	if (nrhs < 1 || mxGetString(prhs[0], func, sizeof(func)))
+		mexErrMsgTxt("First input should be a command string less than 256 characters long.");
+
+	if(!strcmp("poly", func))
+	{
+		poly(nlhs, plhs, nrhs, prhs);
+	}
+	else if(!strcmp("chebyshev", func))
+	{
+		chebyshev(nlhs, plhs, nrhs, prhs);
+	}
+
+}
