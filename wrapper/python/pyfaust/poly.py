@@ -93,7 +93,7 @@ def Chebyshev(L, K, ret_gen=False, dev='cpu', T0=None, impl="native"):
         else:
             return _chebyshev(L, K, T0, T1, rR, dev)
     elif impl == "native":
-        F = FaustPoly(core_obj=_FaustCorePy.FaustCore.polyBasis(L, K))
+        F = FaustPoly(core_obj=_FaustCorePy.FaustCore.polyBasis(L, K, T0))
         if ret_gen:
             g = F._generator()
             return F, g
@@ -181,6 +181,7 @@ def poly(coeffs, basis='chebyshev', L=None, dev='cpu', impl='native'):
             L can aslo be a Faust if impl is "py". It can't be None if basis is not a FaustPoly or a numpy.ndarray.
             dev: the device to instantiate the returned Faust ('cpu' or 'gpu').
             'gpu' is not available yet for impl='native'.
+            impl: "native" (by default) for the C++ impl., "py" for the Python impl.
 
         Returns:
             The linear combination Faust or np.ndarray depending on if basis is itself a Faust or a np.ndarray.

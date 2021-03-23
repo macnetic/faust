@@ -137,7 +137,26 @@ class FaustCoreCpp
     static FaustCoreCpp<FPP,DEV>* hadamardFaust(unsigned int n, const bool norma);
     static FaustCoreCpp<FPP,DEV>* fourierFaust(unsigned int n, const bool norma);
     static FaustCoreCpp<FPP,DEV>* eyeFaust(unsigned int n, unsigned int m);
-    static FaustCoreCpp<FPP, DEV>* polyBasis(unsigned int L_nrows, unsigned int L_ncols, int* L_rowptr, int* L_colind, FPP* L_vals, unsigned int L_nnz, unsigned int K);
+    static FaustCoreCpp<FPP, DEV>* polyBasis(
+            unsigned int L_nrows,
+            unsigned int L_ncols,
+            int* L_rowptr,
+            int* L_colind,
+            FPP* L_vals,
+            unsigned int L_nnz,
+            unsigned int K);
+    static FaustCoreCpp<FPP,DEV>* polyBasis_ext(
+            unsigned int L_nrows, unsigned int L_ncols,
+            int* L_rowptr,
+            int* L_colind,
+            FPP* L_vals,
+            unsigned int L_nnz,
+            unsigned int K,
+            int* T0_rowptr,
+            int* T0_colind,
+            FPP* T0_vals,
+            unsigned int T0_nnz);
+
 
     protected :
     Faust::TransformHelper<FPP,DEV> *transform;

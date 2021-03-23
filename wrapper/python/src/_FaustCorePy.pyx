@@ -258,32 +258,73 @@ cdef class FaustCore:
         return core
 
     @staticmethod
-    def polyBasis(L, K):
+    def polyBasis(L, K, T0=None):
         cdef int[:] colind_view, rowptr_view
         cdef double[:] dbl_vals_view
         cdef complex[:] cplx_vals_view
+        cdef int[:] T0_colind_view, T0_rowptr_view
+        cdef double[:] T0_dbl_vals_view
+        cdef complex[:] T0_cplx_vals_view
         core = FaustCore(core=True)
+        if not isinstance(T0, type(None)):
+            if not isinstance(T0, csr_matrix):
+                raise TypeError("T0 must be a csr_matrix")
+            else:
+                if T0.shape[0] != L.shape[0]:
+                    raise ValueError("T0 must agree.")
+                if T0.dtype == np.complex:
+                    T0_cplx_vals_view = T0.data
+                else:
+                    T0_dbl_vals_view = T0.data
+                T0_colind_view = T0.indices
+                T0_rowptr_view = T0.indptr
         colind_view = L.indices
         rowptr_view = L.indptr
         if L.dtype == np.complex:
             cplx_vals_view = L.data
-            core.core_faust_cplx = \
-            FaustCoreCy.FaustCoreCpp[complex].polyBasis(L.shape[0], L.shape[1],
-                                                       &rowptr_view[0],
-                                                       &colind_view[0],
-                                                       &cplx_vals_view[0],
-                                                       L.nnz,
-                                                       K)
+            if isinstance(T0, type(None)):
+                core.core_faust_cplx = \
+                FaustCoreCy.FaustCoreCpp[complex].polyBasis(L.shape[0], L.shape[1],
+                                                           &rowptr_view[0],
+                                                           &colind_view[0],
+                                                           &cplx_vals_view[0],
+                                                           L.nnz,
+                                                           K)
+            else:
+                core.core_faust_cplx = \
+                        FaustCoreCy.FaustCoreCpp[complex].polyBasis_ext(L.shape[0], L.shape[1],
+                                                                    &rowptr_view[0],
+                                                                    &colind_view[0],
+                                                                    &cplx_vals_view[0],
+                                                                    L.nnz,
+                                                                    K,
+                                                                    &T0_rowptr_view[0],
+                                                                    &T0_colind_view[0],
+                                                                    &T0_cplx_vals_view[0],
+                                                                    T0.nnz)
             core._isReal = False
         else:
             dbl_vals_view = L.data
-            core.core_faust_dbl = \
-            FaustCoreCy.FaustCoreCpp[double].polyBasis(L.shape[0], L.shape[1],
-                                                       &rowptr_view[0],
-                                                       &colind_view[0],
-                                                       &dbl_vals_view[0],
-                                                       L.nnz,
-                                                       K)
+            if isinstance(T0, type(None)):
+                core.core_faust_dbl = \
+                        FaustCoreCy.FaustCoreCpp[double].polyBasis(L.shape[0], L.shape[1],
+                                                                   &rowptr_view[0],
+                                                                   &colind_view[0],
+                                                                   &dbl_vals_view[0],
+                                                                   L.nnz,
+                                                                   K)
+            else:
+                core.core_faust_dbl = \
+                        FaustCoreCy.FaustCoreCpp[double].polyBasis_ext(L.shape[0], L.shape[1],
+                                                                   &rowptr_view[0],
+                                                                   &colind_view[0],
+                                                                   &dbl_vals_view[0],
+                                                                   L.nnz,
+                                                                   K,
+                                                                   &T0_rowptr_view[0],
+                                                                   &T0_colind_view[0],
+                                                                   &T0_dbl_vals_view[0],
+                                                                   T0.nnz)
             core._isReal = True
         return core
 
