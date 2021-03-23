@@ -4,7 +4,7 @@
 namespace Faust
 {
 	template<typename FPP>
-		TransformHelper<FPP, Cpu>* basisChebyshev(MatSparse<FPP,Cpu>* L, int32_t K);
+		TransformHelper<FPP, Cpu>* basisChebyshev(MatSparse<FPP,Cpu>* L, int32_t K, MatSparse<FPP, Cpu>* T0=nullptr);
 
 	template<typename FPP>
 		void poly(int d, int K, int n, const FPP* basisX, const FPP* coeffs, FPP* out);
@@ -37,7 +37,7 @@ namespace Faust
 			void poly(int d, int n, const FPP* basisX, const FPP* coeffs, FPP* out);
 			TransformHelper<FPP, Cpu>* polyFaust(const FPP* coeffs);
 			~TransformHelperPoly();
-			friend TransformHelper<FPP,Cpu>* basisChebyshev<>(MatSparse<FPP,Cpu>* L, int32_t K);
+			friend TransformHelper<FPP,Cpu>* basisChebyshev<>(MatSparse<FPP,Cpu>* L, int32_t K, MatSparse<FPP, Cpu>* T0);
 		};
 
 

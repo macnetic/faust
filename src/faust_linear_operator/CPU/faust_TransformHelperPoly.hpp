@@ -174,6 +174,7 @@ namespace Faust
 			return basisP;
 		}
 
+
 	template<typename FPP>
 		TransformHelper<FPP, Cpu>* TransformHelperPoly<FPP>::polyFaust(const FPP* coeffs)
 		{
@@ -187,16 +188,21 @@ namespace Faust
 			Id.resize(d, d, d);
 			Id.setEyes();
 			coeffDiags = Id;
+//			copy_sp_mat(Id, coeffDiags);
 			coeffDiags *= coeffs[0];
 			for(int i=1;i < this->size(); i++)
 			{
 				Id1 = Id;
+//				copy_sp_mat(Id, Id1);
 				Id1 *= coeffs[i];
 				tmp.hstack(coeffDiags, Id1); //TODO: hstack/vstack to concatenate "this" to argument matrix
-				coeffDiags = tmp;
+//				coeffDiags = tmp; // crash //TODO: fix
+				copy_sp_mat(tmp, coeffDiags);
 			}
 			coeffDiags.set_id(false);
-			facts[0] = new MatSparse<FPP,Cpu>(coeffDiags);
+			auto fac0 = new MatSparse<FPP,Cpu>(); // ctor copy crash //TODO: fix
+			copy_sp_mat(coeffDiags, *fac0);
+			facts[0] = fac0;
 			for(int i=1;i <= this->size();i++)
 				facts[i] = this->get_gen_fact_nonconst(i-1);
 			return new TransformHelper<FPP,Cpu>(facts, (FPP) 1.0,
@@ -225,7 +231,7 @@ namespace Faust
 	}
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>* basisChebyshev(MatSparse<FPP,Cpu>* L, int32_t K)
+		TransformHelper<FPP,Cpu>* basisChebyshev(MatSparse<FPP,Cpu>* L, int32_t K, MatSparse<FPP, Cpu>* T0/*=nullptr*/)
 		{
 			// assuming L is symmetric
 			MatSparse<FPP,Cpu> *T1, *T2;
@@ -235,7 +241,10 @@ namespace Faust
 			// Identity
 			Id.resize(d, d, d);
 			Id.setEyes();
-			facts[K] = new MatSparse<FPP,Cpu>(Id);
+			if(T0 == nullptr)
+				facts[K] = new MatSparse<FPP,Cpu>(Id);
+			else
+				facts[K] = new MatSparse<FPP,Cpu>(*T0);
 			if (K > 0)
 			{
 				// build the chebyshev polynomials by factor
