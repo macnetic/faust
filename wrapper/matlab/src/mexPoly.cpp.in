@@ -39,15 +39,9 @@
 #include "mx2Faust.h"
 #include "faust2Mx.h"
 
-//normally Givens is only for double, float scalars
-// update: complex matrices are available with GivensFGFTComplex
 typedef @FAUST_SCALAR@ FPP;
 
 using namespace Faust;
-
-void fgft_givens(const mxArray* matlab_matrix, int J, int t, double tol, unsigned int verbosity, bool rel_err,  int order, const bool enable_large_Faust, mxArray **plhs);
-
-void fgft_givens_cplx(const mxArray* matlab_matrix, int J, int t, double tol, unsigned int verbosity, bool rel_err, int order, const bool enable_large_Faust, mxArray **plhs);
 
 
 void get_sp_mat(const mxArray * mxMat, MatSparse<FPP, Cpu>* faustMat)
@@ -87,7 +81,7 @@ void chebyshev(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 		auto thp = Faust::basisChebyshev(&L, K, T0);
 
-		if(thp) //not NULL
+		if(thp) // not NULL
 			plhs[0] = convertPtr2Mat<Faust::TransformHelper<FPP, Cpu> >(thp);
 		else {
 			plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
@@ -99,8 +93,56 @@ void chebyshev(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		mexErrMsgTxt("chebyshev mex error: missing matrix argument");
 }
 
-void poly(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+void polyMatrix(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
+	if(nrhs < 6)
+		mexErrMsgTxt("mex polyMatrix needs 6 arguments");
+	else
+	{
+		int d = (int) mxGetScalar(prhs[1]);
+		int K = (int) mxGetScalar(prhs[2]);
+		int n = (int) mxGetScalar(prhs[3]);
+		Faust::MatDense<FPP, Cpu> out(d);
+//		Faust::MatDense<FPP, Cpu> coeffs;
+//		Faust::MatDense<FPP, Cpu> basisX;
+		FPP *coeffs_ptr;
+		FPP *basisX_ptr;
+
+//		mxArray2FaustMat(prhs[4], coeffs);
+//		mxArray2FaustMat(prhs[5], basisX);
+
+		mxArray2Ptr(prhs[4], coeffs_ptr); // avoid a copy
+		mxArray2Ptr(prhs[5], basisX_ptr); // avoid a copy
+
+		Faust::poly(d, K, n, basisX_ptr /*basisX.getData()*/, coeffs_ptr /*coeffs.getData()*/, out.getData());
+
+		plhs[0] = FaustMat2mxArray(out);
+
+		delete [] coeffs_ptr;
+		delete [] basisX_ptr;
+	}
+}
+
+void polyFaust(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+{
+	Faust::MatDense<FPP, Cpu> coeffs;
+	if(nrhs < 3)
+		mexErrMsgTxt("mex polyFaust error: coeffs and basis argument are missing");
+	auto core_ptr = convertMat2Ptr<TransformHelper<FPP,Cpu>>(prhs[2]);
+	auto transform_poly = dynamic_cast<TransformHelperPoly<FPP>*>(core_ptr);
+	if(nullptr)
+		mexErrMsgTxt("polyCoeffs can only be used on a Poly. specialized Faust.");
+
+	if (mxIsSparse(prhs[1]))
+	{
+		mexErrMsgTxt("coeffs matrix must be dense not sparse");
+	}
+
+	// coeffs is assumed to be in the good size
+	mxArray2FaustMat(prhs[1], coeffs);
+	auto coeffsFaust = transform_poly->polyFaust(coeffs.getData());
+
+	plhs[0] = convertPtr2Mat<Faust::TransformHelper<FPP, Cpu> >(coeffsFaust);
 }
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
@@ -110,9 +152,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	if (nrhs < 1 || mxGetString(prhs[0], func, sizeof(func)))
 		mexErrMsgTxt("First input should be a command string less than 256 characters long.");
 
-	if(!strcmp("poly", func))
+	if(!strcmp("polyMatrix", func))
 	{
-		poly(nlhs, plhs, nrhs, prhs);
+		polyMatrix(nlhs, plhs, nrhs, prhs);
+	}
+	else if(!strcmp("polyFaust", func))
+	{
+		polyFaust(nlhs, plhs, nrhs, prhs);
 	}
 	else if(!strcmp("chebyshev", func))
 	{

@@ -1982,6 +1982,9 @@ classdef Faust
 			dev = F.dev
 		end
 
+
+
+
 	end
 	methods(Access = public, Hidden = true)
 		function set_FM_mul_mode(self, mode)
@@ -2048,6 +2051,21 @@ classdef Faust
 		function bool = isFaust(obj)
 			bool = isa(obj, 'matfaust.Faust');
 		end
+
+		%================================================================
+		%> See matfaust.poly
+		%===
+		%>
+		%================================================================
+		function M = poly(self, coeffs)
+			if(self.isreal)
+				core_obj = mexPolyReal('polyFaust', coeffs, self.matrix.objectHandle);
+			else
+				core_obj = mexPolyCplx('polyFaust', coeffs, self.matrix.objectHandle);
+			end
+			M = matfaust.Faust(core_obj, self.isreal);
+		end
+
 	end
 end
 
