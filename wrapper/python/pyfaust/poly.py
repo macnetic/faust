@@ -1,7 +1,7 @@
 # experimental block start
 # @PYFAUST_LICENSE_HEADER@
 
-## @package pyfaust.poly @brief This module provides polynomials as Faust objects.
+## @package pyfaust.poly @brief The pyfaust module for polynomial basis as Faust objects.
 
 import _FaustCorePy
 import scipy.sparse as sp
@@ -19,7 +19,7 @@ def Chebyshev(L, K, ret_gen=False, dev='cpu', T0=None, impl="native"):
     Builds the Faust of the Chebyshev polynomial basis defined on the sparse matrix L.
 
     Args:
-        L: the sparse scipy matrix in CSR format (scipy.sparse.csr_matrix).
+        L: the sparse scipy square matrix in CSR format (scipy.sparse.csr_matrix).
            L can aslo be a Faust if impl is "py".
         K: the degree of the last polynomial, i.e. the K+1 first polynomials are built.
         dev: the device to instantiate the returned Faust ('cpu' or 'gpu').
@@ -71,9 +71,11 @@ def Chebyshev(L, K, ret_gen=False, dev='cpu', T0=None, impl="native"):
         The factors 0 to 3 of G are views of the same factors of F.
         They are not duplicated in memory
     """
+    if not isinstance(L, csr_matrix) and not isFaust(L):
+        L = csr_matrix(L)
+    if L.shape[0] != L.shape[1]:
+        raise ValueError('L must be a square matrix.')
     if impl == "py":
-        if not isinstance(L, csr_matrix) and not isFaust(L):
-            L = csr_matrix(L)
         twoL = 2*L
         d = L.shape[0]
         # Id = sp.eye(d, format="csr")
@@ -109,7 +111,7 @@ def basis(L, K, basis_name, ret_gen=False, dev='cpu', T0=None, impl="native"):
     Builds the Faust of the polynomial basis defined on the sparse matrix L.
 
     Args:
-        L: the sparse scipy matrix in CSR format (scipy.sparse.csr_matrix).
+        L: the sparse scipy square matrix in CSR format (scipy.sparse.csr_matrix).
            L can aslo be a Faust if impl is "py".
         K: the degree of the last polynomial, i.e. the K+1 first polynomials are built.
         basis_name: 'chebyshev', and others yet to come.
@@ -177,7 +179,8 @@ def poly(coeffs, basis='chebyshev', L=None, dev='cpu', impl='native'):
             basis: either the name of the polynomial basis to build on L or the
             basis if already built externally (as a FaustPoly or an equivalent
             np.ndarray).
-            L: the sparse scipy matrix in CSR format (scipy.sparse.csr_matrix).
+            L: the sparse scipy square matrix in CSR format
+            (scipy.sparse.csr_matrix) on which the polynomial basis is built if basis is not already a Faust or a numpy.ndarray.
             L can aslo be a Faust if impl is "py". It can't be None if basis is not a FaustPoly or a numpy.ndarray.
             dev: the device to instantiate the returned Faust ('cpu' or 'gpu').
             'gpu' is not available yet for impl='native'.
@@ -190,9 +193,21 @@ def poly(coeffs, basis='chebyshev', L=None, dev='cpu', impl='native'):
             >>> import numpy as np
             >>> from pyfaust.poly import basis, poly
             >>> from scipy.sparse import random
-            >>> K = 3
             >>> L = random(50, 50, .02, format='csr')
             >>> L = L@L.T
+            >>> coeffs = np.array([.5, 1, 2, 3])
+            >>> G = poly(coeffs, 'chebyshev', L)
+            >>> G
+            Faust size 50x50, density 0.3608, nnz_sum 902, 5 factor(s):
+            - FACTOR 0 (real) SPARSE, size 50x200, density 0.02, nnz 200
+            - FACTOR 1 (real) SPARSE, size 200x150, density 0.00946667, nnz 284
+            - FACTOR 2 (real) SPARSE, size 150x100, density 0.0156, nnz 234
+            - FACTOR 3 (real) SPARSE, size 100x50, density 0.0268, nnz 134
+            - FACTOR 4 (real) SPARSE, size 50x50, density 0.02, nnz 50
+
+            Which is equivalent to do as below (in two times):
+
+            >>> K = 3
             >>> F = basis(L, K, 'chebyshev')
             >>> coeffs = np.array([.5, 1, 2, 3])
             >>> G = poly(coeffs, F)
@@ -221,7 +236,9 @@ def poly(coeffs, basis='chebyshev', L=None, dev='cpu', impl='native'):
         if L is None:
             raise ValueError('The L matrix must be set to build the'
                              ' polynomials.')
-        F = basis(L, K, basis, dev=dev, impl=impl)
+        from pyfaust.poly import basis as _basis
+        basis = F = _basis(L, K, basis, dev=dev, impl=impl)
+
     if isFaust(basis):
         F = basis
     elif not isinstance(basis, np.ndarray):
