@@ -131,7 +131,7 @@ void polyFaust(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	auto core_ptr = convertMat2Ptr<TransformHelper<FPP,Cpu>>(prhs[2]);
 	auto transform_poly = dynamic_cast<TransformHelperPoly<FPP>*>(core_ptr);
 	if(nullptr)
-		mexErrMsgTxt("polyCoeffs can only be used on a Poly. specialized Faust.");
+		mexErrMsgTxt("polyFaust can only be used on a poly. specialized Faust.");
 
 	if (mxIsSparse(prhs[1]))
 	{
@@ -143,6 +143,20 @@ void polyFaust(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	auto coeffsFaust = transform_poly->polyFaust(coeffs.getData());
 
 	plhs[0] = convertPtr2Mat<Faust::TransformHelper<FPP, Cpu> >(coeffsFaust);
+}
+
+void nextPolyFaust(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+{
+	if(nrhs < 2)
+		mexErrMsgTxt("mex nextPolyFaust error: basis argument is missing");
+	auto core_ptr = convertMat2Ptr<TransformHelper<FPP,Cpu>>(prhs[1]);
+	auto transform_poly = dynamic_cast<TransformHelperPoly<FPP>*>(core_ptr);
+	if(nullptr)
+		mexErrMsgTxt("nextPolyFaust can only be used on a poly. specialized Faust.");
+
+	auto nextFaust = transform_poly->next();
+
+	plhs[0] = convertPtr2Mat<Faust::TransformHelper<FPP, Cpu> >(nextFaust);
 }
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
@@ -163,6 +177,18 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	else if(!strcmp("chebyshev", func))
 	{
 		chebyshev(nlhs, plhs, nrhs, prhs);
+	}
+	else if(!strcmp("nextPolyFaust", func))
+	{
+		nextPolyFaust(nlhs, plhs, nrhs, prhs);
+	}
+	else
+	{
+		const char* msg_end = " is an unknown command";
+		char msg[256+strlen(msg_end)];
+		strncat(msg, func, strlen(func));
+		strncat(msg+strlen(func), msg_end, strlen(msg_end));
+		mexErrMsgTxt(msg);
 	}
 
 }

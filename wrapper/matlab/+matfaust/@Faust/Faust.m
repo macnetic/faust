@@ -1982,7 +1982,19 @@ classdef Faust
 			dev = F.dev
 		end
 
-
+		%================================================================
+		%> See matfaust.poly
+		%===
+		%>
+		%================================================================
+		function M = next(self)
+			if(self.isreal)
+				core_obj = mexPolyReal('nextPolyFaust', self.matrix.objectHandle);
+			else
+				core_obj = mexPolyCplx('nextPolyFaust', self.matrix.objectHandle);
+			end
+			M = matfaust.Faust(core_obj, self.isreal);
+		end
 
 
 	end
