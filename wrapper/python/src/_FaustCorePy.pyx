@@ -301,7 +301,8 @@ cdef class FaustCore:
                                                                     &T0_rowptr_view[0],
                                                                     &T0_colind_view[0],
                                                                     &T0_cplx_vals_view[0],
-                                                                    T0.nnz)
+                                                                    T0.nnz,
+                                                                    T0.shape[1])
             core._isReal = False
         else:
             dbl_vals_view = L.data
@@ -324,7 +325,8 @@ cdef class FaustCore:
                                                                    &T0_rowptr_view[0],
                                                                    &T0_colind_view[0],
                                                                    &T0_dbl_vals_view[0],
-                                                                   T0.nnz)
+                                                                   T0.nnz,
+                                                                   T0.shape[1])
             core._isReal = True
         return core
 

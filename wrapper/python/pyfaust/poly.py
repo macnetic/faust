@@ -22,14 +22,14 @@ def Chebyshev(L, K, ret_gen=False, dev='cpu', T0=None, impl="native"):
         L: the sparse scipy square matrix in CSR format (scipy.sparse.csr_matrix).
            L can aslo be a Faust if impl is "py".
         K: the degree of the last polynomial, i.e. the K+1 first polynomials are built.
-        dev: the device to instantiate the returned Faust ('cpu' or 'gpu').
+        dev (optional): the device to instantiate the returned Faust ('cpu' or 'gpu').
         'gpu' is not available yet for impl='native'.
-        ret_gen: to return a generator of polynomials in addition to the
+        ret_gen (optional): to return a generator of polynomials in addition to the
         polynomial itself (the generator starts from the the
         K+1-degree polynomial, and allows this way to compute the next
         polynomial simply with the instruction: next(generator)).
-        T0: to define the 0-degree polynomial as something else than the identity.
-        impl: "native" (by default) for the C++ impl., "py" for the Python impl.
+        T0 (optional): to define the 0-degree polynomial as something else than the identity.
+        impl (optional): "native" (by default) for the C++ impl., "py" for the Python impl.
 
     Returns:
         The Faust of the K+1 Chebyshev polynomials.
@@ -115,13 +115,14 @@ def basis(L, K, basis_name, ret_gen=False, dev='cpu', T0=None, impl="native"):
            L can aslo be a Faust if impl is "py".
         K: the degree of the last polynomial, i.e. the K+1 first polynomials are built.
         basis_name: 'chebyshev', and others yet to come.
-        dev: the device to instantiate the returned Faust ('cpu' or 'gpu').
+        dev (optional): the device to instantiate the returned Faust ('cpu' or 'gpu').
         'gpu' is not available yet for impl='native'.
-        ret_gen: to return a generator of polynomials in addition to the
+        ret_gen (optional): to return a generator of polynomials in addition to the
         polynomial itself (the generator starts from the the
         K+1-degree polynomial, and allows this way to compute the next
         polynomial simply with the instruction: next(generator)).
-        impl: "native" (by default) for the C++ impl., "py" for the Python impl.
+        T0 (optional): a sparse matrix to replace the identity as a 0-degree polynomial of the basis.
+        impl (optional): "native" (by default) for the C++ impl., "py" for the Python impl.
 
     Returns:
         The Faust of the basis composed of the K+1 orthogonal polynomials.
@@ -139,6 +140,18 @@ def basis(L, K, basis_name, ret_gen=False, dev='cpu', T0=None, impl="native"):
         - FACTOR 1 (real) SPARSE, size 150x100, density 0.0145333, nnz 218
         - FACTOR 2 (real) SPARSE, size 100x50, density 0.0236, nnz 118
         - FACTOR 3 (real) SPARSE, size 50x50, density 0.02, nnz 50
+
+         By default, the 0-degree polynomial is the identity.
+         However it is possible to replace the corresponding matrix by
+         any sparse matrix T0 of your choice (with the only constraint that
+         T0.shape[0] == L.shape[0]. In that purpose, do as follows:
+        >>> F = basis(L, K, 'chebyshev', T0=random(50,2, .3, format='csr'))
+        >>> F
+        Faust size 200x2, density 1.7125, nnz_sum 685, 4 factor(s): 
+            - FACTOR 0 (real) SPARSE, size 200x150, density 0.0095, nnz 285
+            - FACTOR 1 (real) SPARSE, size 150x100, density 0.0156667, nnz 235
+            - FACTOR 2 (real) SPARSE, size 100x50, density 0.027, nnz 135
+            - FACTOR 3 (real) SPARSE, size 50x2, density 0.3, nnz 30
 
         >>> F, gen = basis(L, K, 'chebyshev', ret_gen=True)
         >>> F

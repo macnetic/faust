@@ -155,7 +155,8 @@ class FaustCoreCpp
             int* T0_rowptr,
             int* T0_colind,
             FPP* T0_vals,
-            unsigned int T0_nnz);
+            unsigned int T0_nnz,
+            unsigned int T0_ncols);
 
 
     protected :
