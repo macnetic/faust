@@ -100,16 +100,27 @@ namespace Faust
 			int d = L->getNbRow();
 			int K = this->size()-1;
 			int n = X.getNbCol();
-			MatDense<FPP,Cpu> V0_ord(d*(K+1), n);
+			MatDense<FPP,Cpu> Y(d*(K+1), n);
+			multiply(X.getData(), n, Y.getData(), transpose, conjugate);
+			return Y;
+		}
+
+template<typename FPP>
+		void TransformHelperPoly<FPP>::multiply(const FPP* X, int n, FPP* Y, const bool transpose/*=false*/, const bool conjugate/*=false*/)
+		{
+			int d = L->getNbRow();
+			int K = this->size()-1;
 			auto scale = (K+1)*d;
 #pragma omp parallel for
 			for(int i=0;i<n;i++)
 			{
-				Vect<FPP,Cpu> x(d, X.getData()+i*d);
-				auto y = multiply(x);
-				memcpy(V0_ord.getData()+scale*i, y.getData(), sizeof(FPP)*scale);
+				//				Vect<FPP,Cpu> x(d, X.getData()+i*d);
+				//				auto y = multiply(x);
+				//				memcpy(V0_ord.getData()+scale*i, y.getData(), sizeof(FPP)*scale);
+				Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>> x_vec(const_cast<FPP*>(X+i*d), d);
+				Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>> y_vec(const_cast<FPP*>(Y+i*scale), scale);
+				multiply(x_vec.data(), y_vec.data(), transpose, conjugate);
 			}
-			return V0_ord;
 		}
 
 	template<typename FPP>
