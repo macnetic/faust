@@ -177,6 +177,7 @@ void FaustCoreCpp<FPP,DEV>::multiply(FPP* value_y,int nbrow_y,int nbcol_y, const
         {
             // assuming that x and y are pointers to memory allocated to the proper
             // sizes
+//            Y = this->transform->multiply(value_x);
             this->transform->multiply(value_x, value_y);
         }
         else
@@ -185,13 +186,12 @@ void FaustCoreCpp<FPP,DEV>::multiply(FPP* value_y,int nbrow_y,int nbcol_y, const
             Faust::Vect<FPP,Cpu> Y;
 
             Y = this->transform->multiply(X);
-            Y = this->transform->multiply(value_x);
             memcpy(value_y,Y.getData(),sizeof(FPP)*nbrow_y);
         }
     }
     else
     {
-        if(this->transform->get_mul_order_opt_mode() == Faust::DEFAULT)
+        if(this->transform->get_mul_order_opt_mode() == Faust::DEFAULT && DEV == Cpu /*tmp fix to GPU2 that fails in multiply below */)
         {
             //assuming that value_x and value_y are allocated properly (to the good
             //sizes) in numpy world
@@ -208,6 +208,7 @@ void FaustCoreCpp<FPP,DEV>::multiply(FPP* value_y,int nbrow_y,int nbcol_y, const
         }
     }
 }
+
 template<typename FPP, FDevice DEV>
  FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::polyNext() const
 {

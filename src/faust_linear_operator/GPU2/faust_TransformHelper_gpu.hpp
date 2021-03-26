@@ -340,6 +340,24 @@ namespace Faust
 		}
 
 	template<typename FPP>
+		void TransformHelper<FPP,GPU2>::multiply(const FPP* cpu_x_buf, int x_ncols, FPP* cpu_out_buf, const bool transpose /* deft to false */, const bool conjugate/*=false*/)
+		{
+			this->is_transposed ^= transpose;
+			this->is_conjugate ^= conjugate;
+			int32_t x_nrows;
+			if(this->is_transposed)
+				x_nrows = this->getNbRow();
+			else
+				x_nrows = this->getNbCol();
+			MatDense<FPP,GPU2> gpu_x(x_nrows, x_ncols, cpu_x_buf);
+			MatDense<FPP,GPU2> gpu_M = this->multiply(gpu_x, transpose, conjugate); //TODO: handle transpose and conjugate
+			// TODO: fix this function, it works until here then it segfaults or gives a cuda error with tocpu (even if I use a cpu matdense set locally)
+			this->is_transposed ^= transpose;
+			this->is_conjugate ^= conjugate;
+			gpu_M.tocpu(cpu_out_buf);
+		}
+
+	template<typename FPP>
 		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::multiply(const FPP& a)
 		{
 			const vector<MatGeneric<FPP,GPU2>*>& vec = this->transform->data; //TransformHelper is a friend class of Transform // we can access private attribute data
