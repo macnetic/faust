@@ -213,6 +213,7 @@ namespace Faust {
 	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::multiply(const FPP *x, FPP* y, const bool transpose, const bool conjugate)
 		{
+			//TODO: move to Faust::Transform ?
 			int x_size;
 			// assuming that x size is valid, infer it from this size
 			if(this->is_transposed && transpose || ! this->is_transposed && ! transpose)
@@ -296,6 +297,16 @@ namespace Faust {
 			this->is_conjugate ^= conjugate;
 			this->is_transposed ^= transpose;
 			return M;
+		}
+
+	template<typename FPP>
+		void TransformHelper<FPP,Cpu>::multiply(const FPP* A, int A_ncols, FPP* C, const bool transpose/*=false*/, const bool conjugate/*=false*/)
+		{
+			this->is_transposed ^= transpose;
+			this->is_conjugate ^= conjugate;
+			this->transform->multiply(A, A_ncols, C, this->isTransposed2char());
+			this->is_conjugate ^= conjugate;
+			this->is_transposed ^= transpose;
 		}
 
 	template<typename FPP>

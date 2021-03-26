@@ -103,6 +103,8 @@ namespace Faust
 			virtual Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> &x, const bool transpose=false, const bool conjugate=false);
 			virtual Vect<FPP,Cpu> multiply(const FPP* x, const bool transpose=false, const bool conjugate=false);
 			virtual void multiply(const FPP* x, FPP* y, const bool transpose=false, const bool conjugate=false);
+			// \brief multiply this by A (of size: this->getNbCol()*A_ncols) into C (buffers must be properly allocated from the callee).
+			virtual void multiply(const FPP* A, int A_ncols, FPP* C, const bool transpose=false, const bool conjugate=false);
 			//			MatDense<FPP,Cpu> multiply(const MatDense<FPP,Cpu> A) const;
 			virtual MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> &A, const bool transpose=false, const bool conjugate=false);
 			void update_total_nnz();

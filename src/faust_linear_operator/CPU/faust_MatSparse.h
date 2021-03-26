@@ -117,6 +117,7 @@ namespace Faust
 			friend GivensFGFTParallel<FPP,Cpu, float>;
 			friend GivensFGFTComplex<FPP,Cpu, double>;
 			friend GivensFGFTComplex<FPP,Cpu, float>;
+			friend Transform<FPP,Cpu>; //TODO: limit to needed member functions only (multiply)
 			friend TransformHelper<FPP,Cpu>; // TODO: limit to needed member functions only
 			friend TransformHelperPoly<FPP>; // TODO: limit to needed member functions only
 			friend void wht_factors<>(unsigned int n, std::vector<MatGeneric<FPP,Cpu>*>&  factors, const bool, const bool);

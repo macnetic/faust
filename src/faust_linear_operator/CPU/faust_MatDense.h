@@ -135,6 +135,7 @@ namespace Faust
 
 			friend class MatSparse<FPP,Cpu>;
 			friend TransformHelper<FPP,Cpu>; // TODO: limit to needed member functions only
+			friend Transform<FPP,Cpu>; //TODO: limit to needed member functions only (multiply)
 			friend void  MatDiag<FPP>::multiply(MatDense<FPP,Cpu> & M, char opThis) const;
 
 			/// All derived class template of MatDense are considered as friends

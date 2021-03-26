@@ -46,6 +46,7 @@
 #include <iostream>
 #include <exception>
 #include <vector>
+#include "faust_prod_opt.h"
 
 
 template<typename FPP, FDevice DEV>
@@ -172,23 +173,39 @@ void FaustCoreCpp<FPP,DEV>::multiply(FPP* value_y,int nbrow_y,int nbcol_y, const
     }
     if (nbcol_x == 1)
     {
-//        Faust::Vect<FPP,Cpu> X(nbrow_x,value_x);
-//        Faust::Vect<FPP,Cpu> Y;
+        if(this->transform->get_Fv_mul_mode() == Faust::DEFAULT)
+        {
+            // assuming that x and y are pointers to memory allocated to the proper
+            // sizes
+            this->transform->multiply(value_x, value_y);
+        }
+        else
+        { // for other ways to multiply, it is not handled yet
+            Faust::Vect<FPP,Cpu> X(nbrow_x,value_x);
+            Faust::Vect<FPP,Cpu> Y;
 
-//        Y = this->transform->multiply(X);
-//        Y = this->transform->multiply(value_x);
-//        memcpy(value_y,Y.getData(),sizeof(FPP)*nbrow_y);
-        // assuming that x and y are pointers to memory allocated to the proper
-        // sizes
-        this->transform->multiply(value_x, value_y);
-    }else
+            Y = this->transform->multiply(X);
+            Y = this->transform->multiply(value_x);
+            memcpy(value_y,Y.getData(),sizeof(FPP)*nbrow_y);
+        }
+    }
+    else
     {
-        Faust::MatDense<FPP,Cpu> X(value_x,nbrow_x,nbcol_x);
-        Faust::MatDense<FPP,Cpu> Y;
+        if(this->transform->get_mul_order_opt_mode() == Faust::DEFAULT)
+        {
+            //assuming that value_x and value_y are allocated properly (to the good
+            //sizes) in numpy world
+            this->transform->multiply(value_x, nbcol_x, value_y);
+        }
+        else
+        { // for other ways to multiply, it is not handled yet
+            Faust::MatDense<FPP,Cpu> X(value_x,nbrow_x,nbcol_x);
+            Faust::MatDense<FPP,Cpu> Y;
 
-        Y = this->transform->multiply(X);
+            Y = this->transform->multiply(X);
 
-        memcpy(value_y,Y.getData(),sizeof(FPP)*nbrow_y*nbcol_y);
+            memcpy(value_y,Y.getData(),sizeof(FPP)*nbrow_y*nbcol_y);
+        }
     }
 }
 template<typename FPP, FDevice DEV>

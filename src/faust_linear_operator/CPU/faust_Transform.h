@@ -166,6 +166,8 @@ namespace Faust
 						const bool transpose=false) const;
 				faust_unsigned_int getNbRow() const;
 				faust_unsigned_int getNbCol() const;
+				int max_nrows() const;
+				int max_ncols() const;
 				void print_file(const char* filename) const;
 				void print_data_ptrs() const
 				{
@@ -284,6 +286,18 @@ namespace Faust
 				 *! \tparam opThis : character
 				 */
 				MatDense<FPP,Cpu> multiply(const MatDense<FPP,Cpu> &A,const char opThis='N') const;
+
+				/**
+				 * \brief Multiplies this by A into C.
+				 *
+				 * This function uses Eigen Maps to optimize the computation (avoiding internal copies as it is with MatDense).
+				 *
+				 * \param A properly allocated memory area of size getNbCol()*A_ncols.
+				 * \param C properly allocated memory area of size getNbRow()*A_ncols.
+				 * \param opThis the same as multiply(MatDense<FPP,Cpu>, const char)
+				 *
+				 */
+				void multiply(const FPP* A, int A_ncols, FPP* C, const char opThis='N');
 
 				MatSparse<FPP,Cpu> multiply(const MatSparse<FPP,Cpu> A,const char opThis='N') const;
 

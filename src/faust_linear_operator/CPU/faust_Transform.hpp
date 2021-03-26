@@ -1166,6 +1166,106 @@ Faust::MatSparse<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::MatSp
 }
 
 template<typename FPP>
+int Faust::Transform<FPP,Cpu>::max_nrows() const
+{
+	int max_nrows = this->getNbRow();
+	for(int i=1;i<this->size();i++)
+	{
+		auto i_nrows = data[i]->getNbRow();
+		max_nrows = max_nrows>i_nrows?max_nrows:i_nrows;
+	}
+	return max_nrows;
+}
+
+template<typename FPP>
+int Faust::Transform<FPP,Cpu>::max_ncols() const
+{
+	int max_ncols = this->getNbCol();
+	for(int i=1;i<this->size();i++)
+	{
+		auto i_ncols = data[i]->getNbRow();
+		max_ncols = max_ncols>i_ncols?max_ncols:i_ncols;
+	}
+	return max_ncols;
+}
+
+template<typename FPP>
+void Faust::Transform<FPP,Cpu>::multiply(const FPP* A, int A_ncols, FPP* C, const char opThis/*='N'*/)
+{
+	auto lhs_ncols = A_ncols;
+	int lhs_nrows, out_nrows;
+	int i, fac_i;
+	int max_nrows;
+	FPP *tmp_buf1, *tmp_buf2;
+	auto lhs_buf = A;
+	FPP* out_buf = nullptr;
+	MatSparse<FPP, Cpu>* sp_mat;
+	MatDense<FPP, Cpu>* ds_mat;
+	std::function<int(int)> get_fac_i, calc_out_nrows;
+	using SparseMat = Eigen::SparseMatrix<FPP,Eigen::RowMajor>;
+	using DenseMat = Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>;
+	using DenseMatMap = Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>>;
+	std::function<void(SparseMat&, DenseMatMap&,  DenseMatMap&)> mul_sp_mat;
+	std::function<void(DenseMat&, DenseMatMap&,  DenseMatMap&)> mul_ds_mat;
+	std::function<DenseMat(DenseMat&)> op_dsmat;
+	std::function<SparseMat(SparseMat&)> op_spmat;
+	if(opThis == 'N')
+	{
+		max_nrows = this->max_nrows();
+		lhs_nrows = this->getNbCol();
+		get_fac_i = [this](int i) {return this->size()-1-i;};
+		calc_out_nrows = [this](int i) { return this->data[i]->getNbRow();};
+		op_spmat = [](SparseMat& sp_mat) {return sp_mat;};
+		op_dsmat = [](DenseMat& ds_mat) {return ds_mat;};
+	}
+	else
+	{
+		max_nrows = this->max_ncols();
+		lhs_nrows = this->getNbRow();
+		get_fac_i = [this](int i) {return i;};
+		calc_out_nrows = [this](int i) { return this->data[i]->getNbCol();};
+		if(opThis == 'T')
+		{
+			op_spmat = [](SparseMat& sp_mat) {return sp_mat.transpose();};
+			op_dsmat = [](DenseMat& ds_mat) {return ds_mat.transpose();};
+		}
+		else if(opThis == 'H')
+		{
+			op_spmat = [](SparseMat& sp_mat) {return sp_mat.adjoint();};
+			op_dsmat = [](DenseMat& ds_mat) {return ds_mat.adjoint();};
+		}
+		else
+			throw std::runtime_error("Unknown opThis");
+	}
+	mul_ds_mat = [&op_dsmat] (DenseMat& ds_mat, DenseMatMap& lhs_mat, DenseMatMap& out_mat) {out_mat.noalias() = op_dsmat(ds_mat) *  lhs_mat;};
+	mul_sp_mat = [&op_spmat](SparseMat& sp_mat, DenseMatMap& lhs_mat,  DenseMatMap& out_mat) { out_mat.noalias() = op_spmat(sp_mat) * lhs_mat;};
+	tmp_buf1 = new FPP[max_nrows*A_ncols];
+	tmp_buf2 = new FPP[max_nrows*A_ncols];
+	for(i=0; i < this->size(); i++)
+	{
+		if(i == size()-1)
+			out_buf = C;
+		else
+			out_buf = i&1?tmp_buf1:tmp_buf2;
+		fac_i = get_fac_i(i);
+		out_nrows = calc_out_nrows(fac_i);
+		Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>> out_mat(const_cast<FPP*>(out_buf), out_nrows, lhs_ncols);
+		Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>> lhs_mat(const_cast<FPP*>(lhs_buf), lhs_nrows, lhs_ncols);
+		if(sp_mat = dynamic_cast<MatSparse<FPP, Cpu>*>(data[fac_i]))
+			mul_sp_mat(sp_mat->mat, lhs_mat, out_mat);
+		else if(ds_mat = dynamic_cast<MatDense<FPP, Cpu>*>(data[fac_i]))
+			mul_ds_mat(ds_mat->mat, lhs_mat, out_mat);
+		else
+			throw std::runtime_error(std::string("Unknown matrix at index: ")+std::to_string(fac_i));
+		lhs_buf = out_buf;
+		// lhs_ncols never changes
+		lhs_nrows = out_mat.rows();
+	}
+	delete [] tmp_buf1;
+	delete [] tmp_buf2;
+}
+
+template<typename FPP>
 Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const MatDense<FPP,Cpu> &A, const char opThis) const
 {
 
