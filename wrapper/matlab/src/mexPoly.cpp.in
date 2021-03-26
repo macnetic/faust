@@ -185,10 +185,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	else
 	{
 		const char* msg_end = " is an unknown command";
-		char msg[256+strlen(msg_end)];
+		char *msg = new char[256+strlen(msg_end)];
 		strncat(msg, func, strlen(func));
 		strncat(msg+strlen(func), msg_end, strlen(msg_end));
 		mexErrMsgTxt(msg);
+		delete []msg;
 	}
 
 }
