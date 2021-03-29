@@ -346,15 +346,15 @@ namespace Faust
 			this->is_conjugate ^= conjugate;
 			int32_t x_nrows;
 			if(this->is_transposed)
-				x_nrows = this->getNbRow();
+				x_nrows = this->transform->getNbRow();
 			else
-				x_nrows = this->getNbCol();
+				x_nrows = this->transform->getNbCol();
 			MatDense<FPP,GPU2> gpu_x(x_nrows, x_ncols, cpu_x_buf, false);
 			MatDense<FPP,GPU2> gpu_M = this->multiply(gpu_x, transpose, conjugate); //TODO: handle transpose and conjugate
 			// TODO: fix this function, it works until here then it segfaults or gives a cuda error with tocpu (even if I use a cpu matdense set locally)
 			this->is_transposed ^= transpose;
 			this->is_conjugate ^= conjugate;
-			gpu_M.tocpu(cpu_out_buf);
+			gpu_M.tocpu(cpu_out_buf, nullptr);
 		}
 
 	template<typename FPP>

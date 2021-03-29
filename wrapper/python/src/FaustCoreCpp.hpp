@@ -191,7 +191,7 @@ void FaustCoreCpp<FPP,DEV>::multiply(FPP* value_y,int nbrow_y,int nbcol_y, const
     }
     else
     {
-        if(this->transform->get_mul_order_opt_mode() == Faust::DEFAULT && DEV == Cpu /*tmp fix to GPU2 that fails in multiply below */)
+        if(this->transform->get_mul_order_opt_mode() == Faust::DEFAULT)
         {
             //assuming that value_x and value_y are allocated properly (to the good
             //sizes) in numpy world
