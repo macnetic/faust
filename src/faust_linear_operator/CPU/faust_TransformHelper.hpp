@@ -57,18 +57,10 @@ namespace Faust {
 		if(lambda_ != FPP(1.0) && ! internal_call)
 			cerr << "WARNING: the constructor argument for multiplying the Faust by a scalar is DEPRECATED and might not be supported in next versions of FAµST." << endl;
 		this->transform = make_shared<Transform<FPP,Cpu>>(facts, lambda_, optimizedCopy, cloning_fact);
-#ifdef USE_GPU_MOD
-		if(FaustGPU<FPP>::are_cpu_mat_all_known(this->transform->data))
-			//with refman gpu mats will be reused (because already loaded)
-			enable_gpu_meth_for_mul();
-#endif
 	}
 
 	template<typename FPP>
 		TransformHelper<FPP,Cpu>::TransformHelper() : TransformHelperGen<FPP,Cpu>()
-#ifdef USE_GPU_MOD
-													  , gpu_faust(nullptr)
-#endif
 	{
 	}
 
@@ -100,10 +92,6 @@ namespace Faust {
 			this->is_transposed = right_left_transposed;
 			//likewise for the conjugate
 			this->is_conjugate = right_left_conjugate;
-#ifdef USE_GPU_MOD
-			if(th_left->gpu_faust && th_right->gpu_faust)
-				enable_gpu_meth_for_mul();
-#endif
 		}
 
 	template<typename FPP>
@@ -150,10 +138,6 @@ namespace Faust {
 		void TransformHelper<FPP,Cpu>::copy_mul_mode_state(const TransformHelper<FPP,Cpu>& th)
 		{
 			TransformHelperGen<FPP,Cpu>::copy_mul_mode_state(th);
-#ifdef USE_GPU_MOD
-			if(th.gpu_faust)
-				enable_gpu_meth_for_mul();
-#endif
 		}
 
 #ifndef IGNORE_TRANSFORM_HELPER_VARIADIC_TPL
@@ -162,12 +146,6 @@ namespace Faust {
 		TransformHelper<FPP,Cpu>::TransformHelper(GList& ... t) : TransformHelper<FPP,Cpu>()
 		{
 			this->push_back_(t...);
-#ifdef USE_GPU_MOD
-			// it's difficult here to test if all t are TransformHelper with a gpu_faust enabled (for example t can also be a vector<MatGeneric>)
-			// so verify directly that cpu matrices copied are loaded in GPU to respect the invariant: a Faust is fully loaded on GPU or is not on GPU at all
-			if(FaustGPU<FPP>::are_cpu_mat_all_known(this->transform->data))
-				enable_gpu_meth_for_mul();
-#endif
 		}
 #endif
 	template<typename FPP>
@@ -187,10 +165,6 @@ namespace Faust {
 		{
 			this->is_transposed ^= transpose;
 			this->is_conjugate ^= conjugate;
-#ifdef USE_GPU_MOD
-			if(this->Fv_mul_mode == GPU_MOD && gpu_faust != nullptr)
-					return gpu_faust->multiply(x, this->is_transposed, this->is_conjugate);
-#endif
 			Vect<FPP,Cpu> v = std::move(this->transform->multiply(x, this->isTransposed2char()));
 			this->is_transposed ^= transpose;
 			this->is_conjugate ^= conjugate;
@@ -284,12 +258,6 @@ namespace Faust {
 					Faust::tensor_chain_mul(tensor_data, M, &A, /* on_gpu */ false, /*clone */ false, /* chain_opt */ false, /* contiguous_dense_to_torch */ true, !this->is_transposed);
 					break;
 #endif
-#ifdef USE_GPU_MOD
-				case GPU_MOD:
-					if(gpu_faust != nullptr)
-						M = gpu_faust->multiply(&A, this->is_transposed, this->is_conjugate);
-					break;
-#endif
 				default:
 					M = this->transform->multiply(A, this->isTransposed2char());
 					break;
@@ -373,22 +341,11 @@ namespace Faust {
 //				display_TensorList(tensor_data);
 			}
 #else
-			for(int i=7;i<GPU_MOD;i++)
-				disabled_meths.push_back(i);
+			disabled_meths.push_back(TORCH_CPU);
+			disabled_meths.push_back(TORCH_CPU_BEST_ORDER);
+			disabled_meths.push_back(TORCH_CPU_DENSE_ROW_TO_TORCH);
 #endif
-#ifdef USE_GPU_MOD
-			try
-			{
-				GPUModHandler::get_singleton()->check_gpu_mod_loaded();
-			}
-			catch(std::runtime_error& e)
-			{
-			// test only if enable_gpu_mod was called
-#endif
-				disabled_meths.push_back(GPU_MOD);
-#ifdef USE_GPU_MOD
-			}
-#endif
+
 			for(int i=0; i < NMETS; i++)
 			{
 				if(std::find(std::begin(disabled_meths), std::end(disabled_meths), i) != std::end(disabled_meths))
@@ -563,32 +520,8 @@ namespace Faust {
 		}
 
 	template<typename FPP>
-		void TransformHelper<FPP,Cpu>::enable_gpu_meth_for_mul()
-		{
-#ifdef USE_GPU_MOD
-			set_FM_mul_mode(GPU_MOD);
-			set_Fv_mul_mode(GPU_MOD);
-#endif
-		}
-
-	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::set_FM_mul_mode(const int mul_order_opt_mode, const bool silent /* = false */)
 		{
-#ifdef USE_GPU_MOD
-			if(mul_order_opt_mode == GPU_MOD && gpu_faust == nullptr)
-			{
-//				try
-//				{
-					gpu_faust = new Faust::FaustGPU<FPP>(this->transform->data);
-//				}
-//				catch(std::runtime_error & e)
-//				{
-//					// creation failed, nothing todo (must be because of cuda backend is not installed/found)
-//					std::cerr << "error: can't change to GPU method (backend unavailable)." << std::endl;
-//					return;
-//				}
-			}
-#endif
 			this->mul_order_opt_mode = mul_order_opt_mode;
 			if(! silent)
 			{
@@ -603,22 +536,6 @@ namespace Faust {
 	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::set_Fv_mul_mode(const int Fv_mul_mode)
 		{
-#ifdef USE_GPU_MOD
-			//TODO: factorize this code with set_FM_mul_mode
-			if(this->Fv_mul_mode == GPU_MOD && gpu_faust == nullptr)
-			{
-				try
-				{
-					gpu_faust = new Faust::FaustGPU<FPP>(this->transform->data);
-				}
-				catch(std::runtime_error & e)
-				{
-					// creation failed, nothing todo (must be because of cuda backend is not installed/found)
-					std::cerr << "error: can't change to GPU method (backend unavailable)." << std::endl;
-					return;
-				}
-			}
-#endif
 			this->Fv_mul_mode = Fv_mul_mode;
 			std::cout << "changed Faust-vector mul. mode to: " << this->Fv_mul_mode;
 			if(! this->Fv_mul_mode)
@@ -650,20 +567,12 @@ namespace Faust {
 		void TransformHelper<FPP,Cpu>::pop_back()
         {
             this->transform->pop_back();
-#ifdef USE_GPU_MOD
-			if(gpu_faust)
-				gpu_faust->pop_back();
-#endif
         }
 
 	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::pop_front()
         {
             this->transform->pop_front();
-#ifdef USE_GPU_MOD
-			if(gpu_faust)
-				gpu_faust->pop_front();
-#endif
         }
 
 	template<typename FPP>
@@ -683,22 +592,14 @@ namespace Faust {
 			this->transform->push_back(M, optimizedCopy, this->is_conjugate, copying); //2nd argument is for opt. (possibly converting dense <-> sparse)
             if(transpose)
                 get_gen_fact_nonconst(size()-1)->transpose();
-#ifdef USE_GPU_MOD
-			if(gpu_faust)
-				gpu_faust->push_back(const_cast<MatGeneric<FPP,Cpu>*>(M));
-#endif
 		}
-    
+
 	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::push_first(const MatGeneric<FPP,Cpu>* M, const bool optimizedCopy /* false by default */, const bool copying /* true to default */)
 		{
 			//warning: should not be called after initialization of factors (to respect the immutability property)
 			//this function is here only for python wrapper (TODO: see how to modify that wrapper in order to delete this function after or just use it internally -- not py/matfaust)
 			this->transform->push_first(M, optimizedCopy, this->is_conjugate, copying); //2nd argument is for opt. (possibly converting dense <-> sparse)
-#ifdef USE_GPU_MOD
-			if(gpu_faust)
-				gpu_faust->insert(M, 0);
-#endif
 		}
 
 	template<typename FPP>
@@ -810,12 +711,6 @@ template<typename FPP>
 		}
 		fact->set_id(M.is_id());
 		update_total_nnz();
-#if USE_GPU_MOD
-		if(gpu_faust)
-		{
-			gpu_faust->update(fact, fact_id);
-		}
-#endif
 	}
 
 template<typename FPP>
@@ -924,11 +819,6 @@ template<typename FPP>
 		if(this->mul_order_opt_mode)
 			switch(this->mul_order_opt_mode)
 			{
-#ifdef USE_GPU_MOD
-				case GPU_MOD:
-					if(nullptr != gpu_faust)
-						P = gpu_faust->get_product(this->is_transposed, this->is_conjugate);
-#endif
 				default:
 					//TODO: avoid to add one factor for all methods if possible
 					MatDense<FPP,Cpu> Id(this->getNbCol(), this->getNbCol());
@@ -963,10 +853,6 @@ template<typename FPP>
 	double TransformHelper<FPP,Cpu>::spectralNorm(const int nbr_iter_max, double threshold, int &flag) const
 	{
 //			std::cout << "TransformHelper<FPP,Cpu>::spectralNorm" << std::endl;
-#ifdef USE_GPU_MOD
-		if(gpu_faust != nullptr)
-			return gpu_faust->spectral_norm(nbr_iter_max, threshold);
-#endif
 		vector <MatGeneric<FPP, Cpu>*>& orig_facts = this->transform->data;
 		int start_id, end_id;
 		this->transform->get_nonortho_interior_prod_ids(start_id, end_id);
@@ -1146,10 +1032,6 @@ template<typename FPP>
 		// transform is deleted auto. when no TransformHelper uses it (no more weak refs left)
 #ifdef FAUST_VERBOSE
 		cout << "Destroying Faust::TransformHelper object." << endl;
-#endif
-#ifdef USE_GPU_MOD
-		if(gpu_faust != nullptr)
-			delete gpu_faust;
 #endif
 	}
 

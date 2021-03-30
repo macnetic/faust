@@ -2049,7 +2049,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         it doesn't worth it in any case when Eigen multithread is enabled
         (which is the case in any package of pyfaust delivered).
         Although depending on the package you installed and the capability of your
-        hardware the methods based on Torch or GPU Cuda library can be used.
+        hardware the methods based on Torch library can be used.
 
         Args:
             inplace: to optimize the current Faust directly instead of returning a new
@@ -2938,8 +2938,3 @@ class FaustMulMode:
     ##
     ## This method is only available for the specific packages pyfaust_torch.
     TORCH_CPU_DENSE_ROW_TORCH=9
-    ## \brief Use the GPU module to compute the product on a NVIDIA GPU.
-    ##
-    ## Multiplying from the left to the right or in the way around in order to minimize the cost.
-    GPU_MOD=10
-

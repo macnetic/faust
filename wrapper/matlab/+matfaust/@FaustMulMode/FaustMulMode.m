@@ -53,10 +53,5 @@ classdef FaustMulMode
 		%>
 		%> This method is only available for the specific packages pyfaust_torch.
 		TORCH_CPU_DENSE_ROW_TORCH=9
-		%> \brief Use the GPU module to compute the product on a NVIDIA GPU.
-		%>
-		%> Multiplying from the left to the right or in the way around in order to minimize the cost.
-		GPU_MOD=10
-
 	end
 end

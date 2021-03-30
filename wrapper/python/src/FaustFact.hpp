@@ -14,7 +14,6 @@
 #include "faust_hierarchical.h" // 2020
 #include "faust_palm4msa2020.h"
 #ifdef USE_GPU_MOD
-#include "faust_gpu_mod.h"
 #include "faust_gpu_mod_utils.h"
 #include "faust_Transform_gpu.h"
 #include "faust_TransformHelper_gpu.h"

@@ -56,9 +56,6 @@
 #ifdef FAUST_TORCH
 #include "faust_torch.h"
 #endif
-#ifdef USE_GPU_MOD
-#include "faust_gpu_mod.h"
-#endif
 #include "faust_TransformHelper_cat.h"
 
 namespace Faust
@@ -110,7 +107,6 @@ namespace Faust
 			void update_total_nnz();
 			void set_FM_mul_mode(const int mul_order_opt_mode, const bool silent=false);
 			void set_Fv_mul_mode(const int mode);
-			void enable_gpu_meth_for_mul();
 			MatDense<FPP, Cpu> multiply(const MatSparse<FPP,Cpu> A, const bool transpose=false, const bool conjugate=false);
 
 			TransformHelper<FPP, Cpu>* multiply(const TransformHelper<FPP, Cpu>*) const;
@@ -192,10 +188,6 @@ namespace Faust
 
 			transf_iterator<FPP> begin() const;
 			transf_iterator<FPP> end() const;
-
-#ifdef USE_GPU_MOD
-			FaustGPU<FPP>* get_gpu_faust();
-#endif
 
 			void pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id, const int mul_order_opt_mode=DEFAULT);
 			void pack_factors(const int mul_order_opt_mode=DEFAULT);

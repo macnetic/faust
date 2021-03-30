@@ -21,7 +21,6 @@ namespace Faust
 		TORCH_CPU,
 		TORCH_CPU_BEST_ORDER,
 		TORCH_CPU_DENSE_ROW_TO_TORCH,
-		GPU_MOD
 	};
 
 	/**
