@@ -214,7 +214,7 @@ template<typename FPP, FDevice DEV>
 {
     Faust::TransformHelperPoly<FPP> *transform_poly = dynamic_cast<Faust::TransformHelperPoly<FPP>*>(this->transform);
     if(nullptr)
-        throw std::runtime_error("polyCoeffs can only be used on a Poly. specialized Faust.");
+        throw std::runtime_error("polyNext can only be used on a Poly. specialized Faust.");
     auto th = transform_poly->next();
     FaustCoreCpp<FPP,DEV>* core = new FaustCoreCpp<FPP,DEV>(th);
     return core;

@@ -210,7 +210,7 @@ def poly(coeffs, basis='chebyshev', L=None, dev='cpu', impl='native'):
     else:
         F = basis
     if L == None:
-        d = F.shape[1]
+        d = F.shape[0]//(K+1)
     else:
         d = L.shape[0]
     if impl == 'py':
@@ -243,13 +243,13 @@ def _poly_arr_py(coeffs, basisX, d, dev='cpu'):
     K_plus_1 = int(basisX.shape[0]/d)
     Y = np.empty((d, n))
     if n == 1:
-        Y[:, 0] = basisX[:, 0].reshape(K_plus_1, d).T @ coeffs
+        Y[:, 0] = basisX[:, 0].reshape(d, K_plus_1, order='F') @ coeffs
     elif mt:
         nthreads = 4
         threads = []
         def apply_coeffs(i, n):
             for i in range(i,n,nthreads):
-                Y[:, i] = basisX[:, i].reshape(K_plus_1, d).T @ coeffs
+                Y[:, i] = basisX[:, i].reshape(d, K_plus_1, order='F') @ coeffs
         for i in range(0,nthreads):
             t = threading.Thread(target=apply_coeffs, args=([i,n]))
             threads.append(t)
@@ -258,11 +258,11 @@ def _poly_arr_py(coeffs, basisX, d, dev='cpu'):
            threads[i].join()
     else:
          for i in range(n):
-                Y[:, i] = basisX[:, i].reshape(K_plus_1, d).T @ coeffs
+                Y[:, i] = basisX[:, i].reshape(d, K_plus_1, order='F') @ coeffs
 # other way:
-#	Y = coeff[0] * basisX[0:d,:]
-#	for i in range(1,K+1):
-#		Y += (basisX[d*i:(i+1)*d, :] * coeff[i])
+#    Y = coeffs[0] * basisX[0:d,:]
+#    for i in range(1,K_plus_1):
+#        Y += (basisX[d*i:(i+1)*d, :] * coeffs[i])
     return Y
 
 def _poly_arr_cpp(coeffs, basisX, d, dev='cpu'):
