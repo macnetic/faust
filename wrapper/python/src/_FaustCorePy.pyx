@@ -2513,7 +2513,10 @@ def polyCoeffs(d, basisX, coeffs):
     #TODO: raise exception if not real nor complex
     isReal = (basisX.dtype == np.double)
     K = coeffs.size-1
-    n = basisX.shape[1]
+    if basisX.ndim > 1:
+        n = basisX.shape[1]
+    else:
+        n = 1
     if(isReal):
        basisX=basisX.astype(float,'F')
        if not basisX.dtype=='float':
