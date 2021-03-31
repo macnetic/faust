@@ -13,7 +13,7 @@ from pyfaust import (Faust, isFaust, eye as feye, vstack as fvstack, hstack as
 from scipy.sparse.linalg import eigsh
 from scipy.special import ive
 from scipy.sparse import eye as seye
-from numpy import empty, squeeze
+from numpy import empty, squeeze, sqrt, log, array, finfo
 
 import threading
 
@@ -529,4 +529,58 @@ def expm_multiply(A, B, start=None, stop=None, num=None, endpoint=None,
         return np.squeeze(Y)
     else:
         return Y
+
+def invm_multiply(A, B, rel_err=1e-6, max_K=2048):
+    """
+    Computes an approximate of the action of the matrix inverse of A on B using Chebyshev polynomials.
+
+    Args:
+        A: the operator whose inverse is of interest (must be a symmetric
+        positive definite csr_matrix).
+        B: the matrix or vector to be multiplied by the matrix inverse of A
+        (ndarray).
+        rel_err: the targeted relative error between the approximate of the action and the action itself (if you were to compute it with np.inv(A)@x).
+        max_K: (int, optional) the maximum degree of Chebyshev polynomial to use (useful to limit memory consumption).
+
+    Example:
+		>>> import numpy as np
+		>>> from scipy.sparse import random
+		>>> from pyfaust.poly import invm_multiply
+		>>> from numpy.linalg import norm, inv
+		>>> A = random(64, 64, .1, format='csr')
+		>>> A = A@A.T
+		>>> B = np.random.rand(A.shape[1],2)
+		>>> A_inv_B = invm_multiply(A, B, rel_err=1e-2, max_K=2048)
+		>>> A_inv_B_ref = inv(A.toarray())@B
+        >>> norm("err:", A_inv_B-A_inv_B_ref)/norm(A_inv_B))
+        err: 0.011045280586803805
+
+    """
+    eps = rel_err
+    if not isinstance(A, csr_matrix):
+        raise TypeError('A must be a csr_matrix')
+    if A.shape[0] != A.shape[1]:
+        raise ValueError('A must be symmetric positive definite.')
+    Id = seye(*A.shape)
+    b = eigsh(A, 1, return_eigenvectors=False)[0]
+    B_ = b*Id-A
+    b_ = eigsh(B_,1, return_eigenvectors=False)[0]
+    a = b-b_
+    if a <= 0:
+        raise Exception("A is a singular matrix or its spectrum contains"
+                        " negative values.")
+    m = (a + b) /2
+    c = (b - a) / (b + a)
+    g = abs(1 / c + sqrt(1/c**2 - 1))
+    K = min(max_K, int(((log(1/eps) + log(2/(m*sqrt(1-c**2))) - log(g-1)) /
+                        log(g))))
+    Abar = 2*A/(b-a) - (b+a)*Id/(b-a)
+    T = basis(Abar, K, 'chebyshev')
+    coeffs = array([ 2 / (m*sqrt(1-c**2)) * (-1)**k * g**(-k) for k in
+                    range(0, K+1)])
+    coeffs[0] /= 2
+    TB = T@B
+    A_inv_B = poly(coeffs, TB)
+    return A_inv_B
+
 # experimental block end
