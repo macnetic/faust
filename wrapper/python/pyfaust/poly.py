@@ -11,6 +11,10 @@ from scipy.sparse import csr_matrix
 from pyfaust import (Faust, isFaust, eye as feye, vstack as fvstack, hstack as
                      fhstack)
 from scipy.sparse.linalg import eigsh
+from scipy.special import ive
+from scipy.sparse import eye as seye
+from numpy import empty, squeeze
+
 import threading
 
 
@@ -442,4 +446,87 @@ class FaustPoly(Faust):
     def __next__(self):
         return next(self.gen)
 
+
+def expm_multiply(A, B, start=None, stop=None, num=None, endpoint=None,
+                  K=10, dev='cpu'):
+    """
+    Computes an approximate of the action of the matrix exponential of A on B using series of Chebyshev polynomials.
+
+    NOTE: This function is very similar to scipy.sparse.linalg.expm_multiply
+    with two major differences though:
+        1. A must be symmetric positive definite.
+        2. The time values must be negative.
+
+    Args:
+        A: the operator whose exponential is of interest (must be a
+        symmetric positive definite csr_matrix).
+        B: the matrix or vector to be multiplied by the matrix exponential of A (ndarray).
+        start: (scalar, optional) the starting time point of the sequence.
+        stop: (scalar, optional) the end time point of the sequence, unless endpoint is set to False. In that case, the sequence consists of all but the last of num + 1 evenly spaced time points, so that stop is excluded. Note that the step size changes when endpoint is False.
+        num: (int, optional) number of time points to use.
+        endpoint: (bool, optional) if True, stop is the last time point. Otherwise, it is not included.
+        K: (int, optional) The degree of the dominant Chebyshev polynomial (10 by default).
+        dev: (str, optional) the device ('cpu' or 'gpu') on which to compute (currently only cpu is supported).
+
+    Returns:
+        expm_A_B the result of \f$e^{t_k A} B\f$.
+
+    Example:
+        >>> import numpy as np
+        >>> from scipy.sparse import random
+        >>> from pyfaust.poly import expm_multiply as fexpm_multiply
+        >>> L = random(5, 5, .2, format='csr')
+        >>> L = L@L.T
+        >>> x = np.random.rand(L.shape[1])
+        >>> y = fexpm_multiply(L, x, start=-.5, stop=-0.1, num=3, endpoint=True)
+        >>> y
+        array([[0.56445788, 0.22238514, 0.34696112, 0.40463245, 0.56358572],
+                      [0.63657575, 0.22661967, 0.40625063, 0.45271241,
+                       0.57045306],
+                      [0.71895162, 0.23093484, 0.47397342, 0.50650541,
+                       0.57740409]])
+
+
+    """
+    if not isinstance(A, csr_matrix):
+        raise TypeError('A must be a csr_matrix')
+    # check A is PSD or at least square
+    if A.shape[0] != A.shape[1]:
+        raise ValueError('A must be symmetric positive definite.')
+    phi = eigsh(A, k=1, return_eigenvectors=False)[0] / 2
+    T = basis(A/phi-seye(*A.shape), K, 'chebyshev', dev=dev)
+    TB = np.squeeze(T@B)
+    if isinstance(start, type(None)):
+        start = 1
+    if isinstance(stop, type(None)):
+        stop = start
+        num = 1
+    #tau = start
+    points = np.linspace(start, stop, num=num, endpoint=endpoint)
+    m = B.shape[0]
+    if len(B.shape) == 1:
+        n = 1
+    else:
+        n = B.shape[1]
+    npts = len(points)
+    Y = empty((npts, m, n))
+    for i,tau in enumerate(points):
+        if tau >= 0:
+            raise ValueError('pyfaust.poly.expm_multiply handles only positive '
+                             'time points.')
+        # Compute the K+1 Chebychev coefficients
+        coeff = np.empty((K+1,), dtype=np.float)
+        coeff[-1] = 2 * ive(K, tau * phi)
+        coeff[-2] = 2 * ive(K-1, tau * phi)
+        for j in range(K - 2, -1, -1):
+            coeff[j] = coeff[j+2] - (2 * j + 2) / (-tau * phi) * coeff[j+1]
+        coeff[0] /= 2
+        if n == 1:
+            Y[i,:,0] = poly(coeff, TB, A, dev=dev)
+        else:
+            Y[i,:,:] = poly(coeff, TB, A, dev=dev)
+    if B.ndim == 1:
+        return np.squeeze(Y)
+    else:
+        return Y
 # experimental block end
