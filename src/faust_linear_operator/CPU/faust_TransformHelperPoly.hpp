@@ -5,6 +5,37 @@
 namespace Faust
 {
 	template<typename FPP>
+		faust_unsigned_int TransformHelperPoly<FPP>::getNbRow() const
+		{
+			int d = L->getNbRow();
+			int nrows, ncols;
+			nrows = this->size()*d; // (K+1)*d
+			ncols = d;
+			if(this->is_sliced){
+				faust_unsigned_int id = this->is_transposed?1:0;
+				return	this->slices[id].end_id-this->slices[id].start_id;
+			}
+			else
+				return this->is_transposed?ncols:nrows;
+		}
+
+	template<typename FPP>
+		faust_unsigned_int TransformHelperPoly<FPP>::getNbCol() const
+		{
+			int d = L->getNbRow();
+			int nrows, ncols;
+			nrows = this->size()*d; // (K+1)*d
+			ncols = d;
+			if(this->is_sliced)
+			{
+				faust_unsigned_int id = this->is_transposed?0:1;
+				return this->slices[id].end_id-this->slices[id].start_id;
+			}
+			else
+				return this->is_transposed?nrows:ncols;
+		}
+
+	template<typename FPP>
 		Vect<FPP,Cpu> TransformHelperPoly<FPP>::multiply(const Vect<FPP,Cpu> &x, const bool transpose/*=false*/, const bool conjugate/*=false*/)
 		{
 			return std::move(this->multiply(x.getData(), transpose, conjugate));
@@ -223,7 +254,7 @@ template<typename FPP>
 		}
 
 	template<typename FPP>
-		Faust::RefManager Faust::TransformHelperPoly<FPP>::ref_man([](void *fact)
+		Faust::RefManager TransformHelperPoly<FPP>::ref_man([](void *fact)
 				{
 #ifdef DEBUG
 				std::cout << "Faust::TransformHelperPoly delete" << std::endl;
@@ -242,76 +273,157 @@ template<typename FPP>
 	}
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>* basisChebyshev(MatSparse<FPP,Cpu>* L, int32_t K, MatSparse<FPP, Cpu>* T0/*=nullptr*/)
+		void TransformHelperPoly<FPP>::basisChebyshevT0(MatSparse<FPP,Cpu>* T0/*=nullptr*/)
 		{
-			// assuming L is symmetric
-			MatSparse<FPP,Cpu> *T1, *T2;
-			auto d = L->getNbRow();
-			MatSparse<FPP,Cpu> Id, twoL, minus_Id, *rR, R, zero;
-			std::vector<MatGeneric<FPP,Cpu>*> facts(K+1); //normally it'd be K+1 but T0 is ignored except if K==0
-			// Identity
-			Id.resize(d, d, d);
-			Id.setEyes();
+			int K = this->size()-1;
 			if(T0 == nullptr)
-				facts[K] = new MatSparse<FPP,Cpu>(Id);
-			else
-				facts[K] = new MatSparse<FPP,Cpu>(*T0);
-			if (K > 0)
 			{
-				// build the chebyshev polynomials by factor
-				// K >= 1 ignore the first one (for T0 0-degree), which is the identity
-				// T1
-				T1 = new MatSparse<FPP,Cpu>();
+				// Identity
+				auto T0_ = dynamic_cast<MatSparse<FPP,Cpu>*>(this->get_gen_fact_nonconst(K));
+				auto d = this->L->getNbRow();
+				T0_->resize(d, d, d);
+				T0_->setEyes();
+			}
+			else
+				this->update(*T0, K);
+			is_fact_created[K] = true;
+		}
+
+	template<typename FPP>
+		void TransformHelperPoly<FPP>::basisChebyshevT1()
+		{
+			int K = this->size()-1;
+			MatSparse<FPP,Cpu> Id;
+			int id = K-1;
+			if(! is_fact_created[id])
+			{
+				auto d = this->L->getNbRow();
+				Id.resize(d, d, d);
+				Id.setEyes();
+				auto T1 = dynamic_cast<MatSparse<FPP,Cpu>*>(this->get_gen_fact_nonconst(id));
 				T1->vstack(Id, *L);
-				facts[K-1] = T1;
-				// rR block
-				twoL = *L;
-				twoL *= FPP(2);
-				minus_Id.resize(d,d,d);
-				minus_Id.setEyes();
-				minus_Id *= FPP(-1);
-				rR = new MatSparse<FPP,Cpu>();
-				rR->hstack(minus_Id, twoL);
-				if (K > 1)
-				{
-					// T2
-					Id.resize(2*d, 2*d, 2*d);
-					Id.setEyes();
-					T2 = new MatSparse<FPP,Cpu>();
-					T2->vstack(Id, *rR);
-					facts[K-2] = T2;
-					//			 T3 to TK
-					//#pragma omp parallel for private(Id, zero, R)
-					for(int i=3;i<K+1;i++)
+				is_fact_created[id] = true;
+			}
+		}
+
+	template<typename FPP>
+		void TransformHelperPoly<FPP>::basisChebyshevT2()
+		{
+			int K = this->size()-1;
+			int id = K-2;
+			if(! is_fact_created[id])
+			{
+				auto d = this->L->getNbRow();
+				MatSparse<FPP,Cpu> Id;
+				Id.resize(2*d, 2*d, 2*d);
+				Id.setEyes();
+				auto T2 = dynamic_cast<MatSparse<FPP,Cpu>*>(this->get_gen_fact_nonconst(id));
+				T2->vstack(Id, *rR);
+				is_fact_created[id] = true;
+			}
+		}
+
+	template<typename FPP>
+		void TransformHelperPoly<FPP>::basisChebyshevTi(int i)
+		{
+			switch(i)
+			{
+				case 0:
+					return basisChebyshevT0();
+				case 1:
+					return basisChebyshevT1();
+				case 2:
+					return basisChebyshevT2();
+				default:
+					int K = this->size()-1;
+					int fid = K-i;
+					if(! is_fact_created[fid])
 					{
+						MatSparse<FPP,Cpu> R, zero;
+						MatSparse<FPP,Cpu> Id;
+						auto d = this->L->getNbRow();
 						auto id = i*d;
 						Id.resize(id, id, id);
 						Id.setEyes();
-						zero.conservativeResize(d, (i-2)*d);
-						if(i == 3)
-						{
-							R.hstack(zero, *rR);
-						}
-						else
-						{
-							R.conservativeResize(d, rR->getNbCol()+(i-2)*d);
-							for(int i=0;i<R.getNonZeros();i++)
-								R.getColInd()[i] += d;
-						}
-						auto Ti = new MatSparse<FPP,Cpu>();
+						zero.resize(d, (i-2)*d);
+						R.hstack(zero, *rR);
+						auto Ti = dynamic_cast<MatSparse<FPP,Cpu>*>(this->get_gen_fact_nonconst(fid));
 						Ti->vstack(Id, R);
-						facts[K-i] = Ti;
+						is_fact_created[fid] = true;
 					}
+					break;
+			}
+		}
+
+	template<typename FPP>
+		void TransformHelperPoly<FPP>::basisChebyshev_all()
+		{
+			int K = this->size()-1;
+			this->basisChebyshevT0();
+
+			if (K > 0)
+			{
+				this->basisChebyshevT1();
+				if (K > 1)
+				{
+					this->basisChebyshevT2();
+					#pragma omp parallel for
+					for(int i=3;i<K+1;i++)
+						this->basisChebyshevTi(i);
 				}
+			}
+
+		}
+
+	template<typename FPP>
+		void TransformHelperPoly<FPP>::create_rR(const MatSparse<FPP,Cpu>* L)
+		{
+			MatSparse<FPP,Cpu> twoL, minus_Id;
+			auto d = this->L->getNbRow();
+			// rR block
+			twoL = *L;
+			twoL *= FPP(2);
+			minus_Id.resize(d,d,d);
+			minus_Id.setEyes();
+			minus_Id *= FPP(-1);
+			rR = new MatSparse<FPP,Cpu>();
+			rR->hstack(minus_Id, twoL);
+			this->rR = rR;
+			Faust::TransformHelperPoly<FPP>::ref_man.acquire(rR);
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP,Cpu>* basisChebyshev(MatSparse<FPP,Cpu>* L, int32_t K, MatSparse<FPP, Cpu>* T0/*=nullptr*/, bool lazy_instantiation/*=true*/)
+		{
+
+			// assuming L is symmetric
+			MatSparse<FPP,Cpu> *T1, *T2;
+			MatSparse<FPP,Cpu> Id, twoL, minus_Id, *rR, R, zero;
+			auto d = L->getNbRow();
+
+			std::vector<MatGeneric<FPP,Cpu>*> facts(K+1);
+			for(int i=0;i<K+1;i++)
+			{
+				facts[i] = new MatSparse<FPP,Cpu>(); // empty factors (lazy instantiation)
 			}
 			auto basisP = new TransformHelperPoly<FPP>(facts, (FPP)1.0,
 					/* optimizedCopy */ false,
 					/* cloning_fact */ false,
 					/* internal_call */ true);
+			basisP->is_fact_created.assign(K+1, false);
 			basisP->L = new MatSparse<FPP,Cpu>(*L);
 			Faust::TransformHelperPoly<FPP>::ref_man.acquire(basisP->L);
-			basisP->rR = rR;
-			Faust::TransformHelperPoly<FPP>::ref_man.acquire(rR);
+
+			basisP->create_rR(L);
+
+			// build the chebyshev polynomials by factor
+			if(T0 != nullptr)
+				// T0 is arbitrary and need to be stored
+				// best choice is to instantiate the factor directly
+				basisP->basisChebyshevT0(T0);
+
+			if(! lazy_instantiation)
+				basisP->basisChebyshev_all();
 			return basisP;
 		}
 

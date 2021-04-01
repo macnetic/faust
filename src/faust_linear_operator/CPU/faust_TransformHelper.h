@@ -63,9 +63,6 @@ namespace Faust
 
 	template<typename FPP>
 		using transf_iterator = typename Transform<FPP,Cpu>::transf_iterator;
-#ifdef USE_GPU_MOD
-	template<typename FPP> class FaustGPU;
-#endif
 
 
 	template<typename FPP>
@@ -78,9 +75,7 @@ namespace Faust
 #ifdef FAUST_TORCH
 			std::vector<torch::Tensor> tensor_data;
 #endif
-#ifdef USE_GPU_MOD
-			FaustGPU<FPP> *gpu_faust;
-#endif
+
 			public:
 			TransformHelper(const std::vector<MatGeneric<FPP,Cpu> *>& facts, const FPP lambda_ = (FPP)1.0, const bool optimizedCopy=false, const bool cloning_fact = true, const bool internal_call=false);
 			TransformHelper();

@@ -36,15 +36,14 @@ namespace Faust
 #endif
 
 
-            faust_unsigned_int getNbCol() const;
-            faust_unsigned_int getNbRow() const;
+            virtual faust_unsigned_int getNbCol() const;
+            virtual faust_unsigned_int getNbRow() const;
 			virtual void push_back(const MatGeneric<FPP,DEV>* M, const bool optimizedCopy=false, const bool copying=true, const bool transpose=false, const bool conjugate=false)=0;
 
 			const char isTransposed2char() const;
 			bool isTransposed() const;
 			bool isConjugate() const;
 			bool isReal() const;
-			void enable_gpu_meth_for_mul(){}; //TODO: remove later (it is only a special case of TransformHelper Cpu)
 
 			virtual faust_unsigned_int size() const=0;
 			void get_fact(const faust_unsigned_int &id,
