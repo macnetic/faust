@@ -6,7 +6,6 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
 {
 	auto S = new Faust::TransformHelper<FPP,DEVICE>(); // A is copied
 	S->push_back(&A);
-	if(on_gpu) S->enable_gpu_meth_for_mul();
 	Faust::MatGeneric<FPP,DEVICE> *Si;
 	const Faust::ConstraintGeneric *fac_cons, *res_cons;
 	int zero_dims[2], id_dims[2];
@@ -92,7 +91,6 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
 
 		Faust::TransformHelper<FPP,DEVICE> Si_th(Si_vec, 1.0, false, false, true);
 		//		Si_th.display();
-		//		if(on_gpu) Si_th.enable_gpu_meth_for_mul();
 		lambda_ = 1;
 		tmp_dense = dynamic_cast<Faust::MatDense<FPP,DEVICE>*>(Si);
 		if(tmp_dense == nullptr)

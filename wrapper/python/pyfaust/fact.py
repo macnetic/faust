@@ -476,9 +476,7 @@ def palm4msa(M, p, ret_lambda=False, backend=2016, on_gpu=False):
         if on_gpu: raise ValueError("on_gpu applies only on 2020 backend.")
         core_obj, _lambda = _FaustCorePy.FaustFact.fact_palm4msa(M, p)
     elif(backend == 2020):
-        full_gpu = True if on_gpu else False # partial gpu impl. disabled in wrapper
-        core_obj, _lambda = _FaustCorePy.FaustFact.palm4msa2020(M, p, on_gpu,
-                                                                full_gpu)
+        core_obj, _lambda = _FaustCorePy.FaustFact.palm4msa2020(M, p, on_gpu)
     else:
         raise ValueError("Unknown backend (only 2016 and 2020 are available).")
     F = Faust(core_obj=core_obj)
@@ -663,10 +661,8 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
         if on_gpu: raise ValueError("on_gpu applies only on 2020 backend.")
         core_obj,_lambda = _FaustCorePy.FaustFact.fact_hierarchical(M, p)
     elif(backend == 2020):
-        full_gpu = True if on_gpu else False # partial gpu impl. disabled in wrapper
         core_obj, _lambda = _FaustCorePy.FaustFact.hierarchical2020(M, p,
-                                                                    on_gpu,
-                                                                    full_gpu)
+                                                                    on_gpu)
     else:
         raise ValueError("backend must be 2016 or 2020")
     F = Faust(core_obj=core_obj)

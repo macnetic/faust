@@ -254,7 +254,6 @@ cdef extern from "FaustFact.h":
                                                   is_verbose, bool
                                                   constant_step_size,
                                                   double step_size,
-                                                  const bool on_gpu,
                                                   const bool full_gpu)
 
     cdef FaustCoreCpp[FPP]* palm4msa2020[FPP](FPP* mat,
@@ -272,7 +271,6 @@ cdef extern from "FaustFact.h":
                                               bool is_verbose,
                                               bool constant_step_size,
                                               double step_size,
-                                              const bool on_gpu,
                                               const bool full_gpu)
 
 

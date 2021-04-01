@@ -31,8 +31,6 @@ void Faust::palm4msa(const Faust::MatDense<FPP,DEVICE>& A,
 	A_H.adjoint();
 	if(S.size() != nfacts)
 		fill_of_eyes(S, nfacts, use_csr, dims, on_gpu);
-	else
-		if(on_gpu) S.enable_gpu_meth_for_mul();
 	int i = 0, f_id;
 	std::function<void()> init_fid, next_fid;
 	std::function<bool()> updating_facs;
@@ -84,7 +82,6 @@ void Faust::palm4msa(const Faust::MatDense<FPP,DEVICE>& A,
 //		_LSR.multiply(lambda);
 //		tmp = _LSR.get_product();
 		_LSR.get_product(tmp);
-		if(on_gpu) assert(10 == _LSR.get_mul_order_opt_mode());
 		tmp *= lambda;
 		tmp -= A;
 		if(sc.isCriterionErr())
@@ -92,7 +89,6 @@ void Faust::palm4msa(const Faust::MatDense<FPP,DEVICE>& A,
 		//TODO: do something to lighten the double transpose conjugate
 		tmp.adjoint();
 		tmp = R->multiply(tmp, /* H */ false, false);
-		if(on_gpu) assert(10 == R->get_mul_order_opt_mode());
 		tmp.adjoint();
 		tmp *= lambda/c;
 		D -= tmp;
@@ -128,13 +124,11 @@ void Faust::palm4msa(const Faust::MatDense<FPP,DEVICE>& A,
 //		LSR = _LSR;
 //		_LSR.multiply(lambda);
 		tmp = _LSR.get_product();
-		if(on_gpu) assert(10 == _LSR.get_mul_order_opt_mode());
 		tmp *= lambda;
 		tmp -= A;
 		if(sc.isCriterionErr())
 			error = tmp.norm();
 		tmp = L->multiply(tmp, /* NO H */ true, true);
-		if(on_gpu) assert(10 == L->get_mul_order_opt_mode());
 		tmp *= lambda/c;
 		D -= tmp;
 	};
@@ -164,7 +158,6 @@ void Faust::palm4msa(const Faust::MatDense<FPP,DEVICE>& A,
 //		LSR = _LSR;
 //		_LSR.multiply(lambda);
 		tmp = _LSR.get_product();
-		if(on_gpu) assert(10 == _LSR.get_mul_order_opt_mode());
 		tmp *= lambda;
 		tmp -= A;
 		if(sc.isCriterionErr())
@@ -172,10 +165,8 @@ void Faust::palm4msa(const Faust::MatDense<FPP,DEVICE>& A,
 		//TODO: do something to lighten the double transpose conjugate
 		tmp.adjoint();
 		tmp = R->multiply(tmp, /* NO H */ false, false);
-		if(on_gpu) assert(10 == R->get_mul_order_opt_mode());
 		tmp.adjoint();
 		tmp = L->multiply(tmp, true, true);
-		if(on_gpu) assert(10 == L->get_mul_order_opt_mode());
 		tmp *= lambda/c;
 		D -= tmp;
 	};
@@ -252,5 +243,4 @@ void Faust::fill_of_eyes(
 		}
 		S.push_back(fact); //TODO: copying=false
 	}
-	if(on_gpu) S.enable_gpu_meth_for_mul();
 }

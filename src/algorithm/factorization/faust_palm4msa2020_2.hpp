@@ -143,7 +143,6 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 	int prod_mod = ORDER_ALL_BEST_MIXED;
 	double norm1, norm2;
 //	std::cout << "palm4msa2 "<< std::endl;
-//	std::cout << "on_gpu: " << on_gpu << std::endl;
 	if(constraints.size() == 0)
 		throw out_of_range("No constraint passed to palm4msa.");
 	const Real<FPP> lipschitz_multiplicator = 1.001;
@@ -161,8 +160,6 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 	A_H.adjoint();
 	if(S.size() != nfacts)
 		fill_of_eyes(S, nfacts, use_csr, dims, on_gpu);
-	else if(on_gpu)
-		S.enable_gpu_meth_for_mul();
 	int i = 0, f_id;
 	std::function<void()> init_ite, next_fid;
 	std::function<bool()> updating_facs;
@@ -189,7 +186,6 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 				if(pL[i] != nullptr) delete pL[i]; //TODO: maybe to replace by a TransformHelper stored in the stack to avoid deleting each time
 				pL[i] = new TransformHelper<FPP,DEVICE>(*pL[i-1], vec_Si_minus_1);
 				// if the ctor args are GPU-enabled so is pL[i]
-//				if(on_gpu) assert(10 == pL[i]->get_mul_order_opt_mode());
 				if(packing_RL) ((TransformHelperGen<FPP,DEVICE>*)pL[i])->pack_factors(prod_mod);
 			}
 			// all pL[i] Fausts are composed at most of one factor matrix
@@ -203,7 +199,6 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 					delete pR[f_id-1];
 				auto vec_Sj = { *(S.begin()+f_id) };
 				pR[f_id-1] = new Faust::TransformHelper<FPP,DEVICE>(vec_Sj, *pR[f_id]);
-//				if(on_gpu) assert(10 == pR[f_id-1]->get_mul_order_opt_mode());
 				if(packing_RL) ((TransformHelperGen<FPP,DEVICE>*)pR[f_id-1])->pack_factors(prod_mod);
 			}
 			f_id--;
@@ -222,7 +217,6 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 				auto vec_Si_plus_1 = { *(S.begin()+i+1) };
 				if(pR[i] != nullptr) delete pR[i];
 				pR[i] = new TransformHelper<FPP,DEVICE>(vec_Si_plus_1, *pR[i+1]);
-//				if(on_gpu) assert(10 == pR[i]->get_mul_order_opt_mode());
 				if(packing_RL) ((TransformHelperGen<FPP,DEVICE>*)pR[i])->pack_factors(prod_mod);
 			}
 			f_id = 0;
@@ -235,7 +229,6 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 					delete pL[f_id+1];
 				auto vec_Sj = { *(S.begin()+f_id) };
 				pL[f_id+1] = new Faust::TransformHelper<FPP,DEVICE>(*pL[f_id], vec_Sj);
-//				if(on_gpu) assert(10 == pL[f_id+1]->get_mul_order_opt_mode());
 				if(packing_RL) ((TransformHelperGen<FPP,DEVICE>*)pL[f_id+1])->pack_factors(prod_mod);
 			}
 			f_id++;
