@@ -403,12 +403,6 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		void Faust::TransformHelper<FPP,GPU2>::pack_factors(const int mul_order_opt_mode/*=DEFAULT*/)
-		{
-			TransformHelperGen<FPP,Cpu>::pack_factors(mul_order_opt_mode);
-		}
-
-	template<typename FPP>
 		void Faust::TransformHelper<FPP,GPU2>::pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id,const int mul_order_opt_mode/*=DEFAULT*/)
 		{
 			if(start_id < 0 || start_id >= size())

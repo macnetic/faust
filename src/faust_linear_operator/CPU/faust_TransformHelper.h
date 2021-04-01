@@ -99,13 +99,13 @@ namespace Faust
 			virtual void multiply(const FPP* A, int A_ncols, FPP* C, const bool transpose=false, const bool conjugate=false);
 			//			MatDense<FPP,Cpu> multiply(const MatDense<FPP,Cpu> A) const;
 			virtual MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> &A, const bool transpose=false, const bool conjugate=false);
-			void update_total_nnz();
+			virtual void update_total_nnz();
 			void set_FM_mul_mode(const int mul_order_opt_mode, const bool silent=false);
 			void set_Fv_mul_mode(const int mode);
-			MatDense<FPP, Cpu> multiply(const MatSparse<FPP,Cpu> A, const bool transpose=false, const bool conjugate=false);
+			virtual MatDense<FPP, Cpu> multiply(const MatSparse<FPP,Cpu> &A, const bool transpose=false, const bool conjugate=false);
 
-			TransformHelper<FPP, Cpu>* multiply(const TransformHelper<FPP, Cpu>*) const;
-			TransformHelper<FPP, Cpu>* multiply(FPP& scalar);
+			virtual TransformHelper<FPP, Cpu>* multiply(const TransformHelper<FPP, Cpu>*) const;
+			virtual TransformHelper<FPP, Cpu>* multiply(FPP& scalar);
 			template<typename Head, typename ... Tail>
 				void push_back_(Head& h, Tail&... t);
 			//
@@ -116,12 +116,12 @@ namespace Faust
 			void pop_back();
 			void pop_front();
 			void push_first(const MatGeneric<FPP,Cpu>* M, const bool optimizedCopy=false, const bool copying=true);
-			faust_unsigned_int getNBytes() const;
-			faust_unsigned_int get_total_nnz() const;
+			virtual faust_unsigned_int getNBytes() const;
+			virtual faust_unsigned_int get_total_nnz() const;
 			faust_unsigned_int size() const;
-			void resize(faust_unsigned_int);
+			virtual void resize(faust_unsigned_int);
 			void display() const;
-			string to_string() const;
+			virtual string to_string() const;
 			MatDense<FPP,Cpu> get_fact(faust_unsigned_int id) const;
 			void get_fact(const faust_unsigned_int id,
 					const int** rowptr,
@@ -147,29 +147,29 @@ namespace Faust
 					faust_unsigned_int* num_rows,
 					faust_unsigned_int* num_cols,
 					const bool transpose = false) const;
-			MatDense<FPP,Cpu> get_product(const int mul_order_opt_mode=DEFAULT);// const;
-			void get_product(MatDense<FPP,Cpu>& prod, const int mul_order_opt_mode=DEFAULT); //const;
-			void save_mat_file(const char* filename) const;
-			double spectralNorm(const int nbr_iter_max, double threshold, int &flag) const;
+			virtual MatDense<FPP,Cpu> get_product(const int mul_order_opt_mode=DEFAULT);// const;
+			virtual void get_product(MatDense<FPP,Cpu>& prod, const int mul_order_opt_mode=DEFAULT); //const;
+			virtual void save_mat_file(const char* filename) const;
+			virtual double spectralNorm(const int nbr_iter_max, double threshold, int &flag) const;
 			TransformHelper<FPP,Cpu>* transpose();
 			TransformHelper<FPP,Cpu>* conjugate();
 			TransformHelper<FPP,Cpu>* adjoint() const;
-			TransformHelper<FPP,Cpu>* vertcat(const TransformHelper<FPP,Cpu>*);
-			TransformHelper<FPP,Cpu>* horzcat(const TransformHelper<FPP,Cpu>*);
-			double normL1() const;
-			double normFro() const;
-			double normInf() const;
-			TransformHelper<FPP,Cpu>* normalize(const int meth = 2/* 1 for 1-norm, 2 for 2-norm, MAX for inf-norm */) const;
+			virtual TransformHelper<FPP,Cpu>* vertcat(const TransformHelper<FPP,Cpu>*);
+			virtual TransformHelper<FPP,Cpu>* horzcat(const TransformHelper<FPP,Cpu>*);
+			virtual double normL1() const;
+			virtual double normFro() const;
+			virtual double normInf() const;
+			virtual TransformHelper<FPP,Cpu>* normalize(const int meth = 2/* 1 for 1-norm, 2 for 2-norm, MAX for inf-norm */) const;
 			/**
 			 * \param only_forward: True for applying only the forward passes of removal.
 			 * \param npasses: the number of passes to run, by default it goes until the optimal Faust is obtained.
 			 */
-			TransformHelper<FPP,Cpu>* pruneout(const int nnz_tres, const int npasses=-1, const bool only_forward=false);
+			virtual TransformHelper<FPP,Cpu>* pruneout(const int nnz_tres, const int npasses=-1, const bool only_forward=false);
 			TransformHelper<FPP,Cpu>* optimize(const bool transp=false);
-			TransformHelper<FPP,Cpu>* optimize_multiply(std::function<void()> f, const bool transp=false, const bool inplace=false, const int nsamples=1, const char* op_name="unamed_op");
-			TransformHelper<FPP,Cpu>* optimize_time(const bool transp=false, const bool inplace=false, const int nsamples=1);
-			TransformHelper<FPP,Cpu>* optimize_time_full(const bool transp=false, const bool inplace=false, const int nsamples=1);
-			TransformHelper<FPP,Cpu>* optimize_time_Fv(const bool transp=false, const bool inplace=false, const int nsamples=1);
+			virtual TransformHelper<FPP,Cpu>* optimize_multiply(std::function<void()> f, const bool transp=false, const bool inplace=false, const int nsamples=1, const char* op_name="unamed_op");
+			virtual TransformHelper<FPP,Cpu>* optimize_time(const bool transp=false, const bool inplace=false, const int nsamples=1);
+			virtual TransformHelper<FPP,Cpu>* optimize_time_full(const bool transp=false, const bool inplace=false, const int nsamples=1);
+			virtual TransformHelper<FPP,Cpu>* optimize_time_Fv(const bool transp=false, const bool inplace=false, const int nsamples=1);
 			/**
 			  \brief Returns the left hand side factors of this from index 0 to id included (as a new TransformHelper obj).
 
@@ -187,8 +187,8 @@ namespace Faust
 			void pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id, const int mul_order_opt_mode=DEFAULT);
 			void pack_factors(const int mul_order_opt_mode=DEFAULT);
 
-			TransformHelper<FPP,Cpu>* swap_cols(const faust_unsigned_int id1, const faust_unsigned_int id2, const bool permutation=false, const bool inplace=false, const bool check_transpose=true);
-			TransformHelper<FPP,Cpu>* swap_rows(const faust_unsigned_int id1, const faust_unsigned_int id2, const bool permutation=false, const bool inplace=false, const bool check_transpose=true);
+			virtual TransformHelper<FPP,Cpu>* swap_cols(const faust_unsigned_int id1, const faust_unsigned_int id2, const bool permutation=false, const bool inplace=false, const bool check_transpose=true);
+			virtual TransformHelper<FPP,Cpu>* swap_rows(const faust_unsigned_int id1, const faust_unsigned_int id2, const bool permutation=false, const bool inplace=false, const bool check_transpose=true);
 
 			/** for testing purpose only (memory leaks enabled) */
 			void disable_dtor() { this->transform->disable_dtor(); }

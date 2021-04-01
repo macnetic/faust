@@ -149,7 +149,7 @@ namespace Faust {
 		}
 #endif
 	template<typename FPP>
-		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const MatSparse<FPP,Cpu> A, const bool transpose /* deft to false */, const bool conjugate)
+		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const MatSparse<FPP,Cpu> &A, const bool transpose /* deft to false */, const bool conjugate)
 		{
 			this->is_transposed ^= transpose;
 			this->is_conjugate ^= conjugate;

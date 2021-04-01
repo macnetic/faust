@@ -1,13 +1,25 @@
 #ifndef __FAUST_TRANSFORM_HELPER_POLY__
 #define __FAUST_TRANSFORM_HELPER_POLY__
 #include "faust_TransformHelper.h"
+
+#define ERROR_ON_FAC_NUM_CHANGE() \
+	throw std::runtime_error("Can't pack factors of a TransformHelperPoly (the number of factors must be kept consistent with the basis size).");
+
 namespace Faust
 {
+	enum BasisLaziness
+	{
+		NOT_LAZY, // all the factors are instantiated at initialization time
+		INSTANTIATE_ONCE_AND_FOR_ALL, // a factor instantiated is kept until the "Faust" is deleted
+		INSTANTIATE_COMPUTE_AND_FREE // a factor is instantiated and used locally then is freed
+	};
+
 	template<typename FPP>
-		TransformHelper<FPP, Cpu>* basisChebyshev(MatSparse<FPP,Cpu>* L, int32_t K, MatSparse<FPP, Cpu>* T0=nullptr, bool lazy_instantiation=true);
+		TransformHelper<FPP, Cpu>* basisChebyshev(MatSparse<FPP,Cpu>* L, int32_t K, MatSparse<FPP, Cpu>* T0=nullptr, BasisLaziness lazy_instantiation=INSTANTIATE_ONCE_AND_FOR_ALL);
 
 	template<typename FPP>
 		void poly(int d, int K, int n, const FPP* basisX, const FPP* coeffs, FPP* out);
+
 
 	/**
 	 * \brief This class aims to represent a Chebyshev polynomial basis as a "Faust".
@@ -22,6 +34,7 @@ namespace Faust
 			MatSparse<FPP, Cpu> *L;
 			MatSparse<FPP, Cpu> *rR;
 			std::vector<bool> is_fact_created;
+			BasisLaziness laziness;
 			public:
 			TransformHelperPoly(const std::vector<MatGeneric<FPP,Cpu> *>& facts,
 					const FPP lambda_, const bool optimizedCopy, const bool cloning_fact,
@@ -29,6 +42,60 @@ namespace Faust
 
 			faust_unsigned_int getNbRow() const;
 			faust_unsigned_int getNbCol() const;
+			void get_fact(const faust_unsigned_int &id,
+					FPP* elts,
+					faust_unsigned_int* num_rows,
+					faust_unsigned_int* num_cols,
+					const bool transpose = false) const;
+			void get_fact(const faust_unsigned_int id,
+					int* rowptr,
+					int* col_ids,
+					FPP* elts,
+					faust_unsigned_int* nnz,
+					faust_unsigned_int* num_rows,
+					faust_unsigned_int* num_cols,
+					const bool transpose = false) const;
+			unsigned int get_fact_dim_size(const faust_unsigned_int id, unsigned short dim) const;
+			const MatGeneric<FPP,Cpu>* get_gen_fact(const faust_unsigned_int id) const;
+			faust_unsigned_int get_fact_nnz(const faust_unsigned_int id) const;
+			bool is_fact_sparse(const faust_unsigned_int id) const;
+			bool is_fact_dense(const faust_unsigned_int id) const;
+			void pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id, const int mul_order_opt_mode=DEFAULT);
+
+			void pack_factors(const faust_unsigned_int id, const PackDir dir, const int mul_order_opt_mode=DEFAULT);
+			void pack_factors(const int mul_order_opt_mode=DEFAULT);
+			TransformHelper<FPP,Cpu>* left(const faust_unsigned_int id, const bool copy=false) const;
+			TransformHelper<FPP,Cpu>* right(const faust_unsigned_int id, const bool copy=false) const;
+			TransformHelper<FPP,Cpu>* optimize_storage(const bool time=true);
+			TransformHelper<FPP,Cpu>* clone();
+
+			void update_total_nnz();
+			MatDense<FPP, Cpu> multiply(const MatSparse<FPP,Cpu> &A, const bool transpose=false, const bool conjugate=false);
+			TransformHelper<FPP, Cpu>* multiply(const TransformHelper<FPP, Cpu>*) const;
+			TransformHelper<FPP, Cpu>* multiply(FPP& scalar);
+			faust_unsigned_int getNBytes() const;
+			faust_unsigned_int get_total_nnz() const;
+			void resize(faust_unsigned_int);
+			string to_string() const;
+
+			MatDense<FPP,Cpu> get_product(const int mul_order_opt_mode=DEFAULT);// const;
+			void get_product(MatDense<FPP,Cpu>& prod, const int mul_order_opt_mode=DEFAULT); //const;
+			void save_mat_file(const char* filename) const;
+			double spectralNorm(const int nbr_iter_max, double threshold, int &flag) const;
+			TransformHelper<FPP,Cpu>* vertcat(const TransformHelper<FPP,Cpu>*);
+			TransformHelper<FPP,Cpu>* horzcat(const TransformHelper<FPP,Cpu>*);
+			double normL1() const;
+			double normFro() const;
+			double normInf() const;
+			TransformHelper<FPP,Cpu>* normalize(const int meth = 2/* 1 for 1-norm, 2 for 2-norm, MAX for inf-norm */) const;
+			TransformHelper<FPP,Cpu>* pruneout(const int nnz_tres, const int npasses=-1, const bool only_forward=false);
+			TransformHelper<FPP,Cpu>* optimize_multiply(std::function<void()> f, const bool transp=false, const bool inplace=false, const int nsamples=1, const char* op_name="unamed_op");
+			TransformHelper<FPP,Cpu>* optimize_time(const bool transp=false, const bool inplace=false, const int nsamples=1);
+			TransformHelper<FPP,Cpu>* optimize_time_full(const bool transp=false, const bool inplace=false, const int nsamples=1);
+			TransformHelper<FPP,Cpu>* optimize_time_Fv(const bool transp=false, const bool inplace=false, const int nsamples=1);
+			TransformHelper<FPP,Cpu>* swap_cols(const faust_unsigned_int id1, const faust_unsigned_int id2, const bool permutation=false, const bool inplace=false, const bool check_transpose=true);
+			TransformHelper<FPP,Cpu>* swap_rows(const faust_unsigned_int id1, const faust_unsigned_int id2, const bool permutation=false, const bool inplace=false, const bool check_transpose=true);
+
 			Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> &x, const bool transpose=false, const bool conjugate=false);
 			Vect<FPP,Cpu> multiply(const FPP* x, const bool transpose=false, const bool conjugate=false);
 			void multiply(const FPP* x, FPP* y, const bool transpose=false, const bool conjugate=false);
@@ -44,10 +111,17 @@ namespace Faust
 			void basisChebyshevT1();
 			void basisChebyshevT2();
 			void basisChebyshevTi(int i);
+			void basisChebyshev_facti(int i);
+			void basisChebyshev_free_facti(int i);
+			void basisChebyshev_facti2j(int i, int j);
+			void basisChebyshev_free_facti2j(int i, int j);
+			void basisChebyshev_fact_all();
+			void basisChebyshev_free_fact_all();
+
 			void basisChebyshev_all();
 			void create_rR(const MatSparse<FPP,Cpu>* L);
 			~TransformHelperPoly();
-			friend TransformHelper<FPP,Cpu>* basisChebyshev<>(MatSparse<FPP,Cpu>* L, int32_t K, MatSparse<FPP, Cpu>* T0, bool lazy_instantiation);
+			friend TransformHelper<FPP,Cpu>* basisChebyshev<>(MatSparse<FPP,Cpu>* L, int32_t K, MatSparse<FPP, Cpu>* T0, BasisLaziness lazy_instantiation);
 		};
 
 

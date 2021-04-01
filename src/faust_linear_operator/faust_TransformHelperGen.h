@@ -46,12 +46,12 @@ namespace Faust
 			bool isReal() const;
 
 			virtual faust_unsigned_int size() const=0;
-			void get_fact(const faust_unsigned_int &id,
+			virtual void get_fact(const faust_unsigned_int &id,
 					FPP* elts,
 					faust_unsigned_int* num_rows,
 					faust_unsigned_int* num_cols,
 					const bool transpose = false) const;
-			void get_fact(const faust_unsigned_int id,
+			virtual void get_fact(const faust_unsigned_int id,
 					int* rowptr,
 					int* col_ids,
 					FPP* elts,
@@ -59,28 +59,28 @@ namespace Faust
 					faust_unsigned_int* num_rows,
 					faust_unsigned_int* num_cols,
 					const bool transpose = false) const;
-			unsigned int get_fact_nb_rows(const faust_unsigned_int id) const;
-			unsigned int get_fact_nb_cols(const faust_unsigned_int id) const;
-			unsigned int get_fact_dim_size(const faust_unsigned_int id, unsigned short dim) const;
+			virtual unsigned int get_fact_nb_rows(const faust_unsigned_int id) const;
+			virtual unsigned int get_fact_nb_cols(const faust_unsigned_int id) const;
+			virtual unsigned int get_fact_dim_size(const faust_unsigned_int id, unsigned short dim) const;
 			virtual const MatGeneric<FPP,DEV>* get_gen_fact(const faust_unsigned_int id) const=0;
-			faust_unsigned_int get_fact_nnz(const faust_unsigned_int id) const;
-			bool is_fact_sparse(const faust_unsigned_int id) const;
-			bool is_fact_dense(const faust_unsigned_int id) const;
+			virtual faust_unsigned_int get_fact_nnz(const faust_unsigned_int id) const;
+			virtual bool is_fact_sparse(const faust_unsigned_int id) const;
+			virtual bool is_fact_dense(const faust_unsigned_int id) const;
 
 			virtual void pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id, const int mul_order_opt_mode=DEFAULT)=0;
 
-			void pack_factors(const faust_unsigned_int id, const PackDir dir, const int mul_order_opt_mode=DEFAULT);
-			void pack_factors(const int mul_order_opt_mode=DEFAULT);
+			virtual void pack_factors(const faust_unsigned_int id, const PackDir dir, const int mul_order_opt_mode=DEFAULT);
+			virtual void pack_factors(const int mul_order_opt_mode=DEFAULT);
 			/**
 			  \brief Returns the left hand side factors of this from index 0 to id included (as a new TransformHelper obj).
 
 */
-			TransformHelper<FPP,DEV>* left(const faust_unsigned_int id, const bool copy=false) const;
+			virtual TransformHelper<FPP,DEV>* left(const faust_unsigned_int id, const bool copy=false) const;
 			/**
 			  \brief Returns the right hand side factors of this from index id to the size()-1 (as a new TransformHelper obj).
 
 */
-			TransformHelper<FPP,DEV>* right(const faust_unsigned_int id, const bool copy=false) const;
+			virtual TransformHelper<FPP,DEV>* right(const faust_unsigned_int id, const bool copy=false) const;
 
 			void copy_slices(const TransformHelper<FPP,DEV>* th, const bool transpose = false);
 			void copy_slice_state(const TransformHelper<FPP,DEV>& th);
@@ -94,8 +94,8 @@ namespace Faust
 			TransformHelper<FPP, DEV>* slice(faust_unsigned_int start_row_id, faust_unsigned_int end_row_id,
 					faust_unsigned_int start_col_id, faust_unsigned_int end_col_id);
 			TransformHelper<FPP, DEV>* fancy_index(faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols);
-			TransformHelper<FPP,DEV>* optimize_storage(const bool time=true);
-			TransformHelper<FPP,DEV>* clone();
+			virtual TransformHelper<FPP,DEV>* optimize_storage(const bool time=true);
+			virtual TransformHelper<FPP,DEV>* clone();
 		protected:
 			void init_fancy_idx_transform(TransformHelper<FPP,DEV>* th, faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols);
 			void init_sliced_transform(TransformHelper<FPP,DEV>* th, Slice s[2]);
