@@ -5,6 +5,74 @@
 namespace Faust
 {
 	template<typename FPP>
+		TransformHelperPoly<FPP>::TransformHelperPoly(uint K,
+				MatSparse<FPP, Cpu>* L,
+				MatSparse<FPP, Cpu>* rR /* = nullptr*/,
+				MatSparse<FPP,Cpu> *T0 /*= nullptr*/,
+				BasisLaziness laziness /*= INSTANTIATE_COMPUTE_AND_FREE */) : TransformHelper<FPP,Cpu>()
+	{
+		// assuming L is symmetric
+		this->L = L;
+		uint d = L->getNbRow();
+		ref_man.acquire(L);
+		this->rR = rR;
+		if(rR == nullptr)
+			this->create_rR(L);
+		ref_man.acquire(rR);
+		this->laziness = laziness;
+
+		// build the chebyshev polynomials by factor
+		for(int i=0;i<K+1;i++)
+		{
+			// empty factors (in case of lazy instantiation)
+			this->push_back(new MatSparse<FPP, Cpu>()/*d*(K-i+1), d*(K-i)*/, /* OptimizedCopy */ false, /* copying */ false, /*transpose*/ false, /*conjugate*/ false, /* verify_dims_agree */ false); // the dimensions are fake
+		}
+
+		if(T0 != nullptr)
+			// T0 is arbitrary and need to be stored
+			// best choice is to instantiate the factor directly
+			this->basisChebyshevT0(T0);
+			//T0_is_arbitrary == true
+			//ref_man acquired T0
+
+		if(laziness == NOT_LAZY)
+			this->basisChebyshev_all();
+
+		this->is_fact_created.assign(this->size(), laziness == NOT_LAZY);
+	}
+
+	template<typename FPP>
+		TransformHelperPoly<FPP>::TransformHelperPoly(uint K, const TransformHelperPoly<FPP>& src) : TransformHelper<FPP, Cpu>()
+	{
+		if(K+1 < src.size())
+			throw std::runtime_error("The src TransformHelperPoly size can't be greater than K+1.");
+		uint d = src.L->getNbRow();
+		int i;
+		int num_new_polys = (K+1)-src.size();
+		for(i=0;i<num_new_polys;i++)
+		{
+			this->push_back(new MatSparse<FPP, Cpu>()/*d*(K-i+1), d*(K-i)*/, /* OptimizedCopy */ false, /* copying */ false, /*transpose*/ false, /*conjugate*/ false, /* verify_dims_agree */ false);
+		}
+		for(;i<src.size()+num_new_polys;i++)
+			this->push_back(src.get_gen_fact_nonconst(i-num_new_polys), /* OptimizedCopy */ false, /* copying */ false, /*transpose*/ false, /*conjugate*/ false, /* verify_dims_agree */ false);
+		// copy all attributes
+		laziness = src.laziness;
+		this->is_fact_created.assign(this->size(), laziness == NOT_LAZY);
+		for(i=num_new_polys; i < this->size();i++)
+		{
+			is_fact_created[i] = is_fact_created[i-num_new_polys];
+		}
+		L = src.L;
+		ref_man.acquire(L);
+		rR = src.rR;
+		ref_man.acquire(rR);
+		T0_is_arbitrary = src.T0_is_arbitrary;
+		if(laziness == NOT_LAZY)
+			this->basisChebyshev_facti2j(0, K);
+	}
+
+
+	template<typename FPP>
 		faust_unsigned_int TransformHelperPoly<FPP>::getNbRow() const
 		{
 			int d = L->getNbRow();
@@ -45,7 +113,7 @@ namespace Faust
 		Vect<FPP,Cpu> TransformHelperPoly<FPP>::multiply(const FPP* x, const bool transpose/*=false*/, const bool conjugate/*=false*/)
 		{
 			int d = L->getNbRow();
-			int K = this->size()-1;
+			uint K = this->size()-1;
 			Vect<FPP, Cpu> v0(d*(K+1));
 			multiply(x, v0.getData(), transpose, conjugate);
 			return std::move(v0);
@@ -68,7 +136,7 @@ namespace Faust
 			 * Fx = [v_{0, K} ; v_{1, K} ; v_{2, K}]
 			 */
 			int d = L->getNbRow();
-			int K = this->size()-1;
+			uint K = this->size()-1;
 
 			memcpy(y, x, sizeof(FPP)*d);
 			if(K == 0)
@@ -94,7 +162,7 @@ namespace Faust
 	////				std::cout << "TransformHelperPoly<FPP>::multiply(MatDense)" << std::endl;
 	//				int d = L.getNbRow();
 	//				int n = X.getNbCol();
-	//				int K = this->size();
+	//				uint K = this->size();
 	//				MatDense<FPP, Cpu> V0(d*(K+1), n);
 	//				MatDense<FPP,Cpu> V1(d, n), V2 = X, tmp;
 	//				memcpy(V1.getData(), X.getData(), sizeof(FPP)*d*n);
@@ -128,7 +196,7 @@ namespace Faust
 		{
 			//				std::cout << "TransformHelperPoly<FPP>::multiply(MatDense)" << std::endl;
 			int d = L->getNbRow();
-			int K = this->size()-1;
+			uint K = this->size()-1;
 			int n = X.getNbCol();
 			MatDense<FPP,Cpu> Y(d*(K+1), n);
 			multiply(X.getData(), n, Y.getData(), transpose, conjugate);
@@ -139,7 +207,7 @@ namespace Faust
 		void TransformHelperPoly<FPP>::multiply(const FPP* X, int n, FPP* Y, const bool transpose/*=false*/, const bool conjugate/*=false*/)
 		{
 			int d = L->getNbRow();
-			int K = this->size()-1;
+			uint K = this->size()-1;
 			auto scale = (K+1)*d;
 #pragma omp parallel for
 			for(int i=0;i<n;i++)
@@ -184,46 +252,21 @@ namespace Faust
 	template<typename FPP>
 		void TransformHelperPoly<FPP>::poly(int d, int n, const FPP* basisX, const FPP* coeffs, FPP* out)
 		{
-			int K = this->size()-1;
+			uint K = this->size()-1;
 			Faust::poly(d, K, n, basisX, coeffs, out);
 		}
 
 	template<typename FPP>
 		TransformHelper<FPP, Cpu>* TransformHelperPoly<FPP>::next()
 		{
-			int K = this->size()-1;
+			uint K = this->size()-1;
 			return next(K+1);
 		}
 
 	template<typename FPP>
-		TransformHelper<FPP, Cpu>* TransformHelperPoly<FPP>::next(int K)
+		TransformHelper<FPP, Cpu>* TransformHelperPoly<FPP>::next(uint K)
 		{
-			auto old_K = this->size()-1;
-			auto d = L->getNbRow();
-			MatSparse<FPP,Cpu> Id, zero, R;
-			std::vector<MatGeneric<FPP,Cpu>*> facts(K+1);
-			for(int i=0;i<old_K+1;i++)
-				facts[K-i] = this->get_gen_fact_nonconst(old_K-i);
-#pragma omp parallel for private(Id, zero, R)
-			for(int i=old_K+1;i <= K; i++)
-			{
-				//TODO: refactor with basisChebyshev
-				Id.resize(i*d, i*d, i*d);
-				Id.setEyes();
-				zero.resize(0, d, (i-2)*d);
-				R.hstack(zero, *rR);
-				auto Ti = new MatSparse<FPP,Cpu>();
-				Ti->vstack(Id, R);
-				facts[K-i] = Ti;
-			}
-			auto basisP = new TransformHelperPoly<FPP>(facts, (FPP)1.0,
-					/* optimizedCopy */ false,
-					/* cloning_fact */ false,
-					/* internal_call */ true);
-			basisP->L = L;
-			ref_man.acquire(L);
-			basisP->rR = rR;
-			ref_man.acquire(rR);
+			auto basisP = new TransformHelperPoly<FPP>(K, *this);
 			return basisP;
 		}
 
@@ -286,7 +329,7 @@ namespace Faust
 	template<typename FPP>
 		void TransformHelperPoly<FPP>::basisChebyshevT0(MatSparse<FPP,Cpu>* T0/*=nullptr*/)
 		{
-			int K = this->size()-1;
+			uint K = this->size()-1;
 			if(T0 == nullptr)
 			{
 				// Identity
@@ -294,16 +337,20 @@ namespace Faust
 				auto d = this->L->getNbRow();
 				T0_->resize(d, d, d);
 				T0_->setEyes();
+				T0_is_arbitrary = false;
 			}
 			else
+			{
 				this->update(*T0, K);
+				T0_is_arbitrary = true;
+			}
 			is_fact_created[K] = true;
 		}
 
 	template<typename FPP>
 		void TransformHelperPoly<FPP>::basisChebyshevT1()
 		{
-			int K = this->size()-1;
+			uint K = this->size()-1;
 			MatSparse<FPP,Cpu> Id;
 			int id = K-1;
 			if(! is_fact_created[id])
@@ -320,7 +367,7 @@ namespace Faust
 	template<typename FPP>
 		void TransformHelperPoly<FPP>::basisChebyshevT2()
 		{
-			int K = this->size()-1;
+			uint K = this->size()-1;
 			int id = K-2;
 			if(! is_fact_created[id])
 			{
@@ -335,7 +382,7 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		void TransformHelperPoly<FPP>::basisChebyshevTi(int i)
+		void TransformHelperPoly<FPP>::basisChebyshevTi(uint i)
 		{
 			switch(i)
 			{
@@ -346,7 +393,7 @@ namespace Faust
 				case 2:
 					return basisChebyshevT2();
 				default:
-					int K = this->size()-1;
+					uint K = this->size()-1;
 					int fid = K-i;
 					if(! is_fact_created[fid])
 					{
@@ -369,7 +416,7 @@ namespace Faust
 	template<typename FPP>
 		void TransformHelperPoly<FPP>::basisChebyshev_all()
 		{
-			int K = this->size()-1;
+			uint K = this->size()-1;
 			this->basisChebyshevT0();
 
 			if (K > 0)
@@ -378,7 +425,7 @@ namespace Faust
 				if (K > 1)
 				{
 					this->basisChebyshevT2();
-#pragma omp parallel for
+					#pragma omp parallel for
 					for(int i=3;i<K+1;i++)
 						this->basisChebyshevTi(i);
 				}
@@ -406,41 +453,19 @@ namespace Faust
 	template<typename FPP>
 		TransformHelper<FPP,Cpu>* basisChebyshev(MatSparse<FPP,Cpu>* L, int32_t K, MatSparse<FPP, Cpu>* T0/*=nullptr*/, BasisLaziness lazy_instantiation/*=INSTANTIATE_COMPUTE_AND_FREE*/)
 		{
-
 			// assuming L is symmetric
-			MatSparse<FPP,Cpu> *T1, *T2;
-			MatSparse<FPP,Cpu> Id, twoL, minus_Id, *rR, R, zero;
-			auto d = L->getNbRow();
-
-			std::vector<MatGeneric<FPP,Cpu>*> facts(K+1);
-			for(int i=0;i<K+1;i++)
-			{
-				facts[i] = new MatSparse<FPP,Cpu>(); // empty factors (lazy instantiation)
-			}
-			auto basisP = new TransformHelperPoly<FPP>(facts, (FPP)1.0,
-					/* optimizedCopy */ false,
-					/* cloning_fact */ false,
-					/* internal_call */ true);
-			basisP->is_fact_created.assign(K+1, false);
-			basisP->L = new MatSparse<FPP,Cpu>(*L);
-			Faust::TransformHelperPoly<FPP>::ref_man.acquire(basisP->L);
-			basisP->laziness = lazy_instantiation;
-			basisP->create_rR(L);
-
-			// build the chebyshev polynomials by factor
-			if(T0 != nullptr)
-				// T0 is arbitrary and need to be stored
-				// best choice is to instantiate the factor directly
-				basisP->basisChebyshevT0(T0);
-
-			if(lazy_instantiation == NOT_LAZY)
-				basisP->basisChebyshev_all();
+			auto basisP = new TransformHelperPoly<FPP>(
+					K,
+					new MatSparse<FPP, Cpu>(*L),
+					nullptr /* rR initialized by the ctor */,
+					T0,
+					lazy_instantiation);
 
 			return basisP;
 		}
 
 	template<typename FPP>
-		void poly(int d, int K, int n, const FPP* basisX, const FPP* coeffs, FPP* out)
+		void poly(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP* out)
 		{
 			auto K_plus_1 = K+1;
 			auto d_K_plus_1 = d*K_plus_1;
@@ -455,31 +480,41 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		void TransformHelperPoly<FPP>::basisChebyshev_facti(int i)
+		void TransformHelperPoly<FPP>::basisChebyshev_facti(uint i)
 		{
-			int K = this->size()-1;
+			uint K = this->size()-1; // size() >= 1 (cf. ctor)
 			int k_i = K-i;
 			basisChebyshevTi(k_i);
 		}
 
 	template<typename FPP>
-		void TransformHelperPoly<FPP>::basisChebyshev_free_facti(int i)
+		void TransformHelperPoly<FPP>::basisChebyshev_free_facti(uint i)
 		{
-			auto Ti = dynamic_cast<MatSparse<FPP,Cpu>*>(this->get_gen_fact_nonconst(i));
-			Ti->resize(0,0,0);
-			is_fact_created[i] = false;
+			if(i >= this->size()) throw std::out_of_range("i is greater than size");
+			uint K = this->size()-1;
+
+			if(i != 0 || ! T0_is_arbitrary)
+			{
+				auto Ti = dynamic_cast<MatSparse<FPP,Cpu>*>(this->get_gen_fact_nonconst(i));
+				Ti->resize(0,0,0);
+				is_fact_created[i] = false;
+			}
+			// else don't remove a T0 which comes from the oustide (we don't know how to recreate it later)
 		}
 
 	template<typename FPP>
-		void TransformHelperPoly<FPP>::basisChebyshev_facti2j(int i, int j)
+		void TransformHelperPoly<FPP>::basisChebyshev_facti2j(uint i, uint j)
 		{
+			if(i > j) throw std::runtime_error("i must be lower than j");
+			if(j >= this->size()) throw std::out_of_range("j is greater than size");
 			for(auto k=i;k<=j;k++)
 				basisChebyshev_facti(k);
 		}
 
 	template<typename FPP>
-		void TransformHelperPoly<FPP>::basisChebyshev_free_facti2j(int i, int j)
+		void TransformHelperPoly<FPP>::basisChebyshev_free_facti2j(uint i, uint j)
 		{
+			if(i > j) throw std::runtime_error("i must be lower than j");
 			for(auto k=i;k<=j;k++)
 				basisChebyshev_free_facti(k);
 		}
@@ -530,7 +565,7 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		unsigned int TransformHelperPoly<FPP>::get_fact_dim_size(const faust_unsigned_int id, unsigned short dim) const
+		uint TransformHelperPoly<FPP>::get_fact_dim_size(const faust_unsigned_int id, unsigned short dim) const
 		{
 			//TODO: optimize, no need to create the factor to know its size
 			auto this_ = const_cast<TransformHelperPoly<FPP>*>(this);
@@ -619,21 +654,7 @@ namespace Faust
 		TransformHelper<FPP,Cpu>* TransformHelperPoly<FPP>::clone()
 		{
 			// a clone of a TransformHelperPoly is also a TransformHelperPoly (not just a TransformHelper)
-			std::vector<MatGeneric<FPP,Cpu>*> facts(this->size());
-			for(int i=0;i<this->size();i++)
-				facts[i] = this->get_gen_fact_nonconst(i);
-			auto copy = new TransformHelperPoly<FPP>(facts, (FPP)1.0,
-					/* optimizedCopy */ false,
-					/* cloning_fact */ false,
-					/* internal_call */ true);
-			// copy all attributes
-			copy->is_fact_created = this->is_fact_created;
-			copy->L = this->L;
-			Faust::TransformHelperPoly<FPP>::ref_man.acquire(L);
-			copy->laziness = this->laziness;
-			copy->rR = this->rR;
-			Faust::TransformHelperPoly<FPP>::ref_man.acquire(rR);
-			return copy;
+			return new TransformHelperPoly<FPP>(this->size()-1, *this);
 		}
 
 	template<typename FPP>

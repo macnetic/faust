@@ -901,9 +901,9 @@ faust_unsigned_int Faust::Transform<FPP,Cpu>::get_fact_nnz(const faust_unsigned_
 }
 
 	template<typename FPP>
-void Faust::Transform<FPP,Cpu>::push_back(const Faust::MatGeneric<FPP,Cpu>* M, const bool optimizedCopy /*default value = false */, const bool conjugate /* default value = false*/, const bool copying /* default to true */)
+void Faust::Transform<FPP,Cpu>::push_back(const Faust::MatGeneric<FPP,Cpu>* M, const bool optimizedCopy /*default value = false */, const bool conjugate /* default value = false*/, const bool copying /* default to true */, const bool verify_dims_agree/*= true*/)
 {
-	if (size()>0)
+	if (size()>0 && verify_dims_agree)
 	{
 		if(data[size()-1]->getNbCol()!= M->getNbRow() || M->getNbRow()<1)
 		{

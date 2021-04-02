@@ -5,6 +5,8 @@
 #define ERROR_ON_FAC_NUM_CHANGE() \
 	throw std::runtime_error("Can't pack factors of a TransformHelperPoly (the number of factors must be kept consistent with the basis size).");
 
+typedef unsigned int uint;
+
 namespace Faust
 {
 	enum BasisLaziness
@@ -18,7 +20,7 @@ namespace Faust
 		TransformHelper<FPP, Cpu>* basisChebyshev(MatSparse<FPP,Cpu>* L, int32_t K, MatSparse<FPP, Cpu>* T0=nullptr, BasisLaziness lazy_instantiation=INSTANTIATE_ONCE_AND_FOR_ALL);
 
 	template<typename FPP>
-		void poly(int d, int K, int n, const FPP* basisX, const FPP* coeffs, FPP* out);
+		void poly(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP* out);
 
 
 	/**
@@ -35,11 +37,18 @@ namespace Faust
 			MatSparse<FPP, Cpu> *rR;
 			std::vector<bool> is_fact_created;
 			BasisLaziness laziness;
-			public:
-			TransformHelperPoly(const std::vector<MatGeneric<FPP,Cpu> *>& facts,
-					const FPP lambda_, const bool optimizedCopy, const bool cloning_fact,
-					const bool internal_call) : TransformHelper<FPP,Cpu>(facts, lambda_, optimizedCopy, cloning_fact, internal_call) {}
+			bool T0_is_arbitrary;
 
+			// ctor is private on purpose (callees must call basisChebyshev() to instantiate an object
+			TransformHelperPoly(uint K,
+					MatSparse<FPP, Cpu> *L,
+					MatSparse<FPP, Cpu> *rR=nullptr,
+					MatSparse<FPP, Cpu> *T0=nullptr,
+					BasisLaziness laziness=INSTANTIATE_COMPUTE_AND_FREE);
+
+			TransformHelperPoly(uint K, const TransformHelperPoly<FPP>& src);
+
+			public:
 			faust_unsigned_int getNbRow() const;
 			faust_unsigned_int getNbCol() const;
 			void get_fact(const faust_unsigned_int &id,
@@ -55,7 +64,7 @@ namespace Faust
 					faust_unsigned_int* num_rows,
 					faust_unsigned_int* num_cols,
 					const bool transpose = false) const;
-			unsigned int get_fact_dim_size(const faust_unsigned_int id, unsigned short dim) const;
+			uint get_fact_dim_size(const faust_unsigned_int id, unsigned short dim) const;
 			const MatGeneric<FPP,Cpu>* get_gen_fact(const faust_unsigned_int id) const;
 			faust_unsigned_int get_fact_nnz(const faust_unsigned_int id) const;
 			bool is_fact_sparse(const faust_unsigned_int id) const;
@@ -101,7 +110,7 @@ namespace Faust
 			void multiply(const FPP* x, FPP* y, const bool transpose=false, const bool conjugate=false);
 			MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> &X, const bool transpose=false, const bool conjugate=false);
 			void multiply(const FPP* X, int n, FPP* out, const bool transpose=false, const bool conjugate=false);
-			TransformHelper<FPP, Cpu>* next(int K);
+			TransformHelper<FPP, Cpu>* next(uint K);
 			TransformHelper<FPP, Cpu>* next();
 			Vect<FPP, Cpu> poly(MatDense<FPP,Cpu> & basisX, Vect<FPP, Cpu> coeffs);
 			MatDense<FPP, Cpu> poly(int n, MatDense<FPP,Cpu> & basisX, Vect<FPP, Cpu> coeffs);
@@ -110,11 +119,11 @@ namespace Faust
 			void basisChebyshevT0(MatSparse<FPP,Cpu>* T0=nullptr);
 			void basisChebyshevT1();
 			void basisChebyshevT2();
-			void basisChebyshevTi(int i);
-			void basisChebyshev_facti(int i);
-			void basisChebyshev_free_facti(int i);
-			void basisChebyshev_facti2j(int i, int j);
-			void basisChebyshev_free_facti2j(int i, int j);
+			void basisChebyshevTi(uint i);
+			void basisChebyshev_facti(uint i);
+			void basisChebyshev_free_facti(uint i);
+			void basisChebyshev_facti2j(uint i, uint j);
+			void basisChebyshev_free_facti2j(uint i, uint j);
 			void basisChebyshev_fact_all();
 			void basisChebyshev_free_fact_all();
 
