@@ -585,7 +585,7 @@ A.t_add_ext.stop();
 
 // compute the biggest eigenvalue of A, A must be semi-definite positive
 template<typename FPP, typename FPP2>
-FPP Faust::power_iteration(const  Faust::LinearOperator<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max,FPP2 threshold, int & flag)
+FPP Faust::power_iteration(const  Faust::LinearOperator<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max, FPP2 threshold, int & flag)
 {
 	#ifdef __COMPILE_TIMERS__
 		A.t_power_iteration.start();

@@ -323,7 +323,6 @@ namespace Faust
 			return marr_funcs->spectral_norm(gpu_mat_arr, threshold, nb_iter_max);
 		}
 
-
 	template<>
 		void Faust::Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::multiply(const Faust::Transform<@FAUST_SCALAR_FOR_GM@,GPU2> & A)
 		{

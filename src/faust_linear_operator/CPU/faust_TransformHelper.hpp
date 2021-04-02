@@ -874,6 +874,12 @@ template<typename FPP>
 	}
 
 template<typename FPP>
+	FPP Faust::TransformHelper<FPP,Cpu>::power_iteration(const faust_unsigned_int nbr_iter_max, const Real<FPP>& threshold, int & flag) const
+	{
+		return this->transform->power_iteration(nbr_iter_max, threshold, flag);
+	}
+
+template<typename FPP>
 	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::transpose()
 	{
 		return new TransformHelper<FPP,Cpu>(this, true, false);

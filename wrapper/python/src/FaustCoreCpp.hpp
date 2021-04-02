@@ -285,6 +285,14 @@ double FaustCoreCpp<FPP,DEV>::norm(int ord, double threshold, int max_num_its) c
 }
 
 template<typename FPP, FDevice DEV>
+void FaustCoreCpp<FPP,DEV>::power_iteration(FPP* out, double threshold, int max_num_its) const
+{
+
+    int flag; //not used yet
+    *out = this->transform->power_iteration(max_num_its, threshold, flag);
+}
+
+template<typename FPP, FDevice DEV>
 double FaustCoreCpp<FPP,DEV>::normFro() const
 {
     return this->transform->normFro();

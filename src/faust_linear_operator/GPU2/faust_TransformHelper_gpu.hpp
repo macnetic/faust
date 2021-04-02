@@ -197,6 +197,12 @@ namespace Faust
 		{
 			return this->transform->spectralNorm(nb_iter_max, threshold, flag);
 		}
+	template<typename FPP>
+		FPP TransformHelper<FPP,GPU2>::power_iteration(const faust_unsigned_int nb_iter_max, const Real<FPP>& threshold, int& flag)
+		{
+			throw std::runtime_error("power_iteration not yet supported.");
+			//TODO: simple to add in gpu_mod
+		}
 
 	template<typename FPP>
 		const MatGeneric<FPP,GPU2>* TransformHelper<FPP,GPU2>::get_gen_fact(const faust_unsigned_int id) const

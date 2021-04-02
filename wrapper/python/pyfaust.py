@@ -1428,7 +1428,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             threshold: (optional) power iteration algorithm threshold (default
             to .001). Used only for norm(2).
             max_num_its: (optional) maximum number of iterations for
-            power iteration algorithm. Used only for norm(2).
+            power iteration algorithm (default to 100). Used only for norm(2).
 
         Returns:
             the norm (float).

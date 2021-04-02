@@ -783,6 +783,20 @@ cdef class FaustCore:
                 norm = self.core_faust_cplx.normFro()
         return norm
 
+
+    def power_iteration(self, threshold, max_num_its):
+        cdef double[:] _lambda_dbl_view
+        cdef complex[:]  _lambda_cplx_view
+        if(self._isReal):
+            _lambda = np.empty((1,), dtype='float')
+            _lambda_dbl_view = _lambda
+            self.core_faust_dbl.power_iteration(&_lambda_dbl_view[0], threshold, max_num_its)
+        else:
+            _lambda = np.empty((1,), dtype=np.complex)
+            _lambda_cplx_view = _lambda
+            self.core_faust_cplx.power_iteration(&_lambda_cplx_view[0], threshold, max_num_its)
+        return _lambda
+
     def normalize(self, ord):
         core = FaustCore(core=True)
         if(self._isReal):
@@ -808,13 +822,13 @@ cdef class FaustCore:
         cdef double[:,:] fact_dbl_view
         cdef complex[:,:] fact_cplx_view
         if(self._isReal):
-            fact = np.zeros([self.core_faust_dbl.get_fact_nb_rows(i),
+            fact = np.empty([self.core_faust_dbl.get_fact_nb_rows(i),
                              self.core_faust_dbl.get_fact_nb_cols(i)], dtype='d',
                             order='F')
             fact_dbl_view = fact
             self.core_faust_dbl.get_fact(i, &fact_dbl_view[0, 0])
         else:
-            fact = np.zeros([self.core_faust_cplx.get_fact_nb_rows(i),
+            fact = np.empty([self.core_faust_cplx.get_fact_nb_rows(i),
                               self.core_faust_cplx.get_fact_nb_cols(i)],
                                  dtype='complex', order='F')
             fact_cplx_view = fact

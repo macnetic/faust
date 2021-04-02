@@ -60,6 +60,7 @@ cdef extern from "FaustCoreCpp.h":
         unsigned int getNBytes() const
 #        void setOp(const bool isTransposed,unsigned int& nbRowOp, unsigned int& nbColOp)const;
         unsigned long long nnz() const
+        void power_iteration(FPP* out, double threshold, int max_num_its) const;
         double norm(int ord, double threshold, int max_num_its) const
         double normFro() const
         double normInf() const

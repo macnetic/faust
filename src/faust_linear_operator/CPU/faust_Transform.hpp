@@ -602,10 +602,17 @@ double Faust::Transform<FPP,Cpu>::spectralNorm(const int nbr_iter_max, double th
 			AtA.multiplyLeft((*this));
 		}
 		//std::cout<<"Faust fin spectralNorm"<<std::endl;
-		FPP maxAbsValue = std::sqrt(power_iteration(AtA,nbr_iter_max,threshold,flag));
+		FPP maxAbsValue = std::sqrt(Faust::power_iteration(AtA,nbr_iter_max,threshold,flag));
 		return absValue(maxAbsValue);
 
 	}
+}
+
+template<typename FPP>
+FPP Faust::Transform<FPP,Cpu>::power_iteration(const faust_unsigned_int nbr_iter_max, const Real<FPP>& threshold, int & flag) const
+{
+	//assuming that this is PSD
+	return Faust::power_iteration(*this, nbr_iter_max, threshold, flag);
 }
 
 
