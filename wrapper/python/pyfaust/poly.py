@@ -497,7 +497,7 @@ def expm_multiply(A, B, start=None, stop=None, num=None, endpoint=None,
     T = basis(A/phi-seye(*A.shape), K, 'chebyshev', dev=dev)
     TB = np.squeeze(T@B)
     if isinstance(start, type(None)):
-        start = 1
+        start = -1
     if isinstance(stop, type(None)):
         stop = start
         num = 1
@@ -512,7 +512,7 @@ def expm_multiply(A, B, start=None, stop=None, num=None, endpoint=None,
     Y = empty((npts, m, n))
     for i,tau in enumerate(points):
         if tau >= 0:
-            raise ValueError('pyfaust.poly.expm_multiply handles only positive '
+            raise ValueError('pyfaust.poly.expm_multiply handles only negative '
                              'time points.')
         # Compute the K+1 Chebychev coefficients
         coeff = np.empty((K+1,), dtype=np.float)
@@ -522,9 +522,9 @@ def expm_multiply(A, B, start=None, stop=None, num=None, endpoint=None,
             coeff[j] = coeff[j+2] - (2 * j + 2) / (-tau * phi) * coeff[j+1]
         coeff[0] /= 2
         if n == 1:
-            Y[i,:,0] = poly(coeff, TB, A, dev=dev)
+            Y[i,:,0] = poly(coeff, TB, dev=dev)
         else:
-            Y[i,:,:] = poly(coeff, TB, A, dev=dev)
+            Y[i,:,:] = poly(coeff, TB, dev=dev)
     if B.ndim == 1:
         return np.squeeze(Y)
     else:
@@ -574,6 +574,7 @@ def invm_multiply(A, B, rel_err=1e-6, max_K=2048):
     g = abs(1 / c + sqrt(1/c**2 - 1))
     K = min(max_K, int(((log(1/eps) + log(2/(m*sqrt(1-c**2))) - log(g-1)) /
                         log(g))))
+    print("K=", K)
     Abar = 2*A/(b-a) - (b+a)*Id/(b-a)
     T = basis(Abar, K, 'chebyshev')
     coeffs = array([ 2 / (m*sqrt(1-c**2)) * (-1)**k * g**(-k) for k in
