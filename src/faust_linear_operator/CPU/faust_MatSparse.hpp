@@ -1238,29 +1238,23 @@ void Faust::MatSparse<FPP,Cpu>::vstack(MatSparse<FPP, Cpu>& top, MatSparse<FPP, 
 		throw std::runtime_error("vstack error: dimensions must agree.");
 	if(this->getNbCol() != ncols || this->getNbRow() != nrows || this->getNonZeros() != nnz)
 		resize(nnz, nrows, ncols);
-	// copy column indices
-	if(tnnz > 0)
-	{
-		memcpy(getColInd(), top.getColInd(), sizeof(int)*tnnz);
-		memcpy(getValuePtr(), top.getValuePtr(), sizeof(FPP)*tnnz);
-	}
-	if(bnnz > 0)
-	{
-		memcpy(getColInd()+tnnz, bottom.getColInd(), sizeof(int)*bnnz);
-		memcpy(getValuePtr()+tnnz, bottom.getValuePtr(), sizeof(FPP)*bnnz);
-	}
-	// build rowptr
-	memcpy(getRowPtr(), top.getRowPtr(), sizeof(int)*(tnrows+1));
-	int *rowptr, *browptr, row_offset = *(top.getRowPtr()+tnrows);
-	int j = tnrows;
-	//TODO: openmp
-//#pragma omp parallel for
-	for(int i=1;i <= bnrows; i++)
-	{
-		rowptr = getRowPtr()+tnrows+i;
-		browptr = bottom.getRowPtr()+i;
-		*rowptr = *browptr+row_offset;
-	}
+	typedef Eigen::Triplet<FPP> T;
+	std::vector<T> tripletList;
+	tripletList.reserve(top.getNonZeros()+bottom.getNonZeros());
+	for(faust_unsigned_int i=0; i < top.getNbRow() ; i++)
+		for(typename Eigen::SparseMatrix<FPP,Eigen::RowMajor>::InnerIterator it(top.mat,i); it; ++it)
+		{
+			tripletList.push_back(T(it.row(), it.col(), it.value()));
+		}
+
+	for(faust_unsigned_int i=0; i < bottom.getNbRow() ; i++)
+		for(typename Eigen::SparseMatrix<FPP,Eigen::RowMajor>::InnerIterator it(bottom.mat,i); it; ++it)
+		{
+			tripletList.push_back(T(it.row()+top.getNbRow(), it.col(), it.value()));
+		}
+
+	mat.setFromTriplets(tripletList.begin(), tripletList.end());
+	update_dim();
 }
 
 template<typename FPP>
