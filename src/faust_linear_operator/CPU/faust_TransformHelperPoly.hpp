@@ -21,6 +21,7 @@ namespace Faust
 		ref_man.acquire(rR);
 		this->laziness = laziness;
 
+		this->is_fact_created.assign(K+1, laziness == NOT_LAZY);
 		// build the chebyshev polynomials by factor
 		for(int i=0;i<K+1;i++)
 		{
@@ -38,7 +39,6 @@ namespace Faust
 		if(laziness == NOT_LAZY)
 			this->basisChebyshev_all();
 
-		this->is_fact_created.assign(this->size(), laziness == NOT_LAZY);
 	}
 
 	template<typename FPP>
