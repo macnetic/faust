@@ -447,26 +447,26 @@ class FaustPoly(Faust):
         return next(self.gen)
 
 
-def expm_multiply(A, B, start=None, stop=None, num=None, endpoint=None,
-                  K=10, dev='cpu'):
+def expm_multiply(A, B, t, K=10, dev='cpu'):
     """
     Computes an approximate of the action of the matrix exponential of A on B using series of Chebyshev polynomials.
 
     NOTE: This function is very similar to scipy.sparse.linalg.expm_multiply
-    with two major differences though:
+    with three major differences though:
         1. A must be symmetric positive definite.
-        2. The time values must be negative.
+        2. The time points are directly passed to the function rather to be
+        defined as a numpy.linspace.
+        3. The time values must be negative.
 
     Args:
         A: the operator whose exponential is of interest (must be a
         symmetric positive definite csr_matrix).
         B: the matrix or vector to be multiplied by the matrix exponential of A (ndarray).
-        start: (scalar, optional) the starting time point of the sequence.
-        stop: (scalar, optional) the end time point of the sequence, unless endpoint is set to False. In that case, the sequence consists of all but the last of num + 1 evenly spaced time points, so that stop is excluded. Note that the step size changes when endpoint is False.
-        num: (int, optional) number of time points to use.
-        endpoint: (bool, optional) if True, stop is the last time point. Otherwise, it is not included.
-        K: (int, optional) The degree of the dominant Chebyshev polynomial (10 by default).
+        t: (list or float) the time points.
         dev: (str, optional) the device ('cpu' or 'gpu') on which to compute (currently only cpu is supported).
+        K: the greatest polynomial degree of the Chebyshev polynomial basis.
+        The greater it is, the better is the approximate accuracy but note that
+        a larger K increases the computational cost.
 
     Returns:
         expm_A_B the result of \f$e^{t_k A} B\f$.
@@ -478,14 +478,15 @@ def expm_multiply(A, B, start=None, stop=None, num=None, endpoint=None,
         >>> L = random(5, 5, .2, format='csr')
         >>> L = L@L.T
         >>> x = np.random.rand(L.shape[1])
-        >>> y = fexpm_multiply(L, x, start=-.5, stop=-0.1, num=3, endpoint=True)
+        >>> t = np.linspace(start=-.5, stop=-0.1, num=3, endpoint=True)
+        >>> y = fexpm_multiply(L, x, t)
         >>> y
-        array([[0.56445788, 0.22238514, 0.34696112, 0.40463245, 0.56358572],
-                      [0.63657575, 0.22661967, 0.40625063, 0.45271241,
-                       0.57045306],
-                      [0.71895162, 0.23093484, 0.47397342, 0.50650541,
-                       0.57740409]])
-
+        array([[ 0.20063382,  0.39176039,  0.62490929,  0.60165209,
+                -0.00082166],
+               [ 0.20063382,  0.44945087,  0.62490929,  0.6401542 ,
+                0.02325689],
+               [ 0.20063382,  0.51456348,  0.62490929,  0.68279266,
+                0.05458717]])
 
     """
     if not isinstance(A, csr_matrix):
@@ -496,21 +497,16 @@ def expm_multiply(A, B, start=None, stop=None, num=None, endpoint=None,
     phi = eigsh(A, k=1, return_eigenvectors=False)[0] / 2
     T = basis(A/phi-seye(*A.shape), K, 'chebyshev', dev=dev)
     TB = np.squeeze(T@B)
-    if isinstance(start, type(None)):
-        start = -1
-    if isinstance(stop, type(None)):
-        stop = start
-        num = 1
-    #tau = start
-    points = np.linspace(start, stop, num=num, endpoint=endpoint)
+    if isinstance(t, float):
+        t = list(t)
     m = B.shape[0]
     if len(B.shape) == 1:
         n = 1
     else:
         n = B.shape[1]
-    npts = len(points)
+    npts = len(t)
     Y = empty((npts, m, n))
-    for i,tau in enumerate(points):
+    for i,tau in enumerate(t):
         if tau >= 0:
             raise ValueError('pyfaust.poly.expm_multiply handles only negative '
                              'time points.')
@@ -530,7 +526,7 @@ def expm_multiply(A, B, start=None, stop=None, num=None, endpoint=None,
     else:
         return Y
 
-def invm_multiply(A, B, rel_err=1e-6, max_K=2048):
+def invm_multiply(A, B, rel_err=1e-6, max_K=2048, dev='cpu'):
     """
     Computes an approximate of the action of the matrix inverse of A on B using Chebyshev polynomials.
 
@@ -541,6 +537,8 @@ def invm_multiply(A, B, rel_err=1e-6, max_K=2048):
         (ndarray).
         rel_err: the targeted relative error between the approximate of the action and the action itself (if you were to compute it with np.inv(A)@x).
         max_K: (int, optional) the maximum degree of Chebyshev polynomial to use (useful to limit memory consumption).
+        dev: (optional) 'cpu' or 'gpu',  selects the device to use (currently
+        only 'cpu' is supported).
 
     Example:
 		>>> import numpy as np
