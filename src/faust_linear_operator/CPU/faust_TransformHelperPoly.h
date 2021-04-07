@@ -129,6 +129,7 @@ namespace Faust
 
 			void basisChebyshev_all();
 			void create_rR(const MatSparse<FPP,Cpu>* L);
+
 			~TransformHelperPoly();
 			friend TransformHelper<FPP,Cpu>* basisChebyshev<>(MatSparse<FPP,Cpu>* L, int32_t K, MatSparse<FPP, Cpu>* T0, BasisLaziness lazy_instantiation);
 		};

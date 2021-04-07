@@ -224,13 +224,23 @@ namespace Faust
 	template<typename FPP>
 		MatDense<FPP, Cpu> TransformHelperPoly<FPP>::multiply(const MatSparse<FPP,Cpu> &A, const bool transpose/*=false*/, const bool conjugate/*=false*/)
 		{
-			//TODO: optimize, could specialize the mul as it has been done for Vect/MatDense
-			auto this_ = const_cast<TransformHelperPoly<FPP>*>(this);
-			this_->basisChebyshev_fact_all();
-			auto ret = TransformHelper<FPP, Cpu>::multiply(A);
-			if(this_->laziness == INSTANTIATE_COMPUTE_AND_FREE)
-				this_->basisChebyshev_free_fact_all();
-			return ret;
+			MatDense<FPP, Cpu> M(this->getNbRow(), A.getNbCol());
+			M.setZeros();
+			vector<int> col_ids;
+			for(int i=0;i<A.getNonZeros();i++)
+			{
+				auto id = A.getColInd()[i];
+				if(std::find(std::begin(col_ids), std::end(col_ids), id) == std::end(col_ids))
+					col_ids.push_back(id);
+			}
+#pragma omp parallel for
+			for(auto i=col_ids.begin(); i < col_ids.end();i++)
+			{
+				auto id = *i;
+				auto vect = A.get_col(id);
+				this->multiply(vect.getData(), M.getData()+M.getNbRow()*id, transpose, conjugate);
+			}
+			return M;
 		}
 
 	template<typename FPP>
@@ -612,8 +622,8 @@ namespace Faust
 			else
 			{
 				nnz += this->L->getNonZeros();
-				if(rid < this->size()-1)
-					nnz += (this->size()-rid-2)*L->getNbRow();
+				if(rid < this->size()-2)
+					nnz += (this->size()-rid-1)*L->getNbRow();
 			}
 			return nnz;
 		}
