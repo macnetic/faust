@@ -933,5 +933,16 @@ namespace Faust
 			return ret;
 		}
 
+	template<typename FPP>
+		TransformHelper<FPP, Cpu>* TransformHelperPoly<FPP>::slice(faust_unsigned_int start_row_id, faust_unsigned_int end_row_id,
+				faust_unsigned_int start_col_id, faust_unsigned_int end_col_id)
+		{
+			auto this_ = const_cast<TransformHelperPoly<FPP>*>(this);
+			this_->basisChebyshev_fact_all();
+			auto ret = TransformHelperGen<FPP, Cpu>::slice(start_row_id, end_row_id, start_col_id, end_col_id);
+			if(this_->laziness == INSTANTIATE_COMPUTE_AND_FREE)
+				this_->basisChebyshev_free_fact_all();
+			return ret;
+		}
 
 }

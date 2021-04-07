@@ -164,7 +164,7 @@ template<typename FPP,FDevice DEVICE>
 std::string Faust::MatGeneric<FPP,DEVICE>::to_string(int32_t nrows, int32_t ncols, bool transpose, Real<FPP> density, int32_t nnz, bool is_identity, MatType type)
 {
 	std::ostringstream str;
-	str << " (" << MatGeneric<FPP,DEVICE>::get_scalar_type_str() << ")";
+	str << " (" << MatGeneric<FPP,DEVICE>::get_scalar_type_str() << ") ";
 	if(type == Dense)
 		str << "DENSE,";
 	else if(type == Sparse)

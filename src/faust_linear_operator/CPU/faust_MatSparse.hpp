@@ -1249,7 +1249,7 @@ void Faust::MatSparse<FPP,Cpu>::vstack(MatSparse<FPP, Cpu>& top, MatSparse<FPP, 
 		resize(nnz, nrows, ncols);
 	typedef Eigen::Triplet<FPP> T;
 	std::vector<T> tripletList;
-	tripletList.reserve(top.getNonZeros()+bottom.getNonZeros());
+	tripletList.reserve(tnnz+bnnz);
 	for(faust_unsigned_int i=0; i < top.getNbRow() ; i++)
 		for(typename Eigen::SparseMatrix<FPP,Eigen::RowMajor>::InnerIterator it(top.mat,i); it; ++it)
 		{

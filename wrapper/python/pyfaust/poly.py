@@ -526,7 +526,7 @@ def expm_multiply(A, B, t, K=10, dev='cpu'):
     else:
         return Y
 
-def invm_multiply(A, B, rel_err=1e-6, max_K=2048, dev='cpu'):
+def invm_multiply(A, B, rel_err=1e-6, max_K=np.inf, dev='cpu'):
     """
     Computes an approximate of the action of the matrix inverse of A on B using Chebyshev polynomials.
 
@@ -572,7 +572,6 @@ def invm_multiply(A, B, rel_err=1e-6, max_K=2048, dev='cpu'):
     g = abs(1 / c + sqrt(1/c**2 - 1))
     K = min(max_K, int(((log(1/eps) + log(2/(m*sqrt(1-c**2))) - log(g-1)) /
                         log(g))))
-    print("K=", K)
     Abar = 2*A/(b-a) - (b+a)*Id/(b-a)
     T = basis(Abar, K, 'chebyshev')
     coeffs = array([ 2 / (m*sqrt(1-c**2)) * (-1)**k * g**(-k) for k in
