@@ -567,13 +567,20 @@ namespace Faust
 	template<typename FPP>
 		uint TransformHelperPoly<FPP>::get_fact_dim_size(const faust_unsigned_int id, unsigned short dim) const
 		{
-			//TODO: optimize, no need to create the factor to know its size
-			auto this_ = const_cast<TransformHelperPoly<FPP>*>(this);
-			this_->basisChebyshev_facti(id);
-			auto ret = TransformHelper<FPP, Cpu>::get_fact_dim_size(id, dim);
-			if(this_->laziness == INSTANTIATE_COMPUTE_AND_FREE)
-				this_->basisChebyshev_free_facti(id);
-			return ret;
+			//dim == 0 to get num of cols, >0 otherwise
+			faust_unsigned_int rid; //real id
+			if(this->is_transposed) {
+				rid = this->size()-id-1;
+				dim = !dim;
+			}
+			else {
+				rid = id;
+				//dim = dim;
+			}
+			if(dim)
+				return this->L->getNbCol()*(this->size()-rid-(rid==this->size()-1?0:1));
+			else
+				return this->L->getNbCol()*(this->size()-rid);
 		}
 
 	template<typename FPP>
@@ -590,13 +597,25 @@ namespace Faust
 	template<typename FPP>
 		faust_unsigned_int TransformHelperPoly<FPP>::get_fact_nnz(const faust_unsigned_int id) const
 		{
-			//TODO: optimize, no need to create the factor to know its nnz
-			auto this_ = const_cast<TransformHelperPoly<FPP>*>(this);
-			this_->basisChebyshev_facti(id);
-			auto ret = TransformHelper<FPP, Cpu>::get_fact_nnz(id);
-			if(this_->laziness == INSTANTIATE_COMPUTE_AND_FREE)
-				this_->basisChebyshev_free_facti(id);
-			return ret;
+			// compute the nnz based on the factor structure (without really building the factor)
+			faust_unsigned_int rid; //real id
+			if(this->is_transposed) {
+				rid = this->size()-id-1;
+			}
+			else {
+				rid = id;
+				//dim = dim;
+			}
+			int nnz = L->getNbRow();
+			if(id == this->size()-1)
+				return nnz;
+			else
+			{
+				nnz += this->L->getNonZeros();
+				if(rid < this->size()-1)
+					nnz += (this->size()-rid-2)*L->getNbRow();
+			}
+			return nnz;
 		}
 
 	template<typename FPP>
@@ -664,8 +683,6 @@ namespace Faust
 		}
 
 
-
-
 	template<typename FPP>
 		TransformHelper<FPP, Cpu>* TransformHelperPoly<FPP>::multiply(const TransformHelper<FPP, Cpu>* other) const
 		{
@@ -692,25 +709,21 @@ namespace Faust
 	template<typename FPP>
 		faust_unsigned_int TransformHelperPoly<FPP>::getNBytes() const
 		{
-			//TODO: optimize: the size in bytes could be calculated without building the factors
-			auto this_ = const_cast<TransformHelperPoly<FPP>*>(this);
-			this_->basisChebyshev_fact_all();
-			auto ret = TransformHelper<FPP, Cpu>::getNBytes();
-			if(this_->laziness == INSTANTIATE_COMPUTE_AND_FREE)
-				this_->basisChebyshev_free_fact_all();
-			return ret;
+			faust_unsigned_int nbytes = 0;
+			for(int i=0;i<this->size();i++)
+			{
+				nbytes += MatSparse<FPP,Cpu>::getNBytes(this->get_fact_nnz(i), this->get_fact_nb_rows(i));
+			}
+			return nbytes;
 		}
 
 	template<typename FPP>
 		faust_unsigned_int TransformHelperPoly<FPP>::get_total_nnz() const
 		{
-			//TODO: optimize: the nnz_sum could be calculated without building the factors
-			auto this_ = const_cast<TransformHelperPoly<FPP>*>(this);
-			this_->basisChebyshev_fact_all();
-			auto ret = TransformHelper<FPP, Cpu>::get_total_nnz();
-			if(this_->laziness == INSTANTIATE_COMPUTE_AND_FREE)
-				this_->basisChebyshev_free_fact_all();
-			return ret;
+			int total_nnz = 0;
+			for(int i=0;i<this->size();i++)
+				total_nnz += get_fact_nnz(i);
+			return total_nnz;
 		}
 
 	template<typename FPP>
@@ -722,13 +735,19 @@ namespace Faust
 	template<typename FPP>
 		string TransformHelperPoly<FPP>::to_string() const
 		{
-			//TODO: optimize: no need to instantiate factors to print their attributes (size, nnz, type)
-			auto this_ = const_cast<TransformHelperPoly<FPP>*>(this);
-			this_->basisChebyshev_fact_all();
-			auto ret = TransformHelper<FPP, Cpu>::to_string();
-			if(this_->laziness == INSTANTIATE_COMPUTE_AND_FREE)
-				this_->basisChebyshev_free_fact_all();
-			return ret;
+
+			stringstream str;
+			str<<"Faust size ";
+				str << this->get_fact_nb_rows(0) << "x" << this->get_fact_nb_cols(this->size()-1);
+			auto density = (double)this->get_total_nnz()/this->getNbRow()/this->getNbCol();
+			str <<", density "<< density << ", nnz_sum "<<this->get_total_nnz() << ", " << this->size() << " factor(s): "<< std::endl;
+			for (int i=0 ; i<this->size() ; i++)
+			{
+				str << "- FACTOR " << i;
+				density = (double) this->get_fact_nnz(i) / this->get_fact_nb_rows(i) / this->get_fact_nb_cols(i);
+				str << Faust::MatGeneric<FPP,Cpu>::to_string(this->get_fact_nb_rows(i), this->get_fact_nb_cols(i), this->is_transposed, density, this->get_fact_nnz(i), /* is_identity */ i == this->size()-1, Sparse);
+			}
+			return str.str();
 		}
 
 	template<typename FPP>
@@ -903,5 +922,6 @@ namespace Faust
 			auto ret = TransformHelper<FPP, Cpu>::swap_rows(id1, id2, permutation, inplace, check_transpose);
 			return ret;
 		}
+
 
 }

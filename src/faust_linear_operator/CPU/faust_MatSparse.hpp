@@ -1180,9 +1180,14 @@ void Faust::MatSparse<FPP,Cpu>::swap_cols(faust_unsigned_int id1, faust_unsigned
 template<typename FPP>
 size_t Faust::MatSparse<FPP,Cpu>::getNBytes() const
 {
-	return this->getNonZeros()*(sizeof(FPP)+sizeof(int))+(this->getNbRow()+1)*sizeof(int);
+	return this->getNBytes(this->getNonZeros(), this->getNbRow());
 }
 
+template<typename FPP>
+size_t Faust::MatSparse<FPP,Cpu>::getNBytes(int nnz, int nrows)
+{
+	return nnz*(sizeof(FPP)+sizeof(int))+(nrows+1)*sizeof(int);
+}
 template<typename FPP>
 void Faust::MatSparse<FPP,Cpu>::copyRowPtr(size_t* out_rowptr) const
 {

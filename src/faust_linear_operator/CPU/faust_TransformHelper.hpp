@@ -668,8 +668,7 @@ namespace Faust {
 	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::display() const
 		{
-//			cout << "is_transposed:" << this->is_transposed << std::endl;
-			this->transform->Display(this->is_transposed, false);
+			std::cout << this->to_string() << std::endl;
 		}
 
 	template<typename FPP>
