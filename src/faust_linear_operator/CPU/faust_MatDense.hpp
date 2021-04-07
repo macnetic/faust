@@ -758,10 +758,7 @@ std::string MatDense<FPP,Cpu>::to_string(const bool transpose /* set to false by
 {
 	//using ostringstream because it's easier for concatenation (of complex and any number)
 	std::ostringstream  str;
-
-	str << " (" << (typeid(*getData()) == typeid(std::complex<double>) || typeid(*getData()) == typeid(std::complex<float>)?"complex":"real") << ")";
-	str<<" DENSE, "; //number of trailing spaces matters to align with SPARSE to_string()
-	str << MatGeneric<FPP,Cpu>::to_string(transpose);
+	str << MatGeneric<FPP,Cpu>::to_string(Dense, transpose);
 	if(isZeros)
 		str <<"zeros matrix flag" <<std::endl;
 	else
@@ -779,6 +776,11 @@ std::string MatDense<FPP,Cpu>::to_string(const bool transpose /* set to false by
 	return str.str();
 }
 
+template<typename FPP>
+std::string Faust::MatDense<FPP,Cpu>::to_string(int32_t nrows, int32_t ncols, bool transpose, Real<FPP> density, int32_t nnz, bool is_identity)
+{
+	return Faust::MatGeneric<FPP,Cpu>::to_string(nrows, ncols, transpose, density, nnz, is_identity, Dense);
+}
 
 
 // Affichage

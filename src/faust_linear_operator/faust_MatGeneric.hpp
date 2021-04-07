@@ -133,19 +133,56 @@ void Faust::MatGeneric<FPP,DEVICE>::Display() const
 }
 
 template<typename FPP,FDevice DEVICE>
+std::string Faust::MatGeneric<FPP,DEVICE>::to_string(MatType type, const bool transpose /* set to false by default */, const bool displaying_small_mat_elts) const
+{
+	return this->to_string(getNbRow(), getNbCol(), transpose, this->density(), this->getNonZeros(), this->is_identity, type);
+}
+
+template<typename FPP,FDevice DEVICE>
 std::string Faust::MatGeneric<FPP,DEVICE>::to_string(const bool transpose /* set to false by default */, const bool displaying_small_mat_elts) const
 {
-	std::ostringstream str;
-	str <<" size ";
-	if(transpose)
-		str << getNbCol() << "x" << getNbRow();
+	MatType type = Dense;
+	if(dynamic_cast<const MatSparse<FPP,DEVICE>*>(this))
+		type = Sparse;
+	else if (dynamic_cast<const MatDense<FPP,DEVICE>*>(this))
+		type = Dense;
+	else if (dynamic_cast<const MatDiag<FPP>*>(this))
+		type = Diag;
 	else
-		str << getNbRow() << "x" << getNbCol();
-	str << ", density "<< this->density()<<", nnz "<<this->getNonZeros()<<std::endl;
-	if (this->is_identity)
-		str <<" identity matrix flag" << std::endl;
-	return str.str();
+		throw std::runtime_error("Unhandled matrix type in MatGeneric::to_string()"); // shouldn't happen
+	return this->to_string(getNbRow(), getNbCol(), transpose, this->density(), this->getNonZeros(), this->is_identity, type);
+}
+
+template<typename FPP, FDevice DEVICE>
+std::string Faust::MatGeneric<FPP,DEVICE>::get_scalar_type_str()
+{
+	return std::is_same<FPP,Real<FPP>>::value?"real":"complex";
 }
 
 
+template<typename FPP,FDevice DEVICE>
+std::string Faust::MatGeneric<FPP,DEVICE>::to_string(int32_t nrows, int32_t ncols, bool transpose, Real<FPP> density, int32_t nnz, bool is_identity, MatType type)
+{
+	std::ostringstream str;
+	str << " (" << MatGeneric<FPP,DEVICE>::get_scalar_type_str() << ")";
+	if(type == Dense)
+		str << "DENSE,";
+	else if(type == Sparse)
+		str << "SPARSE,";
+	else if(type == Diag)
+		str << "DIAG,";
+	else if(type == None)
+		str << "UNKNOWN MATRIX TYPE,";
+	else
+		throw std::runtime_error("Invalid MatType passed to MatGeneric::to_string()");
+	str << " size ";
+	if(transpose)
+		str << ncols << "x" << nrows;
+	else
+		str << nrows << "x" << ncols;
+	str << ", density "<< density <<", nnz "<< nnz <<std::endl;
+	if (is_identity)
+		str <<" identity matrix flag" << std::endl;
+	return str.str();
+}
 

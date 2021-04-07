@@ -434,9 +434,7 @@ template<typename FPP>
 std::string Faust::MatSparse<FPP,Cpu>::to_string(const bool transpose /* set to false by default */, const bool displaying_small_mat_elts /* false by default */) const
 {
 	std::ostringstream str;
-	str << " (" << (typeid(*getValuePtr()) == typeid(complex<double>) || typeid(*getValuePtr()) == typeid(complex<float>)?"complex":"real") << ")";
-	str<<" SPARSE,";
-	str << Faust::MatGeneric<FPP,Cpu>::to_string(transpose);
+	str << Faust::MatGeneric<FPP, Cpu>::to_string(Sparse, transpose);
 	if (displaying_small_mat_elts && this->dim1*this->dim2 < 100)
 	{
 		str << "rowPtr = " << getRowPtr() << " -> [ " ;
@@ -454,6 +452,12 @@ std::string Faust::MatSparse<FPP,Cpu>::to_string(const bool transpose /* set to 
 
 	}
 	return str.str();
+}
+
+template<typename FPP>
+std::string Faust::MatSparse<FPP,Cpu>::to_string(int32_t nrows, int32_t ncols, bool transpose, Real<FPP> density, int32_t nnz, bool is_identity)
+{
+	return Faust::MatGeneric<FPP,Cpu>::to_string(nrows, ncols, transpose, density, nnz, is_identity, Sparse);
 }
 
 template<typename FPP>

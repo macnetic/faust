@@ -287,6 +287,8 @@ namespace Faust
 			//! Returns a string with all features of MatSparse: dim1, dim2, number of non-zeros, values (if not more than 100), etc.
 			std::string to_string(const bool transpose=false, const bool displaying_small_mat_elts=false) const;
 
+			static std::string to_string(int32_t nrows, int32_t ncols, bool transpose, Real<FPP> density, int32_t nnz, bool is_identity);
+
 			//! \brief Display the support of MatSparse (i.e where are the non zero entries)
 			void display_support() const;
 

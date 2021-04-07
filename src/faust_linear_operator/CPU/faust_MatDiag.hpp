@@ -7,12 +7,8 @@ void Faust::MatDiag<FPP>::Display() const
 template<typename FPP>
 std::string Faust::MatDiag<FPP>::to_string(const bool transpose /* set to false by default */, const bool displaying_small_mat_elts /* false by default */) const
 {
-	//using ostringstream because it's easier for concatenation (of complex and any number)
 	std::ostringstream  str;
-
-	str << " (" << ((typeid(mat.diagonal()(0)) == typeid(std::complex<double>) || typeid(mat.diagonal()(0)) == typeid(std::complex<float>))?"std::complex":"real") << ")";
-	str<<" DENSE,";
-	str << Faust::MatGeneric<FPP,Cpu>::to_string(transpose);
+	str << Faust::MatGeneric<FPP,Cpu>::to_string(Diag, transpose);
 	if(isZeros)
 		str <<"zeros matrix flag" << std::endl;
 	else if (displaying_small_mat_elts && this->dim1 < 100)
