@@ -117,6 +117,22 @@ namespace Faust
 			MatDense<FPP, Cpu> poly(int n, MatDense<FPP,Cpu> & basisX, Vect<FPP, Cpu> coeffs);
 			void poly(int d, int n, const FPP* basisX, const FPP* coeffs, FPP* out);
 			TransformHelper<FPP, Cpu>* polyFaust(const FPP* coeffs);
+			/**
+			 * Computes the multiplication of "this" by x and the linear combination of polynomials at the same time (in a memory saving purpose).
+			 *
+			 * \param x: a vector of size L->getNbRow()
+			 * \param y: output vector of size L->getNbRow()
+			 * \param coeffs: a vector of size K+1 (this->size()), coefficients of the linear combination.
+			 */
+			void multiplyPoly(const FPP* x, FPP* y, const FPP* coeffs);
+			/**
+			 * Computes the multiplication of "this" by X and the linear combination of polynomials at the same time (in a memory saving purpose).
+			 *
+			 * \param X: a matrix of size L->getNbRow() x n
+			 * \param Y: output matrix of size L->getNbRow() x n
+			 * \param coeffs: a vector of size K+1 (this->size()), coefficients of the linear combination.
+			 */
+			void multiplyPoly(const FPP* X, int n, FPP* Y, const FPP* coeffs);
 			void basisChebyshevT0(MatSparse<FPP,Cpu>* T0=nullptr);
 			void basisChebyshevT1();
 			void basisChebyshevT2();

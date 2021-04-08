@@ -618,6 +618,53 @@ cdef class FaustCore:
             core.core_faust_cplx = self.core_faust_cplx.polyCoeffs(&cview_cplx[0])
         return core
 
+    def mulPolyCoeffs(self, coeffs, X):
+        cdef double[:] cview
+        cdef complex[:] cview_cplx
+        cdef double[:,:] Xview
+        cdef complex[:,:] Xview_cplx
+        cdef double[:,:] Yview
+        cdef complex[:,:] Yview_cplx
+
+        #TODO: all arguments must be of the same scalar type as self
+
+        X_1dim = False
+        d = X.shape[0]
+        if(X.ndim > 1):
+            X = np.asfortranarray(X)
+            n = X.shape[1]
+        else:
+            n = 1
+            X = X.reshape(d, 1)
+            X_1dim = True
+
+        if self._isReal:
+            cview = coeffs
+            Y = np.empty((X.shape[0], n), dtype='double', order='F')
+            Yview = Y
+            Xview = X
+        else:
+            cview_cplx = coeffs
+            Y = np.empty((X.shape[0], n), dtype=np.complex, order='F')
+            Yview_cplx = Y
+            Xview_cplx = X
+
+        if(self._isReal):
+            self.core_faust_dbl.mulPolyCoeffs(&Xview[0,0],
+                                              n,
+                                              &Yview[0,0],
+                                              &cview[0])
+        else:
+            self.core_faust_cplx.mulPolyCoeffs(&Xview_cplx[0,0],
+                                               n,
+                                               &Yview_cplx[0,0],
+                                               &cview_cplx[0])
+        if X_1dim:
+            # X is a vector, Y must be one too
+            Y = np.squeeze(Y)
+
+        return Y
+
     def polyNext(self):
         core = FaustCore(core=True)
         core._isReal = self._isReal

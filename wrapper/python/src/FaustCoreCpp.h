@@ -123,6 +123,7 @@ class FaustCoreCpp
     FaustCoreCpp<FPP,DEV>* clone() const;
     void polyCoeffs(int d, int n, const FPP* basisX, const FPP* coeffs, FPP* out) const;
     FaustCoreCpp<FPP,DEV>* polyCoeffs(const FPP* coeffs);
+    void mulPolyCoeffs(const FPP* X, int n, FPP* Y, const FPP* coeffs);
     FaustCoreCpp<FPP,DEV>* polyNext() const;
 	void device(char* dev) const;
     ~FaustCoreCpp();

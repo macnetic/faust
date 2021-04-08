@@ -137,7 +137,7 @@ def basis(L, K, basis_name, dev='cpu', T0=None, impl='native'):
         raise ValueError(basis_name+" is not a valid basis name")
 
 
-def poly(coeffs, basis='chebyshev', L=None, dev='cpu', impl='native'):
+def poly(coeffs, basis='chebyshev', L=None, X=None, dev='cpu', impl='native'):
     """
         Computes the linear combination of the polynomials defined by basis.
 
@@ -145,16 +145,22 @@ def poly(coeffs, basis='chebyshev', L=None, dev='cpu', impl='native'):
             coeffs: the linear combination coefficients (vector as a numpy.ndarray).
             basis: either the name of the polynomial basis to build on L or the
             basis if already built externally (as a FaustPoly or an equivalent
-            np.ndarray).
+            np.ndarray -- if X is not None, basis can only be a FaustPoly).
             L: the sparse scipy square matrix in CSR format
             (scipy.sparse.csr_matrix) on which the polynomial basis is built if basis is not already a Faust or a numpy.ndarray.
             L can aslo be a Faust if impl is "py". It can't be None if basis is not a FaustPoly or a numpy.ndarray.
+            X: (np.darray) if X is not None, the linear combination of basis@X
+            is computed (note that the memory space is optimized compared to
+            the manual way of doing first B = basis@X and then calling poly on
+            B with X at None).
             dev: the device to instantiate the returned Faust ('cpu' or 'gpu').
             'gpu' is not available yet for impl='native'.
             impl: 'native' (by default) for the C++ impl., "py" for the Python impl.
 
         Returns:
-            The linear combination Faust or np.ndarray depending on if basis is itself a Faust or a np.ndarray.
+            The linear combination Faust or np.ndarray depending on if basis is
+            itself a Faust or a np.ndarray. If X is set the result is always a
+            np.ndarray whatever is the basis type.
 
         Example:
             >>> import numpy as np
@@ -217,23 +223,32 @@ def poly(coeffs, basis='chebyshev', L=None, dev='cpu', impl='native'):
         d = F.shape[0]//(K+1)
     else:
         d = L.shape[0]
+    X_and_basis_an_array_error = ValueError("X must be none if basis is a np.ndarray. You"
+                                                     " can compute basis@X manually before calling"
+                                                     " poly.")
     if impl == 'py':
         if isFaust(F):
             Id = sp.eye(d, format="csr")
             scoeffs = sp.hstack(tuple(Id*coeffs[i] for i in range(0, K+1)),
                                 format="csr")
             Fc = Faust(scoeffs, dev=dev) @ F
+            if not isinstance(X, type(None)):
+                return Fc@X
             return Fc
         else:
            # F is a np.ndarray
+           if not isinstance(X, type(None)):
+                raise X_and_basis_an_array_error
            return _poly_arr_py(coeffs, F, d, dev=dev)
     elif impl == 'native':
         if isFaust(F):
-            Fc = _poly_Faust_cpp(coeffs, F)
-            if F.device != dev:
+            Fc = _poly_Faust_cpp(coeffs, F, X=X, dev=dev)
+            if isFaust(Fc) and F.device != dev:
                 Fc = Fc.clone(dev=dev)
             return Fc
         else:
+            if not isinstance(X, type(None)):
+                raise X_and_basis_an_array_error
             return _poly_arr_cpp(coeffs, F, d, dev='cpu')
     else:
         raise ValueError(impl+" is an unknown implementation.")
@@ -273,8 +288,14 @@ def _poly_arr_cpp(coeffs, basisX, d, dev='cpu'):
     Y = _FaustCorePy.polyCoeffs(d, basisX, coeffs)
     return Y
 
-def _poly_Faust_cpp(coeffs, basisFaust, dev='cpu'):
-    Y = Faust(core_obj=basisFaust.m_faust.polyCoeffs(coeffs))
+def _poly_Faust_cpp(coeffs, basisFaust, X=None, dev='cpu'):
+    Y = None # can't happen
+    if isinstance(X, type(None)):
+        Y = Faust(core_obj=basisFaust.m_faust.polyCoeffs(coeffs))
+    elif isinstance(X, np.ndarray):
+        Y = basisFaust.m_faust.mulPolyCoeffs(coeffs, X)
+    else:
+        raise TypeError("Y can't be something else than a Faust or np.ndarray")
     return Y
 
 
@@ -447,7 +468,7 @@ class FaustPoly(Faust):
         return next(self.gen)
 
 
-def expm_multiply(A, B, t, K=10, dev='cpu'):
+def expm_multiply(A, B, t, K=10, dev='cpu', **kwargs):
     """
     Computes an approximate of the action of the matrix exponential of A on B using series of Chebyshev polynomials.
 
@@ -494,13 +515,17 @@ def expm_multiply(A, B, t, K=10, dev='cpu'):
     # check A is PSD or at least square
     if A.shape[0] != A.shape[1]:
         raise ValueError('A must be symmetric positive definite.')
+    poly_meth = 1
+    if 'poly_meth' in kwargs:
+        poly_meth = kwargs['poly_meth']
+        if poly_meth not in [1, 2]:
+            raise ValueError('poly_meth must be 1 or 2')
     phi = eigsh(A, k=1, return_eigenvectors=False)[0] / 2
     T = basis(A/phi-seye(*A.shape), K, 'chebyshev', dev=dev)
-    TB = np.squeeze(T@B)
     if isinstance(t, float):
         t = list(t)
     m = B.shape[0]
-    if len(B.shape) == 1:
+    if B.ndim == 1:
         n = 1
     else:
         n = B.shape[1]
@@ -517,16 +542,23 @@ def expm_multiply(A, B, t, K=10, dev='cpu'):
         for j in range(K - 2, -1, -1):
             coeff[j] = coeff[j+2] - (2 * j + 2) / (-tau * phi) * coeff[j+1]
         coeff[0] /= 2
-        if n == 1:
-            Y[i,:,0] = poly(coeff, TB, dev=dev)
+        if poly_meth == 2:
+            TB = np.squeeze(T@B)
+            if n == 1:
+                Y[i,:,0] = np.squeeze(poly(coeff, TB, dev=dev))
+            else:
+                Y[i,:,:] = poly(coeff, TB, dev=dev)
         else:
-            Y[i,:,:] = poly(coeff, TB, dev=dev)
+            if n == 1:
+                Y[i,:,0] = np.squeeze(poly(coeff, T, X=B, dev=dev))
+            else:
+                Y[i,:,:] = poly(coeff, T, X=B, dev=dev)
     if B.ndim == 1:
         return np.squeeze(Y)
     else:
         return Y
 
-def invm_multiply(A, B, rel_err=1e-6, max_K=np.inf, dev='cpu'):
+def invm_multiply(A, B, rel_err=1e-6, max_K=np.inf, dev='cpu', **kwargs):
     """
     Computes an approximate of the action of the matrix inverse of A on B using Chebyshev polynomials.
 
@@ -559,6 +591,11 @@ def invm_multiply(A, B, rel_err=1e-6, max_K=np.inf, dev='cpu'):
         raise TypeError('A must be a csr_matrix')
     if A.shape[0] != A.shape[1]:
         raise ValueError('A must be symmetric positive definite.')
+    poly_meth = 1
+    if 'poly_meth' in kwargs:
+        poly_meth = kwargs['poly_meth']
+        if poly_meth not in [1, 2]:
+            raise ValueError('poly_meth must be 1 or 2')
     Id = seye(*A.shape)
     b = eigsh(A, 1, return_eigenvectors=False)[0]
     B_ = b*Id-A
@@ -577,8 +614,12 @@ def invm_multiply(A, B, rel_err=1e-6, max_K=np.inf, dev='cpu'):
     coeffs = array([ 2 / (m*sqrt(1-c**2)) * (-1)**k * g**(-k) for k in
                     range(0, K+1)])
     coeffs[0] /= 2
-    TB = T@B
-    A_inv_B = poly(coeffs, TB)
+
+    if poly_meth == 2:
+        TB = T@B
+        A_inv_B = poly(coeffs, TB)
+    else:
+        A_inv_B = poly(coeffs, T, X=B)
     return A_inv_B
 
 # experimental block end

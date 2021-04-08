@@ -155,6 +155,51 @@ namespace Faust
 			}
 		}
 
+	template<typename FPP>
+		void TransformHelperPoly<FPP>::multiplyPoly(const FPP* x, FPP* y, const FPP* coeffs)
+		{
+			int d = L->getNbRow();
+			uint K = this->size()-1;
+
+			memcpy(y, x, sizeof(FPP)*d);
+			Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>> y_(const_cast<FPP*>(y), d);
+			y_ *= coeffs[0];
+			if(K == 0)
+				return;
+			FPP* buf = new FPP[3*d]; // working buffer for v0, v1, v2
+			Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>> x_vec(const_cast<FPP*>(x), d);
+			Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>> v0(const_cast<FPP*>(buf), d);
+			Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>> v1(const_cast<FPP*>(buf+d), d);
+			Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>> v2(const_cast<FPP*>(buf+2*d), d);
+			memcpy(v0.data(), x, sizeof(FPP)*d);
+			v1 = L->mat * x_vec;
+			y_ += v1*coeffs[1];
+			if(K == 1)
+				return;
+			for(int i=2;i<=K;i++)
+			{
+				v2 = L->mat * v1 * 2 - v0;
+				y_ += v2*coeffs[i];
+				memcpy(v0.data(), v1.data(), sizeof(FPP)*d);
+				memcpy(v1.data(), v2.data(), sizeof(FPP)*d);
+			}
+		}
+
+	template<typename FPP>
+		void TransformHelperPoly<FPP>::multiplyPoly(const FPP* X, int n, FPP* Y, const FPP* coeffs)
+		{
+			int d = L->getNbRow();
+			uint K = this->size()-1;
+
+			#pragma omp parallel for
+			for(int i=0;i<n;i++)
+			{
+				auto x = X+i*d;
+				auto y = Y+d*i;
+				this->multiplyPoly(x, y, coeffs);
+			}
+		}
+
 	// Slower method but kept commented here until further tests
 	//	template<typename FPP>
 	//			MatDense<FPP, Cpu> TransformHelperPoly<FPP>::multiply(MatDense<FPP,Cpu> X, const bool transpose/*=false*/, const bool conjugate/*=false*/)
@@ -479,9 +524,9 @@ namespace Faust
 		{
 			auto K_plus_1 = K+1;
 			auto d_K_plus_1 = d*K_plus_1;
-			//			#pragma omp parallel for // most likely counterproductive to use OpenMP here, Eigen is already multithreading scalar product in the loop
 			Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>> vec_out(out, d, n);
 			Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>> vec_coeffs(const_cast<FPP*>(coeffs), K_plus_1);
+			//			#pragma omp parallel for // most likely counterproductive to use OpenMP here, Eigen is already multithreading scalar product in the loop
 			for(int i=0;i<n;i++)
 			{
 				Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>> mat_basisX(const_cast<FPP*>(basisX+d_K_plus_1*i), d, K_plus_1); //constcast is not dangerous, no modification is done later

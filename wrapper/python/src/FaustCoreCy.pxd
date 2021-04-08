@@ -116,6 +116,7 @@ cdef extern from "FaustCoreCpp.h":
         FaustCoreCpp[FPP]* clone()
         void polyCoeffs(int d, int n, const FPP* basisX, const FPP* coeffs, FPP* out) const
         FaustCoreCpp[FPP]* polyCoeffs(const FPP* coeffs) const
+        void mulPolyCoeffs(const FPP* X, int n, const FPP* Y, const FPP* coeffs)
         FaustCoreCpp[FPP]* polyNext() const
         @staticmethod
         FaustCoreCpp[FPP]* randFaust(int faust_nrows, int faust_ncols,
