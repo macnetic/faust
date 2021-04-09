@@ -72,8 +72,8 @@
 %======================================================================
 function LC = poly(coeffs, basis, varargin)
 	dev = 'cpu';
-	argc = length(varargin);
 	X = {}; % by default no X argument is passed, set it as a cell (see why in matfaust.Faust.poly)
+	argc = length(varargin);
 	if(argc > 0)
 		for i=1:2:argc
 			if(argc > i)
@@ -129,7 +129,7 @@ function LC = poly(coeffs, basis, varargin)
 		if(numfactors(basis) ~= numel(coeffs))
 			error('coeffs and basis dimensions must agree.')
 		end
-		LC = matfaust.Faust.poly(basis, coeffs, 0, X);
+		LC = matfaust.Faust.poly(basis, coeffs, X);
 		% LC is a Faust iff X is not set, otherwise it's a matrix
 	elseif(ismatrix(basis))
 		if(mod(size(basis, 1), K+1) ~= 0)
@@ -144,4 +144,4 @@ function LC = poly(coeffs, basis, varargin)
 		% LC is a matrix
 	end
 end
-%> experimental block end
+% experimental block end

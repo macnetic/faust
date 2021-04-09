@@ -542,6 +542,7 @@ def expm_multiply(A, B, t, K=10, dev='cpu', **kwargs):
         for j in range(K - 2, -1, -1):
             coeff[j] = coeff[j+2] - (2 * j + 2) / (-tau * phi) * coeff[j+1]
         coeff[0] /= 2
+        print("coeff:", coeff)
         if poly_meth == 2:
             TB = np.squeeze(T@B)
             if n == 1:
@@ -572,6 +573,9 @@ def invm_multiply(A, B, rel_err=1e-6, max_K=np.inf, dev='cpu', **kwargs):
         dev: (optional) 'cpu' or 'gpu',  selects the device to use (currently
         only 'cpu' is supported).
 
+    Returns:
+        The np.ndarray which is the action of matrix inverse  of A on B.
+
     Example:
 		>>> import numpy as np
 		>>> from scipy.sparse import random
@@ -582,7 +586,7 @@ def invm_multiply(A, B, rel_err=1e-6, max_K=np.inf, dev='cpu', **kwargs):
 		>>> B = np.random.rand(A.shape[1],2)
 		>>> A_inv_B = invm_multiply(A, B, rel_err=1e-2, max_K=2048)
 		>>> A_inv_B_ref = inv(A.toarray())@B
-        >>> norm("err:", A_inv_B-A_inv_B_ref)/norm(A_inv_B))
+        >>> print("err:", norm(A_inv_B-A_inv_B_ref)/norm(A_inv_B))
         err: 0.011045280586803805
 
     """
