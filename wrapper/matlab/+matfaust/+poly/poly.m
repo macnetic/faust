@@ -7,6 +7,7 @@
 %> @param coeffs the linear combination coefficients (vector).
 %> @param basis either the name of the polynomial basis to build on L or the basis if already built externally (as a Faust or an equivalent full array).
 %> @param 'L', matrix the sparse matrix on which the polynomial basis is built if basis is not already a Faust or a full array.
+%> @param 'X', matrix if X is set, the linear combination of basis*X is computed (note that the memory space is optimized compared to the manual way of doing first B = basis*X and then calling poly on B witout X set).
 %>
 %> @retval LC The linear combination Faust or full array depending on if basis is itself a Faust or a np.ndarray.
 %>
@@ -72,6 +73,7 @@
 function LC = poly(coeffs, basis, varargin)
 	dev = 'cpu';
 	argc = length(varargin);
+	X = {}; % by default no X argument is passed, set it as a cell (see why in matfaust.Faust.poly)
 	if(argc > 0)
 		for i=1:2:argc
 			if(argc > i)
@@ -80,8 +82,8 @@ function LC = poly(coeffs, basis, varargin)
 			end
 			switch(varargin{i})
 				case 'L'
-					if(argc == i || ~ ismatrix(tmparg))
-						error('L argument must be followed by a square matrix.')
+					if(argc == i || ~ ismatrix(tmparg) || ~ issparse(tmparg))
+						error('L argument must be followed by a square and sparse matrix.')
 					else
 						L = tmparg;
 					end
@@ -90,6 +92,12 @@ function LC = poly(coeffs, basis, varargin)
 						error('dev keyword argument is not followed by a valid value: cpu, gpu*.')
 					else
 						dev = tmparg;
+					end
+				case 'X'
+					if(argc == i || ~ ismatrix(tmparg) || issparse(tmparg))
+						error('X argument must be followed by a dense matrix.')
+					else
+						X = tmparg;
 					end
 				otherwise
 					if((isstr(varargin{i}) || ischar(varargin{i}))  && ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu'))
@@ -115,11 +123,18 @@ function LC = poly(coeffs, basis, varargin)
 		basis = matfaust.poly.basis(L, K, basis, 'dev', dev);
 	end
 
+
 	is_real = isreal(basis);
 	if(matfaust.isFaust(basis))
-		LC = matfaust.Faust.poly(basis, coeffs);
-		% LC is a Faust
+		if(numfactors(basis) ~= numel(coeffs))
+			error('coeffs and basis dimensions must agree.')
+		end
+		LC = matfaust.Faust.poly(basis, coeffs, 0, X);
+		% LC is a Faust iff X is not set, otherwise it's a matrix
 	elseif(ismatrix(basis))
+		if(mod(size(basis, 1), K+1) ~= 0)
+			error('coeffs and basis dimensions must agree.')
+		end
 		d = floor(size(basis,1) / (K+1));
 		if(is_real)
 			LC = mexPolyReal('polyMatrix', d, K, size(basis,2), coeffs, basis);

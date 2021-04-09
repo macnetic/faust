@@ -4,14 +4,12 @@
 /*  of the project : <http://faust.inria.fr>                                */
 /*                                                                          */
 /*                              License:                                    */
-/*  Copyright (2021):   Hakim HADJ-DJILANI,									*/
-/*  					Nicolas Bellot, Adrien Leman, Thomas Gautrais,      */
-/*                      Luc Le Magoarou, Remi Gribonval                     */
+/*  Copyright (2021):   Hakim HADJ-DJILANI,				    */
+/*                      Remi Gribonval                                      */
 /*                      INRIA Rennes, FRANCE                                */
-/*                      http://www.inria.fr/                                */
+/*                      https://www.inria.fr/                               */
 /*                                                                          */
-/*  The FAuST Toolbox is distributed under the terms of INRIA.              */
-/*																			*/
+/*  The FAuST Toolbox is distributed under the terms of 3-BSD licence.      */
 /*  This program is distributed in the hope that it will be useful, but     */
 /*  WITHOUT ANY WARRANTY; without even the implied warranty of              */
 /*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                    */
@@ -19,17 +17,10 @@
 /*  More information about license: http://faust.inria.fr                   */
 /*                                                                          */
 /*                             Contacts:                                    */
-/*      Nicolas Bellot  : nicolas.bellot@inria.fr                           */
-/*      Adrien Leman    : adrien.leman@inria.fr                             */
-/*      Thomas Gautrais : thomas.gautrais@inria.fr                          */
-/*      Luc Le Magoarou : luc.le-magoarou@inria.fr                          */
 /*      Remi Gribonval  : remi.gribonval@inria.fr                           */
+/*	Hakim Hadj-Djilani: hakim.hadj-djilani@inria.fr                     */
 /*                                                                          */
-/*                              References:                                 */
-/*  [1] Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse       */
-/*  approximations of matrices and applications", Journal of Selected       */
-/*  Topics in Signal Processing, 2016.                                      */
-/*  <https://hal.archives-ouvertes.fr/hal-01167948v1>                       */
+/*                              References: TODO                            */
 
 
 #include "mex.h"
@@ -102,7 +93,7 @@ void polyMatrix(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		int d = (int) mxGetScalar(prhs[1]);
 		int K = (int) mxGetScalar(prhs[2]);
 		int n = (int) mxGetScalar(prhs[3]);
-		Faust::MatDense<FPP, Cpu> out(d);
+		Faust::MatDense<FPP, Cpu> out(d, n);
 //		Faust::MatDense<FPP, Cpu> coeffs;
 //		Faust::MatDense<FPP, Cpu> basisX;
 		FPP *coeffs_ptr;
@@ -127,7 +118,7 @@ void polyFaust(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
 	Faust::MatDense<FPP, Cpu> coeffs;
 	if(nrhs < 3)
-		mexErrMsgTxt("mex polyFaust error: coeffs and basis argument are missing");
+		mexErrMsgTxt("mex polyFaust error: coeffs and/or basis argument are missing");
 	auto core_ptr = convertMat2Ptr<TransformHelper<FPP,Cpu>>(prhs[2]);
 	auto transform_poly = dynamic_cast<TransformHelperPoly<FPP>*>(core_ptr);
 	if(nullptr)
@@ -143,6 +134,32 @@ void polyFaust(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	auto coeffsFaust = transform_poly->polyFaust(coeffs.getData());
 
 	plhs[0] = convertPtr2Mat<Faust::TransformHelper<FPP, Cpu> >(coeffsFaust);
+}
+
+void mulPolyFaust(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+{
+	Faust::MatDense<FPP, Cpu> coeffs, X;
+	if(nrhs < 4)
+		mexErrMsgTxt("mex mulPolyFaust error: basis, coeffs and X arguments must be set.");
+	auto core_ptr = convertMat2Ptr<TransformHelper<FPP,Cpu>>(prhs[2]);
+	auto transform_poly = dynamic_cast<TransformHelperPoly<FPP>*>(core_ptr);
+	if(nullptr)
+		mexErrMsgTxt("polyFaust can only be used on a poly. specialized Faust.");
+
+	if (mxIsSparse(prhs[1]))
+	{
+		mexErrMsgTxt("coeffs matrix must be dense not sparse");
+	}
+
+	// coeffs is assumed to be in the good size
+	mxArray2FaustMat(prhs[1], coeffs);
+	// X is assumed to be in the good size too
+	mxArray2FaustMat(prhs[3], X);
+	int n = X.getNbCol();
+	Faust::MatDense<FPP, Cpu> Y(X.getNbRow(), X.getNbCol());
+	transform_poly->multiplyPoly(X.getData(), n, Y.getData(), coeffs.getData());
+
+	plhs[0] = FaustMat2mxArray(Y);
 }
 
 void nextPolyFaust(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
@@ -173,6 +190,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	else if(!strcmp("polyFaust", func))
 	{
 		polyFaust(nlhs, plhs, nrhs, prhs);
+	}
+	else if(!strcmp("mulPolyFaust", func))
+	{
+		mulPolyFaust(nlhs, plhs, nrhs, prhs);
 	}
 	else if(!strcmp("chebyshev", func))
 	{

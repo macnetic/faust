@@ -332,6 +332,8 @@ namespace Faust
 			//            Id = sp.eye(L.shape[1], format="csr")
 			//				            scoeffs = sp.hstack(tuple(Id*coeffs[i] for i in range(0, K+1)),
 			//									                                format="csr")
+			auto this_ = const_cast<TransformHelperPoly<FPP>*>(this);
+			this_->basisChebyshev_fact_all();
 			std::vector<MatGeneric<FPP,Cpu>*> facts(this->size()+1);
 			MatSparse<FPP,Cpu> Id, Id1;
 			MatSparse<FPP,Cpu> coeffDiags, tmp;
@@ -356,10 +358,13 @@ namespace Faust
 			facts[0] = fac0;
 			for(int i=1;i <= this->size();i++)
 				facts[i] = this->get_gen_fact_nonconst(i-1);
-			return new TransformHelper<FPP,Cpu>(facts, (FPP) 1.0,
+			auto ret = new TransformHelper<FPP,Cpu>(facts, (FPP) 1.0,
 					/* optimizedCopy */ false,
 					/* cloning_fact */ false,
 					/* internal_call */ true);
+			if(this_->laziness == INSTANTIATE_COMPUTE_AND_FREE)
+				this_->basisChebyshev_free_fact_all();
+			return ret;
 		}
 
 	template<typename FPP>
@@ -788,7 +793,7 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		string TransformHelperPoly<FPP>::to_string() const
+		std::string TransformHelperPoly<FPP>::to_string() const
 		{
 
 			stringstream str;

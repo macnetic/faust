@@ -2069,13 +2069,28 @@ classdef Faust
 		%===
 		%>
 		%================================================================
-		function M = poly(self, coeffs)
-			if(self.isreal)
-				core_obj = mexPolyReal('polyFaust', coeffs, self.matrix.objectHandle);
-			else
-				core_obj = mexPolyCplx('polyFaust', coeffs, self.matrix.objectHandle);
+		function M = poly(self, coeffs, X)
+			if(iscell(X))
+				% X is {}: no X passed (see matfaust.poly.poly())
+				if(self.isreal)
+					core_obj = mexPolyReal('polyFaust', coeffs, self.matrix.objectHandle);
+				else
+					core_obj = mexPolyCplx('polyFaust', coeffs, self.matrix.objectHandle);
+				end
+				M = matfaust.Faust(core_obj, self.isreal);
+			elseif(ismatrix(X))
+				if(issparse(X))
+					error('X must be a dense matrix')
+				end
+				if(size(X, 1) ~= size(self,2))
+					error('The faust and X dimensions must agree.')
+				end
+				if(self.isreal)
+					M = mexPolyReal('mulPolyFaust', coeffs, self.matrix.objectHandle, X);
+				else
+					M = mexPolyCplx('mulPolyFaust', coeffs, self.matrix.objectHandle, X);
+				end
 			end
-			M = matfaust.Faust(core_obj, self.isreal);
 		end
 
 	end
