@@ -9,6 +9,7 @@
 %> @param 'max_K', int (optional): the maximum degree of Chebyshev polynomial to use (useful to limit memory consumption).
 %> @param 'dev', str (optional) 'cpu' or 'gpu', selects the device to use (currently only 'cpu' is supported).
 %>
+%> @retval AinvB the array which is the approximate action of matrix inverse  of A on B.
 %>
 %> @b Example
 %> @code

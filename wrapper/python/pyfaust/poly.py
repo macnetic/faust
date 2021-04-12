@@ -482,8 +482,8 @@ def expm_multiply(A, B, t, K=10, dev='cpu', **kwargs):
     Args:
         A: the operator whose exponential is of interest (must be a
         symmetric positive definite csr_matrix).
-        B: the matrix or vector to be multiplied by the matrix exponential of A (ndarray).
-        t: (list or float) the time points.
+        B: (ndarray) the matrix or vector to be multiplied by the matrix exponential of A.
+        t: (list) the time points.
         dev: (str, optional) the device ('cpu' or 'gpu') on which to compute (currently only cpu is supported).
         K: the greatest polynomial degree of the Chebyshev polynomial basis.
         The greater it is, the better is the approximate accuracy but note that
@@ -574,7 +574,7 @@ def invm_multiply(A, B, rel_err=1e-6, max_K=np.inf, dev='cpu', **kwargs):
         only 'cpu' is supported).
 
     Returns:
-        The np.ndarray which is the action of matrix inverse  of A on B.
+        The np.ndarray which is the approximate action of matrix inverse  of A on B.
 
     Example:
 		>>> import numpy as np
