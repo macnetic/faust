@@ -17,7 +17,7 @@ namespace Faust
 	};
 
 	template<typename FPP>
-		TransformHelper<FPP, Cpu>* basisChebyshev(MatSparse<FPP,Cpu>* L, int32_t K, MatSparse<FPP, Cpu>* T0=nullptr, BasisLaziness lazy_instantiation=INSTANTIATE_ONCE_AND_FOR_ALL);
+		TransformHelper<FPP, Cpu>* basisChebyshev(MatSparse<FPP,Cpu>* L, int32_t K, MatSparse<FPP, Cpu>* T0=nullptr, bool on_gpu=false, BasisLaziness lazy_instantiation=INSTANTIATE_ONCE_AND_FOR_ALL);
 
 	template<typename FPP>
 		void poly(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP* out);
@@ -38,13 +38,15 @@ namespace Faust
 			std::vector<bool> is_fact_created;
 			BasisLaziness laziness;
 			bool T0_is_arbitrary;
+			bool mul_and_combi_lin_on_gpu;
 
 			// ctor is private on purpose (callees must call basisChebyshev() to instantiate an object
 			TransformHelperPoly(uint K,
 					MatSparse<FPP, Cpu> *L,
 					MatSparse<FPP, Cpu> *rR=nullptr,
 					MatSparse<FPP, Cpu> *T0=nullptr,
-					BasisLaziness laziness=INSTANTIATE_COMPUTE_AND_FREE);
+					BasisLaziness laziness=INSTANTIATE_COMPUTE_AND_FREE,
+					bool on_gpu=false);
 
 			TransformHelperPoly(uint K, const TransformHelperPoly<FPP>& src);
 
@@ -109,6 +111,8 @@ namespace Faust
 			Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> &x, const bool transpose=false, const bool conjugate=false);
 			Vect<FPP,Cpu> multiply(const FPP* x, const bool transpose=false, const bool conjugate=false);
 			void multiply(const FPP* x, FPP* y, const bool transpose=false, const bool conjugate=false);
+			void multiply_cpu(const FPP* x, FPP* y, const bool transpose=false, const bool conjugate=false);
+			void multiply_gpu(const FPP* x, FPP* y, const bool transpose=false, const bool conjugate=false);
 			MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> &X, const bool transpose=false, const bool conjugate=false);
 			void multiply(const FPP* X, int n, FPP* out, const bool transpose=false, const bool conjugate=false);
 			TransformHelper<FPP, Cpu>* next(uint K);
@@ -148,7 +152,7 @@ namespace Faust
 			void create_rR(const MatSparse<FPP,Cpu>* L);
 
 			~TransformHelperPoly();
-			friend TransformHelper<FPP,Cpu>* basisChebyshev<>(MatSparse<FPP,Cpu>* L, int32_t K, MatSparse<FPP, Cpu>* T0, BasisLaziness lazy_instantiation);
+			friend TransformHelper<FPP,Cpu>* basisChebyshev<>(MatSparse<FPP,Cpu>* L, int32_t K, MatSparse<FPP, Cpu>* T0, bool on_gpu, BasisLaziness lazy_instantiation);
 		};
 
 

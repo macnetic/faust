@@ -9,7 +9,8 @@ namespace Faust
 				MatSparse<FPP, Cpu>* L,
 				MatSparse<FPP, Cpu>* rR /* = nullptr*/,
 				MatSparse<FPP,Cpu> *T0 /*= nullptr*/,
-				BasisLaziness laziness /*= INSTANTIATE_COMPUTE_AND_FREE */) : TransformHelper<FPP,Cpu>()
+				BasisLaziness laziness /*= INSTANTIATE_COMPUTE_AND_FREE */,
+				bool on_gpu /*= false*/) : TransformHelper<FPP,Cpu>()
 	{
 		// assuming L is symmetric
 		this->L = L;
@@ -39,6 +40,7 @@ namespace Faust
 		if(laziness == NOT_LAZY)
 			this->basisChebyshev_all();
 
+		this->mul_and_combi_lin_on_gpu = on_gpu;
 	}
 
 	template<typename FPP>
@@ -120,7 +122,7 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		void TransformHelperPoly<FPP>::multiply(const FPP* x, FPP* y, const bool transpose/*=false*/, const bool conjugate/*=false*/)
+		void TransformHelperPoly<FPP>::multiply_cpu(const FPP* x, FPP* y, const bool transpose/*=false*/, const bool conjugate/*=false*/)
 		{
 			/**
 			 * Recurrence relation (k=1 to K):
@@ -142,7 +144,7 @@ namespace Faust
 			if(K == 0)
 				return;
 			Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>> x_vec(const_cast<FPP*>(x), d);
-			Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>>v2(const_cast<FPP*>(y+d), d);
+			Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>> v2(const_cast<FPP*>(y+d), d);
 			v2 = L->mat*x_vec;
 			if(K == 1) // not necessary but clearer
 				return;
@@ -152,6 +154,57 @@ namespace Faust
 				Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>>v2_(const_cast<FPP*>(y+d*(i-2)), d);
 				Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>>v1_(const_cast<FPP*>(y+d*(i-3)), d);
 				new_v2_ = L->mat*v2_*2-v1_;
+
+			}
+		}
+
+	template<typename FPP>
+		void TransformHelperPoly<FPP>::multiply_gpu(const FPP* x, FPP* y, const bool transpose/*=false*/, const bool conjugate/*=false*/)
+		{
+#ifdef USE_GPU_MOD
+			int d = L->getNbRow();
+			uint K = this->size()-1;
+			Vect<FPP, GPU2> gpu_v1(d, x);
+			Vect<FPP, GPU2> gpu_v2(gpu_v1);
+			Vect<FPP, GPU2> gpu_new_v2(d);
+			const MatSparse<FPP, GPU2> gpu_L(*this->L);
+			MatSparse<FPP, GPU2> gpu_twoL(gpu_L);
+			gpu_twoL *= 2;
+			memcpy(y, x, sizeof(FPP)*d);
+			if(K == 0)
+				return;
+			Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>> v2(const_cast<FPP*>(y+d), d);
+			//			gpu_v2 == x
+			gpu_v2.multiplyLeft(gpu_L);
+			gpu_v2.tocpu(y+d); //			v2 = L->mat*x_vec;
+			if(K == 1) // not necessary but clearer
+				return;
+			for(int i=3;i<=K+1;i++)
+			{
+				Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>>new_v2_cpu(const_cast<FPP*>(y+d*(i-1)), d);
+				gpu_new_v2 = gpu_v2;
+				gpu_new_v2.multiplyLeft(const_cast<const MatSparse<FPP,GPU2>&>(gpu_twoL));
+				gpu_new_v2 -= gpu_v1; // new_v2_ = L->mat*v2_*2-v1_;
+				// prepare next it
+				gpu_v1 = gpu_v2;
+				gpu_v2 = gpu_new_v2;
+				gpu_new_v2.tocpu(new_v2_cpu.data());
+			}
+#else
+			throw std::runtime_error("USE_GPU_MOD option must be enabled at compiling time to use this function (TransformHelperPoly<FPP>::multiply_gpu).");
+#endif
+		}
+
+	template<typename FPP>
+		void TransformHelperPoly<FPP>::multiply(const FPP* x, FPP* y, const bool transpose/*=false*/, const bool conjugate/*=false*/)
+		{
+			if(this->mul_and_combi_lin_on_gpu)
+			{
+				multiply_gpu(x, y, transpose, conjugate);
+			}
+			else
+			{
+				multiply_cpu(x, y, transpose, conjugate);
 			}
 		}
 
@@ -254,7 +307,7 @@ namespace Faust
 			int d = L->getNbRow();
 			uint K = this->size()-1;
 			auto scale = (K+1)*d;
-#pragma omp parallel for
+			#pragma omp parallel for
 			for(int i=0;i<n;i++)
 			{
 				//				Vect<FPP,Cpu> x(d, X.getData()+i*d);
@@ -278,7 +331,7 @@ namespace Faust
 				if(std::find(std::begin(col_ids), std::end(col_ids), id) == std::end(col_ids))
 					col_ids.push_back(id);
 			}
-#pragma omp parallel for
+			#pragma omp parallel for
 			for(auto i=col_ids.begin(); i < col_ids.end();i++)
 			{
 				auto id = *i;
@@ -511,7 +564,7 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>* basisChebyshev(MatSparse<FPP,Cpu>* L, int32_t K, MatSparse<FPP, Cpu>* T0/*=nullptr*/, BasisLaziness lazy_instantiation/*=INSTANTIATE_COMPUTE_AND_FREE*/)
+		TransformHelper<FPP,Cpu>* basisChebyshev(MatSparse<FPP,Cpu>* L, int32_t K, MatSparse<FPP, Cpu>* T0/*=nullptr*/, bool on_gpu/*=false*/, BasisLaziness lazy_instantiation/*=INSTANTIATE_COMPUTE_AND_FREE*/)
 		{
 			// assuming L is symmetric
 			auto basisP = new TransformHelperPoly<FPP>(
@@ -519,7 +572,8 @@ namespace Faust
 					new MatSparse<FPP, Cpu>(*L),
 					nullptr /* rR initialized by the ctor */,
 					T0,
-					lazy_instantiation);
+					lazy_instantiation,
+					on_gpu);
 
 			return basisP;
 		}
@@ -803,7 +857,10 @@ namespace Faust
 			str <<", density "<< density << ", nnz_sum "<<this->get_total_nnz() << ", " << this->size() << " factor(s): "<< std::endl;
 			for (int i=0 ; i<this->size() ; i++)
 			{
-				str << "- FACTOR " << i;
+				str << "- ";
+				if(this->mul_and_combi_lin_on_gpu)
+					str << "GPU ";
+				str << "FACTOR " << i;
 				density = (double) this->get_fact_nnz(i) / this->get_fact_nb_rows(i) / this->get_fact_nb_cols(i);
 				str << Faust::MatGeneric<FPP,Cpu>::to_string(this->get_fact_nb_rows(i), this->get_fact_nb_cols(i), this->is_transposed, density, this->get_fact_nnz(i), /* is_identity */ i == this->size()-1, Sparse);
 			}
