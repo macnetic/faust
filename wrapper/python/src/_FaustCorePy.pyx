@@ -258,7 +258,7 @@ cdef class FaustCore:
         return core
 
     @staticmethod
-    def polyBasis(L, K, T0=None):
+    def polyBasis(L, K, T0=None, on_gpu=False):
         cdef int[:] colind_view, rowptr_view
         cdef double[:] dbl_vals_view
         cdef complex[:] cplx_vals_view
@@ -287,9 +287,10 @@ cdef class FaustCore:
                 FaustCoreCy.FaustCoreCpp[complex].polyBasis(L.shape[0], L.shape[1],
                                                            &rowptr_view[0],
                                                            &colind_view[0],
-                                                           &cplx_vals_view[0],
-                                                           L.nnz,
-                                                           K)
+                                                            &cplx_vals_view[0],
+                                                            L.nnz,
+                                                            K,
+                                                            on_gpu)
             else:
                 core.core_faust_cplx = \
                         FaustCoreCy.FaustCoreCpp[complex].polyBasis_ext(L.shape[0], L.shape[1],
@@ -302,7 +303,8 @@ cdef class FaustCore:
                                                                     &T0_colind_view[0],
                                                                     &T0_cplx_vals_view[0],
                                                                     T0.nnz,
-                                                                    T0.shape[1])
+                                                                    T0.shape[1],
+                                                                    on_gpu)
             core._isReal = False
         else:
             dbl_vals_view = L.data
@@ -313,7 +315,8 @@ cdef class FaustCore:
                                                                    &colind_view[0],
                                                                    &dbl_vals_view[0],
                                                                    L.nnz,
-                                                                   K)
+                                                                   K,
+                                                                   on_gpu)
             else:
                 core.core_faust_dbl = \
                         FaustCoreCy.FaustCoreCpp[double].polyBasis_ext(L.shape[0], L.shape[1],
@@ -326,7 +329,8 @@ cdef class FaustCore:
                                                                    &T0_colind_view[0],
                                                                    &T0_dbl_vals_view[0],
                                                                    T0.nnz,
-                                                                   T0.shape[1])
+                                                                   T0.shape[1],
+                                                                   on_gpu)
             core._isReal = True
         return core
 

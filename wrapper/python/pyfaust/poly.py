@@ -60,7 +60,8 @@ def Chebyshev(L, K, dev='cpu', T0=None, impl='native'):
         else:
             return _chebyshev(L, K, T0, T1, rR, dev)
     elif impl == 'native':
-        F = FaustPoly(core_obj=_FaustCorePy.FaustCore.polyBasis(L, K, T0),
+        F = FaustPoly(core_obj=_FaustCorePy.FaustCore.polyBasis(L, K, T0,
+                                                                dev.startswith('gpu')),
                       impl='native')
         return F
     else:

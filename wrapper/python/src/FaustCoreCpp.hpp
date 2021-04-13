@@ -662,10 +662,11 @@ FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::polyBasis(
         int* L_colind,
         FPP* L_vals,
         unsigned int L_nnz,
-        unsigned int K)
+        unsigned int K,
+        bool on_gpu)
 {
     Faust::MatSparse<FPP, DEV> L(L_nnz, L_nrows, L_ncols, L_vals, L_rowptr, L_colind);
-    Faust::TransformHelper<FPP,DEV>* th = Faust::basisChebyshev(&L, K);
+    Faust::TransformHelper<FPP,DEV>* th = Faust::basisChebyshev(&L, K, static_cast<Faust::MatSparse<FPP,Cpu>*>(nullptr), on_gpu);
     if(!th) return NULL;
     FaustCoreCpp<FPP,DEV>* core = new FaustCoreCpp<FPP,DEV>(th);
     return core;
@@ -683,11 +684,12 @@ FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::polyBasis_ext(
         int* T0_colind,
         FPP* T0_vals,
         unsigned int T0_nnz,
-        unsigned int T0_ncols)
+        unsigned int T0_ncols,
+        bool on_gpu)
 {
     Faust::MatSparse<FPP, DEV> L(L_nnz, L_nrows, L_ncols, L_vals, L_rowptr, L_colind);
     Faust::MatSparse<FPP, DEV> T0(T0_nnz, L_nrows, T0_ncols, T0_vals, T0_rowptr, T0_colind);
-    Faust::TransformHelper<FPP,DEV>* th = Faust::basisChebyshev(&L, K, &T0);
+    Faust::TransformHelper<FPP,DEV>* th = Faust::basisChebyshev(&L, K, &T0, on_gpu);
     if(!th) return NULL;
     FaustCoreCpp<FPP,DEV>* core = new FaustCoreCpp<FPP,DEV>(th);
     return core;

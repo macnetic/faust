@@ -146,7 +146,8 @@ class FaustCoreCpp
             int* L_colind,
             FPP* L_vals,
             unsigned int L_nnz,
-            unsigned int K);
+            unsigned int K,
+            bool on_gpu);
     static FaustCoreCpp<FPP,DEV>* polyBasis_ext(
             unsigned int L_nrows, unsigned int L_ncols,
             int* L_rowptr,
@@ -158,7 +159,8 @@ class FaustCoreCpp
             int* T0_colind,
             FPP* T0_vals,
             unsigned int T0_nnz,
-            unsigned int T0_ncols);
+            unsigned int T0_ncols,
+            bool on_gpu);
 
 
     protected :
