@@ -153,7 +153,6 @@ def poly(coeffs, basis='chebyshev', L=None, X=None, dev='cpu', impl='native'):
             the manual way of doing first B = basis@X and then calling poly on
             B with X at None).
             dev: the device to instantiate the returned Faust ('cpu' or 'gpu').
-            'gpu' is not available yet for impl='native'.
             impl: 'native' (by default) for the C++ impl., "py" for the Python impl.
 
         Returns:
