@@ -92,6 +92,7 @@ namespace Faust
 				std::string to_string(const bool transpose=false, const bool displaying_small_mat_elts=false) const;
 				MatType getType() const;
 				void multiply(Vect<FPP,GPU2>& vec, char opThis='N') const;
+				void multiply(MatDense<FPP,GPU2>& vec, char opThis='N') const;
 				~MatSparse();
 
 			MatSparse<FPP,GPU2>* get_rows(faust_unsigned_int row_id_start, faust_unsigned_int num_rows) const;

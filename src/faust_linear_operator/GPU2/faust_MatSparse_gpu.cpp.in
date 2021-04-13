@@ -487,6 +487,18 @@ namespace Faust
 		}
 
 	template<>
+		void MatSparse<FSFG, GPU2>::multiply(MatDense<FSFG,GPU2>& mat, char opThis/*='N'*/) const
+		{
+			gm_Op gop_this;
+			char2gm_Op(opThis, gop_this);
+			auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			auto gpu_dmat = spm_funcs->mul_gpu_dsm_ext(gpu_mat, mat.gpu_mat, nullptr, gop_this, OP_NOTRANSP);
+			dsm_funcs->free(mat.gpu_mat);
+			mat.gpu_mat = gpu_dmat;
+		}
+
+	template<>
 		size_t Faust::MatSparse<FSFG,GPU2>::getNBytes() const
 		{
 			return this->getNonZeros()*(sizeof(FSFG)+sizeof(int))+(this->getNbRow()+1)*sizeof(int);

@@ -79,6 +79,7 @@ namespace Faust
 				void multiplyRight(const MatDense<FPP, GPU2>& A);
 				//! \brief Replace (this) by S * (this)
 				void multiplyLeft(const MatSparse<FPP, Cpu>& S, const char transS='N');
+				void multiplyLeft(const MatSparse<FPP, GPU2>& S, const char transS='N');
 				void multiply(const Vect<FPP, GPU2>& vec, Vect<FPP, GPU2>& out_vec) const;
 				//! \brief compute MatDense-vector multiplication
 				//! \param vec : the vector

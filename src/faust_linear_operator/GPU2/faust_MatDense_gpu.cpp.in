@@ -481,6 +481,12 @@ namespace Faust
 			}
 		}
 
+		template<>
+		void Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::multiplyLeft(MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2> const& S, const char transS)
+		{
+			S.multiply(*this);
+		}
+
 	template<>
 		void Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::operator=(const MatDense<@FAUST_SCALAR_FOR_GM@, Cpu>& A)
 		{
