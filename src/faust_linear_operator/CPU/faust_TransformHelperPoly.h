@@ -115,6 +115,8 @@ namespace Faust
 			void multiply_gpu(const FPP* x, FPP* y, const bool transpose=false, const bool conjugate=false);
 			MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> &X, const bool transpose=false, const bool conjugate=false);
 			void multiply(const FPP* X, int n, FPP* out, const bool transpose=false, const bool conjugate=false);
+			void multiply_cpu(const FPP* X, int n, FPP* out, const bool transpose=false, const bool conjugate=false);
+			void multiply_gpu(const FPP* X, int n, FPP* out, const bool transpose=false, const bool conjugate=false);
 			TransformHelper<FPP, Cpu>* next(uint K);
 			TransformHelper<FPP, Cpu>* next();
 			Vect<FPP, Cpu> poly(MatDense<FPP,Cpu> & basisX, Vect<FPP, Cpu> coeffs);

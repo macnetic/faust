@@ -173,7 +173,6 @@ namespace Faust
 			memcpy(y, x, sizeof(FPP)*d);
 			if(K == 0)
 				return;
-			Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>> v2(const_cast<FPP*>(y+d), d);
 			//			gpu_v2 == x
 			gpu_v2.multiplyLeft(gpu_L);
 			gpu_v2.tocpu(y+d); //			v2 = L->mat*x_vec;
@@ -304,6 +303,19 @@ namespace Faust
 	template<typename FPP>
 		void TransformHelperPoly<FPP>::multiply(const FPP* X, int n, FPP* Y, const bool transpose/*=false*/, const bool conjugate/*=false*/)
 		{
+			if(this->mul_and_combi_lin_on_gpu)
+			{
+				multiply_gpu(X, n, Y, transpose, conjugate);
+			}
+			else
+			{
+				multiply_cpu(X, n, Y, transpose, conjugate);
+			}
+		}
+
+	template<typename FPP>
+		void TransformHelperPoly<FPP>::multiply_cpu(const FPP* X, int n, FPP* Y, const bool transpose/*=false*/, const bool conjugate/*=false*/)
+		{
 			int d = L->getNbRow();
 			uint K = this->size()-1;
 			auto scale = (K+1)*d;
@@ -317,6 +329,53 @@ namespace Faust
 				Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>> y_vec(const_cast<FPP*>(Y+i*scale), scale);
 				multiply(x_vec.data(), y_vec.data(), transpose, conjugate);
 			}
+		}
+
+	template<typename FPP>
+		void TransformHelperPoly<FPP>::multiply_gpu(const FPP* X, int n, FPP* Y, const bool transpose/*=false*/, const bool conjugate/*=false*/)
+		{
+#ifdef USE_GPU_MOD
+			int d = L->getNbRow();
+			uint K = this->size()-1;
+			MatDense<FPP, GPU2> gpu_V1(d, n, X);
+			MatDense<FPP, GPU2> gpu_V2(gpu_V1);
+			MatDense<FPP, GPU2> gpu_new_V2(d, n);
+			MatDense<FPP, Cpu> tmp_cpu_V2(d, n);
+			const MatSparse<FPP, GPU2> gpu_L(*this->L);
+			MatSparse<FPP, GPU2> gpu_twoL(gpu_L);
+			gpu_twoL *= 2;
+			auto block_to_cpu = [&Y, &d, &n, &K, &tmp_cpu_V2](int i, const FPP* X_)
+			{
+				#pragma omp parallel for
+				for(int j=0;j<n;j++)
+				{
+					memcpy(Y+(K+1)*d*j+d*i, X_+j*d, sizeof(FPP)*d);
+				}
+			};
+			block_to_cpu(0, X);
+			if(K == 0)
+				return;
+			//			gpu_V2 == X
+			gpu_V2.multiplyLeft(gpu_L);
+			gpu_V2.Display();
+			gpu_V2.tocpu(tmp_cpu_V2); //			v2 = L->mat*x_vec;
+			block_to_cpu(1, tmp_cpu_V2.getData());
+			if(K == 1) // not necessary but clearer
+				return;
+			for(int i=3;i<=K+1;i++)
+			{
+				gpu_new_V2 = gpu_V2;
+				gpu_new_V2.multiplyLeft(const_cast<const MatSparse<FPP,GPU2>&>(gpu_twoL));
+				gpu_new_V2 -= gpu_V1; // new_v2_ = L->mat*v2_*2-v1_;
+				// prepare next it
+				gpu_V1 = gpu_V2;
+				gpu_V2 = gpu_new_V2;
+				gpu_new_V2.tocpu(tmp_cpu_V2);
+				block_to_cpu(i-1, tmp_cpu_V2.getData());
+			}
+#else
+			throw std::runtime_error("USE_GPU_MOD option must be enabled at compiling time to use this function (TransformHelperPoly<FPP>::multiply_gpu).");
+#endif
 		}
 
 	template<typename FPP>

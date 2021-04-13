@@ -27,7 +27,6 @@ def Chebyshev(L, K, dev='cpu', T0=None, impl='native'):
            L can aslo be a Faust if impl is "py".
         K: the degree of the last polynomial, i.e. the K+1 first polynomials are built.
         dev (optional): the device to instantiate the returned Faust ('cpu' or 'gpu').
-        'gpu' is not available yet for impl='native'.
         T0 (optional): to define the 0-degree polynomial as something else than the identity.
         impl (optional): 'native' (by default) for the C++ impl., "py" for the Python impl.
 
@@ -79,7 +78,6 @@ def basis(L, K, basis_name, dev='cpu', T0=None, impl='native'):
         K: the degree of the last polynomial, i.e. the K+1 first polynomials are built.
         basis_name: 'chebyshev', and others yet to come.
         dev (optional): the device to instantiate the returned Faust ('cpu' or 'gpu').
-        'gpu' is not available yet for impl='native'.
         T0 (optional): a sparse matrix to replace the identity as a 0-degree polynomial of the basis.
         impl (optional): 'native' (by default) for the C++ impl., "py" for the Python impl.
 
