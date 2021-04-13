@@ -40,7 +40,8 @@
 from libcpp cimport bool, complex
 
 cdef extern from "FaustCoreCpp.h":
-    void polyCoeffs[FPP](int d, int K, int n, const FPP* basisX, const FPP* coeffs, FPP* out)
+    void polyCoeffs[FPP](int d, int K, int n, const FPP* basisX, const FPP*
+                         coeffs, FPP* out, bool on_gpu)
     cdef cppclass FaustCoreCpp[FPP]:
         FaustCoreCpp()
         void Display() const

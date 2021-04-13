@@ -121,7 +121,7 @@ class FaustCoreCpp
     FaustCoreCpp<FPP,DEV>* adjoint()const;
     FaustCoreCpp<FPP,DEV>* zpruneout(const int nnz_tres, const int npasses, const bool only_forward);
     FaustCoreCpp<FPP,DEV>* clone() const;
-    void polyCoeffs(int d, int n, const FPP* basisX, const FPP* coeffs, FPP* out) const;
+    void polyCoeffs(int d, int n, const FPP* basisX, const FPP* coeffs, FPP* out, bool on_gpu) const;
     FaustCoreCpp<FPP,DEV>* polyCoeffs(const FPP* coeffs);
     void mulPolyCoeffs(const FPP* X, int n, FPP* Y, const FPP* coeffs);
     FaustCoreCpp<FPP,DEV>* polyNext() const;
@@ -168,7 +168,7 @@ class FaustCoreCpp
 };
 
 template<typename FPP>
-void polyCoeffs(int d, int K, int n, const FPP* basisX, const FPP* coeffs, FPP* out);
+void polyCoeffs(int d, int K, int n, const FPP* basisX, const FPP* coeffs, FPP* out, bool on_gpu);
 
 #ifdef USE_GPU_MOD
 template<typename FPP>

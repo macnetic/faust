@@ -420,7 +420,7 @@ namespace Faust
 		void TransformHelperPoly<FPP>::poly(int d, int n, const FPP* basisX, const FPP* coeffs, FPP* out)
 		{
 			uint K = this->size()-1;
-			Faust::poly(d, K, n, basisX, coeffs, out);
+			Faust::poly(d, K, n, basisX, coeffs, out, this->mul_and_combi_lin_on_gpu);
 		}
 
 	template<typename FPP>
@@ -638,7 +638,16 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		void poly(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP* out)
+		void poly(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP* out, bool on_gpu/*=on_gpu*/)
+		{
+			if(on_gpu)
+				poly_gpu(d, K, n, basisX, coeffs, out);
+			else // cpu
+				poly_cpu(d, K, n, basisX, coeffs, out);
+		}
+
+	template<typename FPP>
+		void poly_cpu(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP* out)
 		{
 			auto K_plus_1 = K+1;
 			auto d_K_plus_1 = d*K_plus_1;
@@ -649,6 +658,21 @@ namespace Faust
 			{
 				Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>> mat_basisX(const_cast<FPP*>(basisX+d_K_plus_1*i), d, K_plus_1); //constcast is not dangerous, no modification is done later
 				vec_out.block(0,i,d,1) = mat_basisX*vec_coeffs;
+			}
+		}
+
+	template<typename FPP>
+		void poly_gpu(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP* out)
+		{
+			auto K_plus_1 = K+1;
+			auto d_K_plus_1 = d*K_plus_1;
+			Vect<FPP, GPU2> gpu_vec_coeffs(K_plus_1, coeffs);
+			Vect<FPP, GPU2> gpu_dsize_vec(d);
+			for(int i=0;i<n;i++)
+			{
+				MatDense<FPP,GPU2> gpu_mat_basis(d, K_plus_1, basisX+d_K_plus_1*i);
+				gpu_mat_basis.multiply(gpu_vec_coeffs, gpu_dsize_vec);
+				gpu_dsize_vec.tocpu(out+d*i);
 			}
 		}
 

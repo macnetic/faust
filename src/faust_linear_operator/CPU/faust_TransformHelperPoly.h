@@ -20,7 +20,11 @@ namespace Faust
 		TransformHelper<FPP, Cpu>* basisChebyshev(MatSparse<FPP,Cpu>* L, int32_t K, MatSparse<FPP, Cpu>* T0=nullptr, bool on_gpu=false, BasisLaziness lazy_instantiation=INSTANTIATE_ONCE_AND_FOR_ALL);
 
 	template<typename FPP>
-		void poly(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP* out);
+		void poly(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP* out, bool on_gpu=false);
+	template<typename FPP>
+		void poly_cpu(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP* out);
+	template<typename FPP>
+		void poly_gpu(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP* out);
 
 
 	/**

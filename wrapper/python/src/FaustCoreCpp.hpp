@@ -221,12 +221,12 @@ template<typename FPP, FDevice DEV>
 }
 
 template<typename FPP, FDevice DEV>
-void FaustCoreCpp<FPP,DEV>::polyCoeffs(int d, int n, const FPP* basisX, const FPP* coeffs, FPP* out) const
+void FaustCoreCpp<FPP,DEV>::polyCoeffs(int d, int n, const FPP* basisX, const FPP* coeffs, FPP* out, bool on_gpu) const
 {
     Faust::TransformHelperPoly<FPP> *transform_poly = dynamic_cast<Faust::TransformHelperPoly<FPP>*>(this->transform);
     if(nullptr)
         throw std::runtime_error("polyCoeffs can only be used on a Poly. specialized Faust.");
-    transform_poly->poly(d, n, basisX, coeffs, out);
+    transform_poly->poly(d, n, basisX, coeffs, out, on_gpu);
 }
 
 template<typename FPP, FDevice DEV>
@@ -242,9 +242,9 @@ template<typename FPP, FDevice DEV>
 }
 
 template<typename FPP>
-void polyCoeffs(int d, int K, int n, const FPP* basisX, const FPP* coeffs, FPP* out)
+void polyCoeffs(int d, int K, int n, const FPP* basisX, const FPP* coeffs, FPP* out, bool on_gpu)
 {
-    Faust::poly(d, K, n, basisX, coeffs, out);
+    Faust::poly(d, K, n, basisX, coeffs, out, on_gpu);
 }
 
 template<typename FPP, FDevice DEV>

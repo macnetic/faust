@@ -2572,7 +2572,7 @@ cdef class FaustFact:
 
         return core, np.real(_out_buf[0])
 
-def polyCoeffs(d, basisX, coeffs):
+def polyCoeffs(d, basisX, coeffs, dev):
     if not isinstance(basisX, np.ndarray):
         raise ValueError('input basisX must be a numpy.ndarray')
     #TODO: raise exception if not real nor complex
@@ -2649,19 +2649,19 @@ def polyCoeffs(d, basisX, coeffs):
     if ndim_M == 1:
         if(isReal):
             FaustCoreCy.polyCoeffs(d, K, n, &bxview_1D[0],
-                       &cview[0], &yview[0,0])
+                       &cview[0], &yview[0,0], dev.startswith('gpu'))
         else:
             FaustCoreCy.polyCoeffs(d, K, n, &bxview_1D_cplx[0],
-                       &cview_cplx[0], &yview_cplx[0,0])
+                       &cview_cplx[0], &yview_cplx[0,0], dev.startswith('gpu'))
         y = np.squeeze(y) # we want a single dim. (but we created two
         # above)
     else:
         if(isReal):
             FaustCoreCy.polyCoeffs(d, K, n, &bxview_2D[0,0],
-                       &cview[0], &yview[0,0])
+                       &cview[0], &yview[0,0], dev.startswith('gpu'))
         else:
             FaustCoreCy.polyCoeffs(d, K, n, &bxview_2D_cplx[0,0],
-                       &cview_cplx[0], &yview_cplx[0,0])
+                       &cview_cplx[0], &yview_cplx[0,0], dev.startswith('gpu'))
     return y
 
 import sys, os, pyfaust

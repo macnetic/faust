@@ -248,7 +248,7 @@ def poly(coeffs, basis='chebyshev', L=None, X=None, dev='cpu', impl='native'):
         else:
             if not isinstance(X, type(None)):
                 raise X_and_basis_an_array_error
-            return _poly_arr_cpp(coeffs, F, d, dev='cpu')
+            return _poly_arr_cpp(coeffs, F, d, dev=dev)
     else:
         raise ValueError(impl+" is an unknown implementation.")
 
@@ -284,7 +284,7 @@ def _poly_arr_py(coeffs, basisX, d, dev='cpu'):
     return Y
 
 def _poly_arr_cpp(coeffs, basisX, d, dev='cpu'):
-    Y = _FaustCorePy.polyCoeffs(d, basisX, coeffs)
+    Y = _FaustCorePy.polyCoeffs(d, basisX, coeffs, dev)
     return Y
 
 def _poly_Faust_cpp(coeffs, basisFaust, X=None, dev='cpu'):
