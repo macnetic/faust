@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include "faust_linear_algebra.h"
 #include "Eigen/Core"
+#define FUI faust_unsigned_int
 
 namespace Faust
 {
@@ -283,10 +284,10 @@ namespace Faust
 #ifdef USE_GPU_MOD
 			int d = L->getNbRow();
 			uint K = this->size()-1;
-			MatDense<FPP, GPU2> gpu_V1(d, n, X);
+			MatDense<FPP, GPU2> gpu_V1((FUI) d, (FUI) n, X);
 			MatDense<FPP, GPU2> gpu_V2(gpu_V1);
-			MatDense<FPP, GPU2> gpu_new_V2(d, n);
-			MatDense<FPP, GPU2> gpu_Y(d, n, X);
+			MatDense<FPP, GPU2> gpu_new_V2((FUI) d, (FUI) n);
+			MatDense<FPP, GPU2> gpu_Y((FUI) d, (FUI) n, X);
 			const MatSparse<FPP, GPU2> gpu_L(*this->L);
 			MatSparse<FPP, GPU2> gpu_twoL(gpu_L);
 			gpu_twoL *= 2;
@@ -402,10 +403,10 @@ namespace Faust
 #ifdef USE_GPU_MOD
 			int d = L->getNbRow();
 			uint K = this->size()-1;
-			MatDense<FPP, GPU2> gpu_V1(d, n, X);
+			MatDense<FPP, GPU2> gpu_V1((FUI) d, (FUI) n, X);
 			MatDense<FPP, GPU2> gpu_V2(gpu_V1);
-			MatDense<FPP, GPU2> gpu_new_V2(d, n);
-			MatDense<FPP, Cpu> tmp_cpu_V2(d, n);
+			MatDense<FPP, GPU2> gpu_new_V2((FUI) d, (FUI) n);
+			MatDense<FPP, Cpu> tmp_cpu_V2((FUI)d, (FUI)n);
 			const MatSparse<FPP, GPU2> gpu_L(*this->L);
 			MatSparse<FPP, GPU2> gpu_twoL(gpu_L);
 			gpu_twoL *= 2;
@@ -741,7 +742,7 @@ namespace Faust
 			Vect<FPP, GPU2> gpu_dsize_vec(d);
 			for(int i=0;i<n;i++)
 			{
-				MatDense<FPP,GPU2> gpu_mat_basis(d, K_plus_1, basisX+d_K_plus_1*i);
+				MatDense<FPP,GPU2> gpu_mat_basis((FUI)d, (FUI)K_plus_1, basisX+d_K_plus_1*i);
 				gpu_mat_basis.multiply(gpu_vec_coeffs, gpu_dsize_vec);
 				gpu_dsize_vec.tocpu(out+d*i);
 			}
