@@ -249,41 +249,7 @@ namespace Faust
 	template<typename FPP>
 		void TransformHelperPoly<FPP>::multiplyPoly_gpu(const FPP* x, FPP* y, const FPP* coeffs)
 		{
-#ifdef USE_GPU_MOD
-			int d = L->getNbRow();
-			uint K = this->size()-1;
-			Vect<FPP, GPU2> gpu_v1(d, x);
-			Vect<FPP, GPU2> gpu_v2(gpu_v1);
-			Vect<FPP, GPU2> gpu_new_v2(d);
-			Vect<FPP, GPU2> gpu_y(d, x);
-			const MatSparse<FPP, GPU2> gpu_L(*this->L);
-			MatSparse<FPP, GPU2> gpu_twoL(gpu_L);
-			gpu_twoL *= 2;
-			gpu_y.scalarMultiply(coeffs[0]); // x*coeffs[0]
-			if(K == 0)
-				return;
-			//			gpu_v2 == x
-			gpu_v2.multiplyLeft(gpu_L);
-			gpu_new_v2 = gpu_v2;
-			gpu_new_v2.scalarMultiply(coeffs[1]); //	coeffs[1]*(L->mat*x_vec);
-			gpu_y.add(gpu_new_v2); // gpu_y = x*coeffs[0]+coeffs[1]*(L->mat*x_vec)
-			if(K == 1) // not necessary but clearer
-				return;
-			for(int i=3;i<=K+1;i++)
-			{
-				gpu_new_v2 = gpu_v2;
-				gpu_new_v2.multiplyLeft(const_cast<const MatSparse<FPP,GPU2>&>(gpu_twoL));
-				gpu_new_v2 -= gpu_v1; // new_v2_ = L->mat*v2_*2-v1_;
-				// prepare next it
-				gpu_v1 = gpu_v2;
-				gpu_v2 = gpu_new_v2;
-				gpu_new_v2.scalarMultiply(coeffs[i-1]);
-				gpu_y.add(gpu_new_v2);
-			}
-			gpu_y.tocpu(y);
-#else
-			throw std::runtime_error("USE_GPU_MOD option must be enabled at compiling time to use this function (TransformHelperPoly<FPP>::multiplyPoly_gpu).");
-#endif
+			multiplyPoly_gpu(x, 1, y, coeffs);
 		}
 
 	template<typename FPP>
@@ -301,7 +267,7 @@ namespace Faust
 			int d = L->getNbRow();
 			uint K = this->size()-1;
 
-			//TODO:replace OpenMP with a real matrix version
+			//TODO:replace OpenMP with a matrix oriented version
 			#pragma omp parallel for
 			for(int i=0;i<n;i++)
 			{
@@ -314,6 +280,7 @@ namespace Faust
 	template<typename FPP>
 		void TransformHelperPoly<FPP>::multiplyPoly_gpu(const FPP* X, int n, FPP* Y, const FPP* coeffs)
 		{
+#ifdef USE_GPU_MOD
 			int d = L->getNbRow();
 			uint K = this->size()-1;
 			MatDense<FPP, GPU2> gpu_V1(d, n, X);
@@ -345,6 +312,9 @@ namespace Faust
 				gpu_Y.add(gpu_new_V2);
 			}
 			gpu_Y.tocpu(Y, nullptr); // warning: without explicitely passing a nullptr for the stream it provokes a cudaErrorUnknown (TODO: verify tocpu overloads)
+#else
+			throw std::runtime_error("USE_GPU_MOD option must be enabled at compiling time to use this function (TransformHelperPoly<FPP>::multiplyPoly_gpu).");
+#endif
 		}
 
 	// Slower method but kept commented here until further tests
