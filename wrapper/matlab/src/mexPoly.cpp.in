@@ -108,6 +108,7 @@ void polyMatrix(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		int d = (int) mxGetScalar(prhs[1]);
 		int K = (int) mxGetScalar(prhs[2]);
 		int n = (int) mxGetScalar(prhs[3]);
+		bool on_gpu = false;
 		Faust::MatDense<FPP, Cpu> out(d, n);
 //		Faust::MatDense<FPP, Cpu> coeffs;
 //		Faust::MatDense<FPP, Cpu> basisX;
@@ -120,7 +121,19 @@ void polyMatrix(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		mxArray2Ptr(prhs[4], coeffs_ptr); // avoid a copy
 		mxArray2Ptr(prhs[5], basisX_ptr); // avoid a copy
 
-		Faust::poly(d, K, n, basisX_ptr /*basisX.getData()*/, coeffs_ptr /*coeffs.getData()*/, out.getData());
+		if(nrhs >= 7)
+		{
+			on_gpu = (bool) mxGetScalar(prhs[6]);
+		}
+
+		if(on_gpu)
+		{
+#ifdef USE_GPU_MOD
+			Faust::enable_gpu_mod();
+#endif
+		}
+
+		Faust::poly(d, K, n, basisX_ptr /*basisX.getData()*/, coeffs_ptr /*coeffs.getData()*/, out.getData(), on_gpu);
 
 		plhs[0] = FaustMat2mxArray(out);
 

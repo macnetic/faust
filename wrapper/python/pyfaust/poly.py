@@ -540,7 +540,6 @@ def expm_multiply(A, B, t, K=10, dev='cpu', **kwargs):
         for j in range(K - 2, -1, -1):
             coeff[j] = coeff[j+2] - (2 * j + 2) / (-tau * phi) * coeff[j+1]
         coeff[0] /= 2
-        print("coeff:", coeff)
         if poly_meth == 2:
             TB = np.squeeze(T@B)
             if n == 1:
@@ -612,16 +611,16 @@ def invm_multiply(A, B, rel_err=1e-6, max_K=np.inf, dev='cpu', **kwargs):
     K = min(max_K, int(((log(1/eps) + log(2/(m*sqrt(1-c**2))) - log(g-1)) /
                         log(g))))
     Abar = 2*A/(b-a) - (b+a)*Id/(b-a)
-    T = basis(Abar, K, 'chebyshev')
+    T = basis(Abar, K, 'chebyshev', dev=dev)
     coeffs = array([ 2 / (m*sqrt(1-c**2)) * (-1)**k * g**(-k) for k in
                     range(0, K+1)])
     coeffs[0] /= 2
 
     if poly_meth == 2:
         TB = T@B
-        A_inv_B = poly(coeffs, TB)
+        A_inv_B = poly(coeffs, TB, dev=dev)
     else:
-        A_inv_B = poly(coeffs, T, X=B)
+        A_inv_B = poly(coeffs, T, X=B, dev=dev)
     return A_inv_B
 
 # experimental block end

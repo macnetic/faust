@@ -7,7 +7,7 @@
 %> @param B the dense matrix or vector to be multiplied by the matrix inverse of A.
 %> @param 'rel_err', rel_err (optional): the targeted relative error between the approximate of the action and the action itself (if you were to compute it with inv(A)*x).
 %> @param 'max_K', int (optional): the maximum degree of Chebyshev polynomial to use (useful to limit memory consumption).
-%> @param 'dev', str (optional) 'cpu' or 'gpu', selects the device to use (currently only 'cpu' is supported).
+%> @param 'dev', str (optional): the device to instantiate the returned Faust ('cpu' or 'gpu').
 %>
 %> @retval AinvB the array which is the approximate action of matrix inverse  of A on B.
 %>
@@ -90,7 +90,7 @@ function AinvB = invm_multiply(A, B, varargin)
 	g = abs(1 / c + sqrt(1/c^2 - 1));
 	K = min(max_K, floor(((log(1/rel_err) + log(2/(m*sqrt(1-c^2))) - log(g-1)) / log(g))));
 	Abar = 2*A/(b-a) - (b+a)*Id/(b-a);
-	T = matfaust.poly.basis(Abar, K, 'chebyshev');
+	T = matfaust.poly.basis(Abar, K, 'chebyshev', 'dev', dev);
 	coeffs = zeros(K+1, 1);
 	for k=0:K
 		coeffs(k+1) = 2 / (m*sqrt(1-c^2)) * (-1)^k * g^(-k);
@@ -98,9 +98,9 @@ function AinvB = invm_multiply(A, B, varargin)
 	coeffs(1) = coeffs(1)*.5;
 	if(poly_meth == 2)
 		TB = T*B
-		AinvB = matfaust.poly.poly(coeffs, TB);
+		AinvB = matfaust.poly.poly(coeffs, TB, 'dev', dev);
 	elseif(poly_meth == 1)
-		AinvB = matfaust.poly.poly(coeffs, T, 'X', B);
+		AinvB = matfaust.poly.poly(coeffs, T, 'X', B, 'dev', dev);
 	else
 		error('poly_meth must be 1 or 2')
 	end

@@ -6,7 +6,7 @@
 %> @param K	the degree of the last polynomial, i.e. the K+1 first polynomials are built.
 %> @param basis_name 'chebyshev', and others yet to come.
 %> @param 'T0', matrix (optional): a sparse matrix to replace the identity as a 0-degree polynomial of the basis.
-%> @param 'dev', str (optional): the device to instantiate the returned Faust ('cpu' or 'gpu').
+%> @param 'dev', str (optional): the computation device ('cpu' or 'gpu').
 %>
 %> @retval F the Faust of the basis composed of the K+1 orthogonal polynomials.
 %>

@@ -7,7 +7,8 @@
 %> @param B the matrix  or vector to be multiplied by the matrix exponential of A.
 %> @param t (real array) time points.
 %> @param 'K', integer (default value is 10) the greatest polynomial degree of the Chebyshev polynomial basis. The greater it is, the better is the approximate accuracy but note that a larger K increases the computational cost.
-%> @param 'dev', str (optional) 'cpu' or 'gpu', selects the device to use (currently only 'cpu' is supported).
+%> @param 'dev', str (optional): the computation device ('cpu' or 'gpu').
+%>
 %>
 %> @retval C the approximate of e^{t_k A} B
 %>
@@ -34,6 +35,7 @@ function C = expm_multiply(A, B, t, varargin)
 	K = 10;
 	poly_meth = 1;
 	argc = length(varargin);
+	dev = 'cpu';
 	if(argc > 0)
 		for i=1:2:argc
 			if(argc > i)

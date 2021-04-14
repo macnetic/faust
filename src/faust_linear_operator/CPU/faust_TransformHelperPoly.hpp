@@ -423,7 +423,6 @@ namespace Faust
 				return;
 			//			gpu_V2 == X
 			gpu_V2.multiplyLeft(gpu_L);
-			gpu_V2.Display();
 			gpu_V2.tocpu(tmp_cpu_V2); //			v2 = L->mat*x_vec;
 			block_to_cpu(1, tmp_cpu_V2.getData());
 			if(K == 1) // not necessary but clearer

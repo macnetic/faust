@@ -8,7 +8,7 @@
 %> @param basis either the name of the polynomial basis to build on L or the basis if already built externally (as a Faust or an equivalent full array).
 %> @param 'L', matrix the sparse matrix on which the polynomial basis is built if basis is not already a Faust or a full array.
 %> @param 'X', matrix if X is set, the linear combination of basis*X is computed (note that the memory space is optimized compared to the manual way of doing first B = basis*X and then calling poly on B witout X set).
-%>
+%> @param 'dev', str (optional): the computation device ('cpu' or 'gpu').
 %> @retval LC The linear combination Faust or full array depending on if basis is itself a Faust or a np.ndarray.
 %>
 %> @b Example
@@ -74,6 +74,7 @@ function LC = poly(coeffs, basis, varargin)
 	dev = 'cpu';
 	X = {}; % by default no X argument is passed, set it as a cell (see why in matfaust.Faust.poly)
 	argc = length(varargin);
+	dev = 'cpu';
 	if(argc > 0)
 		for i=1:2:argc
 			if(argc > i)
@@ -107,6 +108,8 @@ function LC = poly(coeffs, basis, varargin)
 		end
 	end
 
+	on_gpu = startsWith(dev , 'gpu');
+
 	if(~ ismatrix(coeffs) || size(coeffs, 1) ~= 1 && size(coeffs, 2) ~= 1)
 		error('coeffs must be a scalar vector')
 		if(isreal(coeffs) ~= isreal(basis))
@@ -137,9 +140,9 @@ function LC = poly(coeffs, basis, varargin)
 		end
 		d = floor(size(basis,1) / (K+1));
 		if(is_real)
-			LC = mexPolyReal('polyMatrix', d, K, size(basis,2), coeffs, basis);
+			LC = mexPolyReal('polyMatrix', d, K, size(basis,2), coeffs, basis, on_gpu);
 		else
-			LC = mexPolyCplx('polyMatrix', d, K, size(basis,2), coeffs, basis);
+			LC = mexPolyCplx('polyMatrix', d, K, size(basis,2), coeffs, basis, on_gpu);
 		end
 		% LC is a matrix
 	end
