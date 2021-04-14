@@ -57,24 +57,39 @@ void chebyshev(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	if(nrhs >= 2)
 	{
 		get_sp_mat(prhs[1], &L);
+		bool on_gpu = false;
 
 		if(nrhs >= 3)
 			K = (int) mxGetScalar(prhs[2]);
 		else
 			mexErrMsgTxt("chebyshev mex error: K argument is mandatory");
 
-		// optional T0 matrix
 		if(nrhs >= 4)
 		{
-			get_sp_mat(prhs[3], &opt_T0);
+			on_gpu = (bool) mxGetScalar(prhs[3]);
+		}
+
+		// optional T1 matrix
+		if(nrhs >= 5)
+		{
+			get_sp_mat(prhs[4], &opt_T0);
 			T0 = &opt_T0;
 		}
 
-		auto thp = Faust::basisChebyshev(&L, K, T0);
+		if(on_gpu)
+		{
+#ifdef USE_GPU_MOD
+			Faust::enable_gpu_mod();
+#endif
+		}
+
+
+		auto thp = Faust::basisChebyshev(&L, K, T0, on_gpu);
 
 		if(thp) // not NULL
 			plhs[0] = convertPtr2Mat<Faust::TransformHelper<FPP, Cpu> >(thp);
-		else {
+		else
+		{
 			plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
 			double* ptr_out = (double*) mxGetData(plhs[0]);
 			ptr_out[0] = (double) 0;

@@ -6,6 +6,7 @@
 %> @param K	the degree of the last polynomial, i.e. the K+1 first polynomials are built.
 %> @param basis_name 'chebyshev', and others yet to come.
 %> @param 'T0', matrix (optional): a sparse matrix to replace the identity as a 0-degree polynomial of the basis.
+%> @param 'dev', str (optional): the device to instantiate the returned Faust ('cpu' or 'gpu').
 %>
 %> @retval F the Faust of the basis composed of the K+1 orthogonal polynomials.
 %>
@@ -58,6 +59,7 @@ function F = basis(L, K, basis_name, varargin)
 	T0_is_set = false;
 	T0 = []; % no T0 by default
 	argc = length(varargin);
+	dev = 'cpu';
 	if(argc > 0)
 		for i=1:2:argc
 			if(argc > i)
@@ -86,7 +88,7 @@ function F = basis(L, K, basis_name, varargin)
 		end
 	end
 
-	mex_args = {basis_name, L, K};
+	mex_args = {basis_name, L, K, startsWith(dev, 'gpu')};
 
 	if(T0_is_set)
 		if(size(T0,1) ~= size(L,2))
@@ -97,7 +99,6 @@ function F = basis(L, K, basis_name, varargin)
 		end
 		mex_args = [mex_args {T0}];
 	end
-
 
 	if(strcmp(basis_name, 'chebyshev'))
 		if(is_real)
