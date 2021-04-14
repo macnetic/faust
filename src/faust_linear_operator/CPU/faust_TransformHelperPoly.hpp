@@ -455,7 +455,9 @@ namespace Faust
 				if(std::find(std::begin(col_ids), std::end(col_ids), id) == std::end(col_ids))
 					col_ids.push_back(id);
 			}
+#ifndef _MSC_VER // MS VS doesn't want this OMP loop (increment error) // error C3017
 			#pragma omp parallel for
+#endif
 			for(auto i=col_ids.begin(); i < col_ids.end();i++)
 			{
 				auto id = *i;
