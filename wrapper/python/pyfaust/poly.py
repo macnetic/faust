@@ -136,7 +136,8 @@ def basis(L, K, basis_name, dev='cpu', T0=None, impl='native'):
         raise ValueError(basis_name+" is not a valid basis name")
 
 
-def poly(coeffs, basis='chebyshev', L=None, X=None, dev='cpu', impl='native'):
+def poly(coeffs, basis='chebyshev', L=None, X=None, dev='cpu', impl='native',
+         out=None):
     """
         Computes the linear combination of the polynomials defined by basis.
 
@@ -154,6 +155,9 @@ def poly(coeffs, basis='chebyshev', L=None, X=None, dev='cpu', impl='native'):
             B with X at None).
             dev: the device to instantiate the returned Faust ('cpu' or 'gpu').
             impl: 'native' (by default) for the C++ impl., "py" for the Python impl.
+            out (np.ndarray): if not None the function result is put into this
+            np.ndarray. Note that out.flags['F_CONTINUOUS'] must be True. Note that this can't work if the function returns a
+            Faust.
 
         Returns:
             The linear combination Faust or np.ndarray depending on if basis is
@@ -237,28 +241,33 @@ def poly(coeffs, basis='chebyshev', L=None, X=None, dev='cpu', impl='native'):
            # F is a np.ndarray
            if not isinstance(X, type(None)):
                 raise X_and_basis_an_array_error
-           return _poly_arr_py(coeffs, F, d, dev=dev)
+           return _poly_arr_py(coeffs, F, d, dev=dev, out=out)
     elif impl == 'native':
         if isFaust(F):
-            Fc = _poly_Faust_cpp(coeffs, F, X=X, dev=dev)
+            Fc = _poly_Faust_cpp(coeffs, F, X=X, dev=dev, out=out)
             if isFaust(Fc) and F.device != dev:
                 Fc = Fc.clone(dev=dev)
             return Fc
         else:
             if not isinstance(X, type(None)):
                 raise X_and_basis_an_array_error
-            return _poly_arr_cpp(coeffs, F, d, dev=dev)
+            return _poly_arr_cpp(coeffs, F, d, dev=dev, out=out)
     else:
         raise ValueError(impl+" is an unknown implementation.")
 
 
-def _poly_arr_py(coeffs, basisX, d, dev='cpu'):
+def _poly_arr_py(coeffs, basisX, d, dev='cpu', out=None):
     """
     """
     mt = True # multithreading
     n = basisX.shape[1]
     K_plus_1 = int(basisX.shape[0]/d)
-    Y = np.empty((d, n))
+    if isinstance(out, type(None)):
+        Y = np.empty((d, n))
+    else:
+        Y = out
+        if Y.shape != (d,n):
+            raise ValueError('out shape isn\'t valid.')
     if n == 1:
         Y[:, 0] = basisX[:, 0].reshape(d, K_plus_1, order='F') @ coeffs
     elif mt:
@@ -282,16 +291,15 @@ def _poly_arr_py(coeffs, basisX, d, dev='cpu'):
 #        Y += (basisX[d*i:(i+1)*d, :] * coeffs[i])
     return Y
 
-def _poly_arr_cpp(coeffs, basisX, d, dev='cpu'):
-    Y = _FaustCorePy.polyCoeffs(d, basisX, coeffs, dev)
-    return Y
+def _poly_arr_cpp(coeffs, basisX, d, dev='cpu', out=None):
+    return _FaustCorePy.polyCoeffs(d, basisX, coeffs, dev, out)
 
-def _poly_Faust_cpp(coeffs, basisFaust, X=None, dev='cpu'):
+def _poly_Faust_cpp(coeffs, basisFaust, X=None, dev='cpu', out=None):
     Y = None # can't happen
     if isinstance(X, type(None)):
         Y = Faust(core_obj=basisFaust.m_faust.polyCoeffs(coeffs))
     elif isinstance(X, np.ndarray):
-        Y = basisFaust.m_faust.mulPolyCoeffs(coeffs, X)
+        Y = basisFaust.m_faust.mulPolyCoeffs(coeffs, X, out=out)
     else:
         raise TypeError("Y can't be something else than a Faust or np.ndarray")
     return Y
@@ -529,7 +537,7 @@ def expm_multiply(A, B, t, K=10, dev='cpu', **kwargs):
     else:
         n = B.shape[1]
     npts = len(t)
-    Y = empty((npts, m, n))
+    Y = [empty((m,n), order='F') for i in range(npts)]
     if poly_meth == 2:
         TB = np.squeeze(T@B)
     for i,tau in enumerate(t):
@@ -544,15 +552,12 @@ def expm_multiply(A, B, t, K=10, dev='cpu', **kwargs):
             coeff[j] = coeff[j+2] - (2 * j + 2) / (-tau * phi) * coeff[j+1]
         coeff[0] /= 2
         if poly_meth == 2:
-            if n == 1:
-                Y[i,:,0] = np.squeeze(poly(coeff, TB, dev=dev))
-            else:
-                Y[i,:,:] = poly(coeff, TB, dev=dev)
+                poly(coeff, TB, dev=dev, out=Y[i][:,:])
         else:
             if n == 1:
-                Y[i,:,0] = np.squeeze(poly(coeff, T, X=B, dev=dev))
+                poly(coeff, T, X=B, dev=dev, out=Y[i][:,:])
             else:
-                Y[i,:,:] = poly(coeff, T, X=B, dev=dev)
+                poly(coeff, T, X=B, dev=dev, out=Y[i][:,:])
     if B.ndim == 1:
         return np.squeeze(Y)
     else:

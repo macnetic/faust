@@ -622,7 +622,7 @@ cdef class FaustCore:
             core.core_faust_cplx = self.core_faust_cplx.polyCoeffs(&cview_cplx[0])
         return core
 
-    def mulPolyCoeffs(self, coeffs, X):
+    def mulPolyCoeffs(self, coeffs, X, out=None):
         cdef double[:] cview
         cdef complex[:] cview_cplx
         cdef double[:,:] Xview
@@ -642,16 +642,38 @@ cdef class FaustCore:
             X = X.reshape(d, 1)
             X_1dim = True
 
-        if self._isReal:
-            cview = coeffs
-            Y = np.empty((X.shape[0], n), dtype='double', order='F')
-            Yview = Y
-            Xview = X
+        if not isinstance(out, type(None)):
+            Y = out
+            if Y.ndim == 1:
+                raise ValueError('out must have 2 dimensions.')
+            if Y.shape != (d,n):
+                raise ValueError('out shape isn\'t valid.')
+            dtype_err = ValueError('out dtype isn\'t valid.')
+            if not Y.flags['F_CONTIGUOUS']:
+                raise ValueError('the array must be in fortran/column continous order.')
+            if self._isReal:
+                if Y.dtype != 'd':
+                    raise dtype_err
+                Yview = Y
+                Xview = X
+                cview = coeffs
+            else:
+                if Y.dtYpe != 'complex':
+                    raise dtype_err
+                Yview_cplx = Y
+                Xview_cplx = X
+                cview_cplx = coeffs
         else:
-            cview_cplx = coeffs
-            Y = np.empty((X.shape[0], n), dtype=np.complex, order='F')
-            Yview_cplx = Y
-            Xview_cplx = X
+            if self._isReal:
+                cview = coeffs
+                Y = np.empty((X.shape[0], n), dtype='double', order='F')
+                Yview = Y
+                Xview = X
+            else:
+                cview_cplx = coeffs
+                Y = np.empty((X.shape[0], n), dtype=np.complex, order='F')
+                Yview_cplx = Y
+                Xview_cplx = X
 
         if(self._isReal):
             self.core_faust_dbl.mulPolyCoeffs(&Xview[0,0],
@@ -2572,7 +2594,7 @@ cdef class FaustFact:
 
         return core, np.real(_out_buf[0])
 
-def polyCoeffs(d, basisX, coeffs, dev):
+def polyCoeffs(d, basisX, coeffs, dev, out=None):
     if not isinstance(basisX, np.ndarray):
         raise ValueError('input basisX must be a numpy.ndarray')
     #TODO: raise exception if not real nor complex
@@ -2638,12 +2660,30 @@ def polyCoeffs(d, basisX, coeffs, dev):
     else:
         cview_cplx = coeffs
 
-    if(isReal):
-        y = np.empty((nbrow_y,nbcol_y), dtype='d',order='F')
-        yview = y
+    if not isinstance(out, type(None)):
+        y = out
+        if y.ndim == 1:
+            raise ValueError('out must have 2 dimensions.')
+        if y.shape != (d,n):
+            raise ValueError('out shape isn\'t valid.')
+        dtype_err = ValueError('out dtype isn\'t valid.')
+        if not y.flags['F_CONTIGUOUS']:
+            raise ValueError('the array must be in fortran/column continous order.')
+        if isReal:
+            if y.dtype != 'd':
+                raise dtype_err
+            yview = y
+        else:
+            if y.dtype != 'complex':
+                raise dtype_err
+            yview_cplx = y
     else:
-        y = np.empty((nbrow_y, nbcol_y), dtype='complex', order='F')
-        yview_cplx = y
+        if(isReal):
+            y = np.empty((nbrow_y,nbcol_y), dtype='d',order='F')
+            yview = y
+        else:
+            y = np.empty((nbrow_y, nbcol_y), dtype='complex', order='F')
+            yview_cplx = y
 
     #void polyCoeffs(int d, int K, int n, const FPP* basisX, const FPP* coeffs, FPP* out) const;
     if ndim_M == 1:
