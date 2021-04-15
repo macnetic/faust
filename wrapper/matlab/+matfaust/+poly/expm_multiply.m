@@ -89,6 +89,9 @@ function C = expm_multiply(A, B, t, varargin)
 	n = size(B, 2);
 	npts = numel(t);
 	Y = zeros(npts, m, n);
+	if (poly_meth == 2)
+		TB = T*B;
+	end
 	for i=1:npts
 		tau = t(i);
 		if(tau >= 0)
@@ -102,7 +105,6 @@ function C = expm_multiply(A, B, t, varargin)
 		end
 		coeff(1) = coeff(1)*.5;
 		if(poly_meth == 2)
-			TB = T*B;
 			Y(i, :, :) = matfaust.poly.poly(coeff, TB, 'dev', dev);
 		elseif(poly_meth == 1)
 			Y(i, :, :) = matfaust.poly.poly(coeff, T, 'X', B, 'dev', dev);

@@ -515,9 +515,10 @@ def expm_multiply(A, B, t, K=10, dev='cpu', **kwargs):
         raise ValueError('A must be symmetric positive definite.')
     poly_meth = 1
     if 'poly_meth' in kwargs:
-        poly_meth = kwargs['poly_meth']
-        if poly_meth not in [1, 2]:
+        if kwargs['poly_meth'] not in [1, 2, '1', '2']:
             raise ValueError('poly_meth must be 1 or 2')
+        poly_meth = int(kwargs['poly_meth'])
+        print("expm_multiply poly_meth:", poly_meth)
     phi = eigsh(A, k=1, return_eigenvectors=False)[0] / 2
     T = basis(A/phi-seye(*A.shape), K, 'chebyshev', dev=dev)
     if isinstance(t, float):
@@ -529,6 +530,8 @@ def expm_multiply(A, B, t, K=10, dev='cpu', **kwargs):
         n = B.shape[1]
     npts = len(t)
     Y = empty((npts, m, n))
+    if poly_meth == 2:
+        TB = np.squeeze(T@B)
     for i,tau in enumerate(t):
         if tau >= 0:
             raise ValueError('pyfaust.poly.expm_multiply handles only negative '
@@ -541,7 +544,6 @@ def expm_multiply(A, B, t, K=10, dev='cpu', **kwargs):
             coeff[j] = coeff[j+2] - (2 * j + 2) / (-tau * phi) * coeff[j+1]
         coeff[0] /= 2
         if poly_meth == 2:
-            TB = np.squeeze(T@B)
             if n == 1:
                 Y[i,:,0] = np.squeeze(poly(coeff, TB, dev=dev))
             else:
