@@ -5,11 +5,12 @@
 %>
 %> @param A the operator whose inverse is of interest (must be a symmetric positive definite sparse matrix).
 %> @param B the dense matrix or vector to be multiplied by the matrix inverse of A.
-%> @param 'rel_err', rel_err (optional): the targeted relative error between the approximate of the action and the action itself (if you were to compute it with inv(A)*x).
+%> @param 'rel_err', real (optional): the targeted relative error between the approximate of the action and the action itself (if you were to compute it with inv(A)*x).
+%> @param 'tradeoff', str (optional): 'memory' or 'time' to specify what matters the most: a small memory footprint or a small time of execution. It changes the implementation of pyfaust.poly.poly used behind. It can help when the memory size is limited relatively to the value of rel_err or the size of A and B.
 %> @param 'max_K', int (optional): the maximum degree of Chebyshev polynomial to use (useful to limit memory consumption).
 %> @param 'dev', str (optional): the device to instantiate the returned Faust ('cpu' or 'gpu').
 %>
-%> @retval AinvB the array which is the approximate action of matrix inverse  of A on B.
+%> @retval AinvB the array which is the approximate action of matrix inverse of A on B.
 %>
 %> @b Example
 %> @code
@@ -31,7 +32,7 @@ function AinvB = invm_multiply(A, B, varargin)
 	dev = 'cpu';
 	rel_err = 1e-6;
 	max_K = inf;
-	poly_meth = 1;
+	tradeoff = 'time';
 	argc = length(varargin);
 	if(argc > 0)
 		for i=1:2:argc
@@ -58,11 +59,11 @@ function AinvB = invm_multiply(A, B, varargin)
 					else
 						max_K = tmparg;
 					end
-				case 'poly_meth'
-					if(argc == i || ~ isscalar(tmparg) || ~isreal(tmparg) || tmparg < 0 || tmparg-floor(tmparg) > 0)
-						error('poly_meth argument must be followed by an integer')
+				case 'tradeoff'
+					if(argc == i || ~ isstr(tmparg))
+						error('tradeoff argument must be followed by ''memory'' or ''time''')
 					else
-						poly_meth = tmparg;
+						tradeoff = tmparg;
 					end
 				otherwise
 					if((isstr(varargin{i}) || ischar(varargin{i}))  && ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu'))
@@ -70,6 +71,11 @@ function AinvB = invm_multiply(A, B, varargin)
 					end
 			end
 		end
+	end
+	if (strcmp(tradeoff, 'memory'))
+		poly_meth = 1; % tradeoff is memory
+	else
+		poly_meth = 2;
 	end
 	if (~ issparse(A))
 		error('A must be a sparse matrix.')
@@ -97,7 +103,7 @@ function AinvB = invm_multiply(A, B, varargin)
 	end
 	coeffs(1) = coeffs(1)*.5;
 	if(poly_meth == 2)
-		TB = T*B
+		TB = T*B;
 		AinvB = matfaust.poly.poly(coeffs, TB, 'dev', dev);
 	elseif(poly_meth == 1)
 		AinvB = matfaust.poly.poly(coeffs, T, 'X', B, 'dev', dev);

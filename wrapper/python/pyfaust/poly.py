@@ -155,7 +155,7 @@ def poly(coeffs, basis='chebyshev', L=None, X=None, dev='cpu', impl='native',
             B with X at None).
             dev: the device to instantiate the returned Faust ('cpu' or 'gpu').
             impl: 'native' (by default) for the C++ impl., "py" for the Python impl.
-            out (np.ndarray): if not None the function result is put into this
+            out: (np.ndarray) if not None the function result is put into this
             np.ndarray. Note that out.flags['F_CONTINUOUS'] must be True. Note that this can't work if the function returns a
             Faust.
 
@@ -474,7 +474,7 @@ class FaustPoly(Faust):
         return next(self.gen)
 
 
-def expm_multiply(A, B, t, K=10, dev='cpu', **kwargs):
+def expm_multiply(A, B, t, K=10, tradeoff='time', dev='cpu', **kwargs):
     """
     Computes an approximate of the action of the matrix exponential of A on B using series of Chebyshev polynomials.
 
@@ -494,6 +494,11 @@ def expm_multiply(A, B, t, K=10, dev='cpu', **kwargs):
         K: the greatest polynomial degree of the Chebyshev polynomial basis.
         The greater it is, the better is the approximate accuracy but note that
         a larger K increases the computational cost.
+        tradeoff: 'memory' or 'time' to specify what matters the most: a small
+        memory footprint or a small time of execution. It changes the
+        implementation of pyfaust.poly.poly used behind. It can help when
+        the memory size is limited relatively to the value of K or the size
+        of A and B.
 
     Returns:
         expm_A_B the result of \f$e^{t_k A} B\f$.
@@ -521,7 +526,12 @@ def expm_multiply(A, B, t, K=10, dev='cpu', **kwargs):
     # check A is PSD or at least square
     if A.shape[0] != A.shape[1]:
         raise ValueError('A must be symmetric positive definite.')
-    poly_meth = 1
+    if tradeoff == 'time':
+        poly_meth = 2
+    elif tradeoff == 'memory':
+        poly_meth = 1
+    else:
+        raise ValueError("tradeoff must be 'memory' or 'time'")
     if 'poly_meth' in kwargs:
         if kwargs['poly_meth'] not in [1, 2, '1', '2']:
             raise ValueError('poly_meth must be 1 or 2')
@@ -563,7 +573,7 @@ def expm_multiply(A, B, t, K=10, dev='cpu', **kwargs):
     else:
         return Y
 
-def invm_multiply(A, B, rel_err=1e-6, max_K=np.inf, dev='cpu', **kwargs):
+def invm_multiply(A, B, rel_err=1e-6, tradeoff='time', max_K=np.inf, dev='cpu', **kwargs):
     """
     Computes an approximate of the action of the matrix inverse of A on B using Chebyshev polynomials.
 
@@ -574,8 +584,12 @@ def invm_multiply(A, B, rel_err=1e-6, max_K=np.inf, dev='cpu', **kwargs):
         (ndarray).
         rel_err: the targeted relative error between the approximate of the action and the action itself (if you were to compute it with np.inv(A)@x).
         max_K: (int, optional) the maximum degree of Chebyshev polynomial to use (useful to limit memory consumption).
-        dev: (optional) 'cpu' or 'gpu',  selects the device to use (currently
-        only 'cpu' is supported).
+        dev: (optional) 'cpu' or 'gpu',  selects the device to use.
+        tradeoff: 'memory' or 'time' to specify what matters the most: a small
+        memory footprint or a small time of execution. It changes the
+        implementation of pyfaust.poly.poly used behind. It can help when
+        the memory size is limited relatively to the value of rel_err or the size
+        of A and B.
 
     Returns:
         The np.ndarray which is the approximate action of matrix inverse  of A on B.
@@ -599,7 +613,12 @@ def invm_multiply(A, B, rel_err=1e-6, max_K=np.inf, dev='cpu', **kwargs):
         raise TypeError('A must be a csr_matrix')
     if A.shape[0] != A.shape[1]:
         raise ValueError('A must be symmetric positive definite.')
-    poly_meth = 1
+    if tradeoff == 'time':
+        poly_meth = 2
+    elif tradeoff == 'memory':
+        poly_meth = 1
+    else:
+        raise ValueError("tradeoff must be 'memory' or 'time'")
     if 'poly_meth' in kwargs:
         poly_meth = kwargs['poly_meth']
         if poly_meth not in [1, 2]:

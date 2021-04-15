@@ -7,6 +7,7 @@
 %> @param B the matrix  or vector to be multiplied by the matrix exponential of A.
 %> @param t (real array) time points.
 %> @param 'K', integer (default value is 10) the greatest polynomial degree of the Chebyshev polynomial basis. The greater it is, the better is the approximate accuracy but note that a larger K increases the computational cost.
+%> @param 'tradeoff', str (optional): 'memory' or 'time' to specify what matters the most: a small memory footprint or a small time of execution. It changes the implementation of pyfaust.poly.poly used behind. It can help when the memory size is limited relatively to the value of rel_err or the size of A and B.
 %> @param 'dev', str (optional): the computation device ('cpu' or 'gpu').
 %>
 %>
@@ -33,9 +34,9 @@ function C = expm_multiply(A, B, t, varargin)
 	dev = 'cpu';
 	rel_err = 1e-6; %TODO: to use later when capable to compute K depending on rel_err
 	K = 10;
-	poly_meth = 1;
 	argc = length(varargin);
 	dev = 'cpu';
+	tradeoff = 'time';
 	if(argc > 0)
 		for i=1:2:argc
 			if(argc > i)
@@ -61,11 +62,11 @@ function C = expm_multiply(A, B, t, varargin)
 					else
 						K = tmparg;
 					end
-				case 'poly_meth'
-					if(argc == i || ~ isscalar(tmparg) || ~isreal(tmparg) || tmparg < 0 || tmparg-floor(tmparg) > 0)
-						error('poly_meth argument must be followed by an integer')
+				case 'tradeoff'
+					if(argc == i || ~ isstr(tmparg))
+						error('tradeoff argument must be followed by ''memory'' or ''time''')
 					else
-						poly_meth = tmparg;
+						tradeoff = tmparg;
 					end
 				otherwise
 					if((isstr(varargin{i}) || ischar(varargin{i}))  && ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu'))
@@ -73,6 +74,11 @@ function C = expm_multiply(A, B, t, varargin)
 					end
 			end
 		end
+	end
+	if (strcmp(tradeoff, 'memory'))
+		poly_meth = 1;
+	else
+		poly_meth = 2; % tradeoff is time
 	end
 	if (~ issparse(A))
 		error('A must be a sparse matrix.')
