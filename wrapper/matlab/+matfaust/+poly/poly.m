@@ -1,5 +1,6 @@
 % experimental block start
 %> @package matfaust.poly @brief The matfaust module for polynomial basis as Faust objects.
+%> @note This module is still in BETA status.
 
 %======================================================================
 %> @brief Computes the linear combination of the polynomials defined by basis.

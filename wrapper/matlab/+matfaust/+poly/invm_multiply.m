@@ -89,7 +89,7 @@ function AinvB = invm_multiply(A, B, varargin)
 	b_ = eigs(B_, 1);
 	a = b-b_;
 	if(a <= 0)
-		error('A is a singular matrix or its spectrum contains negative values')
+		error('a <= 0, A is a singular matrix or its spectrum contains negative values')
 	end
 	m = (a + b) / 2;
 	c = (b - a) / (b + a);

@@ -2,6 +2,7 @@
 # @PYFAUST_LICENSE_HEADER@
 
 ## @package pyfaust.poly @brief The pyfaust module for polynomial basis as Faust objects.
+## @note This module is still in BETA status.
 
 import _FaustCorePy
 import scipy.sparse as sp
@@ -629,7 +630,7 @@ def invm_multiply(A, B, rel_err=1e-6, tradeoff='time', max_K=np.inf, dev='cpu', 
     b_ = eigsh(B_,1, return_eigenvectors=False)[0]
     a = b-b_
     if a <= 0:
-        raise Exception("A is a singular matrix or its spectrum contains"
+        raise Exception("a <= 0 error: A is a singular matrix or its spectrum contains"
                         " negative values.")
     m = (a + b) /2
     c = (b - a) / (b + a)
