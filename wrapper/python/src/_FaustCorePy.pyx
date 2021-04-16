@@ -1240,12 +1240,12 @@ cdef check_matrix(isReal, M):
         if not isinstance(M, (np.ndarray) ):
             raise ValueError('input must be a numpy ndarray')
         if(isReal):
-            M=M.astype(float,'F')
+#            M=M.astype(float,'F')
             if not M.dtype=='float':
                 raise ValueError('input numpy array dtype must be double (not'
                                  ' float)')
         else:
-            M=M.astype(complex,'F')
+#            M=M.astype(complex,'F')
             if(M.dtype not in ['complex', 'complex128', 'complex64'] ): #could fail if complex128 etc.
                 raise ValueError('input array must be complex array')
         #TODO: raise exception if not real nor complex
@@ -1462,9 +1462,11 @@ cdef class FaustFact:
                              'float64', 'double']
         # double == float64
         # if not float nor complex, raise exception
+        if not M.flags['F_CONTIGUOUS']:
+            M = np.asfortranarray(M)
+
         check_matrix(isReal, M)
 
-        M = np.asfortranarray(M)
 
         cdef unsigned int M_num_rows=M.shape[0]
         cdef unsigned int M_num_cols=M.shape[1]
@@ -2605,11 +2607,11 @@ def polyCoeffs(d, basisX, coeffs, dev, out=None):
     else:
         n = 1
     if(isReal):
-       basisX=basisX.astype(float,'F')
+#       basisX=basisX.astype(float,'F')
        if not basisX.dtype=='float':
            raise ValueError('input basisX must be a double array')
     else:
-       basisX=basisX.astype(complex,'F')
+#       basisX=basisX.astype(complex,'F')
        if(basisX.dtype not in ['complex', 'complex128', 'complex64'] ): #could fail if complex128 etc.
            raise ValueError('input basisX must be complex array')
     if not basisX.flags['F_CONTIGUOUS']:
