@@ -1,4 +1,3 @@
-% experimental block start
 %======================================================================
 %> @brief Gives the next Faust basis of dimension (n+1) from the Faust F polynomial basis of dimension n.
 %>
@@ -44,4 +43,3 @@
 function G = next(F)
 	G = next(F);
 end
-% experimental block end

@@ -1,4 +1,3 @@
-% experimental block start
 %======================================================================
 %> @brief  Builds the Faust of the polynomial basis defined on the sparse matrix L.
 %>
@@ -112,4 +111,3 @@ function F = basis(L, K, basis_name, varargin)
 
 	F = matfaust.Faust(core_obj, is_real);
 end
-% experimental block end

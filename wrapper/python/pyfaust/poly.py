@@ -1,4 +1,3 @@
-# experimental block start
 # @PYFAUST_LICENSE_HEADER@
 
 ## @package pyfaust.poly @brief The pyfaust module for polynomial basis as Faust objects.
@@ -14,7 +13,7 @@ from pyfaust import (Faust, isFaust, eye as feye, vstack as fvstack, hstack as
 from scipy.sparse.linalg import eigsh
 from scipy.special import ive
 from scipy.sparse import eye as seye
-from numpy import empty, squeeze, sqrt, log, array, finfo
+from numpy import empty, sqrt, log, array, squeeze
 
 import threading
 
@@ -69,18 +68,16 @@ def Chebyshev(L, K, dev='cpu', T0=None, impl='native'):
 
 
 
-def basis(L, K, basis_name, dev='cpu', T0=None, impl='native'):
+def basis(L, K, basis_name, dev='cpu', T0=None, **kwargs):
     """
     Builds the Faust of the polynomial basis defined on the sparse matrix L.
 
     Args:
         L: the sparse scipy square matrix in CSR format (scipy.sparse.csr_matrix).
-           L can aslo be a Faust if impl is "py".
         K: the degree of the last polynomial, i.e. the K+1 first polynomials are built.
         basis_name: 'chebyshev', and others yet to come.
         dev (optional): the device to instantiate the returned Faust ('cpu' or 'gpu').
         T0 (optional): a sparse matrix to replace the identity as a 0-degree polynomial of the basis.
-        impl (optional): 'native' (by default) for the C++ impl., "py" for the Python impl.
 
     Returns:
         The Faust G of the basis composed of the K+1 orthogonal polynomials.
@@ -113,7 +110,6 @@ def basis(L, K, basis_name, dev='cpu', T0=None, impl='native'):
             - FACTOR 4 (real) SPARSE, size 50x50, density 0.02, nnz 50
 
         The factors 0 to 3 of G are views of the same factors of F.
-        They are not duplicated in memory (iff impl==native).
 
         By default, the 0-degree polynomial is the identity.
         However it is possible to replace the corresponding matrix by
@@ -131,14 +127,23 @@ def basis(L, K, basis_name, dev='cpu', T0=None, impl='native'):
 
 
     """
+    # impl (optional): 'native' (by default) for the C++ impl., "py" for the Python impl.
+    # L can aslo be a Faust if impl is "py".
+    impl = 'native'
+    if 'impl' in kwargs:
+        if kwargs['impl'] in ['py', 'native']:
+            impl = kwargs['impl']
+        else:
+            raise ValueError("impl keyword argument has a wrong value (it can"
+                             " only be 'py' or 'native'")
     if basis_name.lower() == 'chebyshev':
         return Chebyshev(L, K, dev=dev, T0=T0, impl=impl)
     else:
         raise ValueError(basis_name+" is not a valid basis name")
 
 
-def poly(coeffs, basis='chebyshev', L=None, X=None, dev='cpu', impl='native',
-         out=None):
+def poly(coeffs, basis='chebyshev', L=None, X=None, dev='cpu', out=None,
+         **kwargs):
     """
         Computes the linear combination of the polynomials defined by basis.
 
@@ -149,13 +154,12 @@ def poly(coeffs, basis='chebyshev', L=None, X=None, dev='cpu', impl='native',
             np.ndarray -- if X is not None, basis can only be a FaustPoly).
             L: the sparse scipy square matrix in CSR format
             (scipy.sparse.csr_matrix) on which the polynomial basis is built if basis is not already a Faust or a numpy.ndarray.
-            L can aslo be a Faust if impl is "py". It can't be None if basis is not a FaustPoly or a numpy.ndarray.
+            It can't be None if basis is not a FaustPoly or a numpy.ndarray.
             X: (np.darray) if X is not None, the linear combination of basis@X
             is computed (note that the memory space is optimized compared to
             the manual way of doing first B = basis@X and then calling poly on
             B with X at None).
             dev: the device to instantiate the returned Faust ('cpu' or 'gpu').
-            impl: 'native' (by default) for the C++ impl., "py" for the Python impl.
             out: (np.ndarray) if not None the function result is put into this
             np.ndarray. Note that out.flags['F_CONTINUOUS'] must be True. Note that this can't work if the function returns a
             Faust.
@@ -207,6 +211,15 @@ def poly(coeffs, basis='chebyshev', L=None, X=None, dev='cpu', impl='native',
             True
 
     """
+    # impl (optional): 'native' (by default) for the C++ impl., "py" for the Python impl.
+    # L can aslo be a Faust if impl is "py".
+    impl = 'native'
+    if 'impl' in kwargs:
+        if kwargs['impl'] in ['py', 'native']:
+            impl = kwargs['impl']
+        else:
+            raise ValueError("impl keyword argument has a wrong value (it can"
+                             " only be 'py' or 'native'")
     K = coeffs.size-1
     if isinstance(basis, str):
         if L is None:
@@ -267,7 +280,7 @@ def _poly_arr_py(coeffs, basisX, d, dev='cpu', out=None):
         Y = np.empty((d, n))
     else:
         Y = out
-        if Y.shape != (d,n):
+        if Y.shape != (d, n):
             raise ValueError('out shape isn\'t valid.')
     if n == 1:
         Y[:, 0] = basisX[:, 0].reshape(d, K_plus_1, order='F') @ coeffs
@@ -275,13 +288,13 @@ def _poly_arr_py(coeffs, basisX, d, dev='cpu', out=None):
         nthreads = 4
         threads = []
         def apply_coeffs(i, n):
-            for i in range(i,n,nthreads):
+            for i in range(i, n, nthreads):
                 Y[:, i] = basisX[:, i].reshape(d, K_plus_1, order='F') @ coeffs
-        for i in range(0,nthreads):
-            t = threading.Thread(target=apply_coeffs, args=([i,n]))
+        for i in range(0, nthreads):
+            t = threading.Thread(target=apply_coeffs, args=([i, n]))
             threads.append(t)
             t.start()
-        for i in range(0,nthreads):
+        for i in range(0, nthreads):
            threads[i].join()
     else:
          for i in range(n):
@@ -296,7 +309,7 @@ def _poly_arr_cpp(coeffs, basisX, d, dev='cpu', out=None):
     return _FaustCorePy.polyCoeffs(d, basisX, coeffs, dev, out)
 
 def _poly_Faust_cpp(coeffs, basisFaust, X=None, dev='cpu', out=None):
-    Y = None # can't happen
+    Y = None  # can't happen
     if isinstance(X, type(None)):
         Y = Faust(core_obj=basisFaust.m_faust.polyCoeffs(coeffs))
     elif isinstance(X, np.ndarray):
@@ -307,14 +320,13 @@ def _poly_Faust_cpp(coeffs, basisFaust, X=None, dev='cpu', out=None):
 
 
 def _chebyshev(L, K, T0, T1, rR, dev='cpu'):
-    d = L.shape[0]
     factors = [T0]
     if(K > 0):
         factors.insert(0, T1)
         for i in range(2, K + 1):
             Ti = _chebyshev_Ti_matrix(rR, L, i)
             factors.insert(0, Ti)
-    kwargs = {'T1': T1, 'rR': rR, 'L': L, 'impl':'py'}
+    kwargs = {'T1': T1, 'rR': rR, 'L': L, 'impl': 'py'}
     T = FaustPoly(factors, dev=dev, **kwargs)
     return T  # K-th poly is T[K*L.shape[0]:,:]
 
@@ -324,7 +336,7 @@ def _chebyshev_Ti_matrix(rR, L, i):
     if i <= 2:
         R = rR
     else:
-        #zero = csr_matrix((d, (i-2)*d), dtype=float)
+        # zero = csr_matrix((d, (i-2)*d), dtype=float)
         zero = _zeros_like(L, shape=(d, (i-2)*d))
         R = _hstack((zero, rR))
     di = d*i
@@ -363,7 +375,6 @@ def _eyes_like(M, shape=None):
 
 
 def _vstack(arrays):
-    _arrays = _build_consistent_tuple(arrays)
     if isFaust(arrays[0]):
         # all arrays are of type Faust
         return fvstack(arrays)
@@ -373,7 +384,6 @@ def _vstack(arrays):
 
 
 def _hstack(arrays):
-    _arrays = _build_consistent_tuple(arrays)
     if isFaust(arrays[0]):
         # all arrays are of type Faust
         return fhstack(arrays)
@@ -397,6 +407,7 @@ def _build_consistent_tuple(arrays):
         return tuple(_arrays)
     else:
         return arrays
+
 
 class FaustPoly(Faust):
     """
@@ -433,7 +444,7 @@ class FaustPoly(Faust):
             yield F
 
     def _py_gen(self, L, T1, rR, dev='cpu'):
-        kwargs = {'T1': T1, 'rR': rR, 'L': L, 'impl':'py'}
+        kwargs = {'T1': T1, 'rR': rR, 'L': L, 'impl': 'py'}
         T = self
         if isFaust(L):
             i = T.shape[0] // L.shape[0]
@@ -548,10 +559,10 @@ def expm_multiply(A, B, t, K=10, tradeoff='time', dev='cpu', **kwargs):
     else:
         n = B.shape[1]
     npts = len(t)
-    Y = [empty((m,n), order='F') for i in range(npts)]
+    Y = [empty((m, n), order='F') for i in range(npts)]
     if poly_meth == 2:
-        TB = np.squeeze(T@B)
-    for i,tau in enumerate(t):
+        TB = squeeze(T@B)
+    for i, tau in enumerate(t):
         if tau >= 0:
             raise ValueError('pyfaust.poly.expm_multiply handles only negative '
                              'time points.')
@@ -563,17 +574,18 @@ def expm_multiply(A, B, t, K=10, tradeoff='time', dev='cpu', **kwargs):
             coeff[j] = coeff[j+2] - (2 * j + 2) / (-tau * phi) * coeff[j+1]
         coeff[0] /= 2
         if poly_meth == 2:
-                poly(coeff, TB, dev=dev, out=Y[i][:,:])
+                poly(coeff, TB, dev=dev, out=Y[i][:, :])
         else:
             if n == 1:
-                poly(coeff, T, X=B, dev=dev, out=Y[i][:,:])
+                poly(coeff, T, X=B, dev=dev, out=Y[i][:, :])
             else:
-                poly(coeff, T, X=B, dev=dev, out=Y[i][:,:])
+                poly(coeff, T, X=B, dev=dev, out=Y[i][:, :])
     if B.ndim == 1:
-        return np.squeeze(Y)
+        return squeeze(Y)
     else:
         return Y
 
+# experimental block start
 def invm_multiply(A, B, rel_err=1e-6, tradeoff='time', max_K=np.inf, dev='cpu', **kwargs):
     """
     Computes an approximate of the action of the matrix inverse of A on B using Chebyshev polynomials.
@@ -626,20 +638,23 @@ def invm_multiply(A, B, rel_err=1e-6, tradeoff='time', max_K=np.inf, dev='cpu', 
             raise ValueError('poly_meth must be 1 or 2')
     Id = seye(*A.shape)
     b = eigsh(A, 1, return_eigenvectors=False)[0]
+#    from scipy import diag
+#    b = max(abs(A.diagonal()))
     B_ = b*Id-A
-    b_ = eigsh(B_,1, return_eigenvectors=False)[0]
+    b_ = eigsh(B_, 1, return_eigenvectors=False)[0]
+    # b_ = max(abs(B_.diagonal()))
     a = b-b_
     if a <= 0:
         raise Exception("a <= 0 error: A is a singular matrix or its spectrum contains"
                         " negative values.")
-    m = (a + b) /2
+    m = (a + b) / 2
     c = (b - a) / (b + a)
     g = abs(1 / c + sqrt(1/c**2 - 1))
     K = min(max_K, int(((log(1/eps) + log(2/(m*sqrt(1-c**2))) - log(g-1)) /
                         log(g))))
     Abar = 2*A/(b-a) - (b+a)*Id/(b-a)
     T = basis(Abar, K, 'chebyshev', dev=dev)
-    coeffs = array([ 2 / (m*sqrt(1-c**2)) * (-1)**k * g**(-k) for k in
+    coeffs = array([2 / (m*sqrt(1-c**2)) * (-1)**k * g**(-k) for k in
                     range(0, K+1)])
     coeffs[0] /= 2
 
@@ -649,5 +664,4 @@ def invm_multiply(A, B, rel_err=1e-6, tradeoff='time', max_K=np.inf, dev='cpu', 
     else:
         A_inv_B = poly(coeffs, T, X=B, dev=dev)
     return A_inv_B
-
 # experimental block end

@@ -1,4 +1,3 @@
-% experimental block start
 %> @package matfaust.poly @brief The matfaust module for polynomial basis as Faust objects.
 %> @note This module is still in BETA status.
 
@@ -148,4 +147,3 @@ function LC = poly(coeffs, basis, varargin)
 		% LC is a matrix
 	end
 end
-% experimental block end

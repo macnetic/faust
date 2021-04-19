@@ -1,4 +1,3 @@
-% experimental block start
 
 %==============================================
 %> @brief Computes an approximate of the action of the matrix exponential of A on B using series of Chebyshev polynomials.
@@ -120,4 +119,3 @@ function C = expm_multiply(A, B, t, varargin)
 	end
 	C = Y;
 end
-% experimental block end
