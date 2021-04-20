@@ -14262,7 +14262,7 @@ a.anchor-link {
 <h1 id="Using-the-poly-module">Using the poly module<a class="anchor-link" href="#Using-the-poly-module">&#182;</a></h1><p>A new module has been added to pyfaust version 3.1.x. Its name is <code>poly</code> and as expected it is dedicated to a kind of Fausts that are defined according to series of polynomials.</p>
 <p>In this notebook we'll see how to use the main functions of this module then we'll introduce one precise use case with the action of exponential matrix on a vector / matrix.</p>
 <p><strong>NOTE</strong>: all the functions introduced in this notebook are available on GPU, using the <code>dev='gpu'</code> argument.</p>
-<h2 id="1.-The-basis-function">1. The basis function<a class="anchor-link" href="#1.-The-basis-function">&#182;</a></h2><p>Firstly, the poly module allows to define a polynomial basis (a <code>FaustPoly</code>) using the function <code>pyfaust.poly.basis</code>. Currently, only Chebyshev polynomials are supported but other are yet to come. Below is the prototype of the function:</p>
+<h2 id="1.-The-basis-function">1. The basis function<a class="anchor-link" href="#1.-The-basis-function">&#182;</a></h2><p>Firstly, the <code>poly</code> module allows to define a polynomial basis (a <code>FaustPoly</code>) using the function <code>pyfaust.poly.basis</code>. Currently, only Chebyshev polynomials are supported but other are yet to come. Below is the prototype of the function:</p>
 <p><code>basis(L, K, basis_name, dev='cpu', T0=None)</code></p>
 <p>In the next, we shall see a simple example but I let you consult the documentation by typing <code>help(pyfaust.poly.basis)</code> to get more details.</p>
 <p>For instance, if you want to instantiate a basis Faust of dimension K+1 (in the example below K=5) on L, which by the way must be a <code>scipy.sparse.csr_matrix</code> at least square (and most likely symmetric positive definite in much use cases),  you'll make this call to the function:</p>
@@ -14279,7 +14279,7 @@ a.anchor-link {
 <span class="n">d</span> <span class="o">=</span> <span class="mi">128</span>
 <span class="n">L</span> <span class="o">=</span> <span class="n">random</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="o">.</span><span class="mi">2</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csr&#39;</span><span class="p">)</span>
 <span class="n">L</span> <span class="o">=</span> <span class="n">L</span><span class="nd">@L</span><span class="o">.</span><span class="n">T</span>
-<span class="n">K</span><span class="o">=</span><span class="mi">5</span>
+<span class="n">K</span> <span class="o">=</span> <span class="mi">5</span>
 <span class="n">F</span> <span class="o">=</span> <span class="n">basis</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">K</span><span class="o">=</span><span class="n">K</span><span class="p">,</span> <span class="n">basis_name</span><span class="o">=</span><span class="s1">&#39;chebyshev&#39;</span><span class="p">)</span>
 <span class="n">F</span>
 </pre></div>
@@ -14303,12 +14303,12 @@ a.anchor-link {
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>Faust size 768x128, density 0.855611, nnz_sum 84110, 6 factor(s): 
-- FACTOR 0 (real) SPARSE, size 768x640, density 0.0347453, nnz 17078
-- FACTOR 1 (real) SPARSE, size 640x512, density 0.0517273, nnz 16950
-- FACTOR 2 (real) SPARSE, size 512x384, density 0.0855611, nnz 16822
-- FACTOR 3 (real) SPARSE, size 384x256, density 0.16982, nnz 16694
-- FACTOR 4 (real) SPARSE, size 256x128, density 0.501648, nnz 16438
+<pre>Faust size 768x128, density 0.855713, nnz_sum 84120, 6 factor(s): 
+- FACTOR 0 (real) SPARSE, size 768x640, density 0.0347493, nnz 17080
+- FACTOR 1 (real) SPARSE, size 640x512, density 0.0517334, nnz 16952
+- FACTOR 2 (real) SPARSE, size 512x384, density 0.0855713, nnz 16824
+- FACTOR 3 (real) SPARSE, size 384x256, density 0.16984, nnz 16696
+- FACTOR 4 (real) SPARSE, size 256x128, density 0.501709, nnz 16440
 - FACTOR 5 (real) SPARSE, size 128x128, density 0.0078125, nnz 128
  identity matrix flag</pre>
 </div>
@@ -14380,7 +14380,7 @@ a.anchor-link {
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <p>One of the most important thing to note about a polynomial basis Faust is that the multiplication by a vector or a matrix is specialized in order to optimize the performance obtained compared to the generic Faust-vector/matrix multiplication. Indeed, due to the particular structure of the polynomial basis Faust, the multiplication can be optimized.</p>
-<p>Let's verify that is true! In the code below F is cloned to a classic Faust G and the time of the multiplication by a matrix is measured in the both cases (with F, the basis Faust and G its classic Faust copy).</p>
+<p>Let's verify that is true! In the code below F is cloned to a classic Faust G and the time of the multiplication by a matrix is measured in the both cases (with F, the basis Faust and G its classic Faust copy). Note that <code>Faust.clone</code> function is not used because in this case it would return a polynomial basis Faust (after all that's the role of <code>clone</code> to preserve the Faust properties!). To get a classic Faust the only way is to copy the Faust factor by factor.</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
@@ -14390,7 +14390,9 @@ a.anchor-link {
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">numpy.random</span> <span class="kn">import</span> <span class="n">rand</span>
-<span class="n">G</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+<span class="kn">from</span> <span class="nn">pyfaust</span> <span class="kn">import</span> <span class="n">Faust</span>
+<span class="n">factors</span> <span class="o">=</span> <span class="p">[</span><span class="n">F</span><span class="o">.</span><span class="n">factors</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">numfactors</span><span class="p">())]</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">Faust</span><span class="p">(</span><span class="n">factors</span><span class="p">)</span>
 <span class="n">X</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="mi">100</span><span class="p">)</span>
 <span class="o">%</span><span class="k">timeit</span> F@X
 <span class="o">%</span><span class="k">timeit</span> G@X
@@ -14413,8 +14415,8 @@ a.anchor-link {
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>2.15 ms ± 247 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
-7.59 ms ± 207 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+<pre>2.18 ms ± 404 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+7.65 ms ± 183 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
 </pre>
 </div>
 </div>
@@ -14456,7 +14458,7 @@ a.anchor-link {
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>err= 1.247286639671429e-16
+<pre>err= 1.226853939966969e-16
 </pre>
 </div>
 </div>
@@ -14474,7 +14476,7 @@ a.anchor-link {
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h2 id="2.-The-poly-function">2. The poly function<a class="anchor-link" href="#2.-The-poly-function">&#182;</a></h2><p>The second function of the <code>pyfaust.poly</code> module is <code>poly</code>. This function purpose is to compute a linear combination of polynomials composing a <code>FaustPoly</code>. So passing the <code>FaustPoly</code> and the linear combination coefficients (one per polynomial, in ascending degree order) you'll obtain:</p>
+<h2 id="2.-The-poly-function">2. The poly function<a class="anchor-link" href="#2.-The-poly-function">&#182;</a></h2><p>The second function of the <code>pyfaust.poly</code> module is <code>poly</code>. This function purpose is to compute a linear combination of polynomials composing a <code>FaustPoly</code> (it can also be viewed as way to compute a polynomial). So passing the <code>FaustPoly</code> and the linear combination coefficients (one per polynomial, in ascending degree order) you'll obtain:</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
@@ -14485,7 +14487,7 @@ a.anchor-link {
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust.poly</span> <span class="kn">import</span> <span class="n">poly</span>
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">array</span>
-<span class="n">coeffs</span> <span class="o">=</span> <span class="n">array</span><span class="p">([</span><span class="n">rand</span><span class="p">()</span><span class="o">*</span><span class="mi">100</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">K</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span>
+<span class="n">coeffs</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="n">K</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="mi">100</span>
 <span class="n">lc_F</span> <span class="o">=</span> <span class="n">poly</span><span class="p">(</span><span class="n">coeffs</span><span class="p">,</span> <span class="n">F</span><span class="p">)</span>
 <span class="n">lc_F</span>
 </pre></div>
@@ -14509,13 +14511,13 @@ a.anchor-link {
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>Faust size 128x128, density 5.18054, nnz_sum 84878, 7 factor(s): 
+<pre>Faust size 128x128, density 5.18115, nnz_sum 84888, 7 factor(s): 
 - FACTOR 0 (real) SPARSE, size 128x768, density 0.0078125, nnz 768
-- FACTOR 1 (real) SPARSE, size 768x640, density 0.0347453, nnz 17078
-- FACTOR 2 (real) SPARSE, size 640x512, density 0.0517273, nnz 16950
-- FACTOR 3 (real) SPARSE, size 512x384, density 0.0855611, nnz 16822
-- FACTOR 4 (real) SPARSE, size 384x256, density 0.16982, nnz 16694
-- FACTOR 5 (real) SPARSE, size 256x128, density 0.501648, nnz 16438
+- FACTOR 1 (real) SPARSE, size 768x640, density 0.0347493, nnz 17080
+- FACTOR 2 (real) SPARSE, size 640x512, density 0.0517334, nnz 16952
+- FACTOR 3 (real) SPARSE, size 512x384, density 0.0855713, nnz 16824
+- FACTOR 4 (real) SPARSE, size 384x256, density 0.16984, nnz 16696
+- FACTOR 5 (real) SPARSE, size 256x128, density 0.501709, nnz 16440
 - FACTOR 6 (real) SPARSE, size 128x128, density 0.0078125, nnz 128
  identity matrix flag</pre>
 </div>
@@ -14541,9 +14543,6 @@ a.anchor-link {
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">eye</span>
 <span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">hstack</span>
 <span class="kn">from</span> <span class="nn">pyfaust</span> <span class="kn">import</span> <span class="n">Faust</span>
-<span class="n">Id</span> <span class="o">=</span> <span class="n">eye</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csr&#39;</span><span class="p">)</span>
-<span class="c1">#coeffs_factor = hstack(tuple(coeffs[i]*Id for i in range(K+1)), format=&#39;csr&#39;)</span>
-<span class="c1">#lc_G = Faust(coeffs_factor)@G</span>
 <span class="n">lc_G</span> <span class="o">=</span> <span class="n">coeffs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">G</span><span class="p">[:</span><span class="n">d</span><span class="p">,:]</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">K</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
     <span class="n">lc_G</span> <span class="o">+=</span> <span class="n">coeffs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="n">d</span><span class="o">*</span><span class="n">i</span><span class="p">:</span><span class="n">d</span><span class="o">*</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">),:]</span>
@@ -14567,7 +14566,7 @@ a.anchor-link {
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>error lc_G/lc_F: 4.492418326200741e-16
+<pre>error lc_G/lc_F: 4.461651547604153e-16
 </pre>
 </div>
 </div>
@@ -14579,7 +14578,7 @@ a.anchor-link {
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Here again the <code>FaustPoly</code> operation is optimized compared to the <code>Faust</code> one. Speaking of which, there is ways to do even more optimized because the <code>poly</code> function is kind of matrix type agnostic (or precisely, it accepts a <code>FaustPoly</code> or a <code>numpy.ndarray</code> as the basis argument. Doing with the latter an optimized implementation is used whose the memory footprint is smaller than the one consumed with a <code>FaustPoly</code>. It can be particulary efficient when the use cases (as we'll see in <a href="">3.</a>) consist to apply a linear combination of F to a vector x as it's shown below.</p>
+<p>Here again the <code>FaustPoly</code> operation is optimized compared to the <code>Faust</code> one. Speaking of which, there is ways to do even more optimized because the <code>poly</code> function is kind of matrix type agnostic, or precisely, it accepts a <code>FaustPoly</code> or a <code>numpy.ndarray</code> as the basis argument. Doing with the latter an optimized implementation is used whose the memory footprint is smaller than the one consumed with a <code>FaustPoly</code>. It can be particulary efficient when the use cases (as we'll see in <a href="">3.</a>) consist to apply a linear combination of F to a vector x as it's shown below.</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
@@ -14625,7 +14624,7 @@ a.anchor-link {
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>123 µs ± 4 µs per loop (mean ± std. dev. of 7 runs, 10000 loops each)
+<pre>124 µs ± 4.63 µs per loop (mean ± std. dev. of 7 runs, 10000 loops each)
 </pre>
 </div>
 </div>
@@ -14660,7 +14659,7 @@ a.anchor-link {
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>95.5 µs ± 841 ns per loop (mean ± std. dev. of 7 runs, 10000 loops each)
+<pre>96.3 µs ± 1.88 µs per loop (mean ± std. dev. of 7 runs, 10000 loops each)
 </pre>
 </div>
 </div>
@@ -14695,7 +14694,7 @@ a.anchor-link {
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>79 µs ± 481 ns per loop (mean ± std. dev. of 7 runs, 10000 loops each)
+<pre>78.8 µs ± 467 ns per loop (mean ± std. dev. of 7 runs, 10000 loops each)
 </pre>
 </div>
 </div>
@@ -14707,7 +14706,8 @@ a.anchor-link {
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>OK! The second way to do is quicker and the third is the quickest but just in case let's verify all ways give the same results.</p>
+<p>Depending on the situation the <code>way2</code> or <code>way3</code> might be the quickest but they are always both quicker than <code>way1</code>.</p>
+<p>Just in case let's verify all ways give the same results.</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
@@ -14736,7 +14736,7 @@ a.anchor-link {
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>err way2 = 1.3764056302069666e-16
+<pre>err way2 = 1.2851224259408018e-16
 </pre>
 </div>
 </div>
@@ -14771,7 +14771,7 @@ a.anchor-link {
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>err way3 = 1.3764056302069666e-16
+<pre>err way3 = 1.2851224259408018e-16
 </pre>
 </div>
 </div>
@@ -14783,7 +14783,7 @@ a.anchor-link {
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>All sounds good! We shall now introduce one use case of Chebyshev polynomial series in FAµST that allow to get interesting results compared to what we can do in the numpy/scipy ecosystem. But to note a last thing before going ahead to the part <a href="">3.</a> is that the function poly is a little more complicated that it looks, fore more details I invite you to consult the <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacepyfaust.html">API documentation</a>.</p>
+<p>All sounds good! We shall now introduce one use case of Chebyshev polynomial series in FAµST that allow to get interesting results compared to what we can do in the numpy/scipy ecosystem. But to note a last thing before going ahead to the part <a href="">3.</a> is that the function poly is a little more complicated that it looks like, for more details I invite you to consult the <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacepyfaust_1_1poly.html#afc6e14fb360a1650cddf8a7646b9209c">API documentation</a>.</p>
 
 </div>
 </div>
@@ -14840,9 +14840,9 @@ The main difference between the two of them, is that in pyfaust the time points 
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>pyfaust error: 5.190526934271e-11
-75.9 ms ± 3.31 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
-1.16 s ± 38.6 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+<pre>pyfaust error: 5.409619074994287e-11
+81.4 ms ± 1.97 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+1.07 s ± 10.1 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
 </pre>
 </div>
 </div>
@@ -14854,7 +14854,7 @@ The main difference between the two of them, is that in pyfaust the time points 
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>It is rather good for <code>pyfaust</code> but note that there is some drawbacks to its <code>expm_multiply</code> implementation. You'll find them among other details in the <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacepyfaust.html">API documentation</a>.</p>
+<p>It is rather good for <code>pyfaust</code> but note that there is some drawbacks to its <code>expm_multiply</code> implementation. You'll find them among other details in the <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacepyfaust_1_1poly.html#aebbce7977632e3c85260738604f01104">API documentation</a>.</p>
 
 </div>
 </div>
