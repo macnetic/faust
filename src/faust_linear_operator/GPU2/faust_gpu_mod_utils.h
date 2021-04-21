@@ -56,7 +56,7 @@ namespace Faust
 
 		public:
 		~GPUModHandler();
-		static GPUModHandler* get_singleton(const bool silent=false);
+		static GPUModHandler* get_singleton(const bool silent=true);
 		void* enable_gpu_mod(const string& libpath, bool silent); //TODO: add backend argument: cuda (only available for now), opencl
 		void* enable_gpu_mod(const char* libpath, bool silent); //TODO: delete when python and matlab wrappers will use string
 		void check_gpu_mod_loaded() const;
