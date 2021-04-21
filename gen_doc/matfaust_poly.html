@@ -1,0 +1,280 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,IE=9,chrome=1"><meta name="generator" content="MATLAB R2018b"><title>Using the poly module</title><style type="text/css">.rtcContent { padding: 30px; } .S0 { margin: 3px 10px 5px 4px; padding: 0px; line-height: 28.7999992370605px; min-height: 0px; white-space: pre-wrap; color: rgb(213, 80, 0); font-family: Helvetica, Arial, sans-serif; font-style: normal; font-size: 24px; font-weight: normal; text-align: left;  }
+.S1 { margin: 2px 10px 9px 4px; padding: 0px; line-height: 21px; min-height: 0px; white-space: pre-wrap; color: rgb(0, 0, 0); font-family: Helvetica, Arial, sans-serif; font-style: normal; font-size: 14px; font-weight: normal; text-align: left;  }
+.S2 { margin: 20px 10px 5px 4px; padding: 0px; line-height: 20px; min-height: 0px; white-space: pre-wrap; color: rgb(60, 60, 60); font-family: Helvetica, Arial, sans-serif; font-style: normal; font-size: 20px; font-weight: bold; text-align: left;  }
+.CodeBlock { background-color: #F7F7F7; margin: 10px 0 10px 0;}
+.S3 { border-left: 1px solid rgb(233, 233, 233); border-right: 1px solid rgb(233, 233, 233); border-top: 1px solid rgb(233, 233, 233); border-bottom: 0px none rgb(0, 0, 0); border-radius: 4px 4px 0px 0px; padding: 6px 45px 0px 13px; line-height: 17.2339992523193px; min-height: 18px; white-space: nowrap; color: rgb(0, 0, 0); font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 14px;  }
+.S4 { border-left: 1px solid rgb(233, 233, 233); border-right: 1px solid rgb(233, 233, 233); border-top: 0px none rgb(0, 0, 0); border-bottom: 0px none rgb(0, 0, 0); border-radius: 0px; padding: 0px 45px 0px 13px; line-height: 17.2339992523193px; min-height: 18px; white-space: nowrap; color: rgb(0, 0, 0); font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 14px;  }
+.S5 { border-left: 1px solid rgb(233, 233, 233); border-right: 1px solid rgb(233, 233, 233); border-top: 0px none rgb(0, 0, 0); border-bottom: 1px solid rgb(233, 233, 233); border-radius: 0px; padding: 0px 45px 4px 13px; line-height: 17.2339992523193px; min-height: 18px; white-space: nowrap; color: rgb(0, 0, 0); font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 14px;  }
+.S6 { color: rgb(64, 64, 64); padding: 10px 0px 6px 17px; background: rgb(255, 255, 255) none repeat scroll 0% 0% / auto padding-box border-box; font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 14px; overflow-x: hidden; line-height: 17.2339992523193px;  }
+.embeddedOutputsErrorElement {min-height: 18px; max-height: 250px; overflow: auto;}
+.embeddedOutputsErrorElement.inlineElement {}
+.embeddedOutputsErrorElement.rightPaneElement {}
+.embeddedOutputsWarningElement{min-height: 18px; max-height: 250px; overflow: auto;}
+.embeddedOutputsWarningElement.inlineElement {}
+.embeddedOutputsWarningElement.rightPaneElement {}
+.diagnosticMessage-wrapper {font-family: Menlo, Monaco, Consolas, "Courier New", monospace; font-size: 12px;}
+.diagnosticMessage-wrapper.diagnosticMessage-warningType {color: rgb(255,100,0);}
+.diagnosticMessage-wrapper.diagnosticMessage-warningType a {color: rgb(255,100,0); text-decoration: underline;}
+.diagnosticMessage-wrapper.diagnosticMessage-errorType {color: rgb(230,0,0);}
+.diagnosticMessage-wrapper.diagnosticMessage-errorType a {color: rgb(230,0,0); text-decoration: underline;}
+.diagnosticMessage-wrapper .diagnosticMessage-messagePart {white-space: pre-wrap;}
+.diagnosticMessage-wrapper .diagnosticMessage-stackPart {white-space: pre;}
+.embeddedOutputsTextElement,.embeddedOutputsVariableStringElement {white-space: pre; word-wrap: initial; min-height: 18px; max-height: 250px; overflow: auto;}
+.textElement,.rtcDataTipElement .textElement {padding-top: 3px;}
+.embeddedOutputsTextElement.inlineElement,.embeddedOutputsVariableStringElement.inlineElement {}
+.inlineElement .textElement {}
+.embeddedOutputsTextElement.rightPaneElement,.embeddedOutputsVariableStringElement.rightPaneElement {min-height: 16px;}
+.rightPaneElement .textElement {padding-top: 2px; padding-left: 9px;}
+.S7 { margin: 10px 10px 9px 4px; padding: 0px; line-height: 21px; min-height: 0px; white-space: pre-wrap; color: rgb(0, 0, 0); font-family: Helvetica, Arial, sans-serif; font-style: normal; font-size: 14px; font-weight: normal; text-align: left;  }
+.S8 { border-left: 1px solid rgb(233, 233, 233); border-right: 1px solid rgb(233, 233, 233); border-top: 1px solid rgb(233, 233, 233); border-bottom: 1px solid rgb(233, 233, 233); border-radius: 4px 4px 0px 0px; padding: 6px 45px 4px 13px; line-height: 17.2339992523193px; min-height: 18px; white-space: nowrap; color: rgb(0, 0, 0); font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 14px;  }
+.variableValue { width: 100% !important; }
+.embeddedOutputsMatrixElement,.eoOutputWrapper .matrixElement {min-height: 18px; box-sizing: border-box;}
+.embeddedOutputsMatrixElement .matrixElement,.eoOutputWrapper .matrixElement,.rtcDataTipElement .matrixElement {position: relative;}
+.matrixElement .variableValue,.rtcDataTipElement .matrixElement .variableValue {white-space: pre; display: inline-block; vertical-align: top; overflow: hidden;}
+.embeddedOutputsMatrixElement.inlineElement {}
+.embeddedOutputsMatrixElement.inlineElement .topHeaderWrapper {display: none;}
+.embeddedOutputsMatrixElement.inlineElement .veTable .body {padding-top: 0 !important; max-height: 100px;}
+.inlineElement .matrixElement {max-height: 300px;}
+.embeddedOutputsMatrixElement.rightPaneElement {}
+.rightPaneElement .matrixElement,.rtcDataTipElement .matrixElement {overflow: hidden; padding-left: 9px;}
+.rightPaneElement .matrixElement {margin-bottom: -1px;}
+.embeddedOutputsMatrixElement .matrixElement .valueContainer,.eoOutputWrapper .matrixElement .valueContainer,.rtcDataTipElement .matrixElement .valueContainer {white-space: nowrap; margin-bottom: 3px;}
+.embeddedOutputsMatrixElement .matrixElement .valueContainer .horizontalEllipsis.hide,.embeddedOutputsMatrixElement .matrixElement .verticalEllipsis.hide,.eoOutputWrapper .matrixElement .valueContainer .horizontalEllipsis.hide,.eoOutputWrapper .matrixElement .verticalEllipsis.hide,.rtcDataTipElement .matrixElement .valueContainer .horizontalEllipsis.hide,.rtcDataTipElement .matrixElement .verticalEllipsis.hide {display: none;}
+.embeddedOutputsVariableMatrixElement .matrixElement .valueContainer.hideEllipses .verticalEllipsis, .embeddedOutputsVariableMatrixElement .matrixElement .valueContainer.hideEllipses .horizontalEllipsis {display:none;}
+.embeddedOutputsMatrixElement .matrixElement .valueContainer .horizontalEllipsis,.eoOutputWrapper .matrixElement .valueContainer .horizontalEllipsis {margin-bottom: -3px;}
+.eoOutputWrapper .embeddedOutputsVariableMatrixElement .matrixElement .valueContainer {cursor: default !important;}
+.embeddedOutputsVariableElement {white-space: pre-wrap; word-wrap: break-word; min-height: 18px; max-height: 250px; overflow: auto;}
+.variableElement {}
+.embeddedOutputsVariableElement.inlineElement {}
+.inlineElement .variableElement {}
+.embeddedOutputsVariableElement.rightPaneElement {min-height: 16px;}
+.rightPaneElement .variableElement {padding-top: 2px; padding-left: 9px;}
+.variableNameElement {margin-bottom: 3px; display: inline-block;}
+.matrixElement .horizontalEllipsis,.rtcDataTipElement .matrixElement .horizontalEllipsis {display: inline-block; margin-top: 3px; width: 30px; height: 12px; background-repeat: no-repeat; background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB0AAAAJCAYAAADO1CeCAAAAJUlEQVR42mP4//8/A70xw0i29BUDFPxnAEtTW37wWDqakIa4pQDvOOG89lHX2gAAAABJRU5ErkJggg==");}
+.matrixElement .verticalEllipsis,.textElement .verticalEllipsis,.rtcDataTipElement .matrixElement .verticalEllipsis,.rtcDataTipElement .textElement .verticalEllipsis {margin-left: 35px; width: 12px; height: 30px; background-repeat: no-repeat; background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAZCAYAAAAIcL+IAAAALklEQVR42mP4//8/AzGYgWyFMECMwv8QddRS+P//KyimlmcGUOFoOI6GI/UVAgDnd8Dd4+NCwgAAAABJRU5ErkJggg==");}
+.S9 { border-left: 1px solid rgb(233, 233, 233); border-right: 1px solid rgb(233, 233, 233); border-top: 1px solid rgb(233, 233, 233); border-bottom: 1px solid rgb(233, 233, 233); border-radius: 0px; padding: 6px 45px 4px 13px; line-height: 17.2339992523193px; min-height: 18px; white-space: nowrap; color: rgb(0, 0, 0); font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 14px;  }
+.S10 { border-left: 1px solid rgb(233, 233, 233); border-right: 1px solid rgb(233, 233, 233); border-top: 1px solid rgb(233, 233, 233); border-bottom: 0px none rgb(0, 0, 0); border-radius: 0px; padding: 6px 45px 0px 13px; line-height: 17.2339992523193px; min-height: 18px; white-space: nowrap; color: rgb(0, 0, 0); font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 14px;  }
+.S11 { border-left: 1px solid rgb(233, 233, 233); border-right: 1px solid rgb(233, 233, 233); border-top: 1px solid rgb(233, 233, 233); border-bottom: 1px solid rgb(233, 233, 233); border-radius: 0px 0px 4px 4px; padding: 6px 45px 4px 13px; line-height: 17.2339992523193px; min-height: 18px; white-space: nowrap; color: rgb(0, 0, 0); font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 14px;  }</style></head><body><div class = rtcContent><h1  class = 'S0'><span>Using the poly module</span></h1><div  class = 'S1'><span>A new module has been added to matfaust version 3.1.x. Its name is </span><span style=' font-family: monospace;'>poly</span><span> and as expected it is dedicated to a kind of Fausts that are defined according to series of polynomials.</span></div><div  class = 'S1'><span>In this notebook we'll see how to use the main functions of this  module then we'll introduce one precise use case with the action of  exponential matrix on a vector / matrix.</span></div><div  class = 'S1'><span style=' font-weight: bold;'>NOTE</span><span>: all the functions introduced in this notebook are available on GPU, using the '</span><span style=' font-family: monospace;'>dev', 'gpu'</span><span> arguments.</span></div><h2  class = 'S2'><span>1. The basis function</span></h2><div  class = 'S1'><span></span></div><div  class = 'S1'><span>Firstly, the </span><span style=' font-family: monospace;'>poly</span><span> module allows to define a polynomial basis (aka </span><span style=' font-family: monospace;'>FaustPoly</span><span>) using the function </span><span style=' font-family: monospace;'>matfaust.poly.basis</span><span>. Currently, only Chebyshev polynomials are supported but other are yet to come. Below is the prototype of the function:</span></div><div  class = 'S1'><span style=' font-family: monospace;'>basis(L, K, basis_name, varargin)</span></div><div  class = 'S1'><span style=' font-weight: bold; font-family: monospace;'>NOTE:</span><span style=' font-family: monospace;'> it is noteworthy that varargin contains the optional T0 argument, we'll come back to this point later.</span></div><div  class = 'S1'><span>In the next, we shall see a simple example but I let you consult the documentation by typing </span><span style=' font-family: monospace;'>help matfaust.poly.basis</span><span> to get more details (alternatively, this is the </span><a href = "https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacematfaust_1_1poly.html#a556d6a4eedc41529ddea692d227caaf4"><span>online doc</span></a><span>).</span></div><div  class = 'S1'><span>For instance, if you want to instantiate a basis Faust of dimension K+1 (in the example below K=5) on L, which by the way must be a sparse matrix at least square (and most likely symmetric positive definite in much use cases), you'll make this call to the function:</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S3'><span style="white-space: pre;"><span>import </span><span style="color: rgb(160, 32, 240);">matfaust.poly.basis</span></span></div></div><div class="inlineWrapper"><div  class = 'S4'><span style="white-space: pre;"><span>d = 128;</span></span></div></div><div class="inlineWrapper"><div  class = 'S4'><span style="white-space: pre;"><span>L = sprand(d, d, .2);</span></span></div></div><div class="inlineWrapper"><div  class = 'S4'><span style="white-space: pre;"><span>L = L*L';</span></span></div></div><div class="inlineWrapper"><div  class = 'S4'><span style="white-space: pre;"><span>K = 5;</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S5'><span style="white-space: pre;"><span>F = basis(L, K, </span><span style="color: rgb(160, 32, 240);">'chebyshev'</span><span>)</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="F7B6A34C" data-testid="output_0" data-width="495" data-height="132" data-hashorizontaloverflow="false" style="width: 525px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">F = </span></div><div>Faust size 768x128, density 0.847371, nnz_sum 83300, 6 factor(s): 
+- FACTOR 0 (real) SPARSE, size 768x640, density 0.0344157, nnz 16916
+- FACTOR 1 (real) SPARSE, size 640x512, density 0.0512329, nnz 16788
+- FACTOR 2 (real) SPARSE, size 512x384, density 0.0847371, nnz 16660
+- FACTOR 3 (real) SPARSE, size 384x256, density 0.168172, nnz 16532
+- FACTOR 4 (real) SPARSE, size 256x128, density 0.496704, nnz 16276
+- FACTOR 5 (real) SPARSE, size 128x128, density 0.0078125, nnz 128
+ identity matrix flag</div></div></div></div></div></div><div  class = 'S7'><span>As you can see, the last factor is followed by the mention </span><span style=' font-family: monospace;'>identity matrix flag</span><span>. It means that this factor is the identity matrix. This is not  suprising, because the 0-degree Chebyshev polynomial is the identity. However, note that the </span><span style=' font-family: monospace;'>T0</span><span> optional argument of the function is here to trick the basis by using another matrix than the identity even if eventually it might not be a proper basis it can be useful if you want to apply this basis on a vector or a matrix (hence you'll set </span><span style=' font-family: monospace;'>T0</span><span> as this vector/matrix instead of multiplying the basis by this vector/matrix).</span></div><div  class = 'S1'><span>So how should we understand this Faust? You can see it as a vertical concatenation of polynomials. Indeed, the basis is composed of K+1 polynomials, the 0-degree polynomial is at the top of the stack (i.e. </span><span style=' font-family: monospace;'>F(1:d,:)</span><span> is the identity):</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S8'><span style="white-space: pre;"><span>full(F(1:d, :))</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableMatrixElement" uid="CF62A7DD" data-testid="output_1" data-width="495" style="width: 525px; white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><div class="matrixElement veSpecifier" style="white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><div class="veVariableName variableNameElement double" style="width: 495px; white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><span style="white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;">ans = </span><span class="veVariableValueSummary veMetaSummary" style="white-space: normal; font-style: normal; color: rgb(179, 179, 179); font-size: 12px;">128×128</span></div><div class="valueContainer" data-layout="{&quot;columnWidth&quot;:40,&quot;totalColumns&quot;:128,&quot;totalRows&quot;:128,&quot;charsPerColumn&quot;:6}" style="white-space: nowrap; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><div class="variableValue" style="width: 442px; white-space: pre; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;">     1     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0
+     0     1     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0
+     0     0     1     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0
+     0     0     0     1     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0
+     0     0     0     0     1     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0
+     0     0     0     0     0     1     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0
+     0     0     0     0     0     0     1     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0
+     0     0     0     0     0     0     0     1     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0
+     0     0     0     0     0     0     0     0     1     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0
+     0     0     0     0     0     0     0     0     0     1     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0
+</div><div class="horizontalEllipsis" style="white-space: nowrap; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"></div><div class="verticalEllipsis" style="white-space: nowrap; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"></div></div></div></div></div></div></div><div  class = 'S7'><span>This first 0-degree polynomial is followed by the next degree polynomials: hence </span><span style=' font-family: monospace;'>F(d+1:d*2, :)</span><span> is the 1-degree polynomial, </span><span style=' font-family: monospace;'>F(d*2+1:d*3, :)</span><span> is the 2-degree polynomial and so on...</span></div><div  class = 'S1'><span>For details about the Chebyshev polynomials, including their definition by a recurrence relationship (that is used here behind the scene), you can look at this </span><a href = "https://en.wikipedia.org/wiki/Chebyshev_polynomials"><span style=' text-decoration: underline;'>wikipedia article</span></a><span>.</span></div><div  class = 'S1'><span>One of the most important thing to note about a polynomial basis Faust is that the multiplication by a vector or a matrix is specialized in order to optimize the performance obtained compared to the generic Faust-vector/matrix multiplication. Indeed, due to the particular structure of the polynomial basis Faust, the multiplication can be optimized.</span></div><div  class = 'S1'><span>Let's verify that is true! In the code below F is cloned to a classic Faust G and the time of the multiplication by a matrix is measured in the both cases (with F, the basis Faust and G its classic Faust copy). Note that </span><span style=' font-family: monospace;'>Faust.clone</span><span> function is not used because in this case it would return a polynomial basis Faust (after all that's the role of </span><span style=' font-family: monospace;'>clone </span><span>to preserve the Faust properties!). To get a classic Faust the only way is to copy the Faust factor by factor.</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S3'><span style="white-space: pre;"><span>facs = {};</span></span></div></div><div class="inlineWrapper"><div  class = 'S4'><span style="white-space: pre;"><span style="color: rgb(0, 0, 255);">for </span><span>i=1:numfactors(F)</span></span></div></div><div class="inlineWrapper"><div  class = 'S4'><span style="white-space: pre;"><span>    </span><span class="warning_squiggle_rte">facs</span><span> = [facs {factors(F,i)}];   </span></span></div></div><div class="inlineWrapper"><div  class = 'S4'><span style="white-space: pre;"><span style="color: rgb(0, 0, 255);">end</span></span></div></div><div class="inlineWrapper"><div  class = 'S4'><span style="white-space: pre;"><span>G = matfaust.Faust(facs);</span></span></div></div><div class="inlineWrapper"><div  class = 'S4'><span style="white-space: pre;"><span>X = rand(size(F, 2), 100);</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S5'><span style="white-space: pre;"><span>timeit(@() F*X)</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>ans = 0.0132</div></div></div><div class="inlineWrapper outputs"><div  class = 'S9'><span style="white-space: pre;"><span>timeit(@() G*X)</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>ans = 0.0221</div></div></div></div><div  class = 'S7'><span>Now let's verify the multiplication result is accurate:</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S8'><span style="white-space: pre;"><span>err = norm(F*X-G*X)/norm(F*X)</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>err = 2.7722e-17</div></div></div></div><div  class = 'S7'><span>As you see it's alright.</span></div><h2  class = 'S2'><span>2. The poly function</span></h2><div  class = 'S1'><span></span></div><div  class = 'S1'><span>The second function of the </span><span style=' font-family: monospace;'>matfaust.poly</span><span> module is </span><span style=' font-family: monospace;'>poly</span><span>. This function purpose is to compute a linear combination of polynomials composing a polynomial basis / </span><span style=' font-family: monospace;'>FaustPoly</span><span> (it can also be viewed as a way to compute a polynomial). So passing the </span><span style=' font-family: monospace;'>FaustPoly</span><span> </span><span style=' font-family: monospace;'>F</span><span> and the linear combination coefficients (one per polynomial, in ascending degree order) you'll obtain:</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S3'><span style="white-space: pre;"><span>import </span><span style="color: rgb(160, 32, 240);">matfaust.poly.poly</span></span></div></div><div class="inlineWrapper"><div  class = 'S4'><span style="white-space: pre;"><span>coeffs = rand(K+1, 1)*100;</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S5'><span style="white-space: pre;"><span>lc_F = poly(coeffs, F)</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="21DA6029" data-testid="output_5" data-width="495" data-height="146" data-hashorizontaloverflow="false" style="width: 525px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">lc_F = </span></div><div>Faust size 128x128, density 5.1311, nnz_sum 84068, 7 factor(s): 
+- FACTOR 0 (real) SPARSE, size 128x768, density 0.0078125, nnz 768
+- FACTOR 1 (real) SPARSE, size 768x640, density 0.0344157, nnz 16916
+- FACTOR 2 (real) SPARSE, size 640x512, density 0.0512329, nnz 16788
+- FACTOR 3 (real) SPARSE, size 512x384, density 0.0847371, nnz 16660
+- FACTOR 4 (real) SPARSE, size 384x256, density 0.168172, nnz 16532
+- FACTOR 5 (real) SPARSE, size 256x128, density 0.496704, nnz 16276
+- FACTOR 6 (real) SPARSE, size 128x128, density 0.0078125, nnz 128
+ identity matrix flag</div></div></div></div></div></div><div  class = 'S7'><span>To be explicit about </span><span style=' font-family: monospace;'>lc_F</span><span> let's show how to rebuild it manually using G (which again is a classic Faust equal to F).</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S8'><span style="white-space: pre;"><span>lc_G = coeffs(1)*G(1:d,:)</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="F4BA5A8E" data-testid="output_6" data-width="495" data-height="118" data-hashorizontaloverflow="false" style="width: 525px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">lc_G = </span></div><div>Faust size 128x128, density 4.05957, nnz_sum 66512, 6 factor(s): 
+- FACTOR 0 (real) SPARSE, size 128x640, density 0.0015625, nnz 128
+- FACTOR 1 (real) SPARSE, size 640x512, density 0.0512329, nnz 16788
+- FACTOR 2 (real) SPARSE, size 512x384, density 0.0847371, nnz 16660
+- FACTOR 3 (real) SPARSE, size 384x256, density 0.168172, nnz 16532
+- FACTOR 4 (real) SPARSE, size 256x128, density 0.496704, nnz 16276
+- FACTOR 5 (real) SPARSE, size 128x128, density 0.0078125, nnz 128</div></div></div></div></div><div class="inlineWrapper"><div  class = 'S10'><span style="white-space: pre;"><span style="color: rgb(0, 0, 255);">for </span><span>i=2:K+1</span></span></div></div><div class="inlineWrapper"><div  class = 'S4'><span style="white-space: pre;"><span>    lc_G = lc_G+coeffs(i)*G(d*(i-1)+1:d*i, :);</span></span></div></div><div class="inlineWrapper"><div  class = 'S4'><span style="white-space: pre;"><span style="color: rgb(0, 0, 255);">end</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S5'><span style="white-space: pre;"><span>error = norm(full(lc_F)-full(lc_G))/norm(full(lc_G))</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>error = 1.0137e-16</div></div></div></div><div  class = 'S7'><span>Here again the basis </span><span style=' font-family: monospace;'>FaustPoly</span><span> operation is optimized compared to the </span><span style=' font-family: monospace;'>Faust</span><span> one. Speaking of which, there is ways to do even more optimized because the </span><span style=' font-family: monospace;'>poly</span><span> function is kind of matrix type agnostic, or precisely, it accepts a </span><span style=' font-family: monospace;'>FaustPoly</span><span> or a full array as the basis argument. Doing with the latter an optimized implementation is used whose the memory footprint is smaller than the one consumed with a </span><span style=' font-family: monospace;'>FaustPoly</span><span>. It can be particulary efficient when the use cases (as we'll see in </span><a href = "https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/pyfaust_poly.html"><span style=' text-decoration: underline;'>3.</span></a><span>) consist to apply a linear combination of F to a vector x as it's shown below.</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S3'><span style="white-space: pre;"><span>x = rand(size(F, 2));</span></span></div></div><div class="inlineWrapper"><div  class = 'S4'><span style="white-space: pre;"><span>way1 = @() poly(coeffs, F)*x; </span><span style="color: rgb(34, 139, 34);">% first way to do as we've done above</span></span></div></div><div class="inlineWrapper"><div  class = 'S4'><span style="white-space: pre;"><span>way2 = @() poly(coeffs, F*x); </span><span style="color: rgb(34, 139, 34);">% second way to do (quicker than way1)</span></span></div></div><div class="inlineWrapper"><div  class = 'S4'><span style="white-space: pre;"><span>way3 = @() poly(coeffs, F, </span><span style="color: rgb(160, 32, 240);">'X'</span><span>, x); </span><span style="color: rgb(34, 139, 34);">% third way to do (quicker than way1 too)</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S5'><span style="white-space: pre;"><span>timeit(way1)</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>ans = 0.0337</div></div></div><div class="inlineWrapper outputs"><div  class = 'S9'><span style="white-space: pre;"><span>timeit(way2)</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>ans = 0.0130</div></div></div><div class="inlineWrapper outputs"><div  class = 'S9'><span style="white-space: pre;"><span>timeit(way3)</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>ans = 0.0255</div></div></div></div><div  class = 'S7'><span>Depending on the situation the </span><span style=' font-family: monospace;'>way2</span><span> or </span><span style=' font-family: monospace;'>way3</span><span> might be the quickest, but they are always both quicker than </span><span style=' font-family: monospace;'>way1</span><span>.</span></div><div  class = 'S1'><span>Just in case let's verify all ways give the same results.</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S8'><span style="white-space: pre;"><span>err_way2 = norm(poly(coeffs,F)*x-poly(coeffs,F*x))/norm(poly(coeffs, F)*x)</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>err_way2 = 2.6314e-17</div></div></div><div class="inlineWrapper outputs"><div  class = 'S9'><span style="white-space: pre;"><span>err_way3 = norm(poly(coeffs, F)*x-poly(coeffs, F, </span><span style="color: rgb(160, 32, 240);">'X'</span><span>, x))/norm(poly(coeffs, F)*x)</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>err_way3 = 2.6314e-17</div></div></div></div><div  class = 'S7'><span>All sounds good! We shall now introduce one use case of Chebyshev polynomial series in FAµST that allow to get interesting results. But a  last thing to note before going ahead to the part </span><a href = "https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/pyfaust_poly.html"><span style=' text-decoration: underline;'>3.</span></a><span> is that the function </span><span style=' font-family: monospace;'>poly</span><span> is a little more complicated that it looks like, for more details I invite you to consult the </span><a href = "https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacematfaust_1_1poly.html#a94c288b6d41bca9541bcc48d22c405e3"><span style=' text-decoration: underline;'>API documentation</span></a><span>.</span></div><h2  class = 'S2'><span>3. Computing the action of the exponential of a matrix on a vector</span></h2><div  class = 'S1'><span></span></div><div  class = 'S1'><span>In the next, we'll see how to compute the action of the exponential matrix on a vector x. This function has been originally developed in pyfaust inspired by the </span><a href = "https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.expm_multiply.html"><span>scipy.sparse.linalg.expm_multiply</span></a><span> function. To get a computation time comparison, please consult the</span><a href = "http://faust.inria.fr/tutorials/pyfaust-jupyter-notebooks/using-the-poly-module/"><span> pyfaust jupyter notebook</span></a><span>.</span></div><div  class = 'S1'><span>Recalling that it consists to compute </span><span style=' font-family: monospace;'>exp(tA)x</span><span> without computing directly the exponential let's use the function.</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S3'><span style="white-space: pre;"><span>import </span><span style="color: rgb(160, 32, 240);">matfaust.poly.expm_multiply</span></span></div></div><div class="inlineWrapper"><div  class = 'S4'><span style="white-space: pre;"><span>S = sprand(1024, 1024, .002);</span></span></div></div><div class="inlineWrapper"><div  class = 'S4'><span style="white-space: pre;"><span>A = S*S'; </span><span style="color: rgb(34, 139, 34);">% A must be symmetric positive definite</span></span></div></div><div class="inlineWrapper"><div  class = 'S4'><span style="white-space: pre;"><span>X = rand(size(A, 2), 1);</span></span></div></div><div class="inlineWrapper"><div  class = 'S4'><span style="white-space: pre;"><span>pts = linspace(-.5, -.2, 1000); </span><span style="color: rgb(34, 139, 34);">% all t must be negative</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S5'><span style="white-space: pre;"><span>y = expm_multiply(A, X, pts)</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableMatrixElement" uid="1C761EBD" data-testid="output_13" data-width="495" style="width: 525px; white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><div class="matrixElement veSpecifier" style="white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><div class="veVariableName variableNameElement double" style="width: 495px; white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><span style="white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;">y = </span><span class="veVariableValueSummary veMetaSummary" style="white-space: normal; font-style: normal; color: rgb(179, 179, 179); font-size: 12px;">1000×1024</span></div><div class="valueContainer" data-layout="{&quot;columnWidth&quot;:66,&quot;totalColumns&quot;:1024,&quot;totalRows&quot;:1000,&quot;charsPerColumn&quot;:10}" style="white-space: nowrap; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><div class="variableValue" style="width: 398px; white-space: pre; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;">    0.4428   -0.1650   -0.0128   -0.0785    0.9582    0.4735    0.3201   -0.1899    0.1672    0.8484    0.3565    0.3985    0.0178    0.3882    0.2830   -0.0713   -0.1608    0.0966    0.1099    0.1194    0.1649    0.1118    0.1484    0.7558    0.3175    0.2315    0.0193    0.0953    0.6403   -0.1513    0.0168    0.3543    0.1125    0.2528    0.2033    0.5364    0.0092   -0.2256    0.0678   -0.2720    0.4734    0.6132    0.3867    0.0179    0.7434    0.2224   -0.0932    0.0388   -0.2210    0.5989
+    0.4429   -0.1650   -0.0128   -0.0785    0.9582    0.4737    0.3203   -0.1900    0.1673    0.8484    0.3567    0.3986    0.0178    0.3883    0.2831   -0.0713   -0.1607    0.0966    0.1100    0.1194    0.1650    0.1119    0.1484    0.7558    0.3175    0.2316    0.0193    0.0953    0.6403   -0.1512    0.0168    0.3544    0.1125    0.2529    0.2034    0.5365    0.0093   -0.2256    0.0678   -0.2719    0.4735    0.6132    0.3869    0.0179    0.7434    0.2226   -0.0932    0.0388   -0.2209    0.5990
+    0.4430   -0.1650   -0.0128   -0.0784    0.9582    0.4738    0.3205   -0.1900    0.1675    0.8484    0.3569    0.3987    0.0178    0.3885    0.2831   -0.0714   -0.1606    0.0966    0.1102    0.1194    0.1651    0.1120    0.1484    0.7558    0.3176    0.2316    0.0194    0.0954    0.6404   -0.1512    0.0168    0.3546    0.1125    0.2531    0.2034    0.5366    0.0094   -0.2255    0.0678   -0.2718    0.4735    0.6133    0.3871    0.0179    0.7434    0.2228   -0.0932    0.0388   -0.2209    0.5991
+    0.4431   -0.1650   -0.0127   -0.0783    0.9582    0.4740    0.3207   -0.1900    0.1676    0.8484    0.3570    0.3988    0.0178    0.3886    0.2832   -0.0714   -0.1605    0.0966    0.1104    0.1194    0.1653    0.1120    0.1484    0.7558    0.3176    0.2317    0.0194    0.0955    0.6404   -0.1511    0.0169    0.3547    0.1125    0.2532    0.2035    0.5367    0.0094   -0.2255    0.0678   -0.2717    0.4736    0.6133    0.3873    0.0179    0.7434    0.2229   -0.0932    0.0388   -0.2208    0.5991
+    0.4432   -0.1650   -0.0127   -0.0782    0.9582    0.4741    0.3208   -0.1900    0.1677    0.8484    0.3572    0.3988    0.0178    0.3887    0.2833   -0.0714   -0.1604    0.0966    0.1106    0.1194    0.1654    0.1121    0.1484    0.7558    0.3176    0.2318    0.0194    0.0956    0.6405   -0.1511    0.0169    0.3548    0.1125    0.2534    0.2036    0.5368    0.0095   -0.2255    0.0678   -0.2715    0.4736    0.6133    0.3875    0.0179    0.7434    0.2231   -0.0931    0.0388   -0.2208    0.5992
+    0.4433   -0.1650   -0.0127   -0.0781    0.9582    0.4743    0.3210   -0.1900    0.1678    0.8484    0.3574    0.3989    0.0178    0.3888    0.2833   -0.0714   -0.1602    0.0966    0.1107    0.1194    0.1655    0.1122    0.1484    0.7558    0.3177    0.2319    0.0195    0.0957    0.6405   -0.1510    0.0169    0.3549    0.1125    0.2535    0.2037    0.5368    0.0096   -0.2254    0.0679   -0.2714    0.4736    0.6133    0.3877    0.0179    0.7434    0.2233   -0.0931    0.0388   -0.2207    0.5993
+    0.4434   -0.1650   -0.0126   -0.0781    0.9582    0.4744    0.3212   -0.1900    0.1680    0.8485    0.3576    0.3990    0.0178    0.3889    0.2834   -0.0714   -0.1601    0.0966    0.1109    0.1194    0.1656    0.1123    0.1484    0.7558    0.3177    0.2320    0.0195    0.0958    0.6406   -0.1509    0.0169    0.3551    0.1125    0.2537    0.2037    0.5369    0.0097   -0.2254    0.0679   -0.2713    0.4737    0.6133    0.3879    0.0179    0.7434    0.2235   -0.0931    0.0388   -0.2207    0.5994
+    0.4435   -0.1650   -0.0126   -0.0780    0.9582    0.4745    0.3213   -0.1900    0.1681    0.8485    0.3578    0.3991    0.0178    0.3890    0.2835   -0.0715   -0.1600    0.0966    0.1111    0.1194    0.1658    0.1124    0.1484    0.7558    0.3178    0.2321    0.0195    0.0959    0.6406   -0.1509    0.0169    0.3552    0.1125    0.2538    0.2038    0.5370    0.0098   -0.2254    0.0679   -0.2711    0.4737    0.6133    0.3881    0.0179    0.7434    0.2237   -0.0931    0.0388   -0.2206    0.5995
+    0.4436   -0.1650   -0.0126   -0.0779    0.9582    0.4747    0.3215   -0.1900    0.1682    0.8485    0.3580    0.3992    0.0178    0.3892    0.2835   -0.0715   -0.1599    0.0966    0.1112    0.1194    0.1659    0.1124    0.1484    0.7558    0.3178    0.2322    0.0196    0.0960    0.6407   -0.1508    0.0169    0.3553    0.1125    0.2540    0.2039    0.5371    0.0099   -0.2253    0.0679   -0.2710    0.4737    0.6134    0.3882    0.0179    0.7434    0.2239   -0.0931    0.0388   -0.2206    0.5996
+    0.4438   -0.1650   -0.0126   -0.0778    0.9582    0.4748    0.3217   -0.1900    0.1684    0.8485    0.3582    0.3992    0.0178    0.3893    0.2836   -0.0715   -0.1598    0.0966    0.1114    0.1194    0.1660    0.1125    0.1484    0.7558    0.3178    0.2323    0.0196    0.0961    0.6407   -0.1508    0.0169    0.3555    0.1125    0.2542    0.2040    0.5372    0.0100   -0.2253    0.0679   -0.2709    0.4738    0.6134    0.3884    0.0179    0.7434    0.2241   -0.0931    0.0388   -0.2205    0.5997
+</div><div class="horizontalEllipsis" style="white-space: nowrap; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"></div><div class="verticalEllipsis" style="white-space: nowrap; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"></div></div></div></div></div></div><div class="inlineWrapper"><div  class = 'S11'></div></div></div><div  class = 'S7'><span>For more details about the use and the limitations of </span><span style=' font-family: monospace;'>expm_multiply</span><span> please see the </span><a href = "https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacematfaust_1_1poly.html#a7d06aeb92187809089a9917b6670b978"><span>API documentation</span></a><span>.</span></div><div  class = 'S1'><span>Thanks for reading this notebook! Many other are available at </span><a href = "https://faust.inria.fr"><span style=' text-decoration: underline;'>faust.inria.fr</span></a><span>.</span></div><div  class = 'S1'><span>This live script has been executed using the following version of matfaust:</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S8'><span style="white-space: pre;"><span>matfaust.version()</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="C48497BD" data-testid="output_14" data-width="495" data-height="20" data-hashorizontaloverflow="false" style="width: 525px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">ans = </span>'3.1.2'</div></div></div></div></div></div><div  class = 'S7'></div></div><br>
+<!-- 
+##### SOURCE BEGIN #####
+%% Using the poly module
+% A new module has been added to matfaust version 3.1.x. Its name is |poly| 
+% and as expected it is dedicated to a kind of Fausts that are defined according 
+% to series of polynomials.
+% 
+% In this notebook we'll see how to use the main functions of this  module 
+% then we'll introduce one precise use case with the action of  exponential matrix 
+% on a vector / matrix.
+% 
+% *NOTE*: all the functions introduced in this notebook are available on 
+% GPU, using the '|dev', 'gpu'| arguments.
+%% 1. The basis function
+% 
+% 
+% Firstly, the |poly| module allows to define a polynomial basis (aka |FaustPoly|) 
+% using the function |matfaust.poly.basis|. Currently, only Chebyshev polynomials 
+% are supported but other are yet to come. Below is the prototype of the function:
+% 
+% |basis(L, K, basis_name, varargin)|
+% 
+% |*NOTE:* it is noteworthy that varargin contains the optional T0 argument, 
+% we'll come back to this point later.|
+% 
+% In the next, we shall see a simple example but I let you consult the documentation 
+% by typing |help matfaust.poly.basis| to get more details (alternatively, this 
+% is the <https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacematfaust_1_1poly.html#a556d6a4eedc41529ddea692d227caaf4 
+% online doc>).
+% 
+% For instance, if you want to instantiate a basis Faust of dimension K+1 
+% (in the example below K=5) on L, which by the way must be a sparse matrix at 
+% least square (and most likely symmetric positive definite in much use cases), 
+% you'll make this call to the function:
+
+import matfaust.poly.basis
+d = 128;
+L = sprand(d, d, .2);
+L = L*L';
+K = 5;
+F = basis(L, K, 'chebyshev')
+%% 
+% As you can see, the last factor is followed by the mention |identity matrix 
+% flag|. It means that this factor is the identity matrix. This is not  suprising, 
+% because the 0-degree Chebyshev polynomial is the identity. However, note that 
+% the |T0| optional argument of the function is here to trick the basis by using 
+% another matrix than the identity even if eventually it might not be a proper 
+% basis it can be useful if you want to apply this basis on a vector or a matrix 
+% (hence you'll set |T0| as this vector/matrix instead of multiplying the basis 
+% by this vector/matrix).
+% 
+% So how should we understand this Faust? You can see it as a vertical concatenation 
+% of polynomials. Indeed, the basis is composed of K+1 polynomials, the 0-degree 
+% polynomial is at the top of the stack (i.e. |F(1:d,:)| is the identity):
+
+full(F(1:d, :))
+%% 
+% This first 0-degree polynomial is followed by the next degree polynomials: 
+% hence |F(d+1:d*2, :)| is the 1-degree polynomial, |F(d*2+1:d*3, :)| is the 2-degree 
+% polynomial and so on...
+% 
+% For details about the Chebyshev polynomials, including their definition 
+% by a recurrence relationship (that is used here behind the scene), you can look 
+% at this <https://en.wikipedia.org/wiki/Chebyshev_polynomials wikipedia article>.
+% 
+% One of the most important thing to note about a polynomial basis Faust 
+% is that the multiplication by a vector or a matrix is specialized in order to 
+% optimize the performance obtained compared to the generic Faust-vector/matrix 
+% multiplication. Indeed, due to the particular structure of the polynomial basis 
+% Faust, the multiplication can be optimized.
+% 
+% Let's verify that is true! In the code below F is cloned to a classic Faust 
+% G and the time of the multiplication by a matrix is measured in the both cases 
+% (with F, the basis Faust and G its classic Faust copy). Note that |Faust.clone| 
+% function is not used because in this case it would return a polynomial basis 
+% Faust (after all that's the role of |clone |to preserve the Faust properties!). 
+% To get a classic Faust the only way is to copy the Faust factor by factor.
+
+facs = {};
+for i=1:numfactors(F)
+    facs = [facs {factors(F,i)}];   
+end
+G = matfaust.Faust(facs);
+X = rand(size(F, 2), 100);
+timeit(@() F*X)
+timeit(@() G*X)
+%% 
+% Now let's verify the multiplication result is accurate:
+
+err = norm(F*X-G*X)/norm(F*X)
+%% 
+% As you see it's alright.
+%% 2. The poly function
+% 
+% 
+% The second function of the |matfaust.poly| module is |poly|. This function 
+% purpose is to compute a linear combination of polynomials composing a polynomial 
+% basis / |FaustPoly| (it can also be viewed as a way to compute a polynomial). 
+% So passing the |FaustPoly| |F| and the linear combination coefficients (one 
+% per polynomial, in ascending degree order) you'll obtain:
+
+import matfaust.poly.poly
+coeffs = rand(K+1, 1)*100;
+lc_F = poly(coeffs, F)
+%% 
+% To be explicit about |lc_F| let's show how to rebuild it manually using 
+% G (which again is a classic Faust equal to F).
+
+lc_G = coeffs(1)*G(1:d,:)
+for i=2:K+1
+    lc_G = lc_G+coeffs(i)*G(d*(i-1)+1:d*i, :);
+end
+error = norm(full(lc_F)-full(lc_G))/norm(full(lc_G))
+%% 
+% Here again the basis |FaustPoly| operation is optimized compared to the 
+% |Faust| one. Speaking of which, there is ways to do even more optimized because 
+% the |poly| function is kind of matrix type agnostic, or precisely, it accepts 
+% a |FaustPoly| or a full array as the basis argument. Doing with the latter an 
+% optimized implementation is used whose the memory footprint is smaller than 
+% the one consumed with a |FaustPoly|. It can be particulary efficient when the 
+% use cases (as we'll see in <https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/pyfaust_poly.html 
+% 3.>) consist to apply a linear combination of F to a vector x as it's shown 
+% below.
+
+x = rand(size(F, 2));
+way1 = @() poly(coeffs, F)*x; % first way to do as we've done above
+way2 = @() poly(coeffs, F*x); % second way to do (quicker than way1)
+way3 = @() poly(coeffs, F, 'X', x); % third way to do (quicker than way1 too)
+timeit(way1)
+timeit(way2)
+timeit(way3)
+%% 
+% Depending on the situation the |way2| or |way3| might be the quickest, 
+% but they are always both quicker than |way1|.
+% 
+% Just in case let's verify all ways give the same results.
+
+err_way2 = norm(poly(coeffs,F)*x-poly(coeffs,F*x))/norm(poly(coeffs, F)*x)
+err_way3 = norm(poly(coeffs, F)*x-poly(coeffs, F, 'X', x))/norm(poly(coeffs, F)*x)
+%% 
+% All sounds good! We shall now introduce one use case of Chebyshev polynomial 
+% series in FAµST that allow to get interesting results. But a  last thing to 
+% note before going ahead to the part <https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/pyfaust_poly.html 
+% 3.> is that the function |poly| is a little more complicated that it looks like, 
+% for more details I invite you to consult the <https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacematfaust_1_1poly.html#a94c288b6d41bca9541bcc48d22c405e3 
+% API documentation>.
+%% 3. Computing the action of the exponential of a matrix on a vector
+% 
+% 
+% In the next, we'll see how to compute the action of the exponential matrix 
+% on a vector x. This function has been originally developed in pyfaust inspired 
+% by the <https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.expm_multiply.html 
+% scipy.sparse.linalg.expm_multiply> function. To get a computation time comparison, 
+% please consult the<http://faust.inria.fr/tutorials/pyfaust-jupyter-notebooks/using-the-poly-module/  
+% pyfaust jupyter notebook>.
+% 
+% Recalling that it consists to compute |exp(tA)x| without computing directly 
+% the exponential let's use the function.
+
+import matfaust.poly.expm_multiply
+S = sprand(1024, 1024, .002);
+A = S*S'; % A must be symmetric positive definite
+X = rand(size(A, 2), 1);
+pts = linspace(-.5, -.2, 1000); % all t must be negative
+y = expm_multiply(A, X, pts)
+
+%% 
+% For more details about the use and the limitations of |expm_multiply| 
+% please see the <https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacematfaust_1_1poly.html#a7d06aeb92187809089a9917b6670b978 
+% API documentation>.
+% 
+% Thanks for reading this notebook! Many other are available at <https://faust.inria.fr 
+% faust.inria.fr>.
+% 
+% This live script has been executed using the following version of matfaust:
+
+matfaust.version()
+%% 
+%
+##### SOURCE END #####
+--></body></html>

@@ -167,6 +167,7 @@ if(BUILD_DOCUMENTATION)
 	configure_file(${FAUST_DOC_SRC_DIR}/faust_projectors.mlx ${PROJECT_BINARY_DIR}/doc/html/faust_projectors.mlx COPYONLY)
 	configure_file(${FAUST_DOC_SRC_DIR}/faust_projectors.mlx.html ${PROJECT_BINARY_DIR}/doc/html/faust_projectors.mlx.html COPYONLY)
 	configure_file(${FAUST_DOC_SRC_DIR}/matfaust_poly.mlx ${PROJECT_BINARY_DIR}/doc/html/matfaust_poly.mlx COPYONLY)
+	configure_file(${FAUST_DOC_SRC_DIR}/matfaust_poly.html ${PROJECT_BINARY_DIR}/doc/html/matfaust_poly.html COPYONLY)
 
 	configure_file(${FAUST_SRC_TEST_SRC_PYTHON_DIR}/test_svd_rc_vs_err.py ${PROJECT_BINARY_DIR}/doc/html/test_svd_rc_vs_err.py COPYONLY)
 	archive_tutos(pyfaust notebook ipynb)
