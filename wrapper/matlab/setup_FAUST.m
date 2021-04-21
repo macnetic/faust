@@ -47,6 +47,10 @@ fprintf('Adding path %s and subdirectories to matlab path\n',ROOT_DIR);
 %addpath(genpath(ROOT_DIR));
 addpath(ROOT_DIR);%% avoiding to use genpath because if +matfaust is added to path eye.m, rand.m, version.m etc. will conflict with matlab eye, etc.
 addpath([ROOT_DIR '/mex']);
+if(startsWith(computer, 'PCWIN'))
+	% executing the script on Windows
+	addpath([ROOT_DIR '/mex/Release'])
+end
 addpath([ROOT_DIR '/data']);
 addpath([ROOT_DIR '/tools']);
 matfaust.enable_gpu_mod()
