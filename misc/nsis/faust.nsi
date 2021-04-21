@@ -115,8 +115,8 @@ Section "" ; no component so name not needed
   ; post install pyfaust auto-setup in environment (only works if python is installed in path)
   ${StrRep} '$0' $TEMP '\' '\\'
   Exec "python -c $\"import site;dir=site.getsitepackages()[1];f=open('$0\\tmp_site_pkg', 'w');f.write(dir);f.close()$\""
-  IfErrors 0 +2
-  MessageBox MB_OK "Error: no python found into your PATH environment variable. You'll have to do the Faust setup manually (you'll see how in the documentation)." IDOK +2
+  IfErrors 0 +3
+  MessageBox MB_OK "Error: no python found into your PATH environment variable. You'll have to do the Faust setup manually (you'll see how in the documentation)." IDOK data_dl
   MessageBox MB_OK "Faust installed in your python environment (the version found into your PATH environment variable)."
 
   FileOpen $1 "$TEMP\tmp_site_pkg" r
@@ -149,7 +149,7 @@ Section "" ; no component so name not needed
 
   ; =================================================
 
-
+  data_dl:
   ; download data into matlab wrapper data folder
   ; create data folder
   ; try with python first
