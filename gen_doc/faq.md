@@ -2,11 +2,15 @@
 
 # Frequently Asked Question
 
-[1. Why did I get a file-not-found error when running demos or examples?](#one)  
-[2. How can I launch the integrated unit tests of pyfaust?](#two)  
-[3. How to launch the demos with pyfaust?](#three)  
+**About matfaust:**  
+[1. Why did I get a file-not-found error when running demos or examples?](#mat_one)  
+[2. How to fix mex not found error: "Undefined function or variable 'mexFaustReal'"?](#mat_two)  
 
-\anchor one
+**About pyfaust:**  
+[1. How can I launch the integrated unit tests of pyfaust?](#py_one)  
+[2. How to launch the demos with pyfaust?](#py_two)  
+
+\anchor mat_one
 ## 1. Why did I get a file-not-found error when running demos or examples?
 
 
@@ -75,8 +79,40 @@ Second, run these commands to download and uncompress the data:
 
 If finally you still don't manage to retrieve the data, please write an [email](index.html) with all the details (at least the version of FAµST, the installer used and of course your system).
 
-\anchor two
-## 2. How can I launch the integrated unit tests of pyfaust?
+\anchor mat_two
+## 2. How to fix mex not found error: "Undefined function or variable 'mexFaustReal'"?
+
+If something went wrong, for example at install stage, it is possible that Matlab doesn't find FAµST (in particular the mex or even matlab files `.m`).  
+In this case, an error similar to two examples might be raised:
+
+	>> import matfaust.rand         
+	Error using import
+	Import argument 'matfaust.rand' cannot be found or cannot be imported.
+
+	>> import matfaust.rand
+	>> rand(5,4)
+	Undefined function or variable 'mexFaustReal'.
+
+	Error in matfaust.rand (line 320)
+				core_obj = mexFaustReal('rand', num_rows, num_cols,
+				fac_type, min_num_factors, max_num_factors,
+				min_dim_size, max_dim_size, density, per_row);
+
+To fix this issue, you have to update the Matlab path manually, however a script (named setup_FAUST.m) is here to help.
+
+	% go in the matlab installation path : /opt/local/faust/matlab on Linux and MacOS X, C:\Program Files\Faust\matlab on Windows
+	>> cd /path/to/faust/matlab
+	% then run the setup_FAUST.m script
+	>> setup_FAUST
+	Welcome to the Matlab wrapper of the FAuST C++ toolbox.FAuST root directory is /path/to/faust/matlab/
+	Adding path /path/to/faust/matlab/ and subdirectories to matlab path
+
+	 To get started with the FAuST Toolbox : 
+
+	 launch quick_start or run_all_demo.m 
+
+\anchor py_one
+## 1. How can I launch the integrated unit tests of pyfaust?
 
 That's actually quite simple, if pyfaust is properly installed, you just have to type this command in a terminal:
 
@@ -85,8 +121,8 @@ That's actually quite simple, if pyfaust is properly installed, you just have to
 
 Note: in the above test, the Faust class is tested for the CPU C++ backend and real Faust objects (i.e. dtype == np.float). If you want to test GPU complex Faust, just replace the arguments as this: ``run_tests('gpu', 'complex')``.
 
-\anchor three
-## 3. How to launch the demos with pyfaust?
+\anchor py_two
+## 2. How to launch the demos with pyfaust?
 
 You might run all the demos at once or one by one. In the former case you should run this python code:
 
