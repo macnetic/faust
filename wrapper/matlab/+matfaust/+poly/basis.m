@@ -109,5 +109,5 @@ function F = basis(L, K, basis_name, varargin)
 		error(['unknown basis name: ' basis_name])
 	end
 
-	F = matfaust.Faust(core_obj, is_real);
+	F = matfaust.poly.FaustPoly(core_obj, is_real);
 end

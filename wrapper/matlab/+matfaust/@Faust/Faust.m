@@ -88,7 +88,7 @@
 % ======================================================================
 
 classdef Faust
-	properties (SetAccess = private, Hidden = true)
+	properties (SetAccess = protected, Hidden = true)
 		matrix; % Handle to the FaustCore class instance
 		isReal;
 		dev; % cpu or gpu
@@ -1982,21 +1982,6 @@ classdef Faust
 			dev = F.dev
 		end
 
-		%================================================================
-		%> See matfaust.poly
-		%===
-		%>
-		%================================================================
-		function M = next(self)
-			if(self.isreal)
-				core_obj = mexPolyReal('nextPolyFaust', self.matrix.objectHandle);
-			else
-				core_obj = mexPolyCplx('nextPolyFaust', self.matrix.objectHandle);
-			end
-			M = matfaust.Faust(core_obj, self.isreal);
-		end
-
-
 	end
 	methods(Access = public, Hidden = true)
 		function set_FM_mul_mode(self, mode)
@@ -2062,35 +2047,6 @@ classdef Faust
 		%================================================================
 		function bool = isFaust(obj)
 			bool = isa(obj, 'matfaust.Faust');
-		end
-
-		%================================================================
-		%> See matfaust.poly
-		%===
-		%>
-		%================================================================
-		function M = poly(self, coeffs, X)
-			if(iscell(X))
-				% X is {}: no X passed (see matfaust.poly.poly())
-				if(self.isreal)
-					core_obj = mexPolyReal('polyFaust', coeffs, self.matrix.objectHandle);
-				else
-					core_obj = mexPolyCplx('polyFaust', coeffs, self.matrix.objectHandle);
-				end
-				M = matfaust.Faust(core_obj, self.isreal);
-			elseif(ismatrix(X))
-				if(issparse(X))
-					error('X must be a dense matrix')
-				end
-				if(size(X, 1) ~= size(self,2))
-					error('The faust and X dimensions must agree.')
-				end
-				if(self.isreal)
-					M = mexPolyReal('mulPolyFaust', coeffs, self.matrix.objectHandle, X);
-				else
-					M = mexPolyCplx('mulPolyFaust', coeffs, self.matrix.objectHandle, X);
-				end
-			end
 		end
 
 	end

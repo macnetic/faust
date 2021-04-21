@@ -132,7 +132,7 @@ function LC = poly(coeffs, basis, varargin)
 		if(numfactors(basis) ~= numel(coeffs))
 			error('coeffs and basis dimensions must agree.')
 		end
-		LC = matfaust.Faust.poly(basis, coeffs, X);
+		LC = matfaust.poly.FaustPoly.poly_(basis, coeffs, X);
 		% LC is a Faust iff X is not set, otherwise it's a matrix
 	elseif(ismatrix(basis))
 		if(mod(size(basis, 1), K+1) ~= 0)
