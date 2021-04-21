@@ -107,7 +107,7 @@ namespace Faust
      *
      *  \param M: the input matrix to project (which could be the output too, if dense format is chosen).
      *  \param spM: the output matrix if eventually the format is the output format is sparse.
-     *  \param k: the sparsity parameter (pseudo-)norm_1 of the output matrix.
+     *  \param k: the sparsity parameter (pseudo-)norm_0 of the output matrix.
      *  \param normalized: true to normalize the output matrix.
      *  \param pos: true to filter negative values of M before applying the de prox.
      *  \param forcedType: used to choose explicitely the output format with values Sparse or Dense (MatSparse or MatDense).

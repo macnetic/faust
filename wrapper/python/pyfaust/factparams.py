@@ -992,7 +992,7 @@ class ParamsPalm4MSA(ParamsFact):
             Constructor.
 
             Args:
-                constraints: a pyfaust.factparams.ConstraintList or
+                constraints: a pyfaust.factparams.ConstraintList
                 or a Python list of pyfaust.proj.proj_gen. The number of items
                 determines the number of matrix factors.
                 stop_crit: a pyfaust.factparams.StoppingCriterion instance
