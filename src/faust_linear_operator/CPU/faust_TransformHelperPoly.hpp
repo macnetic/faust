@@ -723,6 +723,7 @@ namespace Faust
 			}
 		}
 
+
 	template<typename FPP>
 		void poly_gpu(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP* out)
 		{
@@ -733,9 +734,60 @@ namespace Faust
 			for(int i=0;i<n;i++)
 			{
 				MatDense<FPP,GPU2> gpu_mat_basis((FUI)d, (FUI)K_plus_1, basisX+d_K_plus_1*i);
-				gpu_mat_basis.multiply(gpu_vec_coeffs, gpu_dsize_vec);
-				gpu_dsize_vec.tocpu(out+d*i);
+//				gpu_mat_basis.multiply(gpu_vec_coeffs, gpu_dsize_vec);
+//				gpu_dsize_vec.tocpu(out+d*i);
+				poly_gpu(gpu_mat_basis, gpu_vec_coeffs, gpu_dsize_vec, out, d*i);
 			}
+		}
+
+	template<typename FPP>
+		void poly_gpu(const MatDense<FPP,GPU2>& gpu_mat_basis, const Vect<FPP, GPU2>& gpu_vec_coeffs, Vect<FPP, GPU2>& gpu_dsize_vec, FPP* out, int out_offset)
+		{
+			gpu_mat_basis.multiply(gpu_vec_coeffs, gpu_dsize_vec);
+			gpu_dsize_vec.tocpu(out+out_offset);
+		}
+
+	template<typename FPP>
+		void poly(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP** out, int n_out, bool on_gpu/*=false*/)
+		{
+			if(on_gpu)
+#ifdef USE_GPU_MOD
+				poly_gpu(d, K, n, basisX, coeffs, out, n_out);
+#else
+			throw std::runtime_error("USE_GPU_MOD option must be enabled at compiling time to use this function (Faust::poly_gpu()).");
+#endif
+			else // cpu
+				poly_cpu(d, K, n, basisX, coeffs, out, n_out);
+
+		}
+
+	template<typename FPP>
+		void poly_cpu(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP** out, int n_out)
+		{
+			for(int i=0;i<n_out;i++)
+				poly_cpu(d, K, n, basisX, coeffs+i*(K+1), out[i]);
+		}
+
+	template<typename FPP>
+		void poly_gpu(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP** out, int n_out)
+		{
+			auto K_plus_1 = K+1;
+			auto d_K_plus_1 = d*K_plus_1;
+			Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>> vec_coeffs(const_cast<FPP*>(coeffs), K_plus_1);
+			Vect<FPP, GPU2>* gpu_vec_coeffs[n_out];
+			Vect<FPP, GPU2> gpu_dsize_vec(d);
+			for(int j=0;j<n_out;j++)
+				gpu_vec_coeffs[j] = new Vect<FPP, GPU2>(K_plus_1, coeffs+j*(K+1));
+			for(int i=0;i<n;i++)
+			{
+				MatDense<FPP,GPU2> gpu_mat_basis((FUI)d, (FUI)K_plus_1, basisX+d_K_plus_1*i);
+				for(int j=0;j<n_out;j++)
+				{
+					poly_gpu(gpu_mat_basis, *gpu_vec_coeffs[j], gpu_dsize_vec, out[j], d*i);
+				}
+			}
+			for(int j=0;j<n_out;j++)
+				delete gpu_vec_coeffs[j];
 		}
 
 	template<typename FPP>

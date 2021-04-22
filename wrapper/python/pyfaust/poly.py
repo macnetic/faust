@@ -220,7 +220,11 @@ def poly(coeffs, basis='chebyshev', L=None, X=None, dev='cpu', out=None,
         else:
             raise ValueError("impl keyword argument has a wrong value (it can"
                              " only be 'py' or 'native'")
-    K = coeffs.size-1
+    if coeffs.ndim == 1:
+        K = coeffs.size-1
+    else:
+        K = coeffs.shape[1]-1
+
     if isinstance(basis, str):
         if L is None:
             raise ValueError('The L matrix must be set to build the'
@@ -306,7 +310,13 @@ def _poly_arr_py(coeffs, basisX, d, dev='cpu', out=None):
     return Y
 
 def _poly_arr_cpp(coeffs, basisX, d, dev='cpu', out=None):
-    return _FaustCorePy.polyCoeffs(d, basisX, coeffs, dev, out)
+    if coeffs.ndim == 1:
+        return _FaustCorePy.polyCoeffs(d, basisX, coeffs, dev, out)
+    elif coeffs.ndim == 2:
+        K = coeffs.shape[1]-1
+        return _FaustCorePy.polyCoeffsSeq(d, K, basisX, coeffs, dev, out)
+    else:
+        raise ValueError("coeffs can't have more than two dimensions.")
 
 def _poly_Faust_cpp(coeffs, basisFaust, X=None, dev='cpu', out=None):
     Y = None  # can't happen
@@ -486,7 +496,8 @@ class FaustPoly(Faust):
         return next(self.gen)
 
 
-def expm_multiply(A, B, t, K=10, tradeoff='time', dev='cpu', **kwargs):
+def expm_multiply(A, B, t, K=10, tradeoff='time', dev='cpu',
+                  group_coeffs=False, **kwargs):
     """
     Computes an approximate of the action of the matrix exponential of A on B using series of Chebyshev polynomials.
 
@@ -562,21 +573,40 @@ def expm_multiply(A, B, t, K=10, tradeoff='time', dev='cpu', **kwargs):
     Y = [empty((m, n), order='F') for i in range(npts)]
     if poly_meth == 2:
         TB = squeeze(T@B)
-    for i, tau in enumerate(t):
-        if tau >= 0:
-            raise ValueError('pyfaust.poly.expm_multiply handles only negative '
-                             'time points.')
+    else:
+        if group_coeffs:
+            raise ValueError("group_coeffs can't be True if poly_meth == 1.")
+
+    def calc_coeffs(tau, K, phi, coeff):
         # Compute the K+1 Chebychev coefficients
-        coeff = np.empty((K+1,), dtype=np.float)
         coeff[-1] = 2 * ive(K, tau * phi)
         coeff[-2] = 2 * ive(K-1, tau * phi)
         for j in range(K - 2, -1, -1):
             coeff[j] = coeff[j+2] - (2 * j + 2) / (-tau * phi) * coeff[j+1]
         coeff[0] /= 2
-        if poly_meth == 2:
-            poly(coeff, TB, dev=dev, out=Y[i][:, :])
-        else:
-            poly(coeff, T, X=B, dev=dev, out=Y[i][:, :])
+        return coeff
+
+    t_non_neg_err = ValueError('pyfaust.poly.expm_multiply handles only negative '
+                               'time points.')
+
+    if group_coeffs:
+        coeff = np.empty((K+1, npts), dtype=np.float)
+        for i, tau in enumerate(t):
+            if tau >= 0:
+                raise t_non_neg_err
+            calc_coeffs(tau, K, phi, coeff[i,:])
+        poly(coeff, TB, dev=dev, out=Y)
+    else:
+        for i, tau in enumerate(t):
+            if tau >= 0:
+                raise t_non_neg_err
+            coeff = np.empty((K+1,), dtype=np.float)
+            calc_coeffs(tau, K, phi, coeff)
+            if poly_meth == 2:
+                poly(coeff, TB, dev=dev, out=Y[i][:, :])
+            else:
+                poly(coeff, T, X=B, dev=dev, out=Y[i][:, :])
+
     if B.ndim == 1:
         return squeeze(Y)
     else:

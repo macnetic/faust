@@ -2706,6 +2706,137 @@ def polyCoeffs(d, basisX, coeffs, dev, out=None):
                        &cview_cplx[0], &yview_cplx[0,0], dev.startswith('gpu'))
     return y
 
+def polyCoeffsSeq(d, K, basisX, coeffs, dev, out=None):
+    if not isinstance(basisX, np.ndarray):
+        raise ValueError('input basisX must be a numpy.ndarray')
+    #TODO: raise exception if not real nor complex
+    isReal = (basisX.dtype == np.double)
+    if basisX.ndim > 1:
+        n = basisX.shape[1]
+    else:
+        n = 1
+    if(isReal):
+#       basisX=basisX.astype(float,'F')
+       if not basisX.dtype=='float':
+           raise ValueError('input basisX must be a double array')
+    else:
+#       basisX=basisX.astype(complex,'F')
+       if(basisX.dtype not in ['complex', 'complex128', 'complex64'] ): #could fail if complex128 etc.
+           raise ValueError('input basisX must be complex array')
+    if not basisX.flags['F_CONTIGUOUS']:
+        raise ValueError('input basisX must be Fortran contiguous (column major '
+                        'order)')
+
+    ndim_M=basisX.ndim
+
+    if (ndim_M > 2) | (ndim_M < 1):
+        raise ValueError('input basisX invalid number of dimensions')
+    check_matrix(isReal, basisX)
+    ndim_M=basisX.ndim
+    cdef unsigned int nbrow_x=basisX.shape[0]
+    cdef unsigned int nbcol_x #can't be assigned because we don't know yet if the input vector is 1D or 2D
+
+    cdef unsigned int nbrow_y=d
+    cdef unsigned int nbcol_y=n
+
+    cdef double[:] bxview_1D
+    cdef double[:,:] bxview_2D
+    cdef complex[:] bxview_1D_cplx
+    cdef complex[:,:] bxview_2D_cplx
+
+    cdef double[:, :] cview
+    cdef complex[:, :] cview_cplx
+
+    cdef y
+    cdef size_t addr
+    cdef double** yview
+    cdef complex** yview_cplx
+
+    if ndim_M == 1:
+        nbcol_x=1
+        if(isReal):
+            bxview_1D = basisX
+        else:
+            bxview_1D_cplx = basisX
+    else:
+        nbcol_x=basisX.shape[1]
+        if(isReal):
+            bxview_2D=basisX
+        else:
+            bxview_2D_cplx=basisX
+
+    # TODO: make some sanity checks on argument sizes
+
+    if coeffs.ndim != 2:
+        raise ValueError('coeffs must have 2 dimensions.')
+
+    if coeffs.shape[1] != K+d:
+        raise ValueError('coeffs size must agree with K and d.')
+
+    if isReal:
+        cview = coeffs
+    else:
+        cview_cplx = coeffs
+
+    ncoeffs = coeffs.shape[0]
+
+    if isReal:
+        yview = <double**> PyMem_Malloc(sizeof(double**) * ncoeffs)
+    else:
+        yview_cplx = <complex**> PyMem_Malloc(sizeof(complex**) * ncoeffs)
+
+    if not isinstance(out, type(None)):
+        if not isinstance(out, list):
+            raise TypeError('out must be a list')
+        if len(out) != ncoeffs:
+            raise ValueError('out length must agree with coeffs.shape[0]')
+        for i in range(ncoeffs):
+            y = out[i]
+            if y.ndim == 1:
+                raise ValueError('out must have 2 dimensions.')
+            if y.shape != (d,n):
+                raise ValueError('out shape isn\'t valid.')
+            dtype_err = ValueError('out dtype isn\'t valid.')
+            if not y.flags['F_CONTIGUOUS']:
+                raise ValueError('the array must be in fortran/column continous order.')
+            if isReal:
+                if y.dtype != 'd':
+                    raise dtype_err
+                addr = y.__array_interface__['data']
+                yview[i] = <double*> addr
+            else:
+                if y.dtype != 'complex':
+                    raise dtype_err
+                addr = y.__array_interface__['data']
+                yview_cplx[i] = <complex*> addr
+    else:
+        out = []
+        for i in range(ncoeffs):
+            if(isReal):
+                out.append(np.empty((nbrow_y,nbcol_y), dtype='d',order='F'))
+                addr = out[i].__array_interface__['data']
+                yview[i] = <double*> addr
+            else:
+                out.append(np.empty((nbrow_y, nbcol_y), dtype='complex',
+                                    order='F'))
+                addr = out[i].__array_interface__['data']
+                yview_cplx[i] = <complex*> addr
+
+#void polyCoeffsSeq(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP** out, int n_out, bool on_gpu);
+    #void polyCoeffs(int d, int K, int n, const FPP* basisX, const FPP* coeffs, FPP* out) const;
+        if(isReal):
+            FaustCoreCy.polyCoeffsSeq(d, K, n, &bxview_2D[0,0],
+                       &cview[0,0], yview, ncoeffs, dev.startswith('gpu'))
+        else:
+            FaustCoreCy.polyCoeffsSeq(d, K, n, &bxview_2D_cplx[0,0],
+                       &cview_cplx[0,0], yview_cplx, ncoeffs, dev.startswith('gpu'))
+    if isReal:
+        PyMem_Free(yview)
+    else:
+        PyMem_Free(yview_cplx)
+
+    return out
+
 import sys, os, pyfaust
 # tries to load the libgm library silently,
 # if not enabled at build time it will do nothing
