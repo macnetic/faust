@@ -159,7 +159,7 @@ def poly(coeffs, basis='chebyshev', L=None, X=None, dev='cpu', out=None,
             is computed (note that the memory space is optimized compared to
             the manual way of doing first B = basis@X and then calling poly on
             B with X at None).
-            dev: the device to instantiate the returned Faust ('cpu' or 'gpu').
+            dev: the computing device ('cpu' or 'gpu').
             out: (np.ndarray) if not None the function result is put into this
             np.ndarray. Note that out.flags['F_CONTINUOUS'] must be True. Note that this can't work if the function returns a
             Faust.
@@ -574,12 +574,9 @@ def expm_multiply(A, B, t, K=10, tradeoff='time', dev='cpu', **kwargs):
             coeff[j] = coeff[j+2] - (2 * j + 2) / (-tau * phi) * coeff[j+1]
         coeff[0] /= 2
         if poly_meth == 2:
-                poly(coeff, TB, dev=dev, out=Y[i][:, :])
+            poly(coeff, TB, dev=dev, out=Y[i][:, :])
         else:
-            if n == 1:
-                poly(coeff, T, X=B, dev=dev, out=Y[i][:, :])
-            else:
-                poly(coeff, T, X=B, dev=dev, out=Y[i][:, :])
+            poly(coeff, T, X=B, dev=dev, out=Y[i][:, :])
     if B.ndim == 1:
         return squeeze(Y)
     else:

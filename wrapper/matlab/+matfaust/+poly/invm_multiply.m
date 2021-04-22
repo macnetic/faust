@@ -8,7 +8,7 @@
 %> @param 'rel_err', real (optional): the targeted relative error between the approximate of the action and the action itself (if you were to compute it with inv(A)*x).
 %> @param 'tradeoff', str (optional): 'memory' or 'time' to specify what matters the most: a small memory footprint or a small time of execution. It changes the implementation of pyfaust.poly.poly used behind. It can help when the memory size is limited relatively to the value of rel_err or the size of A and B.
 %> @param 'max_K', int (optional): the maximum degree of Chebyshev polynomial to use (useful to limit memory consumption).
-%> @param 'dev', str (optional): the device to instantiate the returned Faust ('cpu' or 'gpu').
+%> @param 'dev', str (optional): the computing device ('cpu' or 'gpu').
 %>
 %> @retval AinvB the array which is the approximate action of matrix inverse of A on B.
 %>

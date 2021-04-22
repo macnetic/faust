@@ -7,8 +7,8 @@
 %> @param coeffs the linear combination coefficients (vector).
 %> @param basis either the name of the polynomial basis to build on L or the basis if already built externally (as a Faust or an equivalent full array).
 %> @param 'L', matrix the sparse matrix on which the polynomial basis is built if basis is not already a Faust or a full array.
-%> @param 'X', matrix if X is set, the linear combination of basis*X is computed (note that the memory space is optimized compared to the manual way of doing first B = basis*X and then calling poly on B witout X set).
-%> @param 'dev', str (optional): the computation device ('cpu' or 'gpu').
+%> @param 'X', matrix if X is set, the linear combination of basis*X is computed (note that the memory space is optimized compared to the manual way of doing first B = basis*X and then calling poly on B without X set).
+%> @param 'dev', str (optional): the computating device ('cpu' or 'gpu').
 %> @retval LC The linear combination Faust or full array depending on if basis is itself a Faust or a np.ndarray.
 %>
 %> @b Example

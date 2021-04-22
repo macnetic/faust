@@ -7,7 +7,7 @@
 %> @param t (real array) time points.
 %> @param 'K', integer (default value is 10) the greatest polynomial degree of the Chebyshev polynomial basis. The greater it is, the better is the approximate accuracy but note that a larger K increases the computational cost.
 %> @param 'tradeoff', str (optional): 'memory' or 'time' to specify what matters the most: a small memory footprint or a small time of execution. It changes the implementation of pyfaust.poly.poly used behind. It can help when the memory size is limited relatively to the value of rel_err or the size of A and B.
-%> @param 'dev', str (optional): the computation device ('cpu' or 'gpu').
+%> @param 'dev', str (optional): the computing device ('cpu' or 'gpu').
 %>
 %>
 %> @retval C the approximate of e^{t_k A} B
