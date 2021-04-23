@@ -2770,8 +2770,8 @@ def polyCoeffsSeq(d, K, basisX, coeffs, dev, out=None):
     if coeffs.ndim != 2:
         raise ValueError('coeffs must have 2 dimensions.')
 
-    if coeffs.shape[1] != K+d:
-        raise ValueError('coeffs size must agree with K and d.')
+    if coeffs.shape[1] != K+1:
+        raise ValueError('coeffs.shape[1] must be equal to K+1.')
 
     if isReal:
         cview = coeffs
@@ -2802,29 +2802,36 @@ def polyCoeffsSeq(d, K, basisX, coeffs, dev, out=None):
             if isReal:
                 if y.dtype != 'd':
                     raise dtype_err
-                addr = y.__array_interface__['data']
+                addr = int(y.__array_interface__['data'][0])
                 yview[i] = <double*> addr
             else:
                 if y.dtype != 'complex':
                     raise dtype_err
-                addr = y.__array_interface__['data']
+                addr = y.__array_interface__['data'][0]
                 yview_cplx[i] = <complex*> addr
     else:
         out = []
         for i in range(ncoeffs):
             if(isReal):
                 out.append(np.empty((nbrow_y,nbcol_y), dtype='d',order='F'))
-                addr = out[i].__array_interface__['data']
+                addr = out[i].__array_interface__['data'][0]
                 yview[i] = <double*> addr
             else:
                 out.append(np.empty((nbrow_y, nbcol_y), dtype='complex',
                                     order='F'))
-                addr = out[i].__array_interface__['data']
+                addr = out[i].__array_interface__['data'][0]
                 yview_cplx[i] = <complex*> addr
 
 #void polyCoeffsSeq(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP** out, int n_out, bool on_gpu);
-    #void polyCoeffs(int d, int K, int n, const FPP* basisX, const FPP* coeffs, FPP* out) const;
-        if(isReal):
+    if ndim_M == 1:
+        if isReal:
+            FaustCoreCy.polyCoeffsSeq(d, K, n, &bxview_1D[0],
+                       &cview[0,0], yview, ncoeffs, dev.startswith('gpu'))
+        else:
+            FaustCoreCy.polyCoeffsSeq(d, K, n, &bxview_1D_cplx[0],
+                       &cview_cplx[0,0], yview_cplx, ncoeffs, dev.startswith('gpu'))
+    else:
+        if isReal:
             FaustCoreCy.polyCoeffsSeq(d, K, n, &bxview_2D[0,0],
                        &cview[0,0], yview, ncoeffs, dev.startswith('gpu'))
         else:

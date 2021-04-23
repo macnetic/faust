@@ -590,7 +590,7 @@ def expm_multiply(A, B, t, K=10, tradeoff='time', dev='cpu',
                                'time points.')
 
     if group_coeffs:
-        coeff = np.empty((K+1, npts), dtype=np.float)
+        coeff = np.empty((npts, K+1), dtype=np.float)
         for i, tau in enumerate(t):
             if tau >= 0:
                 raise t_non_neg_err
