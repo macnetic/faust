@@ -774,7 +774,7 @@ namespace Faust
 			auto K_plus_1 = K+1;
 			auto d_K_plus_1 = d*K_plus_1;
 			Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>> vec_coeffs(const_cast<FPP*>(coeffs), K_plus_1);
-			Vect<FPP, GPU2>* gpu_vec_coeffs[n_out];
+			Vect<FPP, GPU2>** gpu_vec_coeffs = new Vect<FPP, GPU2>*[n_out];
 			Vect<FPP, GPU2> gpu_dsize_vec(d);
 			for(int j=0;j<n_out;j++)
 				gpu_vec_coeffs[j] = new Vect<FPP, GPU2>(K_plus_1, coeffs+j*(K+1));
@@ -788,6 +788,7 @@ namespace Faust
 			}
 			for(int j=0;j<n_out;j++)
 				delete gpu_vec_coeffs[j];
+			delete[] gpu_vec_coeffs;
 		}
 
 	template<typename FPP>
