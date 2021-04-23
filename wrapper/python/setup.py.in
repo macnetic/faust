@@ -50,8 +50,7 @@ setup(
     classifiers = [ 'License :: OSI Approved :: BSD License',
                    'Programming Language :: Python :: 3',
                   '@GPU_CUDA_VERSION_PYPI_CLASSIFIER@'],
-    install_requires = [ 'pygsp', 'scipy', 'numpy>=1.20', 'matplotlib>=2.0.0',
-                        'pathlib'], #ENOTE: order matters (last pkg installed first)
+    install_requires = [@PYFAUST_PYTHON_REQUIREMENTS_AS_PYLIST@],
     license = "3-clause BSD 2.0",
     package_data = {
         'pyfaust': [ 'data/*.mat', 'license*.txt', '@GPU_MOD_LIB_PATH@']

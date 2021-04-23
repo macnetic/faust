@@ -131,9 +131,9 @@ Section "" ; no component so name not needed
   ; CreateShortCut pyfaust @PROJECT_BINARY_DIR@\wrapper\python\pyfaust ; tested and it can't be like a linux symlink
   SetOutPath $2
   File @PROJECT_BINARY_DIR@\wrapper\python\*pyd
-  File @PROJECT_BINARY_DIR@\wrapper\python\*pxd
+  ;File @PROJECT_BINARY_DIR@\wrapper\python\*pxd
 
-  ;add data path in __init__.py (both into site-packages and $INSTDIR)
+  ; add data path in __init__.py (both into site-packages and $INSTDIR)
   FileOpen $1 "$INSTDIR\pyfaust\__init__.py" a
   ; go at the end of file (but with append mode is that necessary ?)
   FileSeek $1 0 END
@@ -146,6 +146,10 @@ Section "" ; no component so name not needed
   FileSeek $1 0 END
   FileWrite $1 "$\r$\n_NSI_INSTALL_PATH='$INSTDIR'"
   FileClose $1
+
+  Exec "python -m pip install $\"@PYFAUST_PYTHON_REQUIREMENTS@$\""
+  IfErrors 0 +2
+  MessageBox MB_OK "Error: failed partly or totally to install the pyfaust python packages through pip, please install them manually to get a workable pyfaust, list of packages: @PYFAUST_PYTHON_REQUIREMENTS@." IDOK data_dl
 
   ; =================================================
 

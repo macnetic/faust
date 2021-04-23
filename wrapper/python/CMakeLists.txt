@@ -9,6 +9,11 @@ set(PY_EXT_SOURCES "['${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.pyx']")
 
 set(FAUST_PYTHON_LIBS "'faust'")
 
+set(PYFAUST_PYTHON_REQUIREMENTS "pygsp scipy numpy>=1.20 matplotlib>=2.0.0 pathlib") #ENOTE: order matters in setup.py, the last package is installed first
+
+string(REGEX REPLACE " " "', '" PYFAUST_PYTHON_REQUIREMENTS_AS_PYLIST ${PYFAUST_PYTHON_REQUIREMENTS})
+set(PYFAUST_PYTHON_REQUIREMENTS_AS_PYLIST "'${PYFAUST_PYTHON_REQUIREMENTS_AS_PYLIST}'")
+
 if(${USE_MATIO_STATIC_LIBS})
 	if(NOT WIN32)
 		set(PYTHON_EXT_EXTRA_OBJECTS "[ '${MATIO_STATIC_LIB_PATH}', '${HDF5_STATIC_LIB_PATH}', '${Z_STATIC_LIB_PATH}']") # the order matters for compilation
