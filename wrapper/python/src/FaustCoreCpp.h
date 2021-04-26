@@ -170,7 +170,7 @@ class FaustCoreCpp
 template<typename FPP>
 void polyCoeffs(int d, int K, int n, const FPP* basisX, const FPP* coeffs, FPP* out, bool on_gpu);
 template<typename FPP>
-void polyCoeffsSeq(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP** out, int n_out, bool on_gpu);
+void polyGroupCoeffs_(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP** out, int n_out, bool on_gpu);
 #ifdef USE_GPU_MOD
 template<typename FPP>
 class FaustCoreCppGPU: public FaustCoreCpp<FPP, GPU2>

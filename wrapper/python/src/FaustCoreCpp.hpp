@@ -249,9 +249,9 @@ void polyCoeffs(int d, int K, int n, const FPP* basisX, const FPP* coeffs, FPP* 
 
 
 template<typename FPP>
-void polyCoeffsSeq(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP** out, int n_out, bool on_gpu)
+void polyGroupCoeffs_(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP** out, int n_out, bool on_gpu)
 {
-    Faust::poly(d, K, n, basisX, coeffs, out, n_out, on_gpu);
+    Faust::polyGroupCoeffs(d, K, n, basisX, coeffs, out, n_out, on_gpu);
 }
 
 

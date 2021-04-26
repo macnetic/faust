@@ -43,7 +43,7 @@ cdef extern from "FaustCoreCpp.h":
     # move in specific Poly.pxd
     void polyCoeffs[FPP](int d, int K, int n, const FPP* basisX, const FPP*
                          coeffs, FPP* out, bool on_gpu)
-    void polyCoeffsSeq[FPP](int d, int K, int n, const FPP* basisX, const FPP* coeffs, FPP** out, int n_out, bool on_gpu);
+    void polyGroupCoeffs_[FPP](int d, int K, int n, const FPP* basisX, const FPP* coeffs, FPP** out, int n_out, bool on_gpu);
 
     cdef cppclass FaustCoreCpp[FPP]:
         FaustCoreCpp()

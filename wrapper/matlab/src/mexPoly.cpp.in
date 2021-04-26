@@ -142,6 +142,45 @@ void polyMatrix(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	}
 }
 
+void polyMatrixGroupCoeffs(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+{
+	if(nrhs < 7)
+		mexErrMsgTxt("mex polyMatrix needs 7 arguments");
+	else
+	{
+		int d = (int) mxGetScalar(prhs[1]);
+		int K = (int) mxGetScalar(prhs[2]);
+		int n = (int) mxGetScalar(prhs[3]);
+		int n_out = (int) mxGetScalar(prhs[4]);
+		bool on_gpu = false;
+		Faust::MatDense<FPP, Cpu> out(d, n*n_out);
+		FPP *coeffs_ptr;
+		FPP *basisX_ptr;
+
+		mxArray2Ptr(prhs[5], coeffs_ptr); // avoid a copy
+		mxArray2Ptr(prhs[6], basisX_ptr); // avoid a copy
+
+		if(nrhs >= 8)
+		{
+			on_gpu = (bool) mxGetScalar(prhs[7]);
+		}
+
+		if(on_gpu)
+		{
+#ifdef USE_GPU_MOD
+			Faust::enable_gpu_mod();
+#endif
+		}
+
+		Faust::polyGroupCoeffs(d, K, n, basisX_ptr /*basisX.getData()*/, coeffs_ptr /*coeffs.getData()*/, out.getData(), n_out, on_gpu);
+
+		plhs[0] = FaustMat2mxArray(out);
+
+		delete [] coeffs_ptr;
+		delete [] basisX_ptr;
+	}
+}
+
 void polyFaust(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
 	Faust::MatDense<FPP, Cpu> coeffs;
@@ -214,6 +253,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	if(!strcmp("polyMatrix", func))
 	{
 		polyMatrix(nlhs, plhs, nrhs, prhs);
+	}
+	else if(!strcmp("polyMatrixGroupCoeffs", func))
+	{
+		polyMatrixGroupCoeffs(nlhs, plhs, nrhs, prhs);
 	}
 	else if(!strcmp("polyFaust", func))
 	{

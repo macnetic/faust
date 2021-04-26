@@ -10,7 +10,7 @@
 %> @param 'dev', str (optional): the computing device ('cpu' or 'gpu').
 %>
 %>
-%> @retval C the approximate of e^{t_k A} B
+%> @retval C the approximate of e^{t_k A} B. C is a tridimensional array of size (sizef(A,1), size(B,2), size(t, 1)), each slice C(:,:,i) is the action of the matrix exponentatial of A on B according to the time point t(i).
 %>
 %> @b Example
 %> @code
@@ -67,6 +67,12 @@ function C = expm_multiply(A, B, t, varargin)
 					else
 						tradeoff = tmparg;
 					end
+				case 'group_coeffs'
+					if(argc == i || ~ islogical(tmparg))
+						error('group_coeffs argument must be followed by a logical (true or false)')
+					else
+						group_coeffs = tmparg;
+					end
 				otherwise
 					if((isstr(varargin{i}) || ischar(varargin{i}))  && ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu'))
 						error([ tmparg ' unrecognized argument'])
@@ -78,6 +84,16 @@ function C = expm_multiply(A, B, t, varargin)
 		poly_meth = 1;
 	else
 		poly_meth = 2; % tradeoff is time
+	end
+	if(~ exist('group_coeffs'))
+		if(strcmp(tradeoff, 'memory'))
+			group_coeffs = false;
+		else
+			group_coeffs = true;
+			if(poly_meth == 1)
+				error('can''t use poly_meth == 2 and group_coeffs at the same time')
+			end
+		end
 	end
 	if (~ issparse(A))
 		error('A must be a sparse matrix.')
@@ -93,29 +109,47 @@ function C = expm_multiply(A, B, t, varargin)
 	m = size(B, 1);
 	n = size(B, 2);
 	npts = numel(t);
-	Y = zeros(npts, m, n);
+	Y = zeros(m, n, npts);
 	if (poly_meth == 2)
 		TB = T*B;
 	end
-	for i=1:npts
-		tau = t(i);
-		if(tau >= 0)
-			error('matfaust.poly.expm_multiply handles only negative time points')
+	if(group_coeffs)
+		% poly_meth == 2
+		coeffs = zeros(K+1, npts);
+		for i=1:npts
+			tau = t(i);
+			if(tau >= 0)
+				error('matfaust.poly.expm_multiply handles only negative time points')
+			end
+			coeffs(:, i) = calc_coeffs(tau, K, phi);
 		end
-		coeff = zeros(K+1, 1);
-		coeff(end) = 2 * besseli(K, tau * phi, 1);
-		coeff(end-1) = 2 * besseli(K-1, tau * phi, 1);
-		for j=K-1:-1:1
-			coeff(j) = coeff(j+2) - (2 * (j-1) + 2) / (-tau * phi) * coeff(j+1);
-		end
-		coeff(1) = coeff(1)*.5;
-		if(poly_meth == 2)
-			Y(i, :, :) = matfaust.poly.poly(coeff, TB, 'dev', dev);
-		elseif(poly_meth == 1)
-			Y(i, :, :) = matfaust.poly.poly(coeff, T, 'X', B, 'dev', dev);
-		else
-			error('poly_meth must be 1 or 2')
+		Y = reshape(matfaust.poly.poly(coeffs, TB, 'dev', dev), m, n, npts);
+	else
+		for i=1:npts
+			tau = t(i);
+			if(tau >= 0)
+				error('matfaust.poly.expm_multiply handles only negative time points')
+			end
+			coeff = calc_coeffs(tau, K, phi);
+			if(poly_meth == 2)
+				Y(:, :, i) = matfaust.poly.poly(coeff, TB, 'dev', dev);
+			elseif(poly_meth == 1)
+				Y(:, :, i) = matfaust.poly.poly(coeff, T, 'X', B, 'dev', dev);
+			else
+				error('poly_meth must be 1 or 2')
+			end
 		end
 	end
 	C = Y;
+end
+
+function coeff = calc_coeffs(tau, K, phi)
+	% Compute the K+1 Chebychev coefficients
+	coeff = zeros(K+1, 1);
+	coeff(end) = 2 * besseli(K, tau * phi, 1);
+	coeff(end-1) = 2 * besseli(K-1, tau * phi, 1);
+	for j=K-1:-1:1
+		coeff(j) = coeff(j+2) - (2 * (j-1) + 2) / (-tau * phi) * coeff(j+1);
+	end
+	coeff(1) = coeff(1)*.5;
 end

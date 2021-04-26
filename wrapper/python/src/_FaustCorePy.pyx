@@ -2706,7 +2706,7 @@ def polyCoeffs(d, basisX, coeffs, dev, out=None):
                        &cview_cplx[0], &yview_cplx[0,0], dev.startswith('gpu'))
     return y
 
-def polyCoeffsSeq(d, K, basisX, coeffs, dev, out=None):
+def polyGroupCoeffs(d, K, basisX, coeffs, dev, out=None):
     if not isinstance(basisX, np.ndarray):
         raise ValueError('input basisX must be a numpy.ndarray')
     #TODO: raise exception if not real nor complex
@@ -2825,17 +2825,17 @@ def polyCoeffsSeq(d, K, basisX, coeffs, dev, out=None):
 #void polyCoeffsSeq(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP** out, int n_out, bool on_gpu);
     if ndim_M == 1:
         if isReal:
-            FaustCoreCy.polyCoeffsSeq(d, K, n, &bxview_1D[0],
+            FaustCoreCy.polyGroupCoeffs_(d, K, n, &bxview_1D[0],
                        &cview[0,0], yview, ncoeffs, dev.startswith('gpu'))
         else:
-            FaustCoreCy.polyCoeffsSeq(d, K, n, &bxview_1D_cplx[0],
+            FaustCoreCy.polyGroupCoeffs_(d, K, n, &bxview_1D_cplx[0],
                        &cview_cplx[0,0], yview_cplx, ncoeffs, dev.startswith('gpu'))
     else:
         if isReal:
-            FaustCoreCy.polyCoeffsSeq(d, K, n, &bxview_2D[0,0],
+            FaustCoreCy.polyGroupCoeffs_(d, K, n, &bxview_2D[0,0],
                        &cview[0,0], yview, ncoeffs, dev.startswith('gpu'))
         else:
-            FaustCoreCy.polyCoeffsSeq(d, K, n, &bxview_2D_cplx[0,0],
+            FaustCoreCy.polyGroupCoeffs_(d, K, n, &bxview_2D_cplx[0,0],
                        &cview_cplx[0,0], yview_cplx, ncoeffs, dev.startswith('gpu'))
     if isReal:
         PyMem_Free(yview)

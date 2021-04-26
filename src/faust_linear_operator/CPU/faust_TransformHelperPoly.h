@@ -28,11 +28,18 @@ namespace Faust
 	template<typename FPP>
 		void poly_gpu(const MatDense<FPP,GPU2>& gpu_mat_basis, const Vect<FPP, GPU2>& gpu_vec_coeffs, Vect<FPP, GPU2>& gpu_dsize_vec, FPP* out, int out_offset);
 	template<typename FPP>
-		void poly(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP** out, int n_out, bool on_gpu=false);
+		void polyGroupCoeffs(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP** out, int n_out, bool on_gpu=false);
 	template<typename FPP>
-		void poly_cpu(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP** out, int n_out);
+		void polyGroupCoeffs_cpu(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP** out, int n_out);
 	template<typename FPP>
-		void poly_gpu(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP** out, int n_out);
+		void polyGroupCoeffs_gpu(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP** out, int n_out);
+
+	template<typename FPP>
+		void polyGroupCoeffs(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP* out, int n_out, bool on_gpu=false);
+	template<typename FPP>
+		void polyGroupCoeffs_cpu(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP* out, int n_out);
+	template<typename FPP>
+		void polyGroupCoeffs_gpu(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP* out, int n_out);
 
 	/**
 	 * \brief This class aims to represent a Chebyshev polynomial basis as a "Faust".

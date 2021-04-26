@@ -110,14 +110,15 @@ function LC = poly(coeffs, basis, varargin)
 
 	on_gpu = startsWith(dev , 'gpu');
 
-	if(~ ismatrix(coeffs) || size(coeffs, 1) ~= 1 && size(coeffs, 2) ~= 1)
-		error('coeffs must be a scalar vector')
-		if(isreal(coeffs) ~= isreal(basis))
-			error('coeffs and basis must be of the same scalar type (real or complex)')
-		end
+	if(~ ismatrix(coeffs)) %|| size(coeffs, 1) ~= 1 && size(coeffs, 2) ~= 1)
+		error('coeffs must be a scalar matrix')
 	end
 
-	K = numel(coeffs)-1;
+	if(isreal(coeffs) ~= isreal(basis))
+		error('coeffs and basis must be of the same scalar type (real or complex)')
+	end
+
+	K = size(coeffs, 1)-1;
 
 	if(isstr(basis) || ischar(basis))
 		if(exist('L') ~= 1)
@@ -139,10 +140,19 @@ function LC = poly(coeffs, basis, varargin)
 			error('coeffs and basis dimensions must agree.')
 		end
 		d = floor(size(basis,1) / (K+1));
-		if(is_real)
-			LC = mexPolyReal('polyMatrix', d, K, size(basis,2), coeffs, basis, on_gpu);
+		if(size(coeffs, 2) == 1)
+			if(is_real)
+				LC = mexPolyReal('polyMatrix', d, K, size(basis,2), coeffs, basis, on_gpu);
+			else
+				LC = mexPolyCplx('polyMatrix', d, K, size(basis,2), coeffs, basis, on_gpu);
+			end
 		else
-			LC = mexPolyCplx('polyMatrix', d, K, size(basis,2), coeffs, basis, on_gpu);
+			if(is_real)
+				LC = mexPolyReal('polyMatrixGroupCoeffs', d, K, size(basis,2), size(coeffs, 2), coeffs, basis, on_gpu);
+			else
+				LC = mexPolyCplx('polyMatrixGroupCoeffs', d, K, size(basis,2), size(coeffs, 2), coeffs, basis, on_gpu);
+			end
+
 		end
 		% LC is a matrix
 	end

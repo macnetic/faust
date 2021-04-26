@@ -314,7 +314,7 @@ def _poly_arr_cpp(coeffs, basisX, d, dev='cpu', out=None):
         return _FaustCorePy.polyCoeffs(d, basisX, coeffs, dev, out)
     elif coeffs.ndim == 2:
         K = coeffs.shape[1]-1
-        return _FaustCorePy.polyCoeffsSeq(d, K, basisX, coeffs, dev, out)
+        return _FaustCorePy.polyGroupCoeffs(d, K, basisX, coeffs, dev, out)
     else:
         raise ValueError("coeffs can't have more than two dimensions.")
 
@@ -496,8 +496,7 @@ class FaustPoly(Faust):
         return next(self.gen)
 
 
-def expm_multiply(A, B, t, K=10, tradeoff='time', dev='cpu',
-                  group_coeffs=False, **kwargs):
+def expm_multiply(A, B, t, K=10, tradeoff='time', dev='cpu', **kwargs):
     """
     Computes an approximate of the action of the matrix exponential of A on B using series of Chebyshev polynomials.
 
@@ -551,8 +550,10 @@ def expm_multiply(A, B, t, K=10, tradeoff='time', dev='cpu',
         raise ValueError('A must be symmetric positive definite.')
     if tradeoff == 'time':
         poly_meth = 2
+        group_coeffs = True
     elif tradeoff == 'memory':
         poly_meth = 1
+        group_coeffs = False
     else:
         raise ValueError("tradeoff must be 'memory' or 'time'")
     if 'poly_meth' in kwargs:
@@ -560,6 +561,11 @@ def expm_multiply(A, B, t, K=10, tradeoff='time', dev='cpu',
             raise ValueError('poly_meth must be 1 or 2')
         poly_meth = int(kwargs['poly_meth'])
         print("expm_multiply poly_meth:", poly_meth)
+    if 'group_coeffs' in kwargs:
+        if not isinstance(kwargs['group_coeffs'], bool):
+            raise ValueError('group_coeffs must be a bool')
+        group_coeffs = kwargs['group_coeffs']
+        print("expm_multiply group_coeffs:", group_coeffs)
     phi = eigsh(A, k=1, return_eigenvectors=False)[0] / 2
     T = basis(A/phi-seye(*A.shape), K, 'chebyshev', dev=dev)
     if isinstance(t, float):
@@ -590,6 +596,7 @@ def expm_multiply(A, B, t, K=10, tradeoff='time', dev='cpu',
                                'time points.')
 
     if group_coeffs:
+        # poly_meth == 2
         coeff = np.empty((npts, K+1), dtype=np.float)
         for i, tau in enumerate(t):
             if tau >= 0:

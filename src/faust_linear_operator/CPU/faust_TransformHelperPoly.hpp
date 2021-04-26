@@ -748,28 +748,28 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		void poly(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP** out, int n_out, bool on_gpu/*=false*/)
+		void polyGroupCoeffs(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP** out, int n_out, bool on_gpu/*=false*/)
 		{
 			if(on_gpu)
 #ifdef USE_GPU_MOD
-				poly_gpu(d, K, n, basisX, coeffs, out, n_out);
+				polyGroupCoeffs_gpu(d, K, n, basisX, coeffs, out, n_out);
 #else
 			throw std::runtime_error("USE_GPU_MOD option must be enabled at compiling time to use this function (Faust::poly_gpu()).");
 #endif
 			else // cpu
-				poly_cpu(d, K, n, basisX, coeffs, out, n_out);
+				polyGroupCoeffs_cpu(d, K, n, basisX, coeffs, out, n_out);
 
 		}
 
 	template<typename FPP>
-		void poly_cpu(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP** out, int n_out)
+		void polyGroupCoeffs_cpu(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP** out, int n_out)
 		{
 			for(int i=0;i<n_out;i++)
 				poly_cpu(d, K, n, basisX, coeffs+i*(K+1), out[i]);
 		}
 
 	template<typename FPP>
-		void poly_gpu(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP** out, int n_out)
+		void polyGroupCoeffs_gpu(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP** out, int n_out)
 		{
 			auto K_plus_1 = K+1;
 			auto d_K_plus_1 = d*K_plus_1;
@@ -789,6 +789,37 @@ namespace Faust
 			for(int j=0;j<n_out;j++)
 				delete gpu_vec_coeffs[j];
 			delete[] gpu_vec_coeffs;
+		}
+
+	template<typename FPP>
+		void polyGroupCoeffs(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP* out, int n_out, bool on_gpu/*=false*/)
+		{
+			if(on_gpu)
+#ifdef USE_GPU_MOD
+				polyGroupCoeffs_gpu(d, K, n, basisX, coeffs, out, n_out);
+#else
+			throw std::runtime_error("USE_GPU_MOD option must be enabled at compiling time to use this function (Faust::poly_gpu()).");
+#endif
+			else // cpu
+				polyGroupCoeffs_cpu(d, K, n, basisX, coeffs, out, n_out);
+
+		}
+
+	template<typename FPP>
+		void polyGroupCoeffs_cpu(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP* out, int n_out)
+		{
+			for(int i=0;i<n_out;i++)
+				poly_cpu(d, K, n, basisX, coeffs+i*(K+1), out+i*d*n);
+		}
+
+	template<typename FPP>
+		void polyGroupCoeffs_gpu(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP* out, int n_out)
+		{
+			FPP** out_ = new FPP*[n_out];
+			for(int i=0;i<n_out;i++)
+				out_[i] = out+i*d*n;
+			polyGroupCoeffs_gpu(d, K, n, basisX, coeffs, out_, n_out);
+			delete [] out_;
 		}
 
 	template<typename FPP>
