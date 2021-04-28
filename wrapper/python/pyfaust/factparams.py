@@ -20,6 +20,103 @@ else:
     pyfaust.fact.hierarchical()
 """
 
+class StoppingCriterion(object):
+    """
+        This class defines a StoppingCriterion for PALM4MSA algorithms.
+
+        A stopping criterion can be of two kinds:
+            - number of iterations,
+            - error threshold.
+
+        Attributes:
+            num_its: see pyfaust.factparams.StoppingCriterion.__init__.
+            maxiter: see pyfaust.factparams.StoppingCriterion.__init__.
+            relerr: see pyfaust.factparams.StoppingCriterion.__init__.
+            relmat: see pyfaust.factparams.StoppingCriterion.__init__.
+            tol: see pyfaust.factparams.StoppingCriterion.__init__.
+    """
+    DEFAULT_MAXITER=10000
+    DEFAULT_TOL=0.3
+    DEFAULT_NUMITS=500
+    def __init__(self, num_its = DEFAULT_NUMITS,
+                 tol = None,
+                 maxiter = DEFAULT_MAXITER,
+                relerr = False, relmat=None):
+        """
+        Class constructor.
+
+        Args:
+            num_its: (optional) the fixed number of iterations of the
+            algorithm. By default the value is DEFAULT_NUMITS. The constructor
+            will fail if arguments num_its and tol are used together.
+            tol: (optional) error target according to the algorithm is stopped.
+            The constructor  will fail if arguments num_its and tol are used together.
+            maxiter: (optional) The maximum number of iterations to run the algorithm,
+            whatever is the criterion used (tol or num_its).
+            relerr: (optional) if False the tol error defines an absolute
+            error, otherwise it defines a relative error (in this case the
+            'relmat' matrix will be used to convert internally the given 'tol'
+            value to the corresponding absolute error).
+            relmat: (optional) The matrix against which is defined the relative error.
+            if relerr is True, this argument is mandatory.
+
+
+        Example:
+            >>> from pyfaust.factparams import StoppingCriterion
+            >>> from numpy.random import rand
+            >>> s = StoppingCriterion()
+            >>> print(s)
+            num_its: 500, maxiter: 10000
+            >>> s = StoppingCriterion(5)
+            >>> print(s)
+            num_its: 5, maxiter: 10000
+            >>> s = StoppingCriterion(tol=.5)
+            >>> print(s)
+            tol: 0.5 relerr: False, maxiter: 10000
+            >>> s = StoppingCriterion(tol=.2, relerr=True, relmat=rand(10,10))
+            >>> print(s)
+            tol: 1.1123924064125228, relerr: True, maxiter: 10000
+
+        """
+        self.tol = tol
+        if(tol != None):
+            self._is_criterion_error = True
+        else:
+            self._is_criterion_error = False
+        self.num_its = num_its
+        self.maxiter = maxiter
+        if(self._is_criterion_error and num_its != StoppingCriterion.DEFAULT_NUMITS
+           or not self._is_criterion_error and (maxiter !=
+                                          StoppingCriterion.DEFAULT_MAXITER or
+                                          tol != None)):
+            raise ValueError("The choice between tol and num_its arguments is exclusive.")
+        if(relerr and (not isinstance(relmat, np.ndarray))):
+            raise ValueError("when error is relative (relerr == true) the "
+                             "reference matrix 'relmat' must be specified")
+        self.relerr = relerr
+        if(self.tol == None):
+            self.tol = StoppingCriterion.DEFAULT_TOL
+        else:
+            if(relerr):
+                self.tol *= np.linalg.norm(relmat)
+
+    def __str__(self):
+        """
+            Converts StoppingCriterion to a str.
+        """
+        if(self._is_criterion_error):
+            return "tol: "+str(self.tol)+", relerr: "+str(self.relerr)+ \
+                    ", maxiter: " + str(self.maxiter)
+        else:
+            return "num_its: "+str(self.num_its)+ \
+                    ", maxiter: " + str(self.maxiter)
+
+    def __repr__(self):
+        """
+            Returns the StoppingCriterion object representation.
+        """
+        return self.__str__()
+
 class ConstraintGeneric(ABC):
     """
     This is the parent class for representing a factor constraint in FAuST factorization algorithms.
@@ -624,7 +721,9 @@ class ParamsFact(ABC):
                  is_verbose, use_csr=True,
                  packing_RL=True, norm2_max_iter=100,
                  norm2_threshold=1e-6,
-                 grad_calc_opt_mode=EXTERNAL_OPT):
+                 grad_calc_opt_mode=EXTERNAL_OPT,
+                 use_MHTP=False,
+                 MHTP_stop_crit=StoppingCriterion(num_its=50)):
         self.num_facts = num_facts
         self.is_update_way_R2L = is_update_way_R2L
         self.init_lambda = init_lambda
@@ -646,6 +745,8 @@ class ParamsFact(ABC):
         self.norm2_threshold = norm2_threshold
         self.use_csr = use_csr
         self.packing_RL = packing_RL
+        self.use_MHTP = use_MHTP
+        self.MHTP_stop_crit = MHTP_stop_crit
 
     def __repr__(self):
         """
@@ -660,6 +761,8 @@ class ParamsFact(ABC):
         "norm2_max_iter="+str( self.norm2_max_iter)+'\r\n'
         "norm2_threshold="+str( self.norm2_threshold)+'\r\n'
         "use_csr="+str( self.use_csr)+'\r\n'
+        "use_MHTP="+str( self.use_MHTP)+'\r\n'
+        "MHTP_stop_crit="+str( self.MHTP_stop_crit)+'\r\n'
         "packing_RL="+str( self.packing_RL)+'\r\n'
         "is_verbose="+str( self.is_verbose)+'\r\n'
         "constraints="+str( self.constraints))+'\r\n'
@@ -692,7 +795,9 @@ class ParamsHierarchical(ParamsFact):
                  packing_RL=True,
                  norm2_max_iter=100,
                  norm2_threshold=1e-6,
-                 grad_calc_opt_mode=ParamsFact.EXTERNAL_OPT):
+                 grad_calc_opt_mode=ParamsFact.EXTERNAL_OPT,
+                 use_MHTP=False,
+                 MHTP_stop_crit=StoppingCriterion(num_its=50)):
         """
         Constructor.
 
@@ -779,7 +884,9 @@ class ParamsHierarchical(ParamsFact):
                                                  packing_RL,
                                                  norm2_max_iter,
                                                  norm2_threshold,
-                                                 grad_calc_opt_mode)
+                                                 grad_calc_opt_mode,
+                                                 use_MHTP,
+                                                 MHTP_stop_crit)
         self.stop_crits = stop_crits
         self.is_fact_side_left = is_fact_side_left
         if((not isinstance(stop_crits, list) and not isinstance(stop_crits,
@@ -1084,102 +1191,6 @@ def _init_init_D(init_D, dim_sz):
 
 
 
-class StoppingCriterion(object):
-    """
-        This class defines a StoppingCriterion for PALM4MSA algorithms.
-
-        A stopping criterion can be of two kinds:
-            - number of iterations,
-            - error threshold.
-
-        Attributes:
-            num_its: see pyfaust.factparams.StoppingCriterion.__init__.
-            maxiter: see pyfaust.factparams.StoppingCriterion.__init__.
-            relerr: see pyfaust.factparams.StoppingCriterion.__init__.
-            relmat: see pyfaust.factparams.StoppingCriterion.__init__.
-            tol: see pyfaust.factparams.StoppingCriterion.__init__.
-    """
-    DEFAULT_MAXITER=10000
-    DEFAULT_TOL=0.3
-    DEFAULT_NUMITS=500
-    def __init__(self, num_its = DEFAULT_NUMITS,
-                 tol = None,
-                 maxiter = DEFAULT_MAXITER,
-                relerr = False, relmat=None):
-        """
-        Class constructor.
-
-        Args:
-            num_its: (optional) the fixed number of iterations of the
-            algorithm. By default the value is DEFAULT_NUMITS. The constructor
-            will fail if arguments num_its and tol are used together.
-            tol: (optional) error target according to the algorithm is stopped.
-            The constructor  will fail if arguments num_its and tol are used together.
-            maxiter: (optional) The maximum number of iterations to run the algorithm,
-            whatever is the criterion used (tol or num_its).
-            relerr: (optional) if False the tol error defines an absolute
-            error, otherwise it defines a relative error (in this case the
-            'relmat' matrix will be used to convert internally the given 'tol'
-            value to the corresponding absolute error).
-            relmat: (optional) The matrix against which is defined the relative error.
-            if relerr is True, this argument is mandatory.
-
-
-        Example:
-            >>> from pyfaust.factparams import StoppingCriterion
-            >>> from numpy.random import rand
-            >>> s = StoppingCriterion()
-            >>> print(s)
-            num_its: 500, maxiter: 10000
-            >>> s = StoppingCriterion(5)
-            >>> print(s)
-            num_its: 5, maxiter: 10000
-            >>> s = StoppingCriterion(tol=.5)
-            >>> print(s)
-            tol: 0.5 relerr: False, maxiter: 10000
-            >>> s = StoppingCriterion(tol=.2, relerr=True, relmat=rand(10,10))
-            >>> print(s)
-            tol: 1.1123924064125228, relerr: True, maxiter: 10000
-
-        """
-        self.tol = tol
-        if(tol != None):
-            self._is_criterion_error = True
-        else:
-            self._is_criterion_error = False
-        self.num_its = num_its
-        self.maxiter = maxiter
-        if(self._is_criterion_error and num_its != StoppingCriterion.DEFAULT_NUMITS
-           or not self._is_criterion_error and (maxiter !=
-                                          StoppingCriterion.DEFAULT_MAXITER or
-                                          tol != None)):
-            raise ValueError("The choice between tol and num_its arguments is exclusive.")
-        if(relerr and (not isinstance(relmat, np.ndarray))):
-            raise ValueError("when error is relative (relerr == true) the "
-                             "reference matrix 'relmat' must be specified")
-        self.relerr = relerr
-        if(self.tol == None):
-            self.tol = StoppingCriterion.DEFAULT_TOL
-        else:
-            if(relerr):
-                self.tol *= np.linalg.norm(relmat)
-
-    def __str__(self):
-        """
-            Converts StoppingCriterion to a str.
-        """
-        if(self._is_criterion_error):
-            return "tol: "+str(self.tol)+", relerr: "+str(self.relerr)+ \
-                    ", maxiter: " + str(self.maxiter)
-        else:
-            return "num_its: "+str(self.num_its)+ \
-                    ", maxiter: " + str(self.maxiter)
-
-    def __repr__(self):
-        """
-            Returns the StoppingCriterion object representation.
-        """
-        return self.__str__()
 
 class ParamsFactFactory:
     """

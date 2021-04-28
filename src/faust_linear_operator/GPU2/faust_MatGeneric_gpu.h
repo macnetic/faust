@@ -22,6 +22,7 @@ namespace Faust
 				bool is_identity;
 				bool is_zeros;
 			public:
+				virtual void setZeros()=0;
 				virtual size_t getNBytes() const=0;
 				virtual MatType getType() const=0;
 				virtual int32_t getNbRow() const=0;
@@ -39,15 +40,15 @@ namespace Faust
 				//! \brief Returns a sub-group of rows of this matrix as the same type of matrix
 				virtual MatGeneric<FPP,GPU2>* get_rows(faust_unsigned_int* row_ids, faust_unsigned_int num_rows) const=0;
 				//! \brief Returns a sub-group of columns of this matrix as the same type of matrix
-			virtual Faust::MatGeneric<FPP,GPU2>* get_cols(faust_unsigned_int col_id_start, faust_unsigned_int num_cols) const=0;
-			//! \brief Returns a sub-group of columns of this matrix as the same type of matrix
-			virtual Faust::MatGeneric<FPP,GPU2>* get_cols(faust_unsigned_int* col_ids, faust_unsigned_int num_cols) const=0;
+				virtual Faust::MatGeneric<FPP,GPU2>* get_cols(faust_unsigned_int col_id_start, faust_unsigned_int num_cols) const=0;
+				//! \brief Returns a sub-group of columns of this matrix as the same type of matrix
+				virtual Faust::MatGeneric<FPP,GPU2>* get_cols(faust_unsigned_int* col_ids, faust_unsigned_int num_cols) const=0;
 
-			virtual void Display() const=0;
-			virtual Real<FPP> norm() const=0;
-			MatGeneric();
+				virtual void Display() const=0;
+				virtual Real<FPP> norm() const=0;
+				MatGeneric();
 
-			virtual ~MatGeneric();
+				virtual ~MatGeneric();
 		};
 
 //	template<typename FPP>

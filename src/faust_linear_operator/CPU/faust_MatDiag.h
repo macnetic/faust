@@ -91,6 +91,7 @@ namespace Faust
 			//! \brief Returns all the features of the MatDense.
 			std::string to_string(const bool transpose=false, const bool displaying_small_mat_elts=false) const;
 			void Display() const;
+			void setZeros();
 
 			const FPP* getData() const { return mat.diagonal().data();};
 

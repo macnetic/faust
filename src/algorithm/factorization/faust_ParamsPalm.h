@@ -109,6 +109,8 @@ namespace Faust
           unsigned int norm2_max_iter;
 		  bool use_csr;
 		  bool packing_RL;
+		  bool use_MHTP;
+          StoppingCriterion<Real<FPP>> stop_crit_MHTP;
 
           void Display() const;
           void init_factors();

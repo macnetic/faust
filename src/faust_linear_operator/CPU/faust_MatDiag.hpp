@@ -183,3 +183,11 @@ size_t Faust::MatDiag<FPP>::getNBytes() const
 {
 	return sizeof(FPP)*this->dim1*this->dim2;
 }
+
+template<typename FPP>
+void Faust::MatDiag<FPP>::setZeros()
+{
+	memset((void*)getData(), 0, sizeof(FPP) * this->dim1*this->dim2);
+	isZeros = true;
+	this->is_identity = false;
+}

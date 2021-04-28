@@ -2404,6 +2404,7 @@ cdef class FaustFact:
         cdef double[:] outbufview
 
         cdef PyxStoppingCriterion[double] cpp_stop_crit
+        cdef PyxStoppingCriterion[double] cpp_MHTP_stop_crit
         # template parameter is always double (never complex) because no need
         # to have a threshold error of complex type (it wouldn't make sense)
         cdef PyxConstraintGeneric** cpp_constraints
@@ -2423,6 +2424,11 @@ cdef class FaustFact:
         cpp_stop_crit.error_threshold = p.stop_crit.tol
         cpp_stop_crit.num_its = p.stop_crit.num_its
         cpp_stop_crit.max_num_its = p.stop_crit.maxiter
+
+        cpp_MHTP_stop_crit.is_criterion_error = p.MHTP_stop_crit._is_criterion_error
+        cpp_MHTP_stop_crit.error_threshold = p.MHTP_stop_crit.tol
+        cpp_MHTP_stop_crit.num_its = p.MHTP_stop_crit.num_its
+        cpp_MHTP_stop_crit.max_num_its = p.MHTP_stop_crit.maxiter
 
         cpp_constraints = \
         <PyxConstraintGeneric**> \
@@ -2465,6 +2471,7 @@ cdef class FaustFact:
                                              cpp_stop_crit,
                                              p.is_update_way_R2L,
                                              p.use_csr, p.packing_RL,
+                                             p.use_MHTP, cpp_MHTP_stop_crit,
                                              p.norm2_max_iter,
                                              p.norm2_threshold,
                                              p.is_verbose,

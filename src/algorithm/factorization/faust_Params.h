@@ -181,6 +181,8 @@ namespace Faust
         unsigned int norm2_max_iter;
 		bool use_csr;
 		bool packing_RL;
+		bool use_MHTP;
+		StoppingCriterion<Real<FPP>> stop_crit_MHTP;
 
         //default value
         static const int defaultNiter1;
@@ -196,6 +198,7 @@ namespace Faust
 		static const GradientCalcOptMode defaultGradCalcOptMode;
 		static const bool defaultUseCSR;
 		static const bool defaultPackingRL;
+		static const bool defaultUseMHTP;
 
         //const int nb_rows; // number of rows of the first factor
         //const int nb_cols; // number of columns of the last factor

@@ -146,70 +146,74 @@ void Faust::ParamsPalm<FPP,DEVICE,FPP2>::Display() const
 {
 	std::cout<<"NFACTS : "<<nbFact<<std::endl;
 	/*int nbr_iter_2_fact = 0;
-	while(params.stop_crit_2facts.do_continue(nbr_iter_2_fact))
-	{
-		nbr_iter_2_fact++;
-	}
-	int nbr_iter_global = 0;
-	while(params.stop_crit_global.do_continue(nbr_iter_global))
-	{
-		nbr_iter_global++;
-	}
-	std::cout<<"NBR_ITER_2_FACT : "<<nbr_iter_2_fact << endl;
-	std::cout<<"NBR_ITER_GLOBAL : "<<nbr_iter_global << endl;*/
+	  while(params.stop_crit_2facts.do_continue(nbr_iter_2_fact))
+	  {
+	  nbr_iter_2_fact++;
+	  }
+	  int nbr_iter_global = 0;
+	  while(params.stop_crit_global.do_continue(nbr_iter_global))
+	  {
+	  nbr_iter_global++;
+	  }
+	  std::cout<<"NBR_ITER_2_FACT : "<<nbr_iter_2_fact << endl;
+	  std::cout<<"NBR_ITER_GLOBAL : "<<nbr_iter_global << endl;*/
 	std::cout<<"VERBOSE : "<<isVerbose<<std::endl;
 	std::cout<<"UPDATEWAY : "<<isUpdateWayR2L<<std::endl;
 	std::cout<<"INIT_LAMBDA : "<<init_lambda<<std::endl;
 	std::cout<<"ISCONSTANTSTEPSIZE : "<<isConstantStepSize<<std::endl;
 	std::cout<<"step_size : "<<step_size<<std::endl;
 	std::cout<<"data :  nbRow "<<data.getNbRow()<<" NbCol : "<< data.getNbCol()<<std::endl;
-//	std::cout<<"stop_crit : "<<stop_crit.get_crit()<<std::endl;
+	//	std::cout<<"stop_crit : "<<stop_crit.get_crit()<<std::endl;
 	std::cout<<"stop_crit : "<< std::endl << stop_crit.to_string() <<std::endl;
 	std::cout << "gradCalcOptMode: "<< gradCalcOptMode << std::endl;
-    std::cout << "norm2_threshold:" << norm2_threshold << std::endl;
-    std::cout << "norm2_max_iter:" << norm2_max_iter << std::endl;
+	std::cout << "norm2_threshold:" << norm2_threshold << std::endl;
+	std::cout << "norm2_max_iter:" << norm2_max_iter << std::endl;
 	std::cout << "use_csr:" << use_csr << std::endl;
 	std::cout << "packing_RL:" << packing_RL << std::endl;
 
 	/*cout<<"INIT_FACTS :"<<endl;
-	for (int L=0;L<init_fact.size();L++)init_fact[L].Display();*/
+	  for (int L=0;L<init_fact.size();L++)init_fact[L].Display();*/
 
 	std::cout<<"CONSTRAINT  : "<< cons.size()<<std::endl;
 
 
-		for (unsigned int L=0;L<cons.size();L++)
+	for (unsigned int L=0;L<cons.size();L++)
+	{
+
+		//std::string type_cons;
+		//type_cons.resize(0);
+		//type_cons=getConstraintType((*cons[jl][L]).getConstraintType());
+		std::cout<<"type_cont : "<<cons[L]->template get_type<FPP,DEVICE,FPP2>()<<" ";
+		std::cout<<(*cons[L]).get_constraint_name();
+		std::cout<<" nb_row :"<<(*cons[L]).get_rows();
+		std::cout<<" nb_col :"<<(*cons[L]).get_cols();
+
+
+		if (cons[L]->template is_constraint_parameter_int<FPP,DEVICE,FPP2>())
 		{
-
-			//std::string type_cons;
-			//type_cons.resize(0);
-			//type_cons=getConstraintType((*cons[jl][L]).getConstraintType());
-			std::cout<<"type_cont : "<<cons[L]->template get_type<FPP,DEVICE,FPP2>()<<" ";
-			std::cout<<(*cons[L]).get_constraint_name();
-			std::cout<<" nb_row :"<<(*cons[L]).get_rows();
-			std::cout<<" nb_col :"<<(*cons[L]).get_cols();
-
-
-			if (cons[L]->template is_constraint_parameter_int<FPP,DEVICE,FPP2>())
-			{
-				Faust::ConstraintInt<FPP,DEVICE>* const_int = (Faust::ConstraintInt<FPP,DEVICE>*)(cons[L]);
-				std::cout<<" parameter :"<<(*const_int).get_parameter()<<std::endl;
-			}
-
-			else if (cons[L]->template is_constraint_parameter_real<FPP,DEVICE,FPP2>())
-			{
-				Faust::ConstraintFPP<FPP,DEVICE>* const_real = (Faust::ConstraintFPP<FPP,DEVICE>*)(cons[L]);
-				std::cout<<" parameter :"<<(*const_real).get_parameter()<<std::endl;
-			}
-
-			else if (cons[L]->template is_constraint_parameter_mat<FPP,DEVICE,FPP2>())
-			{
-				Faust::ConstraintMat<FPP,DEVICE>* const_mat = (Faust::ConstraintMat<FPP,DEVICE>*)(cons[L]);
-				std::cout<<" parameter :"<<std::endl;
-				(*const_mat).get_parameter().Display();
-			}
-
+			Faust::ConstraintInt<FPP,DEVICE>* const_int = (Faust::ConstraintInt<FPP,DEVICE>*)(cons[L]);
+			std::cout<<" parameter :"<<(*const_int).get_parameter()<<std::endl;
 		}
-		std::cout<<std::endl<<std::endl;
+
+		else if (cons[L]->template is_constraint_parameter_real<FPP,DEVICE,FPP2>())
+		{
+			Faust::ConstraintFPP<FPP,DEVICE>* const_real = (Faust::ConstraintFPP<FPP,DEVICE>*)(cons[L]);
+			std::cout<<" parameter :"<<(*const_real).get_parameter()<<std::endl;
+		}
+
+		else if (cons[L]->template is_constraint_parameter_mat<FPP,DEVICE,FPP2>())
+		{
+			Faust::ConstraintMat<FPP,DEVICE>* const_mat = (Faust::ConstraintMat<FPP,DEVICE>*)(cons[L]);
+			std::cout<<" parameter :"<<std::endl;
+			(*const_mat).get_parameter().Display();
+		}
+
+	}
+	std::cout<<std::endl<<std::endl;
+
+	std::cout << "USE_MHTP :" << use_MHTP << std::endl;
+	std::cout<< "stop_crit_MHTP: "<< std::endl << stop_crit_MHTP.to_string() <<std::endl;
+
 }
 
 #endif

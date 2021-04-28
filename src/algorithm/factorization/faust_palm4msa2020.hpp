@@ -244,3 +244,14 @@ void Faust::fill_of_eyes(
 		S.push_back(fact); //TODO: copying=false
 	}
 }
+
+	template<typename FPP, FDevice DEVICE>
+Real<FPP> Faust::calc_rel_err(const TransformHelper<FPP,DEVICE>& S, const MatDense<FPP,DEVICE> &A, const FPP &lambda/*=1*/, const Real<FPP>* A_norm/*=nullptr*/)
+{
+	MatDense<FPP, DEVICE> err = const_cast<TransformHelper<FPP, DEVICE>&>(S).get_product();
+	err *= lambda;
+	err -= A;
+	if(A_norm == nullptr)
+		return err.norm() / A.norm();
+	return err.norm() / *A_norm;
+}

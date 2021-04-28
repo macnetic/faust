@@ -18,6 +18,15 @@
 #include "faust_StoppingCriterion.h"
 #include "faust_prod_opt.h"
 #include <functional>
+#include <cstdlib>
+
+#define PALM4MSA2020_VERBOSE_CALC_ERR_ITE_PERIOD 1 // the period according to the relative error is computed and displayed in palm4msa2
+// this constant is overriden if the variable environment VERBOSE_CALC_ERR_ITE_PERIOD exists
+#define set_calc_err_ite_period() \
+			auto ite_period = PALM4MSA2020_VERBOSE_CALC_ERR_ITE_PERIOD; \
+			auto env_var = getenv("PALM4MSA2020_VERBOSE_CALC_ERR_ITE_PERIOD"); \
+			if (nullptr != env_var) \
+				ite_period = atoi(env_var);
 
 namespace Faust
 {
@@ -59,10 +68,12 @@ namespace Faust
 				const bool is_update_way_R2L=false,
                 const bool use_csr=true,
 				const bool packing_RL=true,
+				const bool use_MHTP=false,
+				const StoppingCriterion<Real<FPP>> MHTP_sc = StoppingCriterion<Real<FPP>>(50),
 				const bool compute_2norm_on_array=false,
 				const Real<FPP> norm2_threshold=FAUST_PRECISION,
 				const unsigned int norm2_max_iter=FAUST_NORM2_MAX_ITER,
-				const bool constant_step_size=false, const Real<FPP> step_size=FAUST_PRECISION,
+				bool constant_step_size=false, Real<FPP> step_size=FAUST_PRECISION,
 				const bool on_gpu=false,
 				const bool is_verbose=false,
 				/* id argument is useful to identify the palm4msa call.
@@ -94,6 +105,8 @@ namespace Faust
 	template <typename FPP, FDevice DEVICE>
 		void compute_n_apply_grad2(const int f_id, const MatDense<FPP,DEVICE> &A, TransformHelper<FPP,DEVICE>& S, std::vector<TransformHelper<FPP,DEVICE>*> &pL, std::vector<TransformHelper<FPP,DEVICE>*>& pR, const FPP& lambda, const Real<FPP> &c, MatDense<FPP,DEVICE> &out /* D */, const StoppingCriterion<Real<FPP>>& sc, Real<FPP> &error, const int prod_mod, const bool packing_RL);
 
+	template<typename FPP, FDevice DEVICE>
+		Real<FPP> calc_rel_err(const TransformHelper<FPP,DEVICE>& S, const MatDense<FPP,DEVICE> &A, const FPP &lambda=1, const Real<FPP>* A_norm=nullptr);
 }
 #include "faust_palm4msa2020.hpp"
 #include "faust_palm4msa2020_2.hpp"
