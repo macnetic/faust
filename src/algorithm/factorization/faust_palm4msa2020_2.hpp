@@ -204,15 +204,20 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 			cur_fac = S.get_gen_fact_nonconst(f_id);
 			if(i%1000 == 0 && mhtp_params.used)
 			{
-				std::cout << "MHTP" << std::endl;
+				if(is_verbose)
+					std::cout << "MHTP" << std::endl;
 				j = 0;
 				// set the factor to zero
 				cur_fac->setZeros();
 				while(mhtp_params.sc.do_continue(j)) // TODO: what about the error stop criterion?
 				{
-//					constant_step_size = true;
-//					step_size = 1e-3;
-//					c = 1 / step_size;
+					if(mhtp_params.constant_step_size)
+					{
+						//TODO: add arguments to update_fac in order to avoid shunting PALM4MSA parameters with MHTP's
+						constant_step_size = true;
+						step_size = mhtp_params.step_size;
+						c = 1 / step_size;
+					}
 					update_fac(cur_fac, f_id);
 					j++;
 					Faust::MatDense<FPP,DEVICE> A_H_S = S.multiply(A_H);
@@ -222,8 +227,10 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 						throw std::runtime_error("Faust Frobenius norm is zero, can't compute lambda.");
 					lambda = trr/(n*n); //TODO: raise exception if n == 0
 				}
-//				constant_step_size = false;
-				std::cout << "end MHTP" << std::endl;
+				if(mhtp_params.constant_step_size) //TODO: cf above
+					constant_step_size = false;
+				if(is_verbose)
+					std::cout << "end MHTP" << std::endl;
 			}
 			else
 				update_fac(cur_fac, f_id);

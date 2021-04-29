@@ -715,8 +715,8 @@ class MHTPParams:
             raise TypeError("constant_step_size must be a bool.")
         if not isinstance(step_size, float):
             raise TypeError("step_size must be a float.")
-        if not isinstance(palm4msa_period, float):
-            raise TypeError("palm4msa_period must be a float.")
+        if not isinstance(palm4msa_period, (float, int)):
+            raise TypeError("palm4msa_period must be a int.")
         if not isinstance(updating_lambda, bool):
             raise TypeError("updating_lambda must be a bool.")
         self.stop_crit = stop_crit
