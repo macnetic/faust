@@ -17,6 +17,7 @@
 #include "faust_ConstraintMat.h"
 #include "faust_StoppingCriterion.h"
 #include "faust_prod_opt.h"
+#include "faust_MHTP.h"
 #include <functional>
 #include <cstdlib>
 
@@ -68,8 +69,7 @@ namespace Faust
 				const bool is_update_way_R2L=false,
                 const bool use_csr=true,
 				const bool packing_RL=true,
-				const bool use_MHTP=false,
-				const StoppingCriterion<Real<FPP>> MHTP_sc = StoppingCriterion<Real<FPP>>(50),
+				const MHTPParams<FPP> mhtp_params=MHTPParams<FPP>(),
 				const bool compute_2norm_on_array=false,
 				const Real<FPP> norm2_threshold=FAUST_PRECISION,
 				const unsigned int norm2_max_iter=FAUST_NORM2_MAX_ITER,

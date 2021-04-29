@@ -703,6 +703,32 @@ class ConstraintList(object):
         """
         return self.clist.__getitem__(ind)
 
+class MHTPParams:
+
+    def __init__(self, stop_crit=StoppingCriterion(num_its=50),
+                 constant_step_size=False, step_size=1e-3,
+                 palm4msa_period=1000,
+                 updating_lambda=True):
+        if not isinstance(stop_crit, StoppingCriterion):
+            raise TypeError("stop_crit must be a StoppingCriterion.")
+        if not isinstance(constant_step_size, bool):
+            raise TypeError("constant_step_size must be a bool.")
+        if not isinstance(step_size, float):
+            raise TypeError("step_size must be a float.")
+        if not isinstance(palm4msa_period, float):
+            raise TypeError("palm4msa_period must be a float.")
+        if not isinstance(updating_lambda, bool):
+            raise TypeError("updating_lambda must be a bool.")
+        self.stop_crit = stop_crit
+        self.constant_step_size = constant_step_size
+        self.step_size = step_size
+        self.palm4msa_period = int(palm4msa_period)
+        self.updating_lambda = updating_lambda
+
+    def __repr__(self):
+        return str(MHTP_stop_crit)
+
+
 class ParamsFact(ABC):
     """
         The parent abstract class to represent the general factorization parameters.
@@ -722,8 +748,7 @@ class ParamsFact(ABC):
                  packing_RL=True, norm2_max_iter=100,
                  norm2_threshold=1e-6,
                  grad_calc_opt_mode=EXTERNAL_OPT,
-                 use_MHTP=False,
-                 MHTP_stop_crit=StoppingCriterion(num_its=50)):
+                 use_MHTP=False):
         self.num_facts = num_facts
         self.is_update_way_R2L = is_update_way_R2L
         self.init_lambda = init_lambda
@@ -745,27 +770,29 @@ class ParamsFact(ABC):
         self.norm2_threshold = norm2_threshold
         self.use_csr = use_csr
         self.packing_RL = packing_RL
+        if not (isinstance(use_MHTP, bool) and use_MHTP == False) \
+            and not isinstance(use_MHTP, MHTPParams):
+            raise ValueError("use_MHTP must be False or a MHTPParams")
         self.use_MHTP = use_MHTP
-        self.MHTP_stop_crit = MHTP_stop_crit
 
     def __repr__(self):
         """
             Returns object representation.
         """
-        return ("num_facts="+str( self.num_facts)+'\r\n'
-        "is_update_way_R2L="+str( self.is_update_way_R2L)+'\r\n'
-        "init_lambda="+str( self.init_lambda)+'\r\n'
-        "step_size="+str( self.step_size)+'\r\n'
-        "constant_step_size="+str( self.constant_step_size)+'\r\n'
-        "grad_calc_opt_mode="+str( self.grad_calc_opt_mode)+'\r\n'
-        "norm2_max_iter="+str( self.norm2_max_iter)+'\r\n'
-        "norm2_threshold="+str( self.norm2_threshold)+'\r\n'
-        "use_csr="+str( self.use_csr)+'\r\n'
-        "use_MHTP="+str( self.use_MHTP)+'\r\n'
-        "MHTP_stop_crit="+str( self.MHTP_stop_crit)+'\r\n'
-        "packing_RL="+str( self.packing_RL)+'\r\n'
-        "is_verbose="+str( self.is_verbose)+'\r\n'
-        "constraints="+str( self.constraints))+'\r\n'
+        return ("num_facts="+str(self.num_facts)+'\r\n'
+        "is_update_way_R2L="+str(self.is_update_way_R2L)+'\r\n'
+        "init_lambda="+str(self.init_lambda)+'\r\n'
+        "step_size="+str(self.step_size)+'\r\n'
+        "constant_step_size="+str(self.constant_step_size)+'\r\n'
+        "grad_calc_opt_mode="+str(self.grad_calc_opt_mode)+'\r\n'
+        "norm2_max_iter="+str(self.norm2_max_iter)+'\r\n'
+        "norm2_threshold="+str(self.norm2_threshold)+'\r\n'
+        "use_csr="+str(self.use_csr)+'\r\n'
+        "packing_RL="+str(self.packing_RL)+'\r\n'
+        "is_verbose="+str(self.is_verbose)+'\r\n'
+        "constraints="+str(self.constraints)+'\r\n'
+        "use_MHTP="+str(self.use_MHTP)+("\r\n" if self.use_MHTP == False else
+                                        ""))
 
     @abstractmethod
     def is_mat_consistent(self, M):
@@ -796,8 +823,7 @@ class ParamsHierarchical(ParamsFact):
                  norm2_max_iter=100,
                  norm2_threshold=1e-6,
                  grad_calc_opt_mode=ParamsFact.EXTERNAL_OPT,
-                 use_MHTP=False,
-                 MHTP_stop_crit=StoppingCriterion(num_its=50)):
+                 use_MHTP=False):
         """
         Constructor.
 
@@ -885,8 +911,7 @@ class ParamsHierarchical(ParamsFact):
                                                  norm2_max_iter,
                                                  norm2_threshold,
                                                  grad_calc_opt_mode,
-                                                 use_MHTP,
-                                                 MHTP_stop_crit)
+                                                 use_MHTP)
         self.stop_crits = stop_crits
         self.is_fact_side_left = is_fact_side_left
         if((not isinstance(stop_crits, list) and not isinstance(stop_crits,
@@ -1094,7 +1119,8 @@ class ParamsPalm4MSA(ParamsFact):
                  is_verbose=False,
                  norm2_max_iter=100,
                  norm2_threshold=1e-6,
-                 grad_calc_opt_mode=ParamsFact.EXTERNAL_OPT):
+                 grad_calc_opt_mode=ParamsFact.EXTERNAL_OPT,
+                 use_MHTP=False):
         """
             Constructor.
 
@@ -1136,7 +1162,8 @@ class ParamsPalm4MSA(ParamsFact):
                                              init_lambda,
                                              constraints, step_size,
                                              constant_step_size,
-                                             is_verbose, grad_calc_opt_mode)
+                                             is_verbose, grad_calc_opt_mode,
+                                             use_MHTP=use_MHTP)
         if(init_facts != None and (not isinstance(init_facts, list) and not isinstance(init_facts,
                                                                tuple) or
            len(init_facts) != num_facts)):

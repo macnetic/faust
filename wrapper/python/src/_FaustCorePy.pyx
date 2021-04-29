@@ -40,7 +40,8 @@
 # importer le module Cython faisant le lien avec la class C++
 cimport FaustCoreCy
 from FaustCoreCy cimport PyxConstraintGeneric, PyxConstraintInt, \
-PyxConstraintMat, PyxConstraintScalar, PyxStoppingCriterion, PyxParamsFactPalm4MSA
+PyxConstraintMat, PyxConstraintScalar, PyxStoppingCriterion, \
+PyxParamsFactPalm4MSA, PyxMHTPParams
 
 import numpy as np
 cimport numpy as np
@@ -2404,7 +2405,7 @@ cdef class FaustFact:
         cdef double[:] outbufview
 
         cdef PyxStoppingCriterion[double] cpp_stop_crit
-        cdef PyxStoppingCriterion[double] cpp_MHTP_stop_crit
+        cdef PyxMHTPParams[double] cpp_MHTPParams
         # template parameter is always double (never complex) because no need
         # to have a threshold error of complex type (it wouldn't make sense)
         cdef PyxConstraintGeneric** cpp_constraints
@@ -2425,10 +2426,20 @@ cdef class FaustFact:
         cpp_stop_crit.num_its = p.stop_crit.num_its
         cpp_stop_crit.max_num_its = p.stop_crit.maxiter
 
-        cpp_MHTP_stop_crit.is_criterion_error = p.MHTP_stop_crit._is_criterion_error
-        cpp_MHTP_stop_crit.error_threshold = p.MHTP_stop_crit.tol
-        cpp_MHTP_stop_crit.num_its = p.MHTP_stop_crit.num_its
-        cpp_MHTP_stop_crit.max_num_its = p.MHTP_stop_crit.maxiter
+        # use_MHTP is either False or a MHTPParams instance
+        if p.use_MHTP != False:
+            mhtpp = p.use_MHTP
+            cpp_MHTPParams.used = True
+            cpp_MHTPParams.stop_crit.is_criterion_error = mhtpp.stop_crit._is_criterion_error
+            cpp_MHTPParams.stop_crit.error_threshold = mhtpp.stop_crit.tol
+            cpp_MHTPParams.stop_crit.num_its = mhtpp.stop_crit.num_its
+            cpp_MHTPParams.stop_crit.max_num_its = mhtpp.stop_crit.maxiter
+            cpp_MHTPParams.constant_step_size = mhtpp.constant_step_size
+            cpp_MHTPParams.step_size = mhtpp.step_size
+            cpp_MHTPParams.updating_lambda = mhtpp.updating_lambda
+            cpp_MHTPParams.palm4msa_period = mhtpp.palm4msa_period
+        else:
+            cpp_MHTPParams.used = False
 
         cpp_constraints = \
         <PyxConstraintGeneric**> \
@@ -2471,7 +2482,7 @@ cdef class FaustFact:
                                              cpp_stop_crit,
                                              p.is_update_way_R2L,
                                              p.use_csr, p.packing_RL,
-                                             p.use_MHTP, cpp_MHTP_stop_crit,
+                                             cpp_MHTPParams,
                                              p.norm2_max_iter,
                                              p.norm2_threshold,
                                              p.is_verbose,

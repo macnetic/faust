@@ -8,8 +8,7 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 		const bool is_update_way_R2L,
 		const bool use_csr,
 		const bool packing_RL,
-		const bool use_MHTP/*=false*/,
-		const StoppingCriterion<Real<FPP>> MHTP_sc/*= StoppingCriterion<Real<FPP>>(50)*/,
+		const MHTPParams<FPP> mhtp_params/*=MHTPParams<FPP>()*/,
 		const bool compute_2norm_on_array,
 		const Real<FPP> norm2_threshold,
 		const unsigned int norm2_max_iter,
@@ -39,8 +38,8 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 	//TODO: make it possible to receive a MatSparse A
 	if(is_verbose)
 	{
-		std::cout << "use_MHTP: " << use_MHTP << std::endl;
-		std::cout<<"MHTP stop crit.: "<< std::endl << MHTP_sc.to_string() <<std::endl;
+		std::cout << "use_MHTP: " << mhtp_params.used << std::endl;
+		std::cout<<"MHTP stop crit.: "<< std::endl << mhtp_params.sc.to_string() <<std::endl;
 	}
 	Faust::MatDense<FPP,DEVICE> A_H = A;
 	A_H.adjoint();
@@ -203,13 +202,13 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 		{
 			//						std::cout << "#f_id: " << f_id << std::endl;
 			cur_fac = S.get_gen_fact_nonconst(f_id);
-			if(i%1000 == 0 && use_MHTP)
+			if(i%1000 == 0 && mhtp_params.used)
 			{
 				std::cout << "MHTP" << std::endl;
 				j = 0;
 				// set the factor to zero
 				cur_fac->setZeros();
-				while(MHTP_sc.do_continue(j)) // TODO: what about the error stop criterion?
+				while(mhtp_params.sc.do_continue(j)) // TODO: what about the error stop criterion?
 				{
 //					constant_step_size = true;
 //					step_size = 1e-3;
@@ -253,7 +252,6 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 				auto err = calc_rel_err(S, A, lambda);
 				std::cout << " relative error: " << err;
 				std::cout << " (call id: " << id << ")" << std::endl;
-				std::cout << std::endl;
 			}
 		}
 		i++;

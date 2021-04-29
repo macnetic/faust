@@ -28,6 +28,7 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
 	std::vector<const Faust::ConstraintGeneric*> & fac_constraints = is_fact_side_left? p.cons[1]: p.cons[0];
 	std::vector<const Faust::ConstraintGeneric*> & res_constraints = is_fact_side_left? p.cons[0]: p.cons[1];;
 
+	const MHTPParams<FPP> mhtp_params; //TODO: replace by a function argument
 
 	if(p.isVerbose) p.Display();
 	for(int i=0;i < fac_constraints.size();i++)
@@ -99,7 +100,7 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
 			tmp_dense = new MatDense<FPP,DEVICE>(*tmp_sparse);
 		}
 		else tmp_sparse = nullptr;
-		Faust::palm4msa2(*tmp_dense, Si_cons, Si_th, lambda_, p.stop_crit_2facts, is_update_way_R2L , use_csr, packing_RL, compute_2norm_on_array,
+		Faust::palm4msa2(*tmp_dense, Si_cons, Si_th, lambda_, p.stop_crit_2facts, is_update_way_R2L, use_csr, packing_RL, mhtp_params, compute_2norm_on_array,
 				norm2_threshold, norm2_max_iter, constant_step_size, step_size, on_gpu, p.isVerbose, i+1);
 		if(tmp_sparse != nullptr)
 			// the Si factor has been converted into a MatDense in the memory
@@ -135,7 +136,7 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
 				glo_cons.push_back(const_cast<Faust::ConstraintGeneric*>(res_constraints[i]));
 
 		// global optimization
-		Faust::palm4msa2(A, glo_cons, *S, glo_lambda, p.stop_crit_global ,is_update_way_R2L, use_csr, packing_RL, compute_2norm_on_array,
+		Faust::palm4msa2(A, glo_cons, *S, glo_lambda, p.stop_crit_global ,is_update_way_R2L, use_csr, packing_RL, mhtp_params, compute_2norm_on_array,
 				norm2_threshold, norm2_max_iter, constant_step_size, step_size, on_gpu, p.isVerbose, i+1);
 	}
 	lambda = glo_lambda;
