@@ -29,6 +29,8 @@
 			if (nullptr != env_var) \
 				ite_period = atoi(env_var);
 
+#define LIPSCHITZ_MULTIPLICATOR 1.001
+
 namespace Faust
 {
 
@@ -107,6 +109,42 @@ namespace Faust
 
 	template<typename FPP, FDevice DEVICE>
 		Real<FPP> calc_rel_err(const TransformHelper<FPP,DEVICE>& S, const MatDense<FPP,DEVICE> &A, const FPP &lambda=1, const Real<FPP>* A_norm=nullptr);
+
+	/**
+	 * \brief This function performs the (scaling factor) lambda update of the PALM4MSA algorithm (palm4msa2).
+	 *
+	 * \param S: the Faust being refined by the PALM4MSA algorithm (palm4msa2).
+	 * \param A_H: the transconjugate of the matrix A for which S is an approximate.
+	 * \param lambda: the output of the lambda computed by the function.
+	 */
+	template<typename FPP, FDevice DEVICE>
+		void update_lambda(Faust::TransformHelper<FPP,DEVICE>& S, const MatDense<FPP, DEVICE> A_H, Real<FPP>& lambda);
+
+	template<typename FPP, FDevice DEVICE>
+		void update_fact(
+				Faust::MatGeneric<FPP,DEVICE>* cur_fac,
+				int f_id,
+				const Faust::MatDense<FPP,DEVICE>& A,
+				Faust::TransformHelper<FPP,DEVICE>& S,
+				std::vector<TransformHelper<FPP,DEVICE>*> &pL,
+				std::vector<TransformHelper<FPP,DEVICE>*> &pR,
+				const bool is_verbose,
+				std::vector<Faust::ConstraintGeneric*> & constraints,
+				const int norm2_max_iter,
+				const Real<FPP>& norm2_threshold,
+				std::chrono::duration<double>& spectral_duration,
+				std::chrono::duration<double>& fgrad_duration,
+				const bool constant_step_size,
+				const Real<FPP> step_size,
+				const StoppingCriterion<Real<FPP>>& sc,
+				Real<FPP> &error,
+				const bool use_csr,
+				const bool packing_RL,
+				const int prod_mod,
+				Real<FPP> &c,
+				const Real<FPP>& lambda);
+
+
 }
 #include "faust_palm4msa2020.hpp"
 #include "faust_palm4msa2020_2.hpp"
