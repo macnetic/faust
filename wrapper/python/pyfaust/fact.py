@@ -439,7 +439,7 @@ def palm4msa(M, p, ret_lambda=False, backend=2016, on_gpu=False):
 
     Args:
         M: the numpy array to factorize.
-        p: the ParamsPalm4MSA instance to define the algorithm parameters.
+        p: the The pyfaust.factparams.ParamsPalm4MSA instance to define the algorithm parameters.
         ret_lambda: set to True to ask the function to return the scale factor (False by default).
         on_gpu: if True the GPU implementation is executed (this option applies only to 2020 backend).
 
@@ -484,6 +484,56 @@ def palm4msa(M, p, ret_lambda=False, backend=2016, on_gpu=False):
         return F, _lambda
     else:
         return F
+
+# experimental block start
+def palm4msa_mhtp(M, palm4msa_p, mhtp_p, ret_lambda=False, on_gpu=False):
+    """ Runs the MHTP-PALM4MSA algorithm to factorize the matrix M.
+
+        MHTP stands for Multilinear Hard Tresholding Pursuit.
+        This is a generalization of the Bilinear HTP algorithm describe in [1].
+
+        [1] Quoc-Tung Le, Rémi Gribonval. Structured Support Exploration For
+        Multilayer Sparse Matrix Fac-
+        torization. ICASSP 2021 - IEEE International Conference on Acoustics,
+        Speech and Signal Processing,
+        Jun 2021, Toronto, Ontario, Canada. pp.1-5. <a
+        href="https://hal.inria.fr/hal-03132013/document">hal-03132013</a>
+
+
+
+    Args:
+        M: the numpy array to factorize.
+        palm4msa_p: the The pyfaust.factparams.ParamsPalm4MSA instance to define the algorithm parameters.
+        mhtp_p: the pyfaust.factparams.MHTPParams instance to define the MHTP algorithm parameters.
+        ret_lambda: set to True to ask the function to return the scale factor (False by default).
+        on_gpu: if True the GPU implementation is executed.
+
+    Returns:
+        The Faust object resulting of the factorization.
+        if ret_lambda == True then the function returns a tuple (Faust, lambda).
+
+    Example:
+		>>> from pyfaust.fact import palm4msa_mhtp
+		>>> from pyfaust.factparams import ParamsPalm4MSA, StoppingCriterion, MHTPParams
+		>>> import numpy as np
+		>>> from pyfaust.proj import splin, normcol
+		>>> M = np.random.rand(500, 32)
+		>>> cons = [ splin((500,32), 5), normcol((32,32), 1.0)]
+		>>> stop_crit = StoppingCriterion(num_its=200)
+		>>> param = ParamsPalm4MSA(cons, stop_crit)
+		>>> # MHTP will run every 100 iterations of PALM4MSA (that is 2 times) for 50 iterations on each factor
+		>>> mhtp_param = MHTPParams(num_its=50, palm4msa_period=100)
+		>>> G = palm4msa_mhtp(M, param, mhtp_param)
+		>>> G
+		Faust size 500x32, density 0.21625, nnz_sum 3460, 2 factor(s):
+		- FACTOR 0 (real) SPARSE, size 500x32, density 0.15625, nnz 2500
+		- FACTOR 1 (real) SPARSE, size 32x32, density 1, nnz 1024
+
+    <b/> See also pyfaust.factparams.MHTPParams
+    """
+    palm4msa_p.use_MHTP = mhtp_p
+    return palm4msa(M, palm4msa_p, ret_lambda=ret_lambda, backend=2020, on_gpu=on_gpu)
+# experimental block end
 
 # experimental block start
 def _palm4msa_fgft(Lap, p, ret_lambda=False):

@@ -704,11 +704,32 @@ class ConstraintList(object):
         return self.clist.__getitem__(ind)
 
 class MHTPParams:
+    """
+    This class defines the set of parameters to run the MHTP-PAL4MSA algorithm.
 
-    def __init__(self, stop_crit=StoppingCriterion(num_its=50),
+    <b/> See also pyfaust.fact.palm4msa_mhtp
+    """
+    def __init__(self, num_its=50,
                  constant_step_size=False, step_size=1e-3,
                  palm4msa_period=1000,
                  updating_lambda=True):
+        """
+        Constructor of the MHTPParams class.
+
+        <b/> See also pyfaust.fact.palm4msa_mhtp
+
+        Args:
+            num_its: (int, optional) the number of iterations to run the MHTP algorithm.
+            constant_step_size: (bool, optional) True to use a constant step for the gradient descent, False otherwise. If False the step size is computed dynamically along the iteration (according to a Lipschitz criterion).
+            step_size: (float, optional) The step size used when constant_step_size==True. 
+            palm4msa_period: (int, optional) The period (in term of iterations)
+            according to the MHTP algorithm is ran (i.e.: 0 <= i < N being the PALM4MSA
+            iteration, MHTP is launched every i = 0 (mod palm4msa_period).
+            Hence the algorithm is ran one time at least -- at PALM4MSA iteration 0).
+            updating_lambda: (bool, optional) if True then the scale factor of the Faust resulting of the factorization is updated after each iteration of MHTP (otherwise it never changes during the whole MHTP execution).
+
+        """
+        stop_crit = StoppingCriterion(num_its=num_its)
         if not isinstance(stop_crit, StoppingCriterion):
             raise TypeError("stop_crit must be a StoppingCriterion.")
         if not isinstance(constant_step_size, bool):
@@ -726,6 +747,9 @@ class MHTPParams:
         self.updating_lambda = updating_lambda
 
     def __repr__(self):
+        """
+        The MHTPParams instance str representation.
+        """
         return str(MHTP_stop_crit)
 
 
@@ -748,7 +772,7 @@ class ParamsFact(ABC):
                  packing_RL=True, norm2_max_iter=100,
                  norm2_threshold=1e-6,
                  grad_calc_opt_mode=EXTERNAL_OPT,
-                 use_MHTP=False):
+                 **kwargs):
         self.num_facts = num_facts
         self.is_update_way_R2L = is_update_way_R2L
         self.init_lambda = init_lambda
@@ -770,10 +794,12 @@ class ParamsFact(ABC):
         self.norm2_threshold = norm2_threshold
         self.use_csr = use_csr
         self.packing_RL = packing_RL
-        if not (isinstance(use_MHTP, bool) and use_MHTP == False) \
-            and not isinstance(use_MHTP, MHTPParams):
-            raise ValueError("use_MHTP must be False or a MHTPParams")
-        self.use_MHTP = use_MHTP
+        use_MHTP = False
+        if 'use_MHTP' in kwargs.keys():
+            if not (isinstance(use_MHTP, bool) and use_MHTP == False) \
+                and not isinstance(use_MHTP, MHTPParams):
+                raise ValueError("use_MHTP must be False or a MHTPParams")
+            self.use_MHTP = use_MHTP
 
     def __repr__(self):
         """
