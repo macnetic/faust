@@ -38,15 +38,14 @@ namespace Faust
 	template<typename FPP, FDevice DEVICE>
 		void perform_MHTP(
 				const MHTPParams<FPP>& mhtp_params,
-				Faust::MatGeneric<FPP,DEVICE>* cur_fac,
-				int f_id,
 				const Faust::MatDense<FPP,DEVICE>& A,
 				const Faust::MatDense<FPP,DEVICE>& A_H,
 				Faust::TransformHelper<FPP,DEVICE>& S,
+				const int f_id,
 				std::vector<TransformHelper<FPP,DEVICE>*> &pL,
 				std::vector<TransformHelper<FPP,DEVICE>*> &pR,
 				const bool is_verbose,
-				std::vector<Faust::ConstraintGeneric*> & constraints,
+				const Faust::ConstraintGeneric &constraint,
 				const int norm2_max_iter,
 				const Real<FPP>& norm2_threshold,
 				std::chrono::duration<double>& norm2_duration,
@@ -54,11 +53,12 @@ namespace Faust
 				const StoppingCriterion<Real<FPP>>& sc,
 				Real<FPP> &error,
 				const bool use_csr,
-				const bool packing_RL,
 				const int prod_mod,
 				Real<FPP> &c,
 				Real<FPP>& lambda)
 				{
+					Faust::MatGeneric<FPP,DEVICE>* cur_fac;
+					cur_fac = S.get_gen_fact_nonconst(f_id);
 					if(is_verbose)
 						std::cout << "Starting a MHTP pass ("<< mhtp_params.sc.get_crit() <<" iterations) for factor #" << f_id << std::endl;
 					int j = 0;
@@ -67,10 +67,10 @@ namespace Faust
 					while(mhtp_params.sc.do_continue(j)) // TODO: what about the error stop criterion?
 					{
 						update_fact(cur_fac, f_id, A, S, pL, pR,
-								is_verbose, constraints,
+								is_verbose, constraint,
 								norm2_max_iter, norm2_threshold, norm2_duration, fgrad_duration,
 								mhtp_params.constant_step_size, mhtp_params.step_size,
-								sc, error, use_csr, packing_RL, prod_mod, c, lambda);
+								sc, error, use_csr, prod_mod, c, lambda);
 						if(mhtp_params.updating_lambda)
 							update_lambda(S, A_H, lambda);
 						j++;

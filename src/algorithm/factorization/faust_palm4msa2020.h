@@ -102,10 +102,10 @@ namespace Faust
 	// warning: before calling compute_n_apply_grad*() out must be initialized to S[f_id] : the factor to update
 	// TODO: ideally compute_n_apply_grad1 has no reason to be kept, compute_n_apply_grad2 is faster (but just in case I decided to keep it for a moment)
 	template <typename FPP, FDevice DEVICE>
-		void compute_n_apply_grad1(const int f_id, const MatDense<FPP,DEVICE> &A, TransformHelper<FPP,DEVICE>& S, std::vector<TransformHelper<FPP,DEVICE>*> &pL, std::vector<TransformHelper<FPP,DEVICE>*>& pR, const FPP& lambda, const Real<FPP>& c, MatDense<FPP,DEVICE> &out /* D */, const StoppingCriterion<Real<FPP>>& sc, Real<FPP> &error, const int prod_mod, const bool packing_RL);
+		void compute_n_apply_grad1(const int f_id, const MatDense<FPP,DEVICE> &A, TransformHelper<FPP,DEVICE>& S, std::vector<TransformHelper<FPP,DEVICE>*> &pL, std::vector<TransformHelper<FPP,DEVICE>*>& pR, const FPP& lambda, const Real<FPP>& c, MatDense<FPP,DEVICE> &out /* D */, const StoppingCriterion<Real<FPP>>& sc, Real<FPP> &error, const int prod_mod);
 
 	template <typename FPP, FDevice DEVICE>
-		void compute_n_apply_grad2(const int f_id, const MatDense<FPP,DEVICE> &A, TransformHelper<FPP,DEVICE>& S, std::vector<TransformHelper<FPP,DEVICE>*> &pL, std::vector<TransformHelper<FPP,DEVICE>*>& pR, const FPP& lambda, const Real<FPP> &c, MatDense<FPP,DEVICE> &out /* D */, const StoppingCriterion<Real<FPP>>& sc, Real<FPP> &error, const int prod_mod, const bool packing_RL);
+		void compute_n_apply_grad2(const int f_id, const MatDense<FPP,DEVICE> &A, TransformHelper<FPP,DEVICE>& S, std::vector<TransformHelper<FPP,DEVICE>*> &pL, std::vector<TransformHelper<FPP,DEVICE>*>& pR, const FPP& lambda, const Real<FPP> &c, MatDense<FPP,DEVICE> &out /* D */, const StoppingCriterion<Real<FPP>>& sc, Real<FPP> &error, const int prod_mod);
 
 	template<typename FPP, FDevice DEVICE>
 		Real<FPP> calc_rel_err(const TransformHelper<FPP,DEVICE>& S, const MatDense<FPP,DEVICE> &A, const FPP &lambda=1, const Real<FPP>* A_norm=nullptr);
@@ -129,7 +129,7 @@ namespace Faust
 				std::vector<TransformHelper<FPP,DEVICE>*> &pL,
 				std::vector<TransformHelper<FPP,DEVICE>*> &pR,
 				const bool is_verbose,
-				std::vector<Faust::ConstraintGeneric*> & constraints,
+				const Faust::ConstraintGeneric &constraints,
 				const int norm2_max_iter,
 				const Real<FPP>& norm2_threshold,
 				std::chrono::duration<double>& spectral_duration,
@@ -139,7 +139,6 @@ namespace Faust
 				const StoppingCriterion<Real<FPP>>& sc,
 				Real<FPP> &error,
 				const bool use_csr,
-				const bool packing_RL,
 				const int prod_mod,
 				Real<FPP> &c,
 				const Real<FPP>& lambda);

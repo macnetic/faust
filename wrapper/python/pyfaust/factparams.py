@@ -794,7 +794,7 @@ class ParamsFact(ABC):
         self.norm2_threshold = norm2_threshold
         self.use_csr = use_csr
         self.packing_RL = packing_RL
-        use_MHTP = False
+        self.use_MHTP = False
         if 'use_MHTP' in kwargs.keys():
             if not (isinstance(use_MHTP, bool) and use_MHTP == False) \
                 and not isinstance(use_MHTP, MHTPParams):
@@ -849,7 +849,7 @@ class ParamsHierarchical(ParamsFact):
                  norm2_max_iter=100,
                  norm2_threshold=1e-6,
                  grad_calc_opt_mode=ParamsFact.EXTERNAL_OPT,
-                 use_MHTP=False):
+                 **kwargs):
         """
         Constructor.
 
@@ -937,7 +937,7 @@ class ParamsHierarchical(ParamsFact):
                                                  norm2_max_iter,
                                                  norm2_threshold,
                                                  grad_calc_opt_mode,
-                                                 use_MHTP)
+                                                 **kwargs)
         self.stop_crits = stop_crits
         self.is_fact_side_left = is_fact_side_left
         if((not isinstance(stop_crits, list) and not isinstance(stop_crits,
@@ -1146,7 +1146,7 @@ class ParamsPalm4MSA(ParamsFact):
                  norm2_max_iter=100,
                  norm2_threshold=1e-6,
                  grad_calc_opt_mode=ParamsFact.EXTERNAL_OPT,
-                 use_MHTP=False):
+                 **kwargs):
         """
             Constructor.
 
@@ -1189,7 +1189,7 @@ class ParamsPalm4MSA(ParamsFact):
                                              constraints, step_size,
                                              constant_step_size,
                                              is_verbose, grad_calc_opt_mode,
-                                             use_MHTP=use_MHTP)
+                                             **kwargs)
         if(init_facts != None and (not isinstance(init_facts, list) and not isinstance(init_facts,
                                                                tuple) or
            len(init_facts) != num_facts)):

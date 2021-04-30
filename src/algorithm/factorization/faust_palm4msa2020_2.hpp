@@ -136,19 +136,19 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 			cur_fac = S.get_gen_fact_nonconst(f_id);
 			if(mhtp_params.used && i%mhtp_params.palm4msa_period == 0)
 			{
-				perform_MHTP(mhtp_params, cur_fac, f_id, A, A_H, S, pL, pR,
-						is_verbose, constraints, norm2_max_iter, norm2_threshold,
+				perform_MHTP(mhtp_params, A, A_H, S, f_id, pL, pR,
+						is_verbose, *constraints[f_id], norm2_max_iter, norm2_threshold,
 						norm2_duration,
 						fgrad_duration,
-						sc, error, use_csr, packing_RL, prod_mod, c, lambda);
+						sc, error, use_csr, prod_mod, c, lambda);
 			}
 			else
 				update_fact(cur_fac, f_id, A, S, pL, pR,
-						is_verbose, constraints, norm2_max_iter, norm2_threshold,
+						is_verbose, *constraints[f_id], norm2_max_iter, norm2_threshold,
 						norm2_duration,
 						fgrad_duration,
 						constant_step_size, step_size,
-						sc, error, use_csr, packing_RL, prod_mod, c, lambda);
+						sc, error, use_csr, prod_mod, c, lambda);
 
 			next_fid(); // f_id updated to iteration factor index (pL or pR too)
 		}
@@ -184,7 +184,7 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 }
 
 template <typename FPP, FDevice DEVICE>
-void Faust::compute_n_apply_grad1(const int f_id, const Faust::MatDense<FPP,DEVICE> &A, Faust::TransformHelper<FPP,DEVICE>& S, std::vector<TransformHelper<FPP,DEVICE>*> &pL, std::vector<TransformHelper<FPP,DEVICE>*>& pR, const FPP& lambda, const Real<FPP> &c, Faust::MatDense<FPP,DEVICE> &out /* D */, const StoppingCriterion<Real<FPP>>& sc, Real<FPP> &error, const int prod_mod, const bool packing_RL)
+void Faust::compute_n_apply_grad1(const int f_id, const Faust::MatDense<FPP,DEVICE> &A, Faust::TransformHelper<FPP,DEVICE>& S, std::vector<TransformHelper<FPP,DEVICE>*> &pL, std::vector<TransformHelper<FPP,DEVICE>*>& pR, const FPP& lambda, const Real<FPP> &c, Faust::MatDense<FPP,DEVICE> &out /* D */, const StoppingCriterion<Real<FPP>>& sc, Real<FPP> &error, const int prod_mod)
 {
 	Faust::MatDense<FPP,DEVICE> tmp;
 	Faust::MatDense<FPP,DEVICE> & D = out;
@@ -199,16 +199,18 @@ void Faust::compute_n_apply_grad1(const int f_id, const Faust::MatDense<FPP,DEVI
 	if(sc.isCriterionErr())
 		error = tmp.norm();
 	FPP alpha_R = 1, alpha_L = 1, beta_R = 0, beta_L = 0; //decl in parent scope
-	if(pR[f_id]->size() > 0)
+	auto pR_sz = pR[f_id]->size();
+	auto pL_sz = pL[f_id]->size();
+	if(pR_sz > 0)
 	{
-		if(packing_RL)
+		if(pR_sz == 1) // packing_RL == true
 			LorR = dynamic_cast<Faust::MatDense<FPP,DEVICE>*>(pR[f_id]->get_gen_fact_nonconst(0)); //normally pR[f_id] is packed (hence reduced to a single MatDense)
 		else
 		{
 			_LorR = pR[f_id]->get_product(prod_mod);
 			LorR = &_LorR;
 		}
-		if(pL[f_id]->size() == 0)
+		if(pL_sz == 0)
 		{ //no L factor for factor f_id
 			alpha_R = - lambda/c;
 			beta_R = 1;
@@ -217,9 +219,9 @@ void Faust::compute_n_apply_grad1(const int f_id, const Faust::MatDense<FPP,DEVI
 		else
 			gemm(tmp, *LorR, tmp, alpha_R, beta_R, 'N', 'T');
 	}
-	if(pL[f_id]->size() > 0)
+	if(pL_sz > 0)
 	{
-		if(packing_RL)
+		if(pL_sz == 1) // packing_RL == true
 			LorR = dynamic_cast<Faust::MatDense<FPP,DEVICE>*>(pL[f_id]->get_gen_fact_nonconst(0));
 		else
 		{
@@ -233,7 +235,7 @@ void Faust::compute_n_apply_grad1(const int f_id, const Faust::MatDense<FPP,DEVI
 }
 
 template <typename FPP, FDevice DEVICE>
-void Faust::compute_n_apply_grad2(const int f_id, const Faust::MatDense<FPP,DEVICE> &A, Faust::TransformHelper<FPP,DEVICE>& S, std::vector<TransformHelper<FPP,DEVICE>*> &pL, std::vector<TransformHelper<FPP,DEVICE>*>& pR, const FPP& lambda, const Real<FPP> &c, Faust::MatDense<FPP,DEVICE> &out /* D */, const StoppingCriterion<Real<FPP>>& sc, Real<FPP> &error, const int prod_mod, const bool packing_RL)
+void Faust::compute_n_apply_grad2(const int f_id, const Faust::MatDense<FPP,DEVICE> &A, Faust::TransformHelper<FPP,DEVICE>& S, std::vector<TransformHelper<FPP,DEVICE>*> &pL, std::vector<TransformHelper<FPP,DEVICE>*>& pR, const FPP& lambda, const Real<FPP> &c, Faust::MatDense<FPP,DEVICE> &out /* D */, const StoppingCriterion<Real<FPP>>& sc, Real<FPP> &error, const int prod_mod)
 {
 	Faust::MatDense<FPP,DEVICE> tmp;
 	Faust::MatDense<FPP,DEVICE> & D = out;
@@ -245,9 +247,11 @@ void Faust::compute_n_apply_grad2(const int f_id, const Faust::MatDense<FPP,DEVI
 //#define mul_3_facts multiply_order_opt
 #define mul_3_facts multiply_order_opt_all_ends// this one only optimizes the product on factor ends but for three factors it doesn't change anything comparing to multiply_order_opt
 	tmp = A;
-	if(pR[f_id]->size() > 0)
+	auto pR_sz = pR[f_id]->size();
+	auto pL_sz = pL[f_id]->size();
+	if(pR_sz > 0)
 	{
-		if(packing_RL)
+		if(pR_sz == 1) // packing_RL == true
 			_R = dynamic_cast<Faust::MatDense<FPP,DEVICE>*>(pR[f_id]->get_gen_fact_nonconst(0));
 		else
 		{
@@ -256,9 +260,9 @@ void Faust::compute_n_apply_grad2(const int f_id, const Faust::MatDense<FPP,DEVI
 		}
 
 	}
-	if(pL[f_id]->size() > 0)
+	if(pL_sz > 0)
 	{
-		if(packing_RL)
+		if(pL_sz == 1) // packing_RL == true
 			_L = dynamic_cast<Faust::MatDense<FPP,DEVICE>*>(pL[f_id]->get_gen_fact_nonconst(0));
 		else
 		{
@@ -266,7 +270,7 @@ void Faust::compute_n_apply_grad2(const int f_id, const Faust::MatDense<FPP,DEVI
 			_L = &__L;
 		}
 	}
-	if(pR[f_id]->size() > 0 && pL[f_id]->size() > 0)
+	if(pR_sz > 0 && pL_sz > 0)
 	{
 		// compute error = m_lambda*L*S*R-data
 		facts = { _L, &D, _R };
@@ -278,7 +282,7 @@ void Faust::compute_n_apply_grad2(const int f_id, const Faust::MatDense<FPP,DEVI
 		tc_flags = {'T', 'N', 'T'};
 		mul_3_facts(facts, D, (FPP) - lambda/c, (FPP)1, tc_flags);
 	}
-	else if(pR[f_id]->size() > 0)
+	else if(pR_sz > 0)
 	{
 		// compute error = m_lambda*L*S*R-data
 		facts = { &D, _R };
@@ -290,7 +294,7 @@ void Faust::compute_n_apply_grad2(const int f_id, const Faust::MatDense<FPP,DEVI
 		tc_flags = { 'N', 'T'};
 		mul_3_facts(facts, D, (FPP) - lambda/c, (FPP)1, tc_flags);
 	}
-	else //if(pL[f_id]->size() > 0)
+	else //if(pL_sz > 0)
 	{
 		// compute error = m_lambda*L*S*R-data
 		facts = { _L, &D};
@@ -324,7 +328,7 @@ void Faust::update_fact(
 		std::vector<TransformHelper<FPP,DEVICE>*> &pL,
 		std::vector<TransformHelper<FPP,DEVICE>*> &pR,
 		const bool is_verbose,
-		std::vector<Faust::ConstraintGeneric*> & constraints,
+		const Faust::ConstraintGeneric &constraint,
 		const int norm2_max_iter,
 		const Real<FPP>& norm2_threshold,
 		std::chrono::duration<double>& norm2_duration,
@@ -334,7 +338,6 @@ void Faust::update_fact(
 		const StoppingCriterion<Real<FPP>>& sc,
 		Real<FPP> &error,
 		const bool use_csr,
-		const bool packing_RL,
 		const int prod_mod,
 		Real<FPP> &c,
 		const Real<FPP>& lambda)
@@ -382,16 +385,16 @@ void Faust::update_fact(
 		fgrad_start = std::chrono::high_resolution_clock::now();
 	if(typeid(D) != typeid(Faust::MatDense<FPP,Cpu>))
 		// compute_n_apply_grad2 is not yet supported with GPU2
-		compute_n_apply_grad1(f_id, A, S, pL, pR, lambda, c, D, sc, error, prod_mod, packing_RL);
+		compute_n_apply_grad1(f_id, A, S, pL, pR, lambda, c, D, sc, error, prod_mod);
 	else
-		compute_n_apply_grad2(f_id, A, S, pL, pR, lambda, c, D, sc, error, prod_mod, packing_RL);
+		compute_n_apply_grad2(f_id, A, S, pL, pR, lambda, c, D, sc, error, prod_mod);
 	if(is_verbose)
 	{
 		fgrad_stop = std::chrono::high_resolution_clock::now();
 		fgrad_duration += fgrad_stop-fgrad_start;
 	}
 	// really update now
-	constraints[f_id]->project<FPP,DEVICE,Real<FPP>>(D);
+	constraint.project<FPP,DEVICE,Real<FPP>>(D);
 
 
 	if(use_csr && dcur_fac != nullptr || !use_csr && scur_fac != nullptr)
