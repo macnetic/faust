@@ -703,11 +703,12 @@ class ConstraintList(object):
         """
         return self.clist.__getitem__(ind)
 
+# experimental block start
 class MHTPParams:
     """
     This class defines the set of parameters to run the MHTP-PAL4MSA algorithm.
 
-    <b/> See also pyfaust.fact.palm4msa_mhtp
+    <b/> See also pyfaust.fact.palm4msa_mhtp, pyfaust.fact.hierarchical_mhtp
     """
     def __init__(self, num_its=50,
                  constant_step_size=False, step_size=1e-3,
@@ -716,7 +717,7 @@ class MHTPParams:
         """
         Constructor of the MHTPParams class.
 
-        <b/> See also pyfaust.fact.palm4msa_mhtp
+        <b/> See also pyfaust.fact.palm4msa_mhtp, pyfaust.fact.hierarchical_mhtp
 
         Args:
             num_its: (int, optional) the number of iterations to run the MHTP algorithm.
@@ -751,7 +752,7 @@ class MHTPParams:
         The MHTPParams instance str representation.
         """
         return str(MHTP_stop_crit)
-
+# experimental block end
 
 class ParamsFact(ABC):
     """
