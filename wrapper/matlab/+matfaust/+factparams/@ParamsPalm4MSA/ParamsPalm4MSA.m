@@ -21,7 +21,7 @@ classdef ParamsPalm4MSA < matfaust.factparams.ParamsFact
 		%>	@param 'init_lambda', real (optional) the scale scalar initial value (by default the value is one).
 		%>	@param 'step_size', real (optional) the initial step of the PALM descent.
 		%>	@param 'constant_step_size', real if true the step_size keeps constant along the algorithm iterations otherwise it is updated before every factor update.
-		%>	@param 'is_verbose', boo (optional) True to enable the verbose mode.
+		%>	@param 'is_verbose', bool (optional) True to enable the verbose mode.
 		%>	parameter is experimental, its value shouldn't be changed.
 		%>	@param 'norm2_max_iter', real (optional) maximum number of iterations of power iteration algorithm. Used for computing 2-norm.
 		%>	@param 'norm2_threshold', real (optional) power iteration algorithm threshold (default to 1e-6). Used for computing 2-norm.
@@ -99,6 +99,18 @@ classdef ParamsPalm4MSA < matfaust.factparams.ParamsFact
 			end
 			% put mex_constraints in a cell array again because mex eats one level of array
 			mex_params = struct('data', M, 'nfacts', this.num_facts, 'cons', {mex_constraints}, 'init_facts', {this.init_facts}, 'niter', this.stop_crit.num_its, 'sc_is_criterion_error', this.stop_crit.is_criterion_error, 'sc_error_treshold', this.stop_crit.tol, 'sc_max_num_its', this.stop_crit.maxiter, 'update_way', this.is_update_way_R2L, 'grad_calc_opt_mode', this.grad_calc_opt_mode, 'constant_step_size', this.constant_step_size, 'step_size', this.step_size, 'verbose', this.is_verbose, 'norm2_max_iter', this.norm2_max_iter, 'norm2_threshold', this.norm2_threshold, 'init_lambda', this.init_lambda, 'use_csr', this.use_csr, 'packing_RL', this.packing_RL);
+			if(~ (islogical(this.use_MHTP) &&  this.use_MHTP == false))
+				% use_MHTP must be a MHTPParams if not false (cf. ParamsFact)
+				if(~ isa(this.use_MHTP, 'matfaust.factparams.MHTPParams'))
+					error('use_MHTP is not a MHTPParams')
+				end
+				mhtp_p = this.use_MHTP;
+				mex_params.mhtp_num_its = mhtp_p.num_its;
+				mex_params.mhtp_constant_step_size = mhtp_p.constant_step_size;
+				mex_params.mhtp_step_size = mhtp_p.step_size;
+				mex_params.mhtp_palm4msa_period = mhtp_p.palm4msa_period;
+				mex_params.mhtp_updating_lambda = mhtp_p.updating_lambda;
+			end
 		end
 	end
 	methods

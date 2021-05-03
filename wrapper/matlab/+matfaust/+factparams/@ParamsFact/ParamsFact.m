@@ -16,6 +16,7 @@ classdef (Abstract) ParamsFact
 		packing_RL
 		norm2_max_iter
 		norm2_threshold
+		use_MHTP
 	end
 	properties (Constant, SetAccess = protected, Hidden)
 		DEFAULT_STEP_SIZE = 10^-16
@@ -177,6 +178,7 @@ classdef (Abstract) ParamsFact
 			p.packing_RL = packing_RL;
 			p.norm2_max_iter = norm2_max_iter;
 			p.norm2_threshold = norm2_threshold;
+			p.use_MHTP = false; % by default no MHTP in PALM4MSA, neither in hierarchical fact.
 		end
 
 		function bool = is_mat_consistent(this, M)

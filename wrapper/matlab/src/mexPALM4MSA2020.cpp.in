@@ -78,6 +78,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	system("sleep 7");
 #endif
 
+	std::cout << "mexPALM4MSA2020" << std::endl;
 
 	if (nrhs != 1)
 	{
@@ -98,6 +99,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 		//	// creation des parametres
 		auto params = mxArray2FaustParamsPALM4MSA<SCALAR,FPP2>(prhs[0], presentFields);
+		Faust::MHTPParams<SCALAR> mhtp_params;
+		mxArray2FaustMHTPParams<SCALAR>(prhs[0], mhtp_params);
+		std::cout << mhtp_params.to_string() << std::endl;
 		if(params->isVerbose) params->Display();
 //		Faust::BlasHandle<Cpu> blas_handle;
 		SCALAR lambda = params->init_lambda;
@@ -118,8 +122,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 //
 		}
 		palm4msa2(params->data, noconst_cons, *F, lambda, params->stop_crit, params->isUpdateWayR2L,
-				params->use_csr, params->packing_RL, /* compute_2norm_on_array */ false, params->norm2_threshold,
-				params->norm2_max_iter, params->isConstantStepSize, params->step_size);
+				params->use_csr, params->packing_RL, mhtp_params, /* compute_2norm_on_array */ false, params->norm2_threshold,
+				params->norm2_max_iter, params->isConstantStepSize, params->step_size, false /* on_gpu*/, params->isVerbose);
 		Faust::MatDense<FPP2,Cpu> mat1x1Lambda = Faust::MatDense<FPP2, Cpu>(&lambda, 1, 1);
 		plhs[0] = FaustMat2mxArray(mat1x1Lambda);
 		F_lambda = F->multiply(lambda);

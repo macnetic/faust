@@ -48,6 +48,7 @@
 #include "faust_constant.h"
 #include "faust_Params.h"
 #include "faust_ParamsPalm.h"
+#include "faust_MHTP.h"
 #include <complex>
 #include <string>
 
@@ -202,6 +203,9 @@ void testCoherencePALM4MSA(const mxArray* params,std::vector<bool> & presentFiel
 
 template<typename SCALAR, typename FPP2>
 const Faust::ParamsPalm<SCALAR,Cpu,FPP2>* mxArray2FaustParamsPALM4MSA(const mxArray* matlab_params, std::vector<bool>& presentFields);
+
+template<typename SCALAR>
+void mxArray2FaustMHTPParams(const mxArray* matlab_params, Faust::MHTPParams<SCALAR>& params);
 
 #include "mx2Faust.hpp"
 
