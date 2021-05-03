@@ -530,9 +530,52 @@ def palm4msa_mhtp(M, palm4msa_p, mhtp_p, ret_lambda=False, on_gpu=False):
 		- FACTOR 1 (real) SPARSE, size 32x32, density 1, nnz 1024
 
     <b/> See also pyfaust.factparams.MHTPParams
+    <b/> See also pyfaust.fact.palm4msa
+    <b/> See also pyfaust.fact.hierarchical_mhtp
     """
     palm4msa_p.use_MHTP = mhtp_p
     return palm4msa(M, palm4msa_p, ret_lambda=ret_lambda, backend=2020, on_gpu=on_gpu)
+
+def hierarchical_mhtp(M, hierar_p, mhtp_p, ret_lambda=False, ret_params=False,
+                      on_gpu=False):
+    """
+    Runs the MHTP-PALM4MSA hierarchical factorization algorithm on the matrix M.
+
+    This algorithm uses the MHTP-PALM4MSA (pyfaust.fact.palm4msa_mhtp) instead of only PALM4MSA as
+    pyfaust.fact.hierarchical.
+
+    Args:
+        M: the numpy array to factorize.
+        p: is a set of hierarchical factorization parameters. See pyfaust.fact.hierarchical.
+        on_gpu: if True the GPU implementation is executed (this option applies only to 2020 backend).
+        ret_lambda: set to True to ask the function to return the scale factor (False by default).
+        ret_params: set to True to ask the function to return the
+        ParamsHierarchical instance used (False by default).
+
+
+    Example:
+		>>> from pyfaust.fact import hierarchical_mhtp
+		>>> from pyfaust.factparams import ParamsHierarchical, StoppingCriterion
+		>>> from pyfaust.factparams import MHTPParams
+		>>> from pyfaust.proj import sp, normcol, splin
+		>>> import numpy as np
+		>>> M = np.random.rand(500, 32)
+		>>> fact_cons = [splin((500, 32), 5), sp((32,32), 96), sp((32,32), 96)]
+		>>> res_cons = [normcol((32,32), 1), sp((32,32), 666), sp((32,32), 333)]
+		>>> stop_crit1 = StoppingCriterion(num_its=200)
+		>>> stop_crit2 = StoppingCriterion(num_its=200)
+		>>> # 50 iterations of MHTP will run every 100 iterations of PALM4MSA (each time PALM4MSA is called by the hierarchical algorithm)
+		>>> mhtp_param = MHTPParams(num_its=50, palm4msa_period=100)
+		>>> param = ParamsHierarchical(fact_cons, res_cons, stop_crit1, stop_crit2)
+		>>> param.is_verbose = True
+		>>> F = hierarchical_mhtp(M, param, mhtp_param)
+
+    <b/> See also pyfaust.fact.hierarchical, pyfaust.fact.palm4msa_mhtp
+    """
+    hierar_p.use_MHTP = mhtp_p
+    return hierarchical(M, hierar_p, ret_lambda=False, ret_params=False, backend=2020,
+                        on_gpu=False)
+
 # experimental block end
 
 # experimental block start
@@ -571,7 +614,7 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
 
     Args:
         M: the numpy array to factorize.
-        p: is a set of factorization parameters. It might be a fully defined instance of parameters (pyfaust.factparams.ParamsHierarchical) or a simplified expression which designates a pre-defined parametrization:
+        p: is a set of hierarchical factorization parameters. It might be a fully defined instance of parameters (pyfaust.factparams.ParamsHierarchical) or a simplified expression which designates a pre-defined parametrization:
             - 'squaremat' to use pre-defined parameters typically used to factorize a Hadamard square matrix of order a power of two (see pyfaust.demo.hadamard).
             - ['rectmat', j, k, s] to use pre-defined parameters used for
             instance in factorization of the MEG matrix which is a rectangular
@@ -583,7 +626,7 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
             pyfaust.factparams.ParamsHierarchical and pyfaust.factparams.ParamsHierarchicalRectMat).
             <br/>The residuum has a sparsity of P*rho^(num_facts-1). <br/> By default, rho == .8 and P = 1.4. It's possible to set custom values with for example p == ( ['rectmat', j, k, s], {'rho':.4, 'P':.7 }). <br/>The sparsity is here the number of non-zero elements.
         backend: the C++ implementation to use (default to 2016, 2020 backend
-        should be quicker for certain configurations - e.g. factorizing a
+        should be faster for certain configurations - e.g. factorizing a
         Hadamard matrix).
         on_gpu: if True the GPU implementation is executed (this option applies only to 2020 backend).
 

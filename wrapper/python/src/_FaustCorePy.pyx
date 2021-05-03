@@ -2522,9 +2522,11 @@ cdef class FaustFact:
         packing_RL = p.packing_RL
         norm2_max_iter = p.norm2_max_iter
         norm2_threshold = p.norm2_threshold
+        cdef PyxMHTPParams[double] cpp_MHTPParams
         cdef PyxStoppingCriterion[double]* cpp_stop_crits
         cpp_stop_crits = <PyxStoppingCriterion[double]*>\
         PyMem_Malloc(sizeof(PyxStoppingCriterion[double])*2)
+
 
         cpp_stop_crits[0].is_criterion_error = p.stop_crits[0]._is_criterion_error
         cpp_stop_crits[0].error_threshold = p.stop_crits[0].tol
@@ -2534,6 +2536,21 @@ cdef class FaustFact:
         cpp_stop_crits[1].error_threshold = p.stop_crits[1].tol
         cpp_stop_crits[1].num_its = p.stop_crits[1].num_its
         cpp_stop_crits[1].max_num_its = p.stop_crits[1].maxiter
+
+        # use_MHTP is either False or a MHTPParams instance
+        if p.use_MHTP != False:
+            mhtpp = p.use_MHTP
+            cpp_MHTPParams.used = True
+            cpp_MHTPParams.stop_crit.is_criterion_error = mhtpp.stop_crit._is_criterion_error
+            cpp_MHTPParams.stop_crit.error_threshold = mhtpp.stop_crit.tol
+            cpp_MHTPParams.stop_crit.num_its = mhtpp.stop_crit.num_its
+            cpp_MHTPParams.stop_crit.max_num_its = mhtpp.stop_crit.maxiter
+            cpp_MHTPParams.constant_step_size = mhtpp.constant_step_size
+            cpp_MHTPParams.step_size = mhtpp.step_size
+            cpp_MHTPParams.updating_lambda = mhtpp.updating_lambda
+            cpp_MHTPParams.palm4msa_period = mhtpp.palm4msa_period
+        else:
+            cpp_MHTPParams.used = False
 
         constraints = p.constraints
 
@@ -2597,6 +2614,7 @@ cdef class FaustFact:
                                                      is_update_way_R2L,
                                                      is_fact_side_left,
                                                      use_csr, packing_RL,
+                                                     cpp_MHTPParams,
                                                      norm2_max_iter,
                                                      norm2_threshold,
                                                      p.is_verbose,

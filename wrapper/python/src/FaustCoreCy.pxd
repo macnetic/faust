@@ -266,6 +266,7 @@ cdef extern from "FaustFact.h":
                                                   is_update_way_R2L, bool
                                                   is_fact_side_left, bool
                                                   use_csr, bool packing_RL,
+                                                  PyxMHTPParams[FPP] mhtpp,
                                                   unsigned int norm2_max_iter,
                                                   double norm2_threshold, bool
                                                   is_verbose, bool

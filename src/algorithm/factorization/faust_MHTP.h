@@ -1,6 +1,8 @@
 #ifndef __MHTP__
 #define __MHTP__
 #include <string>
+#include "faust_StoppingCriterion.h"
+#include "faust_ConstraintGeneric.h"
 namespace Faust
 {
 	/**

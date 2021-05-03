@@ -2,6 +2,7 @@ template<typename FPP, FDevice DEVICE>
 Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FPP,DEVICE>&  A,
 		Params<FPP,DEVICE, Real<FPP>> & p,
 		Real<FPP>& lambda, const bool compute_2norm_on_array,
+		const MHTPParams<FPP>& mhtp_params,
 		const bool on_gpu)
 {
 	auto S = new Faust::TransformHelper<FPP,DEVICE>(); // A is copied
@@ -27,8 +28,6 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
 	const bool constant_step_size = p.isConstantStepSize;
 	std::vector<const Faust::ConstraintGeneric*> & fac_constraints = is_fact_side_left? p.cons[1]: p.cons[0];
 	std::vector<const Faust::ConstraintGeneric*> & res_constraints = is_fact_side_left? p.cons[0]: p.cons[1];;
-
-	const MHTPParams<FPP> mhtp_params; //TODO: replace by a function argument
 
 	if(p.isVerbose) p.Display();
 	for(int i=0;i < fac_constraints.size();i++)
@@ -152,6 +151,7 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
         Real<FPP>& lambda,
         const bool is_update_way_R2L, const bool is_fact_side_left,
         const bool use_csr, const bool packing_RL,
+		const MHTPParams<FPP>& mhtp_params,
         const bool compute_2norm_on_array,
         const Real<FPP> norm2_threshold,
         const unsigned int norm2_max_iter, const bool is_verbose,
@@ -163,5 +163,5 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
 	p.packing_RL = packing_RL;
 	p.norm2_threshold = norm2_threshold;
 	p.norm2_max_iter = norm2_max_iter;
-    return Faust::hierarchical(A, p, lambda, compute_2norm_on_array, on_gpu);
+    return Faust::hierarchical(A, p, lambda, compute_2norm_on_array, mhtp_params, on_gpu);
 }
