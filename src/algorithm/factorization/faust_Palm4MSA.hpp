@@ -4,7 +4,7 @@
 /*  of the project : <http://faust.inria.fr>                         */
 /*                                                                          */
 /*                              License:                                    */
-/*  Copyright (2019):    Hakim Hadj-Djilani, Nicolas Bellot, Adrien Leman, Thomas Gautrais,      */
+/*  Copyright (2021):    Hakim Hadj-Djilani, Nicolas Bellot, Adrien Leman, Thomas Gautrais,      */
 /*                      Luc Le Magoarou, Remi Gribonval                     */
 /*                      INRIA Rennes, FRANCE                                */
 /*                      http://www.inria.fr/                                */
@@ -155,7 +155,7 @@ Faust::Palm4MSA<FPP,DEVICE,FPP2>::Palm4MSA(const Faust::ParamsPalm<FPP,DEVICE,FP
 ),
 	TorH(is_complex?'H':'T')
 {
-   RorL.reserve(const_vec.size()+1);
+	RorL.reserve(const_vec.size()+1);
 
    	if (isConstantStepSize)
 		isCComputed = true;
@@ -721,7 +721,6 @@ t_local_next_step.start();
         update_L();
     }
 
-
     int* ind_ptr = new int[m_nbFact];
     for (int j=0 ; j<m_nbFact ; j++)
 		if (!isUpdateWayR2L)
@@ -749,6 +748,7 @@ t_local_next_step.start();
         compute_grad_over_c();
         compute_projection();
 
+
         if(!isUpdateWayR2L)
             update_L();
         else
@@ -762,7 +762,7 @@ t_local_next_step.start();
 
 	if (verbose)
     {
-        cout << "Iter " << m_indIte << ", RMSE=" << get_RMSE() << endl;
+        cout << "Iter " << m_indIte << ", RMSE=" << get_RMSE() << ", RE=" << get_RE()<< endl;
         cout << "m_lambda " <<setprecision(20)<< m_lambda << endl;
     }
     delete[] ind_ptr;
@@ -907,6 +907,29 @@ void Faust::Palm4MSA<FPP,DEVICE,FPP2>::print_local_timers()const
     cout << "t_local_init_fact_from_palm = " << t_local_init_fact_from_palm.get_time() << " s for "<< t_local_init_fact_from_palm.get_nb_call() << " calls" << endl<<endl;
 }
 
+template<typename FPP,FDevice DEVICE,typename FPP2>
+void Faust::Palm4MSA<FPP,DEVICE,FPP2>::print_state() const
+{
+	std::cout << std::string(7, '=') << " PALM4MSA state: " << "(iter: "  m_indIte <<  ") ===" << std::endl;
+	std::cout << "m_indFact: " << m_indFact << std::endl;
+	std::cout << "isUpdateWayR2L: " << isUpdateWayR2L << std::endl;
+	std::cout << "m_lambda: " << m_lambda << std::endl;
+	std::cout << "S: ";
+	for(auto f: S)
+		std::cout << f.norm() << " ";
+	cout << std::endl;
+	std::cout << "RorL: ";
+	for(auto f: RorL)
+		std::cout << f.norm() << " ";
+	cout << std::endl;
+	std::cout << "LorR: ";
+	std::cout << LorR.norm() << " ";
+	std::cout << LorR.to_string(false, true);
+	cout << std::endl;
+	std::cout << "grad_over_c: " << grad_over_c.norm() << std::endl;
+	std::cout << "c: " << c << std::endl;
+	std::cout << std::string(25, '=') << std::endl;
+}
 
 #endif
 
