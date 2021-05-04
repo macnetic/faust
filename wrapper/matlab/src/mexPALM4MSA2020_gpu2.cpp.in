@@ -101,6 +101,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	{
 		// creation of parameters
 		auto params = mxArray2FaustParamsPALM4MSA<SCALAR,FPP2>(prhs[0], presentFields); //Cpu world
+		Faust::MHTPParams<SCALAR> mhtp_params;
+		mxArray2FaustMHTPParams<SCALAR>(prhs[0], mhtp_params);
+
 		if(params->isVerbose) params->Display();
 		SCALAR lambda = params->init_lambda;
 
@@ -136,7 +139,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		auto inMat = Faust::MatDense<SCALAR,GPU2>(params->data);
 
 		Faust::palm4msa2<SCALAR,GPU2>(inMat, noconst_cons, *F, lambda, params->stop_crit, params->isUpdateWayR2L,
-				params->use_csr, params->packing_RL, /* compute_2norm_on_array */ false, params->norm2_threshold,
+				params->use_csr, params->packing_RL, mhtp_params, /* compute_2norm_on_array */ false, params->norm2_threshold,
 				params->norm2_max_iter, params->isConstantStepSize, params->step_size);
 
 		Faust::MatDense<FPP2,Cpu> mat1x1Lambda = Faust::MatDense<FPP2, Cpu>(1, 1, &lambda);

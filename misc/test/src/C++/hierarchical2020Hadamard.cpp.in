@@ -123,11 +123,13 @@ int main(int argc, char* argv[])
 	vector<StoppingCriterion<Real<FPP>>> sc = {30,30};
 //	sc.push_back(30);
 //	sc.push_back(30);
+
     auto th = Faust::hierarchical(whtmat, sc, fac_cons, res_cons, lambda, isUpdateWayR2L,
             isFactSideLeft, use_csr, packing_RL,
+			MHTPParams<FPP>(),
             /* compute_2norm_on_array*/ false,
-             norm2_threshold,
-             norm2_max_iter);
+			norm2_threshold,
+			norm2_max_iter);
     cout << "lambda=" << lambda << endl;
 //    th->multiply(FPP(lambda));
     th->display();

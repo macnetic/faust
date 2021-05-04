@@ -119,6 +119,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	Faust::MatDense<SCALAR,Cpu> gpu_matrix(matrix);
 
 	auto *params = mxArray2FaustParams<SCALAR,FPP2>(matlab_params);
+	Faust::MHTPParams<SCALAR> mhtp_params;
+	mxArray2FaustMHTPParams<SCALAR>(matlab_params, mhtp_params);
 
 	FPP2 lambda = params->init_lambda;
 
@@ -133,7 +135,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 //		gpu_matrix.Display();
 		std::vector<Faust::StoppingCriterion<Real<SCALAR>>> sc = {params->stop_crit_2facts.get_crit(), params->stop_crit_global.get_crit()};
 //		cout << "gpu_fac_cons.size():" << gpu_fac_cons.size() << endl;
-		auto th = Faust::hierarchical<FPP2, GPU2>(gpu_matrix, sc, gpu_fac_cons, gpu_res_cons, lambda, params->isUpdateWayR2L, params->isFactSideLeft, params->use_csr, params->packing_RL, compute_2norm_on_arrays, params->norm2_threshold, params->norm2_max_iter, params->isVerbose, params->isConstantStepSize, params->step_size);
+		auto th = Faust::hierarchical<FPP2, GPU2>(gpu_matrix, sc, gpu_fac_cons, gpu_res_cons, lambda, params->isUpdateWayR2L, params->isFactSideLeft, params->use_csr, params->packing_RL, mhtp_params, compute_2norm_on_arrays, params->norm2_threshold, params->norm2_max_iter, params->isVerbose, params->isConstantStepSize, params->step_size);
 
 		auto th_times_lambda = th->multiply(lambda);
 		delete th;
