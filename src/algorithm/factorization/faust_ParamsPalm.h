@@ -83,7 +83,8 @@ namespace Faust
              const FPP2 init_lambda_ = defaultLambda,
              const bool constant_step_size_ = defaultConstantStepSize,
              const FPP2 step_size_ = defaultStepSize,
-			 const GradientCalcOptMode gradCalcOptMode = Params<FPP,DEVICE,FPP2>::defaultGradCalcOptMode);
+			 const GradientCalcOptMode gradCalcOptMode = Params<FPP,DEVICE,FPP2>::defaultGradCalcOptMode,
+			 const bool use_MHTP = Params<FPP,DEVICE, FPP2>::defaultUseMHTP);
 
           void check_constraint_validity();
            ParamsPalm();

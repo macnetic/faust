@@ -93,7 +93,7 @@ Faust::ParamsPalm<FPP,DEVICE,FPP2>::ParamsPalm(
          const FPP2 init_lambda_ /* = 1.0 */,
 		 const bool constant_step_size_,
 		 const FPP2 step_size_,
-		 const GradientCalcOptMode gradCalcOptMode /* default INTERNAL_OPT*/) :
+		 const GradientCalcOptMode gradCalcOptMode /* default INTERNAL_OPT*/, const bool use_MHTP/*= Params<FPP,DEVICE, FPP2>::defaultUseMHTP*/) :
             data(data_),
             nbFact(nbFact_),
             cons(cons_),
@@ -106,7 +106,8 @@ Faust::ParamsPalm<FPP,DEVICE,FPP2>::ParamsPalm(
             init_lambda(init_lambda_),
 			gradCalcOptMode(gradCalcOptMode),
             norm2_threshold(FAUST_PRECISION),
-            norm2_max_iter(FAUST_NORM2_MAX_ITER)
+            norm2_max_iter(FAUST_NORM2_MAX_ITER),
+			use_MHTP(use_MHTP)
 {
  check_constraint_validity();
 }

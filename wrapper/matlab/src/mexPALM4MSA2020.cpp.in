@@ -101,7 +101,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		auto params = mxArray2FaustParamsPALM4MSA<SCALAR,FPP2>(prhs[0], presentFields);
 		Faust::MHTPParams<SCALAR> mhtp_params;
 		mxArray2FaustMHTPParams<SCALAR>(prhs[0], mhtp_params);
-		std::cout << mhtp_params.to_string() << std::endl;
 		if(params->isVerbose) params->Display();
 //		Faust::BlasHandle<Cpu> blas_handle;
 		SCALAR lambda = params->init_lambda;

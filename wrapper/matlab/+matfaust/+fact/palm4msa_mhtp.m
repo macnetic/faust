@@ -10,6 +10,7 @@
 %> @param palm4msa_p the matfaust.factparams.ParamsPalm4MSA instance to define the algorithm parameters.
 %> @param mthp_p the matfaust.factparams.MHTPParams instance to define the MHTP algorithm parameters.
 %> @param 'gpu', bool (optional) set to true to execute the algorithm using the GPU implementation. This options is only available when backend==2020.
+%> @param varargin: see matfaust.fact.hierarchical for the other parameters.
 %>
 %> @retval F the Faust object result of the factorization.
 %> @retval [F, lambda] = palm4msa(M, p) to optionally get lambda (scale).

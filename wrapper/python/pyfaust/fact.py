@@ -547,7 +547,8 @@ def hierarchical_mhtp(M, hierar_p, mhtp_p, ret_lambda=False, ret_params=False,
     Args:
         M: the numpy array to factorize.
         p: is a set of hierarchical factorization parameters. See pyfaust.fact.hierarchical.
-        on_gpu: if True the GPU implementation is executed (this option applies only to 2020 backend).
+        mhtp_p: the pyfaust.factparams.MHTPParams instance to define the MHTP algorithm parameters.
+        on_gpu: if True the GPU implementation is executed.
         ret_lambda: set to True to ask the function to return the scale factor (False by default).
         ret_params: set to True to ask the function to return the
         ParamsHierarchical instance used (False by default).

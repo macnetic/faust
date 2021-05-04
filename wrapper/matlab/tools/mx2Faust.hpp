@@ -969,34 +969,27 @@ void mxArray2FaustMHTPParams(const mxArray* matlab_params, Faust::MHTPParams<SCA
 {
 	// all fields are optional
 	mxArray *mx_field = mxGetField(matlab_params, 0, "mhtp_num_its");
-	std::cout << "mxArray2FaustMHTPParams" << std::endl;
-
+	std::cout << "mx_field:" << mx_field << std::endl;
 	if(params.used = (mx_field != nullptr))
 		params.sc = Faust::StoppingCriterion<SCALAR>((int) mxGetScalar(mx_field));
 
-	std::cout << "mxArray2FaustMHTPParams 1" << std::endl;
 	mx_field = mxGetField(matlab_params, 0, "mhtp_constant_step_size");
 	if(params.used = (params.used || (mx_field != nullptr)))
 		params.constant_step_size = (bool) mxGetScalar(mx_field);
 
-	std::cout << "mxArray2FaustMHTPParams 2" << std::endl;
 	mx_field = mxGetField(matlab_params, 0, "mhtp_step_size");
 	if(params.used = (params.used || (mx_field != nullptr)))
 		params.step_size = (Real<SCALAR>) mxGetScalar(mx_field);
 
-	std::cout << "mxArray2FaustMHTPParams 3" << std::endl;
 	mx_field = mxGetField(matlab_params, 0, "mhtp_palm4msa_period");
 	if(params.used = (params.used || (mx_field != nullptr)))
 		params.palm4msa_period = (int) mxGetScalar(mx_field);
 
-	std::cout << "mxArray2FaustMHTPParams 4" << std::endl;
 
 	mx_field = mxGetField(matlab_params, 0, "mhtp_updating_lambda");
 	if(params.used = (params.used || (mx_field != nullptr)))
 		params.updating_lambda = (bool) mxGetScalar(mx_field);
 
-	std::cout << "mxArray2FaustMHTPParams 5" << std::endl;
-	std::cout << "params.used" << params.used << std::endl;
 }
 
 #endif

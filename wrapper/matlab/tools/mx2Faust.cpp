@@ -143,7 +143,12 @@ void testCoherence(const mxArray* params,std::vector<bool> & presentFields)
       mexErrMsgTxt("The number of fields in params must be at least 3 ");
 
   for(int i=0;i<nbr_field;i++)
-	  presentFields[mat_field_str2type(string(mxGetFieldNameByNumber(params,i)))] = true;
+  {
+	  auto field_name = string(mxGetFieldNameByNumber(params,i));
+	  // dirty bypass to tolerate fields starting with mhtp (MHTPParams) parsed by mxArray2FaustMHTPParams
+	  if (field_name.rfind("mhtp_", 0) != 0)
+		  presentFields[mat_field_str2type(field_name)] = true;
+  }
 
 }
 

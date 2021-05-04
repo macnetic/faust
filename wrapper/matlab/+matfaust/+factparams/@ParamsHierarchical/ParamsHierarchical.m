@@ -158,6 +158,18 @@ classdef ParamsHierarchical < matfaust.factparams.ParamsFact
 				mex_constraints{2,i} = cur_cell;
 			end
 			mex_params = struct('nfacts', this.num_facts, 'cons', {mex_constraints}, 'niter1', this.stop_crits{1}.num_its,'niter2', this.stop_crits{2}.num_its, 'sc_is_criterion_error', this.stop_crits{1}.is_criterion_error, 'sc_error_treshold', this.stop_crits{1}.tol, 'sc_max_num_its', this.stop_crits{1}.maxiter, 'sc_is_criterion_error2', this.stop_crits{2}.is_criterion_error, 'sc_error_treshold2', this.stop_crits{2}.tol, 'sc_max_num_its2', this.stop_crits{2}.maxiter, 'nrow', this.data_num_rows, 'ncol', this.data_num_cols, 'fact_side', this.is_fact_side_left, 'update_way', this.is_update_way_R2L, 'verbose', this.is_verbose, 'init_lambda', this.init_lambda, 'use_csr', this.use_csr, 'packing_RL', this.packing_RL, 'norm2_threshold', this.norm2_threshold, 'norm2_max_iter', this.norm2_max_iter, 'step_size', this.step_size, 'constant_step_size', this.constant_step_size);
+			if(~ (islogical(this.use_MHTP) &&  this.use_MHTP == false))
+				% use_MHTP must be a MHTPParams if not false (cf. ParamsFact)
+				if(~ isa(this.use_MHTP, 'matfaust.factparams.MHTPParams'))
+					error('use_MHTP is not a MHTPParams')
+				end
+				mhtp_p = this.use_MHTP;
+				mex_params.mhtp_num_its = mhtp_p.num_its;
+				mex_params.mhtp_constant_step_size = mhtp_p.constant_step_size;
+				mex_params.mhtp_step_size = mhtp_p.step_size;
+				mex_params.mhtp_palm4msa_period = mhtp_p.palm4msa_period;
+				mex_params.mhtp_updating_lambda = mhtp_p.updating_lambda;
+			end
 		end
 
 	end
