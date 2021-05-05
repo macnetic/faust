@@ -751,7 +751,12 @@ class MHTPParams:
         """
         The MHTPParams instance str representation.
         """
-        return str(MHTP_stop_crit)
+        return ("num_its: "+str(self.stop_crit.num_its)+"\r\n"+
+                "constant_step_size: "+str(self.constant_step_size)+"\r\n"+
+                "step_size: "+str(self.step_size)+"\r\n"+
+                "palm4msa_period: "+str(self.palm4msa_period)+"\r\n"+
+                "updating_lambda: " +str(self.updating_lambda)+"\r\n")
+
 # experimental block end
 
 class ParamsFact(ABC):
