@@ -14274,9 +14274,7 @@ a.anchor-link {
 <li><code>updating_lambda</code>: this boolean when set to <code>True</code> allows to update the scale factor of the Faust (the same one that is used in PALM4MSA) in the end of each iteration of MHTP.</li>
 </ul>
 <p>So let's run PALM4MSA-MHTP on a small example: we propose to factorize a 500x32 matrix into two factors.</p>
-<ol>
-<li>First we configure PALM4MSA as usual: </li>
-</ol>
+<b>First</b> we configure PALM4MSA as usual:
 <ul>
 <li>The number of iterations of PALM4SA with the StoppingCriterion (here 200 iterations).</li>
 <li>Then we define the constraints / projectors to use, here the SPLIN projector for the first factor of size 500x32 into which we want to count 5 nonzeros per row and the NORMCOL projector for the second factor in which each column must be normalized.</li>
@@ -14304,9 +14302,7 @@ a.anchor-link {
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<ol>
-<li>Second we define the <code>MHTPParams</code> structure to configure the MHTP pass of PALM4MSA-MHTP</li>
-</ol>
+	<b>Second</b> we define the <code>MHTPParams</code> structure to configure the MHTP pass of PALM4MSA-MHTP
 <p>Hence we define the arguments described above: <code>num_its</code>, etc. We let all of them to their default values so there is not much to do.</p>
 
 </div>
@@ -14553,7 +14549,7 @@ The goal is to factorize the MEG matrix as $M_{MEG} \approx A \times B$ with $M_
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Going ahead we configure the PALM4MSA parameters:</p>
+<p>Going ahead we set the PALM4MSA parameters:</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
@@ -14564,7 +14560,6 @@ The goal is to factorize the MEG matrix as $M_{MEG} \approx A \times B$ with $M_
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust.proj</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">pyfaust.factparams</span> <span class="kn">import</span> <span class="n">ParamsPalm4MSA</span>
-<span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">environ</span>
 <span class="n">k0</span> <span class="o">=</span> <span class="mi">100</span>
 <span class="n">k1</span> <span class="o">=</span> <span class="mi">25</span>
 <span class="c1"># the relevant projectors for our sparsity constraints</span>
@@ -14604,7 +14599,7 @@ The goal is to factorize the MEG matrix as $M_{MEG} \approx A \times B$ with $M_
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Now we are able to launch PALM4MSA and PALM4MSA-MHTP and compare the errors: the computation takes some time, you need to wait about 30 minutes.</p>
+<p>Now we are able to launch PALM4MSA and PALM4MSA-MHTP and compare the errors: the computation takes some time, it can last about 30 minutes.</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
@@ -14653,7 +14648,7 @@ PALM4MSA-MHTP error: 0.027329467651055876
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <p>As you see the MHTP variant is twice accurate than PALM4MSA on this configuration.</p>
-<h2 id="Using-the-Hierarchical-PALM4MSA-MHTP-algorithm">Using the Hierarchical PALM4MSA-MHTP algorithm<a class="anchor-link" href="#Using-the-Hierarchical-PALM4MSA-MHTP-algorithm">&#182;</a></h2><p>Exactly the same way you can use the hierarchical factorization with PALM4MSA, it is possible to use the pyfaust.fact.hierachical_mhtp to run a hierarchical factorization based on PALM4MSA-MHTP instead of simply PALM4MSA.<br>
+<h2 id="Using-the-Hierarchical-PALM4MSA-MHTP-algorithm">Using the Hierarchical PALM4MSA-MHTP algorithm<a class="anchor-link" href="#Using-the-Hierarchical-PALM4MSA-MHTP-algorithm">&#182;</a></h2><p>Exactly the same way you can use the hierarchical factorization with PALM4MSA, it is possible to use the function <code>pyfaust.fact.hierachical_mhtp</code> to run a hierarchical factorization based on PALM4MSA-MHTP instead of simply PALM4MSA.<br>
 The launch of the algorithm function is very similar, you just need to add a <code>MHTPParams</code> instance to the argument list.</p>
 <p>Let's show how with this simple example:</p>
 
@@ -14717,7 +14712,7 @@ The launch of the algorithm function is very similar, you just need to add a <co
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>This notebook is ending here. Please note that although the article <a href="#[1]">[1]</a> tackles the optimization problem of approximately factorizing a matrix in two sparse factors with the Bilinear Hard Tresholding Pursuit (BHTP) algorithm, the MHTP is just generalization to N factors that needs further experiences to be mature. Hence the function palm4msa_mhtp and moreover the function hierarchical_mhtp should be considered as experimental code and might evolve significantly in the future.</p>
+<p>This notebook is ending here. Please note that although the article <a href="#[1]">[1]</a> tackles the optimization problem of approximately factorizing a matrix in two sparse factors with the Bilinear Hard Tresholding Pursuit (BHTP) algorithm, the MHTP is a generalization to N factors that needs further experiences to be mature. Hence the function palm4msa_mhtp and moreover the function hierarchical_mhtp should be considered as experimental code and might evolve significantly in the future.</p>
 
 </div>
 </div>
