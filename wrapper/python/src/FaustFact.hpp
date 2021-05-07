@@ -21,8 +21,6 @@
 #endif
 
 
-using namespace std;
-using namespace Faust;
 
 bool PyxConstraintGeneric::is_int_constraint()
 {
@@ -66,6 +64,21 @@ bool PyxConstraintGeneric::is_mat_constraint()
         default:
             return false;
     }
+}
+
+template<typename FPP>
+MHTPParams<FPP> convPyxMHTPParams2FaustMHTPParams(const PyxMHTPParams<FPP>& MHTP_params)
+{
+    Faust::MHTPParams<FPP> _MHTP_params;
+    _MHTP_params.used = true;
+    _MHTP_params.constant_step_size = MHTP_params.constant_step_size;
+    _MHTP_params.step_size = MHTP_params.step_size;
+    _MHTP_params.updating_lambda = MHTP_params.updating_lambda;
+    _MHTP_params.palm4msa_period = MHTP_params.palm4msa_period;
+    auto sc = MHTP_params.stop_crit;
+    Faust::StoppingCriterion<FPP> sc_(sc.num_its, sc.is_criterion_error, sc.error_threshold, sc.max_num_its);
+    _MHTP_params.sc = sc_;
+    return _MHTP_params;
 }
 
 template<typename FPP>
@@ -837,18 +850,5 @@ FaustCoreCpp<FPP>* hierarchical2020_gpu2(FPP* mat, unsigned int num_rows, unsign
     return core;
 }
 
-template<typename FPP>
-Faust::MHTPParams<FPP> convPyxMHTPParams2FaustMHTPParams(const PyxMHTPParams<FPP>& MHTP_params)
-{
-    Faust::MHTPParams<FPP> _MHTP_params;
-    _MHTP_params.used = true;
-    _MHTP_params.constant_step_size = MHTP_params.constant_step_size;
-    _MHTP_params.step_size = MHTP_params.step_size;
-    _MHTP_params.updating_lambda = MHTP_params.updating_lambda;
-    _MHTP_params.palm4msa_period = MHTP_params.palm4msa_period;
-    auto sc = MHTP_params.stop_crit;
-    Faust::StoppingCriterion<FPP> sc_(sc.num_its, sc.is_criterion_error, sc.error_threshold, sc.max_num_its);
-    _MHTP_params.sc = sc_;
-    return _MHTP_params;
-}
+
 #endif
