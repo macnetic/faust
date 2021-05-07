@@ -1,0 +1,1594 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,IE=9,chrome=1"><meta name="generator" content="MATLAB R2018b"><title>Using the PALM4MSA-MHTP Algorithm</title><style type="text/css">.rtcContent { padding: 30px; } .S0 { margin: 3px 10px 5px 4px; padding: 0px; line-height: 28.7999992370605px; min-height: 0px; white-space: pre-wrap; color: rgb(213, 80, 0); font-family: Helvetica, Arial, sans-serif; font-style: normal; font-size: 24px; font-weight: normal; text-align: left;  }
+.S1 { margin: 2px 10px 9px 4px; padding: 0px; line-height: 21px; min-height: 0px; white-space: pre-wrap; color: rgb(0, 0, 0); font-family: Helvetica, Arial, sans-serif; font-style: normal; font-size: 14px; font-weight: normal; text-align: left;  }
+.S2 { margin: 20px 10px 5px 4px; padding: 0px; line-height: 20px; min-height: 0px; white-space: pre-wrap; color: rgb(60, 60, 60); font-family: Helvetica, Arial, sans-serif; font-style: normal; font-size: 20px; font-weight: bold; text-align: left;  }
+.S3 { margin: 10px 0px 20px; padding-left: 0px; font-family: Helvetica, Arial, sans-serif; font-size: 14px;  }
+.S4 { margin-left: 56px; line-height: 21px; min-height: 0px; text-align: left; white-space: pre-wrap;  }
+.CodeBlock { background-color: #F7F7F7; margin: 10px 0 10px 0;}
+.S5 { border-left: 1px solid rgb(233, 233, 233); border-right: 1px solid rgb(233, 233, 233); border-top: 1px solid rgb(233, 233, 233); border-bottom: 0px none rgb(0, 0, 0); border-radius: 4px 4px 0px 0px; padding: 6px 45px 0px 13px; line-height: 17.2339992523193px; min-height: 18px; white-space: nowrap; color: rgb(0, 0, 0); font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 14px;  }
+.S6 { border-left: 1px solid rgb(233, 233, 233); border-right: 1px solid rgb(233, 233, 233); border-top: 0px none rgb(0, 0, 0); border-bottom: 0px none rgb(0, 0, 0); border-radius: 0px; padding: 0px 45px 0px 13px; line-height: 17.2339992523193px; min-height: 18px; white-space: nowrap; color: rgb(0, 0, 0); font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 14px;  }
+.S7 { border-left: 1px solid rgb(233, 233, 233); border-right: 1px solid rgb(233, 233, 233); border-top: 0px none rgb(0, 0, 0); border-bottom: 1px solid rgb(233, 233, 233); border-radius: 0px 0px 4px 4px; padding: 0px 45px 4px 13px; line-height: 17.2339992523193px; min-height: 18px; white-space: nowrap; color: rgb(0, 0, 0); font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 14px;  }
+.S8 { margin: 10px 10px 9px 4px; padding: 0px; line-height: 21px; min-height: 0px; white-space: pre-wrap; color: rgb(0, 0, 0); font-family: Helvetica, Arial, sans-serif; font-style: normal; font-size: 14px; font-weight: normal; text-align: left;  }
+.S9 { border-left: 1px solid rgb(233, 233, 233); border-right: 1px solid rgb(233, 233, 233); border-top: 0px none rgb(0, 0, 0); border-bottom: 1px solid rgb(233, 233, 233); border-radius: 0px; padding: 0px 45px 4px 13px; line-height: 17.2339992523193px; min-height: 18px; white-space: nowrap; color: rgb(0, 0, 0); font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 14px;  }
+.S10 { color: rgb(64, 64, 64); padding: 10px 0px 6px 17px; background: rgb(255, 255, 255) none repeat scroll 0% 0% / auto padding-box border-box; font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 14px; overflow-x: hidden; line-height: 17.2339992523193px;  }
+.embeddedOutputsErrorElement {min-height: 18px; max-height: 250px; overflow: auto;}
+.embeddedOutputsErrorElement.inlineElement {}
+.embeddedOutputsErrorElement.rightPaneElement {}
+.embeddedOutputsWarningElement{min-height: 18px; max-height: 250px; overflow: auto;}
+.embeddedOutputsWarningElement.inlineElement {}
+.embeddedOutputsWarningElement.rightPaneElement {}
+.diagnosticMessage-wrapper {font-family: Menlo, Monaco, Consolas, "Courier New", monospace; font-size: 12px;}
+.diagnosticMessage-wrapper.diagnosticMessage-warningType {color: rgb(255,100,0);}
+.diagnosticMessage-wrapper.diagnosticMessage-warningType a {color: rgb(255,100,0); text-decoration: underline;}
+.diagnosticMessage-wrapper.diagnosticMessage-errorType {color: rgb(230,0,0);}
+.diagnosticMessage-wrapper.diagnosticMessage-errorType a {color: rgb(230,0,0); text-decoration: underline;}
+.diagnosticMessage-wrapper .diagnosticMessage-messagePart {white-space: pre-wrap;}
+.diagnosticMessage-wrapper .diagnosticMessage-stackPart {white-space: pre;}
+.embeddedOutputsTextElement,.embeddedOutputsVariableStringElement {white-space: pre; word-wrap: initial; min-height: 18px; max-height: 250px; overflow: auto;}
+.textElement,.rtcDataTipElement .textElement {padding-top: 3px;}
+.embeddedOutputsTextElement.inlineElement,.embeddedOutputsVariableStringElement.inlineElement {}
+.inlineElement .textElement {}
+.embeddedOutputsTextElement.rightPaneElement,.embeddedOutputsVariableStringElement.rightPaneElement {min-height: 16px;}
+.rightPaneElement .textElement {padding-top: 2px; padding-left: 9px;}
+.S11 { border-left: 1px solid rgb(233, 233, 233); border-right: 1px solid rgb(233, 233, 233); border-top: 1px solid rgb(233, 233, 233); border-bottom: 1px solid rgb(233, 233, 233); border-radius: 0px; padding: 6px 45px 4px 13px; line-height: 17.2339992523193px; min-height: 18px; white-space: nowrap; color: rgb(0, 0, 0); font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 14px;  }
+.variableValue { width: 100% !important; }
+.embeddedOutputsMatrixElement,.eoOutputWrapper .matrixElement {min-height: 18px; box-sizing: border-box;}
+.embeddedOutputsMatrixElement .matrixElement,.eoOutputWrapper .matrixElement,.rtcDataTipElement .matrixElement {position: relative;}
+.matrixElement .variableValue,.rtcDataTipElement .matrixElement .variableValue {white-space: pre; display: inline-block; vertical-align: top; overflow: hidden;}
+.embeddedOutputsMatrixElement.inlineElement {}
+.embeddedOutputsMatrixElement.inlineElement .topHeaderWrapper {display: none;}
+.embeddedOutputsMatrixElement.inlineElement .veTable .body {padding-top: 0 !important; max-height: 100px;}
+.inlineElement .matrixElement {max-height: 300px;}
+.embeddedOutputsMatrixElement.rightPaneElement {}
+.rightPaneElement .matrixElement,.rtcDataTipElement .matrixElement {overflow: hidden; padding-left: 9px;}
+.rightPaneElement .matrixElement {margin-bottom: -1px;}
+.embeddedOutputsMatrixElement .matrixElement .valueContainer,.eoOutputWrapper .matrixElement .valueContainer,.rtcDataTipElement .matrixElement .valueContainer {white-space: nowrap; margin-bottom: 3px;}
+.embeddedOutputsMatrixElement .matrixElement .valueContainer .horizontalEllipsis.hide,.embeddedOutputsMatrixElement .matrixElement .verticalEllipsis.hide,.eoOutputWrapper .matrixElement .valueContainer .horizontalEllipsis.hide,.eoOutputWrapper .matrixElement .verticalEllipsis.hide,.rtcDataTipElement .matrixElement .valueContainer .horizontalEllipsis.hide,.rtcDataTipElement .matrixElement .verticalEllipsis.hide {display: none;}
+.embeddedOutputsVariableMatrixElement .matrixElement .valueContainer.hideEllipses .verticalEllipsis, .embeddedOutputsVariableMatrixElement .matrixElement .valueContainer.hideEllipses .horizontalEllipsis {display:none;}
+.embeddedOutputsMatrixElement .matrixElement .valueContainer .horizontalEllipsis,.eoOutputWrapper .matrixElement .valueContainer .horizontalEllipsis {margin-bottom: -3px;}
+.eoOutputWrapper .embeddedOutputsVariableMatrixElement .matrixElement .valueContainer {cursor: default !important;}
+.embeddedOutputsVariableElement {white-space: pre-wrap; word-wrap: break-word; min-height: 18px; max-height: 250px; overflow: auto;}
+.variableElement {}
+.embeddedOutputsVariableElement.inlineElement {}
+.inlineElement .variableElement {}
+.embeddedOutputsVariableElement.rightPaneElement {min-height: 16px;}
+.rightPaneElement .variableElement {padding-top: 2px; padding-left: 9px;}
+.variableNameElement {margin-bottom: 3px; display: inline-block;}
+.matrixElement .horizontalEllipsis,.rtcDataTipElement .matrixElement .horizontalEllipsis {display: inline-block; margin-top: 3px; width: 30px; height: 12px; background-repeat: no-repeat; background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB0AAAAJCAYAAADO1CeCAAAAJUlEQVR42mP4//8/A70xw0i29BUDFPxnAEtTW37wWDqakIa4pQDvOOG89lHX2gAAAABJRU5ErkJggg==");}
+.matrixElement .verticalEllipsis,.textElement .verticalEllipsis,.rtcDataTipElement .matrixElement .verticalEllipsis,.rtcDataTipElement .textElement .verticalEllipsis {margin-left: 35px; width: 12px; height: 30px; background-repeat: no-repeat; background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAZCAYAAAAIcL+IAAAALklEQVR42mP4//8/AzGYgWyFMECMwv8QddRS+P//KyimlmcGUOFoOI6GI/UVAgDnd8Dd4+NCwgAAAABJRU5ErkJggg==");}
+.S12 { border-left: 1px solid rgb(233, 233, 233); border-right: 1px solid rgb(233, 233, 233); border-top: 1px solid rgb(233, 233, 233); border-bottom: 1px solid rgb(233, 233, 233); border-radius: 4px; padding: 6px 45px 4px 13px; line-height: 17.2339992523193px; min-height: 18px; white-space: nowrap; color: rgb(0, 0, 0); font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 14px;  }
+.S13 { border-left: 1px solid rgb(233, 233, 233); border-right: 1px solid rgb(233, 233, 233); border-top: 1px solid rgb(233, 233, 233); border-bottom: 0px none rgb(0, 0, 0); border-radius: 0px; padding: 6px 45px 0px 13px; line-height: 17.2339992523193px; min-height: 18px; white-space: nowrap; color: rgb(0, 0, 0); font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 14px;  }</style></head><body><div class = rtcContent><h1  class = 'S0'><span>Using the PALM4MSA-MHTP Algorithm</span></h1><div  class = 'S1'><span></span></div><div  class = 'S1'><span>In this live script we shall see how to use the PALM4MSA-MHTP algorithm. A</span><a href = "http://faust.inria.fr/tutorials/matfaust-matlab-livescripts/using-the-fa%c2%b5st-factorization-wrappers-with-matfaust/"><span> live script</span></a><span> has already been written on the Hierarchical PALM4MSA algorithm and its wrappers and is a prerequisite to the reading of this live script.</span></div><div  class = 'S1'><span>The PALM4MSA-MHTP is a variant of PALM4MSA in which intervenes the Multilinear Hard Tresholdhing Pursuit algorithm (MHTP).</span></div><div  class = 'S1'><span>The interest of this variant is to avoid the situation in which  PALM4MSA tends to stuck on some matrix supports without any way out.  MHTP allows to explore the support more freely and hopefully find a more accurate factorization at the cost of just a few more dozens iterations of the gradient descent algorithm.</span></div><div  class = 'S1'><span>For more information on the theory, you can read the following paper  in which is treated the particular case of the BHTP (Bilinear HTP, that  is running the MHTP on only two factors).</span></div><div  class = 'S1' id = '3C5DE2D9' ><span>[1]</span><span> Quoc-Tung Le, Rémi Gribonval. Structured  Support Exploration For Multilayer Sparse Matrix Fac- torization. ICASSP 2021 - IEEE International Conference on Acoustics, Speech and Signal  Processing, Jun 2021, Toronto, Ontario, Canada. pp.1-5. </span><a href = "https://hal.inria.fr/hal-03132013/document"><span style=' text-decoration: underline;'>hal-03132013</span></a><span>.</span></div><h2  class = 'S2'><span>Configuring and Running PALM4MSA-MHTP</span></h2><div  class = 'S1'><span>This variant works very similarly to a classic run of PALM4MSA, that is with at least the same set of parameters. The main difference is that  periodically (in term of PALM4MSA iterations) the MHTP algorithm is  launched to renew each layer of the Faust being refined.</span></div><div  class = 'S1'><span>Hence running the PALM4MSA-MHTP needs two sets of parameters: </span><a href = "https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1factparams_1_1ParamsPalm4MSA.html"><span style=' text-decoration: underline;'>ParamsPalm4MSA</span></a><span> and </span><a href = "https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1factparams_1_1MHTPParams.html"><span style=' text-decoration: underline;'>MHTPParams</span></a><span> objects. The former should not be really new if you are used to  PALM4MSA, the latter is dedicated to the configuartion of the MHTP part  of PALM4MSA-MHTP.</span></div><div  class = 'S1'><span>The arguments to configure </span><span style=' font-family: monospace;'>MHTPParams</span><span> are basically:</span></div><ul  class = 'S3'><li  class = 'S4'><span style=' font-family: monospace;'>num_its</span><span>: the number of iterations MHTP runs on each  layer of the Faust. Remember that this number of iterations is for each  factor. If you have two factors the overall number of iterations is </span><span style=' font-family: monospace;'>2 x num_its</span><span> (exactly as it is for PALM4MSA).</span></li><li  class = 'S4'><span style=' font-family: monospace;'>constant_step_size</span><span> and </span><span style=' font-family: monospace;'>step_size</span><span>: that  determines if the MHTP gradient descent will be ran according to a  constant step size, and in that case how long is the step size. By  default, the step size is not constant and recomputed dynamically with  the Lipschitz coefficient as in PALM4MSA. In most case, it is  recommended to not use a constant step size to achieve a better loss  function.</span></li><li  class = 'S4'><span style=' font-family: monospace;'>palm4msa_period</span><span>: which governs how many times to evenly run the MHTP algorithm inside PALM4MSA itself. By default, the value is 50. It means that for example if PALM4MSA is running for 200  iterations, MHTP will run 4 times: at iterations 0, 49, 99, 149 and 199  of PALM4MSA. Every time it runs MHTP will run for </span><span style=' font-family: monospace;'>num_its</span><span> iterations.</span></li><li  class = 'S4'><span style=' font-family: monospace;'>updating_lambda</span><span>: this boolean when set to </span><span style=' font-family: monospace;'>True</span><span> allows to update the scale factor of the Faust (the same one that is used in PALM4MSA) in the end of each iteration of MHTP.</span></li></ul><div  class = 'S1'><span>So let's run PALM4MSA-MHTP on a small example: we propose to factorize a 500x32 matrix into two factors.</span></div><div  class = 'S1'><span style=' font-weight: bold;'>First</span><span> we configure PALM4MSA as usual: </span></div><ul  class = 'S3'><li  class = 'S4'><span>The number of iterations of PALM4SA with the StoppingCriterion (here 200 iterations).</span></li><li  class = 'S4'><span>Then we define the constraints / projectors to use, here the SPLIN  projector for the first factor of size 500x32 into which we want to  count 5 nonzeros per row and the NORMCOL projector for the second factor in which each column must be normalized.</span></li></ul><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S5'><span style="white-space: pre;"><span>import </span><span style="color: rgb(160, 32, 240);">matfaust.factparams.*</span></span></div></div><div class="inlineWrapper"><div  class = 'S6'><span style="white-space: pre;"><span>import </span><span style="color: rgb(160, 32, 240);">matfaust.proj.*</span></span></div></div><div class="inlineWrapper"><div  class = 'S6'><span style="white-space: pre;"><span>projs = { splin([500, 32], 5), normcol([32, 32], 1.0) };</span></span></div></div><div class="inlineWrapper"><div  class = 'S6'><span style="white-space: pre;"><span>stop_crit = StoppingCriterion(200);</span></span></div></div><div class="inlineWrapper"><div  class = 'S7'><span style="white-space: pre;"><span>param = ParamsPalm4MSA(projs, stop_crit);</span></span></div></div></div><div  class = 'S8'><span style=' font-weight: bold;'>Second</span><span> we define the </span><span style=' font-family: monospace;'>MHTPParams</span><span> structure to configure the MHTP pass of PALM4MSA-MHTP</span></div><div  class = 'S1'><span>Hence we define the arguments described above: </span><span style=' font-family: monospace;'>num_its</span><span>, etc. We let all of them to their default values so there is not much to do.</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S5'><span style="white-space: pre;"><span>import </span><span style="color: rgb(160, 32, 240);">matfaust.factparams.MHTPParams</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S9'><span style="white-space: pre;"><span>mhtp_param = MHTPParams()</span></span></div><div  class = 'S10'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="4EC9C8D4" data-scroll-top="null" data-scroll-left="null" data-testid="output_0" data-width="833" data-height="118" data-hashorizontaloverflow="false" style="width: 863px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">mhtp_param = </span></div><div>  MHTPParams with properties:
+
+               num_its: 50
+    constant_step_size: 0
+             step_size: 1.0000e-03
+       palm4msa_period: 1000
+       updating_lambda: 1
+</div></div></div></div></div></div><div  class = 'S8'><span>It's now time to run the PALM4MSA-MHTP algorithm passing the two structures of parameters. Before we generate a random matrix </span><span style=' font-family: monospace;'>M</span><span> to factorize.</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S5'><span style="white-space: pre;"><span>import </span><span style="color: rgb(160, 32, 240);">matfaust.fact.palm4msa_mhtp</span></span></div></div><div class="inlineWrapper"><div  class = 'S6'><span style="white-space: pre;"><span>M = rand(500, 32);</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S9'><span style="white-space: pre;"><span>F = palm4msa_mhtp(M, param, mhtp_param)</span></span></div><div  class = 'S10'><div class="inlineElement eoOutputWrapper embeddedOutputsTextElement" uid="8046650E" data-scroll-top="null" data-scroll-left="null" data-testid="output_1" data-width="833" data-height="115" data-hashorizontaloverflow="false" style="width: 863px; max-height: 261px;"><div class="textElement">mexPALM4MSA2020
+mxArray2FaustMHTPParams
+mxArray2FaustMHTPParams 1
+mxArray2FaustMHTPParams 2
+mxArray2FaustMHTPParams 3
+mxArray2FaustMHTPParams 4
+mxArray2FaustMHTPParams 5
+params.used1</div></div><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="901A1B06" data-scroll-top="null" data-scroll-left="null" data-testid="output_2" data-width="833" data-height="62" data-hashorizontaloverflow="false" style="width: 863px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">F = </span></div><div>Faust size 500x32, density 0.22025, nnz_sum 3524, 2 factor(s): 
+- FACTOR 0 (real) SPARSE, size 500x32, density 0.15625, nnz 2500
+- FACTOR 1 (real) SPARSE, size 32x32, density 1, nnz 1024</div></div></div></div></div></div><div  class = 'S8'><span>As you see it's pretty similar to running PALM4MSA, which we could have done with the following code.</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S5'><span style="white-space: pre;"><span>import </span><span style="color: rgb(160, 32, 240);">matfaust.fact.palm4msa</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S9'><span style="white-space: pre;"><span>G = palm4msa(M, param)</span></span></div><div  class = 'S10'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="33199C62" data-scroll-top="null" data-scroll-left="null" data-testid="output_3" data-width="833" data-height="62" data-hashorizontaloverflow="false" style="width: 863px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">G = </span></div><div>Faust size 500x32, density 0.22025, nnz_sum 3524, 2 factor(s): 
+- FACTOR 0 (real) SPARSE, size 500x32, density 0.15625, nnz 2500
+- FACTOR 1 (real) DENSE, size 32x32, density 1, nnz 1024</div></div></div></div></div></div><div  class = 'S1'><span>We can verify that the results are however not the same:</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S5'><span style="white-space: pre;"><span>format </span><span style="color: rgb(160, 32, 240);">long</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S9'><span style="white-space: pre;"><span>mhtp_error = norm(full(F)-M)/norm(M)</span></span></div><div  class = 'S10'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="FA300F9C" data-scroll-top="null" data-scroll-left="null" data-testid="output_4" data-width="833" data-height="34" data-hashorizontaloverflow="false" style="width: 863px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">mhtp_error = </span></div><div>   0.093802635735114
+</div></div></div></div></div><div class="inlineWrapper outputs"><div  class = 'S11'><span style="white-space: pre;"><span>palm4msa_error = norm(full(G)-M)/norm(M)</span></span></div><div  class = 'S10'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="5A71AD81" data-scroll-top="null" data-scroll-left="null" data-testid="output_5" data-width="833" data-height="34" data-hashorizontaloverflow="false" style="width: 863px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">palm4msa_error = </span></div><div>   0.093797104961271
+</div></div></div></div></div></div><div  class = 'S8'><span>They are very close though! In the next part of this live script we'll  demonstrate how PALM4MSA-MHTP can really enhance the accuracy of the  Faust approximate and will do that on the MEG matrix (this matrix is  also discussed and factorized in </span><a href = "#3C5DE2D9"><span style=' text-decoration: underline;'>[1]</span></a><span>).</span></div><h2  class = 'S2'><span>Factorizing the MEG matrix using the PALM4MSA-MHTP algorithm</span></h2><div  class = 'S1'><span></span></div><div  class = 'S1'><span>The MEG (for magnetoencephalography) matrix is also used in </span><a href = "#3C5DE2D9"><span style=' text-decoration: underline;'>[1]</span></a><span> to compare PALM4MSA and PALM4MSA-MHTP performance.</span></div><div  class = 'S1'><span>The goal is to factorize the MEG matrix as</span><span style="vertical-align:-6px"><img src="data:image/png;base64,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" width="93" height="20" /></span><span> with </span><span style="vertical-align:-6px"><img src="data:image/png;base64,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" width="194.5" height="21" /></span><span> and </span><span style="vertical-align:-5px"><img src="data:image/png;base64,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" width="80.5" height="19" /></span><span>.  A and B are subject to sparsity constraints. Here we'll test only one sparsity configuration of the two factors (</span><span style="vertical-align:-6px"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHAAAAAoCAYAAAAmPX7RAAAFZ0lEQVR4Xu2aa8gVVRSGH7UUtaiM0IysoDJRlCjEtJugRURlFOatUisvlGAlWUYKXUTEjKIrFAWad8tSFNOoJP0hZCimRj8iUhM0I8JKsQuvrC3b8ZyZPWcOfO5xDhw++M5es/da77q+e1pRfaK2QKuoT18dngrAyJ2gArACMHILRH78KgJPAwBbA+cDVwLfAwci17lUx68XgWcCjwCD7Hs2sAkYAfxUKgvUV0ZOOxZoC7wUoLMc/QbgfuAg0B44F/gIWA0cTnlGw7JZKbQD8CrwMDAPeBT4I0CZmJcIuNHAJOASYDrwQoZCnWzNNWajb2y9stbbwG7gSWB/jecUkc0cI84z4G4HngBeiRmZjLO3Ax4EOgNnAI8DyjxZACrSZgOPAeOAd4H/vL1uAZaZHZ8CDnm/FZE99pisCLwKWAJcCtwGbCwxgG1Mt3+AC4AFVj6yALzLwNkBDAd+TNhIQfAecDcwCvjQ+72IbBCAdwKfAF8CI4G9JQbQV01pVIa+NSMCOwKvW8p9x6L2r4SNFCTPWor9GHgI+A0oInt8i7QIlEcq9z8D1DtcWfEMBbC3pccrMkqMCwT1Dy6TFZENAtCvfxMMxLICltQrFEAHjOSHAYvrGGgA8LX95mxZRDYIQOchZwF3AOqs9D+lUv1V6/uteeB3QDJ1xAx2KIDKTjNN0etTeoTuBm4fawSftq60UdkjzrhpKVRAzQfW2/znWuDLrCi/BSwH/m0yUs8Bzxd85lbgPiMeGnlUCICy3Qz7ao9QAF05mlpA9niw1ANQw+ssK8oaHeQxQl0zi+YZAbelEcsEyMQCoEYA2WZ8zghca42M9GxEVoH1a1YEdrUu7Gav9e1iG35wGrAxIRHoO3meCNRMOBGYZgGSV1akyu9ZAKrorgH2AfcCmo1Eo71sNFFAIEW9JARAKehni7wpdIpXKvLKZqZQhbYoIIX7p4AYhNcsZfgsg4+S2AuBrW5sO9ALWGRNztHI4AwF0NkpTxS9aWVIrI9s3Ijs32kRmMztbq2amQeAX2qAIfBUG8U2jAF2Aj2A961ezrUojgXHUABDR4F+wGdGzTlKsohs6hghAlc0Un/L09uAhbb5PcauJ4HoC6wA5nhR6hgIpV5FpZ4T8omliZEu/niQxhX7g7yc/POCsqkADjZv+cFS4s8el+dTQX4UO6roJmCDh5J7lqJTHVu99OsDGxOAPh3md+tJR3Xzop/FisjWBdDn7dQtuY5H/J1YdlFBqnNKB6LaBgIC+g2gGzAU2OWd3pHhugg+oXsKCcUWXBOaQnVEd9sgoqMWX3yO2U52m2y9hHPkIrLHzJOcA3V9IjB0KalI0EWmNrvIGHcBttTGiYsNTN0TarSQRyWHZ5didIUS02VwHgD9K6HkbYMPsKJPTY9/J1hEtiaAfk6Xd6yzKBDQuipR1ySQVxkDo1ZYlJo4QDHsSQ909bQWuC0YYJlbX206iaRW960uPO1GXddPIj56WqZRF66P9FdAiATR/WKttxmKyJ4Uga7Y1np9Qp2mXrN40ThQKSU2xoFeC0BHCIgYL0JtZVq8CQtUEq4DdHktZ5Xx9VHZkIN+YVxnvVdKdCGsDCUn/tO44QttjJLDp3HFDctmXeiG2CUtymJNoSF6nxJrmgGgK9ICqyxNzCkBTsghmgGg37kmx4gbga8SDVHIuao1gRZoBoDa6lrL9T7dpmercKvRGQJsDjxTtSyHBZoFoKPS9A6JRpA9wOU2Xqw0Ejw2PjSHGVtuabMAlAbqpNSBqZN1ZLaIcL0clNaCt5z2Jdi5mQCWwBzxqVABGB9mJ5y4ArACMHILRH78KgIrACO3QOTHryIwcgD/Bz0hmDiKyevnAAAAAElFTkSuQmCC" width="56" height="20" /></span><span> and </span><span style="vertical-align:-6px"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGEAAAAoCAYAAADuUZQHAAAFAUlEQVRoQ+2aechuUxTGf9c8Jm5kSIgMJff6A4XMQwjJPHfN8Y95HspQhoyZo8gU914XiUxFoZQhpEgSMs8kQ6Z+tXYdx9nved/zHX3veZ1dX9/XPXt8nr3WetbadwZ9m3YEZkz7DvoN0JMwBpegJ6EnYQwQGIMt9JbQERIWAmYC6wLvAF+Nwb67uIVlgR2AR4A/igfIWcKiwNExyIFO8CJwEPBBFxEYcs+rxBl3ATYFvgGeBe4Angd+r5nnYODuTJ8fgb2AZ8rf69zRUsC1wFHAXcAJgJNNWhOHnYFrgPUyhxOHc4CfMt+XB24PoKu6LACOBL4dlQQnFvzdgJOBqycN/TjPBsB9Ye3e+veAlYA9gdOAFaLficB1wF8VONj3JOCKDFHvAh9X4VdnCesDDwBrAproCxNIwuLAJcCXwJUVLmdr4E5gDeBp4DDg0xIOSwPXB4m3ZUjKQldHwh7Aw+EX9XefTCAJup+z48Z/UXG+hYELgPMC/N2BV0r9tgcuBA4B3h8Vo0EkuPhFwFnALWFqP4+6QAf6e9FWDH+e2+6OwJPxccuSR1gy3PSxEcgVMI/Fz0fAn3UYDCKhGA+OCyLq5pvU71uEOnoT2A94u3BQVdRDgMqq3B4NK3ptkIsaRMJGwDxgGSCZoP+mW/K3+YOT2+ctYBKtJIGaLMGzqhS/L6BtrFgnVJWEbBPxI3VR0itqVEdVAX1gAS9pXoOR+YGBy7ZWmO5NwPxhzG1E89D36l+n0l4H9o/kcirzpLGqnquCAGXooKZ72i4sYJPoKBHiWSlscpawGHBpxAFl6ZnAbyHVTgnwX23jdBVzjBsJSf+7Vf1+uox1xzfBNeCLne1+4Bjgh/LAHAmrAveEaRnx/Xvl2IQ6epKz5jJG6n+1vxWE5+qQL31Xul4OHD9AWWXdkYHoceAzYJ+odeiS1NGm8v+XZn7kpbs1krlKn14DRjFwHxAW8Y8hOUvQ7G4GnoiC0+mRKeqa6jai3HO8/UyCutrSLf4wk8QNe67lABM4L3PyKrUkFHVvsXMuW0x93PShsZCWdH7kGcNudpz6LQIY+2xVWfQoey3iuRPw1DAxQcl1L7B5BJY3whQNNHsDD2Z2YOXV279ZaOqmJEx3YE4ELBH+fKrSO5FgUliVbVfGhKSJLThpQmZ9qTqYrQQWiEmJTRdJkAAT07WBczOFOF249aZfhjSHJHKsng5VRXUBy7WWK4qJiYP1a5axJcYU3rLGtsDLwHctkjDk2VrvJgGHAxsDZwwoWVtx3SqCdV18FE/zgxvDVVuH+1crB2Zdzg0xQLdgYHWh1aKkLehzI/CuHoTY59eOk2D2r/rzTcFzV72Z2Gc2YDlboWKVQKvXS5hD+RahlC9isWFcXj1INraUSbCiaFIxCygGEfsdGIpJoqyJWJg6FdBtFdtU3VHrV7xmwvLZ6tb3PUESBDtVmdMY3yRMcj8Hdo0M2xK3Fzf7KlcmIU1a9ZSpuZqwXBw1IzdSlTV3jQTB8uEqPdzUkWDy5juxTUzEbE4IGecwj/IJ06KeEv/rugnr3hPqxld97xoJTc7Y6piehFbhbDZZT0Iz3Fod1ZPQKpzNJvsvSFBDW21smqw1O0mHR7VJgtLVoHwEsC/wEnBZ/A8EJVvfMgi0SUIPckMEehIaAtfmsJ6ENtFsOFdPQkPg2hzWk9Ammg3n6kloCFybw3oS2kSz4Vx/A1gsDzivzKrWAAAAAElFTkSuQmCC" width="48.5" height="20" /></span><span> being respectively the per-row number of nonzeros of A and B).</span></div><div  class = 'S1'><span>Let's load the MEG matrix which is embedded in FAµST data package (which should be downloaded automatically).</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S5'><span style="white-space: pre;"><span>load(</span><span style="color: rgb(160, 32, 240);">'matrix_MEG.mat'</span><span>);</span></span></div></div><div class="inlineWrapper"><div  class = 'S6'><span style="white-space: pre;"><span>MEG = matrix;</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S9'><span style="white-space: pre;"><span>size(MEG)</span></span></div><div  class = 'S10'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableMatrixElement" uid="AEC6F689" data-scroll-top="null" data-scroll-left="null" data-testid="output_6" data-width="833" style="width: 863px; white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><div class="matrixElement veSpecifier saveLoad" style="white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><div class="veVariableName variableNameElement double" style="width: 833px; white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><span style="white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;">ans = </span><span class="veVariableValueSummary veMetaSummary" style="white-space: normal; font-style: normal; color: rgb(179, 179, 179); font-size: 12px;">1×2</span></div><div class="valueContainer" data-layout="{&quot;columnWidth&quot;:&quot;80&quot;,&quot;totalColumns&quot;:&quot;2&quot;,&quot;totalRows&quot;:&quot;1&quot;,&quot;charsPerColumn&quot;:12}" style="white-space: nowrap; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><div class="variableValue" style="width: 162px; white-space: pre; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;">        8193         204
+</div><div class="horizontalEllipsis hide" style="white-space: nowrap; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"></div><div class="verticalEllipsis hide" style="white-space: nowrap; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"></div></div></div></div></div></div></div><div  class = 'S8'><span>Going ahead we set the PALM4MSA parameters:</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S5'><span style="white-space: pre;"><span>import </span><span style="color: rgb(160, 32, 240);">matfaust.proj.*</span></span></div></div><div class="inlineWrapper"><div  class = 'S6'><span style="white-space: pre;"><span>import </span><span style="color: rgb(160, 32, 240);">matfaust.factparams.*</span></span></div></div><div class="inlineWrapper"><div  class = 'S6'><span style="white-space: pre;"><span>k0 = 100;</span></span></div></div><div class="inlineWrapper"><div  class = 'S6'><span style="white-space: pre;"><span>k1 = 25;</span></span></div></div><div class="inlineWrapper"><div  class = 'S6'><span style="white-space: pre;"><span style="color: rgb(34, 139, 34);">% the relevant projectors for our sparsity constraints</span></span></div></div><div class="inlineWrapper"><div  class = 'S6'><span style="white-space: pre;"><span>projs = {splin([8193, 204], k0), splin([204, 204], k1)};</span></span></div></div><div class="inlineWrapper"><div  class = 'S6'><span style="white-space: pre;"><span style="color: rgb(34, 139, 34);">% the number of iterations of PALM4MSA</span></span></div></div><div class="inlineWrapper"><div  class = 'S6'><span style="white-space: pre;"><span>stop_crit = StoppingCriterion(2000);</span></span></div></div><div class="inlineWrapper"><div  class = 'S6'><span style="white-space: pre;"><span>param = ParamsPalm4MSA(projs, stop_crit);</span></span></div></div><div class="inlineWrapper"><div  class = 'S7'><span style="white-space: pre;"><span>param.use_csr = false;</span></span></div></div></div><div  class = 'S8'><span>It remains the </span><span style=' font-family: monospace;'>MHTPParams</span><span> configuration (it's easy, we use the default parameters) :</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S12'><span style="white-space: pre;"><span>mhtp_p = MHTPParams();</span></span></div></div></div><div  class = 'S8'><span>Now we are able to launch PALM4MSA and PALM4MSA-MHTP and compare the  errors: the computation takes some time, it can last about 30  minutes.</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S5'><span style="white-space: pre;"><span>import </span><span style="color: rgb(160, 32, 240);">matfaust.fact.*</span></span></div></div><div class="inlineWrapper"><div  class = 'S6'><span style="white-space: pre;"><span>F_palm4msa = palm4msa(MEG, param);</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S9'><span style="white-space: pre;"><span>F_mhtp = palm4msa_mhtp(MEG, param,   mhtp_p);</span></span></div><div  class = 'S10'><div class="inlineElement eoOutputWrapper embeddedOutputsTextElement" uid="73C9AD56" data-scroll-top="null" data-scroll-left="null" data-testid="output_7" data-width="833" data-height="31" data-hashorizontaloverflow="false" style="width: 863px; max-height: 261px;"><div class="textElement">mexPALM4MSA2020
+mxArray2FaustMHTPParams</div></div></div></div><div class="inlineWrapper"><div  class = 'S13'><span style="white-space: pre;"><span>err_palm4msa = norm(F_palm4msa-MEG) / norm(MEG)  </span></span></div></div><div class="inlineWrapper"><div  class = 'S7'><span style="white-space: pre;"><span>err_palm4msa_mhtp = norm(F_mhtp-MEG) / norm(MEG)    </span></span></div></div></div><div  class = 'S1'><span>As you see the MHTP variant is twice accurate than PALM4MSA on this configuration.</span></div><h2  class = 'S2'><span>Using the Hierarchical PALM4MSA-MHTP algorithm</span></h2><div  class = 'S1'><span></span></div><div  class = 'S1'><span>Exactly the same way you can use the hierarchical factorization with PALM4MSA, it is possible to use the function </span><span style=' font-family: monospace;'>matfaust.fact.hierachical_mhtp</span><span> to run a hierarchical factorization based on PALM4MSA-MHTP instead of simply PALM4MSA.</span></div><div  class = 'S1'><span>The launch of the algorithm function is very similar, you just need to add a </span><span style=' font-family: monospace;'>MHTPParams</span><span> instance to the argument list.</span></div><div  class = 'S1'><span>Let's show how with this simple example:</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S5'><span style="white-space: pre;"><span>import </span><span style="color: rgb(160, 32, 240);">matfaust.fact.*</span></span></div></div><div class="inlineWrapper"><div  class = 'S6'><span style="white-space: pre;"><span>import </span><span style="color: rgb(160, 32, 240);">matfaust.factparams.*</span></span></div></div><div class="inlineWrapper"><div  class = 'S6'><span style="white-space: pre;"><span>import </span><span style="color: rgb(160, 32, 240);">matfaust.proj.*</span></span></div></div><div class="inlineWrapper"><div  class = 'S6'><span style="white-space: pre;"><span>M = rand(500, 32);</span></span></div></div><div class="inlineWrapper"><div  class = 'S6'><span style="white-space: pre;"><span>fact_projs = {splin([500, 32], 5), sp([32, 32], 96), sp([32, 32], 96)};</span></span></div></div><div class="inlineWrapper"><div  class = 'S6'><span style="white-space: pre;"><span>res_projs = {normcol([32, 32], 1), sp([32, 32], 666), sp([32, 32], 333)};</span></span></div></div><div class="inlineWrapper"><div  class = 'S6'><span style="white-space: pre;"><span>stop_crit1 = StoppingCriterion(200);</span></span></div></div><div class="inlineWrapper"><div  class = 'S6'><span style="white-space: pre;"><span>stop_crit2 = StoppingCriterion(200);</span></span></div></div><div class="inlineWrapper"><div  class = 'S6'><span style="white-space: pre;"><span style="color: rgb(34, 139, 34);">% 50 iterations of MHTP will run every 100 iterations of PALM4MSA</span></span></div></div><div class="inlineWrapper"><div  class = 'S6'><span style="white-space: pre;"><span style="color: rgb(34, 139, 34);">% (each time PALM4MSA is called by the hierarchical algorithm)</span></span></div></div><div class="inlineWrapper"><div  class = 'S6'><span style="white-space: pre;"><span>mhtp_params = MHTPParams(</span><span style="color: rgb(160, 32, 240);">'num_its'</span><span>, 50, </span><span style="color: rgb(160, 32, 240);">'palm4msa_period'</span><span>, 100);</span></span></div></div><div class="inlineWrapper"><div  class = 'S6'><span style="white-space: pre;"><span>param = ParamsHierarchical(fact_projs, res_projs, stop_crit1, stop_crit2);</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S9'><span style="white-space: pre;"><span>F = hierarchical_mhtp(M, param, mhtp_params)</span></span></div><div  class = 'S10'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="0CC9FBE8" data-testid="output_8" data-width="833" data-height="398" data-hashorizontaloverflow="false" style="width: 863px; max-height: 409px;"><div class="textElement"><div><span class="variableNameElement">mex_params = <span class="headerElement">struct with fields:</span></span></div><div>                     nfacts: 4
+                       cons: {2×3 cell}
+                     niter1: 200
+                     niter2: 200
+      sc_is_criterion_error: 0
+          sc_error_treshold: 0.3000
+             sc_max_num_its: 10000
+     sc_is_criterion_error2: 0
+         sc_error_treshold2: 0.3000
+            sc_max_num_its2: 10000
+                       nrow: 500
+                       ncol: 32
+                  fact_side: 0
+                 update_way: 0
+                    verbose: 0
+                init_lambda: 1
+                    use_csr: 1
+                 packing_RL: 1
+            norm2_threshold: 0
+             norm2_max_iter: 0
+                  step_size: 1.0000e-16
+         constant_step_size: 0
+               mhtp_num_its: 50
+    mhtp_constant_step_size: 0
+             mhtp_step_size: 1.0000e-03
+       mhtp_palm4msa_period: 100
+       mhtp_updating_lambda: 1
+</div></div></div><div class="inlineElement eoOutputWrapper embeddedOutputsTextElement scrollableOutput" uid="1BDE6D78" data-scroll-top="4200" data-scroll-left="0" data-testid="output_9" data-width="833" data-height="17951" data-hashorizontaloverflow="false" style="width: 863px; max-height: 261px;"><div class="textElement">mxArray2FaustMHTPParams
+mxArray2FaustMHTPParams 1
+mxArray2FaustMHTPParams 2
+mxArray2FaustMHTPParams 3
+mxArray2FaustMHTPParams 4
+mxArray2FaustMHTPParams 5
+params.used1
+Faust::hierarchical: 1
+Faust::hierarchical: 2
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+Faust::hierarchical: 3
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 4
+changed mul. optimization mode to: 0 (opt. disabled, default mul.)
+changed mul. opti...</div></div><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="43FEAB3F" data-testid="output_10" data-width="833" data-height="90" data-hashorizontaloverflow="false" style="width: 863px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">F = </span></div><div>Faust size 500x32, density 0.18825, nnz_sum 3012, 4 factor(s): 
+- FACTOR 0 (real) SPARSE, size 500x32, density 0.15625, nnz 2500
+- FACTOR 1 (real) SPARSE, size 32x32, density 0.09375, nnz 96
+- FACTOR 2 (real) SPARSE, size 32x32, density 0.09375, nnz 96
+- FACTOR 3 (real) SPARSE, size 32x32, density 0.3125, nnz 320</div></div></div></div></div></div><div  class = 'S8'><span>This live script is ending here. Please note that although th  e article </span><a href = "#3C5DE2D9"><span style=' text-decoration: underline;'>[1]</span></a><span> tackles the optimization problem of approximately factorizing a matrix  in two sparse factors with the Bilinear Hard Tresholding Pursuit (BHTP)  algorithm, the MHTP is a generalization to N factors that needs further experiences to be mature. Hence the function </span><span style=' font-family: monospace;'>palm4msa_mhtp</span><span> and  moreover the function </span><span style=' font-family: monospace;'>hierarchical_mhtp</span><span> should be considered as experimental code and might evolve significantly in the future.</span></div><div  class = 'S1'><span>	</span></div><div  class = 'S1'><span>Thanks for reading this live script! Many other are available at </span><a href = "https://faust.inria.fr"><span style=' text-decoration: underline;'>faust.inria.fr</span></a><span>.</span></div><div  class = 'S1'><span style=' font-weight: bold;'>Note:</span><span> this live script was executed using the following matfaust version:</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S12'><span style="white-space: pre;"><span>matfaust.version()</span></span></div></div></div></div><br>
+<!-- 
+##### SOURCE BEGIN #####
+%% Using the PALM4MSA-MHTP Algorithm
+% 
+% 
+% In this live script we shall see how to use the PALM4MSA-MHTP algorithm. 
+% A<http://faust.inria.fr/tutorials/matfaust-matlab-livescripts/using-the-fa%c2%b5st-factorization-wrappers-with-matfaust/  
+% live script> has already been written on the Hierarchical PALM4MSA algorithm 
+% and its wrappers and is a prerequisite to the reading of this live script.
+% 
+% The PALM4MSA-MHTP is a variant of PALM4MSA in which intervenes the Multilinear 
+% Hard Tresholdhing Pursuit algorithm (MHTP).
+% 
+% The interest of this variant is to avoid the situation in which  PALM4MSA 
+% tends to stuck on some matrix supports without any way out.  MHTP allows to 
+% explore the support more freely and hopefully find a more accurate factorization 
+% at the cost of just a few more dozens iterations of the gradient descent algorithm.
+% 
+% For more information on the theory, you can read the following paper  in 
+% which is treated the particular case of the BHTP (Bilinear HTP, that  is running 
+% the MHTP on only two factors).
+% 
+% [1] Quoc-Tung Le, Rémi Gribonval. Structured  Support Exploration For Multilayer 
+% Sparse Matrix Fac- torization. ICASSP 2021 - IEEE International Conference on 
+% Acoustics, Speech and Signal  Processing, Jun 2021, Toronto, Ontario, Canada. 
+% pp.1-5. <https://hal.inria.fr/hal-03132013/document hal-03132013>.
+%% Configuring and Running PALM4MSA-MHTP
+% This variant works very similarly to a classic run of PALM4MSA, that is with 
+% at least the same set of parameters. The main difference is that  periodically 
+% (in term of PALM4MSA iterations) the MHTP algorithm is  launched to renew each 
+% layer of the Faust being refined.
+% 
+% Hence running the PALM4MSA-MHTP needs two sets of parameters: <https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1factparams_1_1ParamsPalm4MSA.html 
+% ParamsPalm4MSA> and <https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1factparams_1_1MHTPParams.html 
+% MHTPParams> objects. The former should not be really new if you are used to  
+% PALM4MSA, the latter is dedicated to the configuartion of the MHTP part  of 
+% PALM4MSA-MHTP.
+% 
+% The arguments to configure |MHTPParams| are basically:
+% 
+% * |num_its|: the number of iterations MHTP runs on each  layer of the Faust. 
+% Remember that this number of iterations is for each  factor. If you have two 
+% factors the overall number of iterations is |2 x num_its| (exactly as it is 
+% for PALM4MSA).
+% * |constant_step_size| and |step_size|: that  determines if the MHTP gradient 
+% descent will be ran according to a  constant step size, and in that case how 
+% long is the step size. By  default, the step size is not constant and recomputed 
+% dynamically with  the Lipschitz coefficient as in PALM4MSA. In most case, it 
+% is  recommended to not use a constant step size to achieve a better loss  function.
+% * |palm4msa_period|: which governs how many times to evenly run the MHTP algorithm 
+% inside PALM4MSA itself. By default, the value is 50. It means that for example 
+% if PALM4MSA is running for 200  iterations, MHTP will run 4 times: at iterations 
+% 0, 49, 99, 149 and 199  of PALM4MSA. Every time it runs MHTP will run for |num_its| 
+% iterations.
+% * |updating_lambda|: this boolean when set to |True| allows to update the 
+% scale factor of the Faust (the same one that is used in PALM4MSA) in the end 
+% of each iteration of MHTP.
+% 
+% So let's run PALM4MSA-MHTP on a small example: we propose to factorize 
+% a 500x32 matrix into two factors.
+% 
+% *First* we configure PALM4MSA as usual: 
+% 
+% * The number of iterations of PALM4SA with the StoppingCriterion (here 200 
+% iterations).
+% * Then we define the constraints / projectors to use, here the SPLIN  projector 
+% for the first factor of size 500x32 into which we want to  count 5 nonzeros 
+% per row and the NORMCOL projector for the second factor in which each column 
+% must be normalized.
+
+import matfaust.factparams.*
+import matfaust.proj.*
+projs = { splin([500, 32], 5), normcol([32, 32], 1.0) };
+stop_crit = StoppingCriterion(200);
+param = ParamsPalm4MSA(projs, stop_crit);
+%% 
+% *Second* we define the |MHTPParams| structure to configure the MHTP pass 
+% of PALM4MSA-MHTP
+% 
+% Hence we define the arguments described above: |num_its|, etc. We let all 
+% of them to their default values so there is not much to do.
+
+import matfaust.factparams.MHTPParams
+mhtp_param = MHTPParams()
+%% 
+% It's now time to run the PALM4MSA-MHTP algorithm passing the two structures 
+% of parameters. Before we generate a random matrix |M| to factorize.
+
+import matfaust.fact.palm4msa_mhtp
+M = rand(500, 32);
+F = palm4msa_mhtp(M, param, mhtp_param)
+%% 
+% As you see it's pretty similar to running PALM4MSA, which we could have 
+% done with the following code.
+
+import matfaust.fact.palm4msa
+G = palm4msa(M, param)
+%% 
+% We can verify that the results are however not the same:
+
+format long
+mhtp_error = norm(full(F)-M)/norm(M)
+palm4msa_error = norm(full(G)-M)/norm(M)
+%% 
+% They are very close though! In the next part of this live script we'll  
+% demonstrate how PALM4MSA-MHTP can really enhance the accuracy of the  Faust 
+% approximate and will do that on the MEG matrix (this matrix is  also discussed 
+% and factorized in <internal:3C5DE2D9 [1]>).
+%% Factorizing the MEG matrix using the PALM4MSA-MHTP algorithm
+% 
+% 
+% The MEG (for magnetoencephalography) matrix is also used in <internal:3C5DE2D9 
+% [1]> to compare PALM4MSA and PALM4MSA-MHTP performance.
+% 
+% The goal is to factorize the MEG matrix as$M_{MEG} \approx A \times B$ 
+% with $M_{MEG} \in \mathbb{R}^{8193 \times 204}, A \in \mathbb{R}^{8193 \times 
+% 24}$ and $B \in \mathbb{R}^{204 \times 204}$.  A and B are subject to sparsity 
+% constraints. Here we'll test only one sparsity configuration of the two factors 
+% ($k_0 = 100$ and $k_1=25$ being respectively the per-row number of nonzeros 
+% of A and B).
+% 
+% Let's load the MEG matrix which is embedded in FAµST data package (which 
+% should be downloaded automatically).
+
+load('matrix_MEG.mat');
+MEG = matrix;
+size(MEG)
+%% 
+% Going ahead we set the PALM4MSA parameters:
+
+import matfaust.proj.*
+import matfaust.factparams.*
+k0 = 100;
+k1 = 25;
+% the relevant projectors for our sparsity constraints
+projs = {splin([8193, 204], k0), splin([204, 204], k1)};
+% the number of iterations of PALM4MSA
+stop_crit = StoppingCriterion(2000);
+param = ParamsPalm4MSA(projs, stop_crit);
+param.use_csr = false;
+%% 
+% It remains the |MHTPParams| configuration (it's easy, we use the default 
+% parameters) :
+
+mhtp_p = MHTPParams();
+%% 
+% Now we are able to launch PALM4MSA and PALM4MSA-MHTP and compare the  
+% errors: the computation takes some time, it can last about 30  minutes.
+
+import matfaust.fact.*
+F_palm4msa = palm4msa(MEG, param);
+F_mhtp = palm4msa_mhtp(MEG, param,   mhtp_p);
+err_palm4msa = norm(F_palm4msa-MEG) / norm(MEG)  
+err_palm4msa_mhtp = norm(F_mhtp-MEG) / norm(MEG)    
+%% 
+% As you see the MHTP variant is twice accurate than PALM4MSA on this configuration.
+%% Using the Hierarchical PALM4MSA-MHTP algorithm
+% 
+% 
+% Exactly the same way you can use the hierarchical factorization with PALM4MSA, 
+% it is possible to use the function |matfaust.fact.hierachical_mhtp| to run a 
+% hierarchical factorization based on PALM4MSA-MHTP instead of simply PALM4MSA.
+% 
+% The launch of the algorithm function is very similar, you just need to 
+% add a |MHTPParams| instance to the argument list.
+% 
+% Let's show how with this simple example:
+
+import matfaust.fact.*
+import matfaust.factparams.*
+import matfaust.proj.*
+M = rand(500, 32);
+fact_projs = {splin([500, 32], 5), sp([32, 32], 96), sp([32, 32], 96)};
+res_projs = {normcol([32, 32], 1), sp([32, 32], 666), sp([32, 32], 333)};
+stop_crit1 = StoppingCriterion(200);
+stop_crit2 = StoppingCriterion(200);
+% 50 iterations of MHTP will run every 100 iterations of PALM4MSA
+% (each time PALM4MSA is called by the hierarchical algorithm)
+mhtp_params = MHTPParams('num_its', 50, 'palm4msa_period', 100);
+param = ParamsHierarchical(fact_projs, res_projs, stop_crit1, stop_crit2);
+F = hierarchical_mhtp(M, param, mhtp_params)
+%% 
+% This live script is ending here. Please note that although th  e article 
+% <internal:3C5DE2D9 [1]> tackles the optimization problem of approximately factorizing 
+% a matrix  in two sparse factors with the Bilinear Hard Tresholding Pursuit (BHTP)  
+% algorithm, the MHTP is a generalization to N factors that needs further experiences 
+% to be mature. Hence the function |palm4msa_mhtp| and  moreover the function 
+% |hierarchical_mhtp| should be considered as experimental code and might evolve 
+% significantly in the future.
+% 
+% 	
+% 
+% Thanks for reading this live script! Many other are available at <https://faust.inria.fr 
+% faust.inria.fr>.
+% 
+% *Note:* this live script was executed using the following matfaust version:
+
+matfaust.version()
+##### SOURCE END #####
+--></body></html>
