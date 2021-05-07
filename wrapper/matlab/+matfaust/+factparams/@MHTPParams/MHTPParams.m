@@ -19,7 +19,7 @@ classdef MHTPParams
 		%> See also matfaust.fact.palm4msa_mhtp, matfaust.fact.hierarchical_mhtp.
 		%>
 		%> @param 'num_its', int: (optional) the number of iterations to run the MHTP algorithm.
-		%> @param 'constant_step_size', bool: (optional) true to use a constant step for the gradient descent, False otherwise. If false the step size is computed dynamically along the iteration (according to a Lipschitz criterion).
+		%> @param 'constant_step_size', bool: (optional) true to use a constant step for the gradient descent, False otherwise. If false the step size is computed dynamically along the iterations (according to a Lipschitz criterion).
 		%> @param 'step_size', real: (optional) The step size used when constant_step_size==true.
 		%> @param 'palm4msa_period', int: (optional) The period (in term of iterations) according to the MHTP algorithm is ran (i.e.: 0 <= i < N being the PALM4MSA iteration, MHTP is launched every i = 0 (mod palm4msa_period). Hence the algorithm is ran one time at least – at PALM4MSA iteration 0).
 		%> @param 'updating_lambda', bool: (optional) if true then the scale factor of the Faust resulting of the factorization is updated after each iteration of MHTP (otherwise it never changes during the whole MHTP execution).

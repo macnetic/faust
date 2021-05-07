@@ -7,13 +7,12 @@
 %> [1] Quoc-Tung Le, Rémi Gribonval. Structured Support Exploration For Multilayer Sparse Matrix Fac- torization. ICASSP 2021 - IEEE International Conference on Acoustics, Speech and Signal Processing, Jun 2021, Toronto, Ontario, Canada. pp.1-5. <a href="https://hal.inria.fr/hal-03132013/document">hal-03132013</a>
 %>
 %> @param M the dense matrix to factorize.
-%> @param palm4msa_p the matfaust.factparams.ParamsPalm4MSA instance to define the algorithm parameters.
+%> @param palm4msa_p the matfaust.factparams.ParamsPalm4MSA instance to define the PALM4MSA algorithm parameters.
 %> @param mthp_p the matfaust.factparams.MHTPParams instance to define the MHTP algorithm parameters.
-%> @param 'gpu', bool (optional) set to true to execute the algorithm using the GPU implementation. This options is only available when backend==2020.
-%> @param varargin: see matfaust.fact.hierarchical for the other parameters.
+%> @param varargin: see matfaust.fact.palm4msa for the other parameters.
 %>
 %> @retval F the Faust object result of the factorization.
-%> @retval [F, lambda] = palm4msa(M, p) to optionally get lambda (scale).
+%> @retval [F, lambda] = palm4msa(M, p) when optionally getting lambda (scale).
 %>
 %> @b Example
 %> @code

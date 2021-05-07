@@ -8,7 +8,7 @@
 %> @param 'gpu', bool (optional) set to true to execute the algorithm using the GPU implementation. This option is only available when backend==2020.
 %>
 %> @retval F the Faust object result of the factorization.
-%> @retval [F, lambda] = palm4msa(M, p) to optionally get lambda (scale).
+%> @retval [F, lambda] = palm4msa(M, p) when optionally getting lambda (scale).
 %>
 %> @b Example
 %>

@@ -18,7 +18,7 @@
 %> @endcode
 %>
 %> @retval F The Faust object result of the factorization.
-%> @retval [F, lambda, p_obj] = hierarchical(M, p) to optionally get lambda (scale) and the p_obj ParamsHierarchical instance used to factorize.
+%> @retval [F, lambda] = palm4msa(M, p) when optionally getting lambda (scale).
 %>
 %> @b Example 1: Fully Defined Parameters for a Random Matrix Factorization
 %> @code

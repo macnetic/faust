@@ -9,6 +9,9 @@
 %> @param mhtp_p the matfaust.factparams.MHTPParams instance to define the MHTP algorithm parameters.
 %> @param varargin: see matfaust.fact.hierarchical for the other parameters.
 %>
+%> @retval F The Faust object result of the factorization.
+%> @retval [F, lambda] = palm4msa(M, p) when optionally getting lambda (scale).
+%>
 %>@b Example
 %>@code
 %> import matfaust.fact.hierarchical_mhtp

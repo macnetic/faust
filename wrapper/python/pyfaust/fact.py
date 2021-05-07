@@ -503,7 +503,8 @@ def palm4msa_mhtp(M, palm4msa_p, mhtp_p, ret_lambda=False, on_gpu=False):
 
     Args:
         M: the numpy array to factorize.
-        palm4msa_p: the The pyfaust.factparams.ParamsPalm4MSA instance to define the algorithm parameters.
+        palm4msa_p: the The pyfaust.factparams.ParamsPalm4MSA instance to
+        define the PALM4MSA algorithm parameters.
         mhtp_p: the pyfaust.factparams.MHTPParams instance to define the MHTP algorithm parameters.
         ret_lambda: set to True to ask the function to return the scale factor (False by default).
         on_gpu: if True the GPU implementation is executed.

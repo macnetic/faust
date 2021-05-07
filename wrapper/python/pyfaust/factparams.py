@@ -721,7 +721,9 @@ class MHTPParams:
 
         Args:
             num_its: (int, optional) the number of iterations to run the MHTP algorithm.
-            constant_step_size: (bool, optional) True to use a constant step for the gradient descent, False otherwise. If False the step size is computed dynamically along the iteration (according to a Lipschitz criterion).
+            constant_step_size: (bool, optional) True to use a constant step
+            for the gradient descent, False otherwise. If False the step size
+            is computed dynamically along the iterations (according to a Lipschitz criterion).
             step_size: (float, optional) The step size used when constant_step_size==True. 
             palm4msa_period: (int, optional) The period (in term of iterations)
             according to the MHTP algorithm is ran (i.e.: 0 <= i < N being the PALM4MSA
