@@ -1237,13 +1237,13 @@ cdef class FaustCore:
         else:
             del self.core_faust_cplx
 
-cdef check_matrix(isReal, M):
+cdef check_matrix(isReal, M, message=""):
         if not isinstance(M, (np.ndarray) ):
-            raise ValueError('input must be a numpy ndarray')
+            raise ValueError(message+'input must be a numpy ndarray')
         if(isReal):
 #            M=M.astype(float,'F')
             if not M.dtype=='float':
-                raise ValueError('input numpy array dtype must be double (not'
+                raise ValueError(message+'input numpy array dtype must be double (not'
                                  ' float)')
         else:
 #            M=M.astype(complex,'F')
@@ -1251,12 +1251,12 @@ cdef check_matrix(isReal, M):
                 raise ValueError('input array must be complex array')
         #TODO: raise exception if not real nor complex
         if not M.flags['F_CONTIGUOUS']:
-            raise ValueError('input array must be Fortran contiguous (Colmajor)')
+            raise ValueError(message+'input array must be Fortran contiguous (Colmajor)')
 
         ndim_M=M.ndim;
 
         if (ndim_M > 2) | (ndim_M < 1):
-            raise ValueError('input matrix/array invalid number of dimensions')
+            raise ValueError(message+'input matrix/array invalid number of dimensions')
 
 cdef class ConstraintIntCore:
 
@@ -1507,12 +1507,13 @@ cdef class FaustFact:
             else:
                 zeros_id = 0
             p.init_facts[zeros_id] = \
-                np.zeros([p.constraints[zeros_id]._num_rows,p.constraints[zeros_id]._num_cols])
+                np.zeros([p.constraints[zeros_id]._num_rows,p.constraints[zeros_id]._num_cols],
+                        order='F')
             if(not isReal):
                 p.init_facts[zeros_id] = p.init_facts[zeros_id].astype(np.complex)
             for i in [i for i in range(0, p.num_facts) if i != zeros_id]:
                 p.init_facts[i] = np.eye(p.constraints[i]._num_rows,
-                                        p.constraints[i]._num_cols)
+                                        p.constraints[i]._num_cols, order='F')
                 if(not isReal):
                     p.init_facts[i] = p.init_facts[i].astype(np.complex)
 
@@ -1625,6 +1626,8 @@ cdef class FaustFact:
             cpp_params_cplx.num_constraints = len(p.constraints)
 
         for i in range(0,p.num_facts):
+            check_matrix(isReal, p.init_facts[i], message="while checking"
+                         " palm4msa init facts: ")
             if(isReal):
                 tmp_mat = p.init_facts[i]
                 cpp_params.init_facts[i] = &tmp_mat[0,0]
