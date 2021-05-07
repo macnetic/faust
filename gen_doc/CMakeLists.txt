@@ -170,6 +170,7 @@ if(BUILD_DOCUMENTATION)
 	configure_file(${FAUST_DOC_SRC_DIR}/matfaust_poly.html ${PROJECT_BINARY_DIR}/doc/html/matfaust_poly.html COPYONLY)
 
 	configure_file(${FAUST_SRC_TEST_SRC_PYTHON_DIR}/test_svd_rc_vs_err.py ${PROJECT_BINARY_DIR}/doc/html/test_svd_rc_vs_err.py COPYONLY)
+	configure_file(${FAUST_SRC_TEST_SRC_PYTHON_DIR}/step-by-step_palm4msa.py ${PROJECT_BINARY_DIR}/doc/html/step-by-step_palm4msa.py COPYONLY)
 	archive_tutos(pyfaust notebook ipynb)
 	archive_tutos(matfaust livescript mlx)
 	# filter out the HTML tags in pyfaust doc strings

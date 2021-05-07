@@ -2,13 +2,21 @@
 
 # Frequently Asked Question
 
-**About matfaust:**  
-[1. Why did I get a file-not-found error when running demos or examples?](#mat_one)  
-[2. How to fix mex not found error: "Undefined function or variable 'mexFaustReal'"?](#mat_two)  
+
 
 **About pyfaust:**  
 [1. How can I launch the integrated unit tests of pyfaust?](#py_one)  
 [2. How to launch the demos with pyfaust?](#py_two)  
+[3. How to run the PALM4MSA algorithm in a step-by-step fashion?](#py_three)  
+
+**About matfaust:**  
+[1. Why did I get a file-not-found error when running demos or examples?](#mat_one)  
+[2. How to fix mex not found error: "Undefined function or variable 'mexFaustReal'"?](#mat_two)  
+[3. How to launch the demos with matfaust?](#mat_three)  
+[4. How can I launch the integrated unit tests of matfaust?](#mat_four)  
+[5. How to run the PALM4MSA algorithm in a step-by-step fashion?](#mat_five)  
+
+# About matfaust
 
 \anchor mat_one
 ## 1. Why did I get a file-not-found error when running demos or examples?
@@ -111,6 +119,60 @@ To fix this issue, you have to update the Matlab path manually, however a script
 
 	 launch quick_start or run_all_demo.m 
 
+\anchor mat_three
+## 3. How to launch the demos with matfaust?
+
+You might run all the demos at once or one by one. In the former case you should run this matlab code:
+
+	>> import matfaust.demo.runall
+	>> runall()
+
+Note: the raw result are then in output files located in the directory ``./output``.
+
+To launch the demo one by one, you can pick the command in your interest below:
+
+
+For the [BSL](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacematfaust_1_1demo.html) demo:
+
+	>> import matfaust.demo.bsl.*
+	>> BSL()
+	>> Fig_BSL()
+
+For the [DFT](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1demo_1_1fft.html) demo:
+
+	>> import matfaust.demo.fft.speed_up_fourier
+	>> speed_up_fourier
+
+For the [Hadamard](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1demo_1_1hadamard.html) demo:
+
+	>> import matfaust.demo.hadamard
+	>> hadamard.speed_up_hadamard()
+
+For the [runtime comparison](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1demo_1_1runtimecmp.html) demo:
+
+	>> import matfaust.demo.runtimecmp
+	>> runtimecmp.runtime_comparison
+	>> runtimecmp.Fig_runtime_comparison
+
+And for the last and simplest demo, the [quickstart script](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1demo_1_1quickstart.html):
+
+	>> import matfaust.demo.quickstart
+	>> quickstart.quick_start()
+	>> quickstart.factorize_matrix()
+	>> quickstart.construct_Faust_from_factors()
+
+\anchor mat_four
+## 4. How can I launch the integrated unit tests of matfaust?
+
+TODO (in the meanwhile you can see the pyfaust entry)
+
+\anchor mat_five
+
+## 5. How to run the PALM4MSA algorithm in a step-by-step fashion?
+
+TODO (in the meanwhile you can see the pyfaust entry)
+
+# About pyfaust
 \anchor py_one
 ## 1. How can I launch the integrated unit tests of pyfaust?
 
@@ -169,50 +231,21 @@ And for the last and simplest demo, the [quickstart script](https://faustgrp.git
 	>>> from pyfaust.demo import quickstart
 	>>> quickstart.run()
 
-\anchor four
-## 4. How can I launch the integrated unit tests of matfaust?
+\anchor py_three
 
-TODO
+## 3. How to run the PALM4MSA algorithm in step-by-step fashion?
 
-\anchor five
-## 5. How to launch the demos with matfaust?
+Although the verbose mode of the PALM4MSA implementation allows displaying some info, it might be useful in order to analayze the algorithm (e.g. build the loss function or check the matrix supports evolution), to be able to run just one iteration at a time, get all the Faut layers, the scale factor (lambda), do whatever one needs with them, and then continue to the next iteration.
 
-You might run all the demos at once or one by one. In the former case you should run this matlab code:
+It implies to reinitialize the next iteration in the same state it was at the end of the past iteration. The script [step-by-step_palm4msa.py](./step-by-step_palm4msa.py) shows how to do that for a matrix factorization in two factors but it is not much different with a greater number of factors.
+On the script end PALM4MSA is performed all iterations at once in order to verify the step-by-step execution was consistent.
 
->> import matfaust.demo.runall
->> runall()
+Below is an example of output you should obtain running the script (into which you can see that the at-once and iteration-by-iteration executions match perfectly):
 
-Note: the raw result are then in output files located in the directory ``./output``.
+	python3 step-by-step_palm4msa.py | tail -3
+	Relative error when running all PALM4MSA iterations at once:  0.2978799226115671
+	Last relative error obtained when running PALM4MSA iteration-by-iteration:  0.2978799226115671
+	Relative error comparing the final Fausts obtained either by in step-by-step PALM4MSA versus all-iterations-at-once PALM4MSA:  2.1117031467008879e-16
 
-To launch the demo one by one, you can pick the command in your interest below:
 
-
-For the [BSL](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacematfaust_1_1demo.html) demo:
-
-	>> import matfaust.demo.bsl.*
-	>> BSL()
-	>> Fig_BSL()
-
-For the [DFT](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1demo_1_1fft.html) demo:
-
-	>> import matfaust.demo.fft.speed_up_fourier
-	>> speed_up_fourier
-
-For the [Hadamard](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1demo_1_1hadamard.html) demo:
-
-	>> import matfaust.demo.hadamard
-	>> hadamard.speed_up_hadamard()
-
-For the [runtime comparison](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1demo_1_1runtimecmp.html) demo:
-
-	>> import matfaust.demo.runtimecmp
-	>> runtimecmp.runtime_comparison
-	>> runtimecmp.Fig_runtime_comparison
-
-And for the last and simplest demo, the [quickstart script](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1demo_1_1quickstart.html):
-
-	>> import matfaust.demo.quickstart
-	>> quickstart.quick_start()
-	>> quickstart.factorize_matrix()
-	>> quickstart.construct_Faust_from_factors()
 
