@@ -1,4 +1,3 @@
-% experimental block start
 %==========================================================================
 %> @brief Runs the MHTP-PALM4MSA algorithm to factorize the matrix M.
 %>
@@ -39,4 +38,3 @@ function  [F,lambda] = palm4msa_mhtp(M, palm4msa_p, mhtp_p, varargin)
 	palm4msa_p.use_MHTP = mhtp_p;
 	[F, lambda] = matfaust.fact.palm4msa(M, palm4msa_p, 'backend', 2020, varargin{:});
 end
-% experimental block end

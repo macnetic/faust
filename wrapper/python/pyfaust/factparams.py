@@ -703,7 +703,6 @@ class ConstraintList(object):
         """
         return self.clist.__getitem__(ind)
 
-# experimental block start
 class MHTPParams:
     """
     This class defines the set of parameters to run the MHTP-PAL4MSA algorithm.
@@ -759,7 +758,6 @@ class MHTPParams:
                 "palm4msa_period: "+str(self.palm4msa_period)+"\r\n"+
                 "updating_lambda: " +str(self.updating_lambda)+"\r\n")
 
-# experimental block end
 
 class ParamsFact(ABC):
     """

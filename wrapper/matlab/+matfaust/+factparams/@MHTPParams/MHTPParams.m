@@ -1,4 +1,3 @@
-% experimental block start
 % =========================================================
 %> @brief This class defines the set of parameters to run the MHTP-PAL4MSA algorithm.
 %>
@@ -79,4 +78,3 @@ classdef MHTPParams
 		end
 	end
 end
-% experimental block end

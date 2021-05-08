@@ -1,4 +1,3 @@
-% experimental block start
 %==========================================================================
 %> @brief Runs the MHTP-PALM4MSA hierarchical factorization algorithm on the matrix M.
 %>
@@ -35,4 +34,3 @@ function  [F,lambda] = hierarchical_mhtp(M, hierarchical_p, mhtp_p, varargin)
 	hierarchical_p.use_MHTP = mhtp_p;
 	[F, lambda] = matfaust.fact.hierarchical(M, hierarchical_p, varargin{:}, 'backend', 2020);
 end
-% experimental block end

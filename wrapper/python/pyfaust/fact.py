@@ -485,7 +485,6 @@ def palm4msa(M, p, ret_lambda=False, backend=2016, on_gpu=False):
     else:
         return F
 
-# experimental block start
 def palm4msa_mhtp(M, palm4msa_p, mhtp_p, ret_lambda=False, on_gpu=False):
     """ Runs the MHTP-PALM4MSA algorithm to factorize the matrix M.
 
@@ -578,7 +577,6 @@ def hierarchical_mhtp(M, hierar_p, mhtp_p, ret_lambda=False, ret_params=False,
     return hierarchical(M, hierar_p, ret_lambda=False, ret_params=False, backend=2020,
                         on_gpu=False)
 
-# experimental block end
 
 # experimental block start
 def _palm4msa_fgft(Lap, p, ret_lambda=False):
