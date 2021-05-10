@@ -2413,6 +2413,8 @@ cdef class FaustFact:
         # to have a threshold error of complex type (it wouldn't make sense)
         cdef PyxConstraintGeneric** cpp_constraints
 
+        cdef FaustCoreCy.FaustCoreCpp[double]* core_faust_dbl_init_facts
+
         if(M.dtype == np.complex):
             raise TypeError("2020 palm4msa implementation doesn't support"
                             " complex matrices.")
@@ -2475,6 +2477,18 @@ cdef class FaustFact:
             cpp_constraints[i].name = cons.name
             cpp_constraints[i].num_rows = cons._num_rows
             cpp_constraints[i].num_cols = cons._num_cols
+
+        if(p.init_facts):
+            # facts have been initialized from the wrapper
+            # create a Faust
+            F_facts = FaustCore(p.init_facts)
+            F_facts._isReal = True
+            # palm4msa2020_gen in FaustFact.hpp
+            # is responsible to delete the object in case the
+            # algorithm runs on GPU (hence the transform objects F_facts and
+            # core are not the same)
+
+
         core = FaustCore(core=True)
         core.core_faust_dbl = \
             FaustCoreCy.palm4msa2020[double](&Mview[0,0], M_num_rows,
@@ -2491,7 +2505,14 @@ cdef class FaustFact:
                                              p.is_verbose,
                                              p.constant_step_size,
                                              p.step_size,
-                                             full_gpu)
+                                             full_gpu,
+                                             <FaustCoreCy.FaustCoreCpp[double]*>NULL if not p.init_facts else F_facts.core_faust_dbl)
+
+        if(p.init_facts):
+            F_facts.core_faust_dbl = NULL
+            # needed to avoid double-free (because F_facts has the same
+            # TransformHelper behind as core)
+
         core._isReal = True
 
         for i in range(0,len(p.constraints)):

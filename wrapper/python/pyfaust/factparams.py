@@ -1167,6 +1167,10 @@ class ParamsPalm4MSA(ParamsFact):
                 factor to be updated is initialized to zero and the others to
                 identity. Note that the so called first factor can be the
                 rightmost or the leftmost depending on the is_update_way_R2L argument).
+                Note also that the matrices must be np.ndarray if the backend
+                argument of pyfaust.fact.palm4msa is equal to 2016, otherwise (backend==2020)
+                it is possible to use np.ndarray or scipy.sparse.csr_matrix
+                (depending of the ParamsPalm4MSA.use_csr attribute).
                 is_update_way_R2L: if True pyfaust.fact.palm4msa will update factors from
                 the right to the left, otherwise it's done in reverse order.
                 init_lambda: the scale scalar initial value (by default the

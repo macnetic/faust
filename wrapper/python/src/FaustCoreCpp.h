@@ -53,15 +53,29 @@
 #include "faust_TransformHelperPoly.h"
 #include <cstring>
 
+
 template<typename FPP, FDevice DEV=Cpu>
 class FaustCoreCpp
 {
+
 
     public :
 
 
     FaustCoreCpp(): transform(nullptr) {}
     FaustCoreCpp(Faust::TransformHelper<FPP,DEV> *th);
+    /**
+     * Copies the underlying transform into the argument.
+     *
+     * \return true to indicate the two objects are different.
+     */
+    bool make_transform(Faust::TransformHelper<FPP, GPU2>**) const;
+    /**
+     * Copies the pointer of the underlying transform into the argument.
+     *
+     * \return false to indicate the two objects are the same.
+     */
+    bool make_transform(Faust::TransformHelper<FPP, Cpu>**) const;
     void Display() const { transform->display();}
     const char* to_string() const;
     void push_back(FPP* valueMat,unsigned int nbrow,unsigned int nbcol, bool optimizedCopy=false);
@@ -165,6 +179,7 @@ class FaustCoreCpp
 
     protected :
     Faust::TransformHelper<FPP,DEV> *transform;
+
 };
 
 template<typename FPP>

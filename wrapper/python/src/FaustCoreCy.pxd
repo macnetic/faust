@@ -290,7 +290,8 @@ cdef extern from "FaustFact.h":
                                               bool is_verbose,
                                               bool constant_step_size,
                                               double step_size,
-                                              const bool full_gpu)
+                                              const bool full_gpu,
+                                              FaustCoreCpp[FPP]* cth)
 
 
 

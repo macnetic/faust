@@ -704,9 +704,24 @@ FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::polyBasis_ext(
 }
 
 template<typename FPP, FDevice DEV>
+bool FaustCoreCpp<FPP,DEV>::make_transform(Faust::TransformHelper<FPP,Cpu>** th) const
+{
+    *th = this->transform;
+    return false;
+}
+
+template<typename FPP, FDevice DEV>
+bool FaustCoreCpp<FPP, DEV>::make_transform(Faust::TransformHelper<FPP,GPU2>** th) const
+{
+    *th = new Faust::TransformHelper<double,GPU2>(*this->transform);
+    return true;
+}
+
+template<typename FPP, FDevice DEV>
 FaustCoreCpp<FPP,DEV>::~FaustCoreCpp()
 {
     if(transform) delete transform;
+    transform = nullptr;
 }
 
 void* _enable_gpu_mod(const char* libpath, const bool silent)
