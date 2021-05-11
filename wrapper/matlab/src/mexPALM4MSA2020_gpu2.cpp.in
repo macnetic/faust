@@ -68,6 +68,7 @@ typedef @FACT_FPP@ FPP2;
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
+	//TODO: factorize with mexPALM4MSA2020.cpp.in
 	Faust::enable_gpu_mod();
 #ifdef FAUST_VERBOSE
 	if (typeid(SCALAR) == typeid(float))
@@ -83,9 +84,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 #endif
 
 
-	if (nrhs != 1)
+	if (nrhs < 1)
 	{
-		mexErrMsgTxt("Bad Number of inputs arguments");
+		mexErrMsgTxt("Bad Number of inputs arguments (must be 1 or 2)");
 	}
 
 	if(!mxIsStruct(prhs[0]))
@@ -107,7 +108,24 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		if(params->isVerbose) params->Display();
 		SCALAR lambda = params->init_lambda;
 
-		TransformHelper<SCALAR, GPU2>* F = new TransformHelper<SCALAR, GPU2>(), *F_lambda = nullptr;
+		TransformHelper<SCALAR, GPU2>* F = nullptr, *F_lambda = nullptr;
+
+		if(nrhs < 2)
+			F = new TransformHelper<SCALAR, GPU2>();
+		else
+		{
+			// init_facts passed as a Faust in 2nd argument
+			F = convertMat2Ptr<Faust::TransformHelper<SCALAR,GPU2> >(prhs[1]);
+			//TODO: understand why this workaround is necessary
+			// when this copy is not made manually palm4msa2 crashes
+			std::vector<Faust::MatGeneric<SCALAR,GPU2>*> facts;
+			for(int i=0;i<F->size();i++)
+			{
+				facts.push_back(F->get_gen_fact_nonconst(i));
+			}
+			F = new TransformHelper<SCALAR, GPU2>(facts, (SCALAR) 1.0, false, true, true);
+		}
+
 		//TODO: the constness should be kept
 		std::vector<Faust::ConstraintGeneric*> noconst_cons;
 		for(auto cons: params->cons)
@@ -145,7 +163,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		Faust::MatDense<FPP2,Cpu> mat1x1Lambda = Faust::MatDense<FPP2, Cpu>(1, 1, &lambda);
 		plhs[0] = FaustMat2mxArray(mat1x1Lambda);
 		F_lambda = F->multiply(lambda);
-		delete F;
+		delete F; // if init_facts is used F is a copy too
 		F = F_lambda;
 		auto cpuF = F->tocpu();
 		plhs[1] = convertPtr2Mat<Faust::TransformHelper<SCALAR, Cpu>>(cpuF);

@@ -78,11 +78,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	system("sleep 7");
 #endif
 
-	std::cout << "mexPALM4MSA2020" << std::endl;
-
-	if (nrhs != 1)
+	if (nrhs < 1)
 	{
-		mexErrMsgTxt("Bad Number of inputs arguments");
+		mexErrMsgTxt("Bad Number of inputs arguments (must be 1 or 2)");
 	}
 
 	if(!mxIsStruct(prhs[0]))
@@ -97,7 +95,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	try
 	{
 
-		//	// creation des parametres
+		// PALM4MSA parameters
 		auto params = mxArray2FaustParamsPALM4MSA<SCALAR,FPP2>(prhs[0], presentFields);
 		Faust::MHTPParams<SCALAR> mhtp_params;
 		mxArray2FaustMHTPParams<SCALAR>(prhs[0], mhtp_params);
@@ -105,7 +103,23 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 //		Faust::BlasHandle<Cpu> blas_handle;
 		SCALAR lambda = params->init_lambda;
 
-		TransformHelper<SCALAR, Cpu>* F = new TransformHelper<SCALAR, Cpu>(), *F_lambda = nullptr;
+		TransformHelper<SCALAR, Cpu>* F = nullptr, *F_lambda = nullptr;
+
+		if(nrhs < 2)
+			F = new TransformHelper<SCALAR, Cpu>();
+		else
+		{
+			// init_facts passed as a Faust in 2nd argument
+			F = convertMat2Ptr<Faust::TransformHelper<SCALAR,Cpu> >(prhs[1]);
+			//TODO: understand why this workaround is necessary
+			// when this copy is not made manually palm4msa2 crashes
+			std::vector<Faust::MatGeneric<SCALAR,Cpu>*> facts;
+			for(int i=0;i<F->size();i++)
+			{
+				facts.push_back(F->get_gen_fact_nonconst(i));
+			}
+			F = new TransformHelper<SCALAR, Cpu>(facts, (SCALAR) 1.0, false, true, true);
+		}
 
 		//TODO: the constness should be kept
 		std::vector<Faust::ConstraintGeneric*> noconst_cons;
@@ -126,7 +140,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		Faust::MatDense<FPP2,Cpu> mat1x1Lambda = Faust::MatDense<FPP2, Cpu>(&lambda, 1, 1);
 		plhs[0] = FaustMat2mxArray(mat1x1Lambda);
 		F_lambda = F->multiply(lambda);
-		delete F;
+		delete F; // if init_facts is used F is a copy too
 		F = F_lambda;
 		plhs[1] = convertPtr2Mat<Faust::TransformHelper<SCALAR, Cpu>>(F);
 		delete params;

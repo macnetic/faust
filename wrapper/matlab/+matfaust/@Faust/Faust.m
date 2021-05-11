@@ -1991,6 +1991,10 @@ classdef Faust
 		function set_Fv_mul_mode(self, mode)
 			set_Fv_mul_mode(self.matrix, mode)
 		end
+
+		function H = get_handle(self)
+			H = self.matrix.objectHandle;
+		end
 	end
 	methods(Access = private)
 		%================================================================
