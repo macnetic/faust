@@ -710,12 +710,14 @@ bool FaustCoreCpp<FPP,DEV>::make_transform(Faust::TransformHelper<FPP,Cpu>** th)
     return false;
 }
 
+#ifdef USE_GPU_MOD
 template<typename FPP, FDevice DEV>
 bool FaustCoreCpp<FPP, DEV>::make_transform(Faust::TransformHelper<FPP,GPU2>** th) const
 {
     *th = new Faust::TransformHelper<double,GPU2>(*this->transform);
     return true;
 }
+#endif
 
 template<typename FPP, FDevice DEV>
 FaustCoreCpp<FPP,DEV>::~FaustCoreCpp()

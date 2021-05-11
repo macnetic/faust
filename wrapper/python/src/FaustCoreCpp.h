@@ -69,12 +69,14 @@ class FaustCoreCpp
      *
      * \return true to indicate the two objects are different.
      */
+#ifdef USE_GPU_MOD
     bool make_transform(Faust::TransformHelper<FPP, GPU2>**) const;
     /**
      * Copies the pointer of the underlying transform into the argument.
      *
      * \return false to indicate the two objects are the same.
      */
+#endif
     bool make_transform(Faust::TransformHelper<FPP, Cpu>**) const;
     void Display() const { transform->display();}
     const char* to_string() const;
