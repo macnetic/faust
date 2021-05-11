@@ -636,3 +636,19 @@ pypi_pub:
     - tags
   tags:
     - linux
+
+pkg_upload:
+  stage: pkg_pub
+  script:
+        - misc/continuous_integration/upload_pkg.sh
+  needs:
+    - job: pkg_macos_release
+      artifacts: true
+    - job: pkg_win_release
+      artifacts: true
+    - job: pkg_linux_release
+      artifacts: true
+  only:
+    - tags
+  tags:
+    - linux
