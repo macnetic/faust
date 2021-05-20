@@ -67,5 +67,26 @@ class TestPoly(unittest.TestCase):
                         self.assertTrue(np.linalg.norm(zero_part) == 0)
 
 
+    def test_basisT0(self):
+        print("Test basis()")
+        from scipy.sparse import random
+        d = 50
+        density = .02
+        if self.field == 'complex':
+            dtype = 'complex'
+        else:
+            dtype = 'double'
+        L = random(d, d, density, format='csr', dtype=dtype)
+        L = L@L.T
+        K = 5
+        T0 = random(d, 2, density, format='csr', dtype=dtype)
+        F = basis(L, K, 'chebyshev', dev=self.dev, T0=T0)
+        print(F)
+        # assert the dimensions are consistent to L and TO
+        self.assertEqual(F.shape[0], (K+1)*L.shape[0])
+        self.assertEqual(F.shape[1], T0.shape[1])
+        # assert the 0-degree polynomial matrix is T0
+        last_fac = F.factors(F.numfactors()-1).toarray()
+        self.assertTrue(np.allclose(T0.toarray(), last_fac))
 
 
