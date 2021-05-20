@@ -9,9 +9,6 @@ import tempfile
 import os
 import random
 
-dev = 'cpu'
-field = 'real'
-
 
 class TestFaust(unittest.TestCase):
 
@@ -20,16 +17,27 @@ class TestFaust(unittest.TestCase):
     MAX_DIM_SIZE = 256
     MIN_DIM_SIZE = 3
 
+    def __init__(self, methodName='runTest', dev='cpu', field='real'):
+        super(TestFaust, self).__init__(methodName)
+        self.dev = dev
+        self.field = field
+
     def setUp(self):
         """
         """
+#        self.dev = 'cpu'
+#        self.field = 'real'
+#        if 'dev' in os.environ:
+#            self.dev = os.environ['dev']
+#        if 'field' in os.environ:
+#            self.field = os.environ['field']
         nrows = randint(TestFaust.MIN_DIM_SIZE,
                         TestFaust.MAX_DIM_SIZE+1)
         ncols = randint(TestFaust.MIN_DIM_SIZE,
                         TestFaust.MAX_DIM_SIZE+1)
         nfacts = randint(TestFaust.MIN_NUM_FACTORS,
                          TestFaust.MAX_NUM_FACTORS+1)
-        self.F = frand(nrows, ncols, num_factors=nfacts, dev=dev, field=field)
+        self.F = frand(nrows, ncols, num_factors=nfacts, dev=self.dev, field=self.field)
         self.nrows = nrows
         self.ncols = ncols
         self.nfacts = nfacts
@@ -85,7 +93,7 @@ class TestFaust(unittest.TestCase):
 
     def test_device(self):
         print("Faust.device")
-        self.assertEqual(self.F.device, dev)
+        self.assertEqual(self.F.device, self.dev)
 
     def test_transpose(self):
         print("Faust.transpose")
@@ -115,7 +123,7 @@ class TestFaust(unittest.TestCase):
 
     def test_add(self):
         print("Faust.__add__, __radd__")
-        G = frand(self.nrows, self.ncols, dev=dev)
+        G = frand(self.nrows, self.ncols, dev=self.dev)
         self.assertTrue(np.allclose((self.F+G).toarray(),
                                     self.F.toarray()+G.toarray()))
         self.assertTrue(np.allclose((self.F+G.toarray()).toarray(),
@@ -123,7 +131,7 @@ class TestFaust(unittest.TestCase):
 
     def test_sub(self):
         print("Faust.__sub__, __rsub__")
-        G = frand(self.nrows, self.ncols, dev=dev)
+        G = frand(self.nrows, self.ncols, dev=self.dev)
         self.assertTrue(np.allclose((self.F-G).toarray(),
                                     self.F.toarray()-G.toarray()))
         self.assertTrue(np.allclose((self.F-G.toarray()).toarray(),
@@ -135,7 +143,7 @@ class TestFaust(unittest.TestCase):
 
     def test_matmul(self):
         print("Faust.__matmul__, dot, __rmatmul__")
-        G = frand(self.ncols, self.nrows, dev=dev)
+        G = frand(self.ncols, self.nrows, dev=self.dev)
         self.assertTrue(np.allclose((self.F@G).toarray(),
                                     self.F.toarray()@G.toarray()))
         self.assertTrue(np.allclose((self.F@G.toarray()),
@@ -150,7 +158,7 @@ class TestFaust(unittest.TestCase):
 
     def test_concatenate(self):
         print("Faust.concatenate, pyfaust.vstack, pyfaust.hstack")
-        G = frand(self.nrows, self.ncols, dev=dev)
+        G = frand(self.nrows, self.ncols, dev=self.dev)
         self.assertTrue(np.allclose((self.F.concatenate(G)).toarray(),
                                     np.concatenate((self.F.toarray(),
                                                     G.toarray()))))
@@ -324,13 +332,13 @@ class TestFaust(unittest.TestCase):
         print("Faust.optimize_time")
         # test only if CPU and no gpu_mod enabled
         # anyway the method is not yet implemented for GPU
-        if dev == 'cpu' and not is_gpu_mod_enabled():
+        if self.dev == 'cpu' and not is_gpu_mod_enabled():
            oF = self.F.optimize_time()
            self._assertAlmostEqual(oF, self.F)
 
     def test_clone(self):
         print("Faust.clone")
-        if dev =='cpu':
+        if self.dev =='cpu':
             Fc = self.F.clone()
         elif dev == 'gpu':
             Fc = self.F.clone()
