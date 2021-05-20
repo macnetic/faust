@@ -16,6 +16,7 @@ stages:
     - pkg
     - pkg_test
     - pkg_pub
+    - gitlab_pages
 
 ctest:
     <<: *ctest_script
@@ -301,6 +302,7 @@ pkg_linux_release_static:
         - tags
 
 pages:
+    stage: gitlab_pages
     script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
         - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_FILE_NAME=faust-$CI_COMMIT_TAG -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DEXCLUDE_FAUST_LIB_INSTALL=ON  -DINCLUDE_ALL_SYS_INSTALL_INSTRUCS=ON ..'
@@ -308,6 +310,15 @@ pages:
         - make doc_exclu_class_filtering
         - mkdir -p ../public/last-doc
         - cp -Rf doc/html ../public/last-doc/
+        - mkdir -p ../public/last-doc/packages
+        - mv *.pkg *.rpm *.deb *.exe ../public/last-doc/packages/
+    needs:
+      - job: pkg_macos_release
+        artifacts: true
+      - job: pkg_win_release
+        artifacts: true
+      - job: pkg_linux_release
+        artifacts: true
     artifacts:
         paths:
             - public/
@@ -317,6 +328,7 @@ pages:
         - pages
     only:
         - tags
+
 
 .pkg_purepy: &pkg_purepy
     script:
@@ -603,7 +615,7 @@ test_win_purepy_pkg_extra_pyver:
     - job: pkg_win_purepy_release_extra_pyver
       artifacts: true
 
-pypi_pub:
+.pypi_pub:
   stage: pkg_pub
   script:
     - python3 -m pip install --user twine
@@ -637,18 +649,18 @@ pypi_pub:
   tags:
     - linux
 
-pkg_upload:
-  stage: pkg_pub
-  script:
-        - misc/continuous_integration/upload_pkg.sh
-  needs:
-    - job: pkg_macos_release
-      artifacts: true
-    - job: pkg_win_release
-      artifacts: true
-    - job: pkg_linux_release
-      artifacts: true
-  only:
-    - tags
-  tags:
-    - linux
+#pkg_upload:
+#  stage: pkg_pub
+#  script:
+#        - misc/continuous_integration/upload_pkg.sh
+#  needs:
+#    - job: pkg_macos_release
+#      artifacts: true
+#    - job: pkg_win_release
+#      artifacts: true
+#    - job: pkg_linux_release
+#      artifacts: true
+#  only:
+#    - tags
+#  tags:
+#    - linux
