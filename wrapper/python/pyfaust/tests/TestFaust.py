@@ -1,4 +1,3 @@
-import sys
 import unittest
 from pyfaust import (rand as frand, Faust, vstack, hstack, isFaust, dot,
                      concatenate, pinv, eye, dft, wht, is_gpu_mod_enabled)
@@ -14,7 +13,7 @@ dev = 'cpu'
 field = 'real'
 
 
-class PyfaustSimpleTest(unittest.TestCase):
+class TestFaust(unittest.TestCase):
 
     MIN_NUM_FACTORS = 1
     MAX_NUM_FACTORS = 4
@@ -24,12 +23,12 @@ class PyfaustSimpleTest(unittest.TestCase):
     def setUp(self):
         """
         """
-        nrows = randint(PyfaustSimpleTest.MIN_DIM_SIZE,
-                        PyfaustSimpleTest.MAX_DIM_SIZE+1)
-        ncols = randint(PyfaustSimpleTest.MIN_DIM_SIZE,
-                        PyfaustSimpleTest.MAX_DIM_SIZE+1)
-        nfacts = randint(PyfaustSimpleTest.MIN_NUM_FACTORS,
-                         PyfaustSimpleTest.MAX_NUM_FACTORS+1)
+        nrows = randint(TestFaust.MIN_DIM_SIZE,
+                        TestFaust.MAX_DIM_SIZE+1)
+        ncols = randint(TestFaust.MIN_DIM_SIZE,
+                        TestFaust.MAX_DIM_SIZE+1)
+        nfacts = randint(TestFaust.MIN_NUM_FACTORS,
+                         TestFaust.MAX_NUM_FACTORS+1)
         self.F = frand(nrows, ncols, num_factors=nfacts, dev=dev, field=field)
         self.nrows = nrows
         self.ncols = ncols
@@ -282,7 +281,7 @@ class PyfaustSimpleTest(unittest.TestCase):
                 self.assertEqual(self.F.astype(np.complex).dtype, np.complex)
             else:
                 self.assertEqual(self.F.astype(np.float).dtype, np.float)
-        except ValueError as e:
+        except ValueError:
             # complex > float not yet supported
             pass
 
@@ -387,32 +386,3 @@ class PyfaustSimpleTest(unittest.TestCase):
         self._assertAlmostEqual(eye(self.nrows, self.ncols),
                                 np.eye(self.nrows,
                                        self.ncols))
-
-def run_tests(_dev, _field):
-    global dev, field
-    dev = _dev
-    field = _field
-    suite = unittest.makeSuite(PyfaustSimpleTest, 'test')
-    runner = unittest.TextTestRunner()
-    runner.run(suite)
-
-
-if __name__ == "__main__":
-    nargs = len(sys.argv)
-    if(nargs > 1):
-        dev = sys.argv[1]
-        if dev != 'cpu' and not dev.startswith('gpu'):
-            raise ValueError("dev argument must be cpu or gpu.")
-        if(nargs > 2):
-            field = sys.argv[2]
-            if field not in ['complex', 'real']:
-                raise ValueError("field must be complex or float")
-        del sys.argv[2]  # deleted to avoid interfering with unittest
-        del sys.argv[1]
-    if(len(sys.argv) > 1):
-        # ENOTE: test only a single test if name passed on command line
-        singleton = unittest.TestSuite()
-        singleton.addTest(PyfaustSimpleTest(sys.argv[1]))
-        unittest.TextTestRunner().run(singleton)
-    else:
-        unittest.main()
