@@ -11,7 +11,7 @@ namespace Faust
 				MatSparse<FPP, Cpu>* rR /* = nullptr*/,
 				MatSparse<FPP,Cpu> *T0 /*= nullptr*/,
 				BasisLaziness laziness /*= INSTANTIATE_COMPUTE_AND_FREE */,
-				bool on_gpu /*= false*/) : TransformHelper<FPP,Cpu>()
+				bool on_gpu /*= false*/) : TransformHelper<FPP,Cpu>(), T0_is_arbitrary(false)
 	{
 		// assuming L is symmetric
 		this->L = L;
@@ -32,11 +32,14 @@ namespace Faust
 		}
 
 		if(T0 != nullptr)
+		{
+			T0->Display();
 			// T0 is arbitrary and need to be stored
 			// best choice is to instantiate the factor directly
 			this->basisChebyshevT0(T0);
 			//T0_is_arbitrary == true
 			//ref_man acquired T0
+		}
 
 		if(laziness == NOT_LAZY)
 			this->basisChebyshev_all();
@@ -96,7 +99,10 @@ namespace Faust
 			int d = L->getNbRow();
 			int nrows, ncols;
 			nrows = this->size()*d; // (K+1)*d
-			ncols = d;
+			if(T0_is_arbitrary && is_fact_created[this->size()-1])
+				ncols = this->get_gen_fact_nonconst(this->size()-1)->getNbCol();
+			else
+				ncols = d;
 			if(this->is_sliced)
 			{
 				faust_unsigned_int id = this->is_transposed?0:1;
@@ -560,21 +566,24 @@ namespace Faust
 		void TransformHelperPoly<FPP>::basisChebyshevT0(MatSparse<FPP,Cpu>* T0/*=nullptr*/)
 		{
 			uint K = this->size()-1;
-			if(T0 == nullptr)
+			if(! is_fact_created[K])
 			{
-				// Identity
-				auto T0_ = dynamic_cast<MatSparse<FPP,Cpu>*>(this->get_gen_fact_nonconst(K));
-				auto d = this->L->getNbRow();
-				T0_->resize(d, d, d);
-				T0_->setEyes();
-				T0_is_arbitrary = false;
+				if(T0 == nullptr)
+				{
+					// Identity
+					auto T0_ = dynamic_cast<MatSparse<FPP,Cpu>*>(this->get_gen_fact_nonconst(K));
+					auto d = this->L->getNbRow();
+					T0_->resize(d, d, d);
+					T0_->setEyes();
+					T0_is_arbitrary = false;
+				}
+				else
+				{
+					this->update(*T0, K);
+					T0_is_arbitrary = true;
+				}
+				is_fact_created[K] = true;
 			}
-			else
-			{
-				this->update(*T0, K);
-				T0_is_arbitrary = true;
-			}
-			is_fact_created[K] = true;
 		}
 
 	template<typename FPP>
@@ -617,11 +626,11 @@ namespace Faust
 			switch(i)
 			{
 				case 0:
-					return basisChebyshevT0();
+					basisChebyshevT0();
 				case 1:
-					return basisChebyshevT1();
+					basisChebyshevT1();
 				case 2:
-					return basisChebyshevT2();
+					basisChebyshevT2();
 				default:
 					uint K = this->size()-1;
 					int fid = K-i;
@@ -910,7 +919,7 @@ namespace Faust
 	template<typename FPP>
 		uint TransformHelperPoly<FPP>::get_fact_dim_size(const faust_unsigned_int id, unsigned short dim) const
 		{
-			//dim == 0 to get num of cols, >0 otherwise
+			//dim == 1 to get num of cols, >0 otherwise
 			faust_unsigned_int rid; //real id
 			if(this->is_transposed) {
 				rid = this->size()-id-1;
@@ -921,7 +930,11 @@ namespace Faust
 				//dim = dim;
 			}
 			if(dim)
-				return this->L->getNbCol()*(this->size()-rid-(rid==this->size()-1?0:1));
+				if(id < this->size()-1 || ! T0_is_arbitrary || ! is_fact_created[this->size()-1])
+					return this->L->getNbCol()*(this->size()-rid-(rid==this->size()-1?0:1));
+				// id == size()-1 && T0_is_arbitrary && is_fact_created
+				else
+					return this->get_gen_fact_nonconst(this->size()-1)->getNbCol();
 			else
 				return this->L->getNbCol()*(this->size()-rid);
 		}
@@ -1091,7 +1104,7 @@ namespace Faust
 					str << "GPU ";
 				str << "FACTOR " << i;
 				density = (double) this->get_fact_nnz(i) / this->get_fact_nb_rows(i) / this->get_fact_nb_cols(i);
-				str << Faust::MatGeneric<FPP,Cpu>::to_string(this->get_fact_nb_rows(i), this->get_fact_nb_cols(i), this->is_transposed, density, this->get_fact_nnz(i), /* is_identity */ i == this->size()-1, Sparse);
+				str << Faust::MatGeneric<FPP,Cpu>::to_string(this->get_fact_nb_rows(i), this->get_fact_nb_cols(i), this->is_transposed, density, this->get_fact_nnz(i), /* is_identity */ i == this->size()-1 && (! T0_is_arbitrary || is_fact_created[this->size()-1] && this->get_gen_fact_nonconst(this->size()-1)->is_id()), Sparse);
 			}
 			return str.str();
 		}
