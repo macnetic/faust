@@ -8,7 +8,6 @@
 #include "faust_hierarchical.h"
 #ifdef USE_GPU_MOD
 #include"faust_gpu_mod_utils.h"
-#include "faust_gpu_mod.h"
 #endif
 #include <vector>
 #include <cstdlib>

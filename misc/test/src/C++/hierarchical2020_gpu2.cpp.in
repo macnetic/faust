@@ -37,7 +37,7 @@
 /*  Topics in Signal Processing, 2016.                                      */
 /*  <https://hal.archives-ouvertes.fr/hal-01167948v1>                       */
 /****************************************************************************/
-#include "faust_gpu_mod.h"
+
 #include "faust_constant.h"
 #include "faust_Params.h"
 #include "faust_MatSparse.h"

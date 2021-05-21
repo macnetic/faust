@@ -1,5 +1,5 @@
 #include "faust_constant.h"
-#include "faust_gpu_mod.h"
+
 #include "faust_MatDense_gpu.h"
 #include "faust_MatSparse.h"
 #include "faust_MatSparse_gpu.h"
