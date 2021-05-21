@@ -24,7 +24,7 @@ function inject_matlab_code_to_update_path
 
 MATLABRC_RUN_STARTUP_CMD="if(exist('@CMAKE_INSTALL_PREFIX@'))oldpwd=pwd;startup_path=fullfile(matlabroot,'toolbox','local');cd(startup_path);startup_found=which('startup');if(isempty(startup_found))rehash('toolbox');startup_found=which('startup');if(isempty(startup_found)) disp('Faust startup code can''t be executed -- script not found. Please consult the online documentation to resolve this issue.');else;startup;end;else;startup;end;cd(oldpwd);end % Edit at your own risk: automatically added by the FAuST installer to enable access to the FAuST library, https://faust.inria.fr";
 
-funtion inject_matlab_code_to_update_user_paths
+function inject_matlab_code_to_update_user_paths
 {
 	# try edit startup.m of all users (only when files exist)
 	for USER_DIR in /home/*
