@@ -11,7 +11,7 @@ function inject_matlab_code_to_update_path
 	# each line must contains the word faust (for filtering of old install lines)
 	FILE=$1
 	echo "% Edit at your own risk: automatically added by the FAuST installer ${CPACK_PACKAGE_VERSION} to enable access to the FAuST library, https://faust.inria.fr" >> "$FILE"
-	echo "matfaust_path = which('matfaust.version');" >> "$FILE"
+	echo "matfaust_path = which('mexFaustReal');" >> "$FILE"
 	echo "if(isempty(matfaust_path))" >> "$FILE"
 	echo "addpath('"$FAUST_MATLAB_WRAPPER_PATH"')" >> "$FILE"
 	echo "addpath(['"$FAUST_MATLAB_WRAPPER_PATH"' '/mex'])" >> "$FILE"
