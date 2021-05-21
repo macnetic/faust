@@ -161,8 +161,7 @@ def poly(coeffs, basis='chebyshev', L=None, X=None, dev='cpu', out=None,
             B with X at None).
             dev: the computing device ('cpu' or 'gpu').
             out: (np.ndarray) if not None the function result is put into this
-            np.ndarray. Note that out.flags['F_CONTINUOUS'] must be True. Note that this can't work if the function returns a
-            Faust.
+            np.ndarray. Note that out.flags['F_CONTINUOUS'] must be True. Note that this can't work if the function returns a Faust.
 
         Returns:
             The linear combination Faust or np.ndarray depending on if basis is

@@ -1,12 +1,11 @@
 import unittest
-from pyfaust.poly import basis
+from pyfaust.poly import basis, poly, expm_multiply
 from numpy.random import randint
 import numpy as np
-from scipy.sparse import csr_matrix
-from scipy.sparse.linalg import aslinearoperator
+from scipy.sparse import csr_matrix, random
+from scipy.sparse.linalg import expm_multiply as scipy_expm_multiply
 import tempfile
 import os
-import random
 
 dev = 'cpu'
 field = 'real'
@@ -20,19 +19,21 @@ class TestPoly(unittest.TestCase):
         self.field = field
 
     def setUp(self):
-        pass
+        self.d = 50
+        self.density = 0.02
+        if self.field == 'complex':
+            self.dtype = 'complex'
+        else:
+            self.dtype = 'double'
+        self.L = random(self.d, self.d, .02, format='csr', dtype=self.dtype)
+        self.K = 5
 
     def test_basis(self):
         print("Test basis()")
-        from scipy.sparse import random
-        d = 50
-        if self.field == 'complex':
-            dtype = 'complex'
-        else:
-            dtype = 'double'
-        L = random(d, d, .02, format='csr', dtype=dtype)
-        L = L@L.T
-        K = 5
+        d = self.d
+        L = self.L
+        K = self.K
+        density = self.density
         F = basis(L, K, 'chebyshev', dev=self.dev)
         # assert the dimensions are consistent to L
         self.assertEqual(F.shape[0], (K+1)*L.shape[0])
@@ -68,18 +69,12 @@ class TestPoly(unittest.TestCase):
 
 
     def test_basisT0(self):
-        print("Test basis()")
-        from scipy.sparse import random
-        d = 50
-        density = .02
-        if self.field == 'complex':
-            dtype = 'complex'
-        else:
-            dtype = 'double'
-        L = random(d, d, density, format='csr', dtype=dtype)
-        L = L@L.T
-        K = 5
-        T0 = random(d, 2, density, format='csr', dtype=dtype)
+        print("Test basis(T0)")
+        d = self.d
+        L = self.L
+        K = self.K
+        density = self.density
+        T0 = random(d, 2, density, format='csr', dtype=self.dtype)
         F = basis(L, K, 'chebyshev', dev=self.dev, T0=T0)
         print(F)
         # assert the dimensions are consistent to L and TO
@@ -89,4 +84,71 @@ class TestPoly(unittest.TestCase):
         last_fac = F.factors(F.numfactors()-1).toarray()
         self.assertTrue(np.allclose(T0.toarray(), last_fac))
 
+    def test_poly(self):
+        print("Test poly()")
+        d = self.d
+        L = self.L
+        K = self.K
+        density = self.density
+        F = basis(L, K, 'chebyshev', dev=self.dev)
+        coeffs = np.random.rand(K+1)
+        G = poly(coeffs, F)
+        # Test polynomial as Faust
+        poly_ref = np.zeros((d,d))
+        for i,c in enumerate(coeffs[:]):
+            poly_ref += c * F[d*i:(i+1)*d, :]
+        self.assertAlmostEqual((G-poly_ref).norm(), 0)
+        # Test polynomial as array
+        GM = poly(coeffs, F.toarray())
+        self.assertTrue(isinstance(GM, np.ndarray) and np.allclose(GM,
+                                                                  poly_ref.toarray()))
+        # Test polynomial-vector product
+        x = np.random.rand(F.shape[1], 1)
+        # Three ways to do (not all as efficient as each other)
+        Fx1 = poly(coeffs, F, dev=self.dev)@x
+        Fx2 = poly(coeffs, F@x, dev=self.dev)
+        Fx3 = poly(coeffs, F, X=x, dev=self.dev)
+        self.assertTrue(np.allclose(Fx1, Fx2))
+        self.assertTrue(np.allclose(Fx1, Fx3))
+        # Test polynomial-matrix product
+        X = np.random.rand(F.shape[1], 18)
+        FX1 = poly(coeffs, F, dev=self.dev)@X
+        FX2 = poly(coeffs, F@X, dev=self.dev)
+        FX3 = poly(coeffs, F, X=X, dev=self.dev)
+        self.assertTrue(np.allclose(FX1, FX2))
+        self.assertTrue(np.allclose(FX2, FX3))
+        # Test creating the polynomial basis on the fly
+        G2 = poly(coeffs, 'chebyshev', L)
+        self.assertAlmostEqual((G-G2).norm(), 0)
+        GX = poly(coeffs, 'chebyshev', L, X=X, dev=self.dev)
+        self.assertTrue(np.allclose(GX, FX1))
+        # Test polynomial-matrix product with arbitrary T0
+        F_ = basis(L, K, 'chebyshev', dev=self.dev, T0=csr_matrix(X))
+        GT0eqX = poly(coeffs, F_, dev=self.dev).toarray()
+        self.assertTrue(np.allclose(GT0eqX, FX1))
 
+    def test_expm_multiply(self):
+        print("Test expm_multiply()")
+        L = self.L
+        L = L@L.T
+        # test expm_multiply on a vector
+        x = np.random.rand(L.shape[1])
+        pts_args = {'start':-.5, 'stop':-0.1, 'num':3, 'endpoint':True}
+        t = np.linspace(**pts_args)
+        y = expm_multiply(L, x, t)
+        y_ref = scipy_expm_multiply(L, x, **pts_args)
+        self.assertTrue(np.allclose(y, y_ref))
+        # test expm_multiply on a matrix
+        X = np.random.rand(L.shape[1], 32)
+        pts_args = {'start':-.5, 'stop':-0.1, 'num':3, 'endpoint':True}
+        t = np.linspace(**pts_args)
+        y = expm_multiply(L, X, t)
+        y_ref = scipy_expm_multiply(L, X, **pts_args)
+        self.assertTrue(np.allclose(y, y_ref))
+        # test expm_multiply with (non-default) tradeoff=='memory'
+        X = np.random.rand(L.shape[1], 32)
+        pts_args = {'start':-.5, 'stop':-0.1, 'num':3, 'endpoint':True}
+        t = np.linspace(**pts_args)
+        y = expm_multiply(L, X, t, tradeoff='memory')
+        y_ref = scipy_expm_multiply(L, X, **pts_args)
+        self.assertTrue(np.allclose(y, y_ref))
