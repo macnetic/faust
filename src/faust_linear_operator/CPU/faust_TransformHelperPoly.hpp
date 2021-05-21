@@ -511,32 +511,22 @@ namespace Faust
 			auto this_ = const_cast<TransformHelperPoly<FPP>*>(this);
 			this_->basisChebyshev_fact_all();
 			std::vector<MatGeneric<FPP,Cpu>*> facts(this->size()+1);
-			MatSparse<FPP,Cpu> Id, Id1;
-			MatSparse<FPP,Cpu> coeffDiags, tmp;
 			auto d = L->getNbRow();
-			Id.resize(d, d, d);
-			Id.setEyes();
-			coeffDiags = Id;
-			//			copy_sp_mat(Id, coeffDiags);
-			coeffDiags *= coeffs[0];
-			for(int i=1;i < this->size(); i++)
+			vector<Eigen::Triplet<FPP> > tripletList;
+			tripletList.reserve(d*this->size());
+			for(int i=0;i<this->size();i++)
 			{
-				Id1 = Id;
-				//				copy_sp_mat(Id, Id1);
-				Id1 *= coeffs[i];
-				tmp.hstack(coeffDiags, Id1); //TODO: hstack/vstack to concatenate "this" to argument matrix
-				//				coeffDiags = tmp; // crash //TODO: fix
-				copy_sp_mat(tmp, coeffDiags);
+				for(int j = 0; j < d; j++)
+					tripletList.push_back(Eigen::Triplet<FPP>(j, j+i*d, coeffs[i]));
 			}
-			coeffDiags.set_id(false);
-			auto fac0 = new MatSparse<FPP,Cpu>(); // ctor copy crash //TODO: fix
-			copy_sp_mat(coeffDiags, *fac0);
-			facts[0] = fac0;
+			facts[0] = new MatSparse<FPP, Cpu>(tripletList, d, d*this->size());
 			for(int i=1;i <= this->size();i++)
+			{
 				facts[i] = this->get_gen_fact_nonconst(i-1);
+			}
 			auto ret = new TransformHelper<FPP,Cpu>(facts, (FPP) 1.0,
 					/* optimizedCopy */ false,
-					/* cloning_fact */ false,
+					/* cloning_fact */ true, /* forced to clone because in case of laziness the source factors would be freed */
 					/* internal_call */ true);
 			if(this_->laziness == INSTANTIATE_COMPUTE_AND_FREE)
 				this_->basisChebyshev_free_fact_all();
