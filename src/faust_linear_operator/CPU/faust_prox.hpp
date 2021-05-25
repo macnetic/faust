@@ -108,8 +108,160 @@ template<typename FPP> faust_unsigned_int Faust::dense_size(faust_unsigned_int n
 	return size;
 }
 
+	template<typename FPP, typename FPP2>
+		Faust::MatGeneric<FPP,Cpu>* prox_normcol_gen(Faust::MatDense<FPP,Cpu> & M,FPP2 s, const bool normalized/*=false*/, const bool pos/*=false*/, const MatType forcedType/*=None*/)
+{
+	const faust_unsigned_int dim1 = M.getNbRow();
+	const faust_unsigned_int dim2 = M.getNbCol();
+	prox_normcol(M, s, normalized, pos);
+	auto out_is_dense = Faust::sparse_size<FPP>(M.getNonZeros(), dim1) > Faust::dense_size<FPP>(dim1, dim2) && forcedType == None || forcedType == Dense;
+	if(out_is_dense)
+		return &M;
+	else
+		return new Faust::MatSparse<FPP,Cpu>(M);
+
+}
+
+	template<typename FPP, typename FPP2>
+Faust::MatGeneric<FPP,Cpu>* prox_normlin_gen(Faust::MatDense<FPP,Cpu> & M,FPP2 s, const bool normalized/*=false*/, const bool pos/*=false*/, const MatType forcedType/*=None*/)
+{
+	const faust_unsigned_int dim1 = M.getNbRow();
+	const faust_unsigned_int dim2 = M.getNbCol();
+	prox_normlin(M, s, normalized, pos);
+	auto out_is_dense = Faust::sparse_size<FPP>(M.getNonZeros(), dim1) > Faust::dense_size<FPP>(dim1, dim2) && forcedType == None || forcedType == Dense;
+	if(out_is_dense)
+		return &M;
+	else
+		return new Faust::MatSparse<FPP,Cpu>(M);
+}
+
+	template<typename FPP>
+Faust::MatGeneric<FPP,Cpu>* prox_blockdiag_gen(Faust::MatDense<FPP,Cpu> & M, std::vector<faust_unsigned_int>& m_vec, std::vector<faust_unsigned_int>& n_vec, const bool normalized /*= false*/, const bool pos /*= false*/, const MatType forcedType/*=None*/)
+{
+	const faust_unsigned_int dim1 = M.getNbRow();
+	const faust_unsigned_int dim2 = M.getNbCol();
+	prox_blockdiag(M, m_vec, n_vec, normalized, pos);
+	auto out_is_dense = Faust::sparse_size<FPP>(M.getNonZeros(), dim1) > Faust::dense_size<FPP>(dim1, dim2) && forcedType == None || forcedType == Dense;
+	if(out_is_dense)
+		return &M;
+	else
+		return new Faust::MatSparse<FPP,Cpu>(M);
+
+}
+
 template<typename FPP>
-Faust::MatGeneric<FPP,Cpu>* Faust::prox_sp(Faust::MatDense<FPP,Cpu> & M, Faust::MatSparse<FPP, Cpu> & spM, faust_unsigned_int k, const bool normalized /* true by deft */, const bool pos, const MatType forcedType/*=None*/)
+Faust::MatGeneric<FPP,Cpu>* Faust::prox_blockdiag_gen(Faust::MatDense<FPP,Cpu> & M, Faust::MatDense<FPP,Cpu> mn_vec, const bool normalized /* default to false */, const bool pos, const MatType forcedType/*=None*/)
+{
+	std::vector<faust_unsigned_int> m_vec;
+	std::vector<faust_unsigned_int> n_vec;
+	faust_unsigned_int m, n;
+
+	for(int i=0;i < mn_vec.getNbRow(); i++)
+	{
+		for(int j=0;j < mn_vec.getNbCol(); j++)
+		{
+			m = static_cast<faust_unsigned_int>(std::real(std::complex<Real<FPP>>(mn_vec(i,j))));
+			n = static_cast<faust_unsigned_int>(std::real(std::complex<Real<FPP>>(mn_vec(i,j))));
+			m_vec.push_back(m);
+			n_vec.push_back(m);
+		}
+	}
+	return Faust::prox_blockdiag_gen(M, m_vec, n_vec, normalized, pos, forcedType);
+}
+
+template<typename FPP> Faust::MatGeneric<FPP,Cpu>* prox_hankel_gen(Faust::MatDense<FPP, Cpu> & M, const bool normalized = true, const bool pos = false, const MatType forcedType=None)
+{
+	const faust_unsigned_int dim1 = M.getNbRow();
+	const faust_unsigned_int dim2 = M.getNbCol();
+	prox_hankel(M, normalized, pos);
+	auto out_is_dense = Faust::sparse_size<FPP>(M.getNonZeros(), dim1) > Faust::dense_size<FPP>(dim1, dim2) && forcedType == None || forcedType == Dense;
+	if(out_is_dense)
+		return &M;
+	else
+		return new Faust::MatSparse<FPP,Cpu>(M);
+}
+
+template<typename FPP> Faust::MatGeneric<FPP,Cpu>* prox_toeplitz_gen(Faust::MatDense<FPP, Cpu> & M, const bool normalized = true, const bool pos = false, const MatType forcedType=None)
+{
+	const faust_unsigned_int dim1 = M.getNbRow();
+	const faust_unsigned_int dim2 = M.getNbCol();
+	prox_toeplitz(M, normalized, pos);
+	auto out_is_dense = Faust::sparse_size<FPP>(M.getNonZeros(), dim1) > Faust::dense_size<FPP>(dim1, dim2) && forcedType == None || forcedType == Dense;
+	if(out_is_dense)
+		return &M;
+	else
+		return new Faust::MatSparse<FPP,Cpu>(M);
+}
+
+template<typename FPP> Faust::MatGeneric<FPP,Cpu>* prox_circ_gen(Faust::MatDense<FPP, Cpu> & M, const bool normalized = true, const bool pos = false, const MatType forcedType=None)
+{
+	const faust_unsigned_int dim1 = M.getNbRow();
+	const faust_unsigned_int dim2 = M.getNbCol();
+	prox_circ(M, normalized, pos);
+	auto out_is_dense = Faust::sparse_size<FPP>(M.getNonZeros(), dim1) > Faust::dense_size<FPP>(dim1, dim2) && forcedType == None || forcedType == Dense;
+	if(out_is_dense)
+		return &M;
+	else
+		return new Faust::MatSparse<FPP,Cpu>(M);
+}
+
+	template<typename FPP>
+Faust::MatGeneric<FPP,Cpu>* prox_skperm_gen(Faust::MatDense<FPP, Cpu> & M, const unsigned int k,  const bool normalized/*=true*/, const bool pos/*=false*/, const MatType forcedType/*=None*/)
+{
+
+	const faust_unsigned_int dim1 = M.getNbRow();
+	const faust_unsigned_int dim2 = M.getNbCol();
+	auto out_is_dense = Faust::sparse_size<FPP>(k*dim1, dim1) > Faust::dense_size<FPP>(dim1, dim2) && forcedType == None || forcedType == Dense;
+	prox_skperm(M, k, normalized, pos);
+	if(out_is_dense)
+		return &M;
+	else
+		return new Faust::MatSparse<FPP,Cpu>(M);
+}
+
+	template<typename FPP>
+Faust::MatGeneric<FPP,Cpu>* prox_splincol_gen(Faust::MatDense<FPP, Cpu> & M, const unsigned int k,  const bool normalized/*=true*/, const bool pos/*=false*/, const MatType forcedType/*=None*/)
+{
+
+	const faust_unsigned_int dim1 = M.getNbRow();
+	const faust_unsigned_int dim2 = M.getNbCol();
+	auto out_is_dense = Faust::sparse_size<FPP>(k*dim1, dim1) > Faust::dense_size<FPP>(dim1, dim2) && forcedType == None || forcedType == Dense;
+	prox_splincol(M, k, normalized, pos);
+	if(out_is_dense)
+		return &M;
+	else
+		return new Faust::MatSparse<FPP,Cpu>(M);
+}
+
+	template<typename FPP>
+Faust::MatGeneric<FPP,Cpu>* prox_spcol_gen(Faust::MatDense<FPP, Cpu> & M, const unsigned int k,  const bool normalized/*=true*/, const bool pos/*=false*/, const MatType forcedType/*=None*/)
+{
+
+	const faust_unsigned_int dim1 = M.getNbRow();
+	const faust_unsigned_int dim2 = M.getNbCol();
+	auto out_is_dense = Faust::sparse_size<FPP>(k*dim1, dim1) > Faust::dense_size<FPP>(dim1, dim2) && forcedType == None || forcedType == Dense;
+	prox_spcol(M, k, normalized, pos);
+	if(out_is_dense)
+		return &M;
+	else
+		return new Faust::MatSparse<FPP,Cpu>(M);
+}
+
+	template<typename FPP>
+		Faust::MatGeneric<FPP,Cpu>* prox_splin_gen(Faust::MatDense<FPP, Cpu> & M, const unsigned int k,  const bool normalized=true, const bool pos=false, const MatType forcedType=None)
+{
+	const faust_unsigned_int dim1 = M.getNbRow();
+	const faust_unsigned_int dim2 = M.getNbCol();
+	auto out_is_dense = Faust::sparse_size<FPP>(k*dim2, dim1) > Faust::dense_size<FPP>(dim1, dim2) && forcedType == None || forcedType == Dense;
+	prox_splin(M, k, normalized, pos);
+	if(out_is_dense)
+		return &M;
+	else
+		return new Faust::MatSparse<FPP,Cpu>(M);
+}
+
+template<typename FPP>
+Faust::MatGeneric<FPP,Cpu>* Faust::prox_sp_gen(Faust::MatDense<FPP,Cpu> & M, faust_unsigned_int k, const bool normalized /* true by deft */, const bool pos, const MatType forcedType/*=None*/)
 {
 	// M is the dense matrix on which to compute projection
 	// M is also the output matrix if k is high enough
@@ -163,11 +315,11 @@ Faust::MatGeneric<FPP,Cpu>* Faust::prox_sp(Faust::MatDense<FPP,Cpu> & M, Faust::
 				nvalues.normalize();
 				values = nvalues.getData();
 			}
-			spM = MatSparse<FPP,Cpu>(row_ids, col_ids, values, dim1, dim2, index.size());
+			auto spM = new MatSparse<FPP,Cpu>(row_ids, col_ids, values, dim1, dim2, index.size());
 			delete[] row_ids;
 			delete[] col_ids;
 			delete[] values;
-			return &spM;
+			return spM;
 		}
 	}
 	else
@@ -176,8 +328,8 @@ Faust::MatGeneric<FPP,Cpu>* Faust::prox_sp(Faust::MatDense<FPP,Cpu> & M, Faust::
 			return &M;
 		else
 		{
-			spM = M;
-			return &spM;
+			auto spM = new MatSparse<FPP,Cpu>(M);
+			return spM;
 		}
 	}
 }
