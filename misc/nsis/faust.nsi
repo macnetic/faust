@@ -152,9 +152,10 @@ Section "" ; no component so name not needed
   FileWrite $1 "$\r$\n_NSI_INSTALL_PATH='$INSTDIR'"
   FileClose $1
 
-  Exec "python -m pip install @PYFAUST_PYTHON_REQUIREMENTS@"
-  IfErrors 0 +2
-  MessageBox MB_OK "Error: failed partly or totally to install the pyfaust python packages through pip, please install them manually to get a workable pyfaust, list of packages: @PYFAUST_PYTHON_REQUIREMENTS@." IDOK data_dl
+  ExecWait "python -m pip install @PYFAUST_PYTHON_REQUIREMENTS@"
+  ; ExecWait doesn't work with this command, if eventually pip install command fails, the user will be noticed when importing pyfaust
+  ;IfErrors 0 +2
+  ;MessageBox MB_OK "Error: failed partly or totally to install the pyfaust python packages through pip, please install them manually to get a workable pyfaust, list of packages: @PYFAUST_PYTHON_REQUIREMENTS@." IDOK data_dl
 
   ; =================================================
 
@@ -250,17 +251,23 @@ SectionEnd
 Function matlabFoundCb
     StrCpy $R4 $R9
 
+    ; as said above ExecWait won't work with matlab, wait manually
+    ExecWait "matlab -nojvm -r $\"F=matfaust.rand(5,5);save(F, '$TEMP\nsisFFF.mat');exit$\""
+    wait_faust_save:
+	    ; do not edit matlabrc.m and startup.m if matfaust.rand is already usable (because it implies matlabrc.m and startup.m were already properly edited)
+	    ifFileExists "$TEMP\nsisFFF.mat" matlabFoundCbEnd
+	    sleep 1000
+	    IntOp $R0 $R0 + 1
+	    StrCmp $R0 15 0 wait_faust_save ; sleeps 15 secs max
     FileOpen $1 "$R4\toolbox\local\startup.m" a
     FileSeek $1 0 END ; do not erase start of file (but risk to add Faust path multiple times)
     ;FileWrite $1 "$\r$\naddpath(genpath('$INSTDIR\matlab'));$\r$\nmatfaust.enable_gpu_mod('silent', true)"
-    FileWrite $1 "matfaust_path = which('matfaust.version');$\r$\nif(isempty(matfaust_path));"
-    FileWrite $1 "$\r$\naddpath('$INSTDIR\matlab');$\r$\naddpath('$INSTDIR\matlab\mex');$\r$\naddpath('$INSTDIR\matlab\mex\Release');$\r$\naddpath('$INSTDIR\matlab\tools');$\r$\naddpath('$INSTDIR\matlab\data')$\r$\nmatfaust.enable_gpu_mod('silent', true)"
-    FileWrite $1 "$\r$\nend"
+    FileWrite $1 "$\r$\nmatfaust_path = which('matfaust.version');if(isempty(matfaust_path));addpath('$INSTDIR\matlab');addpath('$INSTDIR\matlab\mex');addpath('$INSTDIR\matlab\mex\Release');addpath('$INSTDIR\matlab\tools');addpath('$INSTDIR\matlab\data');matfaust.enable_gpu_mod('silent', true);end"
     FileClose $1
 
     FileOpen $1 "$R4\toolbox\local\matlabrc.m" a
     FileSeek $1 0 END ; do not erase start of file (but risk to add Faust path multiple times)
-    FileWrite $1 "if(exist('$INSTDIR'))oldpwd=pwd;startup_path=fullfile(matlabroot,'toolbox','local');cd(startup_path);startup_found=which('startup');if(isempty(startup_found))rehash toolbox;startup_found=which('startup');if(isempty(startup_found)) disp('Faust startup code can''t be executed -- script not found. Please consult the online documentation to resolve this issue.');else;startup;end;else;startup;end;cd(oldpwd);end"
+    FileWrite $1 "$\r$\nif(exist('$INSTDIR'))oldpwd=pwd;startup_path=fullfile(matlabroot,'toolbox','local');cd(startup_path);startup_found=which('startup');if(isempty(startup_found))rehash('toolbox');startup_found=which('startup');if(isempty(startup_found)) disp('Faust startup code can''t be executed -- script not found. Please consult the online documentation to resolve this issue.');else;startup;end;else;startup;end;cd(oldpwd);end"
     FileClose $1
 
     # disable because it's redundant
@@ -276,6 +283,8 @@ Function matlabFoundCb
 
     ;MessageBox MB_OK '$R0$\n$\nFaust bound into $R4.'
     ;MessageBox MB_YESNO 'Faust installed for $R4. Do you want to continue searching another version of Matlab to install Faust for ?' IDYES +2
+    matlabFoundCbEnd:
+    Delete "$TEMP\nsisFFF.mat"
     StrCpy $0 StopLocate
 
     Push $0
