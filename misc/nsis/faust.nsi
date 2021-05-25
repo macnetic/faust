@@ -111,11 +111,16 @@ Section "" ; no component so name not needed
   ; nonfatal useful in case of data *.mat not used/present (because they are downloaded at installation)
 
 
+  ; check the python version matches python major.minor version used to build the the wrapper shared library
+  Exec "python --version | python -c $\"import re; ver = input(); exit(0) if re.match('Python @WIN_PY_VER@', ver) else exit(1)$\""
+  IfErrors 0 +2
+  MessageBox MB_OK "Error: this version of FAµST is pre-compiled for Python @WIN_PY_VER@ which must be installed and configured as the default python on your system (i.e. it must be available as $\"python$\" command in the PATH environment variable)." IDOK data_dl
+  MessageBox MB_OK "The pyfaust wrapper will be installed for Python @WIN_PY_VER@."
 
-  ; post install pyfaust auto-setup in environment (only works if python is installed in path)
+  ; post install pyfaust auto-setup in environment (works only if python is installed in path)
   ${StrRep} '$0' $TEMP '\' '\\'
   Exec "python -c $\"import site;dir=site.getsitepackages()[1];f=open('$0\\tmp_site_pkg', 'w');f.write(dir);f.close()$\""
-  IfErrors 0 +3
+  IfErrors 0 +2
   MessageBox MB_OK "Error: no python found into your PATH environment variable. You'll have to do the Faust setup manually (you'll see how in the documentation)." IDOK data_dl
   MessageBox MB_OK "Faust installed in your python environment (the version found into your PATH environment variable)."
 
@@ -147,7 +152,7 @@ Section "" ; no component so name not needed
   FileWrite $1 "$\r$\n_NSI_INSTALL_PATH='$INSTDIR'"
   FileClose $1
 
-  Exec "python -m pip install $\"@PYFAUST_PYTHON_REQUIREMENTS@$\""
+  Exec "python -m pip install @PYFAUST_PYTHON_REQUIREMENTS@"
   IfErrors 0 +2
   MessageBox MB_OK "Error: failed partly or totally to install the pyfaust python packages through pip, please install them manually to get a workable pyfaust, list of packages: @PYFAUST_PYTHON_REQUIREMENTS@." IDOK data_dl
 

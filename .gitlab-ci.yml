@@ -5,7 +5,7 @@ variables:
     DURL: "https://gitlab.inria.fr/faustgrp/gforge_files/-/raw/master/"
     DFILE: "faust_data-2.6.0.zip"
     JOB_PYTHON: "python3" # if set again in job, it hides this one (precedence: https://docs.gitlab.com/13.6/ee/ci/variables/#priority-of-environment-variables)
-    WIN_PY_VER: '3.7' #default python version used to build python wrapper on windows
+    WIN_PY_VER: '3.9' #default python version used to build python wrapper on windows (for both whl package and nsis .exe)
 
 .ctest_template: &ctest_script
     script:
@@ -30,7 +30,7 @@ ctest:
     tags:
         - linux
 
-ctest_python:
+.ctest_python:
     <<: *ctest_script
     variables: {BUILD_WRAPPER_PYTHON: "ON", SLOW_TESTS: "OFF", DONT_PYPLOT_FAUST_TIME: "ON", NOCPPTESTS: "ON", NOPY2: "ON", BUILD_MULTITHREAD: "ON"} #, GIT_STRATEGY: none}
     except:
@@ -41,7 +41,7 @@ ctest_python:
     tags:
         - linux
 
-ctest_matlab:
+.ctest_matlab:
     <<: *ctest_script
     variables: {BUILD_WRAPPER_MATLAB: "ON", SLOW_TESTS: "OFF", NOCPPTESTS: "ON", BUILD_MULTITHREAD: "OFF"} # MT OFF because of macOS complicated way to enable OpenMP (but packages are OMP enabled)
     except:
@@ -114,9 +114,9 @@ pkg_macos:
     except:
         - schedules
         - tags
-    needs:
-        - job: ctest_python
-        - job: ctest_matlab
+          #needs:
+      #- job: ctest_python
+      #  - job: ctest_matlab
 
 .win_build_gpu_mod: &win_build_gpu_mod
     before_script:
@@ -156,9 +156,9 @@ pkg_win:
     except:
         - schedules
         - tags
-    needs:
-        - job: ctest_python
-        - job: ctest_matlab
+#    needs:
+#        - job: ctest_python
+#        - job: ctest_matlab
 
 .build_gpu_mod: &build_gpu_mod
     before_script:
@@ -192,9 +192,9 @@ pkg_linux:
     except:
         - schedules
         - tags
-    needs:
-        - job: ctest_python
-        - job: ctest_matlab
+#    needs:
+#        - job: ctest_python
+#        - job: ctest_matlab
 
           # jobs triggered by git tag can force cpack to use the tag name as version but it's not necessary for MacOSX (not using cpack for that sys.)
           #it's done for linux packages
@@ -372,8 +372,8 @@ pkg_macos_purepy_rev:
     variables: {MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a", EXPERIMENTAL_PKG: "ON", BUILD_MULTITHREAD: "ON", NOPY2: "ON"}
     tags:
         - macos
-    needs:
-        - job: ctest_python
+#    needs:
+#        - job: ctest_python
 
 
 pkg_linux_purepy_rev:
@@ -382,8 +382,8 @@ pkg_linux_purepy_rev:
     tags:
         - linux
         - tux_packager
-    needs:
-        - job: ctest_python
+#    needs:
+#        - job: ctest_python
 
 .pkg_purepy_release:
     stage: pkg
@@ -503,8 +503,8 @@ pkg_win_purepy_rev:
     except:
         - schedules
         - tags
-    needs:
-        - job: ctest_python
+#    needs:
+#        - job: ctest_python
 
 pkg_win_purepy_release:
     extends: .pkg_win_purepy
@@ -518,7 +518,7 @@ pkg_win_purepy_release:
 
 pkg_win_purepy_release_extra_pyver:
     extends: .pkg_win_purepy
-    variables: {BUILD_CONFIG: "Release", GIT_SUBMODULE_STRATEGY: recursive, EXPERIMENTAL_PKG: "OFF", WIN_PY_VER: '3.9'}
+    variables: {BUILD_CONFIG: "Release", GIT_SUBMODULE_STRATEGY: recursive, EXPERIMENTAL_PKG: "OFF", WIN_PY_VER: '3.7'}
     before_script:
         - 'set VERSION=%CI_COMMIT_TAG%'
     artifacts:
@@ -631,7 +631,7 @@ test_win_purepy_pkg:
 
 test_win_purepy_pkg_extra_pyver:
   extends: test_win_purepy_pkg
-  variables: {JOB_PYTHON: 'py', WIN_PY_VER: '3.9'}
+  variables: {JOB_PYTHON: 'py', WIN_PY_VER: '3.7'}
   needs:
     - job: pkg_win_purepy_release_extra_pyver
       artifacts: true
