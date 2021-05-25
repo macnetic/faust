@@ -395,6 +395,7 @@ if(BUILD_WRAPPER_PYTHON)
 	set(FAUST_PYTHON_SRC_SRC_DIR ${FAUST_PYTHON_SRC_DIR}/src/ CACHE INTERNAL "")
 	set(FAUST_PYTHON_BIN_DIR ${FAUST_BIN_WRAPPER_DIR}/python CACHE INTERNAL "")
 	set(FAUST_PYTHON_TARGET faust_python CACHE INTERNAL "")
+	set(PYFAUST_PYTHON_REQUIREMENTS "pygsp scipy numpy>=1.20 matplotlib>=2.0.0 pathlib") #ENOTE: order matters in setup.py, the last package is installed first
 endif(BUILD_WRAPPER_PYTHON)
 
 

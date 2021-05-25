@@ -9,8 +9,7 @@ set(PY_EXT_SOURCES "['${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.pyx']")
 
 set(FAUST_PYTHON_LIBS "'faust'")
 
-set(PYFAUST_PYTHON_REQUIREMENTS "pygsp scipy numpy>=1.20 matplotlib>=2.0.0 pathlib") #ENOTE: order matters in setup.py, the last package is installed first
-
+# PYFAUST_PYTHON_REQUIREMENTS is defined in the project root CMakeLists.txt (because it is needed for win32 faust.nsi installer script)
 string(REGEX REPLACE " " "', '" PYFAUST_PYTHON_REQUIREMENTS_AS_PYLIST ${PYFAUST_PYTHON_REQUIREMENTS})
 set(PYFAUST_PYTHON_REQUIREMENTS_AS_PYLIST "'${PYFAUST_PYTHON_REQUIREMENTS_AS_PYLIST}'")
 
