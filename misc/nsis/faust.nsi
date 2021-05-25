@@ -114,15 +114,15 @@ Section "" ; no component so name not needed
   ; check the python version matches python major.minor version used to build the the wrapper shared library
   Exec "python --version | python -c $\"import re; ver = input(); exit(0) if re.match('Python @WIN_PY_VER@', ver) else exit(1)$\""
   IfErrors 0 +2
-  MessageBox MB_OK "Error: this version of FAµST is pre-compiled for Python @WIN_PY_VER@ which must be installed and configured as the default python on your system (i.e. it must be available as $\"python$\" command in the PATH environment variable)." IDOK data_dl
-  MessageBox MB_OK "The pyfaust wrapper will be installed for Python @WIN_PY_VER@."
+  MessageBox MB_OK "Error: this version of FAµST is pre-compiled for Python @WIN_PY_VER@ which must be installed and configured as the default python on your system (i.e. it must be available as $\"python$\" command in the PATH environment variable)." /SD IDOK IDOK data_dl
+  MessageBox MB_OK "The pyfaust wrapper will be installed for Python @WIN_PY_VER@." /SD IDOK
 
   ; post install pyfaust auto-setup in environment (works only if python is installed in path)
   ${StrRep} '$0' $TEMP '\' '\\'
   Exec "python -c $\"import site;dir=site.getsitepackages()[1];f=open('$0\\tmp_site_pkg', 'w');f.write(dir);f.close()$\""
   IfErrors 0 +2
-  MessageBox MB_OK "Error: no python found into your PATH environment variable. You'll have to do the Faust setup manually (you'll see how in the documentation)." IDOK data_dl
-  MessageBox MB_OK "Faust installed in your python environment (the version found into your PATH environment variable)."
+  MessageBox MB_OK "Error: no python found into your PATH environment variable. You'll have to do the Faust setup manually (you'll see how in the documentation)." /SD IDOK IDOK data_dl
+  MessageBox MB_OK "Faust installed in your python environment (the version found into your PATH environment variable)." /SD IDOK
 
   FileOpen $1 "$TEMP\tmp_site_pkg" r
   FileRead $1 $2
@@ -169,12 +169,12 @@ Section "" ; no component so name not needed
   ClearErrors ; in case the data dir was already existing
   Exec "python $2\pyfaust\datadl.py $\"$INSTDIR\matlab\data$\""
   IfErrors 0 after_data_dl
-  MessageBox MB_OK "Downloading FAuST data with python seems to have failed (or maybe it's already done), now trying with powershell."
+  MessageBox MB_OK "Downloading FAuST data with python seems to have failed (or maybe it's already done), now trying with powershell." /SD IDOK
   ClearErrors
   ExecWait "powershell -WindowStyle Hidden Invoke-WebRequest $\"@REMOTE_DATA_URL@/@REMOTE_DATA_FILE@$\" -O $\"$TEMP\@REMOTE_DATA_FILE@$\"" ; ExecWait because unzipping needs download finished
   Exec "powershell -WindowStyle Hidden Expand-Archive -Force $\"$TEMP\@REMOTE_DATA_FILE@$\" '$INSTDIR\matlab\data'" ; output folder data is created auto. ; simple quote used to avoid powershell to think there is two arguments when we meant one argument for the dest. path (double quote doesn't allow that).
   IfErrors 0 after_data_dl
-  MessageBox MB_OK "Error downloading FAuST data (or maybe it's already done). You'll need to download manually (please check the documentation)." IDOK after_data_dl
+  MessageBox MB_OK "Error downloading FAuST data (or maybe it's already done). You'll need to download manually (please check the documentation)." /SD IDOK IDOK after_data_dl
 
   after_data_dl:
 
@@ -198,7 +198,7 @@ Section "" ; no component so name not needed
   StrCmp $R9 "" loc_matlab_man
   ifFileExists "$R9" +1 loc_matlab_man
   Call matlabFoundCb
-  MessageBox MB_OK 'Faust installed in $R9 (matlab was found in PATH environment variable).'
+  MessageBox MB_OK 'Faust installed in $R9 (matlab was found in PATH environment variable).' /SD IDOK
   goto continue
 
   loc_matlab_man: ; manually locate matlab
@@ -225,7 +225,7 @@ Section "" ; no component so name not needed
       ${Locate} $R3 "/L=D /M=$R2 /G=0 /S=" "matlabFoundCb"
       ;MessageBox MB_OK "R4=$R4"
       StrCmp $R4 "" loop +1
-      MessageBox MB_OK 'Faust installed in $R4.'
+      MessageBox MB_OK 'Faust installed in $R4.' /SD IDOK
       ; MessageBox MB_YESNO 'Do you want to continue searching another version of Matlab to install Faust for ?' IDYES +2
       ;goto continue
       goto loop
@@ -236,7 +236,7 @@ Section "" ; no component so name not needed
   ;MessageBox MB_OK "$$R0=$R0"
 
   fatal_error:
-      MessageBox MB_OK "Matlab installation path is not in default $PROGRAMFILES64. You will have to do the Faust setup on your own (you'll see how in the documentation)."
+      MessageBox MB_OK "Matlab installation path is not in default $PROGRAMFILES64. You will have to do the Faust setup on your own (you'll see how in the documentation)."  /SD IDOK
 
   continue:   
 
