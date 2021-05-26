@@ -30,7 +30,7 @@ ctest:
     tags:
         - linux
 
-.ctest_python:
+ctest_python:
     <<: *ctest_script
     variables: {BUILD_WRAPPER_PYTHON: "ON", SLOW_TESTS: "OFF", DONT_PYPLOT_FAUST_TIME: "ON", NOCPPTESTS: "ON", NOPY2: "ON", BUILD_MULTITHREAD: "ON"} #, GIT_STRATEGY: none}
     except:
@@ -41,7 +41,7 @@ ctest:
     tags:
         - linux
 
-.ctest_matlab:
+ctest_matlab:
     <<: *ctest_script
     variables: {BUILD_WRAPPER_MATLAB: "ON", SLOW_TESTS: "OFF", NOCPPTESTS: "ON", BUILD_MULTITHREAD: "OFF"} # MT OFF because of macOS complicated way to enable OpenMP (but packages are OMP enabled)
     except:
@@ -114,9 +114,9 @@ pkg_macos:
     except:
         - schedules
         - tags
-          #needs:
-      #- job: ctest_python
-      #  - job: ctest_matlab
+    needs:
+      - job: ctest_python
+      - job: ctest_matlab
 
 .win_build_gpu_mod: &win_build_gpu_mod
     before_script:
@@ -156,9 +156,9 @@ pkg_win:
     except:
         - schedules
         - tags
-#    needs:
-#        - job: ctest_python
-#        - job: ctest_matlab
+    needs:
+        - job: ctest_python
+        - job: ctest_matlab
 
 .build_gpu_mod: &build_gpu_mod
     before_script:
@@ -192,9 +192,9 @@ pkg_linux:
     except:
         - schedules
         - tags
-#    needs:
-#        - job: ctest_python
-#        - job: ctest_matlab
+    needs:
+        - job: ctest_python
+        - job: ctest_matlab
 
           # jobs triggered by git tag can force cpack to use the tag name as version but it's not necessary for MacOSX (not using cpack for that sys.)
           #it's done for linux packages
@@ -372,8 +372,8 @@ pkg_macos_purepy_rev:
     variables: {MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a", EXPERIMENTAL_PKG: "ON", BUILD_MULTITHREAD: "ON", NOPY2: "ON"}
     tags:
         - macos
-#    needs:
-#        - job: ctest_python
+    needs:
+        - job: ctest_python
 
 
 pkg_linux_purepy_rev:
@@ -382,8 +382,8 @@ pkg_linux_purepy_rev:
     tags:
         - linux
         - tux_packager
-#    needs:
-#        - job: ctest_python
+    needs:
+        - job: ctest_python
 
 .pkg_purepy_release:
     stage: pkg
@@ -503,8 +503,8 @@ pkg_win_purepy_rev:
     except:
         - schedules
         - tags
-#    needs:
-#        - job: ctest_python
+    needs:
+        - job: ctest_python
 
 pkg_win_purepy_release:
     extends: .pkg_win_purepy
@@ -558,6 +558,29 @@ test_linux_pkg_release:
   tags:
     - linux
     - matlab
+
+      # the matlab test is disabled because the Windows VMs are not able to access the license server (VPN issue)
+      #- matlab -nojvm -r "disp(matfaust.version());disp(full(matfaust.rand(5,5)));F=matfaust.rand(5,5);save(F, 'F.mat');exit;"
+      # - python -c "from os.path import exists;from time import sleep; sleep(15); exit(0);if(exists('F.mat')) else exit(1)"
+
+test_win_pkg_release:
+  stage: pkg_test
+  needs:
+    - job: pkg_win_release
+      artifacts: true
+  script:
+    - dir
+    - start build\faust-$CI_COMMIT_TAG-amd64.exe /S
+    - timeout 20
+    - dir 'C:\Program Files\Faust\'
+    - python -c "import pyfaust; print(pyfaust.version()); print(pyfaust.rand(5,5).toarray());"
+    - python -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'real')"
+    - cd "C:\Program Files\Faust"
+    - start uninstall.exe /S
+  only:
+    - tags
+  tags:
+    - win10
 
 .test_unix_purepy_pkg:
   stage: pkg_test
