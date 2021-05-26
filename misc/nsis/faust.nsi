@@ -93,6 +93,8 @@ Section "" ; no component so name not needed
   CreateDirectory $INSTDIR\python
   CreateDirectory $INSTDIR\doc\html
 
+  WriteUninstaller "$INSTDIR\uninstall.exe"
+
   ; install gpu mod lib
   CreateDirectory $INSTDIR\lib
   SetOutPath $INSTDIR\lib
@@ -296,4 +298,16 @@ Function matlabInstallDirFoundCb
     Push StopLocate
 FunctionEnd
 
+
+section "uninstall"
+	; first, delete the uninstaller
+	Delete "$INSTDIR\uninstall.exe"
+	; do not RMDir /r $INSTDIR (danger: https://nsis.sourceforge.io/Reference/RMDir)
+	RMDir /r "$INSTDIR\doc"
+	RMDir /r "$INSTDIR\lib"
+	RMDir /r "$INSTDIR\python"
+	RMDir /r "$INSTDIR\matlab"
+	; delete default install dir (doesn't work if user chose a custom dir)
+	RMDir /r "$PROGRAMFILES64\Faust"
+sectionEnd
 
