@@ -20,7 +20,8 @@ function link_py_files(){
 	[[ -n "$DEBUG" ]] && echo PY_MAJOR_VER=$PY_MAJOR_MINOR_VER
 	if [[ "$PY_MAJOR_VER" = 3* ]]
 	then
-		[[ ! "$PY_MAJOR_MINOR_VER" = 3.$SUPPORTED_PY3 ]] && echo -e "\033[1mWARNING\033[0m: your python3 version ($PY_MAJOR_MINOR_VER) is not supported by Faust (only 3.$SUPPORTED_PY3 is supported)." && return 2 || PYFILES+=" ${FAUST_PY_WRAPPER_PATH}/_FaustCorePy.cpython-3${SUPPORTED_PY3}m-x86_64-linux-gnu.so"
+		# NOTE: shared lib for 3.7 contains a 'm' contrary to 3.9 that doesn't: *37m-x86_64* vs 39m-x86_64, try the two formats
+		[[ ! "$PY_MAJOR_MINOR_VER" = 3.$SUPPORTED_PY3 ]] && echo -e "\033[1mWARNING\033[0m: your python3 version ($PY_MAJOR_MINOR_VER) is not supported by Faust (only 3.$SUPPORTED_PY3 is supported)." && return 2 || PYFILES+=" ${FAUST_PY_WRAPPER_PATH}/_FaustCorePy.cpython-3${SUPPORTED_PY3}m-x86_64-linux-gnu.so ${FAUST_PY_WRAPPER_PATH}/_FaustCorePy.cpython-3${SUPPORTED_PY3}-x86_64-linux-gnu.so"
 	else #py2
 		PYFILES+=" ${FAUST_PY_WRAPPER_PATH}/_FaustCorePy.so"
 	fi

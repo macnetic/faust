@@ -540,8 +540,8 @@ test_macos_pkg_release:
   script:
     - sudo installer -pkg build/faust-$CI_COMMIT_TAG.pkg -target /
     - matlab -nojvm -nodisplay -r "disp(matfaust.version());disp(full(matfaust.rand(5,5))); exit;" | tee /tmp/faust && grep $CI_COMMIT_TAG /tmp/faust
-    - python -c "import pyfaust; print(pyfaust.version()); print(pyfaust.rand(5,5).toarray());"
-    - python -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'real')"
+    - python$NIX_PY_VER -c "import pyfaust; print(pyfaust.version()); print(pyfaust.rand(5,5).toarray());"
+    - python$NIX_PY_VER -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'real')"
   only:
     - tags
   tags:
@@ -556,8 +556,8 @@ test_linux_pkg_release:
   script:
     - sudo rpm -i --nodeps build/faust-$CI_COMMIT_TAG-x86_64.rpm
     - matlab -nojvm -nodisplay -r "disp(matfaust.version());disp(full(matfaust.rand(5,5))); exit;" | tee /tmp/faust && grep $CI_COMMIT_TAG /tmp/faust
-    - python -c "import pyfaust; print(pyfaust.version()); print(pyfaust.rand(5,5).toarray());"
-    - python -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'real')"
+    - python$NIX_PY_VER -c "import pyfaust; print(pyfaust.version()); print(pyfaust.rand(5,5).toarray());"
+    - python$NIX_PY_VER -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'real')"
     - sudo rpm -e faust
   only:
     - tags
@@ -572,17 +572,20 @@ test_linux_pkg_release:
     - job: pkg_win_release
       artifacts: true
   script:
+    - cd build
     - dir
-    - call 'build\faust-%CI_COMMIT_TAG%-amd64.exe' /S
+      #- call 'build\faust-%CI_COMMIT_TAG%-amd64.exe' /S
+    - python -c "import os; os.system(\"faust-%CI_COMMIT_TAG%-amd64.exe /S\")"
     - timeout 20
     - dir 'C:\Program Files\Faust\'
       # the matlab test is disabled because the Windows VMs are not able to access the license server (VPN issue)
-    - matlab -nojvm -r "disp(matfaust.version());disp(full(matfaust.rand(5,5)));F=matfaust.rand(5,5);save(F, 'F.mat');exit;"
-    - python -c "from os.path import exists;from time import sleep; sleep(15); exit(0);if(exists('F.mat')) else exit(1)"
+      #- matlab -nojvm -r "disp(matfaust.version());disp(full(matfaust.rand(5,5)));F=matfaust.rand(5,5);save(F, 'F.mat');exit;"
+      #- python -c "from os.path import exists;from time import sleep; sleep(15); exit(0);if(exists('F.mat')) else exit(1)"
     - python -c "import pyfaust; print(pyfaust.version()); print(pyfaust.rand(5,5).toarray());"
     - python -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'real')"
     - cd "C:\Program Files\Faust"
-    - call 'uninstall.exe' /S
+      #- call 'uninstall.exe' /S
+    - python -c "import os; os.system('uninstall.exe /S')"
   only:
     - tags
   tags:
