@@ -20,7 +20,7 @@ function link_py_files(){
 	[[ -n "$DEBUG" ]] && echo PY_MAJOR_VER=$PY_MAJOR_MINOR_VER
 	if [[ "$PY_MAJOR_VER" = 3* ]]
 	then
-		[[ ! "$PY_MAJOR_MINOR_VER" = 3.$SUPPORTED_PY3 ]] && echo -e "\033[1mWARNING\033[0m: your python3 version ($PY_MAJOR_MINOR_VER) is not supported by Faust (only 3.$SUPPORTED_PY3 is supported). Please rely on Faust for python2." && return 2 || PYFILES+=" ${FAUST_PY_WRAPPER_PATH}/_FaustCorePy.cpython-3${SUPPORTED_PY3}m-x86_64-linux-gnu.so"
+		[[ ! "$PY_MAJOR_MINOR_VER" = 3.$SUPPORTED_PY3 ]] && echo -e "\033[1mWARNING\033[0m: your python3 version ($PY_MAJOR_MINOR_VER) is not supported by Faust (only 3.$SUPPORTED_PY3 is supported)." && return 2 || PYFILES+=" ${FAUST_PY_WRAPPER_PATH}/_FaustCorePy.cpython-3${SUPPORTED_PY3}m-x86_64-linux-gnu.so"
 	else #py2
 		PYFILES+=" ${FAUST_PY_WRAPPER_PATH}/_FaustCorePy.so"
 	fi
@@ -40,7 +40,10 @@ function link_py_files(){
 	[[ $PYLINKS_FAIL_COUNT = 0 ]] && echo -e "\033[1mNOTICE\033[0m: Linked py wrapper for python$PY_MAJOR_VER into ${PY_SITE_PACKAGES_PATH}. Installation's ok for python$PY_MAJOR_MINOR_VER."
 }
 
-for V in 2 3
+# default root PATH is not necessarily including /usr/local/bin (which is very common when python is built manually), so add it to the PATH!
+export PATH=$PATH:/usr/local/bin
+
+for V in 2 3.$SUPPORTED_PY3
 do
 	which python$V 2>&1 > /dev/null && link_py_files $V
 done

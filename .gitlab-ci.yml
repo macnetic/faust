@@ -6,6 +6,7 @@ variables:
     DFILE: "faust_data-2.6.0.zip"
     JOB_PYTHON: "python3" # if set again in job, it hides this one (precedence: https://docs.gitlab.com/13.6/ee/ci/variables/#priority-of-environment-variables)
     WIN_PY_VER: '3.9' #default python version used to build python wrapper on windows (for both whl package and nsis .exe)
+    NIX_PY_VER: '3.9' # default python version used to build python wrapper for "unix" system packages (pkg/macos, rpm/deb/linux)
 
 .ctest_template: &ctest_script
     script:
@@ -79,6 +80,7 @@ ctest_nightly_macos:
 pkg_macos:
     stage: pkg
     script:
+        - export PYTHON_PATH=$(which python$NIX_PY_VER)
         - SHA_START=$(echo $CI_COMMIT_SHA | sed -e 's/^\(.\{8\}\).*/\1/')
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
         - 'cmake -DOpenMP_gomp_LIBRARY=/opt/local/lib/libomp/libgomp.dylib -DBUILD_WRAPPER_PYTHON=ON -DBUILD_DOCUMENTATION=ON -DCPACK_PACKAGE_VERSION=$SHA_START -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DEXPERIMENTAL_PKG=ON -DBUILD_MULTITHREAD=ON -DNOPY2=ON -DCMAKE_CXX_COMPILER=/opt/local/bin/clang++-mp-8.0 ..'
@@ -173,6 +175,7 @@ pkg_linux:
     script:
         # build faust
         - SHA_START=$(echo $CI_COMMIT_SHA | sed -e 's/^\(.\{8\}\).*/\1/')
+        - export PYTHON_PATH=$(which python$NIX_PY_VER)
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
         - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DCPACK_PACKAGE_FILE_NAME=faust-$SHA_START -DCPACK_PACKAGE_VERSION=$SHA_START -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DEXPERIMENTAL_PKG=ON -DNOPY2=ON -DUSE_GPU_MOD=ON -DCMAKE_PREFIX_PATH=$PWD/../gpu_mod ..'
         - make
@@ -202,6 +205,7 @@ pkg_linux:
 pkg_macos_release:
     stage: pkg
     script:
+        - export PYTHON_PATH=$(which python$NIX_PY_VER)
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
         - 'cmake -DOpenMP_gomp_LIBRARY=/opt/local/lib/libomp/libgomp.dylib -DBUILD_WRAPPER_PYTHON=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DCMAKE_BUILD_TYPE=Release -DEXCLUDE_FAUST_LIB_INSTALL=ON -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DBUILD_MULTITHREAD=ON -DNOPY2=ON -DCMAKE_CXX_COMPILER=/opt/local/bin/clang++-mp-8.0 ..'
         - make LANG=en_GB.UTF-8
@@ -262,6 +266,7 @@ pkg_linux_release:
     stage: pkg
     script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
+        - export PYTHON_PATH=$(which python$NIX_PY_VER)
         - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_FILE_NAME=faust-$CI_COMMIT_TAG -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DEXCLUDE_FAUST_LIB_INSTALL=ON  -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DNOPY2=ON -DUSE_GPU_MOD=ON -DCMAKE_PREFIX_PATH=$PWD/../gpu_mod ..'
         - make
         - cpack -G RPM -C CPackConfig.cmake
@@ -284,6 +289,7 @@ pkg_linux_release_static:
     stage: pkg
     script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
+        - export PYTHON_PATH=$(which python$NIX_PY_VER)
         - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_FILE_NAME=faust-$CI_COMMIT_TAG-static -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DEXCLUDE_FAUST_LIB_INSTALL=ON -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=/opt/local/matio-1.5.7/src/.libs/libmatio.a -DZ_STATIC_LIB_PATH=/opt/local/zlib-1.2.11/libz.a -DHDF5_STATIC_LIB_PATH=/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DBUILD_MULTITHREAD=ON -DNOPY2=ON -DUSE_GPU_MOD=ON -DCMAKE_PREFIX_PATH=$PWD/../gpu_mod ..'
         - make
         - cpack -G RPM -C CPackConfig.cmake

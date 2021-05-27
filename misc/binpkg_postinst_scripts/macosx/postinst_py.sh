@@ -1,5 +1,7 @@
 #!/bin/bash
 
+SUPPORTED_PY3=@PY3_MINOR_VER@ # needed because python3 has ABI changes between minor versions (the pyfaust shared lib. is compiled specifically for python major and minor version)
+
 echo "$0 -- FAµST python wrapper post-install script START" | tee -a /tmp/log_faust_install
 
 uid=$(id -u)
@@ -35,8 +37,12 @@ for DIR in /usr/local /opt/local
 do
 	for FILE in $(find $DIR -type l -name "python*") $(find $DIR -type f -name "python*")
 	do
-		echo "PYTHON found: $file" | tee -a /tmp/log_faust_install
-		[[ -x "$FILE" ]] && link_py_files "$FILE"
+		# Install the python wrapper only for python major.minor compatible versions
+		if [[ -x $FILE ]] && $FILE --version | grep -q "Python 3.$SUPPORTED_PY3"
+		then
+			echo "PYTHON found: $file" | tee -a /tmp/log_faust_install
+			[[ -x "$FILE" ]] && link_py_files "$FILE"
+		fi
 	done
 done
 
