@@ -103,46 +103,6 @@ namespace Faust
 	template<typename FPP> faust_unsigned_int sparse_size(faust_unsigned_int nnz, faust_unsigned_int nrows);
 	template<typename FPP> faust_unsigned_int dense_size(faust_unsigned_int nrows, faust_unsigned_int ncols);
 
-    /**
-     * Decides which output format to use when appliying the SP prox. op. to M. Either M or spM is the output, it depends on the byte sizes. The minimum memory fingerprint is targeted.
-     *
-     *  \param M: the input matrix to project (which could be the output too, if dense format is chosen).
-     *  \param k: the sparsity parameter (pseudo-)norm_0 of the output matrix.
-     *  \param normalized: true to normalize the output matrix.
-     *  \param pos: true to filter negative values of M before applying the de prox.
-     *  \param forcedType: used to choose explicitely the output format with values Sparse or Dense (MatSparse or MatDense).
-     * \return the prox image as a MatGeneric matrix (which can be a MatSparse or a MatDense). if the returned matrix is a MatDense, the memory spaced used is the same as the input (that is M), otherwise the matrix is a MatSparse and is allocated in the heap memory (and must be freed by the callee).
-     */
-	template<typename FPP>
-		MatGeneric<FPP,Cpu>* prox_sp_gen(MatDense<FPP,Cpu> & M, faust_unsigned_int k, const bool normalized=true, const bool pos=false, const MatType forcedType=None);
-
-	template<typename FPP>
-		MatGeneric<FPP,Cpu>* prox_skperm_gen(MatDense<FPP, Cpu> & M, const unsigned int k,  const bool normalized=true, const bool pos=false, const MatType forcedType=None);
-
-	template<typename FPP>
-		MatGeneric<FPP,Cpu>* prox_splincol_gen(MatDense<FPP, Cpu> & M, const unsigned int k,  const bool normalized=true, const bool pos=false, const MatType forcedType=None);
-
-	template<typename FPP>
-		MatGeneric<FPP,Cpu>* prox_spcol_gen(MatDense<FPP, Cpu> & M, const unsigned int k,  const bool normalized=true, const bool pos=false, const MatType forcedType=None);
-
-	template<typename FPP>
-		MatGeneric<FPP,Cpu>* prox_splin_gen(MatDense<FPP, Cpu> & M, const unsigned int k,  const bool normalized=true, const bool pos=false, const MatType forcedType=None);
-
-	template<typename FPP, typename FPP2>
-		MatGeneric<FPP,Cpu>* prox_normcol_gen(MatDense<FPP,Cpu> & M,FPP2 s, const bool normalized=false, const bool pos=false, const MatType forcedType=None);
-
-	template<typename FPP, typename FPP2>
-		MatGeneric<FPP,Cpu>* prox_normlin_gen(MatDense<FPP,Cpu> & M,FPP2 s, const bool normalized=false, const bool pos=false, const MatType forcedType=None);
-
-	template<typename FPP>
-		MatGeneric<FPP,Cpu>* prox_blockdiag_gen(MatDense<FPP,Cpu> & M, std::vector<faust_unsigned_int>& m_vec, std::vector<faust_unsigned_int>& n_vec, const bool normalized = false, const bool pos = false, const MatType forcedType=None);
-
-	template<typename FPP>
-		MatGeneric<FPP,Cpu>* prox_blockdiag_gen(MatDense<FPP,Cpu> & M, MatDense<FPP,Cpu> mn_vec, const bool normalized=false, const bool pos=false, const MatType forcedType=None);
-	template<typename FPP> MatGeneric<FPP,Cpu>* prox_hankel_gen(MatDense<FPP, Cpu> & M, const bool normalized = true, const bool pos = false, const MatType forcedType=None);
-	template<typename FPP> MatGeneric<FPP,Cpu>* prox_toeplitz_gen(MatDense<FPP, Cpu> & M, const bool normalized = true, const bool pos = false, const MatType forcedType=None);
-	template<typename FPP> MatGeneric<FPP,Cpu>* prox_circ_gen(MatDense<FPP, Cpu> & M, const bool normalized = true, const bool pos = false, const MatType forcedType=None);
-
 }
 
 #include "faust_prox.hpp"

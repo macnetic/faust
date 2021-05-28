@@ -45,8 +45,8 @@
 #include <iostream>
 #include <algorithm>
 #include "faust_prox.h"
-#include "faust_MatDense_gpu.h"
 #include "faust_constant.h"
+#include "faust_MatDense_gpu.h"
 #include "faust_exception.h"
 
 namespace Faust
@@ -85,7 +85,6 @@ namespace Faust
 	template<typename FPP> void prox_skperm(MatDense<FPP, GPU2> & M,const unsigned int k,  const bool normalized=true, const bool pos=false);
 
 }
-
 #include "faust_prox_gpu.hpp"
 
 #endif

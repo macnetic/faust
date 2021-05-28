@@ -52,7 +52,7 @@ namespace Faust
 				std::chrono::duration<double>& fgrad_duration,
 				const StoppingCriterion<Real<FPP>>& sc,
 				Real<FPP> &error,
-				const bool use_csr,
+				const FactorsFormat factors_format,
 				const int prod_mod,
 				Real<FPP> &c,
 				Real<FPP>& lambda)
@@ -70,7 +70,7 @@ namespace Faust
 								is_verbose, constraint,
 								norm2_max_iter, norm2_threshold, norm2_duration, fgrad_duration,
 								mhtp_params.constant_step_size, mhtp_params.step_size,
-								sc, error, use_csr, prod_mod, c, lambda);
+								sc, error, factors_format, prod_mod, c, lambda);
 						if(mhtp_params.updating_lambda)
 							update_lambda(S, A_H, lambda);
 						j++;

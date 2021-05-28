@@ -58,6 +58,7 @@ namespace Faust
 				MatGeneric<FPP,GPU2>* get_gen_fact_nonconst(const faust_unsigned_int id) const;
 				void pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id, const int mul_order_opt_mode=DEFAULT);
 				void update(const MatGeneric<FPP, GPU2>& M, const faust_unsigned_int id);
+				void replace(const MatGeneric<FPP, GPU2>* M, const faust_unsigned_int id);
 				void operator=(TransformHelper<FPP,GPU2>& th);
 				typename Transform<FPP,GPU2>::iterator begin() const;
 				typename Transform<FPP,GPU2>::iterator end() const;

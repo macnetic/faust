@@ -44,17 +44,13 @@
 #include "faust_ConstraintGeneric.h"
 #include "faust_constant.h"
 
-#ifdef __COMPILE_GPU__
-   #include "faust_MatDense_gpu.h"
-   #include "faust_prox_gpu.h"
-#else
-   #include "faust_MatDense.h"
-   #include "faust_prox.h"
-#endif
+#include "faust_MatDense.h"
+#include "faust_prox.h"
 #if USE_GPU_MOD
 #include "faust_prox_gpu.h"
 #include "faust_MatDense_gpu.h"
 #endif
+#include "faust_prox_gen.h"
 
 //! \class Faust::ConstraintMat
 //!    \brief Contains the matrix dense constraint parameters for the hierarchical factorization. <br>
@@ -94,6 +90,7 @@ namespace Faust
           virtual void set_default_parameter();
           virtual void check_constraint_name()const;
           virtual void project(Faust::MatDense<FPP,DEVICE> & mat)const;
+		  virtual MatGeneric<FPP,DEVICE>* project_gen(Faust::MatDense<FPP,DEVICE> & mat)const;
 		  virtual void Display() const;
           ~ConstraintMat(){};
 

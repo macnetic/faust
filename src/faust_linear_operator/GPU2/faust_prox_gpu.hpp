@@ -139,13 +139,13 @@ namespace Faust
 			prox_normlin(cpuM, s, normalized, pos);
 			M = cpuM;
 		}
-//	template<typename FPP>
-//		void prox_blkdiag(MatDense<FPP,GPU2> & M,faust_unsigned_int k)
-//	{
-//		MatDense<FPP,Cpu> cpuM = M.tocpu();
-//		prox_gpu(cpuM, k);
-//		M = cpuM;
-//	}
+	//	template<typename FPP>
+	//		void prox_blkdiag(MatDense<FPP,GPU2> & M,faust_unsigned_int k)
+	//	{
+	//		MatDense<FPP,Cpu> cpuM = M.tocpu();
+	//		prox_gpu(cpuM, k);
+	//		M = cpuM;
+	//	}
 	template<typename FPP>
 		void prox_blockdiag(MatDense<FPP,GPU2> & M, std::vector<faust_unsigned_int>& m_vec, std::vector<faust_unsigned_int>& n_vec, const bool normalized /*= false*/, const bool pos /*= false*/)
 		{
@@ -156,12 +156,12 @@ namespace Faust
 
 	template<typename FPP>
 		void prox_blockdiag(MatDense<FPP,GPU2> & M, MatDense<FPP,GPU2> mn_vec, const bool normalized/*=true*/, const bool pos/*=false*/)
-	{
-		MatDense<FPP,Cpu> cpuM = M.tocpu();
-		MatDense<FPP,Cpu> cpu_mn_vec = mn_vec.tocpu();
-		prox_blockdiag(cpuM, cpu_mn_vec, normalized, pos);
-		M = cpuM;
-	}
+		{
+			MatDense<FPP,Cpu> cpuM = M.tocpu();
+			MatDense<FPP,Cpu> cpu_mn_vec = mn_vec.tocpu();
+			prox_blockdiag(cpuM, cpu_mn_vec, normalized, pos);
+			M = cpuM;
+		}
 
 	template<typename FPP> void pre_prox_pos(MatDense<FPP,GPU2> & M)
 	{
@@ -198,8 +198,8 @@ namespace Faust
 			prox_skperm(cpuM, k, normalized, pos);
 			M = cpuM;
 		}
-}
 
+}
 #endif
 
 

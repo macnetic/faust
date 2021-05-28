@@ -72,7 +72,7 @@ template<typename FPP,FDevice DEVICE,typename FPP2> const FPP2 Faust::Params<FPP
 template<typename FPP,FDevice DEVICE,typename FPP2> const FPP Faust::Params<FPP,DEVICE,FPP2>::defaultDecreaseSpeed = 1.25;
 template<typename FPP,FDevice DEVICE,typename FPP2> const FPP Faust::Params<FPP,DEVICE,FPP2>::defaultResiduumPercent = 1.4;
 template<typename FPP,FDevice DEVICE,typename FPP2> const Faust::GradientCalcOptMode Faust::Params<FPP,DEVICE,FPP2>::defaultGradCalcOptMode = INTERNAL_OPT;
-template<typename FPP,FDevice DEVICE,typename FPP2> const bool Faust::Params<FPP,DEVICE,FPP2>::defaultUseCSR = true;
+template<typename FPP,FDevice DEVICE,typename FPP2> const Faust::FactorsFormat Faust::Params<FPP,DEVICE,FPP2>::defaultFactorsFormat = AllDynamic;
 template<typename FPP,FDevice DEVICE,typename FPP2> const bool Faust::Params<FPP,DEVICE,FPP2>::defaultPackingRL = true;
 template<typename FPP,FDevice DEVICE,typename FPP2> const bool Faust::Params<FPP,DEVICE,FPP2>::defaultUseMHTP = false;
 
@@ -146,7 +146,7 @@ Faust::Params<FPP,DEVICE,FPP2>::Params(
 	norm2_threshold(FAUST_PRECISION),
 	norm2_max_iter(FAUST_NORM2_MAX_ITER),
 	packing_RL(defaultPackingRL),
-	use_csr(defaultUseCSR),
+	factors_format(defaultFactorsFormat),
 	use_MHTP(defaultUseMHTP)
 
 {
@@ -264,7 +264,7 @@ Faust::Params<FPP,DEVICE,FPP2>::Params(
 	gradCalcOptMode(gradCalcOptMode),
 	norm2_threshold(FAUST_PRECISION),
 	norm2_max_iter(FAUST_NORM2_MAX_ITER),
-	use_csr(defaultUseCSR),
+	factors_format(defaultFactorsFormat),
 	packing_RL(defaultPackingRL),
 	use_MHTP(defaultUseMHTP)
 
@@ -295,7 +295,7 @@ Faust::Params<FPP,DEVICE,FPP2>::Params() : m_nbRow(0),
 	norm2_threshold(FAUST_PRECISION),
 	norm2_max_iter(FAUST_NORM2_MAX_ITER),
 	packing_RL(defaultPackingRL),
-	use_csr(defaultUseCSR),
+	factors_format(defaultFactorsFormat),
 	use_MHTP(defaultUseMHTP)
 
 {}
@@ -322,7 +322,7 @@ void Faust::Params<FPP,DEVICE,FPP2>::Display() const
 	std::cout<<"INIT_LAMBDA : "<<init_lambda<<std::endl;
 	std::cout<<"ISFACTSIDELEFT : "<<isFactSideLeft<<std::endl;
 	std::cout<<"ISCONSTANTSTEPSIZE : "<<isConstantStepSize<<std::endl;
-	std::cout <<"USE_CSR :" << use_csr << std::endl;
+	std::cout <<"factors format (Dense:0, Sparse:1, Dynamic:2) :" << factors_format << std::endl;
 	std::cout <<"PACKING_RL:" << packing_RL << std::endl;
 	std::cout<<"step_size : "<<step_size<<std::endl;
 	std::cout<<"Matrix :  nbRow "<<m_nbRow<<" NbCol : "<< m_nbCol<<std::endl;

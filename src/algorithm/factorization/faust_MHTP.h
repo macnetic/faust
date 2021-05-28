@@ -1,6 +1,7 @@
 #ifndef __MHTP__
 #define __MHTP__
 #include <string>
+#include "faust_Params.h"
 #include "faust_StoppingCriterion.h"
 #include "faust_ConstraintGeneric.h"
 namespace Faust
@@ -47,7 +48,7 @@ namespace Faust
 	 * \param fgrad_duration: measurment of the time passed computing/applying the gradient in this function.
 	 * \param sc: The StoppingCriterion used in the gradient descent used to update the factor (as in PALM4MSA).
 	 * \param error: after this function execution error will be equal to norm(A-S) (frobenius norm).
-	 * \param use_csr: true if S is only sparse factors, false if they are all dense.
+	 * \param factors_format: AllDense, AllSparse, AllDynamic (automatically calculated, cf. prox_gen module).
 	 * \param prod_mod: the method used when computing the full matrix of S (see TransformHelper::get_product() and FaustMulMode).
 	 * \param c: define step size of the gradient descent (which is set by the function to 1/mhtp_params.step_size if mhtp_params.constant_step_size == true, else it is computed according to the lipschitz coefficient).
 	 * \param lambda: the scaling factor of S (lambda*S approx A) which is modified internally if mhtp_params.updating_lambda is true.
@@ -71,7 +72,7 @@ namespace Faust
 				std::chrono::duration<double>& fgrad_duration,
 				const StoppingCriterion<Real<FPP>>& sc,
 				Real<FPP> &error,
-				const bool use_csr,
+				const FactorsFormat factors_format,
 				const int prod_mod,
 				Real<FPP> &c,
 				Real<FPP>& lambda);

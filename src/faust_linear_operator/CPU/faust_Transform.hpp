@@ -367,6 +367,18 @@ void Faust::Transform<FPP,Cpu>::update_total_nnz()
 	}
 }
 
+template<typename FPP>
+void Faust::Transform<FPP,Cpu>::replace(const Faust::MatGeneric<FPP,Cpu>* new_mat, const faust_unsigned_int id)
+{
+	if(dtor_delete_data)
+		delete data[id];
+	else
+		ref_man.release(data[id]);
+	data[id] = const_cast<Faust::MatGeneric<FPP,Cpu>*>(new_mat);
+	if(! dtor_delete_data)
+		ref_man.acquire(data[id]);
+	this->update_total_nnz();
+}
 
 template<typename FPP>
 //Faust::RefManager Faust::Transform<FPP,Cpu>::ref_man(Faust::Transform<FPP,Cpu>::delete_fact);

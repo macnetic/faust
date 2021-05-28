@@ -169,6 +169,30 @@ void Faust::ConstraintMat<FPP,DEVICE>::project(Faust::MatDense<FPP,DEVICE> & mat
          break;
    }
 }
+
+template<typename FPP, FDevice DEVICE>
+Faust::MatGeneric<FPP,DEVICE>* Faust::ConstraintMat<FPP,DEVICE>::project_gen(Faust::MatDense<FPP,DEVICE> & mat) const
+{
+   switch (this->m_constraintName)
+   {
+      case CONSTRAINT_NAME_CONST:
+         //mat=m_parameter;
+		return  Faust::prox_const_gen(mat, m_parameter, false);
+      case CONSTRAINT_NAME_SUPP:
+         return Faust::prox_supp_gen(mat,m_parameter, true);
+	  case CONSTRAINT_NAME_TOEPLITZ:
+//		 return Faust::prox_toeplitz_gen(mat);
+	  case CONSTRAINT_NAME_CIRC:
+		 return Faust::prox_circ_gen(mat);
+	  case CONSTRAINT_NAME_HANKEL:
+		 return Faust::prox_hankel_gen(mat);
+	  case CONSTRAINT_NAME_BLKDIAG:
+		 return Faust::prox_blockdiag_gen(mat, m_parameter, true);
+      default:
+         handleError(m_className,"project : invalid constraint_name");
+         break;
+   }
+}
 template<typename FPP,FDevice DEVICE>
 void Faust::ConstraintMat<FPP,DEVICE>::Display() const
 {
@@ -180,3 +204,4 @@ void Faust::ConstraintMat<FPP,DEVICE>::Display() const
 
 
 #endif
+

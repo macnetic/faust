@@ -169,7 +169,7 @@ void Faust::ParamsPalm<FPP,DEVICE,FPP2>::Display() const
 	std::cout << "gradCalcOptMode: "<< gradCalcOptMode << std::endl;
 	std::cout << "norm2_threshold:" << norm2_threshold << std::endl;
 	std::cout << "norm2_max_iter:" << norm2_max_iter << std::endl;
-	std::cout << "use_csr:" << use_csr << std::endl;
+	std::cout << "factors_format (Dense:0, Sparse:1, Dynamic:2):" << factors_format << std::endl;
 	std::cout << "packing_RL:" << packing_RL << std::endl;
 
 	/*cout<<"INIT_FACTS :"<<endl;

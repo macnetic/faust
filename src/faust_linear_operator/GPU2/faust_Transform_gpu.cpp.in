@@ -130,6 +130,37 @@ namespace Faust
 		}
 
 	template<>
+		void Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::Display(bool transpose/*=false*/) const
+		{
+			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			marr_funcs->display_op(gpu_mat_arr, transpose?OP_TRANSP:OP_NOTRANSP);
+		}
+
+	template<>
+		void Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::update_total_nnz() const
+		{
+			//nothing to do get_total_nnz doesn't use any cache by now
+		}
+
+	template<>
+		void Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::replace(const MatGeneric<@FAUST_SCALAR_FOR_GM@, GPU2>* new_mat, const faust_unsigned_int id)
+		{
+			// update the underlying gpu_mod array
+			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			marr_funcs->erase_at(gpu_mat_arr, id, /* free */ false); // the RefManager is responsible to free the GPU matrix
+			marr_funcs->insert_anymat(gpu_mat_arr, new_mat->get_gpu_mat_ptr(), id);
+			// update local (wrapper) data
+			if(dtor_delete_data)
+				delete data[id];
+			else
+				ref_man.release(data[id]);
+			data[id] = const_cast<Faust::MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>*>(new_mat);
+			if(! dtor_delete_data)
+				ref_man.acquire(data[id]);
+			this->update_total_nnz();
+		}
+
+	template<>
 		void Transform<@FAUST_SCALAR_FOR_GM@, GPU2>::get_facts(std::vector<MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>*> &factors, bool cloning_facts/*=true*/) const
 		{
 			for(int i=0;i < size(); i++)
@@ -245,13 +276,6 @@ namespace Faust
 	}
 
 	template<>
-		void Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::Display(bool transpose/*=false*/) const
-		{
-			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
-			marr_funcs->display_op(gpu_mat_arr, transpose?OP_TRANSP:OP_NOTRANSP);
-		}
-
-	template<>
 		std::string Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::to_string(bool transpose/*=false*/) const
 		{
 			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
@@ -297,12 +321,6 @@ namespace Faust
 			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 			if(gpu_mat_arr == nullptr) throw std::runtime_error("gpu_mat_arr is nullptr");
 			return marr_funcs->get_total_nnz(gpu_mat_arr);
-		}
-
-	template<>
-		void Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::update_total_nnz() const
-		{
-			//nothing to do get_total_nnz doesn't use any cache by now
 		}
 
 	template<>

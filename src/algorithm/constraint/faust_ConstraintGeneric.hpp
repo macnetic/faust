@@ -318,7 +318,8 @@ bool Faust::ConstraintGeneric::is_constraint_parameter_mat()const
 }
 
 template<typename FPP,FDevice DEVICE, typename FPP2>
-void Faust::ConstraintGeneric::project(Faust::MatDense<FPP, DEVICE>& mat) const {
+void Faust::ConstraintGeneric::project(Faust::MatDense<FPP, DEVICE>& mat) const
+{
 	//unfortunately it's not possible to do template with virtual (pure or not) function
 	// (it needs to be a template class with virtual function using template types to be possible)
 	// (but we don't want that because it implies to pass all the templates types when instantiating the child classes
@@ -335,4 +336,13 @@ void Faust::ConstraintGeneric::project(Faust::MatDense<FPP, DEVICE>& mat) const 
 		dynamic_cast<const Faust::ConstraintInt<FPP,DEVICE>*>(this)->project(mat);
 }
 
-
+template<typename FPP,FDevice DEVICE, typename FPP2>
+Faust::MatGeneric<FPP,DEVICE>* Faust::ConstraintGeneric::project_gen(Faust::MatDense<FPP, DEVICE>& mat) const
+{
+	if(this->is_constraint_parameter_mat<FPP,DEVICE,FPP2>())
+		return dynamic_cast<const Faust::ConstraintMat<FPP,DEVICE>*>(this)->project_gen(mat);
+	else if(this->is_constraint_parameter_real<FPP,DEVICE,FPP2>())
+		return dynamic_cast<const Faust::ConstraintFPP<FPP,DEVICE,FPP2>*>(this)->project_gen(mat);
+	else if(this->is_constraint_parameter_int<FPP,DEVICE,FPP2>())
+		return dynamic_cast<const Faust::ConstraintInt<FPP,DEVICE>*>(this)->project_gen(mat);
+}

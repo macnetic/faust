@@ -147,6 +147,24 @@ void Faust::ConstraintFPP<FPP,DEVICE,FPP2>::project(Faust::MatDense<FPP,DEVICE> 
    }
 
 }
+
+template<typename FPP,FDevice DEVICE, typename FPP2>
+Faust::MatGeneric<FPP,DEVICE>* Faust::ConstraintFPP<FPP,DEVICE, FPP2>::project_gen(Faust::MatDense<FPP,DEVICE> & mat) const
+{
+	switch (this->m_constraintName)
+   	{
+      		case CONSTRAINT_NAME_NORMCOL:
+         		return Faust::prox_normcol_gen(mat, m_parameter);
+         	break;
+      		case CONSTRAINT_NAME_NORMLIN:
+         		return Faust::prox_normlin_gen(mat, m_parameter);
+         	break;
+      		default:
+         		handleError(m_className,"project : invalid constraint name");
+         	break;
+   }
+}
+
 template<typename FPP,FDevice DEVICE, typename FPP2>
 void Faust::ConstraintFPP<FPP,DEVICE,FPP2>::Display() const
 {
@@ -155,3 +173,4 @@ void Faust::ConstraintFPP<FPP,DEVICE,FPP2>::Display() const
 }
 
 #endif
+

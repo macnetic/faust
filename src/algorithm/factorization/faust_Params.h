@@ -69,6 +69,13 @@ namespace Faust
 		EXTERNAL_OPT //the optimization defined externally in faust_linear_algebra must be used
 	};
 
+	enum FactorsFormat
+	{
+		AllDense,
+		AllSparse,
+		AllDynamic,
+	};
+
     template<typename FPP,FDevice DEVICE> class MatDense;
 
 
@@ -179,7 +186,7 @@ namespace Faust
 		GradientCalcOptMode gradCalcOptMode;
         Real<FPP> norm2_threshold;
         unsigned int norm2_max_iter;
-		bool use_csr;
+		FactorsFormat factors_format;
 		bool packing_RL;
 		bool use_MHTP;
 		StoppingCriterion<Real<FPP>> stop_crit_MHTP;
@@ -196,7 +203,7 @@ namespace Faust
         static const FPP defaultDecreaseSpeed;
         static const FPP defaultResiduumPercent;
 		static const GradientCalcOptMode defaultGradCalcOptMode;
-		static const bool defaultUseCSR;
+		static const FactorsFormat defaultFactorsFormat;
 		static const bool defaultPackingRL;
 		static const bool defaultUseMHTP;
 

@@ -10,6 +10,7 @@
 #include "faust_MatSparse_gpu.h"
 #include "faust_TransformHelper_gpu.h"
 #endif
+#include "faust_Params.h"
 #include "faust_constant.h"
 #include "faust_ConstraintGeneric.h"
 #include "faust_ConstraintFPP.h"
@@ -69,7 +70,7 @@ namespace Faust
 				//const unsigned int nites,
 				const StoppingCriterion<Real<FPP>>& sc,
 				const bool is_update_way_R2L=false,
-                const bool use_csr=true,
+				const FactorsFormat factors_format=AllDynamic,
 				const bool packing_RL=true,
 				const MHTPParams<FPP> mhtp_params=MHTPParams<FPP>(),
 				const bool compute_2norm_on_array=false,
@@ -138,7 +139,7 @@ namespace Faust
 				const Real<FPP> step_size,
 				const StoppingCriterion<Real<FPP>>& sc,
 				Real<FPP> &error,
-				const bool use_csr,
+				const FactorsFormat factors_format,
 				const int prod_mod,
 				Real<FPP> &c,
 				const Real<FPP>& lambda);

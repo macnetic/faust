@@ -207,7 +207,7 @@ namespace Faust
 			MatGeneric<FPP,Cpu>* get_gen_fact_nonconst(const faust_unsigned_int id) const;
 			const MatGeneric<FPP,Cpu>* get_gen_fact(const faust_unsigned_int id) const;
 			void update(const MatGeneric<FPP,Cpu>& M, const faust_unsigned_int fact_id);
-
+			void replace(const MatGeneric<FPP, Cpu>* M, const faust_unsigned_int fact_id);
 		};
 
 

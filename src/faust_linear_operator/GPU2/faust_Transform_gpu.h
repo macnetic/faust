@@ -36,6 +36,7 @@ namespace Faust
 			void pop_back();
 			void clear();
 			void update(const MatGeneric<FPP, GPU2>& M, const faust_unsigned_int id);
+			void replace(const MatGeneric<FPP, GPU2>* M, const faust_unsigned_int id);
 			MatGeneric<FPP,GPU2>* get_fact(int32_t id, bool cloning_fact=true) const;
 			void get_fact(const faust_unsigned_int &id,
 					FPP* elts,

@@ -12,7 +12,7 @@ namespace Faust
 			std::vector<const ConstraintGeneric*> & res_constraints,
 			Real<FPP>& lambda,
 			const bool is_update_way_R2L=false, const bool is_fact_side_left=false,
-			const bool use_csr=true, const bool packing_RL=true,
+			const FactorsFormat factors_format=AllDynamic, const bool packing_RL=true,
 			const MHTPParams<FPP>& mhtp_params=MHTPParams<FPP>(),
 			const bool compute_2norm_on_array=false,
 			const Real<FPP> norm2_threshold=FAUST_PRECISION,

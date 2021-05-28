@@ -6,7 +6,7 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 		//const unsigned int nites,
 		const StoppingCriterion<Real<FPP>>& sc,
 		const bool is_update_way_R2L,
-		const bool use_csr,
+		const FactorsFormat factors_format,
 		const bool packing_RL,
 		const MHTPParams<FPP> mhtp_params/*=MHTPParams<FPP>()*/,
 		const bool compute_2norm_on_array,
@@ -42,7 +42,7 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 	Faust::MatDense<FPP,DEVICE> A_H = A;
 	A_H.adjoint();
 	if(S.size() != nfacts)
-		fill_of_eyes(S, nfacts, use_csr, dims, on_gpu);
+		fill_of_eyes(S, nfacts, factors_format != AllDense, dims, on_gpu);
 	int i = 0, f_id, j;
 	std::function<void()> init_ite, next_fid;
 	std::function<bool()> updating_facs;
@@ -140,7 +140,7 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 						is_verbose, *constraints[f_id], norm2_max_iter, norm2_threshold,
 						norm2_duration,
 						fgrad_duration,
-						sc, error, use_csr, prod_mod, c, lambda);
+						sc, error, factors_format, prod_mod, c, lambda);
 			}
 			else
 				update_fact(cur_fac, f_id, A, S, pL, pR,
@@ -148,7 +148,7 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 						norm2_duration,
 						fgrad_duration,
 						constant_step_size, step_size,
-						sc, error, use_csr, prod_mod, c, lambda);
+						sc, error, factors_format, prod_mod, c, lambda);
 
 			next_fid(); // f_id updated to iteration factor index (pL or pR too)
 		}
@@ -337,7 +337,7 @@ void Faust::update_fact(
 		const Real<FPP> step_size,
 		const StoppingCriterion<Real<FPP>>& sc,
 		Real<FPP> &error,
-		const bool use_csr,
+		const FactorsFormat factors_format,
 		const int prod_mod,
 		Real<FPP> &c,
 		const Real<FPP>& lambda)
@@ -393,22 +393,38 @@ void Faust::update_fact(
 		fgrad_stop = std::chrono::high_resolution_clock::now();
 		fgrad_duration += fgrad_stop-fgrad_start;
 	}
-	// really update now
-	constraint.project<FPP,DEVICE,Real<FPP>>(D);
 
-
-	if(use_csr && dcur_fac != nullptr || !use_csr && scur_fac != nullptr)
-		throw std::runtime_error("Current factor is inconsistent with use_csr.");
-
-	if(use_csr)
+	// Update the S factor
+	if(factors_format == AllDynamic)
 	{
-		spD = D;
-		S.update(spD, f_id); // update is at higher level than a simple assignment
+		// new_fac is a MatGeneric but underliying concrete object can be a MatSparse or a MatDense
+		// new_fac is allocated in the heap
+		// replace the former fact by the new one
+		auto new_fac = constraint.project_gen<FPP,DEVICE,Real<FPP>>(D);
+		S.replace(new_fac, f_id);
 	}
-	else
+	else // factors_format == AllDense or AllSparse
 	{
-		S.update(D, f_id);
+		constraint.project<FPP,DEVICE,Real<FPP>>(D);
+		// D is the prox image (always a MatDense
+		// convert D to the proper format (MatSparse or MatDense)
+
+		if(factors_format == AllSparse && dcur_fac != nullptr || factors_format != AllSparse && scur_fac != nullptr)
+			throw std::runtime_error("Current factor is inconsistent with the configured factors_format.");
+
+		if(factors_format == AllSparse)
+		{
+			// convert to sparse then update
+			spD = D;
+			S.update(spD, f_id); // update is at higher level than a simple assignment
+		}
+		else
+		{ // factors_format == AllDense
+			// directly update (D is a MatDense)
+			S.update(D, f_id);
+		}
 	}
+
 
 }
 

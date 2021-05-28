@@ -43,6 +43,7 @@
 #include <string>
 //#include <iostream>
 #include "faust_constant.h"
+#include "faust_MatGeneric.h"
 
 
 enum faust_constraint_name
@@ -118,6 +119,9 @@ namespace Faust
 		/*virtual*/ void project(MatDense<FPP,DEVICE> & mat)const;//=0; //template with (pure) virtual not authorized (otherwise it must be templates from class, not function)
 		template<typename FPP, FDevice DEVICE, typename FPP2>
 			/*virtual*/ void project(MatDense<FPP, DEVICE>&) const /*=0*/;
+
+		template<typename FPP, FDevice DEVICE, typename FPP2>
+          MatGeneric<FPP,DEVICE>* project_gen(Faust::MatDense<FPP,DEVICE> & mat) const;
 	    virtual ~ConstraintGeneric(){};
 
 	protected:

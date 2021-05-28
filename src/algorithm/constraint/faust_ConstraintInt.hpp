@@ -180,6 +180,29 @@ void Faust::ConstraintInt<FPP,DEVICE>::project(Faust::MatDense<FPP,DEVICE> & mat
 }
 
 template<typename FPP,FDevice DEVICE>
+Faust::MatGeneric<FPP,DEVICE>* Faust::ConstraintInt<FPP,DEVICE>::project_gen(Faust::MatDense<FPP,DEVICE> & mat) const
+{
+   switch (this->m_constraintName)
+   {
+      case CONSTRAINT_NAME_SP:
+         return Faust::prox_sp_gen(mat,m_parameter);
+      case CONSTRAINT_NAME_SPCOL:
+         return Faust::prox_spcol_gen(mat,m_parameter);
+      case CONSTRAINT_NAME_SPLIN:
+         return Faust::prox_splin_gen(mat,m_parameter);
+      case CONSTRAINT_NAME_SPLINCOL:
+         return Faust::prox_splincol_gen(mat,m_parameter);
+      case CONSTRAINT_NAME_SP_POS:
+         return Faust::prox_sp_gen(mat, m_parameter, /*normalized */ true, /*pos*/ true);
+      case CONSTRAINT_NAME_SKPERM:
+         return Faust::prox_skperm_gen(mat,m_parameter);
+      default:
+		handleError(m_className,"project : cannot project with this constraint name");
+         break;
+   }
+}
+
+template<typename FPP,FDevice DEVICE>
 void Faust::ConstraintInt<FPP,DEVICE>::Display() const
 {
 	Faust::ConstraintGeneric::Display();

@@ -223,6 +223,12 @@ namespace Faust
 		}
 
 	template<typename FPP>
+		void TransformHelper<FPP,GPU2>::replace(const MatGeneric<FPP, GPU2>* M,const faust_unsigned_int id)
+		{
+			return this->transform->replace(M, id);
+		}
+
+	template<typename FPP>
 		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::multiply(const TransformHelper<FPP,GPU2>* right)
 		{
 			// The goal is to minimize the number of factors copied (but maybe the criterion should be the sum of the size of these factors rather than their number)

@@ -719,6 +719,12 @@ template<typename FPP>
 	}
 
 template<typename FPP>
+	void TransformHelper<FPP, Cpu>::replace(const MatGeneric<FPP, Cpu>* M, const faust_unsigned_int fact_id)
+	{
+		this->transform->replace(M, fact_id);
+	}
+
+template<typename FPP>
 	unsigned long long TransformHelper<FPP,Cpu>::get_fact_addr(const faust_unsigned_int id) const
 	{
 		return (unsigned long long) this->transform->data[this->is_transposed?size()-id-1:id];
