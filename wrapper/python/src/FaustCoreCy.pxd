@@ -264,8 +264,8 @@ cdef extern from "FaustFact.h":
                                                   num_facts, double*
                                                   inout_lambda, bool
                                                   is_update_way_R2L, bool
-                                                  is_fact_side_left, bool
-                                                  use_csr, bool packing_RL,
+                                                  is_fact_side_left, int
+                                                  factor_format, bool packing_RL,
                                                   PyxMHTPParams[FPP] mhtpp,
                                                   unsigned int norm2_max_iter,
                                                   double norm2_threshold, bool
@@ -282,7 +282,7 @@ cdef extern from "FaustFact.h":
                                               double* inout_lambda,
                                               PyxStoppingCriterion sc,
                                               bool is_update_way_R2L,
-                                              bool use_csr,
+                                              int factor_format,
                                               bool packing_RL,
                                               PyxMHTPParams[FPP] mhtpp,
                                               unsigned int norm2_max_iter,

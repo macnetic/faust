@@ -774,7 +774,7 @@ class ParamsFact(ABC):
     EXTERNAL_OPT = 2
     def __init__(self, num_facts, is_update_way_R2L, init_lambda,
                  constraints, step_size, constant_step_size,
-                 is_verbose, use_csr=True,
+                 is_verbose, factor_format='dynamic',
                  packing_RL=True, norm2_max_iter=100,
                  norm2_threshold=1e-6,
                  grad_calc_opt_mode=EXTERNAL_OPT,
@@ -798,7 +798,9 @@ class ParamsFact(ABC):
         self.grad_calc_opt_mode = grad_calc_opt_mode
         self.norm2_max_iter = norm2_max_iter # 0 for default value from C++ core
         self.norm2_threshold = norm2_threshold
-        self.use_csr = use_csr
+        self.factor_format = factor_format
+        if factor_format not in ['dense', 'sparse', 'dynamic']:
+            raise ValueError("factor_format must be either 'dense', 'sparse' or 'dynamic'")
         self.packing_RL = packing_RL
         self.use_MHTP = False
         if 'use_MHTP' in kwargs.keys():
@@ -819,7 +821,7 @@ class ParamsFact(ABC):
         "grad_calc_opt_mode="+str(self.grad_calc_opt_mode)+'\r\n'
         "norm2_max_iter="+str(self.norm2_max_iter)+'\r\n'
         "norm2_threshold="+str(self.norm2_threshold)+'\r\n'
-        "use_csr="+str(self.use_csr)+'\r\n'
+        "factor_format="+str(self.factor_format)+'\r\n'
         "packing_RL="+str(self.packing_RL)+'\r\n'
         "is_verbose="+str(self.is_verbose)+'\r\n'
         "constraints="+str(self.constraints)+'\r\n'
@@ -833,6 +835,20 @@ class ParamsFact(ABC):
         #print("M.shape=", M.shape)
         return M.shape[0] == self.constraints[0]._num_rows and \
                 M.shape[1] == self.constraints[-1]._num_cols
+
+    @staticmethod
+    def factor_format_str2int(factor_format):
+        map = {'dense': 0, 'sparse': 1, 'dynamic': 2}
+        if isinstance(factor_format, str):
+            if factor_format not in map.keys():
+                raise ValueError("factor_format must be in "+repr(map.keys()))
+            return map[factor_format]
+        elif isinstance(factor_format, int):
+            if factor_format not in map.values():
+                raise ValueError("factor_format as int must be in"
+                                 +repr(map.values()))
+            return factor_format
+
 
 class ParamsHierarchical(ParamsFact):
     """
@@ -850,7 +866,7 @@ class ParamsHierarchical(ParamsFact):
                  step_size=10.0**-16, constant_step_size=False,
                  is_fact_side_left=False,
                  is_verbose=False,
-                 use_csr=True,
+                 factor_format='dynamic',
                  packing_RL=True,
                  norm2_max_iter=100,
                  norm2_threshold=1e-6,
@@ -889,9 +905,13 @@ class ParamsHierarchical(ParamsFact):
             is_fact_side_left: if True the leftmost factor is factorized,
             otherwise it's the rightmost.
             is_verbose: True to enable the verbose mode.
-            use_csr: True (by default) to prefer csr_matrix format when
-            updating factors (only available with 2020 backend of
-            pyfaust.fact.hierarchical).
+            factor_format: 'dynamic' (by default), 'dense', or 'sparse'. If
+            'dense' or 'sparse' then all factors will be numpy.ndarray or
+            scipy.sparse.csr_matrix. If 'dynamic' is used then the algorithm
+            determines the format of each factor automatically in order to
+            decrease the memory footprint of the Faust. This option is
+            available only on the 2020 backend pyfaust.fact.palm4msa, pyfaust.fact.hierarchical
+            or pyfaust.fact.palm4msa_mhtp, pyfaust.fact.hierarchical_mhtp.
             packing_RL: True (by default) to pre-compute R and L products
             (only available with 2020 backend of pyfaust.fact.hierarchical).
             norm2_max_iter: maximum number of iterations of power iteration
@@ -938,7 +958,7 @@ class ParamsHierarchical(ParamsFact):
                                                  constraints, step_size,
                                                  constant_step_size,
                                                  is_verbose,
-                                                 use_csr,
+                                                 factor_format,
                                                  packing_RL,
                                                  norm2_max_iter,
                                                  norm2_threshold,
@@ -1170,7 +1190,7 @@ class ParamsPalm4MSA(ParamsFact):
                 Note also that the matrices must be np.ndarray if the backend
                 argument of pyfaust.fact.palm4msa is equal to 2016, otherwise (backend==2020)
                 it is possible to use np.ndarray or scipy.sparse.csr_matrix
-                (depending of the ParamsPalm4MSA.use_csr attribute).
+                (depending of the ParamsPalm4MSA.factor_format attribute).
                 is_update_way_R2L: if True pyfaust.fact.palm4msa will update factors from
                 the right to the left, otherwise it's done in reverse order.
                 init_lambda: the scale scalar initial value (by default the
@@ -1198,7 +1218,7 @@ class ParamsPalm4MSA(ParamsFact):
                                              init_lambda,
                                              constraints, step_size,
                                              constant_step_size,
-                                             is_verbose, grad_calc_opt_mode,
+                                             is_verbose, grad_calc_opt_mode=grad_calc_opt_mode,
                                              **kwargs)
         if(init_facts != None and (not isinstance(init_facts, list) and not isinstance(init_facts,
                                                                tuple) or

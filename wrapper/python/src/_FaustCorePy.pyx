@@ -2450,6 +2450,9 @@ cdef class FaustFact:
         <PyxConstraintGeneric**> \
         PyMem_Malloc(sizeof(PyxConstraintGeneric*)*len(p.constraints))
 
+        p.factor_format = \
+        pyfaust.factparams.ParamsFact.factor_format_str2int(p.factor_format)
+
         for i in range(0,len(p.constraints)):
             cons = p.constraints[i]
             #print("FaustFact.fact_palm4MSA() cons.name =", cons.name)
@@ -2498,7 +2501,7 @@ cdef class FaustFact:
                                              &outbufview[0],
                                              cpp_stop_crit,
                                              p.is_update_way_R2L,
-                                             p.use_csr, p.packing_RL,
+                                             p.factor_format, p.packing_RL,
                                              cpp_MHTPParams,
                                              p.norm2_max_iter,
                                              p.norm2_threshold,
@@ -2542,7 +2545,7 @@ cdef class FaustFact:
         M = np.asfortranarray(M)
         is_update_way_R2L = p.is_update_way_R2L
         is_fact_side_left = p.is_fact_side_left
-        use_csr = p.use_csr
+        factor_format = p.factor_format
         packing_RL = p.packing_RL
         norm2_max_iter = p.norm2_max_iter
         norm2_threshold = p.norm2_threshold
@@ -2625,6 +2628,9 @@ cdef class FaustFact:
             cpp_constraints[i].num_rows = cons._num_rows
             cpp_constraints[i].num_cols = cons._num_cols
 
+        p.factor_format = \
+        pyfaust.factparams.ParamsFact.factor_format_str2int(p.factor_format)
+
         core = FaustCore(core=True)
 
         core.core_faust_dbl = \
@@ -2637,7 +2643,8 @@ cdef class FaustFact:
                                                      &outbufview[0],
                                                      is_update_way_R2L,
                                                      is_fact_side_left,
-                                                     use_csr, packing_RL,
+                                                     p.factor_format,
+                                                     packing_RL,
                                                      cpp_MHTPParams,
                                                      norm2_max_iter,
                                                      norm2_threshold,
