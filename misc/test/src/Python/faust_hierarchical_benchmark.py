@@ -41,7 +41,7 @@ def benchmark_hierarchical2020(H):
         p.norm2_threshold = NORM2_THRESHOLD
         p.packing_RL = False
         print("packing_RL:", p.packing_RL)
-        print("use_csr:", p.use_csr)
+        print("factor_format:", p.factor_format)
 #        F, _lambda = hierarchical2020(H, p.stop_crits[0].num_its, p.constraints,
 #                                      p.is_update_way_R2L, p.is_fact_side_left, True,
 #                                      p.norm2_threshold, p.norm2_max_iter,

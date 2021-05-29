@@ -8,7 +8,7 @@ import numpy as np
 
 num_its = 100 # the total number of iterations to run PALM4MSA
 backend = 2016 # or 2020
-use_csr = True
+factor_format = 'sparse'
 # Generate a matrix to factorize
 d = 64
 S = pyfaust.rand(d, d, num_factors=2, density=0.1, per_row=True)
@@ -22,7 +22,7 @@ stop_crit = StoppingCriterion(num_its=1)
 
 # pack all these parameters into a ParamsPalm4MSA
 p = ParamsPalm4MSA(projs, stop_crit)
-p.use_csr = use_csr
+p.factor_format = factor_format
 
 rel_errs = [] # relative errors for all iterations
 
@@ -62,14 +62,14 @@ for i in range(num_its):
                        init_facts=facts,
                        init_lambda=scale)
 
-    p.use_csr = use_csr
+    p.factor_format = factor_format
 
 print("relative errors along the iterations (step-by-step mode):", rel_errs)
 
 
 stop_crit = StoppingCriterion(num_its=num_its)
 p = ParamsPalm4MSA(projs, stop_crit)
-p.use_csr = use_csr
+p.factor_format = factor_format
 G = palm4msa(M, p, backend=backend)
 print("Relative error when running all PALM4MSA iterations at once: ", (G-M).norm() / norm(M))
 print("Last relative error obtained when running PALM4MSA "

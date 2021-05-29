@@ -823,7 +823,7 @@ class TestFaustFactory(unittest.TestCase):
         from pyfaust.factparams import (ParamsPalm4MSA, ConstraintList,
                                         StoppingCriterion,
                                         ConstraintInt,
-                                        ConstraintReal)
+                                        ConstraintReal, ParamsFact)
         import numpy as np
         from tempfile import gettempdir
         from os.path import join
@@ -836,7 +836,7 @@ class TestFaustFactory(unittest.TestCase):
         param = ParamsPalm4MSA(cons, stop_crit)
         param.is_verbose = True
         param.grad_calc_opt_mode = 1 
-        param.use_csr = False
+        param.factor_format = 'dense'
         param.packing_RL = False
         tmp_dir = gettempdir()
         tmp_file = join(tmp_dir, "verbose_output_of_palm4msa_test")
@@ -870,8 +870,10 @@ class TestFaustFactory(unittest.TestCase):
                 param_test.step_size = float(line.split(':')[-1].strip())
             if(line.startswith('gradCalcOptMode')):
                 param_test.grad_calc_opt_mode = int(line.split(':')[-1].strip())
-            if(line.startswith('use_csr')):
-                param_test.use_csr = int(line.split(':')[-1].strip()) != 0
+            if(line.startswith('factors format')):
+                param_test.factor_format = int(line.split(':')[-1].strip())
+                param_test.factor_format = \
+                ParamsFact.factor_format_int2str(param_test.factor_format)
             if(line.startswith('packing_RL')):
                 param_test.packing_RL = int(line.split(':')[-1].strip()) != 0
                 print(param_test.packing_RL)
@@ -908,7 +910,7 @@ class TestFaustFactory(unittest.TestCase):
                          param.constant_step_size)
         self.assertEqual(param_test.step_size, param.step_size)
         self.assertEqual(param_test.grad_calc_opt_mode, param.grad_calc_opt_mode)
-#        self.assertEqual(param_test.use_csr, param.use_csr)
+#        self.assertEqual(param_test.factor_format, param.factor_format)
 #        self.assertEqual(param_test.packing_RL, param.packing_RL)
         self.assertEqual(param_test.stop_crit.maxiter, param.stop_crit.maxiter)
         self.assertEqual(param_test.stop_crit._is_criterion_error,
