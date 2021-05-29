@@ -229,6 +229,36 @@ namespace Faust
 		}
 
 	template<typename FPP>
+		void TransformHelper<FPP, GPU2>::convertToSparse()
+		{
+			const MatDense<FPP,GPU2> * mat_dense;
+			const MatSparse<FPP,GPU2> * mat_sparse;
+			for(int i=0;i<this->size();i++)
+			{
+				if(mat_dense = dynamic_cast<const MatDense<FPP,GPU2>*>(this->get_gen_fact(i)))
+				{
+					mat_sparse = new MatSparse<FPP,GPU2>(*mat_dense);
+					this->replace(mat_sparse, i);
+				}
+			}
+		}
+
+	template<typename FPP>
+		void TransformHelper<FPP, GPU2>::convertToDense()
+		{
+			const MatDense<FPP,GPU2> * mat_dense;
+			const MatSparse<FPP,GPU2> * mat_sparse;
+			for(int i=0;i<this->size();i++)
+			{
+				if(mat_sparse = dynamic_cast<const MatSparse<FPP,GPU2>*>(this->get_gen_fact(i)))
+				{
+					mat_dense = new MatDense<FPP,GPU2>(*mat_sparse);
+					this->replace(mat_dense, i);
+				}
+			}
+		}
+
+	template<typename FPP>
 		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::multiply(const TransformHelper<FPP,GPU2>* right)
 		{
 			// The goal is to minimize the number of factors copied (but maybe the criterion should be the sum of the size of these factors rather than their number)

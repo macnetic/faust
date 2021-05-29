@@ -19,7 +19,7 @@ namespace Faust
 				TransformHelper(TransformHelper<FPP,GPU2>* th, faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols);
 				TransformHelper(const std::vector<MatGeneric<FPP,GPU2> *>& facts, const FPP lambda_ = (FPP)1.0, const bool optimizedCopy=false, const bool cloning_fact = true, const bool internal_call=false);
 				TransformHelper(const TransformHelper<FPP,Cpu>& cpu_t, int32_t dev_id=-1, void* stream=nullptr);
-                TransformHelper(const TransformHelper<FPP,GPU2>& th, bool transpose, bool conjugate);
+				TransformHelper(const TransformHelper<FPP,GPU2>& th, bool transpose, bool conjugate);
 #ifndef IGNORE_TRANSFORM_HELPER_VARIADIC_TPL
 				template<typename ...GList> TransformHelper(GList& ... t);
 #endif
@@ -59,6 +59,9 @@ namespace Faust
 				void pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id, const int mul_order_opt_mode=DEFAULT);
 				void update(const MatGeneric<FPP, GPU2>& M, const faust_unsigned_int id);
 				void replace(const MatGeneric<FPP, GPU2>* M, const faust_unsigned_int id);
+				void convertToSparse();
+				void convertToDense();
+
 				void operator=(TransformHelper<FPP,GPU2>& th);
 				typename Transform<FPP,GPU2>::iterator begin() const;
 				typename Transform<FPP,GPU2>::iterator end() const;
@@ -79,7 +82,7 @@ namespace Faust
 				void set_FM_mul_mode(const int mul_order_opt_mode, const bool silent=false) const;
 				void set_Fv_mul_mode(const int Fv_mul_mode) const;
 				faust_unsigned_int get_total_nnz() const;
-//				faust_unsigned_int get_fact_nnz(const faust_unsigned_int id) const;
+				//				faust_unsigned_int get_fact_nnz(const faust_unsigned_int id) const;
 				TransformHelper<FPP,GPU2>* normalize(const int meth /* 1 for 1-norm, 2 for 2-norm (2-norm), -1 for inf-norm */) const;
 				TransformHelper<FPP,GPU2>* transpose();
 				TransformHelper<FPP,GPU2>* conjugate();

@@ -719,6 +719,36 @@ template<typename FPP>
 	}
 
 template<typename FPP>
+	void TransformHelper<FPP, Cpu>::convertToSparse()
+	{
+		const MatDense<FPP,Cpu> * mat_dense;
+		const MatSparse<FPP,Cpu> * mat_sparse;
+		for(int i=0;i<this->size();i++)
+		{
+			if(mat_dense = dynamic_cast<const MatDense<FPP,Cpu>*>(this->get_gen_fact(i)))
+			{
+				mat_sparse = new MatSparse<FPP,Cpu>(*mat_dense);
+				this->replace(mat_sparse, i);
+			}
+		}
+	}
+
+template<typename FPP>
+	void TransformHelper<FPP, Cpu>::convertToDense()
+	{
+		const MatDense<FPP,Cpu> * mat_dense;
+		const MatSparse<FPP,Cpu> * mat_sparse;
+		for(int i=0;i<this->size();i++)
+		{
+			if(mat_sparse = dynamic_cast<const MatSparse<FPP,Cpu>*>(this->get_gen_fact(i)))
+			{
+				mat_dense = new MatDense<FPP,Cpu>(*mat_sparse);
+				this->replace(mat_dense, i);
+			}
+		}
+	}
+
+template<typename FPP>
 	void TransformHelper<FPP, Cpu>::replace(const MatGeneric<FPP, Cpu>* M, const faust_unsigned_int fact_id)
 	{
 		this->transform->replace(M, fact_id);

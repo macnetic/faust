@@ -96,6 +96,9 @@ namespace Faust
 			TransformHelper<FPP, DEV>* fancy_index(faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols);
 			virtual TransformHelper<FPP,DEV>* optimize_storage(const bool time=true);
 			virtual TransformHelper<FPP,DEV>* clone();
+			virtual void convertToSparse()=0;
+			virtual void convertToDense()=0;
+
 		protected:
 			void init_fancy_idx_transform(TransformHelper<FPP,DEV>* th, faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols);
 			void init_sliced_transform(TransformHelper<FPP,DEV>* th, Slice s[2]);

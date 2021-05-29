@@ -43,6 +43,14 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 	A_H.adjoint();
 	if(S.size() != nfacts)
 		fill_of_eyes(S, nfacts, factors_format != AllDense, dims, on_gpu);
+	else if(factors_format == AllSparse)
+	{
+		S.convertToSparse();
+	}
+	else if(factors_format == AllDense)
+	{
+		S.convertToDense();
+	}
 	int i = 0, f_id, j;
 	std::function<void()> init_ite, next_fid;
 	std::function<bool()> updating_facs;
@@ -409,7 +417,7 @@ void Faust::update_fact(
 		// D is the prox image (always a MatDense
 		// convert D to the proper format (MatSparse or MatDense)
 
-		if(factors_format == AllSparse && dcur_fac != nullptr || factors_format != AllSparse && scur_fac != nullptr)
+		if(factors_format == AllSparse && dcur_fac != nullptr || factors_format == AllDense && scur_fac != nullptr)
 			throw std::runtime_error("Current factor is inconsistent with the configured factors_format.");
 
 		if(factors_format == AllSparse)
