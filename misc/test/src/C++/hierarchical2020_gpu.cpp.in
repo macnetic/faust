@@ -49,6 +49,7 @@
 #include "faust_SpBlasHandle.h"
 #include "faust_HierarchicalFact.h"
 #include "faust_hierarchical.h"
+#include "faust_MHTP.h"
 #include <iostream>
 #include <iomanip>
 
@@ -186,14 +187,10 @@ int main(int argc, char* argv[])
     auto res_cons = cons[1];
 	vector<Faust::StoppingCriterion<Real<FPP>>> sc = {200,200};
     Real<FPP> lambda;
-//	auto th = Faust::hierarchical(matrix, sc, fac_cons, res_cons, lambda, params.isUpdateWayR2L,
-//            params.isFactSideLeft, /*use_csr */ true, /*packing_RL default to true*/true,
-//			/* compute_norms_on_arrays */false, FAUST_PRECISION, FAUST_NORM2_MAX_ITER, /* is_verbose default to false */ true, false, FAUST_PRECISION, /*on_gpu*/ true);
-//
 
     params.isVerbose = true;
-	params.use_csr = true;
-    auto th = Faust::hierarchical<FPP,Cpu>(matrix, params, lambda, false, /* on_gpu */ on_gpu);
+	params.factors_format = Faust::AllDynamic;
+    auto th = Faust::hierarchical<FPP,Cpu>(matrix, params, lambda, false, Faust::MHTPParams<FPP>(), on_gpu);
     cout << "lambda=" << lambda << endl;
     th->multiply(lambda);
     th->display();

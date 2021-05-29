@@ -94,7 +94,8 @@ int main(int argc, char* argv[])
     //algorithm
 
     Real<FPP> lambda;
-    bool isUpdateWayR2L = true, isFactSideLeft = false, use_csr = true, packing_RL = false;
+    bool isUpdateWayR2L = true, isFactSideLeft = false, packing_RL = false;
+	FactorsFormat factors_format = Faust::AllDynamic;
     char* str_norm2_threshold = getenv("NORM2_THRESHOLD");
     char* str_norm2_max_iter = getenv("NORM2_MAX_ITER");
 	char* str_packing_RL = getenv("PACKING_RL");
@@ -125,7 +126,7 @@ int main(int argc, char* argv[])
 //	sc.push_back(30);
 
     auto th = Faust::hierarchical(whtmat, sc, fac_cons, res_cons, lambda, isUpdateWayR2L,
-            isFactSideLeft, use_csr, packing_RL,
+            isFactSideLeft, factors_format, packing_RL,
 			MHTPParams<FPP>(),
             /* compute_2norm_on_array*/ false,
 			norm2_threshold,

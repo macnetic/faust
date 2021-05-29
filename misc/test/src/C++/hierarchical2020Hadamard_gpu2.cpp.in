@@ -57,6 +57,7 @@
 #include <iostream>
 #include <iomanip>
 #include <vector>
+#include "faust_MHTP.h"
 /** \brief An example of using the hierarchical factorization of a dense matrix. from .mat file.
 * A dense matrix is loaded from "@FAUST_DATA_MAT_DIR@
 * \param MatrixFilename :  a .mat (MATLAB file) where the matrix to be factorized is stored (or its transposed (cf. parameter transposeMatrix))
@@ -100,8 +101,9 @@ int main(int argc, char* argv[])
     //algorithm
 
     Real<FPP> lambda;
-    bool isUpdateWayR2L = true, isFactSideLeft = false, use_csr = true, packing_RL = false;
-    char* str_use_csr = getenv("USE_CSR");
+    bool isUpdateWayR2L = true, isFactSideLeft = false, packing_RL = false;
+	Faust::FactorsFormat factors_format = Faust::AllDynamic;
+    char* str_factors_format = getenv("FACTOR_FORMAT");
     char* str_norm2_threshold = getenv("NORM2_THRESHOLD");
     char* str_norm2_max_iter = getenv("NORM2_MAX_ITER");
 	char* str_packing_RL = getenv("PACKING_RL");
@@ -116,8 +118,8 @@ int main(int argc, char* argv[])
        norm2_max_iter = std::atoi(str_norm2_max_iter);
 	if(str_packing_RL)
 		packing_RL = std::atoi(str_packing_RL) != 0;
-	if(str_use_csr)
-		use_csr = std::atoi(str_use_csr) != 0;
+	if(str_factors_format)
+		factors_format = static_cast<Faust::FactorsFormat>(std::atoi(str_factors_format));
 	if(str_nfacts)
 		nfacts = std::atoi(str_nfacts);
 	if(str_constraint_name)
@@ -144,11 +146,13 @@ int main(int argc, char* argv[])
     cout << "norm2_threshold: "<< norm2_threshold << endl;
     cout << "norm2_max_iter: " << norm2_max_iter << endl;
 	cout << "prox: " << str_constraint_name << endl;
-	cout << "use_csr: " << use_csr << endl;
+	cout << "factors format: " << factors_format << endl;
 	cout << "packing_RL: " << packing_RL << endl;
 	vector<StoppingCriterion<Real<FPP>>> sc = {2,2};
+
     auto th = Faust::hierarchical(whtmat_gpu, sc, fac_cons, res_cons, lambda, isUpdateWayR2L,
-            isFactSideLeft, use_csr, packing_RL,
+            isFactSideLeft, factors_format, packing_RL,
+			Faust::MHTPParams<FPP>(),
             /* compute_2norm_on_array*/ false,
              norm2_threshold,
              norm2_max_iter);

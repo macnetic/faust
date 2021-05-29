@@ -1,6 +1,7 @@
 #include "faust_MatDense.h"
 #include "faust_MatSparse.h"
 #include "faust_prox.h"
+#include "faust_prox_gen.h"
 #include <iostream>
 
 /** \brief unitary test for MatDense conjugate

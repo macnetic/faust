@@ -6,6 +6,7 @@
 #include "faust_ConstraintInt.h"
 #include "faust_MatDense.h"
 #include "faust_hierarchical.h"
+#include "faust_MHTP.h"
 #ifdef USE_GPU_MOD
 #include"faust_gpu_mod_utils.h"
 #endif
@@ -98,20 +99,20 @@ int main(int argc, const char** argv)
 	Faust::SpBlasHandle<Cpu> cusparseHandle;
 	double lambda2020;
 
-	char* str_use_csr = getenv("USE_CSR");
+	char* str_factors_format = getenv("FACTOR_FORMAT");
 	char* str_packing_RL = getenv("PACKING_RL");
 	char* str_isUpdateWayR2L = getenv("UR2L");
 	char* str_isFactSideLeft = getenv("FSL");
 	params.isUpdateWayR2L = true;
 	params.isFactSideLeft = true;
 	params.packing_RL = true;
-	params.use_csr = true;
+	params.factors_format = AllDynamic;
 	params.isVerbose = true;
 
 	if(str_packing_RL)
 		params.packing_RL = std::atoi(str_packing_RL) != 0;
-	if(str_use_csr)
-		params.use_csr = std::atoi(str_use_csr) != 0;
+	if(str_factors_format)
+		params.factors_format = static_cast<FactorsFormat>(std::atoi(str_factors_format));
 	if(str_isUpdateWayR2L)
 		params.isUpdateWayR2L = std::atoi(str_isUpdateWayR2L) != 0;
 	if(str_isFactSideLeft)
@@ -139,10 +140,10 @@ int main(int argc, const char** argv)
 
 #ifdef ON_CPU
 			cout << "on_gpu: " << on_gpu << endl;
-			auto th = Faust::hierarchical<double,Cpu>(MEG, params, lambda2020, false, on_gpu);
+			auto th = Faust::hierarchical<double,Cpu>(MEG, params, lambda2020, false, MHTPParams<double>(), on_gpu);
 #else
 			cout << "hierarchical on GPU2 MEG" << endl;
-			auto th = Faust::hierarchical<double,GPU2>(gpu_MEG, params, lambda2020, false, on_gpu);
+			auto th = Faust::hierarchical<double,GPU2>(gpu_MEG, params, lambda2020, false, MHTPParams<double>(), on_gpu);
 #endif
 			th->display();
 
