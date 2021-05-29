@@ -841,7 +841,7 @@ class ParamsFact(ABC):
         map = {'dense': 0, 'sparse': 1, 'dynamic': 2}
         if isinstance(factor_format, str):
             if factor_format not in map.keys():
-                raise ValueError("factor_format must be in "+repr(map.keys()))
+                raise ValueError("factor_format as str must be in "+repr(map.keys()))
             return map[factor_format]
         elif isinstance(factor_format, int):
             if factor_format not in map.values():
@@ -849,6 +849,18 @@ class ParamsFact(ABC):
                                  +repr(map.values()))
             return factor_format
 
+    @staticmethod
+    def factor_format_int2str(factor_format):
+        a = ['dense', 'sparse', 'dynamic']
+        if isinstance(factor_format, str):
+            if factor_format not in a:
+                raise ValueError("factor_format as str must be in "+a)
+            return factor_format
+        elif isinstance(factor_format, int):
+            if factor_format not in range(len(a)):
+                raise ValueError("factor_format as int must be in"
+                                 +repr(range(len(a))))
+            return factor_format
 
 class ParamsHierarchical(ParamsFact):
     """
@@ -906,7 +918,7 @@ class ParamsHierarchical(ParamsFact):
             otherwise it's the rightmost.
             is_verbose: True to enable the verbose mode.
             factor_format: 'dynamic' (by default), 'dense', or 'sparse'. If
-            'dense' or 'sparse' then all factors will be numpy.ndarray or
+            'dense' or 'sparse' then all factors will be respectively numpy.ndarray or
             scipy.sparse.csr_matrix. If 'dynamic' is used then the algorithm
             determines the format of each factor automatically in order to
             decrease the memory footprint of the Faust. This option is
