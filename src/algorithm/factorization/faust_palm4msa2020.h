@@ -48,7 +48,7 @@ namespace Faust
 				//const unsigned int nites,
 				const StoppingCriterion<Real<FPP>>& sc,
 				const bool is_update_way_R2L=false,
-                const bool use_csr=true,
+				const FactorsFormat factors_format=AllDynamic,
 				const bool compute_2norm_on_array=false,
 				const Real<FPP> norm2_threshold=FAUST_PRECISION,
 				const unsigned int norm2_max_iter=FAUST_NORM2_MAX_ITER,
