@@ -106,8 +106,8 @@ const string mat_field_type2str(MAT_FIELD_TYPE f)
 			return "init_D";
 		case PACKING_RL:
 			return "packing_RL";
-		case USE_CSR:
-			return "use_csr";
+		case FACTOR_FORMAT:
+			return "factor_format";
 		case NORM2_MAX_ITER:
 			return "norm2_max_iter";
 		case NORM2_THRESHOLD:
@@ -232,7 +232,7 @@ void testCoherencePALM4MSA(const mxArray* params,std::vector<bool> & presentFiel
 			presentFields[14] = true;
 		else if(strcmp(fieldName, "norm2_threshold") == 0)
 			presentFields[15] = true;
-		else if(strcmp(fieldName, "use_csr") == 0)
+		else if(strcmp(fieldName, "factor_format") == 0)
 			presentFields[16] = true;
 		else if(strcmp(fieldName, "packing_RL") == 0)
 			presentFields[17] = true;

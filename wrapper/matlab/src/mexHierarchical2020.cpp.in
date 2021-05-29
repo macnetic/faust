@@ -74,7 +74,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	system("sleep 7");
 #endif
 
-	if(nrhs < 2) // matrix + params + (optional use_csr and packing_RL)
+	if(nrhs < 2) // matrix + params + (optional factors_format and packing_RL)
 		mexErrMsgTxt("The number of arguments of hierarchical2020 must be 2 at least");
 
 	const mxArray* matlab_matrix = prhs[0];
@@ -99,7 +99,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		auto res_cons = params->cons[1];
 		bool compute_2norm_on_arrays = false;
 		std::vector<Faust::StoppingCriterion<Real<SCALAR>>> sc = {params->stop_crit_2facts.get_crit(), params->stop_crit_global.get_crit()};
-		auto th = Faust::hierarchical(matrix, sc, fac_cons, res_cons, lambda, params->isUpdateWayR2L, params->isFactSideLeft, params->use_csr, params->packing_RL, mhtp_params, compute_2norm_on_arrays, params->norm2_threshold, params->norm2_max_iter, params->isVerbose, params->isConstantStepSize, params->step_size);
+		auto th = Faust::hierarchical(matrix, sc, fac_cons, res_cons, lambda, params->isUpdateWayR2L, params->isFactSideLeft, params->factors_format, params->packing_RL, mhtp_params, compute_2norm_on_arrays, params->norm2_threshold, params->norm2_max_iter, params->isVerbose, params->isConstantStepSize, params->step_size);
 
 		auto th_times_lambda = th->multiply(lambda);
 		delete th;

@@ -26,7 +26,7 @@ classdef ParamsPalm4MSA < matfaust.factparams.ParamsFact
 		%>	@param 'norm2_max_iter', real (optional) maximum number of iterations of power iteration algorithm. Used for computing 2-norm.
 		%>	@param 'norm2_threshold', real (optional) power iteration algorithm threshold (default to 1e-6). Used for computing 2-norm.
 		%>	@param 'grad_calc_opt_mode', int (optional) the mode used for computing the PALM gradient. It can be one value among matfaust.factparams.ParamsFact.EXTERNAL_OPT, matfaust.factparams.ParamsFact.INTERNAL_OPT or matfaust.factparams.ParamsFact.DISABLED_OPT. This
-		%>	@param 'use_csr', bool true (by default) to prefer compressed sparse row matrix format when updating factors (only available with 2020 backend of matfaust.fact.palm4msa).
+		%>	@param 'factor_format', str (optional) 'dynamic' (by default), 'dense', or 'sparse'. If 'dense' or 'sparse' then all factors will be respectively full arrays or sparse matrices. If 'dynamic' is used then the algorithm determines the format of each factor automatically in order to decrease the memory footprint of the Faust. This option is available only on the 2020 backend matfaust.fact.palm4msa, matfaust.fact.hierarchical or matfaust.fact.palm4msa_mhtp, matfaust.fact.hierarchical_mhtp.
 		%>	@param 'packing_RL', bool true (by default) to pre-compute R and L products (only available with 2020 backend of pyfaust.fact.palm4msa).
 		%>
 		%>
@@ -98,7 +98,7 @@ classdef ParamsPalm4MSA < matfaust.factparams.ParamsFact
 				mex_constraints{i} = cur_cell;
 			end
 			% put mex_constraints in a cell array again because mex eats one level of array
-			mex_params = struct('data', M, 'nfacts', this.num_facts, 'cons', {mex_constraints}, 'init_facts', {this.init_facts}, 'niter', this.stop_crit.num_its, 'sc_is_criterion_error', this.stop_crit.is_criterion_error, 'sc_error_treshold', this.stop_crit.tol, 'sc_max_num_its', this.stop_crit.maxiter, 'update_way', this.is_update_way_R2L, 'grad_calc_opt_mode', this.grad_calc_opt_mode, 'constant_step_size', this.constant_step_size, 'step_size', this.step_size, 'verbose', this.is_verbose, 'norm2_max_iter', this.norm2_max_iter, 'norm2_threshold', this.norm2_threshold, 'init_lambda', this.init_lambda, 'use_csr', this.use_csr, 'packing_RL', this.packing_RL);
+			mex_params = struct('data', M, 'nfacts', this.num_facts, 'cons', {mex_constraints}, 'init_facts', {this.init_facts}, 'niter', this.stop_crit.num_its, 'sc_is_criterion_error', this.stop_crit.is_criterion_error, 'sc_error_treshold', this.stop_crit.tol, 'sc_max_num_its', this.stop_crit.maxiter, 'update_way', this.is_update_way_R2L, 'grad_calc_opt_mode', this.grad_calc_opt_mode, 'constant_step_size', this.constant_step_size, 'step_size', this.step_size, 'verbose', this.is_verbose, 'norm2_max_iter', this.norm2_max_iter, 'norm2_threshold', this.norm2_threshold, 'init_lambda', this.init_lambda, 'factor_format', matfaust.factparams.ParamsFact.factor_format_str2int(this.factor_format), 'packing_RL', this.packing_RL);
 			if(~ (islogical(this.use_MHTP) &&  this.use_MHTP == false))
 				% use_MHTP must be a MHTPParams if not false (cf. ParamsFact)
 				if(~ isa(this.use_MHTP, 'matfaust.factparams.MHTPParams'))

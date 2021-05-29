@@ -683,11 +683,13 @@ const Params<SCALAR, Cpu, FPP2>* mxArray2FaustParams(const mxArray* matlab_param
 		params = new Params<SCALAR,Cpu,FPP2>(nb_row,nb_col,nbFact,consSS,/*std::vector<Faust::MatDense<SCALAR,Cpu> >()*/ init_facts,crit1,crit2,isVerbose,updateway,factside,init_lambda);
 	}
 
-	bool use_csr = Params<SCALAR, Cpu, FPP2>::defaultUseCSR;
-	if(presentFields[USE_CSR])
+
+	FactorsFormat factors_format = Params<SCALAR, Cpu, FPP2>::defaultFactorsFormat;
+	if(presentFields[FACTOR_FORMAT])
 	{
-		mxCurrentField = mxGetField(matlab_params, 0, mat_field_type2str(USE_CSR).c_str());
-		use_csr = (bool) mxGetScalar(mxCurrentField);
+		mxCurrentField = mxGetField(matlab_params, 0, mat_field_type2str(FACTOR_FORMAT).c_str());
+		factors_format = static_cast<FactorsFormat>((int)mxGetScalar(mxCurrentField));
+		std::cout << "mx2Faust factors_format:" << factors_format << std::endl;
 	}
 
 	bool packing_RL = Params<SCALAR, Cpu, FPP2>::defaultPackingRL;
@@ -713,7 +715,7 @@ const Params<SCALAR, Cpu, FPP2>* mxArray2FaustParams(const mxArray* matlab_param
 	if(norm2_threshold != FPP2(0))
 		params->norm2_threshold = norm2_threshold;
 	params->packing_RL = packing_RL;
-	params->use_csr = use_csr;
+	params->factors_format = factors_format;
 	bool constant_step_size = false;
 	if(presentFields[CONSTANT_STEP_SIZE])
 	{
@@ -924,12 +926,13 @@ const ParamsPalm<SCALAR,Cpu,FPP2>* mxArray2FaustParamsPALM4MSA(const mxArray* ma
 		mxCurrentField = mxGetField(matlab_params, 0, "norm2_threshold");
 		norm2_threshold = (FPP2) mxGetScalar(mxCurrentField);
 	}
-	bool use_csr = Params<SCALAR, Cpu, FPP2>::defaultUseCSR;
+	FactorsFormat factors_format = Params<SCALAR, Cpu, FPP2>::defaultFactorsFormat;
 	bool packing_RL = Params<SCALAR, Cpu, FPP2>::defaultPackingRL;
 	if(presentFields[16])
 	{
-		mxCurrentField = mxGetField(matlab_params, 0, "use_csr");
-		use_csr = (bool) mxGetScalar(mxCurrentField);
+		mxCurrentField = mxGetField(matlab_params, 0, "factor_format");
+		factors_format = static_cast<FactorsFormat>((int)mxGetScalar(mxCurrentField));
+		std::cout << "mx2Faust factors_format:" << factors_format << std::endl;
 	}
 	if(presentFields[17])
 	{
@@ -958,7 +961,7 @@ const ParamsPalm<SCALAR,Cpu,FPP2>* mxArray2FaustParamsPALM4MSA(const mxArray* ma
 
 	if(norm2_max_iter) params->norm2_max_iter = norm2_max_iter;
 	if(norm2_threshold != FPP2(0)) params->norm2_threshold = norm2_threshold;
-	params->use_csr = use_csr;
+	params->factors_format = factors_format;
 	params->packing_RL = packing_RL;
 
 	return params;
@@ -969,7 +972,6 @@ void mxArray2FaustMHTPParams(const mxArray* matlab_params, Faust::MHTPParams<SCA
 {
 	// all fields are optional
 	mxArray *mx_field = mxGetField(matlab_params, 0, "mhtp_num_its");
-	std::cout << "mx_field:" << mx_field << std::endl;
 	if(params.used = (mx_field != nullptr))
 		params.sc = Faust::StoppingCriterion<SCALAR>((int) mxGetScalar(mx_field));
 

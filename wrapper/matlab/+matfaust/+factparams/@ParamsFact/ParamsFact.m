@@ -12,7 +12,7 @@ classdef (Abstract) ParamsFact
 		constraints
 		is_verbose
 		grad_calc_opt_mode
-		use_csr
+		factor_format
 		packing_RL
 		norm2_max_iter
 		norm2_threshold
@@ -25,7 +25,7 @@ classdef (Abstract) ParamsFact
 		DEFAULT_INIT_LAMBDA = 1.0
 		DEFAULT_IS_UPDATE_WAY_R2L = false
 		DEFAULT_PACKING_RL = true
-		DEFAULT_USE_CSR = true
+		DEFAULT_FACTOR_FORMAT = 'dynamic'
 		%> @note 0 means the default value defined in C++ core (100).
 		DEFAULT_NORM2_MAX_ITER = 0 % norm2 parameters to 0 in order to use default parameters from C++ core
 		%> @note 0 means the default value defined in C++ core (1e-6).
@@ -39,7 +39,7 @@ classdef (Abstract) ParamsFact
 		IDX_GRAD_CALC_OPT_MODE = 6
 		IDX_NORM2_MAX_ITER = 7
 		IDX_NORM2_THRESHOLD = 8
-		IDX_USE_CSR = 9
+		IDX_FACTOR_FORMAT = 9
 		IDX_PACKING_RL = 10
 		% flags to control the optimization of the multiplication L'(LSR)R' in PALM4MSA
 		%> gradient product optimization is disabled
@@ -51,7 +51,7 @@ classdef (Abstract) ParamsFact
 		%> default is EXTERNAL_OPT
 		DEFAULT_OPT = 2
 		% the order of names matters and must respect the indices above
-		OPT_ARG_NAMES = {'is_update_way_R2L', 'init_lambda', 'step_size', 'constant_step_size', 'is_verbose', 'grad_calc_opt_mode', 'norm2_max_iter', 'norm2_threshold', 'use_csr', 'packing_RL'}
+		OPT_ARG_NAMES = {'is_update_way_R2L', 'init_lambda', 'step_size', 'constant_step_size', 'is_verbose', 'grad_calc_opt_mode', 'norm2_max_iter', 'norm2_threshold', 'factor_format', 'packing_RL'}
 	end
 	methods
 		function p = ParamsFact(num_facts, constraints, varargin)
@@ -72,7 +72,7 @@ classdef (Abstract) ParamsFact
 			grad_calc_opt_mode = ParamsFact.DEFAULT_OPT;
 			norm2_threshold = ParamsFact.DEFAULT_NORM2_THRESHOLD;
 			norm2_max_iter = ParamsFact.DEFAULT_NORM2_MAX_ITER;
-			use_csr = ParamsFact.DEFAULT_USE_CSR;
+			factor_format = ParamsFact.DEFAULT_FACTOR_FORMAT;
 			packing_RL = ParamsFact.DEFAULT_PACKING_RL;
 			% check mandatory arguments
 			if(~ isscalar(num_facts) || ~ isreal(num_facts))
@@ -128,8 +128,8 @@ classdef (Abstract) ParamsFact
 			if(opt_arg_map.isKey(ParamsFact.OPT_ARG_NAMES{ParamsFact.IDX_PACKING_RL}))
 				packing_RL = opt_arg_map(ParamsFact.OPT_ARG_NAMES{ParamsFact.IDX_PACKING_RL});
 			end
-			if(opt_arg_map.isKey(ParamsFact.OPT_ARG_NAMES{ParamsFact.IDX_USE_CSR}))
-				use_csr = opt_arg_map(ParamsFact.OPT_ARG_NAMES{ParamsFact.IDX_USE_CSR});
+			if(opt_arg_map.isKey(ParamsFact.OPT_ARG_NAMES{ParamsFact.IDX_FACTOR_FORMAT}))
+				factor_format = opt_arg_map(ParamsFact.OPT_ARG_NAMES{ParamsFact.IDX_FACTOR_FORMAT});
 			end
 			% then check validity of opt args (it's useless for default values but it's not too costfull)
 			% TODO: group argument verifs by type in loops
@@ -152,8 +152,8 @@ classdef (Abstract) ParamsFact
 			if(~ isscalar(grad_calc_opt_mode) && (grad_calc_opt_mode == ParamsFact.INTERNAL_OPT || grad_calc_opt_mode == ParamsFact.EXTERNAL_OPT || grad_calc_opt_mode == ParamsFact.DISABLED_OPT))
 				error(['matfaust.factparams.ParamsFact ', p.OPT_ARG_NAMES{ParamsFact.IDX_GRAD_CALC_OPT_MODE},' argument (grad_calc_opt_mode) must be an integer equal to ParamsFact.INTERNAL_OPT, ParamsFact.EXTERNAL_OPT, or ParamsFact.DISABLED_OPT.'])
 			end
-			if(~ islogical(use_csr))
-				error(['matfaust.factparams.ParamsFact ', p.OPT_ARG_NAMES{ParamsFact.IDX_USE_CSR},' argument must be logical.'])
+			if(~ ischar(factor_format) && ~ isstring(factor_format) || ~ any(strcmp(factor_format, {'dense', 'sparse', 'dynamic'})))
+				error(['matfaust.factparams.ParamsFact ', p.OPT_ARG_NAMES{ParamsFact.IDX_FACTOR_FORMAT},' argument must be a str in ''dense'', ''sparse'' or ''dynamic''.'])
 			end
 			if(~ islogical(packing_RL))
 				error(['matfaust.factparams.ParamsFact ', p.OPT_ARG_NAMES{ParamsFact.IDX_PACKING_RL},' argument must be logical.'])
@@ -174,7 +174,7 @@ classdef (Abstract) ParamsFact
 			p.is_verbose = is_verbose;
 			p.constant_step_size = constant_step_size;
 			p.grad_calc_opt_mode = grad_calc_opt_mode;
-			p.use_csr = use_csr;
+			p.factor_format = ParamsFact.factor_format_str2int(factor_format)
 			p.packing_RL = packing_RL;
 			p.norm2_max_iter = norm2_max_iter;
 			p.norm2_threshold = norm2_threshold;
@@ -192,6 +192,22 @@ classdef (Abstract) ParamsFact
 
 	end
 	methods(Static)
+		function ff_int = factor_format_str2int(factor_format)
+			if(ischar(factor_format) || isstring(factor_format))
+				if(strcmp('dense', factor_format))
+					ff_int = 0;
+				elseif(strcmp('sparse', factor_format))
+					ff_int = 1;
+				elseif(strcmp('dynamic', factor_format))
+					ff_int = 2;
+				end
+			elseif(isreal(factor_format) && factor_format >= 0 && factor_format <=2)
+				% already a int or real to truncate
+				ff_int = floor(factor_format)
+			else
+				error('factor_format should be a char array: ''dense'', ''sparse'' or ''dynamic''')
+			end
+		end
 		function parse_opt_args(cell_args, opt_arg_names, opt_arg_map)
 			if(~ iscell(cell_args))
 				error('cell_args must be a cell array')

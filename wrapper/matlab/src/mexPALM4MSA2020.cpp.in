@@ -135,7 +135,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 //
 		}
 		palm4msa2(params->data, noconst_cons, *F, lambda, params->stop_crit, params->isUpdateWayR2L,
-				params->use_csr, params->packing_RL, mhtp_params, /* compute_2norm_on_array */ false, params->norm2_threshold,
+				params->factors_format, params->packing_RL, mhtp_params, /* compute_2norm_on_array */ false, params->norm2_threshold,
 				params->norm2_max_iter, params->isConstantStepSize, params->step_size, false /* on_gpu*/, params->isVerbose);
 		Faust::MatDense<FPP2,Cpu> mat1x1Lambda = Faust::MatDense<FPP2, Cpu>(&lambda, 1, 1);
 		plhs[0] = FaustMat2mxArray(mat1x1Lambda);
