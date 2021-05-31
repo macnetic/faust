@@ -361,7 +361,7 @@ First please copy the following function in the appropriate filename ``factorize
 			    s = 8;
 			    tic
 			    p = ParamsHierarchicalRectMat.createParams(MEG, {'rectmat', num_facts, k, s});
-			    p.use_csr = false;
+			    p.factor_format = 'dense';
 			    MEG16 = hierarchical(MEG, p, 'backend', 2020, 'gpu', strcmp('dev', 'gpu'));
 			    total_time = toc;
 			    err = norm(MEG16-MEG, 'fro')/norm(MEG, 'fro');
