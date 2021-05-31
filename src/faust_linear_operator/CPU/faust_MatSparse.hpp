@@ -959,21 +959,21 @@ Faust::MatSparse<FPP,Cpu>* Faust::MatSparse<FPP,Cpu>::get_rows(faust_unsigned_in
 }
 
 	template<typename FPP>
-Faust::MatSparse<FPP, Cpu>* Faust::MatSparse<FPP, Cpu>::randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, double density)
+Faust::MatSparse<FPP, Cpu>* Faust::MatSparse<FPP, Cpu>::randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, Real<FPP> density)
 {
 	std::default_random_engine generator(rand());
-	std::uniform_real_distribution<double> distribution(0, 1);
+	std::uniform_real_distribution<Real<FPP>> distribution(0, 1);
 	std::uniform_int_distribution<faust_unsigned_int> int_distribution(0, num_rows*num_cols-1);
 	typedef Eigen::Triplet<FPP,faust_unsigned_int> T;
 	std::vector<T> tripletList;
 	MatSparse<FPP, Cpu>* fsmat = new MatSparse<FPP,Cpu>();
 	Eigen::SparseMatrix<FPP,Eigen::RowMajor> mat(num_rows, num_cols);
 	FPP rand_number;
-	complex<double> rs;
+	complex<Real<FPP>> rs;
 	try {
 		faust_unsigned_int num_elts = (faust_unsigned_int)(num_rows*num_cols*density);
 		tripletList.reserve(num_elts);
-		faust_unsigned_int i,col_id,row_id, r;
+		faust_unsigned_int i, col_id,row_id, r;
 		i = 0;
 		while(i < num_elts)
 		{
@@ -981,9 +981,10 @@ Faust::MatSparse<FPP, Cpu>* Faust::MatSparse<FPP, Cpu>::randMat(faust_unsigned_i
 			row_id = r/num_cols;
 			col_id = r - row_id * num_cols;
 			assert(col_id >= 0 && col_id < num_cols);
-			rs = complex<double>(distribution(generator), distribution(generator));
+			rs = complex<Real<FPP>>(distribution(generator), distribution(generator));
 			memcpy(&rand_number, &rs, sizeof(FPP));
-//			cout << row_id << " " << col_id << " " << rand_number << endl;
+//			rand_number = complex2other<FPP>(rs);
+//			cout << row_id << " " << col_id << " " << rand_number << rs << sizeof(FPP) << sizeof(complex<FPP>)<< endl;
 			tripletList.push_back(T(row_id,col_id, rand_number));
 			i++;
 		}
@@ -1001,7 +1002,7 @@ Faust::MatSparse<FPP, Cpu>* Faust::MatSparse<FPP, Cpu>::randMat(faust_unsigned_i
 }
 
 	template<typename FPP>
-Faust::MatSparse<FPP, Cpu>* Faust::MatSparse<FPP, Cpu>::randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, double density, bool per_row)
+Faust::MatSparse<FPP, Cpu>* Faust::MatSparse<FPP, Cpu>::randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, Real<FPP> density, bool per_row)
 {
 	std::default_random_engine generator(rand());
 	std::uniform_real_distribution<Real<FPP>> distribution(0, 1);
@@ -1346,4 +1347,5 @@ void Faust::copy_sp_mat(Faust::MatSparse<FPP,Cpu>& src, Faust::MatSparse<FPP, Cp
 	memcpy(dst.getColInd(), src.getColInd(), src.getNonZeros()*sizeof(int));
 	memcpy(dst.getRowPtr(), src.getRowPtr(), (src.getNbRow()+1)*sizeof(int));
 }
+
 #endif

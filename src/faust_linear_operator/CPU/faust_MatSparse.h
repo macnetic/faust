@@ -372,9 +372,9 @@ namespace Faust
 
 			void print_bufs(const std::string name="");
 			void print_asarray(const std::string name="");
-			static MatSparse<FPP, Cpu>* randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, double density);
+			static MatSparse<FPP, Cpu>* randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, Real<FPP> density);
 			//\param : per_row means the density applies for each line rather than globally for the matrix
-			static MatSparse<FPP, Cpu>* randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, double density, bool per_row);
+			static MatSparse<FPP, Cpu>* randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, Real<FPP> density, bool per_row);
 			static MatSparse<FPP, Cpu>* eye(faust_unsigned_int num_rows, faust_unsigned_int num_cols);
 
 			// Permutation matrix set to exchange two rows or columns (depending on the multiplication side)

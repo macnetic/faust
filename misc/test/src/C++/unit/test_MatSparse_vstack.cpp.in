@@ -12,8 +12,8 @@ typedef @TEST_FPP@ FPP;
 int main()
 {
 
-	MatSparse<FPP,Cpu>* M1 = MatSparse<FPP,Cpu>::randMat(3, 4, .5);
-	MatSparse<FPP,Cpu>* M2 = MatSparse<FPP,Cpu>::randMat(13, 4, .5);
+	MatSparse<FPP,Cpu>* M1 = MatSparse<FPP,Cpu>::randMat(30, 40, .5);
+	MatSparse<FPP,Cpu>* M2 = MatSparse<FPP,Cpu>::randMat(130, 40, .5);
 	MatSparse<FPP,Cpu> M;
 	M.vstack(*M1, *M2);
 	cout << "M1:" << endl;
@@ -29,7 +29,8 @@ int main()
 	memcpy(buf, M1->getValuePtr(), sizeof(FPP)*M1->getNonZeros());
 	memcpy(buf+M1->getNonZeros(), M2->getValuePtr(), sizeof(FPP)*M2->getNonZeros());
 	MatDense<FPP,Cpu> Mds(buf, M.getNonZeros(), 1);
-	assert(abs(Mds.norm()-M.norm()) < 1e-1);
+	auto diff = Mds.norm()-M.norm();
+	assert(abs(diff) < 1e-1);
 	for(int i=0;i < M.getNonZeros(); i++)
 		assert(abs(M.getValuePtr()[i] - buf[i] < 1e-6));
 	delete [] buf;
