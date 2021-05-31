@@ -13,11 +13,6 @@ namespace Faust
 	template<typename FPP,FDevice DEVICE> class MatDense;
 	template<typename FPP,FDevice DEVICE> class MatGeneric;
 
-	enum PackDir {
-		PACK_LEFT,
-		PACK_RIGHT
-	};
-
 	enum RandFaustType {
 		DENSE,
 		SPARSE,
@@ -69,7 +64,6 @@ namespace Faust
 
 			virtual void pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id, const int mul_order_opt_mode=DEFAULT)=0;
 
-			virtual void pack_factors(const faust_unsigned_int id, const PackDir dir, const int mul_order_opt_mode=DEFAULT);
 			virtual void pack_factors(const int mul_order_opt_mode=DEFAULT);
 			/**
 			  \brief Returns the left hand side factors of this from index 0 to id included (as a new TransformHelper obj).

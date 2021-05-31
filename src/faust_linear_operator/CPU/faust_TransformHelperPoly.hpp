@@ -985,12 +985,6 @@ namespace Faust
 
 
 	template<typename FPP>
-		void TransformHelperPoly<FPP>::pack_factors(const faust_unsigned_int id, const PackDir dir, const int mul_order_opt_mode/*=DEFAULT*/)
-		{
-			ERROR_ON_FAC_NUM_CHANGE();
-		}
-
-	template<typename FPP>
 		void TransformHelperPoly<FPP>::pack_factors(const int mul_order_opt_mode/*=DEFAULT*/)
 		{
 			ERROR_ON_FAC_NUM_CHANGE();

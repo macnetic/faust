@@ -91,7 +91,6 @@ namespace Faust
 			bool is_fact_dense(const faust_unsigned_int id) const;
 			void pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id, const int mul_order_opt_mode=DEFAULT);
 
-			void pack_factors(const faust_unsigned_int id, const PackDir dir, const int mul_order_opt_mode=DEFAULT);
 			void pack_factors(const int mul_order_opt_mode=DEFAULT);
 			TransformHelper<FPP,Cpu>* left(const faust_unsigned_int id, const bool copy=false) const;
 			TransformHelper<FPP,Cpu>* right(const faust_unsigned_int id, const bool copy=false) const;
