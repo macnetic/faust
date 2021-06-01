@@ -384,6 +384,14 @@ namespace Faust
 			MatDense<FPP,Cpu>* get_cols(faust_unsigned_int start_col_id, faust_unsigned_int num_cols) const;
 			MatDense<FPP,Cpu>* get_cols(faust_unsigned_int* col_ids, faust_unsigned_int n) const;
 			MatDense<FPP,Cpu>* get_cols(std::vector<int> col_ids) const;
+			/** \brief Returns true if this[:,id_this] == other[:, id_other] at the specified precision. */
+			bool eq_cols(const MatDense<FPP, Cpu> & other, faust_unsigned_int id_this, faust_unsigned_int id_other, const Real<FPP>& precision) const;
+			/** \brief Returns true if this[id_this, :] == other[id_other, :] at the specified precision. */
+			bool eq_rows(const MatDense<FPP, Cpu> & other, faust_unsigned_int id_this, faust_unsigned_int id_other, const Real<FPP>& precision) const;
+			/** \brief Returns the sum of the column of index id. */
+			FPP sum_col(faust_unsigned_int id) const;
+			/** \brief Returns the sum of the row of index id. */
+			FPP sum_row(faust_unsigned_int id) const;
 			void delete_col(int offset);
 			void delete_row(int offset);
 
@@ -468,6 +476,22 @@ namespace Faust
 			 */
 			std::list<std::pair<int,int>> nonzeros_indices() const;
 
+			/**
+			 * \brief Returns the best low rank approximation this = bestX * bestY using the svd.
+			 */
+			void best_low_rank(const int &r, MatDense<FPP,Cpu> &bestX, MatDense<FPP, Cpu> &bestY) const;
+			/**
+			 * Returns the vector of the indices of the nonzeros of the row of index row_id.
+			 */
+			std::vector<int> row_nonzero_inds(faust_unsigned_int row_id) const;
+			/**
+			 * Returns the vector of the indices of the nonzeros of the column of index col_id.
+			 */
+			std::vector<int> col_nonzero_inds(faust_unsigned_int col_id) const;
+			/**
+			 * Returns in submat the submatrix defined by the row indices row_ids and the column indices col_ids.
+			 */
+			void submatrix(const std::vector<int> &row_ids, const std::vector<int> &col_ids, MatDense<FPP, Cpu> & submat) const;
 			private:
 			Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic> mat;
 			bool isZeros;

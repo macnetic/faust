@@ -53,7 +53,7 @@
 #include "faust_exception.h"
 #include "faust_constant.h"
 #include <cassert>
-
+#include <Eigen/SVD>
 
 namespace Faust
 {
@@ -202,7 +202,7 @@ namespace Faust
 			std::list<std::pair<int,int>> nz_inds;
 			if(this->is_identity)
 #ifdef _MSC_VER
-				for(int i=0;i<min(this->dim1, this->dim2);i++) // VS14 strange issue with std::min //C2589 or C2059
+				for(int i=0;i<min(this->dim1, this->dim2);i++) // VS14 strange issue with std::min //C2589 or C2059 // TODO/ fix rather with -DNOMINMAX
 #else
 					for(int i=0;i<std::min(this->dim1, this->dim2);i++)
 #endif
@@ -1219,6 +1219,88 @@ MatDense<FPP,Cpu>* MatDense<FPP,Cpu>::get_rows(faust_unsigned_int* row_ids, faus
 	MatDense<FPP, Cpu>* rows = new MatDense<FPP, Cpu>(data, n, this->getNbCol());
 	delete [] data;
 	return rows;
+}
+
+
+	template<typename FPP>
+bool MatDense<FPP,Cpu>::eq_cols(const MatDense<FPP, Cpu> & other, faust_unsigned_int id_this, faust_unsigned_int id_other, const Real<FPP>& precision) const
+{
+	if(this->getNbRow() != other.getNbRow()) return false;
+	for(int i=0;i<this->getNbRow();i++)
+	{
+		if(std::abs((*this)(i, id_this)-other(i, id_other)) > precision)
+			return false;
+	}
+	return true;
+}
+
+	template<typename FPP>
+bool MatDense<FPP,Cpu>::eq_rows(const MatDense<FPP, Cpu> & other, faust_unsigned_int id_this, faust_unsigned_int id_other, const Real<FPP>& precision) const
+{
+	if(this->getNbCol() != other.getNbCol()) return false;
+	for(int j=0;j<this->getNbCol();j++)
+	{
+		if(std::abs((*this)(id_this,j)-other(id_other,j)) > precision)
+			return false;
+	}
+	return true;
+}
+
+template<typename FPP>
+void MatDense<FPP, Cpu>::best_low_rank(const int &r, MatDense<FPP,Cpu> &bestX, MatDense<FPP, Cpu> &bestY) const
+{
+	Eigen::JacobiSVD<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>> svd(this->mat, Eigen::ComputeThinU | Eigen::ComputeThinV);
+	bestX.mat = svd.matrixU().block(0, 0, this->getNbRow(), r) * svd.singularValues().block(0, 0, r, r).asDiagonal();
+	bestY.mat = svd.matrixV().block(0, 0, this->getNbCol(), r) * svd.singularValues().block(0, 0, r, r).asDiagonal();
+}
+
+	template<typename FPP>
+std::vector<int> MatDense<FPP, Cpu>::col_nonzero_inds(faust_unsigned_int col_id) const
+{
+	std::vector<int> ids;
+	auto data_ptr = this->getData()+col_id*this->getNbRow();
+	for(int i=0;i<this->getNbRow();i++)
+	{
+		if(data_ptr[i]) ids.push_back(i);
+	}
+	return ids;
+}
+
+template<typename FPP>
+std::vector<int> MatDense<FPP, Cpu>::row_nonzero_inds(faust_unsigned_int row_id) const
+{
+	std::vector<int> ids;
+	auto data_ptr = this->getData();
+	for(int j=0;j<this->getNbRow();j++)
+		if(data_ptr[j*this->getNbRow()+row_id]) ids.push_back(j);
+	return ids;
+}
+
+template<typename FPP>
+void MatDense<FPP, Cpu>::submatrix(const std::vector<int> &row_ids, const std::vector<int> &col_ids, MatDense<FPP, Cpu> & submat) const
+{
+	if(this->dim1 != row_ids.size() || this->dim2 != col_ids.size())
+		submat.resize(row_ids.size(), col_ids.size());
+	submat.mat = mat(row_ids, col_ids);
+	std::cout << submat.mat << std::endl;
+}
+
+template<typename FPP>
+FPP MatDense<FPP,Cpu>::sum_col(faust_unsigned_int id) const
+{
+	FPP sum = (FPP)0;
+	for(int i=0;i<this->getNbRow();i++)
+		sum += (*this)(i, id);
+	return sum;
+}
+
+	template<typename FPP>
+FPP MatDense<FPP,Cpu>::sum_row(faust_unsigned_int id) const
+{
+	FPP sum = (FPP)0;
+	for(int i=0;i<this->getNbCol();i++)
+		sum += (*this)(id, i);
+	return sum;
 }
 
 	template<typename FPP>
