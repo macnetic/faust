@@ -210,7 +210,7 @@ namespace Faust
 			}
 
 
-			//! \brief compute MatGeneric-MatDense multiplication
+			//! \brief compute MatDense multiplication
 			//! \param M : the dense matrix
 			//! \param opThis : character	
 			//! M = (*this) * M if opThis='N'
@@ -250,6 +250,9 @@ namespace Faust
 
 			//! \brief Set the matrix to the one diagonal matrix
 			void setEyes();
+
+			// \brief Sets all nonzeros to one.
+			void setNZtoOne();
 
 			//! \brief Returns the identity matrix.
 			static MatDense<FPP,Cpu> eye(faust_unsigned_int nrows, faust_unsigned_int ncols);
@@ -492,6 +495,17 @@ namespace Faust
 			 * Returns in submat the submatrix defined by the row indices row_ids and the column indices col_ids.
 			 */
 			void submatrix(const std::vector<int> &row_ids, const std::vector<int> &col_ids, MatDense<FPP, Cpu> & submat) const;
+
+			/**
+			 * Assigns this[row_ids[i], col_id] to values[i, val_col_id] for each i in {0, ..., row_ids.size()}.
+			 */
+			void set_col_coeffs(faust_unsigned_int col_id, const std::vector<int> &row_ids, const MatDense<FPP, Cpu> &values, faust_unsigned_int val_col_id);
+
+			/**
+			 * Assigns this[row_id, col_ids[j]] to values[val_row_id, j] for each j in {0, ..., col_ids.size()}.
+			 */
+			void set_row_coeffs(faust_unsigned_int row_id, const std::vector<int> &col_ids, const MatDense<FPP, Cpu> &values, faust_unsigned_int val_row_id);
+
 			private:
 			Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic> mat;
 			bool isZeros;
@@ -529,6 +543,9 @@ namespace Faust
 #endif
 		};
 
+	// \brief Computes the Kronecker product A \otimes B into out.
+	template<typename FPP>
+			void kron(const MatDense<FPP,Cpu> &A, const MatDense<FPP, Cpu> &B, MatDense<FPP,Cpu>& out);
 }
 
 #include "faust_MatDense.hpp"

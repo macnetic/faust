@@ -44,6 +44,7 @@
 
 
 #include "faust_linear_algebra.h"
+#include <limits>
 
 //#include <cmath>
 #include <iostream>
@@ -254,6 +255,16 @@ namespace Faust
 			if (this->dim1 == this->dim2)
 				this->is_identity = true;
 			isZeros = false;
+		}
+
+	template<typename FPP>
+		void MatDense<FPP, Cpu>::setNZtoOne()
+		{
+			auto eps = std::numeric_limits<Real<FPP>>::epsilon();
+			for(int i=0;i<this->dim1*this->dim2;i++)
+			{
+				mat.data()[i] = static_cast<FPP>(std::abs((*this)(i)) > eps?1:0);
+			}
 		}
 
 	template<typename FPP>
@@ -1250,8 +1261,13 @@ template<typename FPP>
 void MatDense<FPP, Cpu>::best_low_rank(const int &r, MatDense<FPP,Cpu> &bestX, MatDense<FPP, Cpu> &bestY) const
 {
 	Eigen::JacobiSVD<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>> svd(this->mat, Eigen::ComputeThinU | Eigen::ComputeThinV);
-	bestX.mat = svd.matrixU().block(0, 0, this->getNbRow(), r) * svd.singularValues().block(0, 0, r, r).asDiagonal();
-	bestY.mat = svd.matrixV().block(0, 0, this->getNbCol(), r) * svd.singularValues().block(0, 0, r, r).asDiagonal();
+	if(bestX.getNbRow() != this->getNbRow() || r != bestX.getNbCol())
+		bestX.resize(this->getNbRow(), r);
+	if(bestY.getNbRow() != this->getNbRow() || r != bestY.getNbCol())
+		bestY.resize(r, this->getNbCol());
+	auto s = Eigen::sqrt(svd.singularValues().block(0, 0, r, r).array()).matrix().asDiagonal();
+	bestX.mat = svd.matrixU().block(0, 0, this->getNbRow(), r) * s;
+	bestY.mat = s * svd.matrixV().block(0, 0, this->getNbCol(), r).adjoint();
 }
 
 	template<typename FPP>
@@ -1282,7 +1298,28 @@ void MatDense<FPP, Cpu>::submatrix(const std::vector<int> &row_ids, const std::v
 	if(this->dim1 != row_ids.size() || this->dim2 != col_ids.size())
 		submat.resize(row_ids.size(), col_ids.size());
 	submat.mat = mat(row_ids, col_ids);
-	std::cout << submat.mat << std::endl;
+}
+
+template<typename FPP>
+void MatDense<FPP, Cpu>::set_col_coeffs(faust_unsigned_int col_id, const std::vector<int> &row_ids, const MatDense<FPP, Cpu> &values, faust_unsigned_int val_col_id)
+{
+	for(int i=0;i<row_ids.size();i++)
+	{
+		auto row_id = row_ids[i];
+		mat(row_id, col_id) = values(i, val_col_id);
+	}
+	this->isZeros = this->getNonZeros() == 0;
+}
+
+template<typename FPP>
+void MatDense<FPP, Cpu>::set_row_coeffs(faust_unsigned_int row_id, const std::vector<int> &col_ids, const MatDense<FPP, Cpu> &values, faust_unsigned_int val_row_id)
+{
+	for(int i=0;i<col_ids.size();i++)
+	{
+		auto col_id = col_ids[i];
+		mat(row_id, col_id) = values(val_row_id, i);
+	}
+	this->isZeros = this->getNonZeros() == 0;
 }
 
 template<typename FPP>
@@ -1339,6 +1376,31 @@ Vect<FPP,Cpu> MatDense<FPP,Cpu>::rowwise_min(int* col_indices) const
 	for(int i=0;i<this->getNbRow();i++)
 		vec.getData()[i] = mat.row(i).minCoeff(col_indices+i);
 	return vec;
+}
+
+	template<typename FPP>
+void kron(const MatDense<FPP,Cpu> &A, const MatDense<FPP, Cpu> &B, MatDense<FPP,Cpu>& out)
+{
+	auto out_nrows = A.getNbRow()*B.getNbRow();
+	auto out_ncols = A.getNbCol()*B.getNbCol();
+	out.resize(out_nrows, out_ncols);
+	MatDense<FPP,Cpu> tmp;
+	//TODO: OpenMP ?
+	for(int i=0;i<A.getNbRow();i++)
+	{
+		for(int j=0;j<A.getNbRow();j++)
+		{
+			auto s = A(i,j);
+			tmp = B;
+			tmp *= s;
+			// copy column by column in out
+			for(int k=0;k<B.getNbCol();k++)
+			{
+				auto col_offset = out_nrows*j*B.getNbCol()+out_nrows*k+i*B.getNbRow();
+				memcpy(out.getData()+col_offset, tmp.getData()+k*B.getNbRow(), sizeof(FPP)*B.getNbRow());
+			}
+		}
+	}
 }
 
 template<typename FPP>
