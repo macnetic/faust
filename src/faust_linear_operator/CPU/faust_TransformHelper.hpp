@@ -1000,7 +1000,7 @@ template<typename FPP>
 					handleError("Faust::TransformHelper::normalize()", "order for the norm to use is not valid");
 			}
 			if(norm != FPP(0))
-				norm_invs[i] = 1./norm;
+				norm_invs[i] = (FPP)1./norm;
 			else
 				norm_invs[i] = 1;
 			coords[i] = i;
