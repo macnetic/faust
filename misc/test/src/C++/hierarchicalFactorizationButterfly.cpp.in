@@ -1,0 +1,103 @@
+#include "faust_init_from_matio_params.h"
+#include "faust_init_from_matio_core.h"
+#include "faust_MatDense.h"
+#include "faust_TransformHelper.h"
+#include "faust_butterfly.h"
+
+typedef @TEST_FPP@ FPP;
+
+using namespace Faust;
+using namespace std;
+
+
+int main(int argc, char** argv)
+{
+	auto wht = TransformHelper<FPP,Cpu>::hadamardFaust(10, false);
+	Faust::MatDense<FPP,Cpu> A;
+	/********** NOTE: a lot of garbage is left here, it was useful during the first writing of butterfly module (it could be again) */
+	//	Faust::MatDense<FPP,Cpu> support1, support2, A;
+	//	Faust::MatDense<FPP,Cpu> submatrixA, bestx, besty, X, Y, refX, refY;
+	//	init_faust_mat_from_matio(support1, "supports.mat", "support1");
+	//	init_faust_mat_from_matio(support2, "supports.mat", "support2");
+	//	init_faust_mat_from_matio(submatrixA, "svd.mat", "submatrixA");
+	//	init_faust_mat_from_matio(bestx, "svd.mat", "bestx");
+	//	init_faust_mat_from_matio(besty, "svd.mat", "besty");
+	//	init_faust_mat_from_matio(A, "A.mat", "A");
+	//	init_faust_mat_from_matio(refX, "XY.mat", "X");
+	//	init_faust_mat_from_matio(refY, "XY.mat", "Y");
+
+	//	support1.Display();
+	//	support2.Display();
+	cout << "matrix to factorize:" << std::endl;
+	A = wht->get_product();
+	A.Display();
+
+
+	//	vector<vector<faust_unsigned_int>*> cec, noncec;
+	////	vector<vector<faust_unsigned_int>> cec, noncec;
+	//	retrieveCEC(support1, support2, cec, noncec);
+	//	std::cout << "cec:" << std::endl;
+	//	print_classes(cec);
+	//	std::cout << "noncec:" << std::endl;
+	//	print_classes(noncec);
+	//
+	//	Faust::MatDense<FPP,Cpu> _bestx(bestx.getNbRow(), bestx.getNbCol());
+	//	Faust::MatDense<FPP,Cpu> _besty(besty.getNbRow(), besty.getNbCol());
+	//	int r = bestx.getNbCol();
+	//	submatrixA.best_low_rank(r, _bestx, _besty);
+	//	std::cout << bestx.norm() << " " << _bestx.norm() << std::endl;
+	//	std::cout << besty.norm() << " " << _besty.norm() << std::endl;
+	//	bestx.Display();
+	//	_bestx.Display();
+	//	besty.Display();
+	//	_besty.Display();
+	//
+	//
+	//	r = 1;
+	//	auto RP = support1.col_nonzero_inds(r);
+	//	for(int i=0;i<RP.size();i++)
+	//		std::cout << RP[i] << " ";
+	//	std::cout << std::endl;
+	//	auto CP = support2.row_nonzero_inds(r);
+	//	for(int i=0;i<CP.size();i++)
+	//		std::cout << CP[i] << " ";
+	//	std::cout << std::endl;
+	//
+	//	Faust::MatDense<FPP, Cpu> submat;
+	//	A.submatrix(RP, CP, submat);
+	//	submat.Display();
+	//
+	////    colx, rowx = np.meshgrid(ce, RP)
+	////    print("ce=", ce, "RP=", RP, "colx=", colx, "rowx=", rowx)
+	////    coly, rowy = np.meshgrid(CP, ce)
+	////    print("ce=", ce, "CP=", CP, "coly=", coly, "rowy=", rowy)
+	////    bestx, besty = best_low_rank(submatrixA, len(ce))
+	////    if not exists("svd.mat"):
+	////        savemat("svd.mat", {'submatrixA': submatrixA, 'bestx': bestx, 'besty':
+	////                            besty})
+	////    X[rowx, colx] = bestx
+	////    Y[rowy, coly] = besty
+	//
+	//	solveDTO(A, support1, support2, X, Y);
+	//	std::cout << X.norm() << " " << refX.norm() << std::endl;
+	//	std::cout << Y.norm() << " " << refY.norm() << std::endl;
+	//
+	//	Faust::MatDense<FPP, Cpu> ones(2, 2);
+	//	Faust::MatDense<FPP, Cpu> id(5, 5);
+	//	ones.setOnes();
+	//	id.setEyes();
+	//
+	//	Faust::MatDense<FPP, Cpu> out;
+	//	Faust::kron(ones, id, out);
+	//	std::cout << out.norm() << std::endl;
+
+	auto th = butterfly_hierarchical(A);
+	th->display();
+	auto M = th->get_product();
+	M -= A;
+	auto err = M.norm()/A.norm();
+	std::cout << "err=" << err << std::endl;
+	if(err > 1e-6)
+		exit(1);
+}
+

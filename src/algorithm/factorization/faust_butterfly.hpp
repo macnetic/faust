@@ -68,7 +68,7 @@ namespace Faust
 						th_class[i].clear();
 					}
 					// class is in cec or noncec
-					if(min(s1.sum_row(i), s1.sum_col(i)) <= class_->size())
+					if(min(Faust::fabs(s1.sum_row(i)), Faust::fabs(s1.sum_col(i))) <= class_->size())
 					{
 						cec.push_back(class_);
 					}

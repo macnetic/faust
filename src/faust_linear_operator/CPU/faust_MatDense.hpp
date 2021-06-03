@@ -1277,7 +1277,7 @@ std::vector<int> MatDense<FPP, Cpu>::col_nonzero_inds(faust_unsigned_int col_id)
 	auto data_ptr = this->getData()+col_id*this->getNbRow();
 	for(int i=0;i<this->getNbRow();i++)
 	{
-		if(data_ptr[i]) ids.push_back(i);
+		if((FPP)data_ptr[i] != FPP(0)) ids.push_back(i);
 	}
 	return ids;
 }
@@ -1288,7 +1288,7 @@ std::vector<int> MatDense<FPP, Cpu>::row_nonzero_inds(faust_unsigned_int row_id)
 	std::vector<int> ids;
 	auto data_ptr = this->getData();
 	for(int j=0;j<this->getNbRow();j++)
-		if(data_ptr[j*this->getNbRow()+row_id]) ids.push_back(j);
+		if((FPP)(data_ptr[j*this->getNbRow()+row_id]) != FPP(0)) ids.push_back(j);
 	return ids;
 }
 
