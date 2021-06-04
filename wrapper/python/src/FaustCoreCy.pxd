@@ -293,6 +293,7 @@ cdef extern from "FaustFact.h":
                                               const bool full_gpu,
                                               FaustCoreCpp[FPP]* cth)
 
+    cdef FaustCoreCpp[FPP]* butterfly_hierarchical[FPP](FPP* mat, unsigned int, unsigned int)
 
 
 cdef extern from "FaustFactGivensFGFT.h":
@@ -360,4 +361,5 @@ cdef extern from "FaustFactGivensFGFT.h":
 
     cdef void* _enable_gpu_mod(const char* libpath, const bool silent)
     cdef bool _is_gpu_mod_enabled()
+
 

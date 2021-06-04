@@ -1067,3 +1067,9 @@ def fgft_palm(U, Lap, p, init_D=None, ret_lambda=False, ret_params=False):
         ret_list += [ p ]
     return ret_list
 # experimental block end
+
+
+# experimental block start
+def butterfly(M):
+    return Faust(core_obj=_FaustCorePy.FaustFact.butterfly_hierarchical(M))
+# experimental block end

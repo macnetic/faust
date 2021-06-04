@@ -2663,6 +2663,39 @@ cdef class FaustFact:
 
         return core, np.real(_out_buf[0])
 
+    @staticmethod
+    def butterfly_hierarchical(M):
+
+        cdef unsigned int M_num_rows=M.shape[0]
+        cdef unsigned int M_num_cols=M.shape[1]
+
+        cdef double[:,:] Mview
+        cdef complex[:,:] Mview_cplx
+
+        isReal = M.dtype in [ 'float', 'float128',
+                             'float16', 'float32',
+                             'float64', 'double']
+        # double == float64
+
+        if not M.flags['F_CONTIGUOUS']:
+            M = np.asfortranarray(M)
+
+        check_matrix(isReal, M)
+
+        core = FaustCore(core=True)
+        if(isReal):
+            Mview = M
+            core.core_faust_dbl = FaustCoreCy.butterfly_hierarchical[double](&Mview[0,0], M_num_rows, M_num_cols)
+            core._isReal = True
+        else:
+            Mview_cplx = M
+            core.core_faust_cplx = \
+            FaustCoreCy.butterfly_hierarchical[complex](&Mview_cplx[0,0], M_num_rows, M_num_cols)
+            core._isReal = False
+
+        return core
+
+
 def polyCoeffs(d, basisX, coeffs, dev, out=None):
     if not isinstance(basisX, np.ndarray):
         raise ValueError('input basisX must be a numpy.ndarray')
