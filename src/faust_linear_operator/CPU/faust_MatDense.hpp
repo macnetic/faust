@@ -1297,7 +1297,15 @@ void MatDense<FPP, Cpu>::submatrix(const std::vector<int> &row_ids, const std::v
 {
 	if(this->dim1 != row_ids.size() || this->dim2 != col_ids.size())
 		submat.resize(row_ids.size(), col_ids.size());
+#ifdef _MSC_VER
+	// as far as I tested eigen3.4rc1 doesn't compile with VS 14
+	// so extract the matrix manually in this env.
+	for(int i=0;i<row_ids.size();i++)
+		for(int j=0;j<col_ids.size();j++)
+			submat.mat(i,j) = mat(row_ids[i], col_ids[j]);
+#else
 	submat.mat = mat(row_ids, col_ids);
+#endif
 }
 
 template<typename FPP>
