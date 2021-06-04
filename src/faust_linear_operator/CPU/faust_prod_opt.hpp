@@ -1,3 +1,4 @@
+#include "faust_openmp.h"
 //TODO: allow nflags == 1 and all factors using with same flag
 /**
  *	\brief Multiply all the matrices together (as a product of n factors) with an optimization based on the associativity of the matrix product ; following an order that minimizes the number of scalar operations.
@@ -346,7 +347,7 @@ template<typename FPP, FDevice DEVICE>
 Faust::MatDense<FPP,DEVICE> Faust::multiply_omp(const std::vector<Faust::MatGeneric<FPP,DEVICE>*> data, const Faust::MatDense<FPP,DEVICE> A, const char opThis)
 {
 	Faust::MatDense<FPP, DEVICE> *M = nullptr;
-#ifdef _MUL_OMP_ //TODO: this compiler constant should be defined auto. when BUILD_MULTITHREADING is ON
+#ifdef OMP_ENABLED
 				// until this this method is disabled at compilation unless we manually define the constant in CFLAGS (for example).
 	int nth, start_nth, thid, num_per_th, data_size;
 	Faust::MatDense<FPP,DEVICE>* mats[8];
@@ -445,6 +446,8 @@ Faust::MatDense<FPP,DEVICE> Faust::multiply_omp(const std::vector<Faust::MatGene
 template<typename FPP, FDevice DEVICE>
 Faust::MatDense<FPP,DEVICE> Faust::multiply_par(const std::vector<Faust::MatGeneric<FPP,DEVICE>*>& data, const Faust::MatDense<FPP,DEVICE> A, const char opThis)
 {
+
+#ifdef OMP_ENABLED // this function doesn't use OpenMP but C++ threads are implemented using POSIX threads on Linux gcc as OpenMP, so for FAµST we assume it's the same
 	int nth = std::thread::hardware_concurrency(); // https://en.cppreference.com/w/cpp/thread/thread/hardware_concurrency
 	int barrier_count = nth;
 	Faust::MatDense<FPP, DEVICE> *M;
@@ -504,7 +507,9 @@ Faust::MatDense<FPP,DEVICE> Faust::multiply_par(const std::vector<Faust::MatGene
 	//TODO: return a ptr instead of a copy
 	//TODO: delete threads
 	return *M;
-
+#else
+	throw std::runtime_error("It's not possible to call Faust::multiply_par because the library hasn't been compiled with this function enabled.");
+#endif
 }
 
 template<typename FPP, FDevice DEVICE>

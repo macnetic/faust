@@ -1,7 +1,10 @@
 #include "faust_MatDense.h"
 #include "faust_TransformHelper.h"
 #include <vector>
-#include "omp.h" //TODO: ifdef to avoid when BUILD_MULTITHREAD is OFF
+#include "faust_openmp.h"
+#ifdef OMP_ENABLED
+#include "omp.h"
+#endif
 #include <cmath>
 #include <limits>
 
@@ -40,7 +43,11 @@ namespace Faust
 			//	Vect<FPP, Cpu> c1(r), c2(r), r1(r), r2(r);
 			vector<bool> processed_ids(r, false);
 			auto eps = 1e-6;
+#ifdef OMP_ENABLED
 			int nthreads = 8;
+#else
+			int nthreads = 1;
+#endif
 			auto th_class = new vector<faust_unsigned_int>[nthreads];
 			for(int i=0;i<r;i++)
 			{
@@ -56,7 +63,11 @@ namespace Faust
 						{
 							if(s1.eq_cols(s2, i, j, eps) && s1.eq_rows(s2, i, j, eps))
 							{
+#ifdef OMP_ENABLED
 								th_class[omp_get_thread_num()].push_back(j);
+#else
+								th_class[0].push_back(j);
+#endif
 								processed_ids[j] = true;
 							}
 						}

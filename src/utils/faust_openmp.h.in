@@ -1,0 +1,2 @@
+#cmakedefine OMP_ENABLED // #define OMP_ENABLED if BUILD_MULTITHREAD=ON, not defined otherwise (see the main CMakeLists.txt for the variable def)
+

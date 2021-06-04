@@ -549,7 +549,9 @@ if(BUILD_MULTITHREAD)
 	endif()
 	message(STATUS OMP_CXX_FLAGS=${OMP_CXX_FLAGS} OMP_CXX_LFLAGS=${OMP_CXX_LFLAGS})
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OMP_CXX_FLAGS}")
+	set(OMP_ENABLED ON) # (CPP preprocessor compilation constant) used in cpp code to detect if OMP is usable
 endif(BUILD_MULTITHREAD)
+configure_file(${FAUST_SRC_DIR}/utils/faust_openmp.h.in ${FAUST_SRC_DIR}/utils/faust_openmp.h)
 
 #if( (CMAKE_BUILD_TYPE MATCHES "Debug") OR  (CMAKE_BUILD_TYPE MATCHES "debug") OR  (CMAKE_BUILD_TYPE MATCHES "DEBUG") )
 if (BUILD_DEBUG OR (CMAKE_BUILD_TYPE MATCHES "Debug") OR  (CMAKE_BUILD_TYPE MATCHES "debug") OR  (CMAKE_BUILD_TYPE MATCHES "DEBUG") )
