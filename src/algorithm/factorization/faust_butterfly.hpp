@@ -103,58 +103,68 @@ namespace Faust
 			X.setZeros();
 			Y.setZeros();
 			retrieveCEC(s1, s2, cec, noncec);
+			for(auto ce: cec)
+			{
+				auto r = (*ce)[0];
+				auto RP = s1.col_nonzero_inds(r);
+				auto CP = s2.row_nonzero_inds(r);
+				if(RP.size() == 0 || CP.size() == 0)
+					continue;
+				//TODO: maybe some refactoring is possible between the for loops
+				if(ce->size() == RP.size() || ce->size() == RP.size())
+				{
+					noncec.push_back(ce);
+					continue;
+				}
+				A.submatrix(RP, CP, submat);
+				if(ce->size() >= RP.size())
+				{
+					MatDense<FPP, Cpu> eye(RP.size(), ce->size());
+					eye.setEyes();
+					for(int i=0;i< ce->size();i++)
+					{
+						auto col_id = (*ce)[i];
+						X.set_col_coeffs(col_id, RP, eye, i);
+						if(i < RP.size())
+						{
+							auto row_id = (*ce)[i];
+							Y.set_row_coeffs(row_id, CP, submat, i);
+						}
+					}
+				}
+				else
+				{
+					MatDense<FPP, Cpu> eye(ce->size(), CP.size());
+					eye.setEyes();
+					for(int i=0;i< ce->size();i++)
+					{
+
+						if(i < CP.size())
+						{
+							auto col_id = (*ce)[i];
+							X.set_col_coeffs(col_id, RP, eye, i);
+						}
+						auto row_id = (*ce)[i];
+						Y.set_row_coeffs(row_id, CP, submat, i);
+					}
+
+				}
+			}
 			for(auto ce: noncec)
 			{
 				auto r = (*ce)[0];
-				//		std::cout << "r:" << r << std::endl;
 				auto RP = s1.col_nonzero_inds(r);
-				//		for(int i=0;i<RP.size();i++)
-				//			std::cout << RP[i] << " ";
-				//		std::cout << std::endl;
 				auto CP = s2.row_nonzero_inds(r);
-				//		for(int i=0;i<CP.size();i++)
-				//			std::cout << CP[i] << " ";
-				//		std::cout << std::endl;
 				A.submatrix(RP, CP, submat);
 				submat.best_low_rank(ce->size(), bestx, besty);
-				//		std::cout << "bestx.norm():" << bestx.norm() << std::endl;
-				//		std::cout << bestx.getNbRow() << "," << bestx.getNbCol() << std::endl;
-				//		std::cout << "besty.norm():" << besty.norm() << std::endl;
-				//		std::cout << besty.getNbRow() << "," << besty.getNbCol() << std::endl;
-				//		std::cout << "submat.norm():" << submat.norm() << std::endl;
-				//		submat.Display();
 				//TODO: OpenMP ?
 				for(int i=0;i< ce->size();i++)
 				{
 
 					auto col_id = (*ce)[i];
 					X.set_col_coeffs(col_id, RP, bestx, i);
-					//			cout << "X" << endl;
-					//			X.Display();
-					//			std::cout << "colx=" << col_id << std::endl;
-					//			std::cout << "rowx=";
-					//			for(auto x: RP)
-					//				std::cout << x << ", ";
-					//			std::cout << std::endl;
-					auto row_id = col_id;
+					auto row_id = (*ce)[i];
 					Y.set_row_coeffs(row_id, CP, besty, i);
-					//			std::cout << "coly=";
-					//			for(auto x: CP)
-					//				std::cout << x << ", ";
-					//			std::cout << std::endl;
-					//			std::cout << "rowy=";
-					//			std::cout << row_id << std::endl;
-
-					//			std::cout << "X.norm():" << X.norm() << std::endl;
-					//			std::cout << "Y.norm():" << Y.norm() << std::endl;
-					//			auto X_nnz_inds = X.nonzeros_indices();
-					//			std::cout << " X nonzeros:" << std::endl;
-					//			for(auto c: X_nnz_inds)
-					//				std::cout << c.first << " " << c.second << std::endl;
-					//			auto Y_nnz_inds = Y.nonzeros_indices();
-					//			std::cout << " Y nonzeros:" << std::endl;
-					//			for(auto c: Y_nnz_inds)
-					//				std::cout << c.first << " " << c.second << std::endl;
 				}
 			}
 		}
