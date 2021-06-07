@@ -1185,9 +1185,7 @@ template<typename FPP>
 		try
 		{
 			fft_factors(n, factors);
-			//			for(int i=0;i<n+1;i++)
-			//				factors[i]->Display();
-			float alpha = norma?1/sqrt((double)(1 << n)):1.0;
+			FPP alpha = norma?FPP(1/sqrt((double)(1 << n))):FPP(1.0);
 			fourierFaust = new TransformHelper<FPP, Cpu>(factors, alpha, false, false, /* internal call */ true);
 		}
 		catch(std::bad_alloc e)

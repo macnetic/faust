@@ -198,7 +198,36 @@ namespace Faust
 				sp_support = new Faust::MatSparse<FPP, Cpu>(support);
 				out.push_back(sp_support);
 			}
+			if(! std::is_same<FPP, Real<FPP>>::value)
+			{
+				bit_reversal_factor(nfactors, out);
+			}
 			return out;
+		}
+
+	template<>
+		void bit_reversal_factor<double>(int nfactors, std::vector<Faust::MatSparse<double, Cpu>*> &out)
+		{
+			//nothing to do for double matrices
+		}
+
+	template<>
+		void bit_reversal_factor<std::complex<double>>(int nfactors, std::vector<Faust::MatSparse<std::complex<double>, Cpu>*>& out)
+		{
+			std::cout << "bit_reversal_factor" << std::endl;
+			// bit reversal permutation factor
+			unsigned int dim_size = 1u << nfactors, L, r, L_over_2, L_times_2;
+			unsigned int* index = new unsigned int[dim_size];
+			unsigned int* new_index = new unsigned int[dim_size];
+			for(unsigned int i = 0; i < dim_size; i++)
+				index[i] = i;
+			memcpy(new_index, index, sizeof(unsigned int)*dim_size);
+			bit_rev_permu(nfactors, new_index, false);
+			std::vector<std::complex<Real<double>>> ones(dim_size);
+			for(typename std::vector<std::complex<double>>::iterator it=ones.begin(); it != ones.end(); it++)
+				*it = std::complex<double>(1.0);
+			MatSparse<std::complex<double>,Cpu> *P = new MatSparse<std::complex<double>,Cpu>(index, new_index, ones, dim_size, dim_size);
+			out.push_back(P);
 		}
 
 	template<typename FPP>
