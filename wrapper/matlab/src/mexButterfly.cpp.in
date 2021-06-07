@@ -1,0 +1,93 @@
+/****************************************************************************/
+/*                              Description:                                */
+/*  For more information on the FAuST Project, please visit the website     */
+/*  of the project : <http://faust.inria.fr>                         		*/
+/*                                                                          */
+/*                              License:                                    */
+/*  Copyright (2021): 	Hakim HADJ-DJILANI									*/
+/* 						Nicolas Bellot, Adrien Leman, Thomas Gautrais,		*/
+/*                      Luc Le Magoarou, Remi Gribonval                     */
+/*                      INRIA Rennes, FRANCE                                */
+/*                      http://www.inria.fr/                                */
+/*                                                                          */
+/*  The FAuST Toolbox is distributed under the terms of the GNU Affero      */
+/*  General Public License.                                                 */
+/*  This program is free software: you can redistribute it and/or modify    */
+/*  it under the terms of the GNU Affero General Public License as          */
+/*  published by the Free Software Foundation.                              */
+/*                                                                          */
+/*  This program is distributed in the hope that it will be useful, but     */
+/*  WITHOUT ANY WARRANTY; without even the implied warranty of              */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                    */
+/*  See the GNU Affero General Public License for more details.             */
+/*                                                                          */
+/*  You should have received a copy of the GNU Affero General Public        */
+/*  License along with this program.                                        */
+/*  If not, see <http://www.gnu.org/licenses/>.                             */
+/*                                                                          */
+/*                             Contacts:                                    */
+/*      Nicolas Bellot  : nicolas.bellot@inria.fr                           */
+/*      Adrien Leman    : adrien.leman@inria.fr                             */
+/*      Thomas Gautrais : thomas.gautrais@inria.fr                          */
+/*      Luc Le Magoarou : luc.le-magoarou@inria.fr                          */
+/*      Remi Gribonval  : remi.gribonval@inria.fr                           */
+/*                                                                          */
+/*                              References:                                 */
+/*  [1] Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse       */
+/*  approximations of matrices and applications", Journal of Selected       */
+/*  Topics in Signal Processing, 2016.                                      */
+/*  <https://hal.archives-ouvertes.fr/hal-01167948v1>                       */
+
+
+#include "mex.h"
+//#include "mexutils.h"
+#include "faust_MatDense.h"
+#include <vector>
+#include <stdexcept>
+#include "mx2Faust.h"
+#include "faust2Mx.h"
+#include "mx2Faust.h"
+#include "faust_TransformHelper.h"
+#include "class_handle.hpp"
+#include "faust_butterfly.h"
+using namespace Faust;
+
+typedef @FAUST_SCALAR@ SCALAR;
+typedef @FACT_FPP@ FPP2;
+
+void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+{
+#ifdef FAUST_VERBOSE
+	if (typeid(SCALAR) == typeid(float))
+	{
+		std::cout<<"SCALAR == float"<<std::endl;
+	}
+
+	if (typeid(SCALAR) == typeid(double))
+	{
+		std::cout<<"SCALAR == double"<<std::endl;
+	}
+	system("sleep 7");
+#endif
+
+	if (nrhs < 1)
+	{
+		mexErrMsgTxt("Bad Number of inputs arguments (must be 1)");
+	}
+	try
+	{
+		TransformHelper<SCALAR, Cpu>* F = nullptr;
+		Faust::MatDense<SCALAR,Cpu> matrix;
+		mxArray2FaustMat(prhs[0],matrix);
+
+		F = Faust::butterfly_hierarchical(matrix);
+		F->display();
+		plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR, Cpu>>(F);
+	}
+	catch (const std::exception& e)
+	{
+		plhs[0] = nullptr;
+		mexErrMsgTxt(e.what());
+	}
+}
+
