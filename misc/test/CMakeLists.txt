@@ -218,7 +218,7 @@ if(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE AND NOT NOCPPTESTS) 
 			endif()
 			if(${TEST_FPP} MATCHES complex )
 				set(TEST_IS_COMPLEX 1)
-				if(${testin} MATCHES GivensFGFT OR ${testin} MATCHES palm4msa_2020 OR ${testin} MATCHES hierarchical2020.* OR ${testin} MATCHES hierarchicalFactorizationHadamard )
+				if(${testin} MATCHES GivensFGFT OR ${testin} MATCHES palm4msa_2020 OR ${testin} MATCHES hierarchical2020.* OR ${testin} MATCHES hierarchicalFactorizationHadamard OR ${testin} MATCHES hierarchicalFactorizationButterfly)
 					continue()
 				endif()
 				# GivensFGFT doesn't handle complex matrices
