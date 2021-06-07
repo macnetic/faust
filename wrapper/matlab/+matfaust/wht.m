@@ -66,7 +66,7 @@ function H = wht(n, varargin)
 					if(argc == i || ~ islogical(tmparg))
 						error('normed keyword argument is not followed by a logical')
 					else
-						per_row = tmparg;
+						normed = tmparg;
 					end
 				case 'dev'
 					if(argc == i || ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu'))

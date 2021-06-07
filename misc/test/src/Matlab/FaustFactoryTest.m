@@ -353,7 +353,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			import matfaust.*
 			log2n = randi([1,6]);
 			n = 2^log2n;
-			H = wht(n, false);
+			H = wht(n, 'normed', false);
 			fH = full(H);
 			this.verifyEqual(nnz(fH), numel(fH));
 			i = 1;
@@ -366,6 +366,8 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 				i = i + 1;
 			end
 			this.assertEqual(full(wht(n)), full(normalize(H)), 'AbsTol', 10^-7)
+
+			this.assertEqual(full(wht(n, 'normed', false)), full(H), 'AbsTol', 10^-7)
 		end
 
 		function testFourier(this)
@@ -373,12 +375,14 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			import matfaust.dft
 			log2n = randi([1,10]);
 			n = 2^log2n;
-			F = dft(n, false);
+			F = dft(n, 'normed', false);
 			fF = full(F);
 			fftI = fft(eye(n));
 			% this.verifyEqual(nnz(fH), numel(fH));
 			this.verifyEqual(norm(fF-fftI), 0, 'AbsTol', 10^-12);
 			this.assertEqual(full(dft(n)), full(normalize(F)), 'AbsTol', 10^-7)
+
+			this.assertEqual(full(dft(n, 'normed', false)), full(F), 'AbsTol', 10^-7)
 		end
 
 		function test_sp(this)
