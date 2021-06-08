@@ -402,6 +402,19 @@ cdef class FaustCoreGPU:
                 norm = self.core_faust_cplx.normFro()
         return norm
 
+    def power_iteration(self, threshold, max_num_its):
+        cdef double[:] _lambda_dbl_view
+        cdef complex[:]  _lambda_cplx_view
+        if(self._isReal):
+            _lambda = np.empty((1,), dtype='float')
+            _lambda_dbl_view = _lambda
+            self.core_faust_dbl.power_iteration(&_lambda_dbl_view[0], threshold, max_num_its)
+        else:
+            _lambda = np.empty((1,), dtype=np.complex)
+            _lambda_cplx_view = _lambda
+            self.core_faust_cplx.power_iteration(&_lambda_cplx_view[0], threshold, max_num_its)
+        return _lambda[0]
+
     def normalize(self, ord):
         core = FaustCoreGPU(core=True)
         if(self._isReal):

@@ -869,7 +869,7 @@ cdef class FaustCore:
             _lambda = np.empty((1,), dtype=np.complex)
             _lambda_cplx_view = _lambda
             self.core_faust_cplx.power_iteration(&_lambda_cplx_view[0], threshold, max_num_its)
-        return _lambda
+        return _lambda[0]
 
     def normalize(self, ord):
         core = FaustCore(core=True)

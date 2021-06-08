@@ -1465,6 +1465,23 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             raise ValueError("ord must have the value 1, 2, 'fro' or numpy.inf.")
         return F.m_faust.norm(ord, **kwargs)
 
+    def power_iteration(self, threshold=1e-2, maxiter=100):
+        """
+        Performs the power iteration algorithm to compute the greatest eigenvalue of the Faust.
+
+        For the algorithm to succeed the Faust should be diagonalizable
+        (similar to a digonalizable Faust), ideally, a symmetric postive-definite Faust.
+
+        Args:
+            threshold: the precision required on the eigenvalue.
+            maxiter: the number of iterations above what the algorithm will stop anyway.
+
+        Returns:
+            The greatest eigenvalue approximate.
+
+        """
+        return self.m_faust.power_iteration(threshold=threshold,
+                                            max_num_its=maxiter)
 
     def normalize(F, ord='fro', axis=1):
         """
