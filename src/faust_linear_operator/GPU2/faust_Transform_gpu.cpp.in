@@ -342,6 +342,17 @@ namespace Faust
 		}
 
 	template<>
+		@FAUST_SCALAR_FOR_GM@ Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::power_iteration(int32_t nb_iter_max, float threshold, int& flag)
+		{
+			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			if(gpu_mat_arr == nullptr) throw std::runtime_error("gpu_mat_arr is nullptr");
+			//TODO: update gpu_mod to handle output flag
+			@FAUST_SCALAR_FOR_GM@ lambda;
+			marr_funcs->power_iteration(gpu_mat_arr, threshold, nb_iter_max, reinterpret_cast<@GM_SCALAR@*>(&lambda));
+			return lambda;
+		}
+
+	template<>
 		void Faust::Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::multiply(const Faust::Transform<@FAUST_SCALAR_FOR_GM@,GPU2> & A)
 		{
 			if (A.size() != 0)

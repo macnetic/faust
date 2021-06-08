@@ -200,8 +200,7 @@ namespace Faust
 	template<typename FPP>
 		FPP TransformHelper<FPP,GPU2>::power_iteration(const faust_unsigned_int nb_iter_max, const Real<FPP>& threshold, int& flag)
 		{
-			throw std::runtime_error("power_iteration not yet supported.");
-			//TODO: simple to add in gpu_mod
+			return this->transform->power_iteration(nb_iter_max, threshold, flag);
 		}
 
 	template<typename FPP>

@@ -69,6 +69,7 @@ namespace Faust
 			void multiply(const FPP& a, const int32_t id=-1);
 			Vect<FPP,GPU2> multiply(const Vect<FPP,GPU2>& x, const char opThis='N');
 			Real<FPP> spectralNorm(int32_t nb_iter_max, float threshold, int& flag);
+			FPP power_iteration(int32_t nb_iter_max, float threshold, int& flag);
 			Real<FPP> normL1(const bool transpose = false) const;
 			void tocpu(Transform<FPP, Cpu>& cpu_transf) const;
 			Transform<FPP, Cpu> tocpu() const;
