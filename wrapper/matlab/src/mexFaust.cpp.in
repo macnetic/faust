@@ -74,6 +74,7 @@
 #include "faust_size.h"
 #include "faust_full.h"
 #include "faust_norm.h"
+#include "faust_power_ite.h"
 #include "faust_normalize.h"
 #include "faust_copy.h"
 #include "faust_nbytes.h"
@@ -155,6 +156,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			faust_full<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
 		else if(!strcmp("norm", cmd))
 			faust_norm<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("power_ite", cmd))
+			faust_power_ite<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
 		else if(!strcmp("normfro", cmd))
 			faust_norm_fro<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
 		else if(!strcmp("normalize", cmd))

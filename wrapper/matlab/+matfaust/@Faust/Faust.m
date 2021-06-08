@@ -1439,6 +1439,58 @@ classdef Faust
 			n = call_mex(F, 'norm', args{:});
 		end
 
+		%==========================================================
+		%> Performs the power iteration algorithm to compute the greatest eigenvalue of the Faust.
+		%>
+		%> For the algorithm to succeed the Faust should be diagonalizable
+		%> (similar to a digonalizable Faust), ideally, a symmetric positive-definite Faust.
+		%>
+		%> @param 'threshold', real: (optional) the precision required on the eigenvalue. Default value is 1e-3.
+		%> @param 'maxiter', integer: (optional) the number of iterations above what the algorithm will stop anyway. Default value is 100.
+		%>
+		%> @retval lambda the greatest eigenvalue approximate.
+		%>
+		%> @Example
+		%> @code
+		%> %in a matlab terminal
+		%> >> F = matfaust.rand(8, 5)
+		%> >> F = F*F'
+		%> >> power_iteration(F)
+		%> 1.1795e+04
+		%> @endcode
+		%==========================================================
+		function lambda = power_iteration(F, varargin)
+			threshold = 1e-3;
+			maxiter = 100;
+			argc = length(varargin);
+			if(argc > 0)
+				for i=1:argc
+					switch(varargin{i})
+						case 'threshold'
+							tmparg = varargin{i+1};
+							if(argc == i || ~ isnumeric(tmparg) || ~ isreal(tmparg) || ~ isscalar(tmparg) || tmparg < 0)
+								error('thres holdkeyword arg. is not followed by a positive integer')
+							end
+							threshold = varargin{i+1};
+						case 'maxiter'
+							if(argc == i ||  ~ isnumeric(varargin{i+1}) || varargin{i+1}-floor(varargin{i+1}) > 0)
+								error('maxiter keyword arg. is not followed by an integer')
+							else
+								maxiter = varargin{i+1};
+							end
+						otherwise
+							if(isstr(varargin{i}))
+								error([ varargin{i} ' unrecognized argument'])
+							end
+					end
+				end
+			end
+			if(~ isreal(F))
+				error('Faust.power_iteration is not yet supported for complex Fausts.')
+			end
+			lambda = call_mex(F, 'power_ite', threshold, maxiter);
+		end
+
 		%===============================================================================
 		%> Returns the normalized F.
 		%===
