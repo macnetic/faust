@@ -21,8 +21,8 @@ D = FD.todense()
 
 I = [125, 132, 1000, 155]
 for P, Pt in [(lambda x: D*x, lambda x: D.H*x),
-              (lambda x: np.matrix(FD*x),
-               lambda x: np.matrix(FD.H*x))]:
+              (lambda x: np.matrix(FD@x),
+               lambda x: np.matrix(FD.H@x))]:
     R = empty((0,0))
     for i in range(1, len(I)+1):
         R = UpdateCholeskyFull(R[0:i,0:i], P, Pt, I[:i], 8193)

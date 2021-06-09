@@ -150,7 +150,7 @@ class TestFaustPy(unittest.TestCase):
                    ord = args[0]
                    if(len(args) > 1):
                         axis = args[1]
-            ref_full_NF = F.todense()
+            ref_full_NF = F.toarray()
             # print("axis=", axis, "ord=", ord)
             i = self.r.randint(0, F.shape[axis]-1)
             #for i in range(0,F.shape[axis]):
@@ -176,7 +176,7 @@ class TestFaustPy(unittest.TestCase):
                 vec_test_NF = test_NF[:,i]
             self.assertAlmostEqual(n1,n2,
                 places=places,
-                       msg="\nref_full_F=\n"+str(F.todense())+"\nvec_ref_full_NF=\n"+str(vec_ref_full_NF)+"\nvec_test_NF=\n"+ \
+                       msg="\nref_full_F=\n"+str(F.toarray())+"\nvec_ref_full_NF=\n"+str(vec_ref_full_NF)+"\nvec_test_NF=\n"+ \
                        str(vec_test_NF.toarray())+"\nF=\n"+ \
                        str(str(F.save('/tmp/normalize_test.mat'))+", i="+str(i)))
 
@@ -270,10 +270,10 @@ class TestFaustPy(unittest.TestCase):
         n = self.factors[0].shape[0]
         # test whole array
         prod = self.mulFactors()
-        test_prod = self.F[::,::].todense()
+        test_prod = self.F[::,::].toarray()
         self.assertProdEq(prod, test_prod)
         # reminder the Faust is of minimal size 3 for the both dims (MIN_DIM_SIZE)
-        # test_prod = self.F[...,...].todense() # forbidden (only one index can
+        # test_prod = self.F[...,...].toarray() # forbidden (only one index can
         # be an ellipsis)
         # self.assertProdEq(prod, test_prod)
         # test one random element
@@ -284,7 +284,7 @@ class TestFaustPy(unittest.TestCase):
                                               +str(prod[rand_i,rand_j])+str(prod[rand_i,rand_j])))
         # test one random row
         rand_i = self.r.randint(0,self.F.shape[0]-2)
-        row = self.F[rand_i,...].todense()
+        row = self.F[rand_i,...].toarray()
         for j in range(0,self.F.shape[1]):
             if(row[0,j] == 0):
                 self.assertEqual(prod[rand_i,j], 0)
@@ -292,7 +292,7 @@ class TestFaustPy(unittest.TestCase):
                 self.assertLessEqual(abs(row[0,j]-(prod[rand_i,j]))/prod[rand_i,j],10**-6)
         # test one random col
         rand_j = self.r.randint(0,self.F.shape[1]-2)
-        col = self.F[..., rand_j].todense()
+        col = self.F[..., rand_j].toarray()
         for i in range(0,self.F.shape[0]):
             if(col[i,0] == 0):
                 self.assertEqual(prod[i, rand_j], 0)
@@ -303,8 +303,8 @@ class TestFaustPy(unittest.TestCase):
         rand_ii, rand_jj = \
         self.r.randint(rand_i+1,self.F.shape[0]-1),self.r.randint(rand_j+1,self.F.shape[1]-1)
         sF = self.F[rand_i:rand_ii,rand_j:rand_jj]
-        n1 = norm(sF.toarray()-self.F.todense()[rand_i:rand_ii,rand_j:rand_jj])
-        n2 = norm(self.F.todense()[rand_i:rand_ii,rand_j:rand_jj])
+        n1 = norm(sF.toarray()-self.F.toarray()[rand_i:rand_ii,rand_j:rand_jj])
+        n2 = norm(self.F.toarray()[rand_i:rand_ii,rand_j:rand_jj])
         if(n2 == 0): # avoid nan error
             self.assertLessEqual(n1,0.0005)
         else:
@@ -316,8 +316,8 @@ class TestFaustPy(unittest.TestCase):
             rand_ii, rand_jj = \
                     self.r.randint(rand_i+1,sF.shape[0]-1),self.r.randint(rand_j+1,sF.shape[1]-1)
             sF2 = sF[rand_i:rand_ii,rand_j:rand_jj]
-            n1 = norm(sF2.todense()-sF.todense()[rand_i:rand_ii,rand_j:rand_jj])
-            n2 = norm(sF.todense()[rand_i:rand_ii,rand_j:rand_jj])
+            n1 = norm(sF2.toarray()-sF.toarray()[rand_i:rand_ii,rand_j:rand_jj])
+            n2 = norm(sF.toarray()[rand_i:rand_ii,rand_j:rand_jj])
             if(n2 == 0): # avoid nan error
                 self.assertLessEqual(n1,0.0005)
             else:
@@ -481,9 +481,9 @@ class TestFaustPy(unittest.TestCase):
             self.assertAlmostEqual(norm(test_F.toarray()-ref_full_F), 0, places=3)
         print("addition Faust-Faust")
         fausts = \
-        [ frand(F.shape[0], F.shape[0])*Faust(rand(F.shape[0],F.shape[1])),
+        [ frand(F.shape[0], F.shape[0])@Faust(rand(F.shape[0],F.shape[1])),
          frand(F.shape[0],F.shape[0], density=.5,
-                           field='complex')*Faust(rand(F.shape[0],F.shape[1]))]
+                           field='complex')@Faust(rand(F.shape[0],F.shape[1]))]
         for i in range(0,len(fausts)):
             F2 = fausts[i]
             self.assertAlmostEqual(norm((F+F2).toarray()-
@@ -507,9 +507,9 @@ class TestFaustPy(unittest.TestCase):
                                    places=3)
         print("substraction Faust-Faust")
         fausts = \
-        [ frand(F.shape[0], F.shape[0])*Faust(rand(F.shape[0],F.shape[1])),
+        [ frand(F.shape[0], F.shape[0])@Faust(rand(F.shape[0],F.shape[1])),
          frand(F.shape[0], F.shape[0], density=.5,
-                           field='complex')*Faust(rand(F.shape[0],F.shape[1]))]
+                           field='complex')@Faust(rand(F.shape[0],F.shape[1]))]
         for i in range(0,len(fausts)):
             F2 = fausts[i]
             self.assertAlmostEqual(norm((F-F2).toarray()-
@@ -567,7 +567,7 @@ class TestFaustPy(unittest.TestCase):
         for i in range(0,len(r_fausts)):
             rF = r_fausts[i]
             assert(isinstance(rF, Faust))
-            test_prod = F*rF
+            test_prod = F@rF
             ref_prod = self.mulFactors().dot(rF.toarray())
 #            print('test_prod=', test_prod)
 #            print('ref_prof=', ref_prod.shape)
@@ -580,20 +580,20 @@ class TestFaustPy(unittest.TestCase):
         print("test mul of a Faust by a dia_matrix")
         D = dia_matrix((np.random.rand(1,F.shape[1]),np.array([0])),
                        shape=(F.shape[1],F.shape[1]))
-        test_prod = F*D
+        test_prod = F@D
         self.assertTrue(np.allclose(test_prod, F.toarray().dot(D.toarray())))
         print("test mul of a Faust by a complex dia_matrix")
         D = \
         dia_matrix((np.random.rand(1,F.shape[1])+np.random.rand(1,F.shape[1])*np.complex(0,1),np.array([0])),
                        shape=(F.shape[1],F.shape[1]))
-        test_prod = F*D
+        test_prod = F@D
         self.assertTrue(np.allclose(test_prod, F.toarray().dot(D.toarray())))
         Mr = csr_matrix(rand(F.shape[1],10))
         Mc = csr_matrix(rand(F.shape[1],10)+np.complex(0,1)*rand(F.shape[1],10))
         print("test mul Faust-csr_matrix")
-        self.assertTrue(np.allclose(F*Mr, F.toarray().dot(Mr.toarray())))
+        self.assertTrue(np.allclose(F@Mr, F.toarray().dot(Mr.toarray())))
         print("test mul Faust-complex csr_matrix")
-        self.assertTrue(np.allclose(F*Mc, F.toarray().dot(Mc.toarray())))
+        self.assertTrue(np.allclose(F@Mc, F.toarray().dot(Mc.toarray())))
 
     def testConcatenate(self):
         print("testConcatenate()")
@@ -808,8 +808,8 @@ class TestFaustFactory(unittest.TestCase):
         #F.display()
         #print("normF", F.norm("fro"))
         self.assertEqual(F.shape, M.shape)
-        E = F.todense()-M
-        #print("err.:",norm(F.todense(), "fro"),  norm(E,"fro"), norm (M,"fro"))
+        E = F.toarray()-M
+        #print("err.:",norm(F.toarray(), "fro"),  norm(E,"fro"), norm (M,"fro"))
         print("err:", norm(E,"fro")/norm(M,"fro"))
         print("_lambda:", _lambda)
         # matrix to factorize and reference relative error come from
@@ -955,8 +955,8 @@ class TestFaustFactory(unittest.TestCase):
         #F.display()
         #print("normF", F.norm("fro"))
         self.assertEqual(F.shape, M.shape)
-        E = F.todense()-M
-        #print("err.:",norm(F.todense(), "fro"),  norm(E,"fro"), norm (M,"fro"))
+        E = F.toarray()-M
+        #print("err.:",norm(F.toarray(), "fro"),  norm(E,"fro"), norm (M,"fro"))
         print("err:", norm(E,"fro")/norm(M,"fro"))
         print("_lambda:", _lambda)
         # matrix to factorize and reference relative error come from
@@ -990,8 +990,8 @@ class TestFaustFactory(unittest.TestCase):
                                        is_verbose=False)
         F = hierarchical(M, param, backend=2020)
         self.assertEqual(F.shape, M.shape)
-        E = F.todense()-M
-        #print("err.:",norm(F.todense(), "fro"),  norm(E,"fro"), norm (M,"fro"),
+        E = F.toarray()-M
+        #print("err.:",norm(F.toarray(), "fro"),  norm(E,"fro"), norm (M,"fro"),
         print("err: ", norm(E,"fro")/norm(M,"fro"))
         # matrix to factorize and reference relative error come from
         # misc/test/src/C++/hierarchicalFactorization.cpp
@@ -1025,9 +1025,9 @@ class TestFaustFactory(unittest.TestCase):
                                        is_verbose=False)
         F = hierarchical(M, param)
         self.assertEqual(F.shape, M.shape)
-        #print(F.todense())
-        E = F.todense()-M
-        #print("err.:",norm(F.todense(), "fro"),  norm(E,"fro"), norm (M,"fro"),
+        #print(F.toarray())
+        E = F.toarray()-M
+        #print("err.:",norm(F.toarray(), "fro"),  norm(E,"fro"), norm (M,"fro"),
         print("err: ", norm(E,"fro")/norm(M,"fro"))
         # matrix to factorize and reference relative error come from
         # misc/test/src/C++/hierarchicalFactorization.cpp
@@ -1061,9 +1061,9 @@ class TestFaustFactory(unittest.TestCase):
         #F.display()
         #print("normF", F.norm("fro"))
         self.assertEqual(F.shape, M.shape)
-        #print(F.todense())
-        E = F.todense()-M
-        #print("err.:",norm(F.todense(), "fro"),  norm(E,"fro"), norm (M,"fro"))
+        #print(F.toarray())
+        E = F.toarray()-M
+        #print("err.:",norm(F.toarray(), "fro"),  norm(E,"fro"), norm (M,"fro"))
         print("err:", norm(E,"fro")/norm(M,"fro"))
         print("lambda:", _lambda)
         # matrix to factorize and reference relative error come from
@@ -1076,7 +1076,7 @@ class TestFaustFactory(unittest.TestCase):
         pow2_exp = random.Random().randint(1,10)
         n = 2**pow2_exp
         H = wht(n, False)
-        fH = H.todense()
+        fH = H.toarray()
         self.assertEqual(np.count_nonzero(fH), fH.size)
         for i in range(0,n-1):
             for j in range(i+1,n):
@@ -1091,7 +1091,7 @@ class TestFaustFactory(unittest.TestCase):
         pow2_exp = random.Random().randint(1,10)
         n = 2**pow2_exp
         F = dft(n, False)
-        fF = F.todense()
+        fF = F.toarray()
         ref_fft = fft(np.eye(n))
         self.assertAlmostEqual(norm(ref_fft-fF)/norm(ref_fft),0)
         assert(np.allclose(dft(n).toarray(),
@@ -1108,7 +1108,7 @@ class TestFaustFactory(unittest.TestCase):
         D, F = pyfaust.fact.eigtj(L, J, nGivens_per_fac=1, verbosity=0, enable_large_Faust=True)
         D = spdiags(D, [0], L.shape[0], L.shape[0])
         print("Lap norm:", norm(L, 'fro'))
-        err = norm((F*D.todense())*F.T.todense()-L,"fro")/norm(L,"fro")
+        err = norm((F@D.toarray())@F.T.toarray()-L,"fro")/norm(L,"fro")
         print("err: ", err)
         # the error reference is from the C++ test,
         # misc/test/src/C++/GivensFGFT.cpp.in
@@ -1130,7 +1130,7 @@ class TestFaustFactory(unittest.TestCase):
                            enable_large_Faust=True)
         D = spdiags(D, [0], L.shape[0], L.shape[0])
         print("Lap norm:", norm(L, 'fro'))
-        err = norm((F*D.todense())*F.T.todense()-L,"fro")/norm(L,"fro")
+        err = norm((F@D.toarray())@F.T.toarray()-L,"fro")/norm(L,"fro")
         print("err: ", err)
         # the error reference is from the C++ test,
         # misc/test/src/C++/GivensFGFTParallel.cpp.in (_double version)
@@ -1139,7 +1139,7 @@ class TestFaustFactory(unittest.TestCase):
                        enable_large_Faust=True)
         D2 = spdiags(D, [0], L.shape[0], L.shape[0])
         print("Lap norm:", norm(L, 'fro'))
-        err2 = norm((F2*D.todense())*F2.T.todense()-L,"fro")/norm(L,"fro")
+        err2 = norm((F2@D.toarray())@F2.T.toarray()-L,"fro")/norm(L,"fro")
         print("err2: ", err2)
         # the error reference is from the C++ test,
         # misc/test/src/C++/GivensFGFTParallel.cpp.in
@@ -1163,7 +1163,7 @@ class TestFaustFactory(unittest.TestCase):
                                         verbosity=0,enable_large_Faust=True)
         D = spdiags(D, [0], L.shape[0], L.shape[0])
         print("Lap norm:", norm(L, 'fro'))
-        err = norm((F*D.todense())*F.T.todense()-L,"fro")/norm(L,"fro")
+        err = norm((F@D.toarray())@F.T.toarray()-L,"fro")/norm(L,"fro")
         print("err: ", err)
         # the error reference is from the C++ test,
         # misc/test/src/C++/GivensFGFT.cpp.in
@@ -1185,7 +1185,7 @@ class TestFaustFactory(unittest.TestCase):
         D, F = eigtj(csr_matrix(L), J, nGivens_per_fac=t, verbosity=0, enable_large_Faust=True)
         D = spdiags(D, [0], L.shape[0], L.shape[0])
         print("Lap norm:", norm(L, 'fro'))
-        err = norm((F*D.todense())*F.T.todense()-L,"fro")/norm(L,"fro")
+        err = norm((F@D.toarray())@F.T.toarray()-L,"fro")/norm(L,"fro")
         print("err: ", err)
         # the error reference is from the C++ test,
         # misc/test/src/C++/GivensFGFTParallel.cpp.in (_double version)
@@ -1194,7 +1194,7 @@ class TestFaustFactory(unittest.TestCase):
                        enable_large_Faust=True)
         D2 = spdiags(D, [0], L.shape[0], L.shape[0])
         print("Lap norm:", norm(L, 'fro'))
-        err2 = norm((F2*D.todense())*F2.T.todense()-L,"fro")/norm(L,"fro")
+        err2 = norm((F2@D.toarray())@F2.T.toarray()-L,"fro")/norm(L,"fro")
         print("err2: ", err2)
         # the error reference is from the C++ test,
         # misc/test/src/C++/GivensFGFTParallel.cpp.in
@@ -1213,14 +1213,14 @@ class TestFaustFactory(unittest.TestCase):
         M = rand(128,128)
         M = M.dot(M.T)
         D,U = eigtj(M, tol=err, relerr=False)
-        self.assertAlmostEqual(norm(M-U*np.diag(D)*U.T), err, places=3 )
+        self.assertAlmostEqual(norm(M-U@np.diag(D)@U.T), err, places=3 )
         L = loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['Lap']
         L = L.astype(np.float64)
         M_cplx = L*np.complex(1,0) + L*np.complex(0,1)
         M_cplx = M_cplx.dot(np.matrix(M_cplx).H)
         err=.1
         D,U = eigtj(M_cplx, tol=err, relerr=False, verbosity=0)
-        self.assertLessEqual(norm(M_cplx-U*np.diag(D)*U.H), err)
+        self.assertLessEqual(norm(M_cplx-U@np.diag(D)@U.H), err)
 
     def testeigtj_relerr(self):
         from numpy.random import rand
@@ -1229,11 +1229,11 @@ class TestFaustFactory(unittest.TestCase):
         M = rand(128,128)
         M = M.dot(M.T)
         D,U = eigtj(M, tol=err)
-        self.assertLessEqual(norm(M-U*np.diag(D)*U.T)/norm(M), err)
+        self.assertLessEqual(norm(M-U@np.diag(D)@U.T)/norm(M), err)
         M_cplx = M + rand(128,128)*np.complex(0,1)
         M_cplx = M_cplx.dot(np.matrix(M_cplx).H)
         D,U = eigtj(M_cplx, tol=err)
-        self.assertLessEqual(norm(M_cplx-U*np.diag(D)*U.H)/norm(M_cplx), err)
+        self.assertLessEqual(norm(M_cplx-U@np.diag(D)@U.H)/norm(M_cplx), err)
 
     def testFactPalm4MSA_fgft(self):
         print("Test pyfaust.fact._palm4msa_fgft()")
@@ -1270,7 +1270,7 @@ class TestFaustFactory(unittest.TestCase):
         print("Lap norm:", norm(L, 'fro'))
         print("out lambda:", _lambda)
         D = diag(D)
-        err = norm((F.todense()*D)*F.T.todense()-L,"fro")/norm(L,"fro")
+        err = norm((F.toarray()@D)@F.T.toarray()-L,"fro")/norm(L,"fro")
         print("err: ", err)
         # the error reference is from the C++ test,
         # misc/test/src/C++/test_Palm4MSAFFT.cpp.in
@@ -1334,7 +1334,7 @@ class TestFaustFactory(unittest.TestCase):
         print("out_lambda:", _lambda)
         self.assertEqual(F.shape, U.shape)
         D = diag(D)
-        err = norm((F.todense()*D)*F.T.todense()-Lap,"fro")/norm(Lap,"fro")
+        err = norm((F.toarray()@D)@F.T.toarray()-Lap,"fro")/norm(Lap,"fro")
         # matrix to factorize and reference relative error come from
         # misc/test/src/C++/hierarchicalFactorizationFFT.cpp
         self.assertAlmostEqual(err, 0.08480, places=4)
