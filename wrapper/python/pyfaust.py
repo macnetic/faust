@@ -1486,10 +1486,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             >>> power_iteration(F)
             14630.932668438209
 
-
         """
-        if self.dtype == np.complex:
-            raise TypeError("power_iteration doesn't support complex Fausts.")
         return self.m_faust.power_iteration(threshold=threshold,
                                             max_num_its=maxiter)
 

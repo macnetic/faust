@@ -1485,9 +1485,6 @@ classdef Faust
 					end
 				end
 			end
-			if(~ isreal(F))
-				error('Faust.power_iteration is not yet supported for complex Fausts.')
-			end
 			lambda = call_mex(F, 'power_ite', threshold, maxiter);
 		end
 
