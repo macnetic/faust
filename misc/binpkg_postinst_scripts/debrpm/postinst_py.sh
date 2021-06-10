@@ -34,8 +34,11 @@ function link_py_files(){
 		[[ -n "$DEBUG" ]] && echo ln -sf "$PYFILE" "${PY_SITE_PACKAGES_PATH}/"
 		[[ -n "$DEBUG" ]] && echo PYLINK=$PYLINK
 		[[ -r "${PYLINK}" ]] && rm -f "$PYLINK"
-		[[ -r "$PYFILE" ]] && ln -sf "$PYFILE" "${PY_SITE_PACKAGES_PATH}/"
-		[[ ! -r "$PYLINK" ]] && PYLINKS_FAIL_COUNT+=1
+		if [[ -r "$PYFILE" ]]
+		then
+			ln -sf "$PYFILE" "${PY_SITE_PACKAGES_PATH}/"
+			[[ ! -r "$PYLINK" ]] && PYLINKS_FAIL_COUNT+=1
+		fi
 		[[ -n "$DEBUG" ]] && echo  PYLINKS_FAIL_COUNT=$PYLINKS_FAIL_COUNT
 	done
 	[[ $PYLINKS_FAIL_COUNT = 0 ]] && echo -e "\033[1mNOTICE\033[0m: Linked py wrapper for python$PY_MAJOR_VER into ${PY_SITE_PACKAGES_PATH}. Installation's ok for python$PY_MAJOR_MINOR_VER."
