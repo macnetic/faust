@@ -47,7 +47,7 @@ function link_py_files(){
 # default root PATH is not necessarily including /usr/local/bin (which is very common when python is built manually), so add it to the PATH!
 export PATH=$PATH:/usr/local/bin
 
-for V in 2 3.$SUPPORTED_PY3
+for V in 3.$SUPPORTED_PY3
 do
 	which python$V 2>&1 > /dev/null && link_py_files $V
 done
