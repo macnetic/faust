@@ -10,9 +10,9 @@
 
 <style type="text/css">
     pre { line-height: 125%; }
-td.linenos pre { color: #000000; background-color: #f0f0f0; padding-left: 5px; padding-right: 5px; }
-span.linenos { color: #000000; background-color: #f0f0f0; padding-left: 5px; padding-right: 5px; }
-td.linenos pre.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
 span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
 .highlight .hll { background-color: var(--jp-cell-editor-active-background) }
 .highlight { background: var(--jp-cell-editor-background); color: var(--jp-mirror-editor-variable-color) }
@@ -14325,11 +14325,11 @@ a.anchor-link {
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
 <pre>Faust size 100x100, density 3.2, nnz_sum 32000, 5 factor(s): 
-- FACTOR 0 (real) DENSE,  size 100x100, density 1, nnz 10000
+- FACTOR 0 (real) DENSE, size 100x100, density 1, nnz 10000
 - FACTOR 1 (real) SPARSE, size 100x100, density 0.1, nnz 1000
-- FACTOR 2 (real) DENSE,  size 100x100, density 1, nnz 10000
+- FACTOR 2 (real) DENSE, size 100x100, density 1, nnz 10000
 - FACTOR 3 (real) SPARSE, size 100x100, density 0.1, nnz 1000
-- FACTOR 4 (real) DENSE,  size 100x100, density 1, nnz 10000</pre>
+- FACTOR 4 (real) DENSE, size 100x100, density 1, nnz 10000</pre>
 </div>
 
 </div>
@@ -14373,18 +14373,18 @@ You can also call <strong><a href="https://faustgrp.gitlabpages.inria.fr/faust/l
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
 <pre>Faust size 100x100, density 3.2, nnz_sum 32000, 5 factor(s): 
-- FACTOR 0 (real) DENSE,  size 100x100, density 1, nnz 10000
+- FACTOR 0 (real) DENSE, size 100x100, density 1, nnz 10000
 - FACTOR 1 (real) SPARSE, size 100x100, density 0.1, nnz 1000
-- FACTOR 2 (real) DENSE,  size 100x100, density 1, nnz 10000
+- FACTOR 2 (real) DENSE, size 100x100, density 1, nnz 10000
 - FACTOR 3 (real) SPARSE, size 100x100, density 0.1, nnz 1000
-- FACTOR 4 (real) DENSE,  size 100x100, density 1, nnz 10000
+- FACTOR 4 (real) DENSE, size 100x100, density 1, nnz 10000
 
 Faust size 100x100, density 3.2, nnz_sum 32000, 5 factor(s): 
-- FACTOR 0 (real) DENSE,  size 100x100, density 1, nnz 10000
+- FACTOR 0 (real) DENSE, size 100x100, density 1, nnz 10000
 - FACTOR 1 (real) SPARSE, size 100x100, density 0.1, nnz 1000
-- FACTOR 2 (real) DENSE,  size 100x100, density 1, nnz 10000
+- FACTOR 2 (real) DENSE, size 100x100, density 1, nnz 10000
 - FACTOR 3 (real) SPARSE, size 100x100, density 0.1, nnz 1000
-- FACTOR 4 (real) DENSE,  size 100x100, density 1, nnz 10000
+- FACTOR 4 (real) DENSE, size 100x100, density 1, nnz 10000
 
 </pre>
 </div>
@@ -14451,11 +14451,11 @@ Faust size 100x100, density 3.2, nnz_sum 32000, 5 factor(s):
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
 <pre>Faust size 100x100, density 3.2, nnz_sum 32000, 5 factor(s): 
-- FACTOR 0 (real) DENSE,  size 100x100, density 1, nnz 10000
+- FACTOR 0 (real) DENSE, size 100x100, density 1, nnz 10000
 - FACTOR 1 (real) SPARSE, size 100x100, density 0.1, nnz 1000
-- FACTOR 2 (real) DENSE,  size 100x100, density 1, nnz 10000
+- FACTOR 2 (real) DENSE, size 100x100, density 1, nnz 10000
 - FACTOR 3 (real) SPARSE, size 100x100, density 0.1, nnz 1000
-- FACTOR 4 (real) DENSE,  size 100x100, density 1, nnz 10000</pre>
+- FACTOR 4 (real) DENSE, size 100x100, density 1, nnz 10000</pre>
 </div>
 
 </div>
@@ -14485,8 +14485,8 @@ One noticeable function of this package is <a href="https://faustgrp.gitlabpages
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust</span> <span class="kn">import</span> <span class="n">rand</span>
-<span class="n">F</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">num_factors</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">density</span><span class="o">=.</span><span class="mi">5</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="s1">&#39;complex&#39;</span><span class="p">)</span>
-<span class="n">G</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">num_factors</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="n">dim_sizes</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span> <span class="n">density</span><span class="o">=.</span><span class="mi">5</span><span class="p">,</span> <span class="n">fac_type</span><span class="o">=</span><span class="s1">&#39;dense&#39;</span><span class="p">)</span>
+<span class="n">F</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">num_factors</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="mf">.5</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="s1">&#39;complex&#39;</span><span class="p">)</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">num_factors</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="n">dim_sizes</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span> <span class="n">density</span><span class="o">=</span><span class="mf">.5</span><span class="p">,</span> <span class="n">fac_type</span><span class="o">=</span><span class="s1">&#39;dense&#39;</span><span class="p">)</span>
 </pre></div>
 
      </div>
@@ -14528,9 +14528,9 @@ One noticeable function of this package is <a href="https://faustgrp.gitlabpages
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>Faust size 2x10, density 2.4, nnz_sum 48, 2 factor(s): 
-- FACTOR 0 (complex) SPARSE, size 2x8, density 0.5, nnz 8
-- FACTOR 1 (complex) SPARSE, size 8x10, density 0.5, nnz 40</pre>
+<pre>Faust size 2x10, density 2.65, nnz_sum 53, 2 factor(s): 
+- FACTOR 0 (complex) SPARSE, size 2x9, density 0.444444, nnz 8
+- FACTOR 1 (complex) SPARSE, size 9x10, density 0.5, nnz 45</pre>
 </div>
 
 </div>
@@ -14573,10 +14573,12 @@ One noticeable function of this package is <a href="https://faustgrp.gitlabpages
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>Faust size 10x20, density 2.065, nnz_sum 413, 3 factor(s): 
-- FACTOR 0 (real) DENSE,  size 10x17, density 0.470588, nnz 80
-- FACTOR 1 (real) DENSE,  size 17x18, density 0.5, nnz 153
-- FACTOR 2 (real) DENSE,  size 18x20, density 0.5, nnz 180</pre>
+<pre>Faust size 10x20, density 2.585, nnz_sum 517, 5 factor(s): 
+- FACTOR 0 (real) DENSE, size 10x19, density 0.473684, nnz 90
+- FACTOR 1 (real) DENSE, size 19x10, density 0.5, nnz 95
+- FACTOR 2 (real) DENSE, size 10x16, density 0.5, nnz 80
+- FACTOR 3 (real) DENSE, size 16x14, density 0.5, nnz 112
+- FACTOR 4 (real) DENSE, size 14x20, density 0.5, nnz 140</pre>
 </div>
 
 </div>
@@ -14633,7 +14635,7 @@ It would be the topic of another notebook! If you want, for example, to learn ab
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>&#39;2.10.13&#39;</pre>
+<pre>&#39;3.2.11&#39;</pre>
 </div>
 
 </div>
