@@ -15,11 +15,11 @@ function generate_html
 	echo "<b>Latest FAµST version: $VERSION ($(date +%D))"
 	echo "<table cellpadding="5">"
 	echo "<tr><th>System</th><th>Link</th><th>SHA256</th></tr>"
-	for CONF in  "Mac OS X PKG::faust-$VERSION.pkg" "Linux RPM::faust-$VERSION-x86_64.rpm" "Linux DEB::faust-$VERSION-x86_64.deb" "Windows 10 EXE::faust-$VERSION-amd64.exe"
+	for CONF in  "Mac OS X PKG::faust-$VERSION.pkg" "Linux RPM::faust-$VERSION-x86_64.rpm" "Linux DEB::faust-$VERSION-x86_64.deb" "Windows 10 EXE::faust-$VERSION-amd64.exe" "Linux RPM (static matio)::faust-$VERSION-static-x86_64.rpm" "Linux DEB (static matio)::faust-$VERSION-x86_64.deb"
 	do
 		SYS=${CONF%%::*}
 		FILE=${CONF##*::}
-		echo "<tr><td>$SYS</td><td><a href=\"https://faustgrp.gitlabpages.inria.fr/faust/last-doc/packages/$FILE\">$FILE</a></td><td>$(sha256sum_or_not_found $FILE)</td></tr>"
+		echo "<tr><td>$SYS</td><td><a href=\"https://faustgrp.gitlabpages.inria.fr/faust/packages/$FILE\">$FILE</a></td><td>$(sha256sum_or_not_found $FILE)</td></tr>"
 	done
 	echo "</table>"
 
