@@ -766,10 +766,10 @@ cdef class FaustCore:
         cdef double[:,:] yview
         cdef complex[:,:] yview_cplx
         if(self._isReal):
-            y = np.zeros([nbrow_y,nbcol_y], dtype='d',order='F')
+            y = np.empty([nbrow_y,nbcol_y], dtype='d',order='F')
             yview = y
         else:
-            y = np.zeros([nbrow_y, nbcol_y], dtype='complex', order='F')
+            y = np.empty([nbrow_y, nbcol_y], dtype='complex', order='F')
             yview_cplx = y
 
         if ndim_M == 1:

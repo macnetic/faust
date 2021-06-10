@@ -188,12 +188,9 @@ namespace Faust {
 		void TransformHelper<FPP,Cpu>::multiply(const FPP *x, FPP* y, const bool transpose, const bool conjugate)
 		{
 			//TODO: move to Faust::Transform ?
-			int x_size;
-			// assuming that x size is valid, infer it from this size
-			if(this->is_transposed && transpose || ! this->is_transposed && ! transpose)
-				x_size = this->getNbCol();
-			else
-				x_size = this->getNbRow();
+			// x is a vector, it doesn't matter it's transpose or not, just keep the valid size to multiply against this Transform
+			int x_size = this->getNbCol();
+			// however x and y are supposed to be allocated to the good sizes
 			Vect<FPP, Cpu> vx(x_size, x);
 			auto y_vec = std::move(this->multiply(vx, transpose, conjugate));
 			memcpy(y, y_vec.getData(), sizeof(FPP)*y_vec.size());

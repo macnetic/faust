@@ -368,11 +368,7 @@ namespace Faust
 		{
 			this->is_transposed ^= transpose;
 			this->is_conjugate ^= conjugate;
-			int32_t in_vec_size;
-			if(this->is_transposed)
-				in_vec_size = this->getNbRow();
-			else
-				in_vec_size = this->getNbCol();
+			int32_t in_vec_size = this->getNbCol();
 			Vect<FPP,GPU2> gpu_A(in_vec_size, cpu_in_buf);
 			Vect<FPP,GPU2> v = this->multiply(gpu_A , transpose, conjugate); //TODO: handle transpose and conjugate
 			this->is_transposed ^= transpose;
