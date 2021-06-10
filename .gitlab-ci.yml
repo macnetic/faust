@@ -316,16 +316,18 @@ pages:
         - make doc_exclu_class_filtering
         - mkdir -p ../public/last-doc
         - cp -Rf doc/html ../public/last-doc/
-        - mkdir -p ../public/last-doc/packages
+        - mkdir -p ../public/packages
         - ../gen_doc/gen_pkg_dl_page.sh $CI_COMMIT_TAG # download.html generated
-        - mv download.html ../public/last-doc/packages/
-        - mv *.pkg *.rpm *.deb *.exe ../public/last-doc/packages/
+        - mv download.html ../public/packages/
+        - mv *.pkg *.rpm *.deb *.exe ../public/packages/
     needs:
       - job: pkg_macos_release
         artifacts: true
       - job: pkg_win_release
         artifacts: true
       - job: pkg_linux_release
+        artifacts: true
+      - job: pkg_linux_release_static
         artifacts: true
       - job: test_linux_pkg_release
       - job: test_macos_pkg_release
