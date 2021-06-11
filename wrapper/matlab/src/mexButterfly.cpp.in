@@ -72,16 +72,18 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 	if (nrhs < 1)
 	{
-		mexErrMsgTxt("Bad Number of inputs arguments (must be 1)");
+		mexErrMsgTxt("Bad Number of inputs arguments (must be at least 1)");
 	}
 	try
 	{
+		ButterflyFactDir dir = RIGHT;
+		if(nrhs >= 2)
+			dir = static_cast<ButterflyFactDir>(static_cast<int>(mxGetScalar(prhs[1])));
 		TransformHelper<SCALAR, Cpu>* F = nullptr;
 		Faust::MatDense<SCALAR,Cpu> matrix;
-		mxArray2FaustMat(prhs[0],matrix);
+		mxArray2FaustMat(prhs[0], matrix);
 
-		F = Faust::butterfly_hierarchical(matrix);
-		F->display();
+		F = Faust::butterfly_hierarchical(matrix, dir);
 		plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR, Cpu>>(F);
 	}
 	catch (const std::exception& e)
