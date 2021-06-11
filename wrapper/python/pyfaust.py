@@ -2330,7 +2330,9 @@ def implements(numpy_function):
 def version():
     """Returns the FAuST package version.
     """
-    return "@CPACK_PACKAGE_VERSION@"
+    return __version__
+
+__version__ =  "@CPACK_PACKAGE_VERSION@"
 
 def faust_fact(*args, **kwargs):
     """
