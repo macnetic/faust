@@ -183,7 +183,7 @@ template<typename FPP>
 FaustCoreCpp<FPP>* hierarchical2020(FPP* mat, unsigned int num_rows, unsigned int num_cols, /* unsigned int nites*/PyxStoppingCriterion<double>* sc, PyxConstraintGeneric** constraints, unsigned int num_cons, unsigned int num_facts, double* inout_lambda, bool is_update_way_R2L, bool is_fact_side_left, int factor_format, bool packing_RL, PyxMHTPParams<FPP> &MHTP_params, unsigned int norm2_max_iter, double norm2_threshold, bool is_verbose, bool constant_step_size, double step_size, const bool full_gpu=false);
 
 template<typename FPP>
-FaustCoreCpp<FPP>* butterfly_hierarchical(FPP* mat, unsigned int num_rows, unsigned int num_cols);
+FaustCoreCpp<FPP>* butterfly_hierarchical(FPP* mat, unsigned int num_rows, unsigned int num_cols, int dir);
 
 template<typename FPP>
 MHTPParams<FPP> convPyxMHTPParams2FaustMHTPParams(const PyxMHTPParams<FPP>& MHTPParams);

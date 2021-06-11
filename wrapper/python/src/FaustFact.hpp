@@ -866,13 +866,13 @@ FaustCoreCpp<FPP>* hierarchical2020_gpu2(FPP* mat, unsigned int num_rows, unsign
 #endif
 
 template<typename FPP>
-FaustCoreCpp<FPP>* butterfly_hierarchical(FPP* mat, unsigned int num_rows, unsigned int num_cols)
+FaustCoreCpp<FPP>* butterfly_hierarchical(FPP* mat, unsigned int num_rows, unsigned int num_cols, int dir)
 {
 
     FaustCoreCpp<FPP>* core = nullptr;
     TransformHelper<FPP, Cpu> * th = nullptr;
     Faust::MatDense<FPP, Cpu> inMat(num_rows, num_cols, mat);
-    th = Faust::butterfly_hierarchical(inMat);
+    th = Faust::butterfly_hierarchical(inMat, static_cast<Faust::ButterflyFactDir>(dir));
     core = new FaustCoreCpp<FPP>(th);
     return core;
 }

@@ -2664,7 +2664,7 @@ cdef class FaustFact:
         return core, np.real(_out_buf[0])
 
     @staticmethod
-    def butterfly_hierarchical(M):
+    def butterfly_hierarchical(M, dir):
 
         cdef unsigned int M_num_rows=M.shape[0]
         cdef unsigned int M_num_cols=M.shape[1]
@@ -2680,17 +2680,29 @@ cdef class FaustFact:
         if not M.flags['F_CONTIGUOUS']:
             M = np.asfortranarray(M)
 
+        if dir == "right":
+            dir = 1
+        elif dir == "left":
+            dir = 0
+        else:
+            raise ValueError("dir argument must be 'right' or 'left'.")
+
+
         check_matrix(isReal, M)
 
         core = FaustCore(core=True)
         if(isReal):
             Mview = M
-            core.core_faust_dbl = FaustCoreCy.butterfly_hierarchical[double](&Mview[0,0], M_num_rows, M_num_cols)
+            core.core_faust_dbl = \
+            FaustCoreCy.butterfly_hierarchical[double](&Mview[0,0], M_num_rows,
+                                                       M_num_cols, dir)
             core._isReal = True
         else:
             Mview_cplx = M
             core.core_faust_cplx = \
-            FaustCoreCy.butterfly_hierarchical[complex](&Mview_cplx[0,0], M_num_rows, M_num_cols)
+                    FaustCoreCy.butterfly_hierarchical[complex](&Mview_cplx[0,0],
+                                                                M_num_rows, M_num_cols,
+                                                                dir)
             core._isReal = False
 
         return core

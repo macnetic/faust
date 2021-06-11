@@ -1070,6 +1070,17 @@ def fgft_palm(U, Lap, p, init_D=None, ret_lambda=False, ret_params=False):
 
 
 # experimental block start
-def butterfly(M):
-    return Faust(core_obj=_FaustCorePy.FaustFact.butterfly_hierarchical(M))
+def butterfly(M, dir="right"):
+    """
+    Factorizes M according to a butterfly support.
+
+    Args:
+        dir: (str) the direction of factorization 'right'ward or 'left'ward
+        (more precisely: at each stage of the factorization the most right factor or
+        the most left factor is split in two).
+
+    Returns:
+        The Faust which is an approximate of M according to a butterfly support.
+    """
+    return Faust(core_obj=_FaustCorePy.FaustFact.butterfly_hierarchical(M, dir))
 # experimental block end
