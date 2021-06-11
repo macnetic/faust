@@ -214,7 +214,6 @@ namespace Faust
 	template<>
 		void bit_reversal_factor<std::complex<double>>(int nfactors, std::vector<Faust::MatSparse<std::complex<double>, Cpu>*>& out)
 		{
-			std::cout << "bit_reversal_factor" << std::endl;
 			// bit reversal permutation factor
 			unsigned int dim_size = 1u << nfactors, L, r, L_over_2, L_times_2;
 			unsigned int* index = new unsigned int[dim_size];

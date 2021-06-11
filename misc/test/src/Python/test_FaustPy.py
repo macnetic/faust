@@ -1524,6 +1524,19 @@ class TestFaustFactory(unittest.TestCase):
                   [ 0.,0.,-5.92900636,-6.51064175]]
         self.assertTrue(np.allclose(p(M), ref_pM))
 
+    def test_butterfly(self):
+        from pyfaust import wht, dft
+        from pyfaust.fact import butterfly
+        H = wht(64).toarray()
+        for dir in ['right', 'left']:
+            FH = butterfly(H, dir=dir)
+            self.assertAlmostEqual((FH-H).norm()/norm(H), 0)
+        D = dft(64).toarray() 
+        for dir in ['right', 'left']:
+            FD = butterfly(D, dir=dir)
+            self.assertAlmostEqual((FD-D).norm()/norm(D), 0)
+
+
 if __name__ == "__main__":
     if(len(sys.argv)> 1):
         # argv[1] is for adding a directory in PYTHONPATH

@@ -503,6 +503,28 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			pM = p(M)
 			this.verifyEqual(norm(pM-pM_ref)/norm(pM_ref), 0)
 		end
+
+		function test_butterfly(this)
+			import matfaust.wht
+			import matfaust.dft
+			import matfaust.fact.butterfly
+			D = full(dft(64));
+			H = full(wht(64));
+			dirs = {'left', 'right'}
+			for t=1:2
+				if(t == 2)
+					M = D;
+				else
+					M = H;
+				end
+				for i=1:2
+					dir = dirs{i};
+					F = butterfly(M, 'dir', dir);
+					this.verifyEqual(norm(full(F)-M)/norm(M), 0, 'AbsTol', 1e-6);
+				end
+			end
+		end
+
 	end
 
 	methods
