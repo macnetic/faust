@@ -91,7 +91,9 @@ int main(int argc, char** argv)
 	//	Faust::kron(ones, id, out);
 	//	std::cout << out.norm() << std::endl;
 
-	auto th = butterfly_hierarchical(A);
+	ButterflyFactDir dir = (argc > 1 && !strcmp(argv[1], "1"))?LEFT:RIGHT;
+	std::cout << "Factorization dir: " << dir << std::endl;
+	auto th = butterfly_hierarchical(A, dir);
 	th->display();
 	auto M = th->get_product();
 	M -= A;

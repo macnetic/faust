@@ -231,46 +231,69 @@ namespace Faust
 		}
 
 	template<typename FPP>
-Faust::TransformHelper<FPP, Cpu>* butterfly_hierarchical(const Faust::MatDense<FPP, Cpu>& A, const std::vector<Faust::MatSparse<FPP, Cpu>*> &supports)
-{
-	Faust::TransformHelper<FPP, Cpu>* th = new TransformHelper<FPP, Cpu>();
-	Faust::MatDense<FPP, Cpu> s2;
-	Faust::MatDense<FPP, Cpu> X, Y;
-	Faust::MatDense<FPP, Cpu> mat = A;
-	for(int i=0;i<supports.size()-1;i++)
-	{
-		auto s1 = Faust::MatDense<FPP, Cpu>(*supports[i]);
-		s2.resize(s1.getNbRow(), s1.getNbCol());
-		s2.setEyes();
-		for(int j=supports.size()-1;j>=i+1;j--)
+		Faust::TransformHelper<FPP, Cpu>* butterfly_hierarchical(const Faust::MatDense<FPP, Cpu>& A, const std::vector<Faust::MatSparse<FPP, Cpu>*> &supports, const ButterflyFactDir& dir/*=RIGHT*/)
 		{
-			supports[j]->multiply(s2, 'N');
+			using ID_FUNC = std::function<int(int)>;
+			auto th = new TransformHelper<FPP, Cpu>();
+			int i, j;
+			Faust::MatDense<FPP, Cpu> s2;
+			Faust::MatDense<FPP, Cpu> X, Y;
+			Faust::MatDense<FPP, Cpu> mat = A;
+			assert(dir == RIGHT || dir == LEFT);
+			ID_FUNC next_s1_id_left = [&supports](int i){if(i > 1) return i-1; else return -1;};
+			ID_FUNC next_s1_id_right = [&supports](int i){if(i < supports.size()-2) return i+1; else return -1;};
+			ID_FUNC next_s1_id = dir == RIGHT?next_s1_id_right:next_s1_id_left;
+			ID_FUNC next_s2_id_left = [&supports](int j){if(j>0) return j-1; else return -1;};
+			ID_FUNC next_s2_id_right = [&supports, &i](int j){if(j>i+1) return j-1; else return -1;};
+			ID_FUNC next_s2_id = RIGHT==dir?next_s2_id_right:next_s2_id_left;
+			i = dir == RIGHT?0:supports.size()-1;
+			do
+			{
+				auto s1 = Faust::MatDense<FPP, Cpu>(*supports[i]);
+				s2.resize(s1.getNbRow(), s1.getNbCol());
+				s2.setEyes();
+				j = dir == RIGHT?supports.size()-1:i-1;
+				do
+				{
+					supports[j]->multiply(s2, 'N');
+				}
+				while((j = next_s2_id(j)) > -1);
+				s2.setNZtoOne();
+				if(dir == RIGHT)
+				{
+					solveDTO(mat, s1, s2, X, Y);
+					th->push_back(&X);
+				}
+				else
+				{
+					solveDTO(mat, s2, s1, Y, X);
+					th->push_first(&X);
+				}
+				mat = Y;
+				std::cout << "factorization #" << (dir==RIGHT?i+1:supports.size()-i) << std::endl;
+			}
+			while((i = next_s1_id(i)) > -1);
+			if(dir == RIGHT)
+				th->push_back(&mat);
+			else
+				th->push_first(&mat);
+			return th;
 		}
-		s2.setNZtoOne();
-		solveDTO(mat, s1, s2, X, Y);
-		mat = Y;
-		th->push_back(&X);
-//		std::cout << X.norm() << std::endl;
-		std::cout << "factorization #" << i << std::endl;
-	}
-	th->push_back(&mat);
-	return th;
-}
 
 	template<typename FPP>
-		Faust::TransformHelper<FPP, Cpu>* butterfly_hierarchical(const Faust::MatDense<FPP, Cpu>& A)
-	{
-		double log2_size = log2((double)A.getNbRow());
-		if(A.getNbRow() != A.getNbCol())
-			throw std::runtime_error("The matrix to factorize must be square.");
-		if(log2_size - int(log2_size) > std::numeric_limits<Real<FPP>>::epsilon())
-			throw std::runtime_error("The matrix to factorize must be of a size equal to a power of two.");
-		auto support = support_DFT<FPP>((int) log2_size);
-		//	std::cout << "support norms" << std::endl;
-		//	for(auto s: support)
-		//		std::cout << s->norm() << std::endl;
-		auto th = butterfly_hierarchical(A, support);
-		return th;
-	}
+		Faust::TransformHelper<FPP, Cpu>* butterfly_hierarchical(const Faust::MatDense<FPP, Cpu>& A, const ButterflyFactDir &dir/*=RIGHT*/)
+		{
+			double log2_size = log2((double)A.getNbRow());
+			if(A.getNbRow() != A.getNbCol())
+				throw std::runtime_error("The matrix to factorize must be square.");
+			if(log2_size - int(log2_size) > std::numeric_limits<Real<FPP>>::epsilon())
+				throw std::runtime_error("The matrix to factorize must be of a size equal to a power of two.");
+			auto support = support_DFT<FPP>((int) log2_size);
+			//	std::cout << "support norms" << std::endl;
+			//	for(auto s: support)
+			//		std::cout << s->norm() << std::endl;
+			auto th = butterfly_hierarchical(A, support, dir);
+			return th;
+		}
 
 };

@@ -2,6 +2,12 @@
 #define __FAUST_BUTTERFLY__
 namespace Faust
 {
+	enum ButterflyFactDir
+	{
+		LEFT,
+		RIGHT,
+	};
+
 	template<typename FPP>
 		void retrieveCEC(const Faust::MatDense<FPP, Cpu>& s1, const Faust::MatDense<FPP, Cpu>& s2, vector<vector<faust_unsigned_int>*> &cec, vector<vector<faust_unsigned_int>*> &noncec);
 
@@ -18,10 +24,10 @@ namespace Faust
 		void bit_reversal_factor(int nfactors, std::vector<Faust::MatSparse<FPP, Cpu>*>& out);
 
 	template<typename FPP>
-		Faust::TransformHelper<FPP, Cpu>* butterfly_hierarchical(const Faust::MatDense<FPP, Cpu>& A, const std::vector<Faust::MatSparse<FPP, Cpu>*> &supports);
+		Faust::TransformHelper<FPP, Cpu>* butterfly_hierarchical(const Faust::MatDense<FPP, Cpu>& A, const std::vector<Faust::MatSparse<FPP, Cpu>*> &supports, const ButterflyFactDir& dir=RIGHT);
 
 	template<typename FPP>
-		Faust::TransformHelper<FPP, Cpu>* butterfly_hierarchical(const Faust::MatDense<FPP, Cpu>& A);
+		Faust::TransformHelper<FPP, Cpu>* butterfly_hierarchical(const Faust::MatDense<FPP, Cpu>& A, const ButterflyFactDir &dir=RIGHT);
 
 
 };
