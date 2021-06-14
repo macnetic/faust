@@ -1260,7 +1260,13 @@ bool MatDense<FPP,Cpu>::eq_rows(const MatDense<FPP, Cpu> & other, faust_unsigned
 template<typename FPP>
 void MatDense<FPP, Cpu>::best_low_rank(const int &r, MatDense<FPP,Cpu> &bestX, MatDense<FPP, Cpu> &bestY) const
 {
+#ifdef _MSC_VER
+	// as far as I tested eigen3.4rc1 doesn't compile with VS 14
+	// so use JacobiSVD
+	Eigen::JacobiSVD<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>> svd(this->mat, Eigen::ComputeThinU | Eigen::ComputeThinV);
+#else
 	Eigen::BDCSVD<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>> svd(this->mat, Eigen::ComputeThinU | Eigen::ComputeThinV);
+#endif
 	if(bestX.getNbRow() != this->getNbRow() || r != bestX.getNbCol())
 		bestX.resize(this->getNbRow(), r);
 	if(bestY.getNbRow() != this->getNbRow() || r != bestY.getNbCol())

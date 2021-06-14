@@ -12,7 +12,12 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-	auto wht = TransformHelper<FPP,Cpu>::hadamardFaust(10, false);
+	int log2dim;
+	if(argc > 2)
+		log2dim = std::atoi(argv[2]);
+	else
+		log2dim = 10;
+	auto wht = TransformHelper<FPP,Cpu>::hadamardFaust(log2dim, false);
 	Faust::MatDense<FPP,Cpu> A;
 	/********** NOTE: a lot of garbage is left here, it was useful during the first writing of butterfly module (it could be again) */
 	//	Faust::MatDense<FPP,Cpu> support1, support2, A;
