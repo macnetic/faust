@@ -84,7 +84,7 @@ if(WIN32)
 	set(FAUST_SETUP_PY_CFLAGS "'/w', '/EHsc', '/DNOMINMAX'")
 	set(FAUST_SETUP_PY_LFLAGS "")
 else() #UNIX
-	set(FAUST_SETUP_PY_CFLAGS "'-std=c++11', '-O3'")
+	set(FAUST_SETUP_PY_CFLAGS "'-std=c++11', '-O3', '-fno-wrapv'") # without -fno-wrapv the butterfly factorization is twice slower
 	set(FAUST_SETUP_PY_LFLAGS "'-s'")
 endif()
 
