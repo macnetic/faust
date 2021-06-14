@@ -236,36 +236,39 @@ namespace Faust
 			auto th = new TransformHelper<FPP, Cpu>();
 			int i, j;
 			Faust::MatDense<FPP, Cpu> s2;
+			std::vector<Faust::MatDense<FPP, Cpu>> s2_vec(supports.size());
 			Faust::MatDense<FPP, Cpu> X, Y;
 			Faust::MatDense<FPP, Cpu> mat = A;
 			assert(dir == RIGHT || dir == LEFT);
 			ID_FUNC next_s1_id_left = [&supports](int i){if(i > 1) return i-1; else return -1;};
 			ID_FUNC next_s1_id_right = [&supports](int i){if(i < supports.size()-2) return i+1; else return -1;};
 			ID_FUNC next_s1_id = dir == RIGHT?next_s1_id_right:next_s1_id_left;
-			ID_FUNC next_s2_id_left = [&supports](int j){if(j>0) return j-1; else return -1;};
+			ID_FUNC next_s2_id_left = [&supports, &i](int j){if(j<i-1) return j+1; else return -1;};
 			ID_FUNC next_s2_id_right = [&supports, &i](int j){if(j>i+1) return j-1; else return -1;};
 			ID_FUNC next_s2_id = RIGHT==dir?next_s2_id_right:next_s2_id_left;
+
+			s2.resize(A.getNbRow(), A.getNbCol());
+			s2.setEyes();
 			i = dir == RIGHT?0:supports.size()-1;
+			j = dir == RIGHT?supports.size()-1:0;
+			do
+			{
+				supports[j]->multiply(s2, 'N');
+				s2.setNZtoOne();
+				s2_vec[dir == RIGHT?j-1:j+1] = s2;
+			}
+			while((j = next_s2_id(j)) > -1);
 			do
 			{
 				auto s1 = Faust::MatDense<FPP, Cpu>(*supports[i]);
-				s2.resize(s1.getNbRow(), s1.getNbCol());
-				s2.setEyes();
-				j = dir == RIGHT?supports.size()-1:i-1;
-				do
-				{
-					supports[j]->multiply(s2, 'N');
-				}
-				while((j = next_s2_id(j)) > -1);
-				s2.setNZtoOne();
 				if(dir == RIGHT)
 				{
-					solveDTO(mat, s1, s2, X, Y);
+					solveDTO(mat, s1, s2_vec[i], X, Y);
 					th->push_back(&X);
 				}
 				else
 				{
-					solveDTO(mat, s2, s1, Y, X);
+					solveDTO(mat, s2_vec[i], s1, Y, X);
 					th->push_first(&X);
 				}
 				mat = Y;
