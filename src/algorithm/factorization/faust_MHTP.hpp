@@ -57,15 +57,16 @@ namespace Faust
 				Real<FPP> &c,
 				Real<FPP>& lambda)
 				{
+
 					Faust::MatGeneric<FPP,DEVICE>* cur_fac;
-					cur_fac = S.get_gen_fact_nonconst(f_id);
+					// set the factor to zero
+					S.get_gen_fact_nonconst(f_id)->setZeros();
 					if(is_verbose)
 						std::cout << "Starting a MHTP pass ("<< mhtp_params.sc.get_crit() <<" iterations) for factor #" << f_id << std::endl;
 					int j = 0;
-					// set the factor to zero
-					cur_fac->setZeros();
 					while(mhtp_params.sc.do_continue(j)) // TODO: what about the error stop criterion?
 					{
+						cur_fac = S.get_gen_fact_nonconst(f_id);
 						update_fact(cur_fac, f_id, A, S, pL, pR,
 								is_verbose, constraint,
 								norm2_max_iter, norm2_threshold, norm2_duration, fgrad_duration,
