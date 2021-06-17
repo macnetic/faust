@@ -1525,6 +1525,7 @@ class TestFaustFactory(unittest.TestCase):
         self.assertTrue(np.allclose(p(M), ref_pM))
 
     def test_butterfly(self):
+        print("test pyfaust.fact.butterfly")
         from pyfaust import wht, dft
         from pyfaust.fact import butterfly
         H = wht(64).toarray()

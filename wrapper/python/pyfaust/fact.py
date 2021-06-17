@@ -162,18 +162,26 @@ def svdtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
     else:
         verbosity = 0
 
-    if(M.dtype == np.complex):
+    is_real = np.empty((1,))
+    M = _check_fact_mat('svdtj()', M, is_real)
+
+    if is_real:
         if(isinstance(M, np.ndarray)):
-            Ucore, S, Vcore =  _FaustCorePy.FaustFact.svdtj_cplx(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
+            Ucore, S, Vcore =  _FaustCorePy.FaustFact.svdtj(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
         elif(isinstance(M, csr_matrix)):
-            Ucore, S, Vcore =  _FaustCorePy.FaustFact.svdtj_sparse_cplx(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
-    elif(isinstance(M, np.ndarray)):
-        Ucore, S, Vcore =  _FaustCorePy.FaustFact.svdtj(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
-    elif(isinstance(M, csr_matrix)):
-        Ucore, S, Vcore =  _FaustCorePy.FaustFact.svdtj_sparse(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
+            Ucore, S, Vcore =  _FaustCorePy.FaustFact.svdtj_sparse(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
+        else:
+            raise ValueError("invalid type for M (first argument): only np.ndarray "
+                             "or scipy.sparse.csr_matrix are supported.")
     else:
-        raise ValueError("invalid type for M (first argument): only np.ndarray "
-                         "or scipy.sparse.csr_matrix are supported.")
+        if(isinstance(M, np.ndarray)):
+            Ucore, S, Vcore =  _FaustCorePy.FaustFactCplx.svdtj(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
+        elif(isinstance(M, csr_matrix)):
+            Ucore, S, Vcore =  _FaustCorePy.FaustFactCplx.svdtj_sparse(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
+        else:
+            raise ValueError("invalid type for M (first argument): only np.ndarray "
+                             "or scipy.sparse.csr_matrix are supported.")
+
     U = Faust(core_obj=Ucore)
     V = Faust(core_obj=Vcore)
     return U, S, V
@@ -265,7 +273,7 @@ def eigtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
         >>> Dhat3, Uhat3 = eigtj(Lap, tol=0.1, relerr=False)
         >>> assert(norm(Lap-Uhat3*np.diag(Dhat3)*Uhat3.H) < .11)
         >>> # now recompute Uhat2, Dhat2 but asking a descending order of eigenvalues
-        >>> Dhat4, Uhat4 = eigtj(Lap, tol=0.01)
+        >>> Dhat4, Uhat4 = eigtj(Lap, tol=0.01, order='descend')
         >>> assert((Dhat4[::-1] == Dhat2[::]).all())
         >>> # and now with no sort
         >>> Dhat5, Uhat5 = eigtj(Lap, tol=0.01, order='undef')
@@ -274,21 +282,47 @@ def eigtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
     See also:
         svdtj
     """
-    D, core_obj = _FaustCorePy.FaustFact.eigtj(M, nGivens, tol, relerr,
-                                               nGivens_per_fac, verbosity, order,
-                                               enable_large_Faust)
+    is_real = np.empty((1,))
+    if not isinstance(M, scipy.sparse.csr_matrix):
+        M = _check_fact_mat('eigtj()', M, is_real)
+    else:
+        is_real = (M.dtype == np.float)
+
+    if is_real:
+        D, core_obj = _FaustCorePy.FaustFact.eigtj(M, nGivens, tol, relerr,
+                                                   nGivens_per_fac, verbosity, order,
+                                                   enable_large_Faust)
+    else:
+        D, core_obj = _FaustCorePy.FaustFactCplx.eigtj(M, nGivens, tol, relerr,
+                                                   nGivens_per_fac, verbosity, order,
+                                                   enable_large_Faust)
     return D, Faust(core_obj=core_obj)
 
-def _check_fact_mat(funcname, M):
-    if(not isinstance(M, np.ndarray)):
+def _check_fact_mat(funcname, M, is_real=None):
+    if not isinstance(M, np.ndarray):
         raise Exception(funcname+" 1st argument must be a numpy ndarray.")
-    if(not isinstance(M[0,0], np.complex) and not isinstance(M[0,0],
-                                                            np.float)):
-        raise Exception(funcname+" 1st argument must be a float or complex "
-                        "ndarray.")
-    #if(isinstance(M[0,0], np.complex)):
-    #   raise Exception(funcname+" doesn't yet support complex matrix "
-    #                   "factorization.")
+
+    use_is_real = isinstance(is_real, (list, np.ndarray))
+    if M.dtype in ['float64']:
+        if use_is_real:
+            is_real[0] = True
+    elif M.dtype in ['complex128']:
+        if use_is_real:
+            is_real[0] = False
+    else:
+        raise TypeError("The np.ndarray dtype is neither np.float64 nor"
+                        " np.complex128")
+
+    ndim_M=M.ndim;
+
+    if (ndim_M > 2) or (ndim_M < 1):
+        raise ValueError(funcname+': input matrix/array invalid number of dimensions')
+
+    if not M.flags['F_CONTIGUOUS']:
+#        raise ValueError(funcname+' input array must be Fortran contiguous (Colmajor)')
+        M = np.asfortranarray(M)
+    return M
+
 
 
 # experimental block start
@@ -468,7 +502,8 @@ def palm4msa(M, p, ret_lambda=False, backend=2016, on_gpu=False):
     """
     if(not isinstance(p, pyfaust.factparams.ParamsPalm4MSA)):
         raise TypeError("p must be a ParamsPalm4MSA object.")
-    _check_fact_mat('palm4msa()', M)
+    is_real = np.empty((1,))
+    M = _check_fact_mat('palm4msa()', M, is_real)
     if(not p.is_mat_consistent(M)):
         raise ValueError("M's number of columns must be consistent with "
                          "the last residuum constraint defined in p. "
@@ -476,7 +511,10 @@ def palm4msa(M, p, ret_lambda=False, backend=2016, on_gpu=False):
                          "with the first factor constraint defined in p.")
     if(backend == 2016):
         if on_gpu: raise ValueError("on_gpu applies only on 2020 backend.")
-        core_obj, _lambda = _FaustCorePy.FaustFact.fact_palm4msa(M, p)
+        if is_real:
+            core_obj, _lambda = _FaustCorePy.FaustFact.fact_palm4msa(M, p)
+        else:
+            core_obj, _lambda = _FaustCorePy.FaustFactCplx.fact_palm4msa(M, p)
     elif(backend == 2020):
         core_obj, _lambda = _FaustCorePy.FaustFact.palm4msa2020(M, p, on_gpu)
     else:
@@ -750,11 +788,15 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
        <b/> See also pyfaust.factparams.ParamsHierarchicalRectMat
 
     """
-    p = _prepare_hierarchical_fact(M,p, "hierarchical", ret_lambda,
-                              ret_params)
+    is_real = np.empty((1,))
+    p, M = _prepare_hierarchical_fact(M, p, "hierarchical", ret_lambda,
+                              ret_params, is_real=is_real)
     if(backend == 2016):
         if on_gpu: raise ValueError("on_gpu applies only on 2020 backend.")
-        core_obj,_lambda = _FaustCorePy.FaustFact.fact_hierarchical(M, p)
+        if is_real:
+            core_obj,_lambda = _FaustCorePy.FaustFact.fact_hierarchical(M, p)
+        else:
+            core_obj,_lambda = _FaustCorePy.FaustFactCplx.fact_hierarchical(M, p)
     elif(backend == 2020):
         core_obj, _lambda = _FaustCorePy.FaustFact.hierarchical2020(M, p,
                                                                     on_gpu)
@@ -773,7 +815,7 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
 
 
 def _prepare_hierarchical_fact(M, p, callee_name, ret_lambda, ret_params,
-                               M_name='M'):
+                               M_name='M', is_real=None):
     """
     Utility func. for hierarchical() and fgft_palm().
     Among other checkings, it sets parameters from simplified ones.
@@ -785,7 +827,7 @@ def _prepare_hierarchical_fact(M, p, callee_name, ret_lambda, ret_params,
         p = ParamsFactFactory.createParams(M, p)
     if(not isinstance(p, ParamsHierarchical)):
         raise TypeError("p must be a ParamsHierarchical object.")
-    _check_fact_mat(''+callee_name+'()', M)
+    M = _check_fact_mat(callee_name+'()', M, is_real=is_real)
     if(not isinstance(ret_lambda, bool)):
         raise TypeError("ret_lambda must be a bool.")
     if(not isinstance(ret_params, bool)):
@@ -795,7 +837,7 @@ def _prepare_hierarchical_fact(M, p, callee_name, ret_lambda, ret_params,
                          "the last residuum constraint defined in p. "
                          "Likewise its number of rows must be consistent "
                          "with the first factor constraint defined in p.")
-    return p
+    return p, M
 
 # experimental block start
 def hierarchical_constends(M, p, A, B, ret_lambda=False, ret_params=False):
@@ -1051,14 +1093,19 @@ def fgft_palm(U, Lap, p, init_D=None, ret_lambda=False, ret_params=False):
     """
     from pyfaust.factparams import _init_init_D
 
-    p = _prepare_hierarchical_fact(U, p, "fgft_palm", ret_lambda,
-                              ret_params, 'U')
+    is_real = np.empty((1,))
+    p, M = _prepare_hierarchical_fact(U, p, "fgft_palm", ret_lambda,
+                              ret_params, 'U', is_real=is_real)
     if(init_D.dtype != Lap.dtype or Lap.dtype != U.dtype or U.dtype != init_D.dtype):
         raise ValueError("All the numpy arrays must be of the same dtype.")
 
     init_D = _init_init_D(init_D, U.shape[0])
-    core_obj, _lambda, D = _FaustCorePy.FaustFact.fact_hierarchical_fft(U, Lap, p,
-                                                                    init_D)
+    if is_real:
+        core_obj, _lambda, D = _FaustCorePy.FaustFact.fact_hierarchical_fft(U, Lap, p,
+                                                                            init_D)
+    else:
+        core_obj, _lambda, D = _FaustCorePy.FaustFactCplx.fact_hierarchical_fft(U, Lap, p,
+                                                                                init_D)
     F = Faust(core_obj=core_obj)
     ret_list = [ F, D ]
     if(ret_lambda):
@@ -1082,5 +1129,10 @@ def butterfly(M, dir="right"):
     Returns:
         The Faust which is an approximate of M according to a butterfly support.
     """
-    return Faust(core_obj=_FaustCorePy.FaustFact.butterfly_hierarchical(M, dir))
+    is_real = np.empty((1,))
+    M = _check_fact_mat('butterfly()', M, is_real)
+    if is_real:
+        return Faust(core_obj=_FaustCorePy.FaustFact.butterfly_hierarchical(M, dir))
+    else:
+        return Faust(core_obj=_FaustCorePy.FaustFactCplx.butterfly_hierarchical(M, dir))
 # experimental block end

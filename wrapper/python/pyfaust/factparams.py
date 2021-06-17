@@ -11,6 +11,7 @@ else:
     ABC = object # trick to handle py2 missing ABC
                  # but not using abstract class in py2.7
 
+
 ## @package pyfaust.factparams @brief The module for the parametrization of FAuST's algorithms (Palm4MSA and Hierarchical Factorization).
 ## <b/> See also: pyfaust.fact.hierarchical, pyfaust.fact.palm4msa
 
@@ -272,9 +273,17 @@ class ConstraintInt(ConstraintGeneric):
             <b/> See: ConstraintGeneric.project
         """
         super(ConstraintInt, self).project(M)
-        return _FaustCorePy.ConstraintIntCore.project(M, self._name.name, self._num_rows,
-                                                      self._num_cols, self._cons_value,
-                                                      self.normalized, self.pos)
+        from pyfaust.fact import _check_fact_mat
+        is_real = np.empty((1,))
+        M = _check_fact_mat('ConstraintInt.project', M, is_real)
+        if is_real:
+            return _FaustCorePy.ConstraintIntCore.project(M, self._name.name, self._num_rows,
+                                                          self._num_cols, self._cons_value,
+                                                          self.normalized, self.pos)
+        else:
+            return _FaustCorePy.ConstraintIntCoreCplx.project(M, self._name.name, self._num_rows,
+                                                          self._num_cols, self._cons_value,
+                                                          self.normalized, self.pos)
 
 class ConstraintMat(ConstraintGeneric):
     """
@@ -345,11 +354,21 @@ class ConstraintMat(ConstraintGeneric):
             <b/> See: ConstraintGeneric.project
         """
         super(ConstraintMat, self).project(M)
-        return _FaustCorePy.ConstraintMatCore.project(M, self._name.name, self._num_rows,
-                                                      self._num_cols,
-                                                      self._cons_value,
-                                                      self._cons_value_sz,
-                                                      self.normalized, self.pos)
+        is_real = np.empty((1,))
+        from pyfaust.fact import _check_fact_mat
+        M = _check_fact_mat('ConstraintMat.project', M, is_real)
+        if is_real:
+            return _FaustCorePy.ConstraintMatCore.project(M, self._name.name, self._num_rows,
+                                                          self._num_cols,
+                                                          self._cons_value,
+                                                          self._cons_value_sz,
+                                                          self.normalized, self.pos)
+        else:
+            return _FaustCorePy.ConstraintMatCoreCplx.project(M, self._name.name, self._num_rows,
+                                                              self._num_cols,
+                                                              self._cons_value,
+                                                              self._cons_value_sz,
+                                                              self.normalized, self.pos)
 
 
 class ConstraintReal(ConstraintGeneric):
@@ -403,10 +422,19 @@ class ConstraintReal(ConstraintGeneric):
         <b/> See: ConstraintGeneric.project
         """
         super(ConstraintReal, self).project(M)
-        return _FaustCorePy.ConstraintRealCore.project(M, self._name.name, self._num_rows,
-                                                       self._num_cols,
-                                                       self._cons_value,
-                                                       self.normalized, self.pos)
+        is_real = np.empty((1,))
+        from pyfaust.fact import _check_fact_mat
+        M = _check_fact_mat('ConstraintReal.project', M, is_real)
+        if is_real:
+            return _FaustCorePy.ConstraintRealCore.project(M, self._name.name, self._num_rows,
+                                                           self._num_cols,
+                                                           self._cons_value,
+                                                           self.normalized, self.pos)
+        else:
+            return _FaustCorePy.ConstraintRealCore.project(M, self._name.name, self._num_rows,
+                                                           self._num_cols,
+                                                           self._cons_value,
+                                                           self.normalized, self.pos)
 
 
 class ConstraintName:

@@ -14,6 +14,7 @@ from scipy.sparse.linalg import eigsh
 from scipy.special import ive
 from scipy.sparse import eye as seye
 from numpy import empty, sqrt, log, array, squeeze
+from pyfaust.fact import _check_fact_mat
 
 import threading
 
@@ -59,9 +60,14 @@ def Chebyshev(L, K, dev='cpu', T0=None, impl='native'):
         else:
             return _chebyshev(L, K, T0, T1, rR, dev)
     elif impl == 'native':
-        F = FaustPoly(core_obj=_FaustCorePy.FaustCore.polyBasis(L, K, T0,
-                                                                dev.startswith('gpu')),
-                      impl='native')
+        if L.dtype == np.complex:
+            F = FaustPoly(core_obj=_FaustCorePy.FaustCoreCplx.polyBasis(L, K, T0,
+                                                                        dev.startswith('gpu')),
+                          impl='native')
+        else:
+            F = FaustPoly(core_obj=_FaustCorePy.FaustCore.polyBasis(L, K, T0,
+                                                                    dev.startswith('gpu')),
+                          impl='native')
         return F
     else:
         raise ValueError(impl+" is an unknown implementation.")
@@ -309,11 +315,19 @@ def _poly_arr_py(coeffs, basisX, d, dev='cpu', out=None):
     return Y
 
 def _poly_arr_cpp(coeffs, basisX, d, dev='cpu', out=None):
+    is_real = np.empty((1,))
+    basisX = _check_fact_mat('_poly_arr_cpp()', basisX, is_real)
     if coeffs.ndim == 1:
-        return _FaustCorePy.polyCoeffs(d, basisX, coeffs, dev, out)
+        if is_real:
+            return _FaustCorePy.polyCoeffs(d, basisX, coeffs, dev, out)
+        else:
+            return _FaustCorePy.polyCoeffsCplx(d, basisX, coeffs, dev, out)
     elif coeffs.ndim == 2:
         K = coeffs.shape[1]-1
-        return _FaustCorePy.polyGroupCoeffs(d, K, basisX, coeffs, dev, out)
+        if is_real:
+            return _FaustCorePy.polyGroupCoeffs(d, K, basisX, coeffs, dev, out)
+        else:
+            return _FaustCorePy.polyGroupCoeffsCplx(d, K, basisX, coeffs, dev, out)
     else:
         raise ValueError("coeffs can't have more than two dimensions.")
 
@@ -506,6 +520,7 @@ def expm_multiply(A, B, t, K=10, tradeoff='time', dev='cpu', **kwargs):
         defined as a numpy.linspace.
         3. The time values must be negative.
 
+
     Args:
         A: the operator whose exponential is of interest (must be a
         symmetric positive definite csr_matrix).
@@ -541,7 +556,8 @@ def expm_multiply(A, B, t, K=10, tradeoff='time', dev='cpu', **kwargs):
                [ 0.20063382,  0.51456348,  0.62490929,  0.68279266,
                 0.05458717]])
 
-    """
+
+   """
     if not isinstance(A, csr_matrix):
         raise TypeError('A must be a csr_matrix')
     # check A is PSD or at least square
@@ -575,7 +591,7 @@ def expm_multiply(A, B, t, K=10, tradeoff='time', dev='cpu', **kwargs):
     else:
         n = B.shape[1]
     npts = len(t)
-    Y = [empty((m, n), order='F') for i in range(npts)]
+    Y = [empty((m, n), order='F', dtype=A.dtype) for i in range(npts)]
     if poly_meth == 2:
         TB = squeeze(T@B)
     else:
@@ -596,7 +612,7 @@ def expm_multiply(A, B, t, K=10, tradeoff='time', dev='cpu', **kwargs):
 
     if group_coeffs:
         # poly_meth == 2
-        coeff = np.empty((npts, K+1), dtype=np.float)
+        coeff = np.empty((npts, K+1), dtype=A.dtype)
         for i, tau in enumerate(t):
             if tau >= 0:
                 raise t_non_neg_err
@@ -606,7 +622,7 @@ def expm_multiply(A, B, t, K=10, tradeoff='time', dev='cpu', **kwargs):
         for i, tau in enumerate(t):
             if tau >= 0:
                 raise t_non_neg_err
-            coeff = np.empty((K+1,), dtype=np.float)
+            coeff = np.empty((K+1,), dtype=A.dtype)
             calc_coeffs(tau, K, phi, coeff)
             if poly_meth == 2:
                 poly(coeff, TB, dev=dev, out=Y[i][:, :])

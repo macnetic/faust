@@ -10,6 +10,8 @@ else:
     ABC = object # trick to handle py2 missing ABC
                  # but not using abstract class in py2.7
 
+from pyfaust.fact import _check_fact_mat
+
 class proj_gen(ABC):
     """
     The parent abstract class to represent projectors (as functors).
@@ -487,8 +489,16 @@ class blockdiag(proj_gen):
         if(M.shape != self._shape): raise ValueError('The dimension of the '
                                                    'projector and matrix must '
                                                    'agree.')
-        return _FaustCorePy.prox_blockdiag(M, self._block_shapes, self.normalized,
-                                           self.pos)
+
+        is_real = np.empty((1,))
+        M = _check_fact_mat('prox_blockdiag.__call__', M, is_real)
+        if is_real:
+            return _FaustCorePy.ConstraintMatCore.prox_blockdiag(M, self._block_shapes, self.normalized,
+                                                             self.pos)
+        else:
+            return _FaustCorePy.ConstraintMatCoreCplx.prox_blockdiag(M, self._block_shapes, self.normalized,
+                                                             self.pos)
+
 #        M_ = np.zeros(M.shape)
 #        m_ = 0
 #        n_ = 0

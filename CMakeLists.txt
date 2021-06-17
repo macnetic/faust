@@ -239,8 +239,8 @@ option(PYTHON_ENCODING "The *.py charset for pyfaust/__init__.py (utf-8, windows
 #set(BUILD_READ_MAT_FILE OFF CACHE BOOL "Using matio library to read mat files")
 
 option(FAUST_TORCH "Faust torch backend for the Faust-Matrix/Vector product." OFF)
-option(USE_GPU_MOD "Faust cuda backend for the Faust-Matrix/Vector prodduct." OFF)
-
+option(USE_GPU_MOD "Faust cuda backend for the Faust-Matrix/Vector product." OFF)
+option(BUILD_COMPLEX_PYX "Building the python wrapper in order to support complex matrices or not." ON)
 
 if (BUILD_USE_SINGLEPRECISION)
 	message(STATUS "**********SINGLEPRECISION ACTIF************")

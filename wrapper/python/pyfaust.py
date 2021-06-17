@@ -153,21 +153,27 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                 filepath = factors
             if(filepath and isinstance(filepath, str)):
                     contents = loadmat(filepath)
-                    factors = contents['faust_factors'][0]
+                    factors = contents['faust_factors'][0].tolist()
             if((isinstance(factors, np.ndarray) and factors.ndim == 2)
                or isinstance(factors,
                              scipy.sparse.csc.csc_matrix)
                or isinstance(factors, scipy.sparse.csr.csr_matrix)):
                 factors = [ factors ]
-            if(not isinstance(factors, list) and not
-               isinstance(factors, np.ndarray)):
+            if(not isinstance(factors, list)):
                 raise Exception("factors must be a non-empty list of/or a numpy.ndarray, "
                                 "scipy.sparse.csr.csr_matrix/csc.csc_matrix.")
+            F._is_real = True
+            for f in factors:
+                if(isinstance(f[0,0], (np.complex, np.complex64))):
+                    F._is_real = False
+                    break
             if(factors is not None and len(factors) > 0):
                 if(is_on_gpu):
                     F.m_faust = _FaustCorePy.FaustCoreGPU(factors, scale);
-                else:
+                elif F._is_real:
                     F.m_faust = _FaustCorePy.FaustCore(factors, scale);
+                else:
+                    F.m_faust = _FaustCorePy.FaustCoreCplx(factors, scale);
             else:
                 raise Exception("Cannot create an empty Faust.")
 
@@ -897,8 +903,9 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             or A.ndim == 2 and A.shape[0] == 1:
                 return F@Faust(np.diag(A.squeeze()), dev=F.device)
         # A is a Faust, a numpy.ndarray (eg. numpy.matrix) or anything
-        warnings.warn("The * is deprecated as a matrix product and will soon"
-                      " be removed")
+        raise Exception("* use")
+#        warnings.warn("The * is deprecated as a matrix product and will soon"
+#                      " be removed")
         try:
             return F.__matmul__(A)
         except:
@@ -2276,22 +2283,22 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                             " differ.")
 
         if weights.shape == F.shape:
-            aF = Faust([(weights[:,0].T).reshape(1,F.shape[0])], dev=F.device)*F[:,0]
+            aF = Faust([(weights[:,0].T).reshape(1,F.shape[0])], dev=F.device)@F[:,0]
             for i in range(1,F.shape[1]):
                 aF = pyfaust.hstack((aF, Faust([(weights[:,i].T).reshape(1,
-                                                                         F.shape[0])], dev=F.device)*F[:,i]))
+                                                                         F.shape[0])], dev=F.device)@F[:,i]))
             sum_weights = 1/np.sum(weights, axis=axis)
-            aFw =  aF[:,0]*Faust([sum_weights[0].reshape(1,1)], dev=F.device)
+            aFw =  aF[:,0]@Faust([sum_weights[0].reshape(1,1)], dev=F.device)
             for i in range(1, sum_weights.shape[0]):
                 aFw = pyfaust.hstack((aFw,
-                                      aF[:,i]*Faust([sum_weights[i].reshape(1,1)], dev=F.device)))
+                                      aF[:,i]@Faust([sum_weights[i].reshape(1,1)], dev=F.device)))
             if(returned):
                 return (aFw, sum_weights)
             return aFw
 
         if axis == 1 or isinstance(axis, tuple) and 1 in axis:
             if weights.shape[0] == F.shape[1]:
-                aF = F*Faust(weights.reshape(weights.size, 1), dev=F.device)
+                aF = F@Faust(weights.reshape(weights.size, 1), dev=F.device)
             else:
                 raise ValueError("ValueError: Length of weights not compatible"
                                  " with specified axis 1.")
@@ -2302,7 +2309,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             if weights.ndim == 1:
                 weightsM = weights.reshape(1, weights.size)
             if weightsM.shape[1] == F.shape[0]:
-                aF = Faust(weightsM, dev=F.device)*F
+                aF = Faust(weightsM, dev=F.device)@F
             else:
                 raise ValueError("ValueError: Length of weights not compatible"
                                  " with axis 0.")
@@ -2549,12 +2556,12 @@ def dft(n, normed=True, dev='cpu'):
     if(not isinstance(normed, bool)):
         raise TypeError("normed must be True of False.")
     if dev == "cpu":
-        F = Faust(core_obj=_FaustCorePy.FaustCore.fourierFaust(log2n, normed))
+        F = Faust(core_obj=_FaustCorePy.FaustCoreCplx.fourierFaust(log2n, normed))
     elif dev.startswith("gpu"):
         F = Faust(core_obj=_FaustCorePy.FaustCoreGPU.fourierFaust(log2n, normed))
     return F
 
-def eye(m,n=None,t='real', dev="cpu"):
+def eye(m, n=None, t='real', dev="cpu"):
     """
         Identity matrix as a Faust object.
 
@@ -2581,7 +2588,10 @@ def eye(m,n=None,t='real', dev="cpu"):
         raise ValueError("t must be 'real' or 'complex'")
     if(n == None): n = m
     if dev == "cpu":
-        rF = Faust(core_obj=_FaustCorePy.FaustCore.eyeFaust(m, n, t))
+        if t == 'real':
+            rF = Faust(core_obj=_FaustCorePy.FaustCore.eyeFaust(m, n))
+        else:
+            rF = Faust(core_obj=_FaustCorePy.FaustCoreCplx.eyeFaust(m, n))
     elif dev.startswith("gpu"):
         rF = Faust(core_obj=_FaustCorePy.FaustCoreGPU.eyeFaust(m, n, t))
     return rF

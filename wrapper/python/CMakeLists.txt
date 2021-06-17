@@ -137,10 +137,22 @@ if(USE_GPU_MOD)
 	set(GPU_CUDA_VERSION_PYPI_CLASSIFIER "Environment :: GPU :: NVIDIA CUDA :: 9.2")
 endif()
 
+if(BUILD_COMPLEX_PYX)
+	set(FAUST_CORE_CPLX_TYPE FaustCoreCplx)
+else()
+	set(FAUST_CORE_CPLX_TYPE FaustCoreCplxDummy)
+endif()
+
 # configure the setup.py.in into setup.py (equivalent of Makefile for Python)
 configure_file(${FAUST_PYTHON_SRC_DIR}/setup.py.in ${FAUST_PYTHON_BIN_DIR}/setup.py @ONLY)
-configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/_FaustCorePy.pyx ${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.pyx COPYONLY)
+configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/_FaustCorePy.pyx ${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.pyx @ONLY)
 configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/FaustCoreCy.pxd ${FAUST_PYTHON_BIN_DIR}/FaustCoreCy.pxd COPYONLY)
+
+if(BUILD_COMPLEX_PYX)
+	set(FAUST_CORE_CPLX_TYPE FaustCoreCplx)
+	file(READ ${FAUST_PYTHON_SRC_SRC_DIR}/_FaustCorePyCplx.pyx CPLX_PYX)
+	file(APPEND ${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.pyx ${CPLX_PYX})
+endif()
 
 if(USE_GPU_MOD)
 	file(READ ${FAUST_PYTHON_SRC_SRC_DIR}/_FaustCorePyGPU.pyx GPU_PYX)

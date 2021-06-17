@@ -91,7 +91,7 @@ class TestPoly(unittest.TestCase):
         K = self.K
         density = self.density
         F = basis(L, K, 'chebyshev', dev=self.dev)
-        coeffs = np.random.rand(K+1)
+        coeffs = np.random.rand(K+1).astype(L.dtype)
         G = poly(coeffs, F)
         # Test polynomial as Faust
         poly_ref = np.zeros((d,d))
@@ -103,7 +103,7 @@ class TestPoly(unittest.TestCase):
         self.assertTrue(isinstance(GM, np.ndarray) and np.allclose(GM,
                                                                   poly_ref.toarray()))
         # Test polynomial-vector product
-        x = np.random.rand(F.shape[1], 1)
+        x = np.random.rand(F.shape[1], 1).astype(L.dtype)
         # Three ways to do (not all as efficient as each other)
         Fx1 = poly(coeffs, F, dev=self.dev)@x
         Fx2 = poly(coeffs, F@x, dev=self.dev)
@@ -111,7 +111,7 @@ class TestPoly(unittest.TestCase):
         self.assertTrue(np.allclose(Fx1, Fx2))
         self.assertTrue(np.allclose(Fx1, Fx3))
         # Test polynomial-matrix product
-        X = np.random.rand(F.shape[1], 18)
+        X = np.random.rand(F.shape[1], 18).astype(L.dtype)
         FX1 = poly(coeffs, F, dev=self.dev)@X
         FX2 = poly(coeffs, F@X, dev=self.dev)
         FX3 = poly(coeffs, F, X=X, dev=self.dev)
@@ -132,21 +132,21 @@ class TestPoly(unittest.TestCase):
         L = self.L
         L = L@L.T
         # test expm_multiply on a vector
-        x = np.random.rand(L.shape[1])
+        x = np.random.rand(L.shape[1]).astype(L.dtype)
         pts_args = {'start':-.5, 'stop':-0.1, 'num':3, 'endpoint':True}
-        t = np.linspace(**pts_args)
+        t = np.linspace(**pts_args).astype(L.dtype)
         y = expm_multiply(L, x, t)
         y_ref = scipy_expm_multiply(L, x, **pts_args)
         self.assertTrue(np.allclose(y, y_ref))
         # test expm_multiply on a matrix
-        X = np.random.rand(L.shape[1], 32)
+        X = np.random.rand(L.shape[1], 32).astype(L.dtype)
         pts_args = {'start':-.5, 'stop':-0.1, 'num':3, 'endpoint':True}
         t = np.linspace(**pts_args)
         y = expm_multiply(L, X, t)
         y_ref = scipy_expm_multiply(L, X, **pts_args)
         self.assertTrue(np.allclose(y, y_ref))
         # test expm_multiply with (non-default) tradeoff=='memory'
-        X = np.random.rand(L.shape[1], 32)
+        X = np.random.rand(L.shape[1], 32).astype(L.dtype)
         pts_args = {'start':-.5, 'stop':-0.1, 'num':3, 'endpoint':True}
         t = np.linspace(**pts_args)
         y = expm_multiply(L, X, t, tradeoff='memory')
