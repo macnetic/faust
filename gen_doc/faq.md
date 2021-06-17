@@ -8,6 +8,7 @@
 [1. How can I launch the integrated unit tests of pyfaust?](#py_one)  
 [2. How to launch the demos with pyfaust?](#py_two)  
 [3. How to run the PALM4MSA algorithm in a step-by-step fashion?](#py_three)  
+[4. Why does PALM4MSA fail on Windows when the numpy array is complex?](#py_four)
 
 **About matfaust:**  
 [1. Why did I get a file-not-found error when running demos or examples?](#mat_one)  
@@ -248,4 +249,27 @@ Below is an example of output you should obtain running the script (into which y
 	Relative error comparing the final Fausts obtained either by in step-by-step PALM4MSA versus all-iterations-at-once PALM4MSA:  2.1117031467008879e-16
 
 
+\anchor py_four
+
+## 4. Why does PALM4MSA fail on Windows when the numpy array is complex?
+
+If you run the following Python code on Windows with pyfaust, it will fail with the next error (while it works properly on Linux or Mac OS X).
+
+```
+from pyfaust.fact import palm4msa
+from pyfaust.factparams import ParamsPalm4MSA, ConstraintList, StoppingCriterion
+import numpy as np
+from numpy.random import rand
+d = 3
+cons = ConstraintList('sp', d, d, d, 'sp', d, d, d)
+stop_crit = StoppingCriterion(num_its=10)
+param = ParamsPalm4MSA(cons, stop_crit)
+M = rand(d, d)+1j*rand(d,d) # M is complex
+print(M.dtype)
+F1 = palm4msa(M, param, ret_lambda=True)
+```
+
+**Error**: TypeError: data type 'float128' not understood.
+
+Unfortunately when built with Microsoft Visual Studio the ``float128`` numpy is not supported and somehow this type is used when the numpy scalar type (dtype) ``numpy.complex128`` is used for a matrix. Until numpy or VS is fixed to support this missing type pyfaust PALM4MSA won't run on complex matrices.
 
