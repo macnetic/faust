@@ -4,12 +4,7 @@ from pyfaust import *
 import numpy as np
 import _FaustCorePy
 import sys
-if sys.version_info > (3,0):
-    from abc import ABC, abstractmethod
-else:
-    from abc import abstractmethod
-    ABC = object # trick to handle py2 missing ABC
-                 # but not using abstract class in py2.7
+from abc import ABC, abstractmethod
 
 
 ## @package pyfaust.factparams @brief The module for the parametrization of FAuST's algorithms (Palm4MSA and Hierarchical Factorization).
@@ -1047,7 +1042,7 @@ class ParamsHierarchicalSquareMat(ParamsHierarchical):
     """
     The simplified parameterization class for factorizing a square matrix (of order a power of two) with the hierarchical factorization algorithm.
 
-    This type of parameters is typically used for Hadamard matrix
+    This type of parameters is typically used for a Hadamard matrix
     factorization.
 
     <b/> See also pyfaust.fact.hierarchical, pyfaust.demo.hadamard

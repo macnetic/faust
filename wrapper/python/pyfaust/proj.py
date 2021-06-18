@@ -3,12 +3,7 @@
 ## @package pyfaust.proj @brief This module provides matrix projectors.
 import _FaustCorePy
 from pyfaust.factparams import *
-if sys.version_info > (3,0):
-    from abc import ABC, abstractmethod
-else:
-    from abc import abstractmethod
-    ABC = object # trick to handle py2 missing ABC
-                 # but not using abstract class in py2.7
+from abc import ABC, abstractmethod
 
 from pyfaust.fact import _check_fact_mat
 

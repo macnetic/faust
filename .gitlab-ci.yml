@@ -5,7 +5,7 @@ variables:
     DURL: "https://gitlab.inria.fr/faustgrp/gforge_files/-/raw/master/"
     DFILE: "faust_data-2.6.0.zip"
     JOB_PYTHON: "python3" # if set again in job, it hides this one (precedence: https://docs.gitlab.com/13.6/ee/ci/variables/#priority-of-environment-variables)
-    WIN_PY_VER: '3.9' #default python version used to build python wrapper on windows (for both whl package and nsis .exe)
+    WIN_PY_VER: '3.9' # default python version used to build python wrapper on windows (for both whl package and nsis .exe)
     NIX_PY_VER: '3.9' # default python version used to build python wrapper for "unix" system packages (pkg/macos, rpm/deb/linux)
 
 .ctest_template: &ctest_script
@@ -93,6 +93,8 @@ pkg_macos:
         # restore clang libomp
         - sudo cp /opt/local/lib/libomp/libomp.dylib /opt/local/lib/libomp/libiomp5.dylib
         - sudo mv /opt/local/lib/libomp/libomp.dylib.bak /opt/local/lib/libomp/libomp.dylib
+        # ensure the linking of libomp to the python wrapper shared lib is right (not overridden by matlab libomp)
+        - sudo install_name_tool -change @rpath/libiomp5.dylib /opt/local/lib/libomp/libomp.dylib wrapper/python/_FaustCorePy.cpython-*-darwin.so
         - sudo make install LANG=en_GB.UTF-8
           #- 'sudo hdiutil create -volname Faust-$SHA_START-MatlabR2016a-Py2.7 -srcfolder /opt/local/faust-$SHA_START -ov -format UDRW faust-$SHA_START'
         - sudo pkgbuild --identifier fr.inria.faust --version $SHA_START --root /opt/local/faust-$SHA_START --install-location /opt/local/faust-$SHA_START --scripts . ./faust-$SHA_START.pkg
@@ -217,7 +219,15 @@ pkg_macos_release:
         # restore clang libomp
         - sudo cp /opt/local/lib/libomp/libomp.dylib /opt/local/lib/libomp/libiomp5.dylib
         - sudo mv /opt/local/lib/libomp/libomp.dylib.bak /opt/local/lib/libomp/libomp.dylib
+          # ensure the linking of libomp to the python wrapper shared lib is right (not overridden by matlab libomp)
+        - otool -L wrapper/python/_FaustCorePy.cpython-*-darwin.so
+        - sudo install_name_tool -change @rpath/libiomp5.dylib /opt/local/lib/libomp/libomp.dylib wrapper/python/_FaustCorePy.cpython-*-darwin.so
+        - otool -L wrapper/python/_FaustCorePy.cpython-*-darwin.so
+        - sudo rm -Rf /opt/local/faust # install dir
         - 'sudo make install LANG=en_GB.UTF-8'
+        # ensure libomp path also in install path
+        - sudo install_name_tool -change @rpath/libiomp5.dylib /opt/local/lib/libomp/libomp.dylib /opt/local/faust/python/_FaustCorePy.cpython-*-darwin.so
+        - otool -L wrapper/python/_FaustCorePy.cpython-*-darwin.so
         - 'sudo hdiutil create -volname Faust-$CI_COMMIT_TAG-MatlabR2016a-Py2.7 -srcfolder /opt/local/faust -ov -format UDRW faust-$CI_COMMIT_TAG'
         - sudo pkgbuild --identifier fr.inria.faust --version $CI_COMMIT_TAG --root /opt/local/faust --install-location /opt/local/faust --scripts . ./faust-$CI_COMMIT_TAG.pkg
         - for FILE in $(find /usr/local/lib ! -iname "libmatio*" -maxdepth 1 -mindepth 1); do filter_list+="--filter $(basename $FILE) "; done;
