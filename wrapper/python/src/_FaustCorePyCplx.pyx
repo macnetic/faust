@@ -971,14 +971,15 @@ cdef class FaustFactCplx(FaustFact):
                 PyMem_Malloc(sizeof(PyxConstraintScalar[double]))
                 (<PyxConstraintScalar[double]*>cpp_constraints[i]).parameter =\
                         cons._cons_value
-            elif(cons._is_mat_constraint()):
+            elif(cons.is_mat_constraint()):
                 #print("FaustFact.fact_hierarchical() Matrix Constraint")
                 cpp_constraints[i] = <PyxConstraintMat[complex]*> \
                         PyMem_Malloc(sizeof(PyxConstraintMat[complex]))
                 tmp_mat_cplx = cons._cons_value
                 (<PyxConstraintMat[complex]*>cpp_constraints[i]).parameter =\
                         &tmp_mat_cplx[0,0]
-
+                (<PyxConstraintMat[complex]*>cpp_constraints[i]).parameter_sz =\
+                        cons._cons_value_sz
             else:
                 raise ValueError("Constraint type/name is not recognized.")
             cpp_constraints[i].name = cons.name
