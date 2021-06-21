@@ -271,5 +271,5 @@ F1 = palm4msa(M, param, ret_lambda=True)
 
 **Error**: TypeError: data type 'float128' not understood.
 
-Unfortunately when built with Microsoft Visual Studio the ``float128`` numpy is not supported and somehow this type is used when the numpy scalar type (dtype) ``numpy.complex128`` is used for a matrix. Until numpy or VS is fixed to support this missing type pyfaust PALM4MSA won't run on complex matrices.
+Unfortunately when built with Microsoft Visual Studio the ``float128`` numpy is not supported and somehow this type is used when the numpy scalar type (dtype) ``numpy.complex128`` is used for a matrix. Until numpy or VS is fixed to support this missing type pyfaust PALM4MSA won't run with complex matrices on Windows.
 
