@@ -882,9 +882,7 @@ cdef class FaustCoreGPU:
         x_nnz = X.nnz
         nbcol = X.shape[1]
         e = Exception("Dimensions must agree")
-        if(X.dtype in [ 'float', 'float128',
-                       'float16', 'float32',
-                       'float64', 'double']):
+        if(X.dtype in [ 'double', 'float64']):
             x_data1d = X.data
             nbrow = self.core_faust_dbl.getNbRow()
             if(self.core_faust_dbl.getNbCol() != X.shape[0]): raise e
