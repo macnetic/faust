@@ -714,7 +714,7 @@ bool FaustCoreCpp<FPP,DEV>::make_transform(Faust::TransformHelper<FPP,Cpu>** th)
 template<typename FPP, FDevice DEV>
 bool FaustCoreCpp<FPP, DEV>::make_transform(Faust::TransformHelper<FPP,GPU2>** th) const
 {
-    *th = new Faust::TransformHelper<double,GPU2>(*this->transform);
+    *th = new Faust::TransformHelper<FPP,GPU2>(*this->transform);
     return true;
 }
 #endif

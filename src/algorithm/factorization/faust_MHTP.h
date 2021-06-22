@@ -57,7 +57,7 @@ namespace Faust
 	 */
 	template<typename FPP, FDevice DEVICE>
 		void perform_MHTP(
-				const MHTPParams<FPP>& mhtp_params,
+				const MHTPParams<Real<FPP>>& mhtp_params,
 				const Faust::MatDense<FPP,DEVICE>& A,
 				const Faust::MatDense<FPP,DEVICE>& A_H,
 				Faust::TransformHelper<FPP,DEVICE>& S,

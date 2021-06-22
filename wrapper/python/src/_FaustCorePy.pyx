@@ -1481,10 +1481,6 @@ cdef class FaustFact:
 
         cdef FaustCoreCy.FaustCoreCpp[double]* core_faust_dbl_init_facts
 
-        if(M.dtype == np.complex):
-            raise TypeError("2020 palm4msa implementation doesn't support"
-                            " complex matrices.")
-
         Mview = M
         _out_buf = np.array([0], dtype=M.dtype)
         _out_buf[0] = p.init_lambda;
@@ -1549,7 +1545,6 @@ cdef class FaustFact:
             # facts have been initialized from the wrapper
             # create a Faust
             F_facts = FaustCore(p.init_facts)
-            F_facts._isReal = True
             # palm4msa2020_gen in FaustFact.hpp
             # is responsible to delete the object in case the
             # algorithm runs on GPU (hence the transform objects F_facts and

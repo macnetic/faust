@@ -8,7 +8,7 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 		const bool is_update_way_R2L,
 		const FactorsFormat factors_format,
 		const bool packing_RL,
-		const MHTPParams<FPP> mhtp_params/*=MHTPParams<FPP>()*/,
+		const MHTPParams<Real<FPP>> mhtp_params/*=MHTPParams<FPP>()*/,
 		const bool compute_2norm_on_array,
 		const Real<FPP> norm2_threshold,
 		const unsigned int norm2_max_iter,
@@ -192,7 +192,7 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 }
 
 template <typename FPP, FDevice DEVICE>
-void Faust::compute_n_apply_grad1(const int f_id, const Faust::MatDense<FPP,DEVICE> &A, Faust::TransformHelper<FPP,DEVICE>& S, std::vector<TransformHelper<FPP,DEVICE>*> &pL, std::vector<TransformHelper<FPP,DEVICE>*>& pR, const FPP& lambda, const Real<FPP> &c, Faust::MatDense<FPP,DEVICE> &out /* D */, const StoppingCriterion<Real<FPP>>& sc, Real<FPP> &error, const int prod_mod)
+void Faust::compute_n_apply_grad1(const int f_id, const Faust::MatDense<FPP,DEVICE> &A, Faust::TransformHelper<FPP,DEVICE>& S, std::vector<TransformHelper<FPP,DEVICE>*> &pL, std::vector<TransformHelper<FPP,DEVICE>*>& pR, const Real<FPP>& lambda, const Real<FPP> &c, Faust::MatDense<FPP,DEVICE> &out /* D */, const StoppingCriterion<Real<FPP>>& sc, Real<FPP> &error, const int prod_mod)
 {
 	Faust::MatDense<FPP,DEVICE> tmp;
 	Faust::MatDense<FPP,DEVICE> & D = out;
@@ -243,7 +243,7 @@ void Faust::compute_n_apply_grad1(const int f_id, const Faust::MatDense<FPP,DEVI
 }
 
 template <typename FPP, FDevice DEVICE>
-void Faust::compute_n_apply_grad2(const int f_id, const Faust::MatDense<FPP,DEVICE> &A, Faust::TransformHelper<FPP,DEVICE>& S, std::vector<TransformHelper<FPP,DEVICE>*> &pL, std::vector<TransformHelper<FPP,DEVICE>*>& pR, const FPP& lambda, const Real<FPP> &c, Faust::MatDense<FPP,DEVICE> &out /* D */, const StoppingCriterion<Real<FPP>>& sc, Real<FPP> &error, const int prod_mod)
+void Faust::compute_n_apply_grad2(const int f_id, const Faust::MatDense<FPP,DEVICE> &A, Faust::TransformHelper<FPP,DEVICE>& S, std::vector<TransformHelper<FPP,DEVICE>*> &pL, std::vector<TransformHelper<FPP,DEVICE>*>& pR, const Real<FPP>& lambda, const Real<FPP> &c, Faust::MatDense<FPP,DEVICE> &out /* D */, const StoppingCriterion<Real<FPP>>& sc, Real<FPP> &error, const int prod_mod)
 {
 	Faust::MatDense<FPP,DEVICE> tmp;
 	Faust::MatDense<FPP,DEVICE> & D = out;

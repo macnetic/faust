@@ -1020,6 +1020,129 @@ cdef class FaustFactCplx(FaustFact):
             return core, np.real(_out_buf[0])
 
     @staticmethod
+    def palm4msa2020(M, p, full_gpu=True):
+        cdef unsigned int M_num_rows=M.shape[0]
+        cdef unsigned int M_num_cols=M.shape[1]
+
+        cdef complex[:,:] Mview
+        cdef complex[:,:] tmp_mat
+        # view for lambda
+        cdef double[:] outbufview
+
+        cdef PyxStoppingCriterion[double] cpp_stop_crit
+        cdef PyxMHTPParams[double] cpp_MHTPParams
+        # template parameter is always double (never complex) because no need
+        # to have a threshold error of complex type (it wouldn't make sense)
+        cdef PyxConstraintGeneric** cpp_constraints
+
+        cdef FaustCoreCy.FaustCoreCpp[complex]* core_faust_dbl_init_facts
+
+
+        Mview = M
+        _out_buf = np.array([0], dtype=M.dtype)
+        _out_buf[0] = p.init_lambda;
+        outbufview = _out_buf
+
+        cpp_stop_crit.is_criterion_error = p.stop_crit._is_criterion_error
+        cpp_stop_crit.error_threshold = p.stop_crit.tol
+        cpp_stop_crit.num_its = p.stop_crit.num_its
+        cpp_stop_crit.max_num_its = p.stop_crit.maxiter
+
+        # use_MHTP is either False or a MHTPParams instance
+        if p.use_MHTP != False:
+            mhtpp = p.use_MHTP
+            cpp_MHTPParams.used = True
+            cpp_MHTPParams.stop_crit.is_criterion_error = mhtpp.stop_crit._is_criterion_error
+            cpp_MHTPParams.stop_crit.error_threshold = mhtpp.stop_crit.tol
+            cpp_MHTPParams.stop_crit.num_its = mhtpp.stop_crit.num_its
+            cpp_MHTPParams.stop_crit.max_num_its = mhtpp.stop_crit.maxiter
+            cpp_MHTPParams.constant_step_size = mhtpp.constant_step_size
+            cpp_MHTPParams.step_size = mhtpp.step_size
+            cpp_MHTPParams.updating_lambda = mhtpp.updating_lambda
+            cpp_MHTPParams.palm4msa_period = mhtpp.palm4msa_period
+        else:
+            cpp_MHTPParams.used = False
+
+        cpp_constraints = \
+        <PyxConstraintGeneric**> \
+        PyMem_Malloc(sizeof(PyxConstraintGeneric*)*len(p.constraints))
+
+        p.factor_format = \
+        pyfaust.factparams.ParamsFact.factor_format_str2int(p.factor_format)
+
+        for i in range(0,len(p.constraints)):
+            cons = p.constraints[i]
+            #print("FaustFact.fact_palm4MSA() cons.name =", cons.name)
+            if cons.is_int_constraint():
+                #print("FaustFact.fact_palm4MSA() Int Constraint")
+                cpp_constraints[i] = <PyxConstraintInt*> PyMem_Malloc(sizeof(PyxConstraintInt))
+                (<PyxConstraintInt*>cpp_constraints[i]).parameter = cons._cons_value
+            elif cons.is_real_constraint():
+                #print("FaustFact.fact_palm4MSA() Real Constraint")
+                cpp_constraints[i] = <PyxConstraintScalar[double]*> \
+                PyMem_Malloc(sizeof(PyxConstraintScalar[double]))
+                (<PyxConstraintScalar[double]*>cpp_constraints[i]).parameter =\
+                        cons._cons_value
+            elif cons.is_mat_constraint():
+                #print("FaustFact.fact_palm4MSA() Matrix Constraint")
+                cpp_constraints[i] = <PyxConstraintMat[complex]*> \
+                        PyMem_Malloc(sizeof(PyxConstraintMat[complex]))
+                tmp_mat = cons._cons_value
+                (<PyxConstraintMat[complex]*>cpp_constraints[i]).parameter =\
+                        &tmp_mat[0,0]
+                (<PyxConstraintMat[complex]*>cpp_constraints[i]).parameter_sz =\
+                        cons._cons_value_sz
+            else:
+                raise ValueError("Constraint type/name is not recognized.")
+            cpp_constraints[i].name = cons.name
+            cpp_constraints[i].num_rows = cons._num_rows
+            cpp_constraints[i].num_cols = cons._num_cols
+
+        if p.init_facts:
+            # facts have been initialized from the wrapper
+            # create a Faust
+            F_facts = FaustCore(p.init_facts)
+            # palm4msa2020_gen in FaustFact.hpp
+            # is responsible to delete the object in case the
+            # algorithm runs on GPU (hence the transform objects F_facts and
+            # core are not the same)
+
+
+        core = FaustCoreCplx(core=True)
+        core.core_faust_cplx = \
+            FaustCoreCy.palm4msa2020[complex](&Mview[0,0], M_num_rows,
+                                             M_num_cols,
+                                             cpp_constraints,
+                                             len(p.constraints),
+                                             &outbufview[0],
+                                             cpp_stop_crit,
+                                             p.is_update_way_R2L,
+                                             p.factor_format, p.packing_RL,
+                                             cpp_MHTPParams,
+                                             p.norm2_max_iter,
+                                             p.norm2_threshold,
+                                             p.is_verbose,
+                                             p.constant_step_size,
+                                             p.step_size,
+                                             full_gpu,
+                                             <FaustCoreCy.FaustCoreCpp[complex]*>NULL
+                                              if not p.init_facts else F_facts.core_faust_cplx)
+
+        if p.init_facts:
+            F_facts.core_faust_cplx = NULL
+            # needed to avoid double-free (because F_facts has the same
+            # TransformHelper behind as core)
+
+        for i in range(0,len(p.constraints)):
+            PyMem_Free(cpp_constraints[i])
+        PyMem_Free(cpp_constraints)
+
+        if(core.core_faust_cplx == NULL): raise Exception("palm4msa2020"
+                                                          " has failed.");
+
+        return core, np.real(_out_buf[0])
+
+    @staticmethod
     def fact_givens_fgft(Lap, J, t, verbosity=0, stoppingError = 0.0,
                          errIsRel=True, order=1, enable_large_Faust=False):
         if(order == 'ascend'): order = 1

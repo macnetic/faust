@@ -516,7 +516,10 @@ def palm4msa(M, p, ret_lambda=False, backend=2016, on_gpu=False):
         else:
             core_obj, _lambda = _FaustCorePy.FaustFactCplx.fact_palm4msa(M, p)
     elif(backend == 2020):
-        core_obj, _lambda = _FaustCorePy.FaustFact.palm4msa2020(M, p, on_gpu)
+        if is_real:
+            core_obj, _lambda = _FaustCorePy.FaustFact.palm4msa2020(M, p, on_gpu)
+        else:
+            core_obj, _lambda = _FaustCorePy.FaustFactCplx.fact_palm4msa(M, p)
     else:
         raise ValueError("Unknown backend (only 2016 and 2020 are available).")
     F = Faust(core_obj=core_obj)
