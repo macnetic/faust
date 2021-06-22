@@ -1143,6 +1143,138 @@ cdef class FaustFactCplx(FaustFact):
         return core, np.real(_out_buf[0])
 
     @staticmethod
+    def hierarchical2020(M, p, full_gpu=False):
+
+        cdef unsigned int M_num_rows=M.shape[0]
+        cdef unsigned int M_num_cols=M.shape[1]
+
+        cdef complex[:,:] Mview
+
+        # view for lambda
+        cdef double[:] outbufview
+
+        cdef complex[:,:] tmp_mat
+
+        cdef PyxConstraintGeneric** cpp_constraints
+
+        is_update_way_R2L = p.is_update_way_R2L
+        is_fact_side_left = p.is_fact_side_left
+        factor_format = p.factor_format
+        packing_RL = p.packing_RL
+        norm2_max_iter = p.norm2_max_iter
+        norm2_threshold = p.norm2_threshold
+        cdef PyxMHTPParams[double] cpp_MHTPParams
+        cdef PyxStoppingCriterion[double]* cpp_stop_crits
+        cpp_stop_crits = <PyxStoppingCriterion[double]*>\
+        PyMem_Malloc(sizeof(PyxStoppingCriterion[double])*2)
+
+
+        cpp_stop_crits[0].is_criterion_error = p.stop_crits[0]._is_criterion_error
+        cpp_stop_crits[0].error_threshold = p.stop_crits[0].tol
+        cpp_stop_crits[0].num_its = p.stop_crits[0].num_its
+        cpp_stop_crits[0].max_num_its = p.stop_crits[0].maxiter
+        cpp_stop_crits[1].is_criterion_error = p.stop_crits[1]._is_criterion_error
+        cpp_stop_crits[1].error_threshold = p.stop_crits[1].tol
+        cpp_stop_crits[1].num_its = p.stop_crits[1].num_its
+        cpp_stop_crits[1].max_num_its = p.stop_crits[1].maxiter
+
+        # use_MHTP is either False or a MHTPParams instance
+        if p.use_MHTP != False:
+            mhtpp = p.use_MHTP
+            cpp_MHTPParams.used = True
+            cpp_MHTPParams.stop_crit.is_criterion_error = mhtpp.stop_crit._is_criterion_error
+            cpp_MHTPParams.stop_crit.error_threshold = mhtpp.stop_crit.tol
+            cpp_MHTPParams.stop_crit.num_its = mhtpp.stop_crit.num_its
+            cpp_MHTPParams.stop_crit.max_num_its = mhtpp.stop_crit.maxiter
+            cpp_MHTPParams.constant_step_size = mhtpp.constant_step_size
+            cpp_MHTPParams.step_size = mhtpp.step_size
+            cpp_MHTPParams.updating_lambda = mhtpp.updating_lambda
+            cpp_MHTPParams.palm4msa_period = mhtpp.palm4msa_period
+        else:
+            cpp_MHTPParams.used = False
+
+        constraints = p.constraints
+
+        # store only lambda as a return from Palm4MSA algo
+        _out_buf = np.array([0], dtype='double')
+        _out_buf[0] = p.init_lambda;
+
+        Mview=M
+        outbufview = _out_buf
+
+        num_constraints = len(constraints)
+        num_facts = int(num_constraints/2+1)
+
+        cpp_constraints = \
+        <PyxConstraintGeneric**> \
+        PyMem_Malloc(sizeof(PyxConstraintGeneric*)*num_constraints)
+
+
+        for i in range(0,num_constraints):
+            cons = constraints[i]
+            #print("FaustFact.fact_hierarchical() cons.name =", cons.name)
+            if(cons.is_int_constraint()):
+                #print("FaustFact.fact_hierarchical() Int Constraint")
+                cpp_constraints[i] = <PyxConstraintInt*> PyMem_Malloc(sizeof(PyxConstraintInt))
+                (<PyxConstraintInt*>cpp_constraints[i]).parameter = cons._cons_value
+            elif(cons.is_real_constraint()):
+                #print("FaustFact.fact_hierarchical() Real Constraint")
+                cpp_constraints[i] = <PyxConstraintScalar[double]*> \
+                PyMem_Malloc(sizeof(PyxConstraintScalar[double]))
+                (<PyxConstraintScalar[double]*>cpp_constraints[i]).parameter =\
+                        cons._cons_value
+            elif(cons.is_mat_constraint()):
+                #print("FaustFact.fact_hierarchical() Matrix Constraint")
+                cpp_constraints[i] = <PyxConstraintMat[complex]*> \
+                        PyMem_Malloc(sizeof(PyxConstraintMat[complex]))
+                tmp_mat = cons._cons_value
+                (<PyxConstraintMat[complex]*>cpp_constraints[i]).parameter =\
+                        &tmp_mat[0,0]
+                (<PyxConstraintMat[complex]*>cpp_constraints[i]).parameter_sz =\
+                        cons._cons_value_sz
+
+            else:
+                raise ValueError("Constraint type/name is not recognized.")
+            cpp_constraints[i].name = cons.name
+            cpp_constraints[i].num_rows = cons._num_rows
+            cpp_constraints[i].num_cols = cons._num_cols
+
+        p.factor_format = \
+        pyfaust.factparams.ParamsFact.factor_format_str2int(p.factor_format)
+
+        core = FaustCoreCplx(core=True)
+
+        core.core_faust_cplx = \
+                FaustCoreCy.hierarchical2020[complex](&Mview[0,0],
+                                                      M_num_rows,
+                                                      M_num_cols,
+                                                      cpp_stop_crits,
+                                                      cpp_constraints,
+                                                      num_constraints,
+                                                      num_facts,
+                                                      &outbufview[0],
+                                                      is_update_way_R2L,
+                                                      is_fact_side_left,
+                                                      p.factor_format,
+                                                      packing_RL,
+                                                      cpp_MHTPParams,
+                                                      norm2_max_iter,
+                                                      norm2_threshold,
+                                                      p.is_verbose,
+                                                      p.constant_step_size,
+                                                      p.step_size,
+                                                      full_gpu)
+
+        for i in range(0,num_constraints):
+            PyMem_Free(cpp_constraints[i])
+        PyMem_Free(cpp_constraints)
+        PyMem_Free(cpp_stop_crits)
+        if(core.core_faust_cplx == NULL): raise Exception("hierarchical2020"
+                                                          " has failed.");
+
+        return core, np.real(_out_buf[0])
+
+    @staticmethod
     def fact_givens_fgft(Lap, J, t, verbosity=0, stoppingError = 0.0,
                          errIsRel=True, order=1, enable_large_Faust=False):
         if(order == 'ascend'): order = 1

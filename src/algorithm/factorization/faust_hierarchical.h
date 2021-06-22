@@ -13,7 +13,7 @@ namespace Faust
 			Real<FPP>& lambda,
 			const bool is_update_way_R2L=false, const bool is_fact_side_left=false,
 			const FactorsFormat factors_format=AllDynamic, const bool packing_RL=true,
-			const MHTPParams<FPP>& mhtp_params=MHTPParams<FPP>(),
+			const MHTPParams<Real<FPP>>& mhtp_params=MHTPParams<Real<FPP>>(),
 			const bool compute_2norm_on_array=false,
 			const Real<FPP> norm2_threshold=FAUST_PRECISION,
 			const unsigned int norm2_max_iter=FAUST_NORM2_MAX_ITER,
@@ -26,7 +26,7 @@ namespace Faust
 		TransformHelper<FPP,DEVICE>* hierarchical(const MatDense<FPP,DEVICE>& A,
 				Params<FPP,DEVICE, Real<FPP>> &p,
 				Real<FPP>& lambda, const bool compute_2norm_on_array,
-				const MHTPParams<FPP>& mhtp_params=MHTPParams<FPP>(),
+				const MHTPParams<Real<FPP>>& mhtp_params=MHTPParams<Real<FPP>>(),
 				const bool on_gpu=false);
 }
 

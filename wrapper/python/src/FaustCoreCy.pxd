@@ -257,7 +257,7 @@ cdef extern from "FaustFact.h":
                                                   num_rows, unsigned int
                                                   num_cols,
                                                   #unsigned int nites,
-                                                  PyxStoppingCriterion*,
+                                                  PyxStoppingCriterion[double]*,
                                                   PyxConstraintGeneric**
                                                   constraints, unsigned int
                                                   num_cons, unsigned int
@@ -266,7 +266,7 @@ cdef extern from "FaustFact.h":
                                                   is_update_way_R2L, bool
                                                   is_fact_side_left, int
                                                   factor_format, bool packing_RL,
-                                                  PyxMHTPParams[FPP] mhtpp,
+                                                  PyxMHTPParams[double] mhtpp,
                                                   unsigned int norm2_max_iter,
                                                   double norm2_threshold, bool
                                                   is_verbose, bool

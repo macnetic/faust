@@ -2,7 +2,7 @@ template<typename FPP, FDevice DEVICE>
 Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FPP,DEVICE>&  A,
 		Params<FPP,DEVICE, Real<FPP>> & p,
 		Real<FPP>& lambda, const bool compute_2norm_on_array,
-		const MHTPParams<FPP>& mhtp_params,
+		const MHTPParams<Real<FPP>>& mhtp_params,
 		const bool on_gpu)
 {
 	auto S = new Faust::TransformHelper<FPP,DEVICE>(); // A is copied
@@ -150,7 +150,7 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
         Real<FPP>& lambda,
         const bool is_update_way_R2L, const bool is_fact_side_left,
         const FactorsFormat factors_format, const bool packing_RL,
-		const MHTPParams<FPP>& mhtp_params,
+		const MHTPParams<Real<FPP>>& mhtp_params,
         const bool compute_2norm_on_array,
         const Real<FPP> norm2_threshold,
         const unsigned int norm2_max_iter, const bool is_verbose,

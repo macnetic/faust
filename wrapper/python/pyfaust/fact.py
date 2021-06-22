@@ -801,8 +801,12 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
         else:
             core_obj,_lambda = _FaustCorePy.FaustFactCplx.fact_hierarchical(M, p)
     elif(backend == 2020):
-        core_obj, _lambda = _FaustCorePy.FaustFact.hierarchical2020(M, p,
-                                                                    on_gpu)
+        if is_real:
+            core_obj, _lambda = _FaustCorePy.FaustFact.hierarchical2020(M, p,
+                                                                        on_gpu)
+        else:
+            core_obj, _lambda = _FaustCorePy.FaustFactCplx.hierarchical2020(M, p,
+                                                                        on_gpu)
     else:
         raise ValueError("backend must be 2016 or 2020")
     F = Faust(core_obj=core_obj)
