@@ -182,7 +182,11 @@ function varargout = hierarchical(M, p, varargin)
 				[lambda, core_obj] = mexHierarchical2020Real(M, mex_params);
 			end
 		else
-			error('backend 2020 doesn''t handle yet the complex matrices')
+			if(gpu)
+				[lambda, core_obj] = mexHierarchical2020_gpu2Cplx(M, mex_params);
+			else
+				[lambda, core_obj] = mexHierarchical2020Cplx(M, mex_params);
+			end
 		end
 		F = Faust(core_obj, isreal(M));
 	end

@@ -97,11 +97,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 		// PALM4MSA parameters
 		auto params = mxArray2FaustParamsPALM4MSA<SCALAR,FPP2>(prhs[0], presentFields);
-		Faust::MHTPParams<SCALAR> mhtp_params;
-		mxArray2FaustMHTPParams<SCALAR>(prhs[0], mhtp_params);
+		Faust::MHTPParams<Real<SCALAR>> mhtp_params;
+		mxArray2FaustMHTPParams<Real<SCALAR>>(prhs[0], mhtp_params);
 		if(params->isVerbose) params->Display();
 //		Faust::BlasHandle<Cpu> blas_handle;
-		SCALAR lambda = params->init_lambda;
+		FPP2 lambda = params->init_lambda;
 
 		TransformHelper<SCALAR, Cpu>* F = nullptr, *F_lambda = nullptr;
 
@@ -139,7 +139,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 				params->norm2_max_iter, params->isConstantStepSize, params->step_size, false /* on_gpu*/, params->isVerbose);
 		Faust::MatDense<FPP2,Cpu> mat1x1Lambda = Faust::MatDense<FPP2, Cpu>(&lambda, 1, 1);
 		plhs[0] = FaustMat2mxArray(mat1x1Lambda);
-		F_lambda = F->multiply(lambda);
+		SCALAR _lambda = SCALAR(lambda);
+		F_lambda = F->multiply(_lambda);
 		delete F; // if init_facts is used F is a copy too
 		F = F_lambda;
 		plhs[1] = convertPtr2Mat<Faust::TransformHelper<SCALAR, Cpu>>(F);

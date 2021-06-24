@@ -689,7 +689,6 @@ const Params<SCALAR, Cpu, FPP2>* mxArray2FaustParams(const mxArray* matlab_param
 	{
 		mxCurrentField = mxGetField(matlab_params, 0, mat_field_type2str(FACTOR_FORMAT).c_str());
 		factors_format = static_cast<FactorsFormat>((int)mxGetScalar(mxCurrentField));
-		std::cout << "mx2Faust factors_format:" << factors_format << std::endl;
 	}
 
 	bool packing_RL = Params<SCALAR, Cpu, FPP2>::defaultPackingRL;

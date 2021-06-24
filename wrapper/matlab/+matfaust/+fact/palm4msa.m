@@ -79,17 +79,22 @@ function  [F,lambda] = palm4msa(M, p, varargin)
 			[lambda, core_obj] = mexPalm4MSACplx(mex_params);
 		end
 	elseif(backend == 2020)
-		init_faust = matfaust.Faust(p.init_facts);
 		% no need to keep the ParamsPalm4MSA extracted/generated cell for init_facts
 		% mex_params = rmfield(mex_params, 'init_facts')
 		if(isreal(M))
+			init_faust = matfaust.Faust(p.init_facts);
 			if(gpu)
 				[lambda, core_obj] = mexPALM4MSA2020_gpu2Real(mex_params, get_handle(init_faust));
 			else
 				[lambda, core_obj] = mexPALM4MSA2020Real(mex_params, get_handle(init_faust));
 			end
 		else
-			error('backend 2020 doesn''t handle yet the complex matrices')
+			init_faust = complex(matfaust.Faust(p.init_facts));
+			if(gpu)
+				[lambda, core_obj] = mexPALM4MSA2020_gpu2Cplx(mex_params, get_handle(init_faust));
+			else
+				[lambda, core_obj] = mexPALM4MSA2020Cplx(mex_params, get_handle(complex(init_faust)));
+			end
 		end
 	end
 	F = Faust(core_obj, isreal(M));
