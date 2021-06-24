@@ -73,7 +73,7 @@ namespace Faust
 								mhtp_params.constant_step_size, mhtp_params.step_size,
 								sc, error, factors_format, prod_mod, c, lambda);
 						if(mhtp_params.updating_lambda)
-							update_lambda(S, A_H, lambda);
+							update_lambda(S, pL, pR, A_H, lambda);
 						j++;
 					}
 					if(is_verbose)

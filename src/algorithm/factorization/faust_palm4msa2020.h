@@ -119,7 +119,7 @@ namespace Faust
 	 * \param lambda: the output of the lambda computed by the function.
 	 */
 	template<typename FPP, FDevice DEVICE>
-		void update_lambda(Faust::TransformHelper<FPP,DEVICE>& S, const MatDense<FPP, DEVICE> A_H, Real<FPP>& lambda);
+		void update_lambda(Faust::TransformHelper<FPP,DEVICE>& S, std::vector<TransformHelper<FPP,DEVICE>*> &pL, std::vector<TransformHelper<FPP,DEVICE>*>& pR, const MatDense<FPP, DEVICE> &A_H, Real<FPP>& lambda);
 
 	template<typename FPP, FDevice DEVICE>
 		void update_fact(
