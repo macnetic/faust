@@ -832,8 +832,8 @@ cdef check_matrix(isReal, M, message=""):
                                  ' float)')
         else:
 #            M=M.astype(complex,'F')
-            if(M.dtype not in ['complex', 'complex128', 'complex64'] ): #could fail if complex128 etc.
-                raise ValueError('input array must be complex array')
+            if(M.dtype not in ['complex', 'complex128'] ): #could fail if complex128 etc.
+                raise ValueError('input array must be complex(128) array')
         #TODO: raise exception if not real nor complex
         if not M.flags['F_CONTIGUOUS']:
             raise ValueError(message+'input array must be Fortran contiguous (Colmajor)')
@@ -1482,7 +1482,7 @@ cdef class FaustFact:
         cdef FaustCoreCy.FaustCoreCpp[double]* core_faust_dbl_init_facts
 
         Mview = M
-        _out_buf = np.array([0], dtype=M.dtype)
+        _out_buf = np.array([0], dtype=np.double)
         _out_buf[0] = p.init_lambda;
         outbufview = _out_buf
 
@@ -1582,7 +1582,7 @@ cdef class FaustFact:
         if(core.core_faust_dbl == NULL): raise Exception("palm4msa2020"
                                                           " has failed.");
 
-        return core, np.real(_out_buf[0])
+        return core, _out_buf[0]
 
     @staticmethod
     def hierarchical2020(M, p, full_gpu=False):
@@ -1639,7 +1639,7 @@ cdef class FaustFact:
         constraints = p.constraints
 
         # store only lambda as a return from Palm4MSA algo
-        _out_buf = np.array([0], dtype=M.dtype)
+        _out_buf = np.array([0], dtype=np.double)
         _out_buf[0] = p.init_lambda;
 
         Mview=M
@@ -1714,7 +1714,7 @@ cdef class FaustFact:
         if(core.core_faust_dbl == NULL): raise Exception("hierarchical2020"
                                                           " has failed.");
 
-        return core, np.real(_out_buf[0])
+        return core, _out_buf[0]
 
     @staticmethod
     def butterfly_hierarchical(M, dir):

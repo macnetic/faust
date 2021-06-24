@@ -842,7 +842,7 @@ cdef class FaustFactCplx(FaustFact):
         for i in range(0,p.num_facts):
             check_matrix(False, p.init_facts[i], message="while checking"
                          " palm4msa init facts: ")
-            tmp_mat_cplx = p.init_facts[i].astype('complex')
+            tmp_mat_cplx = p.init_facts[i]
             cpp_params_cplx.init_facts[i] = &tmp_mat_cplx[0,0]
             cpp_params_cplx.init_fact_sizes[i*2+0] = p.init_facts[i].shape[0]
             cpp_params_cplx.init_fact_sizes[i*2+1] = p.init_facts[i].shape[1]
@@ -1039,7 +1039,7 @@ cdef class FaustFactCplx(FaustFact):
 
 
         Mview = M
-        _out_buf = np.array([0], dtype=M.dtype)
+        _out_buf = np.array([0], dtype=np.double)
         _out_buf[0] = p.init_lambda;
         outbufview = _out_buf
 
@@ -1101,7 +1101,7 @@ cdef class FaustFactCplx(FaustFact):
         if p.init_facts:
             # facts have been initialized from the wrapper
             # create a Faust
-            F_facts = FaustCore(p.init_facts)
+            F_facts = FaustCoreCplx(p.init_facts)
             # palm4msa2020_gen in FaustFact.hpp
             # is responsible to delete the object in case the
             # algorithm runs on GPU (hence the transform objects F_facts and
@@ -1140,7 +1140,7 @@ cdef class FaustFactCplx(FaustFact):
         if(core.core_faust_cplx == NULL): raise Exception("palm4msa2020"
                                                           " has failed.");
 
-        return core, np.real(_out_buf[0])
+        return core, _out_buf[0]
 
     @staticmethod
     def hierarchical2020(M, p, full_gpu=False):
@@ -1272,7 +1272,7 @@ cdef class FaustFactCplx(FaustFact):
         if(core.core_faust_cplx == NULL): raise Exception("hierarchical2020"
                                                           " has failed.");
 
-        return core, np.real(_out_buf[0])
+        return core, _out_buf[0]
 
     @staticmethod
     def fact_givens_fgft(Lap, J, t, verbosity=0, stoppingError = 0.0,
