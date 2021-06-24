@@ -519,6 +519,9 @@ def palm4msa(M, p, ret_lambda=False, backend=2016, on_gpu=False):
         if is_real:
             core_obj, _lambda = _FaustCorePy.FaustFact.palm4msa2020(M, p, on_gpu)
         else:
+            if M.dtype == np.complex and p.factor_format != 'dense':
+                p.factor_format = 'dense'
+                warnings.warn("forcing the factor_format parameter to 'dense'")
             core_obj, _lambda = _FaustCorePy.FaustFactCplx.palm4msa2020(M, p)
     else:
         raise ValueError("Unknown backend (only 2016 and 2020 are available).")
@@ -805,6 +808,9 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
             core_obj, _lambda = _FaustCorePy.FaustFact.hierarchical2020(M, p,
                                                                         on_gpu)
         else:
+            if M.dtype == np.complex and p.factor_format != 'dense':
+                p.factor_format = 'dense'
+                warnings.warn("forcing the factor_format parameter to 'dense'")
             core_obj, _lambda = _FaustCorePy.FaustFactCplx.hierarchical2020(M, p,
                                                                         on_gpu)
     else:
