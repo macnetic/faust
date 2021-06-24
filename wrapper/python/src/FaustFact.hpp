@@ -848,7 +848,8 @@ FaustCoreCpp<FPP>* hierarchical2020_gpu2(FPP* mat, unsigned int num_rows, unsign
     {
         auto th = hierarchical2020_gen<FPP,GPU2>(mat,num_rows,num_cols, sc, constraints, num_cons, num_facts, inout_lambda, is_update_way_R2L, is_fact_side_left, factor_format, packing_RL, MHTP_params, norm2_max_iter, norm2_threshold, is_verbose, constant_step_size, step_size);
         if(is_verbose) th->display();
-        Faust::TransformHelper<FPP,GPU2>* th_times_lambda = th->multiply(inout_lambda[0]);
+        FPP _lambda = FPP(inout_lambda[0]);
+        Faust::TransformHelper<FPP,GPU2>* th_times_lambda = th->multiply(_lambda);
         if(is_verbose) th->display();
         cpu_th = new Faust::TransformHelper<FPP,Cpu>();
         th_times_lambda->tocpu(*cpu_th);
