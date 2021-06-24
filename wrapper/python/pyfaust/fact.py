@@ -1129,7 +1129,6 @@ def fgft_palm(U, Lap, p, init_D=None, ret_lambda=False, ret_params=False):
 # experimental block end
 
 
-# experimental block start
 def butterfly(M, dir="right"):
     """
     Factorizes M according to a butterfly support.
@@ -1148,4 +1147,3 @@ def butterfly(M, dir="right"):
         return Faust(core_obj=_FaustCorePy.FaustFact.butterfly_hierarchical(M, dir))
     else:
         return Faust(core_obj=_FaustCorePy.FaustFactCplx.butterfly_hierarchical(M, dir))
-# experimental block end

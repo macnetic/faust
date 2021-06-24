@@ -1,4 +1,3 @@
-% experimental block start
 %==========================================================================
 %> @brief Factorizes the matrix M according to a butterfly support.
 %>
@@ -36,5 +35,3 @@ function F = butterfly(M, varargin)
         end
         F = Faust(core_obj, isreal(M));
 end
-
-% experimental block end
