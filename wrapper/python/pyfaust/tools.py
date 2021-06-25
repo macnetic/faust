@@ -5,11 +5,12 @@
 
 import numpy as np
 from scipy.sparse.linalg import spsolve_triangular
-from numpy.linalg import solve, lstsq, norm
+from numpy.linalg import solve, lstsq
 from scipy.sparse import hstack, vstack, csr_matrix
 from numpy import concatenate as cat
 from numpy import zeros, argmax, empty, ndarray
 from pyfaust import Faust
+
 
 def omp(y, D, maxiter=None, tol=0, relerr=True, verbose=False):
     """
@@ -47,8 +48,8 @@ def omp(y, D, maxiter=None, tol=0, relerr=True, verbose=False):
     else:
         raise Exception("y must be a vector")
     if(Faust.isFaust(D) or isinstance(D, ndarray)):
-        P = lambda z : D@z
-        Pt = lambda z : D.T.conj()@z
+        P = lambda z: D@z
+        Pt = lambda z: D.T.conj()@z
     else:
         raise Exception("D must be a Faust or a numpy.ndarray. Here D is "
                         "a:"+str(type(D)))
@@ -80,15 +81,15 @@ def omp(y, D, maxiter=None, tol=0, relerr=True, verbose=False):
     s = s_initial
     R = empty((maxiter+1,maxiter+1)).astype(np.complex)
     oldErr = y.T.conj()@y
-    err_mse = []
+    # err_mse = []
 
-    t=0
+    t = 0
     IN = []
     DR = Pt(residual)
     done = False
     it = 1
 
-    MAXITER=n
+    MAXITER = n
 
     while not done:
 
@@ -231,3 +232,6 @@ def UpdateCholeskySparse(R,P,Pt,index,m):
     return R
 
 greed_omp_chol = omp
+
+
+
