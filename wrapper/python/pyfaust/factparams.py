@@ -1038,6 +1038,105 @@ class ParamsHierarchical(ParamsFact):
                 "global stopping criterion"+str(self.stop_crits[1])+"\r\n" \
                 "is_fact_side_left:"+str(self.is_fact_side_left)
 
+class ParamsHierarchicalDFT(ParamsHierarchical):
+    """
+    The simplified parameterization class for factorizing a DFT matrix using the hierarchical factorization algorithm.
+
+    <b/> See also pyfaust.fact.hierarchical
+    """
+
+    def __init__(self, n):
+        """
+        Args:
+            n: the log2(size) of the DFT matrix (of size 2^n x 2^n).
+        """
+        n = int(n)
+        supports = self.support_DFT(n)
+        stop_crit = StoppingCriterion(num_its=8)
+        fac_cons = []
+        for i in range(n):
+            fac_cons += [ConstraintMat("supp", supports[i])]
+        res_cons = []
+        for j in range(n-1):
+            supp = np.eye(*supports[0].shape, dtype=np.complex)
+            for i in range(j+1, n+1):
+                fi = supports[i]
+                supp = supp@fi
+            supp[np.nonzero(supp)] = 1
+            res_cons += [ConstraintMat("supp", supp)]
+
+        super(ParamsHierarchicalDFT, self).__init__(fac_cons,
+                                                     res_cons+[ConstraintMat("supp",
+                                                                            supports[-1])],
+                                                     stop_crit,
+                                                     stop_crit,
+                                                     is_update_way_R2L=True)
+        self.supports = supports
+
+    @staticmethod
+    def createParams(M, p):
+        pot = np.log2(M.shape[0])
+        if(pot > int(pot) or M.shape[0] != M.shape[1]):
+            raise ValueError('M must be a '
+                             'square matrix of order a power of '
+                             'two.')
+        pot = int(pot)
+        return ParamsHierarchicalDFT(pot)
+
+    def __repr__(self):
+        return super(ParamsHierarchicalDFT, self).__repr__()
+
+    def support_DFT(self, n):
+        """
+        Generates the DFT supports with the additional bit-reversal permutation matrix.
+
+        n: the log2(size) of the DFT (of size 2^n x 2^n).
+        """
+        size = 2 ** n
+        supports = []
+        for i in range(n):
+            supp_bf = np.kron(np.ones((2,2)), np.eye(2 ** ((n-i)-1)))
+            supports += [np.kron(np.eye(2**i), supp_bf).astype(np.complex)]
+        # bit-reversal permutation
+        row_ids = np.arange(size)
+        col_ids = self.bit_rev_permu(n)
+        br_permu = np.zeros((size,size)).astype(np.complex)
+        br_permu[row_ids, col_ids] = 1
+        supports += [br_permu]
+        return supports
+
+    def bit_rev_permu(self, n):
+        """
+        Returns the Bit-reversal permutation of index n.
+
+        Args:
+            n: the index of the permutation.
+
+        Returns: the Bit-reversal permutation of index n as a list.
+        """
+        if n == 0:
+            return [0]
+        size = 1 << n
+        v = [i for i in range(size)]
+        lower_mask = int(1)
+        upper_mask = int(1<<(n-1))
+        shift = 0
+        while(lower_mask < upper_mask):
+            for i in range(0,size):
+                lobit = (int(v[i]) & lower_mask) >> shift
+                hibit = (int(v[i]) & upper_mask) >> (n-shift-1)
+                if lobit > hibit:
+                    v[i] ^= lower_mask
+                    v[i] |= upper_mask
+                elif lobit < hibit:
+                    v[i] |= lower_mask
+                    v[i] ^= upper_mask
+            lower_mask <<= 1
+            upper_mask >>= 1
+            shift += 1
+        return v
+
+
 class ParamsHierarchicalSquareMat(ParamsHierarchical):
     """
     The simplified parameterization class for factorizing a square matrix (of order a power of two) with the hierarchical factorization algorithm.
@@ -1322,10 +1421,12 @@ class ParamsFactFactory:
     """
     SIMPLIFIED_PARAM_NAMES = [
         [ "squaremat", "hadamard"],
-        ["rectmat", "meg"]
+        ["rectmat", "meg"],
+        ["dft"],
     ]
     SQRMAT_ID = 0
     RECTMAT_ID = 1
+    DFTMAT_ID = 2
 
     @staticmethod
     def createParams(M, p):
@@ -1347,6 +1448,8 @@ class ParamsFactFactory:
             return ParamsHierarchicalSquareMat.createParams(M, p)
         elif(param_id.lower() in c.SIMPLIFIED_PARAM_NAMES[c.RECTMAT_ID]):
             return ParamsHierarchicalRectMat.createParams(M, p)
+        elif(param_id.lower() in c.SIMPLIFIED_PARAM_NAMES[c.DFTMAT_ID]):
+            return ParamsHierarchicalDFT.createParams(M, p)
         else:
             raise ValueError("p is not a known simplified parametrization.")
 
