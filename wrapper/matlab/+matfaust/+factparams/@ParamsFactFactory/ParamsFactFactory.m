@@ -2,10 +2,12 @@ classdef ParamsFactFactory
 	properties(Constant)
 		SIMPLIFIED_PARAMS = {
 		{'squaremat', 'hadamard'},
-		{'rectmat', 'meg'}
+		{'rectmat', 'meg'},
+		{'dft'}
 		};
 		SQRTMAT_ID = 1;
 		RECTMAT_ID = 2;
+		DFTMAT_ID = 3;
 	end
 	methods(Static)
 		function sp = createParams(M, p)
@@ -24,6 +26,8 @@ classdef ParamsFactFactory
 				sp = ParamsHierarchicalSquareMat.createParams(M, p);
 			elseif(strcmp_anycell(param_id, ParamsFactFactory.SIMPLIFIED_PARAMS{ParamsFactFactory.RECTMAT_ID}))
 				sp = ParamsHierarchicalRectMat.createParams(M, p);
+			elseif(strcmp_anycell(param_id, ParamsFactFactory.SIMPLIFIED_PARAMS{ParamsFactFactory.DFTMAT_ID}))
+				sp = ParamsHierarchicalDFT.createParams(M, p);
 			else
 				error('p is not a known simplified parametrization')
 			end

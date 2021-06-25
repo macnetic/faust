@@ -174,7 +174,7 @@ classdef (Abstract) ParamsFact
 			p.is_verbose = is_verbose;
 			p.constant_step_size = constant_step_size;
 			p.grad_calc_opt_mode = grad_calc_opt_mode;
-			p.factor_format = ParamsFact.factor_format_str2int(factor_format)
+			p.factor_format = ParamsFact.factor_format_str2int(factor_format);
 			p.packing_RL = packing_RL;
 			p.norm2_max_iter = norm2_max_iter;
 			p.norm2_threshold = norm2_threshold;
@@ -203,7 +203,7 @@ classdef (Abstract) ParamsFact
 				end
 			elseif(isreal(factor_format) && factor_format >= 0 && factor_format <=2)
 				% already a int or real to truncate
-				ff_int = floor(factor_format)
+				ff_int = floor(factor_format);
 			else
 				error('factor_format should be a char array: ''dense'', ''sparse'' or ''dynamic''')
 			end

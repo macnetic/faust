@@ -1,9 +1,7 @@
 % =========================================================
-%> @brief The simplified parameterization class for factorizing a square matrix (of order a power of two) with the hierarchical factorization algorithm.
+%> @brief The simplified parameterization class for factorizing a Hadamard matrix using the hierarchical factorization algorithm.
 %>
-%> This type for parameters is typically used for Hadamard matrix factorization.
-%>
-%> <p>@b See @b also matfaust.demo.hadamard, matfaust.FaustFactory.fact_hierarchical</p>
+%> <p>@b See @b also matfaust.demo.hadamard, matfaust.fact.hierarchical</p>
 % =========================================================
 classdef ParamsHierarchicalSquareMat < matfaust.factparams.ParamsHierarchical
 	methods
