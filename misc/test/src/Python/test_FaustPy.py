@@ -1532,10 +1532,51 @@ class TestFaustFactory(unittest.TestCase):
         for dir in ['right', 'left']:
             FH = butterfly(H, dir=dir)
             self.assertAlmostEqual((FH-H).norm()/norm(H), 0)
-        D = dft(64).toarray() 
+        D = dft(64).toarray()
         for dir in ['right', 'left']:
             FD = butterfly(D, dir=dir)
             self.assertAlmostEqual((FD-D).norm()/norm(D), 0)
+
+    def test_palm4msa_mhtp(self):
+        # call Palm4MSA specifying params
+        from os import dup2, pipe # for
+        from pyfaust.fact import palm4msa
+        from pyfaust.factparams import (ParamsPalm4MSA, ConstraintList,
+                                        StoppingCriterion,
+                                        ConstraintInt,
+                                        ConstraintReal, ParamsFact)
+        import numpy as np
+        from tempfile import gettempdir
+        from os.path import join
+        from pyfaust.proj import splin, normcol
+        from pyfaust.factparams import MHTPParams
+        from pyfaust.fact import palm4msa_mhtp
+        M = np.random.rand(500, 32)
+        stop_crit = StoppingCriterion(num_its=200)
+        cons = [ splin((500,32), 5), normcol((32,32), 1.0)]
+        param = ParamsPalm4MSA(cons, stop_crit)
+        param.is_verbose = True
+        # MHTP will run every 100 iterations of PALM4MSA (that is 2 times) for 50
+        # iterations on each factor
+        mhtp_param = MHTPParams(num_its=50, palm4msa_period=100)
+        tmp_dir = gettempdir()
+        tmp_file = join(tmp_dir, "verbose_output_of_palm4msa_mhtp_test")
+        print("tmp_file:", tmp_file)
+        f = open(tmp_file, 'w')
+        dup2(1,2)
+        dup2(f.fileno(), 1)
+        F = palm4msa_mhtp(M, param, mhtp_param)
+        print()
+        f.close()
+        dup2(2,1)
+        factor0_line = factor1_line = False
+        for line in open(tmp_file, 'r').readlines():
+            print(line, end='')
+            factor0_line = factor0_line or line.startswith('Starting a MHTP pass (50 iterations) for factor #0')
+            factor1_line = factor1_line or line.startswith('Starting a MHTP pass (50 iterations) for factor #1')
+        self.assertTrue(factor0_line)
+        self.assertTrue(factor1_line)
+        self.assertLessEqual(norm((F.toarray()-M), "fro")/norm(M,"fro"), 0.4)
 
 
 if __name__ == "__main__":
