@@ -56,7 +56,7 @@
 %> FH = wht(32);
 %> H = full(FH); % the full matrix version
 %> % factorize it
-%> FH2 = hierarchical(H, 'squaremat');
+%> FH2 = hierarchical(H, 'hadamard');
 %> % test the relative error
 %> norm(FH-FH2, 'fro')/norm(FH, 'fro') % the result is about 1e-16, the factorization is accurate
 %>@endcode
@@ -122,7 +122,45 @@
 %>ans =
 %>
 %> 8
-%> <p> @b See @b also matfaust.faust_fact, factparams.ParamsHierarchical, factparams.ParamsHierarchicalSquareMat, factparams.ParamsHierarchicalRectMat
+%> <br/>
+%> @b Example 4: Simplified Parameters for Discrete Fourier Transform Factorization
+%>@code
+%> import matfaust.*
+%> import matfaust.fact.hierarchical
+%> % generate a DFT Faust of size 32x32
+%> FDFT = dft(32);
+%> DFT = full(DFT); % the full matrix version
+%> % factorize it
+%> FDFT2 = hierarchical(DFT, 'dft');
+%> % test the relative error
+%> norm(FDFT-FDFT2, 'fro')/norm(FDFT, 'fro') % the result is about 1e-6, the factorization is accurate
+%> >> FDFT
+%>@endcode
+%>
+%> FDFT =
+%>
+%> Faust size 32x32, density 0.34375, nnz_sum 352, 6 factor(s):
+%> - FACTOR 0 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+%> - FACTOR 1 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+%> - FACTOR 2 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+%> - FACTOR 3 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+%> - FACTOR 4 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+%> - FACTOR 5 (complex) SPARSE, size 32x32, density 0.03125, nnz 32
+%> @code
+%> >> FDFT2
+%> @endcode
+%>
+%> FDFT2 =
+%>
+%> Faust size 32x32, density 1.3125, nnz_sum 1344, 6 factor(s):
+%> - FACTOR 0 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+%> - FACTOR 1 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+%> - FACTOR 2 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+%> - FACTOR 3 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+%> - FACTOR 4 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+%> - FACTOR 5 (complex) SPARSE, size 32x32, density 1, nnz 1024
+%>
+%> <p> @b See @b also matfaust.faust_fact, factparams.ParamsHierarchical, factparams.ParamsHierarchicalSquareMat, factparams.ParamsHierarchicalRectMat,factparams.ParamsHierarchicalDFT
 %==========================================================================================
 function varargout = hierarchical(M, p, varargin)
 	import matfaust.Faust

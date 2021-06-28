@@ -791,7 +791,36 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
        >>> count_nonzero(MEG16.factors(1).toarray())/MEG16.shape[0]
        8.0
 
-       <b/> See also pyfaust.factparams.ParamsHierarchicalRectMat
+       <br/>
+       <b>4. Simplified Parameters for the Discrete Fourier Transform Factorization</b>
+       >>> from pyfaust import dft
+       >>> from pyfaust.fact import hierarchical
+       >>> from numpy.linalg import norm
+       >>> # generate a DFT matrix of size 32x32
+       >>> FDFT = dft(32)
+       >>> DFT = FDFT.toarray()
+       >>> # factorize it
+       >>> FDFT2 = hierarchical(DFT, 'dft');
+       >>> # test the relative error
+       >>> (FDFT-FDFT2).norm('fro')/FDFT.norm('fro') # the result is about 1e-16, the factorization is accurate
+       >>> FDFT
+       Faust size 32x32, density 0.34375, nnz_sum 352, 6 factor(s):
+           - FACTOR 0 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+           - FACTOR 1 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+           - FACTOR 2 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+           - FACTOR 3 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+           - FACTOR 4 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+           - FACTOR 5 (complex) SPARSE, size 32x32, density 0.03125, nnz 32
+       >>> DFT2
+       Faust size 32x32, density 0.34375, nnz_sum 352, 6 factor(s):
+           - FACTOR 0 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+           - FACTOR 1 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+           - FACTOR 2 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+           - FACTOR 3 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+           - FACTOR 4 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+           - FACTOR 5 (complex) SPARSE, size 32x32, density 0.03125, nnz 32
+
+       <b/> See also pyfaust.factparams.ParamsHierarchicalRectMat, pyfaust.factparams.ParamsHierarchicalSquareMat, pyfaust.factparams.ParamsHierarchicalDFT
 
     """
     is_real = np.empty((1,))
