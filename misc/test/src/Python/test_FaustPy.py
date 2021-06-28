@@ -927,6 +927,7 @@ class TestFaustFactory(unittest.TestCase):
                              param_test.constraints[i].name)
             self.assertEqual(param_test.constraints[i]._cons_value,
                              param_test.constraints[i]._cons_value)
+        os.remove(tmp_file)
 
     def testFactPalm4MSA2020(self):
         from pyfaust.fact import palm4msa
@@ -1538,6 +1539,7 @@ class TestFaustFactory(unittest.TestCase):
             self.assertAlmostEqual((FD-D).norm()/norm(D), 0)
 
     def test_palm4msa_mhtp(self):
+        print("Test palm4msa_mhtp")
         # call Palm4MSA specifying params
         from os import dup2, pipe # for
         from pyfaust.fact import palm4msa
@@ -1570,13 +1572,39 @@ class TestFaustFactory(unittest.TestCase):
         f.close()
         dup2(2,1)
         factor0_line = factor1_line = False
-        for line in open(tmp_file, 'r').readlines():
-            print(line, end='')
-            factor0_line = factor0_line or line.startswith('Starting a MHTP pass (50 iterations) for factor #0')
-            factor1_line = factor1_line or line.startswith('Starting a MHTP pass (50 iterations) for factor #1')
-        self.assertTrue(factor0_line)
-        self.assertTrue(factor1_line)
-        self.assertLessEqual(norm((F.toarray()-M), "fro")/norm(M,"fro"), 0.4)
+        with open(tmp_file, 'r') as lines:
+            for line in lines.readlines():
+                print(line, end='')
+                factor0_line = factor0_line or line.startswith('Starting a MHTP pass (50 iterations) for factor #0')
+                factor1_line = factor1_line or line.startswith('Starting a MHTP pass (50 iterations) for factor #1')
+            self.assertTrue(factor0_line)
+            self.assertTrue(factor1_line)
+            self.assertLessEqual(norm((F.toarray()-M), "fro")/norm(M,"fro"), 0.4)
+        os.remove(tmp_file)
+
+
+    def test_hierarchical_mhtp(self):
+       print("Test hierarchical_mhtp")
+       from os import dup2, pipe # for
+       from tempfile import gettempdir
+       from os.path import join 
+       from pyfaust.fact import hierarchical_mhtp
+       from pyfaust.factparams import ParamsHierarchical, StoppingCriterion
+       from pyfaust.factparams import MHTPParams
+       from pyfaust.proj import sp, normcol, splin
+       import numpy as np
+       M = np.random.rand(500, 32)
+       fact_cons = [splin((500, 32), 5), sp((32,32), 96), sp((32,32), 96)]
+       res_cons = [normcol((32,32), 1), sp((32,32), 666), sp((32,32), 333)]
+       stop_crit1 = StoppingCriterion(num_its=200)
+       stop_crit2 = StoppingCriterion(num_its=200)
+       # 50 iterations of MHTP will run every 100 iterations of PALM4MSA (each time PALM4MSA is called by the hierarchical algorithm)
+       mhtp_param = MHTPParams(num_its=50, palm4msa_period=100)
+       param = ParamsHierarchical(fact_cons, res_cons, stop_crit1, stop_crit2)
+       param.is_verbose = True
+       F = hierarchical_mhtp(M, param, mhtp_param)
+       self.assertLessEqual(norm((F.toarray()-M), "fro")/norm(M,"fro"), 0.5)
+
 
 
 if __name__ == "__main__":
