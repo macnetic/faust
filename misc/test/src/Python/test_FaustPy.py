@@ -1605,6 +1605,17 @@ class TestFaustFactory(unittest.TestCase):
        F = hierarchical_mhtp(M, param, mhtp_param)
        self.assertLessEqual(norm((F.toarray()-M), "fro")/norm(M,"fro"), 0.5)
 
+    def test_hierarchical_dft(self):
+        print("Test hierarchical dft")
+        from pyfaust import dft
+        from pyfaust.fact import hierarchical
+        DFT = dft(32).toarray()
+        F = hierarchical(DFT, 'dft', backend=2020)
+        err = norm(F.toarray()-DFT)/norm(DFT)
+        self.assertLessEqual(err, 1e-6)
+        F = hierarchical(DFT, 'dft', backend=2016)
+        err = norm(F.toarray()-DFT)/norm(DFT)
+        self.assertLessEqual(err, 1e-6)
 
 
 if __name__ == "__main__":

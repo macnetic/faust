@@ -558,6 +558,20 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			this.verifyLessThanOrEqual(err, 0.20)
 		end
 
+		function test_hierarchical_dft(this)
+			disp('Test hierarchical dft')
+			import matfaust.fact.hierarchical
+			import matfaust.dft
+			DFT = full(dft(32))
+			F = hierarchical(DFT, 'dft', 'backend', 2020)
+			err = norm(full(F)-DFT)/norm(DFT)
+			this.verifyLessThanOrEqual(err, 1e-3)
+			DFT = full(dft(32))
+			F = hierarchical(DFT, 'dft', 'backend', 2016)
+			err = norm(full(F)-DFT)/norm(DFT)
+			this.verifyLessThanOrEqual(err, 1e-3)
+		end
+
 	end
 
 	methods
