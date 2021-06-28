@@ -525,6 +525,39 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			end
 		end
 
+		function test_palm4msa_mhtp(this)
+			import matfaust.fact.palm4msa_mhtp
+			import matfaust.factparams.*
+			import matfaust.proj.*
+			M = rand(500,32);
+			projs = { splin([500,32], 5), normcol([32,32], 1.0)};
+			stop_crit = StoppingCriterion(200);
+			param = ParamsPalm4MSA(projs, stop_crit);
+			mhtp_param = MHTPParams('num_its', 60, 'palm4msa_period', 10);
+			G = palm4msa_mhtp(M, param, mhtp_param)
+			err = norm(full(G)-M)/norm(M)
+			this.verifyLessThanOrEqual(err, 0.20)
+		end
+
+		function test_hierarchical_mhtp(this)
+			import matfaust.fact.hierarchical_mhtp
+			import matfaust.factparams.ParamsHierarchical
+			import matfaust.factparams.StoppingCriterion
+			import matfaust.factparams.MHTPParams
+			import matfaust.proj.*
+			M = rand(500,32);
+			fact_projs = { splin([500,32], 5), sp([32,32], 96), sp([32, 32], 96)};
+			res_projs = { normcol([32,32], 1), sp([32,32], 666), sp([32, 32], 333)};
+			stop_crit1 = StoppingCriterion(200)
+			stop_crit2 = StoppingCriterion(200)
+			% 50 iterations of MHTP will run every 100 iterations of PALM4MSA (each time PALM4MSA is called by the hierarchical algorithm)
+			mhtp_param = MHTPParams('num_its', 150, 'palm4msa_period', 100)
+			param = ParamsHierarchical(fact_projs, res_projs, stop_crit1, stop_crit2)
+			F = hierarchical_mhtp(M, param, mhtp_param)
+			err = norm(full(F)-M)/norm(M)
+			this.verifyLessThanOrEqual(err, 0.20)
+		end
+
 	end
 
 	methods
