@@ -38,6 +38,9 @@ namespace Faust
 	template<typename FPP, FDevice DEVICE>
 		void multiply_order_opt_all_ends(std::vector<MatDense<FPP,DEVICE>*>& facts, MatDense<FPP,DEVICE>& out, FPP alpha=1.0, FPP beta_out=.0, std::vector<char> transconj_flags = std::vector<char>({'N'}));
 
+	template<typename FPP, FDevice DEVICE>
+		void multiply_order_opt_all_ends(std::vector<MatGeneric<FPP,DEVICE>*>& facts, MatDense<FPP,DEVICE>& out, FPP alpha=1.0, FPP beta_out=.0, std::vector<char> transconj_flags= {'N'});
+
 	/**
 	 *
 	 * This function does the same as multiply_order_opt_all_ends but is capable to multiply not only on the ends of the matrix chain but also in the middle if a better complexity guides to this.
