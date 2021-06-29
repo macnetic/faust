@@ -64,6 +64,7 @@ namespace Faust
 				int f_id,
 				std::vector<TransformHelper<FPP,DEVICE>*> &pL,
 				std::vector<TransformHelper<FPP,DEVICE>*> &pR,
+				const bool packing_RL,
 				const bool is_verbose,
 				const Faust::ConstraintGeneric &constraint,
 				const int norm2_max_iter,

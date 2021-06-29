@@ -196,6 +196,7 @@ void Faust::compute_n_apply_grad1(const int f_id, const Faust::MatDense<FPP,DEVI
 {
 	Faust::MatDense<FPP,DEVICE> tmp;
 	Faust::MatDense<FPP,DEVICE> & D = out;
+//	Faust::MatGeneric<FPP,DEVICE> * LorR;
 	Faust::MatDense<FPP,DEVICE> * LorR;
 	Faust::MatDense<FPP,DEVICE> _LorR;
 	auto S_j_vec = {*(S.begin()+f_id)};
@@ -212,7 +213,8 @@ void Faust::compute_n_apply_grad1(const int f_id, const Faust::MatDense<FPP,DEVI
 	if(pR_sz > 0)
 	{
 		if(pR_sz == 1 && packing_RL) // packing_RL == true
-			LorR = dynamic_cast<Faust::MatDense<FPP,DEVICE>*>(pR[f_id]->get_gen_fact_nonconst(0)); //normally pR[f_id] is packed (hence reduced to a single MatDense)
+			LorR = dynamic_cast<Faust::MatDense<FPP,DEVICE>*>(pR[f_id]->get_gen_fact_nonconst(0));
+//			LorR = pR[f_id]->get_gen_fact_nonconst(0); //normally pR[f_id] is packed (hence reduced to a single MatDense)
 		else
 		{
 			_LorR = pR[f_id]->get_product(prod_mod);
@@ -223,14 +225,17 @@ void Faust::compute_n_apply_grad1(const int f_id, const Faust::MatDense<FPP,DEVI
 			alpha_R = - lambda/c;
 			beta_R = 1;
 			gemm(tmp, *LorR, D, alpha_R, beta_R, 'N', 'H');
+//			gemm_gen(tmp, *LorR, D, alpha_R, beta_R, 'N', 'H');
 		}
 		else
 			gemm(tmp, *LorR, tmp, alpha_R, beta_R, 'N', 'H');
+//			gemm_gen(tmp, *LorR, tmp, alpha_R, beta_R, 'N', 'H');
 	}
 	if(pL_sz > 0)
 	{
 		if(pL_sz == 1 && packing_RL) // packing_RL == true
 			LorR = dynamic_cast<Faust::MatDense<FPP,DEVICE>*>(pL[f_id]->get_gen_fact_nonconst(0));
+//			LorR = pL[f_id]->get_gen_fact_nonconst(0);
 		else
 		{
 			_LorR = pL[f_id]->get_product(prod_mod);
@@ -239,6 +244,7 @@ void Faust::compute_n_apply_grad1(const int f_id, const Faust::MatDense<FPP,DEVI
 		alpha_L = -lambda/c;
 		beta_L = 1;
 		gemm(*LorR, tmp, D, alpha_L, beta_L, 'H', 'N');
+//		gemm_gen(*LorR, tmp, D, alpha_L, beta_L, 'H', 'N');
 	}
 }
 
@@ -248,10 +254,11 @@ void Faust::compute_n_apply_grad2(const int f_id, const Faust::MatDense<FPP,DEVI
 	Faust::MatDense<FPP,DEVICE> tmp;
 	Faust::MatDense<FPP,DEVICE> grad_over_c;
 	Faust::MatDense<FPP,DEVICE> & D = out;
-	Faust::MatDense<FPP,DEVICE> *_L, *_R, __L, __R;
+	Faust::MatGeneric<FPP,DEVICE> *_L, *_R;
+	Faust::MatDense<FPP,DEVICE> __L, __R;
 	Faust::MatDense<FPP,DEVICE> * LorR;
 	Faust::MatDense<FPP,DEVICE> _LorR;
-	std::vector<MatDense<FPP,DEVICE>*> facts;
+	std::vector<Faust::MatGeneric<FPP,DEVICE>*> facts;
 	std::vector<char> tc_flags;
 //#define mul_3_facts multiply_order_opt
 #define mul_3_facts multiply_order_opt_all_ends// this one only optimizes the product on factor ends but for three factors it doesn't change anything comparing to multiply_order_opt
@@ -260,8 +267,8 @@ void Faust::compute_n_apply_grad2(const int f_id, const Faust::MatDense<FPP,DEVI
 	auto pL_sz = pL[f_id]->size();
 	if(pR_sz > 0)
 	{
-		if(pR_sz == 1 && packing_RL)
-			_R = dynamic_cast<Faust::MatDense<FPP,DEVICE>*>(pR[f_id]->get_gen_fact_nonconst(0));
+		if(pR_sz == 1)
+			_R = pR[f_id]->get_gen_fact_nonconst(0);
 		else
 		{
 			__R = pR[f_id]->get_product(prod_mod);
@@ -271,8 +278,8 @@ void Faust::compute_n_apply_grad2(const int f_id, const Faust::MatDense<FPP,DEVI
 	}
 	if(pL_sz > 0)
 	{
-		if(pL_sz == 1 && packing_RL)
-			_L = dynamic_cast<Faust::MatDense<FPP,DEVICE>*>(pL[f_id]->get_gen_fact_nonconst(0));
+		if(pL_sz == 1)
+			_L = pL[f_id]->get_gen_fact_nonconst(0);
 		else
 		{
 			__L = pL[f_id]->get_product(prod_mod);

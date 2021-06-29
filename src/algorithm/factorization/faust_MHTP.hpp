@@ -44,6 +44,7 @@ namespace Faust
 				const int f_id,
 				std::vector<TransformHelper<FPP,DEVICE>*> &pL,
 				std::vector<TransformHelper<FPP,DEVICE>*> &pR,
+				const bool packing_RL,
 				const bool is_verbose,
 				const Faust::ConstraintGeneric &constraint,
 				const int norm2_max_iter,
@@ -67,7 +68,7 @@ namespace Faust
 					while(mhtp_params.sc.do_continue(j)) // TODO: what about the error stop criterion?
 					{
 						cur_fac = S.get_gen_fact_nonconst(f_id);
-						update_fact(cur_fac, f_id, A, S, pL, pR,
+						update_fact(cur_fac, f_id, A, S, pL, pR, packing_RL,
 								is_verbose, constraint,
 								norm2_max_iter, norm2_threshold, norm2_duration, fgrad_duration,
 								mhtp_params.constant_step_size, mhtp_params.step_size,
