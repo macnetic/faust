@@ -53,8 +53,231 @@
 #ifdef __COMPILE_TIMERS__
     #include "faust_Timer.h"
 #endif
+template<typename FPP>
+void Faust::gemm_gen(const Faust::MatGeneric<FPP,Cpu> & A,const Faust::MatGeneric<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB)
+{
+	const MatSparse<FPP, Cpu>* spA;
+	const MatSparse<FPP, Cpu>* spB;
+	const MatDense<FPP, Cpu>* dsA;
+	const MatDense<FPP, Cpu>* dsB;
+	// downcast an call the proper function
+	spA = dynamic_cast<const Faust::MatSparse<FPP,Cpu>*>(&A);
+	if(! spA)
+		dsA = dynamic_cast<const Faust::MatDense<FPP,Cpu>*>(&A);
+	spB = dynamic_cast<const Faust::MatSparse<FPP,Cpu>*>(&B);
+	if(! spB)
+		dsB = dynamic_cast<const Faust::MatDense<FPP,Cpu>*>(&B);
+	if(spA && spB)
+		throw std::runtime_error("gemm on two MatSparse is not supported.");
+	else if(spA)
+		spgemm(*spA, *dsB, C, alpha, beta, typeA, typeB);
+	else if(spB)
+		spgemm(*dsA, *spB, C, alpha, beta, typeA, typeB);
+	else
+		gemm(*dsA, *dsB, C, alpha, beta, typeA, typeB);
+}
+
+template<typename FPP>
+void Faust::spgemm(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatSparse<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB)
+{
+	//TODO: refactoring should be done to avoid repeating similar block of code for different cases (typeA,typeB,alpha,beta)
+//#ifdef __COMPILE_TIMERS__
+//	A.t_gemm.start();
+//#endif
+	faust_unsigned_int nbRowOpA,nbRowOpB,nbColOpA,nbColOpB;
+
+	Faust::MatDense<FPP, Cpu>& _A = const_cast<Faust::MatDense<FPP,Cpu>&>(A);
+	Faust::MatDense<FPP, Cpu> copy_A;
+	if (((&(C.mat)) == (&(A.mat))))
+	{
+//		handleError("linear_algebra", " Faust::spgemm : C is the same object as A or B");
+		copy_A = A;
+		_A = copy_A;
+	}
+
+	if (typeA == 'T' || typeA == 'H')
+	{
+		nbRowOpA = _A.getNbCol();
+		nbColOpA = _A.getNbRow();
+	}else
+	{
+		nbRowOpA = _A.getNbRow();
+		nbColOpA = _A.getNbCol();
+	}
 
 
+	if (typeB == 'T' || typeA == 'H')
+	{
+		nbRowOpB = B.getNbCol();
+		nbColOpB = B.getNbRow();
+	}else
+	{
+		nbRowOpB = B.getNbRow();
+		nbColOpB = B.getNbCol();
+	}
+
+
+	if (nbColOpA != nbRowOpB)
+	{
+		handleError("linear_algebra", "Faust::spgemm : dimension conflict  between matrix op(_A) and matrix op(B)");
+
+	}
+
+
+	if ( (beta!= FPP(0.0))  && ( (C.getNbRow() != nbRowOpA)	|| (C.getNbCol() != nbColOpB) ) )
+	{
+		//handleError("Linalgebra : gemm : nbRow of op(_A) = %d while nbRow of op(C) = %d\n or nbCol of op(B) = %d  while nbCol of C = %d",nbRowOpA,C.getNbRow(),nbColOpB,C.getNbCol());
+		handleError("linear_algebra", "Faust::spgemm : invalid dimension for output matrix C");
+	}
+
+        C.resize(nbRowOpA,nbColOpB);
+
+
+
+
+
+	if (beta == FPP(0.0))
+	{
+
+		if(_A.isZeros)
+		{
+
+			FPP *const ptr_data_dst = C.getData();
+			memset(ptr_data_dst, 0, sizeof(FPP) * C.dim1*C.dim2);
+			C.isZeros = true;
+			C.set_id(false);
+			//#ifdef __COMPILE_TIMERS__
+			//	_A.t_gemm.stop();
+			//#endif
+			return;
+		}
+
+#define M_times_alpha_into_C(alpha, M, typeM) \
+		{ \
+			C=M; \
+			if(typeM == 'T') \
+			C.transpose(); \
+			else if(typeM == 'H') \
+			{ \
+				C.transpose(); \
+				C.conjugate(); \
+			} \
+			if(alpha!=FPP(1.0)) \
+			C*= alpha; \
+			return; \
+		}
+
+
+		if(B.is_id())
+			M_times_alpha_into_C(alpha, _A, typeA); //return here
+
+		if(_A.is_id())
+			M_times_alpha_into_C(alpha, B, typeB); //return here
+
+		if (typeA == 'N')
+		{
+			if (typeB == 'N')
+				C.mat.noalias() = alpha * _A.mat * B.mat;
+			else if(typeB == 'T')
+				C.mat.noalias() = alpha * _A.mat * B.mat.transpose();
+			else // typeB == 'H'
+				C.mat.noalias() = alpha * _A.mat * B.mat.adjoint();
+		}else if(typeA == 'T')
+		{
+			if (typeB == 'N')
+				C.mat.noalias() = alpha * _A.mat.transpose() * B.mat;
+			else if(typeB == 'T')
+				C.mat.noalias() = alpha * _A.mat.transpose() * B.mat.transpose();
+			else // typeB == 'H'
+				C.mat.noalias() = alpha * _A.mat.transpose() * B.mat.adjoint();
+		} else // typeA == 'H'
+		{
+			if (typeB == 'N')
+				C.mat.noalias() = alpha * _A.mat.adjoint() * B.mat;
+			else if(typeB == 'T')
+				C.mat.noalias() = alpha * _A.mat.adjoint() * B.mat.transpose();
+			else // typeB == 'H'
+				C.mat.noalias() = alpha * _A.mat.adjoint() * B.mat.adjoint();
+
+		}
+
+
+	}else //beta != 0
+	{
+		if(_A.isZeros)
+		{
+			C *= beta;
+			C.isZeros = false;
+			C.set_id(false);
+			//#ifdef __COMPILE_TIMERS__
+			//	_A.t_gemm.stop();
+			//#endif
+			return;
+		}
+
+#define M_times_alpha_plus_beta_times_C_into_C(M, typeM, alpha, beta, C)\
+		{ \
+			C *= beta; \
+			if(typeM == 'N' && alpha == FPP(1.0)) \
+			{ \
+				C += M; \
+				C.isZeros = false; \
+				C.set_id(false); \
+			} \
+			Faust::MatDense<FPP,Cpu> M_tmp(M); \
+			if(typeM == 'T') \
+			M_tmp.transpose(); \
+			else if(typeM == 'H') \
+			{ \
+				M_tmp.conjugate(false); \
+				M_tmp.transpose(); \
+			} \
+			if(alpha != FPP(1.0)) \
+			M_tmp *= alpha; \
+			C += M_tmp; \
+			return; \
+		}
+
+		if(B.is_id())
+			M_times_alpha_plus_beta_times_C_into_C(_A, typeA, alpha, beta, C); // return here
+
+		if(_A.is_id())
+			M_times_alpha_plus_beta_times_C_into_C(B, typeB, alpha, beta, C); //return here
+
+		if (typeA == 'N')
+		{
+			if (typeB == 'N')
+				C.mat = alpha * _A.mat * B.mat + beta * C.mat;
+			else if(typeB == 'T')
+				C.mat = alpha * _A.mat * B.mat.transpose() + beta * C.mat;
+			else //typeB == 'H'
+				C.mat = alpha * _A.mat * B.mat.adjoint() + beta * C.mat;
+		}else if(typeA == 'T')
+		{
+			if (typeB == 'N')
+				C.mat = alpha * _A.mat.transpose() * B.mat + beta * C.mat ;
+			else if(typeB == 'T')
+				C.mat = alpha * _A.mat.transpose() * B.mat.transpose() + beta * C.mat;
+			else //typeB 'H'
+				C.mat = alpha * _A.mat.transpose() * B.mat.adjoint() + beta * C.mat;
+		}
+		else //typeA == 'H'
+		{
+			if (typeB == 'N')
+				C.mat = alpha * _A.mat.adjoint() * B.mat + beta * C.mat ;
+			else if(typeB == 'T')
+				C.mat = alpha * _A.mat.adjoint() * B.mat.transpose() + beta * C.mat;
+			else //typeB 'H'
+				C.mat = alpha * _A.mat.adjoint() * B.mat.adjoint() + beta * C.mat;
+		}
+
+	}
+	C.isZeros = false;
+	C.set_id(false);
+//#ifdef __COMPILE_TIMERS__
+//_A.t_gemm.stop();
+//#endif
+}
 
 template<typename FPP>
 void Faust::spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB)
