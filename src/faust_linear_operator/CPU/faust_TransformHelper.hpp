@@ -517,7 +517,7 @@ namespace Faust {
 		}
 
 	template<typename FPP>
-		void TransformHelper<FPP,Cpu>::set_FM_mul_mode(const int mul_order_opt_mode, const bool silent /* = false */)
+		void TransformHelper<FPP,Cpu>::set_FM_mul_mode(const int mul_order_opt_mode, const bool silent /* = true */)
 		{
 			this->mul_order_opt_mode = mul_order_opt_mode;
 			if(! silent)
