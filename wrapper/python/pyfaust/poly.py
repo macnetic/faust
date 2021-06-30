@@ -61,12 +61,12 @@ def Chebyshev(L, K, dev='cpu', T0=None, impl='native'):
             return _chebyshev(L, K, T0, T1, rR, dev)
     elif impl == 'native':
         if L.dtype == np.complex:
-            F = FaustPoly(core_obj=_FaustCorePy.FaustCoreCplx.polyBasis(L, K, T0,
+            F = FaustPoly(core_obj=_FaustCorePy.FaustAlgoGenCplxDbl.polyBasis(L, K, T0,
                                                                         dev.startswith('gpu')),
                           impl='native')
         else:
-            F = FaustPoly(core_obj=_FaustCorePy.FaustCore.polyBasis(L, K, T0,
-                                                                    dev.startswith('gpu')),
+            F = FaustPoly(core_obj=_FaustCorePy.FaustAlgoGenDbl.polyBasis(L, K, T0,
+                                                                          dev.startswith('gpu')),
                           impl='native')
         return F
     else:
@@ -319,15 +319,15 @@ def _poly_arr_cpp(coeffs, basisX, d, dev='cpu', out=None):
     basisX = _check_fact_mat('_poly_arr_cpp()', basisX, is_real)
     if coeffs.ndim == 1:
         if is_real:
-            return _FaustCorePy.polyCoeffs(d, basisX, coeffs, dev, out)
+            return _FaustCorePy.FaustAlgoGenDbl.polyCoeffs(d, basisX, coeffs, dev, out)
         else:
-            return _FaustCorePy.polyCoeffsCplx(d, basisX, coeffs, dev, out)
+            return _FaustCorePy.FaustAlgoGenCplxDbl.polyCoeffs(d, basisX, coeffs, dev, out)
     elif coeffs.ndim == 2:
         K = coeffs.shape[1]-1
         if is_real:
-            return _FaustCorePy.polyGroupCoeffs(d, K, basisX, coeffs, dev, out)
+            return _FaustCorePy.FaustAlgoGenDbl.polyGroupCoeffs(d, K, basisX, coeffs, dev, out)
         else:
-            return _FaustCorePy.polyGroupCoeffsCplx(d, K, basisX, coeffs, dev, out)
+            return _FaustCorePy.FaustAlgoGenCplxDbl.polyGroupCoeffs(d, K, basisX, coeffs, dev, out)
     else:
         raise ValueError("coeffs can't have more than two dimensions.")
 

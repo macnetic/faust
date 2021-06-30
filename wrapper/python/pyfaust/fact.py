@@ -167,17 +167,17 @@ def svdtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
 
     if is_real:
         if(isinstance(M, np.ndarray)):
-            Ucore, S, Vcore =  _FaustCorePy.FaustFact.svdtj(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
+            Ucore, S, Vcore =  _FaustCorePy.FaustAlgoGenDbl.svdtj(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
         elif(isinstance(M, csr_matrix)):
-            Ucore, S, Vcore =  _FaustCorePy.FaustFact.svdtj_sparse(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
+            Ucore, S, Vcore =  _FaustCorePy.FaustAlgoGenDbl.svdtj_sparse(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
         else:
             raise ValueError("invalid type for M (first argument): only np.ndarray "
                              "or scipy.sparse.csr_matrix are supported.")
     else:
         if(isinstance(M, np.ndarray)):
-            Ucore, S, Vcore =  _FaustCorePy.FaustFactCplx.svdtj(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
+            Ucore, S, Vcore =  _FaustCorePy.FaustAlgoGenCplxDbl.svdtj(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
         elif(isinstance(M, csr_matrix)):
-            Ucore, S, Vcore =  _FaustCorePy.FaustFactCplx.svdtj_sparse(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
+            Ucore, S, Vcore =  _FaustCorePy.FaustAlgoGenCplxDbl.svdtj_sparse(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
         else:
             raise ValueError("invalid type for M (first argument): only np.ndarray "
                              "or scipy.sparse.csr_matrix are supported.")
@@ -289,11 +289,11 @@ def eigtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
         is_real = (M.dtype == np.float)
 
     if is_real:
-        D, core_obj = _FaustCorePy.FaustFact.eigtj(M, nGivens, tol, relerr,
+        D, core_obj = _FaustCorePy.FaustAlgoGenDbl.eigtj(M, nGivens, tol, relerr,
                                                    nGivens_per_fac, verbosity, order,
                                                    enable_large_Faust)
     else:
-        D, core_obj = _FaustCorePy.FaustFactCplx.eigtj(M, nGivens, tol, relerr,
+        D, core_obj = _FaustCorePy.FaustAlgoGenCplxDbl.eigtj(M, nGivens, tol, relerr,
                                                    nGivens_per_fac, verbosity, order,
                                                    enable_large_Faust)
     return D, Faust(core_obj=core_obj)
@@ -459,7 +459,7 @@ def hierarchical2020(M, nites, constraints, is_update_way_R2L,
                      norm2_max_iter):
     factor_format = ParamsFact.factor_format_str2int(factor_format)
     core_obj,_lambda = \
-            _FaustCorePy.FaustFact.hierarchical2020(M, nites, constraints, is_update_way_R2L,
+            _FaustCorePy.FaustAlgoGenDbl.hierarchical2020(M, nites, constraints, is_update_way_R2L,
                                                     is_fact_side_left,
                                                     factor_format,
                                                     packing_RL, norm2_threshold,
@@ -512,17 +512,17 @@ def palm4msa(M, p, ret_lambda=False, backend=2016, on_gpu=False):
     if(backend == 2016):
         if on_gpu: raise ValueError("on_gpu applies only on 2020 backend.")
         if is_real:
-            core_obj, _lambda = _FaustCorePy.FaustFact.fact_palm4msa(M, p)
+            core_obj, _lambda = _FaustCorePy.FaustAlgoGenDbl.fact_palm4msa(M, p)
         else:
-            core_obj, _lambda = _FaustCorePy.FaustFactCplx.fact_palm4msa(M, p)
+            core_obj, _lambda = _FaustCorePy.FaustAlgoGenCplxDbl.fact_palm4msa(M, p)
     elif(backend == 2020):
         if is_real:
-            core_obj, _lambda = _FaustCorePy.FaustFact.palm4msa2020(M, p, on_gpu)
+            core_obj, _lambda = _FaustCorePy.FaustAlgoGenDbl.palm4msa2020(M, p, on_gpu)
         else:
             if M.dtype == np.complex and p.factor_format != 'dense':
                 p.factor_format = 'dense'
                 warnings.warn("forcing the factor_format parameter to 'dense'")
-            core_obj, _lambda = _FaustCorePy.FaustFactCplx.palm4msa2020(M, p)
+            core_obj, _lambda = _FaustCorePy.FaustAlgoGenCplxDbl.palm4msa2020(M, p)
     else:
         raise ValueError("Unknown backend (only 2016 and 2020 are available).")
     F = Faust(core_obj=core_obj)
@@ -630,7 +630,8 @@ def _palm4msa_fgft(Lap, p, ret_lambda=False):
     """
     if(not isinstance(p, pyfaust.factparams.ParamsPalm4MSAFGFT)):
         raise TypeError("p must be a ParamsPalm4MSAFGFT object.")
-    _check_fact_mat('_palm4msa_fgft()', Lap)
+    is_real = np.empty((1,))
+    Lap = _check_fact_mat('_palm4msa_fgft()', Lap, is_real)
     if((Lap.T != Lap).any() or Lap.shape[0] != Lap.shape[1]):
         raise ValueError("Laplacian matrix must be square and symmetric.")
     if(not p.is_mat_consistent(Lap)):
@@ -638,7 +639,11 @@ def _palm4msa_fgft(Lap, p, ret_lambda=False):
                          "the last residuum constraint defined in p. "
                          "Likewise its number of rows must be consistent "
                          "with the first factor constraint defined in p.")
-    core_obj, _lambda, D = _FaustCorePy.FaustFact.fact_palm4msa_fft(Lap, p)
+    if is_real:
+        core_obj, _lambda, D = _FaustCorePy.FaustAlgoGenDbl.fact_palm4msa_fft(Lap, p)
+    else:
+        core_obj, _lambda, D = _FaustCorePy.FaustAlgoGenCplxDbl.fact_palm4msa_fft(Lap, p)
+
     F = Faust(core_obj=core_obj)
     if(ret_lambda):
         return F, D, _lambda
@@ -829,18 +834,18 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
     if(backend == 2016):
         if on_gpu: raise ValueError("on_gpu applies only on 2020 backend.")
         if is_real:
-            core_obj,_lambda = _FaustCorePy.FaustFact.fact_hierarchical(M, p)
+            core_obj,_lambda = _FaustCorePy.FaustAlgoGenDbl.fact_hierarchical(M, p)
         else:
-            core_obj,_lambda = _FaustCorePy.FaustFactCplx.fact_hierarchical(M, p)
+            core_obj,_lambda = _FaustCorePy.FaustAlgoGenCplxDbl.fact_hierarchical(M, p)
     elif(backend == 2020):
         if is_real:
-            core_obj, _lambda = _FaustCorePy.FaustFact.hierarchical2020(M, p,
+            core_obj, _lambda = _FaustCorePy.FaustAlgoGenDbl.hierarchical2020(M, p,
                                                                         on_gpu)
         else:
-            if M.dtype == np.complex and p.factor_format != 'dense':
-                p.factor_format = 'dense'
-                warnings.warn("forcing the factor_format parameter to 'dense'")
-            core_obj, _lambda = _FaustCorePy.FaustFactCplx.hierarchical2020(M, p,
+#            if M.dtype == np.complex and p.factor_format != 'dense':
+#                p.factor_format = 'dense'
+#                warnings.warn("forcing the factor_format parameter to 'dense'")
+            core_obj, _lambda = _FaustCorePy.FaustAlgoGenCplxDbl.hierarchical2020(M, p,
                                                                         on_gpu)
     else:
         raise ValueError("backend must be 2016 or 2020")
@@ -1143,10 +1148,10 @@ def fgft_palm(U, Lap, p, init_D=None, ret_lambda=False, ret_params=False):
 
     init_D = _init_init_D(init_D, U.shape[0])
     if is_real:
-        core_obj, _lambda, D = _FaustCorePy.FaustFact.fact_hierarchical_fft(U, Lap, p,
+        core_obj, _lambda, D = _FaustCorePy.FaustAlgoGenDbl.fact_hierarchical_fft(U, Lap, p,
                                                                             init_D)
     else:
-        core_obj, _lambda, D = _FaustCorePy.FaustFactCplx.fact_hierarchical_fft(U, Lap, p,
+        core_obj, _lambda, D = _FaustCorePy.FaustAlgoGenCplxDbl.fact_hierarchical_fft(U, Lap, p,
                                                                                 init_D)
     F = Faust(core_obj=core_obj)
     ret_list = [ F, D ]
@@ -1173,6 +1178,6 @@ def butterfly(M, dir="right"):
     is_real = np.empty((1,))
     M = _check_fact_mat('butterfly()', M, is_real)
     if is_real:
-        return Faust(core_obj=_FaustCorePy.FaustFact.butterfly_hierarchical(M, dir))
+        return Faust(core_obj=_FaustCorePy.FaustAlgoGenDbl.butterfly_hierarchical(M, dir))
     else:
-        return Faust(core_obj=_FaustCorePy.FaustFactCplx.butterfly_hierarchical(M, dir))
+        return Faust(core_obj=_FaustCorePy.FaustAlgoGenCplxDbl.butterfly_hierarchical(M, dir))

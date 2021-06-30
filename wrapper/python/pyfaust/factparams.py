@@ -272,11 +272,11 @@ class ConstraintInt(ConstraintGeneric):
         is_real = np.empty((1,))
         M = _check_fact_mat('ConstraintInt.project', M, is_real)
         if is_real:
-            return _FaustCorePy.ConstraintIntCore.project(M, self._name.name, self._num_rows,
+            return _FaustCorePy.ConstraintIntCoreDbl.project(M, self._name.name, self._num_rows,
                                                           self._num_cols, self._cons_value,
                                                           self.normalized, self.pos)
         else:
-            return _FaustCorePy.ConstraintIntCoreCplx.project(M, self._name.name, self._num_rows,
+            return _FaustCorePy.ConstraintIntCoreCplxDbl.project(M, self._name.name, self._num_rows,
                                                           self._num_cols, self._cons_value,
                                                           self.normalized, self.pos)
 
@@ -353,13 +353,13 @@ class ConstraintMat(ConstraintGeneric):
         from pyfaust.fact import _check_fact_mat
         M = _check_fact_mat('ConstraintMat.project', M, is_real)
         if is_real:
-            return _FaustCorePy.ConstraintMatCore.project(M, self._name.name, self._num_rows,
+            return _FaustCorePy.ConstraintMatCoreDbl.project(M, self._name.name, self._num_rows,
                                                           self._num_cols,
                                                           self._cons_value,
                                                           self._cons_value_sz,
                                                           self.normalized, self.pos)
         else:
-            return _FaustCorePy.ConstraintMatCoreCplx.project(M, self._name.name, self._num_rows,
+            return _FaustCorePy.ConstraintMatCoreCplxDbl.project(M, self._name.name, self._num_rows,
                                                               self._num_cols,
                                                               self._cons_value,
                                                               self._cons_value_sz,
@@ -421,12 +421,12 @@ class ConstraintReal(ConstraintGeneric):
         from pyfaust.fact import _check_fact_mat
         M = _check_fact_mat('ConstraintReal.project', M, is_real)
         if is_real:
-            return _FaustCorePy.ConstraintRealCore.project(M, self._name.name, self._num_rows,
+            return _FaustCorePy.ConstraintRealCoreDbl.project(M, self._name.name, self._num_rows,
                                                            self._num_cols,
                                                            self._cons_value,
                                                            self.normalized, self.pos)
         else:
-            return _FaustCorePy.ConstraintRealCore.project(M, self._name.name, self._num_rows,
+            return _FaustCorePy.ConstraintRealCoreCplxDbl.project(M, self._name.name, self._num_rows,
                                                            self._num_cols,
                                                            self._cons_value,
                                                            self.normalized, self.pos)

@@ -18,7 +18,7 @@ if(${USE_MATIO_STATIC_LIBS})
 		set(PYTHON_EXT_EXTRA_OBJECTS "[ '${MATIO_STATIC_LIB_PATH}', '${HDF5_STATIC_LIB_PATH}', '${Z_STATIC_LIB_PATH}']") # the order matters for compilation
 	else() # WIN32 # intended for Visual Studio!
 		# compile the pyx and all faust .cpp needed (instead to link to faust.lib)
-		set(PY_EXT_SOURCES "${PY_EXT_SOURCES}+glob('${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}/*.cpp')+glob('${FAUST_SRC_LINEAR_OPERATOR_DIR}/*.cpp')+glob('${FAUST_ALGORITHM_CONSTRAINT_SRC_DIR}/*.cpp')+glob('${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR}/*.cpp')+glob('${FAUST_UTILS_SRC_DIR}/*.cpp')")
+		set(PY_EXT_SOURCES "${PY_EXT_SOURCES}+glob('${FAUST_PYTHON_SRC_SRC_DIR}/*.cpp')+glob('${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}/*.cpp')+glob('${FAUST_SRC_LINEAR_OPERATOR_DIR}/*.cpp')+glob('${FAUST_ALGORITHM_CONSTRAINT_SRC_DIR}/*.cpp')+glob('${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR}/*.cpp')+glob('${FAUST_UTILS_SRC_DIR}/*.cpp')")
 		if(USE_GPU_MOD)
 			set(PY_EXT_SOURCES "${PY_EXT_SOURCES}+glob('${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR}/*.cpp')")
 		endif()
@@ -49,6 +49,7 @@ else() # in fact this is only for WIN32 MINGW
 endif()
 
 
+set(PY_EXT_SOURCES "${PY_EXT_SOURCES}+glob('${FAUST_PYTHON_SRC_SRC_DIR}*.cpp')")
 
 set(FAUST_PYTHON_INCLUDE_DIR "'${EIGEN_INC_DIR}',
 '${FAUST_SRC_LINEAR_OPERATOR_DIR}',
@@ -138,7 +139,7 @@ if(USE_GPU_MOD)
 endif()
 
 if(BUILD_COMPLEX_PYX)
-	set(FAUST_CORE_CPLX_TYPE FaustCoreCplx)
+	set(FAUST_CORE_CPLX_TYPE FaustCoreCplx) #TODO: rename variable to CORE_CLASS and class to *ComplexDouble
 else()
 	set(FAUST_CORE_CPLX_TYPE FaustCoreCplxDummy)
 endif()
@@ -148,10 +149,38 @@ configure_file(${FAUST_PYTHON_SRC_DIR}/setup.py.in ${FAUST_PYTHON_BIN_DIR}/setup
 configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/_FaustCorePy.pyx ${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.pyx @ONLY)
 configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/FaustCoreCy.pxd ${FAUST_PYTHON_BIN_DIR}/FaustCoreCy.pxd COPYONLY)
 
+
+
+
 if(BUILD_COMPLEX_PYX)
 	set(FAUST_CORE_CPLX_TYPE FaustCoreCplx)
 	file(READ ${FAUST_PYTHON_SRC_SRC_DIR}/_FaustCorePyCplx.pyx CPLX_PYX)
 	file(APPEND ${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.pyx ${CPLX_PYX})
+endif()
+
+# TODO: factorize complex and double generation using a cmake function
+# Generate FaustAlgoGenDbl pyx class:
+set(TYPE_NAME Dbl)
+set(TYPE double)
+set(CORE_CLASS FaustCore) # TODO: FaustCoreDouble
+set(CORE_OBJ core_faust_dbl)
+configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/_FaustAlgoGen.pyx.in ${FAUST_PYTHON_BIN_DIR}/_FaustAlgoGen${TYPE_NAME}.pyx @ONLY)
+file(READ ${FAUST_PYTHON_BIN_DIR}/_FaustAlgoGen${TYPE_NAME}.pyx PYX_VAR)
+file(APPEND ${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.pyx ${PYX_VAR})
+
+if(BUILD_COMPLEX_PYX)
+	# Generate FaustAlgoGenCplxDbl pyx class according to the generic algorithms
+	set(TYPE_NAME CplxDbl)
+	set(TYPE complex)
+	set(CORE_CLASS FaustCoreCplx) # TODO: FaustCoreCplxDbl
+	set(CORE_OBJ core_faust_cplx)
+	set(FUNC_TYPE_SUFFIX _cplx)
+	configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/_FaustAlgoGen.pyx.in ${FAUST_PYTHON_BIN_DIR}/_FaustAlgoGen${TYPE_NAME}.pyx @ONLY)
+	file(READ ${FAUST_PYTHON_BIN_DIR}/_FaustAlgoGen${TYPE_NAME}.pyx PYX_VAR)
+	file(APPEND ${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.pyx ${PYX_VAR})
+	# Generate and include the complex-only class
+	file(READ ${FAUST_PYTHON_SRC_SRC_DIR}/_FaustAlgoCplxDbl.pyx PYX_VAR)
+	file(APPEND ${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.pyx ${PYX_VAR})
 endif()
 
 if(USE_GPU_MOD)

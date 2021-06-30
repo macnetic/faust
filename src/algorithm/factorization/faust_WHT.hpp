@@ -31,7 +31,7 @@ namespace Faust {
 					row_ids[i+order_over_2] = i_times_2+1;
 					col_ids[i] = i;
 					col_ids[i+order_over_2] = i + order_over_2;
-					vals[i] = vals[i+order_over_2] = 1;
+					vals[i] = vals[i+order_over_2] = FPP(1);
 				}
 				//			cout << row_ids.size() << endl;
 				//			cout << col_ids.size() << endl;
@@ -62,11 +62,11 @@ namespace Faust {
 				{
 
 					if(parity) //row index is pair
-						bvalues[i] = bvalues[i+1] = 1;
+						bvalues[i] = bvalues[i+1] = FPP(1);
 					else
 					{
-						bvalues[i+1] = -1;
-						bvalues[i] = 1;
+						bvalues[i+1] = FPP(-1);
+						bvalues[i] = FPP(1);
 					}
 					//				cout << bvalues[i] << " " << bvalues[i+1];
 					parity = ! parity;

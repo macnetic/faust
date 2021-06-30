@@ -488,10 +488,10 @@ class blockdiag(proj_gen):
         is_real = np.empty((1,))
         M = _check_fact_mat('prox_blockdiag.__call__', M, is_real)
         if is_real:
-            return _FaustCorePy.ConstraintMatCore.prox_blockdiag(M, self._block_shapes, self.normalized,
+            return _FaustCorePy.ConstraintMatCoreDbl.prox_blockdiag(M, self._block_shapes, self.normalized,
                                                              self.pos)
         else:
-            return _FaustCorePy.ConstraintMatCoreCplx.prox_blockdiag(M, self._block_shapes, self.normalized,
+            return _FaustCorePy.ConstraintMatCoreCplxDbl.prox_blockdiag(M, self._block_shapes, self.normalized,
                                                              self.pos)
 
 #        M_ = np.zeros(M.shape)

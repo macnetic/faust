@@ -2468,7 +2468,7 @@ def isFaust(obj):
     """
     return Faust.isFaust(obj)
 
-def wht(n, normed=True, dev="cpu"):
+def wht(n, normed=True, dev="cpu", dtype='double'):
     """
        Constructs a Faust implementing the Hadamard transform of dimension n.
 
@@ -2481,6 +2481,7 @@ def wht(n, normed=True, dev="cpu"):
            normed: default to True to normalize the Hadamard Faust as if you called
            Faust.normalize() and False otherwise.
            dev: device to create the Faust on.
+           dtype: the Faust dtype, it must be 'double' or 'complex'.
        Returns:
            The Faust implementing the Hadamard transform of dimension n.
 
@@ -2502,15 +2503,23 @@ def wht(n, normed=True, dev="cpu"):
           >>> wht(1024, normed=False).normalize() # which is less optimized though
 
     """
+    if dtype not in ['double', 'complex']:
+        raise ValueError('dtype argument must be double or complex')
     check_dev(dev)
     log2n = np.floor(np.log2(n))
     if(n > 2**log2n): raise ValueError("n must be a power of 2.")
     if(not isinstance(normed, bool)):
         raise TypeError("normed must be True of False.")
     if dev == "cpu":
-        H = Faust(core_obj=_FaustCorePy.FaustCore.hadamardFaust(log2n, normed))
+        if dtype == 'double':
+            H = Faust(core_obj=_FaustCorePy.FaustAlgoGenDbl.hadamardFaust(log2n, normed))
+        else: # dtype == 'complex'
+            H = Faust(core_obj=_FaustCorePy.FaustAlgoGenCplxDbl.hadamardFaust(log2n, normed))
     elif dev.startswith("gpu"):
-        H = Faust(core_obj=_FaustCorePy.FaustCoreGPU.hadamardFaust(log2n, normed))
+        if dtype == 'double':
+            H = Faust(core_obj=_FaustCorePy.FaustCoreGPU.hadamardFaust(log2n, normed))
+        else: # dtype == 'complex'
+            raise ValueError("complex wht is not supported for GPU")
     return H
 
 def dft(n, normed=True, dev='cpu'):
@@ -2556,7 +2565,7 @@ def dft(n, normed=True, dev='cpu'):
     if(not isinstance(normed, bool)):
         raise TypeError("normed must be True of False.")
     if dev == "cpu":
-        F = Faust(core_obj=_FaustCorePy.FaustCoreCplx.fourierFaust(log2n, normed))
+        F = Faust(core_obj=_FaustCorePy.FaustAlgoCplxDbl.fourierFaust(log2n, normed))
     elif dev.startswith("gpu"):
         F = Faust(core_obj=_FaustCorePy.FaustCoreGPU.fourierFaust(log2n, normed))
     return F
@@ -2589,9 +2598,9 @@ def eye(m, n=None, t='real', dev="cpu"):
     if(n == None): n = m
     if dev == "cpu":
         if t == 'real':
-            rF = Faust(core_obj=_FaustCorePy.FaustCore.eyeFaust(m, n))
+            rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenDbl.eyeFaust(m, n))
         else:
-            rF = Faust(core_obj=_FaustCorePy.FaustCoreCplx.eyeFaust(m, n))
+            rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenCplxDbl.eyeFaust(m, n))
     elif dev.startswith("gpu"):
         rF = Faust(core_obj=_FaustCorePy.FaustCoreGPU.eyeFaust(m, n, t))
     return rF
