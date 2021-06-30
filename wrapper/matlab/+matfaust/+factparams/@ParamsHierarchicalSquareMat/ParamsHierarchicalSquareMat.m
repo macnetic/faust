@@ -21,7 +21,7 @@ classdef ParamsHierarchicalSquareMat < matfaust.factparams.ParamsHierarchical
 				%res_cons = [ res_cons, {ConstraintInt('sp',d,d,d*d/2^(i+1))} ];
 			end
 			p = p@matfaust.factparams.ParamsHierarchical(fact_cons, res_cons, stop_crit,...
-			stop_crit, 'is_update_way_R2L', true);
+			stop_crit, 'is_update_way_R2L', true, 'packing_RL', false);
 		end
 	end
 	methods(Static)

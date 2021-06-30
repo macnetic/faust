@@ -1077,9 +1077,7 @@ class ParamsHierarchicalDFT(ParamsHierarchical):
     def createParams(M, p):
         pot = np.log2(M.shape[0])
         if(pot > int(pot) or M.shape[0] != M.shape[1]):
-            raise ValueError('M must be a '
-                             'square matrix of order a power of '
-                             'two.')
+            raise ValueError('M must be of order a power of two.')
         pot = int(pot)
         return ParamsHierarchicalDFT(pot)
 
@@ -1162,11 +1160,12 @@ class ParamsHierarchicalSquareMat(ParamsHierarchical):
         stop_crit = StoppingCriterion(num_its=30)
         super(ParamsHierarchicalSquareMat,
               self).__init__([ConstraintInt(ConstraintName(cons_name),d,d,2)
-                                        for i in range(0,n-1)],
-                                        [ConstraintInt(ConstraintName(cons_name),d,d,int(d/2.**(i+1)))
-                                         for i in range(0,n-1)],
-                                        stop_crit, stop_crit,
-                                        is_update_way_R2L=True)
+                              for i in range(0,n-1)],
+                             [ConstraintInt(ConstraintName(cons_name),d,d,int(d/2.**(i+1)))
+                              for i in range(0,n-1)],
+                             stop_crit, stop_crit,
+                             is_update_way_R2L=True,
+                             packing_RL=False)
 
     @staticmethod
     def createParams(M, p):
