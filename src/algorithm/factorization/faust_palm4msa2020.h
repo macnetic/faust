@@ -8,6 +8,7 @@
 #include "faust_MatGeneric_gpu.h"
 #include "faust_MatDense_gpu.h"
 #include "faust_MatSparse_gpu.h"
+#include "faust_linear_algebra_gpu.h"
 #include "faust_TransformHelper_gpu.h"
 #endif
 #include "faust_Params.h"

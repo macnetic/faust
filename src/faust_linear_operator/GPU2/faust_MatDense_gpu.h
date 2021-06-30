@@ -10,11 +10,6 @@
 #include "faust_gpu_mod_utils.h"
 namespace Faust
 {
-	template <typename FPP>
-	void gemm(const MatDense<FPP, GPU2> &A, const MatDense<FPP, GPU2> &B, MatDense<FPP, GPU2> &C, const FPP& alpha, const FPP& beta, const char opA, const char opB);
-
-	template <typename FPP>
-	void gemv(const MatDense<FPP, GPU2> &A, const Vect<FPP, GPU2> &B, Vect<FPP, GPU2> &C, const FPP& alpha, const FPP& beta, const char opA, const char opB='N');
 
 
 	template<typename FPP, FDevice DEVICE>
@@ -24,9 +19,9 @@ namespace Faust
 		{
 			friend Transform<FPP,GPU2>; // need to access to get_gpu_mat_ptr
 			friend MatSparse<FPP,GPU2>;
-			friend void gemm<>(const MatDense<FPP, GPU2> &A, const MatDense<FPP, GPU2> &B, MatDense<FPP, GPU2> &C, const FPP& alpha, const FPP& beta, const char opA, const char opB);
-
-			friend void gemv<>(const MatDense<FPP, GPU2> &A, const Vect<FPP, GPU2> &B, Vect<FPP, GPU2> &C, const FPP& alpha, const FPP& beta, const char opA, const char opB);
+//			friend void gemm<>(const MatDense<FPP, GPU2> &A, const MatDense<FPP, GPU2> &B, MatDense<FPP, GPU2> &C, const FPP& alpha, const FPP& beta, const char opA, const char opB);
+//
+//			friend void gemv<>(const MatDense<FPP, GPU2> &A, const Vect<FPP, GPU2> &B, Vect<FPP, GPU2> &C, const FPP& alpha, const FPP& beta, const char opA, const char opB);
 
 			public:
 				MatDense(const faust_unsigned_int nbRow,
@@ -133,6 +128,8 @@ namespace Faust
 				void prox_sp(int32_t k, bool normalized=false, bool pos=false) const;
 				void prox_spcol(int32_t k, bool normalized=false, bool pos=false) const;
 				void prox_splin(int32_t k, bool normalized=false, bool pos=false) const;
+				static void gemm(const MatDense<FPP, GPU2> &A, const MatDense<FPP, GPU2> &B, MatDense<FPP, GPU2> &C, const FPP& alpha, const FPP& beta, const char opA, const char opB);
+				static void gemv(const MatDense<FPP, GPU2> &A, const Vect<FPP, GPU2> &B, Vect<FPP, GPU2> &C, const FPP& alpha, const FPP& beta, const char opA, const char opB='N');
 
 			protected:
 				gm_DenseMat_t gpu_mat;

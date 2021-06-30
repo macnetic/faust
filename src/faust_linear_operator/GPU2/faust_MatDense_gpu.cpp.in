@@ -514,7 +514,7 @@ namespace Faust
 		}
 
 	template <>
-		void gemm(const MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> &A, const MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> &B, MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> &C,
+		void Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::gemm(const MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> &A, const MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> &B, MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> &C,
 				const @FAUST_SCALAR_FOR_GM@& alpha, const @FAUST_SCALAR_FOR_GM@& beta, const char opA, const char opB)
 		{
 			gm_Op gop_A, gop_B;
@@ -525,7 +525,7 @@ namespace Faust
 		}
 
 	template <>
-		void gemv(const MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> &A, const Vect<@FAUST_SCALAR_FOR_GM@, GPU2> &B, Vect<@FAUST_SCALAR_FOR_GM@, GPU2> &C,
+		void Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::gemv(const MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> &A, const Vect<@FAUST_SCALAR_FOR_GM@, GPU2> &B, Vect<@FAUST_SCALAR_FOR_GM@, GPU2> &C,
 				const @FAUST_SCALAR_FOR_GM@& alpha, const @FAUST_SCALAR_FOR_GM@& beta, const char opA, const char opB/*='N'*/)
 		{
 			gm_Op gop_A, gop_B;

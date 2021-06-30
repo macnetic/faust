@@ -65,6 +65,7 @@ namespace Faust
 	template<typename FPP>
 		void add(const MatDense<FPP,Cpu> & A, const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C);
 
+	// Computes alpha*typeA(A)*typeB(B)+ beta*C into C.
 	template<typename FPP>
 		void gemm_gen(const Faust::MatGeneric<FPP,Cpu> & A,const Faust::MatGeneric<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB);
 
