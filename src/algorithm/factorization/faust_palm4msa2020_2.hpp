@@ -203,6 +203,7 @@ void Faust::compute_n_apply_grad1(const int f_id, const Faust::MatDense<FPP,DEVI
 	Faust::TransformHelper<FPP, DEVICE> _LSR(/*lambda_vec,*/ *pL[f_id], S_j_vec, *pR[f_id]);
 	//			tmp = _LSR.get_product(prod_mod);
 	_LSR.get_product(tmp, prod_mod);
+//	_LSR.get_product(tmp);
 	tmp *= FPP(lambda);
 	tmp -= A;
 	if(sc.isCriterionErr())
@@ -271,7 +272,8 @@ void Faust::compute_n_apply_grad2(const int f_id, const Faust::MatDense<FPP,DEVI
 			_R = pR[f_id]->get_gen_fact_nonconst(0);
 		else
 		{
-			__R = pR[f_id]->get_product(prod_mod);
+//			__R = pR[f_id]->get_product(prod_mod); // disabled because  ORDER_ALL_BEST_MIXED is slower than DEFAULT for Hadamard factorization
+			__R = pR[f_id]->get_product();
 			_R = &__R;
 		}
 
@@ -282,7 +284,8 @@ void Faust::compute_n_apply_grad2(const int f_id, const Faust::MatDense<FPP,DEVI
 			_L = pL[f_id]->get_gen_fact_nonconst(0);
 		else
 		{
-			__L = pL[f_id]->get_product(prod_mod);
+//			__L = pL[f_id]->get_product(prod_mod); // disabled because  ORDER_ALL_BEST_MIXED is slower than DEFAULT for Hadamard factorization
+			__L = pL[f_id]->get_product();
 			_L = &__L;
 		}
 	}
