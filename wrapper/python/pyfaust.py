@@ -171,9 +171,9 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                 if(is_on_gpu):
                     F.m_faust = _FaustCorePy.FaustCoreGPU(factors, scale);
                 elif F._is_real:
-                    F.m_faust = _FaustCorePy.FaustCore(factors, scale);
+                    F.m_faust = _FaustCorePy.FaustCoreGenDbl(factors, scale);
                 else:
-                    F.m_faust = _FaustCorePy.FaustCoreCplx(factors, scale);
+                    F.m_faust = _FaustCorePy.FaustCoreGenCplxDbl(factors, scale);
             else:
                 raise Exception("Cannot create an empty Faust.")
 
@@ -803,14 +803,29 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             if(F.shape[1] != A.shape[0]): raise ValueError("The dimensions of "
                                                           "the two Fausts must "
                                                           "agree.")
-            return Faust(core_obj=F.m_faust.multiply(A.m_faust))
+            if F.dtype == np.complex and A.dtype != np.complex:
+                A = A.astype(np.complex)
+            elif F.dtype != np.complex and A.dtype == np.complex:
+                F = F.astype(np.complex)
+            return Faust(core_obj=F.m_faust.multiply_faust(A.m_faust))
         elif(isinstance(A, (float, int, np.complex))):
             raise ValueError("Scalar operands are not allowed, use '*'"
                              " instead")
-        elif(isinstance(A, np.ndarray) and A.dtype == np.complex and F.dtype !=
-            np.complex):
-            j = np.complex(0,1)
-            return F.m_faust.multiply(A.real).astype(np.complex) + j*F.m_faust.multiply(A.imag)
+        elif isinstance(A, np.ndarray):
+            if A.dtype == np.complex and F.dtype != np.complex:
+                A_r = np.asfortranarray(A.real)
+                A_i = np.asfortranarray(A.imag)
+                if not A.imag.flags['F_CONTIGUOUS']:
+                    A_i = np.asfortranarray(A_i)
+                    A_r = np.asfortranarray(A_r)
+                G = F.m_faust.multiply(A_r) + 1j*F.m_faust.multiply(A_i)
+                return G
+            else:
+                if not A.flags['F_CONTIGUOUS']:
+                    A = np.asfortranarray(A)
+                if F.dtype == 'complex' and A.dtype != 'complex':
+                    A = A.astype('complex')
+                return F.m_faust.multiply(A)
         elif(isinstance(A, scipy.sparse.csr_matrix)):
             if(A.dtype == np.complex and F.dtype != np.complex):
                 j = np.complex(0,1)
@@ -821,7 +836,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         elif(isinstance(A, (dia_matrix, csc_matrix))):
             return F.__matmul__(A.tocsr())
         else:
-            return F.m_faust.multiply(A)
+            raise TypeError("can't multiply a Faust by something that is not a Faust, a np.ndarray, a csr_matrix or a dia_matrix.")
 
     def dot(F, A, *args, **kwargs):
         """
@@ -892,6 +907,15 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         <b/>See also Faust.__init__, Faust.rcg, Faust.__mul__, Faust.__matmul__, Faust.dot
         """
         if(isinstance(A, (float, int, np.complex))):
+            if isinstance(A, int):
+                A = float(A)
+            elif isinstance(A, np.complex):
+                if F.dtype != np.complex:
+                    F = F.astype(np.complex)
+            else:
+                # A is a float
+                if F.dtype == np.complex:
+                    A = np.complex(A)
             return Faust(core_obj=F.m_faust.multiply_scal(A))
         elif(isinstance(A, np.ndarray)):
             if(A.size == 1):
@@ -1056,15 +1080,25 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             raise ValueError("Axis must be 0 or 1.")
 
         largs = []
+        any_G_is_cplx = F.dtype == np.complex
         for i,G in enumerate(args):
             if(isinstance(G, (np.ndarray, csr_matrix, csc_matrix))):
                 G = Faust(G, dev=F.device)
-            if(not isinstance(G, Faust)): raise ValueError("You can't concatenate a "
+            elif(not isinstance(G, Faust)): raise ValueError("You can't concatenate a "
                                                            "Faust with something "
                                                            "that is not a Faust, "
                                                            "a numpy array or scipy "
                                                            "sparse matrix.")
+            any_G_is_cplx |= G.dtype == np.complex
             largs.append(G)
+
+        if any_G_is_cplx:
+            # one Faust is complex convert all real Faust to complex
+            for i in range(len(largs)):
+                if largs[i].dtype != np.complex:
+                    largs[i] = largs[i].astype(np.complex)
+            if F.dtype != np.complex:
+                F = F.astype(np.complex)
 
         if(axis == 0 and F.shape[1] != G.shape[1] or axis == 1 and F.shape[0]
            != G.shape[0]): raise ValueError("The dimensions of "
@@ -1074,9 +1108,9 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         if all([isFaust(G) for G in largs]) and not "iterative" in kwargs.keys() or kwargs['iterative']:
             # use iterative meth.
             if axis == 0:
-                C = Faust(core_obj=F.m_faust.vertcatn(*[G.m_faust for G in largs]))
+                C = Faust(core_obj=F.m_faust.vertcatn([G.m_faust for G in largs]))
             else: # axis == 1
-                C = Faust(core_obj=F.m_faust.horzcatn(*[G.m_faust for G in largs]))
+                C = Faust(core_obj=F.m_faust.horzcatn([G.m_faust for G in largs]))
             return C
 
         # use recursive meth.
@@ -1787,7 +1821,8 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         if(dtype == F.dtype):
             return F.clone(dev=F.device)
         elif dtype == np.complex:
-            return F*np.complex(1,0)
+            return Faust([F.factors(i).astype(np.complex) for i in
+                          range(F.numfactors())])
         else:
             raise ValueError("complex -> float conversion not yet supported.")
 
@@ -2732,16 +2767,22 @@ def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
     elif(not isinstance(density, np.float)):
         raise ValueError("rand(): density must be a float")
     if dev == "cpu":
-        rF = Faust(core_obj=_FaustCorePy.FaustCore.randFaust(num_rows,
-                                                             num_cols,
-                                                             fac_type_map[fac_type], field, min_num_factors, max_num_factors,
-                                                             min_dim_size, max_dim_size, density, per_row))
+        if field == REAL:
+            rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenDbl.randFaust(num_rows,
+                                                                       num_cols,
+                                                                       fac_type_map[fac_type], min_num_factors, max_num_factors,
+                                                                       min_dim_size, max_dim_size, density, per_row))
+        elif field == COMPLEX:
+            rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenCplxDbl.randFaust(num_rows,
+                                                                           num_cols,
+                                                                           fac_type_map[fac_type], min_num_factors, max_num_factors,
+                                                                           min_dim_size, max_dim_size, density, per_row))
+        # no else possible (see above)
     elif dev.startswith("gpu"):
         rF = Faust(core_obj=_FaustCorePy.FaustCoreGPU.randFaust(num_rows,
                                                                 num_cols,
-                                                                fac_type_map[fac_type], field, min_num_factors, max_num_factors,
+                                                                fac_type_map[fac_type], min_num_factors, max_num_factors,
                                                                 min_dim_size, max_dim_size, density, per_row))
-
     return rF
 
 def enable_gpu_mod(libpaths=None, backend='cuda', silent=False, fatal=False):
@@ -2759,13 +2800,13 @@ def enable_gpu_mod(libpaths=None, backend='cuda', silent=False, fatal=False):
         silent: if True nothing or almost will be displayed on loading (e.g.
         silent errors), otherwise all messages are visible.
     """
-    return _FaustCorePy.FaustCore.enable_gpu_mod(libpaths, backend, silent, fatal)
+    return _FaustCorePy.enable_gpu_mod(libpaths, backend, silent, fatal)
 
 def is_gpu_mod_enabled():
     """
     Returns True if the gpu_mod plug-in has been loaded correctly, false otherwise.
     """
-    return _FaustCorePy.FaustCore._is_gpu_mod_enabled()
+    return _FaustCorePy._is_gpu_mod_enabled()
 
 def check_dev(dev):
     if dev.startswith('gpu'):

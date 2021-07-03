@@ -985,6 +985,19 @@ cdef class FaustAlgoGen@TYPE_NAME@:
             raise MemoryError()
         return core
 
+    @staticmethod
+    def randFaust(faust_nrows, faust_ncols, t, min_num_factors, max_num_factors, min_dim_size,
+                  max_dim_size, density=0.1, per_row=True):
+        core = @CORE_CLASS@(core=True)
+        core.@CORE_OBJ@ = \
+                FaustCoreCy.FaustCoreCpp[@TYPE@].randFaust(faust_nrows,
+                                                           faust_ncols,
+                                                           t, min_num_factors, max_num_factors, min_dim_size,
+                                                           max_dim_size, density, per_row)
+        if(core.@CORE_OBJ@ == NULL): raise MemoryError()
+        return core
+
+
 cdef class ConstraintIntCore@TYPE_NAME@:
 
     # no need to create an object, because project() needs to create core object

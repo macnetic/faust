@@ -152,32 +152,30 @@ configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/FaustCoreCy.pxd ${FAUST_PYTHON_BIN_DI
 
 
 
-if(BUILD_COMPLEX_PYX)
-	set(FAUST_CORE_CPLX_TYPE FaustCoreCplx)
-	file(READ ${FAUST_PYTHON_SRC_SRC_DIR}/_FaustCorePyCplx.pyx CPLX_PYX)
-	file(APPEND ${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.pyx ${CPLX_PYX})
-endif()
-
 # TODO: factorize complex and double generation using a cmake function
 # Generate FaustAlgoGenDbl pyx class:
 set(TYPE_NAME Dbl)
 set(TYPE double)
-set(CORE_CLASS FaustCore) # TODO: FaustCoreDouble
+set(CORE_CLASS FaustCoreGenDbl)
 set(CORE_OBJ core_faust_dbl)
-configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/_FaustAlgoGen.pyx.in ${FAUST_PYTHON_BIN_DIR}/_FaustAlgoGen${TYPE_NAME}.pyx @ONLY)
-file(READ ${FAUST_PYTHON_BIN_DIR}/_FaustAlgoGen${TYPE_NAME}.pyx PYX_VAR)
-file(APPEND ${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.pyx ${PYX_VAR})
+foreach(PYX_NAME _FaustCoreGen _FaustAlgoGen)
+	configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/${PYX_NAME}.pyx.in ${FAUST_PYTHON_BIN_DIR}/${PYX_NAME}${TYPE_NAME}.pyx @ONLY)
+	file(READ ${FAUST_PYTHON_BIN_DIR}/${PYX_NAME}${TYPE_NAME}.pyx PYX_VAR)
+	file(APPEND ${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.pyx ${PYX_VAR})
+endforeach()
 
 if(BUILD_COMPLEX_PYX)
 	# Generate FaustAlgoGenCplxDbl pyx class according to the generic algorithms
 	set(TYPE_NAME CplxDbl)
 	set(TYPE complex)
-	set(CORE_CLASS FaustCoreCplx) # TODO: FaustCoreCplxDbl
+	set(CORE_CLASS FaustCoreGenCplxDbl)
 	set(CORE_OBJ core_faust_cplx)
 	set(FUNC_TYPE_SUFFIX _cplx)
-	configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/_FaustAlgoGen.pyx.in ${FAUST_PYTHON_BIN_DIR}/_FaustAlgoGen${TYPE_NAME}.pyx @ONLY)
-	file(READ ${FAUST_PYTHON_BIN_DIR}/_FaustAlgoGen${TYPE_NAME}.pyx PYX_VAR)
-	file(APPEND ${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.pyx ${PYX_VAR})
+	foreach(PYX_NAME _FaustCoreGen _FaustAlgoGen)
+		configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/${PYX_NAME}.pyx.in ${FAUST_PYTHON_BIN_DIR}/${PYX_NAME}${TYPE_NAME}.pyx @ONLY)
+		file(READ ${FAUST_PYTHON_BIN_DIR}/${PYX_NAME}${TYPE_NAME}.pyx PYX_VAR)
+		file(APPEND ${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.pyx ${PYX_VAR})
+	endforeach()
 	# Generate and include the complex-only class
 	file(READ ${FAUST_PYTHON_SRC_SRC_DIR}/_FaustAlgoCplxDbl.pyx PYX_VAR)
 	file(APPEND ${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.pyx ${PYX_VAR})

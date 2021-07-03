@@ -593,7 +593,6 @@ cdef class FaustCoreGPU:
 
     def clone(self, dev='cpu'):
         core_gpu = FaustCoreGPU(core=True)
-        core_cpu = FaustCore(core=True)
         if(dev.startswith('gpu')):
             if(self._isReal):
                 core_gpu.core_faust_dbl = self.core_faust_dbl.clone_gpu()
@@ -603,10 +602,11 @@ cdef class FaustCoreGPU:
             return core_gpu
         elif(dev == 'cpu'):
             if(self._isReal):
-                core_cpu.core_faust_dbl = self.core_faust_dbl.clone_cpu()
-                core_cpu._isReal = self._isReal
+                core_cpu = FaustCoreGenDbl(core=True)
+                (<FaustCoreGenDbl?>core_cpu).core_faust_dbl = self.core_faust_dbl.clone_cpu()
             else:
-                core_cpu.core_faust_cplx = self.core_faust_cplx.clone_cpu()
+                core_cpu = FaustCoreGenCplxDbl(core=True)
+                (<FaustCoreGenCplxDbl?>core_cpu).core_faust_cplx = self.core_faust_cplx.clone_cpu()
             return core_cpu
         else:
             raise ValueError('dev='+str(dev)+' is not a valid device')
