@@ -169,11 +169,14 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                     break
             if(factors is not None and len(factors) > 0):
                 if(is_on_gpu):
-                    F.m_faust = _FaustCorePy.FaustCoreGPU(factors, scale);
+                    if F._is_real:
+                        F.m_faust = _FaustCorePy.FaustCoreGenDblGPU(factors, scale)
+                    else:
+                        F.m_faust = _FaustCorePy.FaustCoreGenCplxDblGPU(factors, scale)
                 elif F._is_real:
-                    F.m_faust = _FaustCorePy.FaustCoreGenDbl(factors, scale);
+                    F.m_faust = _FaustCorePy.FaustCoreGenDblCPU(factors, scale)
                 else:
-                    F.m_faust = _FaustCorePy.FaustCoreGenCplxDbl(factors, scale);
+                    F.m_faust = _FaustCorePy.FaustCoreGenCplxDblCPU(factors, scale)
             else:
                 raise Exception("Cannot create an empty Faust.")
 
@@ -2168,11 +2171,29 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             dev = F.device
         check_dev(dev)
         # dev is 'gpu[:id]' or 'cpu'
-        if F.device == 'gpu':
-            clone_F = Faust(core_obj=F.m_faust.clone(dev))
+        if F.device.startswith('gpu'):
+            if F.dtype == 'double':
+                clone_F = \
+                        Faust(core_obj=_FaustCorePy.FaustCoreGenNonMemberFuncsDblGPU.clone(F.m_faust,
+                                                                                           dev))
+            else: # F.dtype == np.complex
+                clone_F = \
+                        Faust(core_obj=_FaustCorePy.FaustCoreGenNonMemberFuncsCplxDblGPU.clone(F.m_faust,
+                                                                                            dev))
+#            clone_F = Faust(core_obj=F.m_faust.clone(dev))
+        elif F.device == 'cpu':
+            if dev == 'cpu':
+                clone_F = Faust(core_obj=F.m_faust.clone(-1))
+            else:
+                if F.dtype == 'double':
+                    clone_F = \
+                            Faust(core_obj=_FaustCorePy.FaustCoreGenNonMemberFuncsDblCPU.clone(F.m_faust, dev))
+                else:
+                    clone_F = \
+                            Faust(core_obj=_FaustCorePy.FaustCoreGenNonMemberFuncsCplxDblCPU.clone(F.m_faust,
+                                                                                                   dev))
         else:
-            clone_F = Faust([F.factors(i) for i in
-                          range(F.numfactors())], dev=dev)
+            raise ValueError("F.device is not valid")
         return clone_F
 
     def sum(F, axis=None, **kwargs):
@@ -2547,14 +2568,14 @@ def wht(n, normed=True, dev="cpu", dtype='double'):
         raise TypeError("normed must be True of False.")
     if dev == "cpu":
         if dtype == 'double':
-            H = Faust(core_obj=_FaustCorePy.FaustAlgoGenDbl.hadamardFaust(log2n, normed))
+            H = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUDbl.hadamardFaust(log2n, normed))
         else: # dtype == 'complex'
-            H = Faust(core_obj=_FaustCorePy.FaustAlgoGenCplxDbl.hadamardFaust(log2n, normed))
+            H = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUCplxDbl.hadamardFaust(log2n, normed))
     elif dev.startswith("gpu"):
         if dtype == 'double':
-            H = Faust(core_obj=_FaustCorePy.FaustCoreGPU.hadamardFaust(log2n, normed))
+            H = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUDbl.hadamardFaust(log2n, normed))
         else: # dtype == 'complex'
-            raise ValueError("complex wht is not supported for GPU")
+            H = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUCplxDbl.hadamardFaust(log2n, normed))
     return H
 
 def dft(n, normed=True, dev='cpu'):
@@ -2600,9 +2621,9 @@ def dft(n, normed=True, dev='cpu'):
     if(not isinstance(normed, bool)):
         raise TypeError("normed must be True of False.")
     if dev == "cpu":
-        F = Faust(core_obj=_FaustCorePy.FaustAlgoCplxDbl.fourierFaust(log2n, normed))
+        F = Faust(core_obj=_FaustCorePy.FaustAlgoCplxDblGenCPU.fourierFaust(log2n, normed))
     elif dev.startswith("gpu"):
-        F = Faust(core_obj=_FaustCorePy.FaustCoreGPU.fourierFaust(log2n, normed))
+        F = Faust(core_obj=_FaustCorePy.FaustAlgoCplxDblGenGPU.fourierFaust(log2n, normed))
     return F
 
 def eye(m, n=None, t='real', dev="cpu"):
@@ -2633,11 +2654,14 @@ def eye(m, n=None, t='real', dev="cpu"):
     if(n == None): n = m
     if dev == "cpu":
         if t == 'real':
-            rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenDbl.eyeFaust(m, n))
+            rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUDbl.eyeFaust(m, n))
         else:
-            rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenCplxDbl.eyeFaust(m, n))
+            rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUCplxDbl.eyeFaust(m, n))
     elif dev.startswith("gpu"):
-        rF = Faust(core_obj=_FaustCorePy.FaustCoreGPU.eyeFaust(m, n, t))
+        if t == 'real':
+            rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUDbl.eyeFaust(m, n))
+        else:
+            rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUCplxDbl.eyeFaust(m, n))
     return rF
 #    from scipy.sparse import eye
 #    if(not n):
@@ -2768,21 +2792,27 @@ def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
         raise ValueError("rand(): density must be a float")
     if dev == "cpu":
         if field == REAL:
-            rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenDbl.randFaust(num_rows,
+            rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUDbl.randFaust(num_rows,
                                                                        num_cols,
                                                                        fac_type_map[fac_type], min_num_factors, max_num_factors,
                                                                        min_dim_size, max_dim_size, density, per_row))
         elif field == COMPLEX:
-            rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenCplxDbl.randFaust(num_rows,
+            rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUCplxDbl.randFaust(num_rows,
                                                                            num_cols,
                                                                            fac_type_map[fac_type], min_num_factors, max_num_factors,
                                                                            min_dim_size, max_dim_size, density, per_row))
         # no else possible (see above)
     elif dev.startswith("gpu"):
-        rF = Faust(core_obj=_FaustCorePy.FaustCoreGPU.randFaust(num_rows,
-                                                                num_cols,
-                                                                fac_type_map[fac_type], min_num_factors, max_num_factors,
-                                                                min_dim_size, max_dim_size, density, per_row))
+        if field == REAL:
+            rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUDbl.randFaust(num_rows,
+                                                                       num_cols,
+                                                                       fac_type_map[fac_type], min_num_factors, max_num_factors,
+                                                                       min_dim_size, max_dim_size, density, per_row))
+        elif field == COMPLEX:
+            rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUCplxDbl.randFaust(num_rows,
+                                                                           num_cols,
+                                                                           fac_type_map[fac_type], min_num_factors, max_num_factors,
+                                                                           min_dim_size, max_dim_size, density, per_row))
     return rF
 
 def enable_gpu_mod(libpaths=None, backend='cuda', silent=False, fatal=False):

@@ -318,7 +318,7 @@ cdef class FaustAlgoGen@TYPE_NAME@:
         # to have a threshold error of complex type (it wouldn't make sense)
         cdef PyxConstraintGeneric** cpp_constraints
 
-        cdef FaustCoreCy.FaustCoreCpp[@TYPE@]* core_faust_init_facts
+        cdef FaustCoreCy.@CPP_CORE_CLASS@[@TYPE@]* core_faust_init_facts
 
         Mview = M
         _out_buf = np.array([0], dtype=np.double)
@@ -403,7 +403,7 @@ cdef class FaustAlgoGen@TYPE_NAME@:
                                              p.constant_step_size,
                                              p.step_size,
                                              full_gpu,
-                                             <FaustCoreCy.FaustCoreCpp[@TYPE@]*>NULL
+                                             <FaustCoreCy.@CPP_CORE_CLASS@[@TYPE@]*>NULL
                                              if not p.init_facts else
                                              F_facts.@CORE_OBJ@)
 
@@ -943,7 +943,7 @@ cdef class FaustAlgoGen@TYPE_NAME@:
         cplx_vals_view = L.data
         if isinstance(T0, type(None)):
             core.@CORE_OBJ@ = \
-            FaustCoreCy.FaustCoreCpp[@TYPE@].polyBasis(L.shape[0], L.shape[1],
+            FaustCoreCy.@CPP_CORE_CLASS@[@TYPE@].polyBasis(L.shape[0], L.shape[1],
                                                        &rowptr_view[0],
                                                        &colind_view[0],
                                                         &cplx_vals_view[0],
@@ -952,7 +952,7 @@ cdef class FaustAlgoGen@TYPE_NAME@:
                                                         on_gpu)
         else:
             core.@CORE_OBJ@ = \
-                    FaustCoreCy.FaustCoreCpp[@TYPE@].polyBasis_ext(L.shape[0], L.shape[1],
+                    FaustCoreCy.@CPP_CORE_CLASS@[@TYPE@].polyBasis_ext(L.shape[0], L.shape[1],
                                                                 &rowptr_view[0],
                                                                 &colind_view[0],
                                                                 &cplx_vals_view[0],
@@ -966,36 +966,6 @@ cdef class FaustAlgoGen@TYPE_NAME@:
                                                                 on_gpu)
         return core
 
-    @staticmethod
-    def eyeFaust(n, m):
-        core = @CORE_CLASS@(core=True)
-        core.@CORE_OBJ@ = FaustCoreCy.FaustCoreCpp[@TYPE@].eyeFaust(n,
-                                                                    m)
-        return core
-
-    @staticmethod
-    def hadamardFaust(n, norma):
-        if(n>31):
-            raise ValueError("Faust doesn't handle a Hadamard of order larger than "
-                             "2**31")
-        core = @CORE_CLASS@(core=True)
-        core.@CORE_OBJ@ = FaustCoreCy.FaustCoreCpp[@TYPE@].hadamardFaust(n,
-                                                                         norma)
-        if(core.@CORE_OBJ@ == NULL):
-            raise MemoryError()
-        return core
-
-    @staticmethod
-    def randFaust(faust_nrows, faust_ncols, t, min_num_factors, max_num_factors, min_dim_size,
-                  max_dim_size, density=0.1, per_row=True):
-        core = @CORE_CLASS@(core=True)
-        core.@CORE_OBJ@ = \
-                FaustCoreCy.FaustCoreCpp[@TYPE@].randFaust(faust_nrows,
-                                                           faust_ncols,
-                                                           t, min_num_factors, max_num_factors, min_dim_size,
-                                                           max_dim_size, density, per_row)
-        if(core.@CORE_OBJ@ == NULL): raise MemoryError()
-        return core
 
 
 cdef class ConstraintIntCore@TYPE_NAME@:

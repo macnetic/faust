@@ -136,98 +136,8 @@ FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::mul_scal(FPP scal)
     return core;
 }
 
-template<typename FPP, FDevice DEV>
-void FaustCoreCpp<FPP,DEV>::get_product(FPP* y_data, int y_nrows, int y_ncols)
-{
-    Faust::MatDense<FPP, DEV> Y = this->transform->get_product();
-    memcpy(y_data, Y.getData(), sizeof(FPP)*y_ncols*y_nrows);
-}
-
-template<typename FPP, FDevice DEV>
-void FaustCoreCpp<FPP,DEV>::multiply(FPP* y_data, int y_nrows, int y_ncols, FPP* x_data, int* x_row_ptr, int* x_id_col, int x_nnz, int x_nrows, int x_ncols)
-{
-    Faust::MatSparse<FPP, DEV> X(x_nnz, x_nrows, x_ncols, x_data, x_row_ptr, x_id_col);
-    Faust::MatDense<FPP, DEV> Y;
-    Y = this->transform->multiply(X);
-    memcpy(y_data, Y.getData(),sizeof(FPP)*y_ncols*y_nrows);
-}
-
-template<typename FPP, FDevice DEV>
-void FaustCoreCpp<FPP,DEV>::multiply(FPP* value_y,int nbrow_y,int nbcol_y, const FPP* value_x,int nbrow_x,int nbcol_x)const
-{
 
 
-
-    unsigned int nbRowThis,nbColThis;
-
-
-    nbRowThis = this->getNbRow();
-    nbColThis = this->getNbCol();
-
-    if ( (nbrow_y != nbRowThis) | (nbrow_x != nbColThis) | (nbcol_y != nbcol_x) )
-    {
-        std::cout<<"nbRowThis "<<nbRowThis<<" must be equal to nb row y  "<<nbrow_y<<std::endl;
-        std::cout<<"nbColThis "<<nbColThis<<" must be equal to nb row x  "<<nbrow_x<<std::endl;
-        std::cout<<"nbcol_y "<<nbcol_y<<" must be equal to nbcol_x  "<<nbcol_x<<std::endl;
-        handleError("FaustCpp"," multiply : invalid dimension");
-    }
-    if (nbcol_x == 1)
-    {
-        if(this->transform->get_Fv_mul_mode() == Faust::DEFAULT)
-        {
-            // assuming that x and y are pointers to memory allocated to the proper
-            // sizes
-//            Y = this->transform->multiply(value_x);
-            this->transform->multiply(value_x, value_y);
-        }
-        else
-        { // for other ways to multiply, it is not handled yet
-            Faust::Vect<FPP,Cpu> X(nbrow_x,value_x);
-            Faust::Vect<FPP,Cpu> Y;
-
-            Y = this->transform->multiply(X);
-            memcpy(value_y,Y.getData(),sizeof(FPP)*nbrow_y);
-        }
-    }
-    else
-    {
-        if(this->transform->get_mul_order_opt_mode() == Faust::DEFAULT)
-        {
-            //assuming that value_x and value_y are allocated properly (to the good
-            //sizes) in numpy world
-            this->transform->multiply(value_x, nbcol_x, value_y);
-        }
-        else
-        { // for other ways to multiply, it is not handled yet
-            Faust::MatDense<FPP,Cpu> X(value_x,nbrow_x,nbcol_x);
-            Faust::MatDense<FPP,Cpu> Y;
-
-            Y = this->transform->multiply(X);
-
-            memcpy(value_y,Y.getData(),sizeof(FPP)*nbrow_y*nbcol_y);
-        }
-    }
-}
-
-template<typename FPP, FDevice DEV>
- FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::polyNext() const
-{
-    Faust::TransformHelperPoly<FPP> *transform_poly = dynamic_cast<Faust::TransformHelperPoly<FPP>*>(this->transform);
-    if(nullptr)
-        throw std::runtime_error("polyNext can only be used on a Poly. specialized Faust.");
-    auto th = transform_poly->next();
-    FaustCoreCpp<FPP,DEV>* core = new FaustCoreCpp<FPP,DEV>(th);
-    return core;
-}
-
-template<typename FPP, FDevice DEV>
-void FaustCoreCpp<FPP,DEV>::polyCoeffs(int d, int n, const FPP* basisX, const FPP* coeffs, FPP* out, bool on_gpu) const
-{
-    Faust::TransformHelperPoly<FPP> *transform_poly = dynamic_cast<Faust::TransformHelperPoly<FPP>*>(this->transform);
-    if(nullptr)
-        throw std::runtime_error("polyCoeffs can only be used on a Poly. specialized Faust.");
-    transform_poly->poly(d, n, basisX, coeffs, out, on_gpu);
-}
 
 template<typename FPP, FDevice DEV>
     void FaustCoreCpp<FPP,DEV>::mulPolyCoeffs(const FPP* X, int n, FPP* Y, const FPP* coeffs)
@@ -256,16 +166,15 @@ void polyGroupCoeffs_(int d, uint K, int n, const FPP* basisX, const FPP* coeffs
 
 
 template<typename FPP, FDevice DEV>
-FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::polyCoeffs(const FPP* coeffs)
+void FaustCoreCpp<FPP,DEV>::polyCoeffs(int d, int n, const FPP* basisX, const FPP* coeffs, FPP* out, bool on_gpu) const
 {
-    //verify if transform is a TransformHelperPoly otherwise raise an exception
     Faust::TransformHelperPoly<FPP> *transform_poly = dynamic_cast<Faust::TransformHelperPoly<FPP>*>(this->transform);
     if(nullptr)
         throw std::runtime_error("polyCoeffs can only be used on a Poly. specialized Faust.");
-    Faust::TransformHelper<FPP,DEV>* th = transform_poly->polyFaust(coeffs);
-    FaustCoreCpp<FPP,DEV>* core = new FaustCoreCpp<FPP,DEV>(th);
-    return core;
+    transform_poly->poly(d, n, basisX, coeffs, out, on_gpu);
 }
+
+
 
 
 template<typename FPP, FDevice DEV>
@@ -366,19 +275,6 @@ template<typename FPP, FDevice DEV>
 faust_unsigned_int FaustCoreCpp<FPP,DEV>::get_fact_nnz(const faust_unsigned_int i) const
 {
     return transform->get_fact_nnz(i);
-}
-
-template<typename FPP, FDevice DEV>
-void FaustCoreCpp<FPP,DEV>::get_fact(const unsigned int& i, FPP* fact_ptr) const
-{
-    Faust::MatDense<FPP,DEV> dense_factor = this->transform->get_fact(i);
-    // not optimized here (we have three copies from C++ object to Py, the first in MatDense::Clone()
-    // (called from Faust::Transform::get_fact()) the second when converting to
-    // MatDense (even if not a MatSparse, the copy is made)
-    // and finally a third copy here)
-    memcpy(fact_ptr, dense_factor.getData(),
-            sizeof(FPP)*dense_factor.getNbCol()*dense_factor.getNbRow());
-    //optimized versions are get_fact_dense(), get_fact_sparse()
 }
 
 template<typename FPP, FDevice DEV>
@@ -617,11 +513,6 @@ FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::zpruneout(const int nnz_tres, cons
     return core;
 }
 
-template<typename FPP, FDevice DEV>
-void  FaustCoreCpp<FPP,DEV>::device(char* dev) const
-{
-	std::strncpy(dev, "cpu", 4);
-}
 
 template<typename FPP, FDevice DEV>
 FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::swap_cols(const unsigned int id1, const unsigned int id2,
@@ -653,14 +544,6 @@ FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::swap_rows(const unsigned int id1, 
         auto th = this->transform->swap_rows(id1, id2, permutation, inplace);
         return new FaustCoreCpp<FPP,DEV>(th);
     }
-}
-
-template<typename FPP, FDevice DEV>
-FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP, DEV>::clone() const
-{
-    Faust::TransformHelper<FPP,DEV>* th = this->transform->clone();
-    auto core = new FaustCoreCpp<FPP, DEV>(th);
-    return core;
 }
 
 template<typename FPP, FDevice DEV>
@@ -726,20 +609,4 @@ FaustCoreCpp<FPP,DEV>::~FaustCoreCpp()
     transform = nullptr;
 }
 
-void* _enable_gpu_mod(const char* libpath, const bool silent)
-{
-#ifdef USE_GPU_MOD
-    return Faust::enable_gpu_mod(libpath, silent);
-#else
-    return nullptr;
-#endif
-}
 
-bool _is_gpu_mod_enabled()
-{
-#ifdef USE_GPU_MOD
-    return Faust::is_gpu_mod_enabled();
-#else
-    return false;
-#endif
-}

@@ -52,7 +52,16 @@
 #include "faust_TransformHelper.h"
 #include "faust_TransformHelperPoly.h"
 #include <cstring>
+#include <complex>
 
+template<typename FPP, FDevice DEV> class FaustCoreCpp;
+
+#if USE_GPU_MOD
+template<typename FPP>
+FaustCoreCpp<FPP, Cpu>* clone_gpu2cpu(FaustCoreCpp<FPP, GPU2>* gpu_t);
+template<typename FPP>
+FaustCoreCpp<FPP, GPU2>* clone_cpu2gpu(FaustCoreCpp<FPP, Cpu>* cpu_t);
+#endif
 
 template<typename FPP, FDevice DEV=Cpu>
 class FaustCoreCpp
@@ -136,7 +145,7 @@ class FaustCoreCpp
     FaustCoreCpp<FPP,DEV>* conjugate()const;
     FaustCoreCpp<FPP,DEV>* adjoint()const;
     FaustCoreCpp<FPP,DEV>* zpruneout(const int nnz_tres, const int npasses, const bool only_forward);
-    FaustCoreCpp<FPP,DEV>* clone() const;
+    FaustCoreCpp<FPP,DEV>* clone(int dev=-1) const; //-2 for CPU
     void polyCoeffs(int d, int n, const FPP* basisX, const FPP* coeffs, FPP* out, bool on_gpu) const;
     FaustCoreCpp<FPP,DEV>* polyCoeffs(const FPP* coeffs);
     void mulPolyCoeffs(const FPP* X, int n, FPP* Y, const FPP* coeffs);
@@ -182,68 +191,80 @@ class FaustCoreCpp
     protected :
     Faust::TransformHelper<FPP,DEV> *transform;
 
+#ifdef USE_GPU_MOD
+friend FaustCoreCpp<FPP, Cpu>* clone_gpu2cpu<>(FaustCoreCpp<FPP, GPU2>* gpu_t);
+friend FaustCoreCpp<FPP, GPU2>* clone_cpu2gpu<>(FaustCoreCpp<FPP, Cpu>* cpu_t);
+
+#endif
+
 };
 
 template<typename FPP>
 void polyCoeffs(int d, int K, int n, const FPP* basisX, const FPP* coeffs, FPP* out, bool on_gpu);
 template<typename FPP>
 void polyGroupCoeffs_(int d, uint K, int n, const FPP* basisX, const FPP* coeffs, FPP** out, int n_out, bool on_gpu);
+template<typename FPP>
+using FaustCoreCppCPU = FaustCoreCpp<FPP, Cpu>;
+
 #ifdef USE_GPU_MOD
 template<typename FPP>
-class FaustCoreCppGPU: public FaustCoreCpp<FPP, GPU2>
-{
-	public:
-		FaustCoreCppGPU() {}
-		FaustCoreCppGPU(Faust::TransformHelper<FPP,GPU2> *th);
-		void get_product(FPP* y_data, int y_nrows, int y_ncols);
-		FaustCoreCppGPU<FPP>* mul_faust_gpu(FaustCoreCppGPU<FPP>* right);
-		FaustCoreCppGPU<FPP>* mul_scal_gpu(const FPP& scal);
-		void multiply_gpu(FPP* y_data, int y_nrows, int y_ncols, FPP* x_data, int* x_row_ptr, int* x_id_col, int x_nnz, int x_nrows, int x_ncols);
-		FaustCoreCppGPU<FPP>* normalize_gpu(int ord) const;
-		FaustCoreCppGPU<FPP>* left_gpu(const faust_unsigned_int) const;
-		FaustCoreCppGPU<FPP>* right_gpu(const faust_unsigned_int) const;
-        FaustCoreCppGPU<FPP>* transpose_gpu() const;
-        FaustCoreCppGPU<FPP>* conjugate_gpu() const;
-        FaustCoreCppGPU<FPP>* adjoint_gpu() const;
-		FaustCoreCppGPU<FPP>* zpruneout_gpu(const int nnz_tres, const int npasses, const bool only_forward);
-		FaustCoreCppGPU<FPP>* clone_gpu(int dev_id=-1) const;
-		FaustCoreCpp<FPP,Cpu>* clone_cpu() const;
-		FaustCoreCppGPU<FPP>* horzcat_gpu(FaustCoreCppGPU<FPP>* right) const;
-        FaustCoreCppGPU<FPP>* horzcatn_gpu(FaustCoreCppGPU<FPP>** rights, size_t n) const;
-		FaustCoreCppGPU<FPP>* vertcat_gpu(FaustCoreCppGPU<FPP>* right) const;
-        FaustCoreCppGPU<FPP>* vertcatn_gpu(FaustCoreCppGPU<FPP>** rights, size_t n) const;
-		FaustCoreCppGPU<FPP>* slice_gpu(unsigned int start_row_id, unsigned int end_row_id, unsigned int start_col_id, unsigned int end_col_id) const;
-		FaustCoreCppGPU<FPP>* fancy_idx_gpu(unsigned long int* row_ids, unsigned long int
-                                  num_rows, unsigned long int* col_ids,
-                                  unsigned long int num_cols) const;
-
-		FaustCoreCppGPU<FPP>* optimize_storage_gpu(const bool time=false);
-		FaustCoreCppGPU<FPP>* optimize_gpu(const bool transp=false);
-		FaustCoreCppGPU<FPP>* optimize_time_gpu(const bool transp=false, const bool inplace=false, const int nsamples=1);
-        FaustCoreCppGPU<FPP>* swap_rows_gpu(const unsigned int id1, const unsigned int id2,
-            const bool permutation, const bool inplace);
-        FaustCoreCppGPU<FPP>* swap_cols_gpu(const unsigned int id1, const unsigned int id2,
-            const bool permutation, const bool inplace);
-		void device_gpu(char* dev) const;
-		static FaustCoreCppGPU<FPP>* randFaustGPU(
-                unsigned int t,
-				unsigned int min_num_factors, unsigned int max_num_factors,
-				unsigned int min_dim_size,
-				unsigned int max_dim_size, float density, bool per_row);
-        static FaustCoreCppGPU<FPP>* randFaustGPU(int faust_nrows, int faust_ncols,
-                unsigned int t,
-                unsigned int min_num_factors, unsigned int max_num_factors,
-                unsigned int min_dim_size,
-                unsigned int max_dim_size, float density, bool per_row);
-
-		static FaustCoreCppGPU<FPP>* hadamardFaustGPU(unsigned int n, const bool norma);
-		static FaustCoreCppGPU<FPP>* fourierFaustGPU(unsigned int n, const bool norma);
-		static FaustCoreCppGPU<FPP>* eyeFaustGPU(unsigned int n, unsigned int m);
-};
+using FaustCoreCppGPU = FaustCoreCpp<FPP, GPU2>;
+//template<typename FPP>
+//class FaustCoreCppGPU: public FaustCoreCpp<FPP, GPU2>
+//{
+//	public:
+//		FaustCoreCppGPU() {}
+//		FaustCoreCppGPU(Faust::TransformHelper<FPP,GPU2> *th);
+//		void get_product(FPP* y_data, int y_nrows, int y_ncols);
+//		FaustCoreCppGPU<FPP>* mul_faust_gpu(FaustCoreCppGPU<FPP>* right);
+//		FaustCoreCppGPU<FPP>* mul_scal_gpu(const FPP& scal);
+//		void multiply_gpu(FPP* y_data, int y_nrows, int y_ncols, FPP* x_data, int* x_row_ptr, int* x_id_col, int x_nnz, int x_nrows, int x_ncols);
+//		FaustCoreCppGPU<FPP>* normalize_gpu(int ord) const;
+//		FaustCoreCppGPU<FPP>* left_gpu(const faust_unsigned_int) const;
+//		FaustCoreCppGPU<FPP>* right_gpu(const faust_unsigned_int) const;
+//        FaustCoreCppGPU<FPP>* transpose_gpu() const;
+//        FaustCoreCppGPU<FPP>* conjugate_gpu() const;
+//        FaustCoreCppGPU<FPP>* adjoint_gpu() const;
+//		FaustCoreCppGPU<FPP>* zpruneout_gpu(const int nnz_tres, const int npasses, const bool only_forward);
+//		FaustCoreCppGPU<FPP>* clone_gpu(int dev_id=-1) const;
+//		FaustCoreCpp<FPP,Cpu>* clone_cpu() const;
+//		FaustCoreCppGPU<FPP>* horzcat_gpu(FaustCoreCppGPU<FPP>* right) const;
+//        FaustCoreCppGPU<FPP>* horzcatn_gpu(FaustCoreCppGPU<FPP>** rights, size_t n) const;
+//		FaustCoreCppGPU<FPP>* vertcat_gpu(FaustCoreCppGPU<FPP>* right) const;
+//        FaustCoreCppGPU<FPP>* vertcatn_gpu(FaustCoreCppGPU<FPP>** rights, size_t n) const;
+//		FaustCoreCppGPU<FPP>* slice_gpu(unsigned int start_row_id, unsigned int end_row_id, unsigned int start_col_id, unsigned int end_col_id) const;
+//		FaustCoreCppGPU<FPP>* fancy_idx_gpu(unsigned long int* row_ids, unsigned long int
+//                                  num_rows, unsigned long int* col_ids,
+//                                  unsigned long int num_cols) const;
+//
+//		FaustCoreCppGPU<FPP>* optimize_storage_gpu(const bool time=false);
+//		FaustCoreCppGPU<FPP>* optimize_gpu(const bool transp=false);
+//		FaustCoreCppGPU<FPP>* optimize_time_gpu(const bool transp=false, const bool inplace=false, const int nsamples=1);
+//        FaustCoreCppGPU<FPP>* swap_rows_gpu(const unsigned int id1, const unsigned int id2,
+//            const bool permutation, const bool inplace);
+//        FaustCoreCppGPU<FPP>* swap_cols_gpu(const unsigned int id1, const unsigned int id2,
+//            const bool permutation, const bool inplace);
+//		void device_gpu(char* dev) const;
+//		static FaustCoreCppGPU<FPP>* randFaustGPU(
+//                unsigned int t,
+//				unsigned int min_num_factors, unsigned int max_num_factors,
+//				unsigned int min_dim_size,
+//				unsigned int max_dim_size, float density, bool per_row);
+//        static FaustCoreCppGPU<FPP>* randFaustGPU(int faust_nrows, int faust_ncols,
+//                unsigned int t,
+//                unsigned int min_num_factors, unsigned int max_num_factors,
+//                unsigned int min_dim_size,
+//                unsigned int max_dim_size, float density, bool per_row);
+//
+//		static FaustCoreCppGPU<FPP>* hadamardFaustGPU(unsigned int n, const bool norma);
+//		static FaustCoreCppGPU<FPP>* fourierFaustGPU(unsigned int n, const bool norma);
+//		static FaustCoreCppGPU<FPP>* eyeFaustGPU(unsigned int n, unsigned int m);
+//};
 #endif
 
-void* _enable_gpu_mod(const char* libpath);
+void* _enable_gpu_mod(const char* libpath, const bool silent);
 bool _is_gpu_mod_enabled();
+
 
 #include "FaustCoreCpp.hpp"
 #include "FaustCoreCppGPU.hpp"

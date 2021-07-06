@@ -1,7 +1,7 @@
 
-cdef class FaustCoreGen@TYPE_NAME@:
+cdef class FaustCoreGen@TYPE_NAME@@PROC@:
 
-    cdef FaustCoreCy.FaustCoreCpp[@TYPE@]* @CORE_OBJ@
+    cdef FaustCoreCy.@CPP_CORE_CLASS@[@TYPE@]* @CORE_OBJ@
 
     def  __cinit__(self, list_factors=None, alpha=1.0, core=False,
                    optimizedCopy=False):
@@ -34,7 +34,7 @@ cdef class FaustCoreGen@TYPE_NAME@:
                    #print("FaustCorePy.pyx __cinit__(), factor:",factor)
                    raise ValueError("Faust factors must be numpy.ndarray or "
                                     " scipy.sparse.csr.csr_matrix")
-            self.@CORE_OBJ@ = new FaustCoreCy.FaustCoreCpp[@TYPE@]()
+            self.@CORE_OBJ@ = new FaustCoreCy.@CPP_CORE_CLASS@[@TYPE@]()
             for factor in list_factors:
                 nbrow=factor.shape[0];
                 nbcol=factor.shape[1];
@@ -58,7 +58,7 @@ cdef class FaustCoreGen@TYPE_NAME@:
                                               &indices[0], factor.nnz,
                                               nbrow, nbcol,
                                               optimizedCopy)
-        elif(core): # trick to initialize a new FaustCoreCpp from C++ (see
+        elif(core): # trick to initialize a new @CPP_CORE_CLASS@ from C++ (see
         # transpose, conj and adjoint)
             pass
         #else:
@@ -66,7 +66,7 @@ cdef class FaustCoreGen@TYPE_NAME@:
 
     def clone(self, *args, **kwargs):
         core = @CORE_CLASS@(core=True)
-        core.@CORE_OBJ@ = self.@CORE_OBJ@.clone()
+        core.@CORE_OBJ@ = self.@CORE_OBJ@.clone(-1)
         return core
 
     def nbytes(self):
@@ -128,7 +128,6 @@ cdef class FaustCoreGen@TYPE_NAME@:
         return '@TYPE@' != 'complex'
 
     def device(self):
-        # always returns cpu but calls the cpp code just in case
         cdef char c_str[256]
         self.@CORE_OBJ@.device(c_str)
         cdef length = strlen(c_str)
@@ -155,9 +154,9 @@ cdef class FaustCoreGen@TYPE_NAME@:
 
     def vertcatn(self, Fs):
         # assume self and all F in Fs are defined over the same scalar type
-        cdef FaustCoreCy.FaustCoreCpp[@TYPE@]** _Fs
+        cdef FaustCoreCy.@CPP_CORE_CLASS@[@TYPE@]** _Fs
 
-        _Fs = <FaustCoreCy.FaustCoreCpp[@TYPE@]**> PyMem_Malloc(sizeof(void*) *
+        _Fs = <FaustCoreCy.@CPP_CORE_CLASS@[@TYPE@]**> PyMem_Malloc(sizeof(void*) *
                                                                 len(Fs))
         for i, F in enumerate(Fs):
             _Fs[i] = (<@CORE_CLASS@?>F).@CORE_OBJ@
@@ -170,9 +169,9 @@ cdef class FaustCoreGen@TYPE_NAME@:
 
     def horzcatn(self, Fs):
         # assume self and all F in Fs are defined over the same scalar type
-        cdef FaustCoreCy.FaustCoreCpp[@TYPE@]** _Fs
+        cdef FaustCoreCy.@CPP_CORE_CLASS@[@TYPE@]** _Fs
 
-        _Fs = <FaustCoreCy.FaustCoreCpp[@TYPE@]**> PyMem_Malloc(sizeof(void*) *
+        _Fs = <FaustCoreCy.@CPP_CORE_CLASS@[@TYPE@]**> PyMem_Malloc(sizeof(void*) *
                                                                 len(Fs))
         for i, F in enumerate(Fs):
             _Fs[i] = (<@CORE_CLASS@?>F).@CORE_OBJ@

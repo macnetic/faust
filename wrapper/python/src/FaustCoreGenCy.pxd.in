@@ -1,0 +1,114 @@
+from libcpp cimport bool
+cdef extern from "FaustCoreCpp.h":
+
+
+    cdef cppclass @CPP_CORE_CLASS@[FPP]:
+        @CPP_CORE_CLASS@()
+        void Display() const
+        const char* to_string() const
+        void push_back(FPP* valueMat,unsigned int nbrow,unsigned int nbcol, bool optimizedCopy)
+        void push_back(FPP* data, int* row_ptr, int* id_col, int nnz, int nrows,
+                       int ncols, bool optimizedCopy)
+        void get_product(FPP* data, int nbrow, int nbcol);
+        void multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,
+                      int nbrow_x, int nbcol_x);#,bool isTranspose*/);
+        void set_FM_mul_mode(const int mode);
+        void set_Fv_mul_mode(const int mode);
+        # Faust-by-csr product -> dense mat
+        void multiply(FPP* y_data, int y_nrows, int y_ncols, FPP* x_data, int* x_row_ptr, int* x_id_col, int x_nnz, int x_nrows, int x_ncols);
+        unsigned int getNbRow() const
+        unsigned int getNbCol() const
+        unsigned int getNBytes() const
+#        void setOp(const bool isTransposed,unsigned int& nbRowOp, unsigned int& nbColOp)const;
+        unsigned long long nnz() const
+        void power_iteration(FPP* out, double threshold, int max_num_its) const;
+        double norm(int ord, double threshold, int max_num_its) const
+        double normFro() const
+        double normInf() const
+        @CPP_CORE_CLASS@[FPP]* normalize(int ord) const
+        double get_nb_factors() const
+        unsigned int get_fact_nb_rows(unsigned int& i) const
+        unsigned int get_fact_nb_cols(unsigned int& i) const
+        double get_fact(unsigned int& i, FPP* fact_ptr) const
+        void get_fact_sparse(unsigned int& i,
+                      int* rowptr,
+                      int* col_ids,
+                      FPP* elts,
+                      const bool transpose) const
+        void get_fact_dense(unsigned int& i,
+                      FPP* elts,
+                      unsigned int*,
+                      unsigned int*,
+                      const bool transpose) const
+        unsigned int get_fact_nnz(const unsigned int i) const
+        bool is_fact_sparse(const unsigned int i) const
+        @CPP_CORE_CLASS@[FPP]* right(const unsigned int) const
+        @CPP_CORE_CLASS@[FPP]* left(const unsigned int) const
+        @CPP_CORE_CLASS@[FPP]* get_slice(unsigned int, unsigned int, unsigned int,
+                                    unsigned int) const
+        @CPP_CORE_CLASS@[FPP]* slice(unsigned int, unsigned int, unsigned int,
+                                    unsigned int) const
+        @CPP_CORE_CLASS@[FPP]* fancy_idx(unsigned long int* row_ids, unsigned long int
+                                  num_rows, unsigned long int* col_ids,
+                                  unsigned long int num_cols) const
+        bool save_mat_file(const char* filepath) const
+        @CPP_CORE_CLASS@[FPP]* swap_cols(const unsigned int id1, const unsigned int id2,
+                                const bool permutation, const bool inplace);
+        @CPP_CORE_CLASS@[FPP]* swap_rows(const unsigned int id1, const unsigned int id2,
+                                const bool permutation, const bool inplace);
+
+        @CPP_CORE_CLASS@[FPP]* optimize_time(const bool transp, const bool inplace,
+                                       const int nsamples)
+        @CPP_CORE_CLASS@[FPP]* optimize(const bool transp)
+        @CPP_CORE_CLASS@[FPP]* optimize_storage(const bool time)
+        const bool isTransposed()
+        @CPP_CORE_CLASS@[FPP]* transpose()
+        @CPP_CORE_CLASS@[FPP]* conjugate()
+        @CPP_CORE_CLASS@[FPP]* adjoint()
+        @CPP_CORE_CLASS@[FPP]* zpruneout(const int nnz_tres, const int npasses,
+                                    const bool only_forward)
+        @CPP_CORE_CLASS@[FPP]* vertcat(@CPP_CORE_CLASS@[FPP]*) const
+        @CPP_CORE_CLASS@[FPP]* vertcatn(@CPP_CORE_CLASS@[FPP]**, size_t n) const
+        @CPP_CORE_CLASS@[FPP]* horzcat(@CPP_CORE_CLASS@[FPP]*) const
+        @CPP_CORE_CLASS@[FPP]* horzcatn(@CPP_CORE_CLASS@[FPP]**, size_t n) const
+        @CPP_CORE_CLASS@[FPP]* mul_faust(@CPP_CORE_CLASS@[FPP]*)
+        @CPP_CORE_CLASS@[FPP]* mul_scal(FPP scal)
+        void device(char*) const
+        @CPP_CORE_CLASS@[FPP]* clone(int dev) const
+        void polyCoeffs(int d, int n, const FPP* basisX, const FPP* coeffs, FPP* out) const
+        @CPP_CORE_CLASS@[FPP]* polyCoeffs(const FPP* coeffs) const
+        void mulPolyCoeffs(const FPP* X, int n, const FPP* Y, const FPP* coeffs)
+        @CPP_CORE_CLASS@[FPP]* polyNext() const
+        @staticmethod
+        @CPP_CORE_CLASS@[FPP]* randFaust(int faust_nrows, int faust_ncols,
+                                     unsigned int t,
+                                     unsigned int min_num_factors, unsigned int max_num_factors,
+                                     unsigned int min_dim_size,
+                                     unsigned int max_dim_size,
+                                     float density, bool per_row)
+        @staticmethod
+        @CPP_CORE_CLASS@[FPP]* randFaust(unsigned int t,
+                                             unsigned int min_num_factors, unsigned int max_num_factors,
+                                             unsigned int min_dim_size,
+                                             unsigned int max_dim_size,
+                                             float density, bool per_row)
+        @staticmethod
+        @CPP_CORE_CLASS@[FPP]* hadamardFaust(unsigned int n, const bool norma)
+        @staticmethod
+        @CPP_CORE_CLASS@[FPP]* polyBasis(unsigned int L_nrows, unsigned int
+                                     L_ncols, int* L_rowptr, int* L_colind,
+                                     FPP* L_vals, unsigned int L_nnz, unsigned
+                                     int K, bool on_gpu);
+        @staticmethod
+        @CPP_CORE_CLASS@[FPP]* polyBasis_ext(unsigned int L_nrows, unsigned int
+                                     L_ncols, int* L_rowptr, int* L_colind,
+                                     FPP* L_vals, unsigned int L_nnz, unsigned
+                                     int K, int* T0_rowptr, int* T0_colind,
+                                         FPP* T0_vals, unsigned int T0_nnz,
+                                         unsigned int T0_ncols, bool on_gpu);
+        @staticmethod
+        @CPP_CORE_CLASS@[FPP]* fourierFaust(unsigned int n, const bool norma)
+        @staticmethod
+        @CPP_CORE_CLASS@[FPP]* eyeFaust(unsigned int n, unsigned int m)
+
+

@@ -1,0 +1,18 @@
+class FaustCoreGenNonMemberFuncs@TYPE_NAME@@PROC@:
+
+    def clone(self, dev='@PROC@'):
+        clone_core = @CORE_CLASS@(core=True)
+        if(dev.startswith('@PROC_LOWER@')): # cloning on same proc
+            dev_id = -1 # useless on CPU
+            if ':' in dev:
+                dev_id = int(dev.split(':')[-1])
+            clone_core.@CORE_OBJ@ = (<@CORE_CLASS@?>self).@CORE_OBJ@.clone(dev_id)
+            return clone_core
+        elif(dev == '@OTHER_PROC_LOWER@'):
+            core_cpu = @CORE_CLASS_OTHER_PROC@(core=True)
+            (<@CORE_CLASS_OTHER_PROC@?>core_cpu).@CORE_OBJ@ = \
+                    FaustCoreCy.clone_@PROC_LOWER@2@OTHER_PROC_LOWER@[@TYPE@]((<@CORE_CLASS@?>self).@CORE_OBJ@)
+            return core_cpu
+        else:
+            raise ValueError('dev='+str(dev)+' is not a valid device')
+

@@ -1,0 +1,123 @@
+#include "FaustCoreCpp.h"
+using namespace std;
+
+template<>
+void FaustCoreCpp<@TYPE@,Cpu>::multiply(@TYPE@* y_data, int y_nrows, int y_ncols, @TYPE@* x_data, int* x_row_ptr, int* x_id_col, int x_nnz, int x_nrows, int x_ncols)
+{
+    Faust::MatSparse<@TYPE@, Cpu> X(x_nnz, x_nrows, x_ncols, x_data, x_row_ptr, x_id_col);
+    Faust::MatDense<@TYPE@, Cpu> Y;
+    Y = this->transform->multiply(X);
+    memcpy(y_data, Y.getData(),sizeof(@TYPE@)*y_ncols*y_nrows);
+}
+
+template<>
+void FaustCoreCpp<@TYPE@,Cpu>::multiply(@TYPE@* value_y,int nbrow_y,int nbcol_y, const @TYPE@* value_x,int nbrow_x,int nbcol_x)const
+{
+    unsigned int nbRowThis,nbColThis;
+
+
+    nbRowThis = this->getNbRow();
+    nbColThis = this->getNbCol();
+
+    if ( (nbrow_y != nbRowThis) | (nbrow_x != nbColThis) | (nbcol_y != nbcol_x) )
+    {
+        std::cout<<"nbRowThis "<<nbRowThis<<" must be equal to nb row y  "<<nbrow_y<<std::endl;
+        std::cout<<"nbColThis "<<nbColThis<<" must be equal to nb row x  "<<nbrow_x<<std::endl;
+        std::cout<<"nbcol_y "<<nbcol_y<<" must be equal to nbcol_x  "<<nbcol_x<<std::endl;
+        handleError("FaustCpp"," multiply : invalid dimension");
+    }
+    if (nbcol_x == 1)
+    {
+        if(this->transform->get_Fv_mul_mode() == Faust::DEFAULT)
+        {
+            // assuming that x and y are pointers to memory allocated to the proper
+            // sizes
+//            Y = this->transform->multiply(value_x);
+            this->transform->multiply(value_x, value_y);
+        }
+        else
+        { // for other ways to multiply, it is not handled yet
+            Faust::Vect<@TYPE@,Cpu> X(nbrow_x,value_x);
+            Faust::Vect<@TYPE@,Cpu> Y;
+
+            Y = this->transform->multiply(X);
+            memcpy(value_y,Y.getData(),sizeof(@TYPE@)*nbrow_y);
+        }
+    }
+    else
+    {
+        if(this->transform->get_mul_order_opt_mode() == Faust::DEFAULT)
+        {
+            //assuming that value_x and value_y are allocated properly (to the good
+            //sizes) in numpy world
+            this->transform->multiply(value_x, nbcol_x, value_y);
+        }
+        else
+        { // for other ways to multiply, it is not handled yet
+            Faust::MatDense<@TYPE@,Cpu> X(value_x,nbrow_x,nbcol_x);
+            Faust::MatDense<@TYPE@,Cpu> Y;
+
+            Y = this->transform->multiply(X);
+
+            memcpy(value_y,Y.getData(),sizeof(@TYPE@)*nbrow_y*nbcol_y);
+        }
+    }
+}
+
+
+template<>
+void FaustCoreCpp<@TYPE@,Cpu>::get_product(@TYPE@* y_data, int y_nrows, int y_ncols)
+{
+    Faust::MatDense<@TYPE@, Cpu> Y = this->transform->get_product();
+    memcpy(y_data, Y.getData(), sizeof(@TYPE@)*y_ncols*y_nrows);
+}
+
+template<>
+ FaustCoreCpp<@TYPE@,Cpu>* FaustCoreCpp<@TYPE@,Cpu>::polyNext() const
+{
+    Faust::TransformHelperPoly<@TYPE@> *transform_poly = dynamic_cast<Faust::TransformHelperPoly<@TYPE@>*>(this->transform);
+    if(nullptr)
+        throw std::runtime_error("polyNext can only be used on a Poly. specialized Faust.");
+    auto th = transform_poly->next();
+    FaustCoreCpp<@TYPE@,Cpu>* core = new FaustCoreCpp<@TYPE@,Cpu>(th);
+    return core;
+}
+
+template<>
+FaustCoreCpp<@TYPE@,Cpu>* FaustCoreCpp<@TYPE@,Cpu>::polyCoeffs(const @TYPE@* coeffs)
+{
+    //verify if transform is a TransformHelperPoly otherwise raise an exception
+    Faust::TransformHelperPoly<@TYPE@> *transform_poly = dynamic_cast<Faust::TransformHelperPoly<@TYPE@>*>(this->transform);
+    if(nullptr)
+        throw std::runtime_error("polyCoeffs can only be used on a Poly. specialized Faust.");
+    Faust::TransformHelper<@TYPE@,Cpu>* th = transform_poly->polyFaust(coeffs);
+    FaustCoreCpp<@TYPE@,Cpu>* core = new FaustCoreCpp<@TYPE@,Cpu>(th);
+    return core;
+}
+
+template<>
+void FaustCoreCpp<@TYPE@,Cpu>::get_fact(const unsigned int& i, @TYPE@* fact_ptr) const
+{
+    Faust::MatDense<@TYPE@,Cpu> dense_factor = this->transform->get_fact(i);
+    // not optimized here (we have three copies from C++ object to Py, the first in MatDense::Clone()
+    // (called from Faust::Transform::get_fact()) the second when converting to
+    // MatDense (even if not a MatSparse, the copy is made)
+    // and finally a third copy here)
+    memcpy(fact_ptr, dense_factor.getData(),
+            sizeof(@TYPE@)*dense_factor.getNbCol()*dense_factor.getNbRow());
+    //optimized versions are get_fact_dense(), get_fact_sparse()
+}
+
+template<>
+FaustCoreCpp<@TYPE@,Cpu>* FaustCoreCpp<@TYPE@, Cpu>::clone(int dev/*=-1*/) const
+{
+    Faust::TransformHelper<@TYPE@,Cpu>* th = this->transform->clone();
+    auto core = new FaustCoreCpp<@TYPE@, Cpu>(th);
+    return core;
+}
+
+template<>
+void  FaustCoreCpp<@TYPE@,Cpu>::device(char* dev) const
+{
+	std::strncpy(dev, "cpu", 4);
+}
