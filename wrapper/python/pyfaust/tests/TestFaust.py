@@ -340,7 +340,7 @@ class TestFaust(unittest.TestCase):
         print("Faust.clone")
         if self.dev =='cpu':
             Fc = self.F.clone()
-        elif dev == 'gpu':
+        elif self.dev == 'gpu':
             Fc = self.F.clone()
             self._assertAlmostEqual(Fc, self.F)
             Fc_cpu = self.F.clone(dev='cpu')
