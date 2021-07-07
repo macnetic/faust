@@ -11,116 +11,121 @@ The Python wrapper intefaces the Faust C++ class with Python.
 
 
 ##########################################################################
-Required Component :
+Required Components :
 
-Python 2 : https://www.python.org/downloads/
-The wrapper is not compatible with Python 3.x versions, onlu Python 2.x versions.
+Python 3, the support of Python 2.7 has been dropped (the cmake building option NOPY2=ON disables python2).
+Note that it is most likely that pyfaust won't work with python 2 as it was in older versions because of python syntax changes (even if NOPY2=OFF and the cython wrapper compiles).
 
-Numpy : (http://www.numpy.org/), it's a python package useful for numerical calulation.
-Don't worry, very often it's a nativ python package.
-However, you may experienced trouble  if your version of numpy is older than 1.9.2 
-
+The pyfaust package requirements are specified in the main CMake script of the project (numpy 1.20 etc.) and automatically added to the setup.py generated to build the cython extension and to generate the whl package.
 
 Cython : http://cython.org/
 This module allows to write Python extension in C/C++.
 
+Many dependencies are necessary to build the C++ code, the first of it being the MAT-IO library.
 
+##########################################################################
+
+CMake related information:
+
+To build the python wrapper and only it, use the command "make faust_python" after the cmake configuration in the build directory.
+
+Below are a few CMake options that concern the python wrapper.
+- NOPY2: to enable/disable the python2 support (which use is anyway discouraged because py2 compatibility is no more guaranteed).
+- BUILD_COMPLEX_PYX: to enable/disable the support of the complex Faust-s in the wrapper (it can spare some compilation time).
+- USE_GPU_MOD: to enable/disable the support of the GPU code of the wrapper (here gain, the compilation time is reduced if it is disabled).
+Look in the main CMakeLists.txt for more details about the project CMake options.
+- BUILD_WRAPPER_PYTHON: to enable/disable the whole python wrapper building.
 
 
 ##########################################################################
-File's Structure :
 
 *****************
 Main Files :
 *****************
 
-FaustPy.py :
-	--> this python module is directly utilised by the user.
-	    It allows the handling of FaustPy.Faust class representing our type of matrices
+pyfaust.py : this file contains the Faust class and hence is the main module of the pyfaust package. It becomes the __init__.py file in the generated package.
 
-setup.py.in : 
-	--> file that will be configured into setup.py in the build 
+pyfaust/*.py : pyfaust is composed of further modules (fact, factparams, poly, tools, tests, etc.). They are located in the pyfaust sub-directory.
+	The pyfaust/demo.py module: contains a cerntain number of demos (quickstart, the Hadamard and the MEG factorizations, see the doxygen doc online).
+
+setup.py.in :
+	--> file that will be configured into setup.py in the build
 	directory with CMake.
-	A setup.py file is equivalent to a Makefile in C/C++ but for Python. 
-	It's that the different paths such include directories, 
+	A setup.py file is equivalent to a Makefile in C/C++ but for Python.
+	It's that the different paths such include directories,
 	library's flags are set.
-	The behaviour of setup.py file is welldocumented on this link :
+	The behaviour of setup.py file is well documented on this link :
 	https://docs.python.org/2/distutils/configfile.html
 
-        In our case, it compiles the module FaustCorePy 
-	(which consists in only one class FaustCorePy.FaustCore)
-	This class is used by the FaustPy.Faust class
+        In our case, it compiles the module _FaustCorePy
+	(which is defined by many source files which are merged by cmake -- see below)
+	The central classes are prefixed by FaustCore, there are several for CPU, GPU and one per scalar types (double, complex and other envisioned).
 
-quickstart.py :
-	--> Little demo to illustrate the behaviour of the class FaustPy.Faust
-
-
+wrapper/python/CMakeLists.txt: the makefile specifically written to configure and build the python wrapper (it comes before the setup.py execution).
 
 *****************
-Sources Files :
+C++/Cython Sources Files :
 *****************
 
-src/FaustCore.h and src/FaustCore.hpp :
-	--> C++ Header file wrapping the  Class Faust::Transform<FPP,Cpu>,          
-        the methods are quite the same but this works with pointer             
+Nota Bene: The "FaustCoreCpp" name is twofold, it refers to the FaustCoreCpp class but also to the C++ core of FAµST.
+
+src/FaustCoreCpp.h, src/FaustCoreCppCPU.hpp, src/FaustCoreCppCPU.cpp.in, src/FaustCoreCpp.cpp:
+	--> C++ class wrapping the  Class Faust::TransformHelper<FPP,Cpu>,
+        the methods are quite the same but this works with pointer
 	which are easier to handle from Cython/Python
+	The cpp.in contains specialized member functions of the template class (which is common to the different scalar types and devices -- CPU, GPU).
+	This code is passed through cmake to generate the double and complex<double> code. It could have been defined directly in hpp but because of the GPU template specialization(see below) the CPU definitions were also separated.
+	The cpp contains non-templates non-member functions but not necessarily related to the FaustCore* classes.
 
-src/FaustCoreCy.pxd :
-	--> Cython Header making the links between C++ class FaustCpp       
-            and Cython environment, works like C/C++ Header, 
-	    creates the Cython module named FaustCoreCy.
+src/FaustCoreCppGPU* files: they are similar to the CPU files above and obviously they handle the GPU part of the wrapper (Faust::TransformHelper<FPP, GPU>).
 
-src/FaustCorePy.pyx :
-	--> creates the Python module FaustCorePy
-	    Cython source file making the links between :                     
-	    the Cython module FaustCoreCy and Python		
+src/FaustFact* files: they compose the wrapper C++ code necessary to access the algorithm implementations (in particular the factorization algorithm) in the FAµST C++ core.
 
+src/*.pxd :
+	--> Cython Header declaring C++ symbols callable from the cython code.
+	FaustAlgo.pxd: contains the declarations for the FAµST algorithms class/functions (corresponding mainly to the FaustFact code referred above).
+	FaustCoreGenCy.pxd.in: which is configured for CPU and GPU (if enabled) by the cmake script.
+	FaustCoreCyGPU.pxd: contains the declarations of the GPU specific functions (clone_gpu2cpu, etc.), that is functions that don't make sense if only the CPU support is built.
+	FaustCoreCy.pxd: contains the general purpose functions (note that this file is copied in the build directory and all the configured pxd are concatenated to the copy by the CMake script to form the single pxd of the wrapper).
 
-
-
-
+The wrapper/python/src/*pyx cython code files:
+- _FaustCoreGen.pyx.in: the generic class FaustCoreGen(eric) class which is generated in any version for which CMake was configured (double, complex, CPU, GPU).
+- _FaustCoreGenNonMemberFuncs.pyx.in: The non-member functions related to the FaustCoreGen classes (also configurable for CPU, GPU, double and complex scalar types).
+- _FaustAlgoGen.pyx.in: the generic CPU only class of static function to calls C++ core algorithm implementations (corresponding to FaustFact code referred above). This file is configured for double and complex (the latter is generated only if enabled via CMake -- BUILD_COMPLEX_PYX option).
+- _FaustAlgoGenProc.pyx.in: the generic CPU/GPU part of cython functions.
+- _FaustAlgoCplxDblGenProc.pyx.in: as above but contains only functions that are limited to complex type definitions (for example: the DFT).
+- _FaustCorePy.pyx: the basis pyx file used to generated the cython extension, it contains a few utility functions and is the destination of the concatenation of all other pyx files proceeded after their configuration (by CMake).
 
 ##########################################################################
-License:
+License: Please refer to the license.txt file at the project's root.
 
-Copyright (2016):          Luc Le Magoarou, Remi Gribonval, 
+Copyright (2021):          Luc Le Magoarou, Remi Gribonval,
                       Nicolas Bellot, Adrien Leman, Thomas Gautrais
-                                INRIA Rennes, FRANCE
+			Hakim HADJ-DJILANI
+
+                                INRIA Rennes
+				INRIA Rhône Alpes
                                 http://www.inria.fr/
 
-The FAuST Toolbox is distributed under the terms of the GNU Affero General 
-Public License.
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation.
-
-This program is distributed in the hope that it will be useful, but WITHOUT
-ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
-FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public 
-License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-##########################################################################
+#########################################################################
 
 
 ##########################################################################
-Contacts:	
+Contacts:
 
-	Luc Le Magoarou: luc.le-magoarou@inria.fr
 	Remi Gribonval : remi.gribonval@inria.fr
-	Nicolas Bellot  : nicolas.bellot@inria.fr
-	Adrien Leman    : adrien.leman@inria.fr	
-	Thomas Gautrais : thomas.gautrais@inria.fr	
+	Hakim HADJ-DJILANI: hakim.hadj-djilani@inria.fr
 ##########################################################################
 
 
 ##########################################################################
 References:
 
-[1]	Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse 
-	approximations of matrices and applications", Journal of Selected 
+[1]	Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse
+	approximations of matrices and applications", Journal of Selected
 	Topics in Signal Processing, 2016.
 	<https://hal.archives-ouvertes.fr/hal-01167948v1>
-##########################################################################	
+
+Many other references are available on the doxygen doc front page (https://faust.inria.fr)
+##########################################################################
 
