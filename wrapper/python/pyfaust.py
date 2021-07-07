@@ -1825,7 +1825,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             return F.clone(dev=F.device)
         elif dtype == np.complex:
             return Faust([F.factors(i).astype(np.complex) for i in
-                          range(F.numfactors())])
+                          range(F.numfactors())], dev=F.device)
         else:
             raise ValueError("complex -> float conversion not yet supported.")
 
