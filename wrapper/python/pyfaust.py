@@ -24,13 +24,13 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
     with FAuST data structures, which correspond to matrices that can be
     written exactly as the product of sparse matrices.
 
-    A FAuST data structure is designed to allow fast matrix-vector multiplications
+    The Faust class is designed to allow fast matrix-vector multiplications
     together with reduced memory storage compared to what would be obtained by
     manipulating directly the corresponding dense matrix.
 
     A particular example is the matrix associated to the discrete Fourier
-    transform, which can be represented exactly as a Faust, leading to a fast and
-    compact implementation.
+    transform, which can be represented exactly as a Faust,
+    leading to a fast and compact implementation (see pyfaust.dft).
 
     Although sparse matrices are more interesting for optimization it's not
     forbidden to define a Faust as a product of dense matrices or a mix of dense
@@ -40,29 +40,32 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
     defined on complex or real fields. Hence a Faust can be a complex Faust or a
     real Faust.
 
-    Several Python builtins have been overloaded to ensure that a Faust is
+    Several Python built-ins have been overloaded to ensure that a Faust is
     almost handled as a native numpy array.
 
     The main exception is that contrary to a numpy array a Faust is immutable.
-    It means that you cannot affect elements of a Faust using
+    It means that you cannot modify elements of a Faust using
     the assignment operator `=' like you do with a numpy array (e.g. `M[i,j] =
     2').
     That limitation is the reason why the Python built-in `__setitem__()' is not
     implemented in this class.
+    Note however that you can optionally contravene the immuability in
+    certain functions (e.g. with the `inplace` argument of the
+    functions Faust.swap_rows, Faust.swap_cols, Faust.optimize_time).
 
-    Other notable limitations are that one cannot:
+
+    Other noticeable limitations are that one cannot:
         - compute the real and imaginary parts of a Faust,
         - perform elementwise operations between two Fausts (e.g. elementwise
         multiplication), the addition and subtraction are available though,
         - reshape a Faust.
 
-    A last but not least caveat is that Faust doesn't support numpy universal
+    A last but not least caveat is that Faust doesn't support the numpy universal
     functions (ufuncs) except if the contrary is specified in the API doc. for
     a particular function.
 
-    Primarily for convenience and test purposes, a Faust can be converted into
-    the corresponding full matrix using the function Faust.toarray or
-    Faust.toarray.
+    Mainly for convenience and test purposes, a Faust can be converted into
+    the corresponding full matrix using the function Faust.toarray.
 
     Warning: using Faust.toarray is discouraged except for test purposes, as it
     loses the main potential interests of the FAuST structure: compressed
@@ -72,8 +75,12 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
     In this documentation, the expression 'full matrix' designates the array
     Faust.toarray() obtained by the multiplication of the Faust factors.
 
-    List of functions that are memory costly: Faust.toarray(), Faust.toarray(),
-    Faust.pinv().
+    List of functions that are memory costly:
+        - Faust.toarray(),
+        - Faust.pinv(),
+        - element indexing (F[i,j] / __getitem__, but note that slicing is memory
+        efficient through memory views).
+        - Faust.norm, except the 2-norm which doesn't imply a call to Faust.toarray().
 
     For more information about FAuST take a look at http://faust.inria.fr.
     """
@@ -1459,11 +1466,13 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         The norm of F is equal to the numpy.linalg.norm of F.toarray().
 
-        WARNING: the computation time can be expected to be of order
+        WARNING: all the norms except the 2-norm imply to compute F.toarray()
+        which might be costly.
+
+        WARNING: for the 2-norm the computation time can be expected to be of order
         n*min(F.shape) with n the time for multipliying F by a vector.
         Nevertheless, the implementation ensures that memory usage remains
-        controlled by avoiding to explicitly compute F.toarray() (at least for
-        2-norm).
+        controlled by avoiding to explicitly compute F.toarray().
 
         Args:
             F: the Faust object.
@@ -2264,7 +2273,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
     def average(F, axis=None, weights=None, returned=False):
         """
-        Compute the weighted average of F along the specified axis.
+        Computes the weighted average of F along the specified axis.
 
         Args:
             axis (optional): None or int  or tuple of ints.
