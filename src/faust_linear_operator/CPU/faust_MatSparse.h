@@ -350,6 +350,7 @@ namespace Faust
 			const FPP& operator()(faust_unsigned_int i, faust_unsigned_int j)const{return const_cast<Eigen::SparseMatrix<FPP,Eigen::RowMajor>*>(&mat)->coeffRef(i,j);}
 
 			Vect<FPP,Cpu> get_col(faust_unsigned_int id) const;
+			void get_col(faust_unsigned_int id, Vect<FPP, Cpu> &out_vec) const;
 			MatSparse<FPP,Cpu>* get_cols(faust_unsigned_int col_id_start, faust_unsigned_int num_cols) const;
 			MatSparse<FPP,Cpu>* get_cols(faust_unsigned_int* col_ids, faust_unsigned_int num_cols) const;
 			void delete_col(faust_unsigned_int id);
@@ -412,7 +413,7 @@ namespace Faust
 
 			//! *this = S * (*this)
 			friend void  Vect<FPP,Cpu>::multiplyLeft(MatSparse<FPP,Cpu> const& S,const char TransS);
-			friend double Transform<FPP,Cpu>::normL1(const bool transpose) const;
+			friend double Transform<FPP,Cpu>::normL1(const bool transpose, const bool full_array/*=true*/) const;
 
 			/*friend void  MatDense<FPP,Cpu>::multiplyLeft(MatSparse<FPP,Cpu> const& S,const char TransS);*/
 

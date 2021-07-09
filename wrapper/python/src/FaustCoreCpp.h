@@ -108,9 +108,10 @@ class FaustCoreCpp
     FaustCoreCpp<FPP,DEV>* normalize(int ord) const;
     unsigned long long nnz()const;
     void power_iteration(FPP* out, double threshold=.001, int max_num_its=100) const;
-    double norm(int ord, double threshold=.001, int max_num_its=100) const;
+    double norm2(double threshold=.001, int max_num_its=100) const;
     double normFro() const;
     double normInf() const;
+    double norm1(const bool full_array) const;
     double get_nb_factors() const;
     unsigned int get_fact_nb_rows(unsigned int& i) const;
     unsigned int get_fact_nb_cols(unsigned int& i) const;

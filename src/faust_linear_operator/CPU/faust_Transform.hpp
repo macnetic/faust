@@ -629,11 +629,53 @@ FPP Faust::Transform<FPP,Cpu>::power_iteration(const faust_unsigned_int nbr_iter
 
 
 template<typename FPP>
-double Faust::Transform<FPP,Cpu>::normL1(const bool transpose /* = false */) const
+double Faust::Transform<FPP,Cpu>::normL1(const bool transpose /* = false */, const bool full_array/*=true*/) const
 {
-	double norm;
-	MatDense<FPP, Cpu> full = get_product(transpose?'T':'N');
-	norm = std::abs(full.normL1(/*transpose*/)); //transpose not necessary because full is already transposed if needed
+	double norm = 0;
+	double abs_sum;
+	Faust::MatDense<FPP, Cpu>* dlf = nullptr; // dense last factor
+	Faust::MatSparse<FPP, Cpu>* slf = nullptr; // sparse last factor
+	Faust::Vect<FPP, Cpu> lf_col; // last factor column
+	Faust::Vect<FPP, Cpu> t_col(this->getNbRow()); // transform column
+	faust_unsigned_int lf_nrows = (*(data.end()-1))->getNbRow(); // last factor nrows
+	auto last_fac = *(data.end()-1);
+	if(full_array)
+	{
+
+		MatDense<FPP, Cpu> full = get_product(transpose?'T':'N');
+		norm = std::abs(full.normL1(/*transpose*/)); //transpose not necessary because full is already transposed if needed
+	}
+	else
+	{
+		std::vector<Faust::MatGeneric<FPP, Cpu>*> first_factors(data.begin(), data.end()-1);
+		Transform<FPP, Cpu> ff_transform(first_factors, 1, false, false);
+		FPP* col_ptr = nullptr;
+
+		for(int j=0;j<this->getNbCol();j++)
+		{
+			// compute the Transform column j without a get_product
+			if(dlf = dynamic_cast<Faust::MatDense<FPP, Cpu>*>(last_fac))
+			{
+				// last fact is a MatDense, no need to copy the column
+				col_ptr = dlf->getData()+j*dlf->getNbRow();
+			}
+			else if(slf = dynamic_cast<Faust::MatSparse<FPP, Cpu>*>(last_fac))
+			{
+				// last fact is a MatSparse, copy it to a Vect
+				slf->get_col(j, lf_col);
+				col_ptr = lf_col.getData();
+			}
+			ff_transform.multiply(col_ptr, 1, t_col.getData());
+			// now that we have the column, compute the abs sum
+			abs_sum = 0;
+			for(int i=0;i<lf_nrows;i++)
+			{
+				abs_sum += std::abs(t_col[i]);
+			}
+			if(abs_sum > norm) // abs_sum gets a chance to be the norm
+				norm = abs_sum;
+		}
+	}
 	return norm;
 }
 
@@ -1209,7 +1251,7 @@ int Faust::Transform<FPP,Cpu>::max_ncols() const
 }
 
 template<typename FPP>
-void Faust::Transform<FPP,Cpu>::multiply(const FPP* A, int A_ncols, FPP* C, const char opThis/*='N'*/)
+void Faust::Transform<FPP,Cpu>::multiply(const FPP* A, int A_ncols, FPP* C, const char opThis/*='N'*/) const
 {
 	auto lhs_ncols = A_ncols;
 	int lhs_nrows, out_nrows;

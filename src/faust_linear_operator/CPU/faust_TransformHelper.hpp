@@ -931,17 +931,20 @@ template<typename FPP>
 
 
 template<typename FPP>
-	double TransformHelper<FPP,Cpu>::normL1() const {
-		return this->transform->normL1(this->is_transposed);
+	double TransformHelper<FPP,Cpu>::normL1(const bool full_array/*=true*/) const
+	{
+		return this->transform->normL1(this->is_transposed, full_array);
 	}
 
 template<typename FPP>
-	double TransformHelper<FPP,Cpu>::normInf() const {
+	double TransformHelper<FPP,Cpu>::normInf() const
+	{
 		return this->transform->normL1(!this->is_transposed);
 	}
 
 template<typename FPP>
-	double TransformHelper<FPP,Cpu>::normFro() const {
+	double TransformHelper<FPP,Cpu>::normFro() const
+	{
 		vector <MatGeneric<FPP, Cpu>*>& orig_facts = this->transform->data;
 		int start_id, end_id;
 		this->transform->get_nonortho_interior_prod_ids(start_id, end_id);

@@ -447,7 +447,7 @@ namespace Faust
 			friend void Faust::multiply<>(const Transform<FPP,Cpu> & A, const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP & alpha, char typeA, char typeMult);
 			friend void gemv<>(const MatDense<FPP,Cpu> & A,const Vect<FPP,Cpu> & x,Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);
 			//	friend void  MatSparse<FPP,Cpu>::multiply(MatDense<FPP,Cpu> & M,const char opThis) const;
-			friend double Transform<FPP,Cpu>::normL1(const bool transpose) const;
+			friend double Transform<FPP,Cpu>::normL1(const bool transpose, const bool full_array/*=true*/) const;
 			bool estNulle()const{return isZeros;}
 
 			static MatDense<FPP,Cpu>* randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols);

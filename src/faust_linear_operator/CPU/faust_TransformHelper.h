@@ -158,7 +158,7 @@ namespace Faust
 			TransformHelper<FPP,Cpu>* adjoint() const;
 			virtual TransformHelper<FPP,Cpu>* vertcat(const TransformHelper<FPP,Cpu>*);
 			virtual TransformHelper<FPP,Cpu>* horzcat(const TransformHelper<FPP,Cpu>*);
-			virtual double normL1() const;
+			virtual double normL1(const bool full_array=true) const;
 			virtual double normFro() const;
 			virtual double normInf() const;
 			virtual TransformHelper<FPP,Cpu>* normalize(const int meth = 2/* 1 for 1-norm, 2 for 2-norm, MAX for inf-norm */) const;

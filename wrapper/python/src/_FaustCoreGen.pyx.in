@@ -331,14 +331,19 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
             raise ValueError("FaustCorePy.norm() invalid type of norm asked.")
         threshold = .001
         max_num_its = 100
-        if('threshold' in kwargs.keys()):
+        full_array = True;
+        if 'threshold' in kwargs.keys():
             threshold = kwargs['threshold']
-        if('max_num_its' in kwargs.keys()):
+        if 'max_num_its' in kwargs.keys():
             max_num_its = kwargs['max_num_its']
-        if(isinstance(ord,int)):
-            norm = self.@CORE_OBJ@.norm(ord, threshold, max_num_its)
-        elif(ord == np.inf):
+        if 'full_array' in kwargs.keys():
+            full_array = kwargs['full_array']
+        if ord == 2:
+            norm = self.@CORE_OBJ@.norm2(threshold, max_num_its)
+        elif ord == np.inf:
             norm = self.@CORE_OBJ@.normInf()
+        elif ord == 1:
+            norm = self.@CORE_OBJ@.norm1(full_array);
         else:
             norm = self.@CORE_OBJ@.normFro()
         return norm

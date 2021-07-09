@@ -109,6 +109,7 @@ namespace Faust
 		friend class Transform<FPP,Cpu>;
 		friend class MatDiag<FPP>;
 		friend class MatDense<FPP,Cpu>;
+		friend class MatSparse<FPP,Cpu>; // TODO: limit friendship to the necessary functions
 //		friend void  MatDiag<FPP>::multiply(Vect<FPP,Cpu> & vec, char opThis) const;
 
 		friend TransformHelperPoly<FPP>; // TODO: limit to needed member functions only

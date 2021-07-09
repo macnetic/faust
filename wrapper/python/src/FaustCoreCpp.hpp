@@ -197,20 +197,10 @@ unsigned long long FaustCoreCpp<FPP,DEV>::nnz() const
 
 
 template<typename FPP, FDevice DEV>
-double FaustCoreCpp<FPP,DEV>::norm(int ord, double threshold, int max_num_its) const
+double FaustCoreCpp<FPP,DEV>::norm2(double threshold, int max_num_its) const
 {
     int flag; //not used yet
-    switch(ord)
-	{
-        case 2:
-            return this->transform->spectralNorm(max_num_its, threshold, flag);
-        case 1:
-            return this->transform->normL1();
-        default:
-            handleError("FaustCoreCpp", "norm(int ord) unvalid norm order.");
-    }
-	//TODO: call normFro and normInf from here (and delete the two functions below)
-    return -1;
+    return this->transform->spectralNorm(max_num_its, threshold, flag);
 }
 
 template<typename FPP, FDevice DEV>
@@ -231,6 +221,12 @@ template<typename FPP, FDevice DEV>
 double FaustCoreCpp<FPP,DEV>::normInf() const
 {
     return this->transform->normInf();
+}
+
+template<typename FPP, FDevice DEV>
+double FaustCoreCpp<FPP,DEV>::norm1(const bool full_array) const
+{
+    return this->transform->normL1(full_array);
 }
 
 template<typename FPP, FDevice DEV>
