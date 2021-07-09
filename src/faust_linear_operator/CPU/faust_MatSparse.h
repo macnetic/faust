@@ -41,6 +41,7 @@
 #ifndef __FAUST_MATSPARSE_H__
 #define __FAUST_MATSPARSE_H__
 
+#include <algorithm>
 #include "faust_constant.h"
 #include "faust_MatDiag.h"
 #include "faust_MatDense.h"
@@ -351,13 +352,41 @@ namespace Faust
 
 			Vect<FPP,Cpu> get_col(faust_unsigned_int id) const;
 			void get_col(faust_unsigned_int id, Vect<FPP, Cpu> &out_vec) const;
-			MatSparse<FPP,Cpu>* get_cols(faust_unsigned_int col_id_start, faust_unsigned_int num_cols) const;
-			MatSparse<FPP,Cpu>* get_cols(faust_unsigned_int* col_ids, faust_unsigned_int num_cols) const;
+			/*
+			 * \brief Returns a slice of "this" as a MatSparse. The slice start from column start_col_id and finishes to the column start_col_id+num_cols-1 of "this".
+			 *
+			 * Warning: using this function is discouraged as it returns a naked pointer, use preferably another prototype of get_cols except if you really need this one
+			 */
+
+			MatSparse<FPP,Cpu>* get_cols(faust_unsigned_int start_col_id, faust_unsigned_int num_cols) const;
+			/*
+			 * \brief Returns a MatSparse composed of num_cols columns of "this". Their indices are defined in col_ids, the first column of the returned matrix is this[:, col_ids[0]], the second this[:, col_ids[1]], ...
+			 *
+			 * Warning: using this function is discouraged as it returns a naked pointer, use preferably another prototype of get_cols except if you really need this one
+			 */
+			MatSparse<FPP,Cpu>* get_cols(const faust_unsigned_int* col_ids, faust_unsigned_int num_cols) const;
+			/* \brief Returns a column slice of "this" into out_cols. The slice start from column start_col_id and finishes to the column start_col_id+num_cols-1 of "this".
+			 *
+			 * \param out_cols: the MatSparse doesn't have to be initialized (it's handled internally).
+			 */
+			void get_cols(faust_unsigned_int start_col_id, faust_unsigned_int num_cols, MatSparse<FPP, Cpu>& out_cols) const;
+			/*
+			 * \brief Returns a MatSparse composed of num_cols columns of "this" into out_cols. Their indices are defined in col_ids, the first column of the returned matrix is this[:, col_ids[0]], the second this[:, col_ids[1]], ...
+			 *
+			 * \param out_cols: the MatSparse doesn't have to be initialized (it's handled internally).
+			 *
+			 * Warning: using this function is discouraged as it returns a naked pointer, use preferably another prototype of get_cols except if you really need this one
+			 */
+			void get_cols(const faust_unsigned_int* col_ids, faust_unsigned_int num_cols, MatSparse<FPP, Cpu>& out_cols) const;
+
 			void delete_col(faust_unsigned_int id);
 			void delete_row(faust_unsigned_int id);
 
 			MatSparse<FPP,Cpu>* get_rows(faust_unsigned_int row_id_start, faust_unsigned_int num_rows) const;
-			MatSparse<FPP,Cpu>* get_rows(faust_unsigned_int* row_ids, faust_unsigned_int num_rows) const;
+			MatSparse<FPP,Cpu>* get_rows(const faust_unsigned_int* row_ids, faust_unsigned_int num_rows) const;
+			void get_rows(faust_unsigned_int row_id_start, faust_unsigned_int num_rows, MatSparse<FPP, Cpu>& out_rows) const;
+			void get_rows(const faust_unsigned_int* row_ids, faust_unsigned_int num_rows, MatSparse<FPP, Cpu>& out_rows) const;
+
 			void swap_rows(faust_unsigned_int id1, faust_unsigned_int id2);
 			void swap_cols(faust_unsigned_int id1, faust_unsigned_int id2);
 

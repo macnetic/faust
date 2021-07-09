@@ -387,7 +387,7 @@ namespace Faust
 			Vect<FPP,Cpu> get_col(faust_unsigned_int id) const;
 			Vect<FPP,Cpu> get_row(faust_unsigned_int id) const;
 			MatDense<FPP,Cpu>* get_cols(faust_unsigned_int start_col_id, faust_unsigned_int num_cols) const;
-			MatDense<FPP,Cpu>* get_cols(faust_unsigned_int* col_ids, faust_unsigned_int n) const;
+			MatDense<FPP,Cpu>* get_cols(const faust_unsigned_int* col_ids, faust_unsigned_int n) const;
 			MatDense<FPP,Cpu>* get_cols(std::vector<int> col_ids) const;
 			/** \brief Returns true if this[:,id_this] == other[:, id_other] at the specified precision. */
 			bool eq_cols(const MatDense<FPP, Cpu> & other, faust_unsigned_int id_this, faust_unsigned_int id_other, const Real<FPP>& precision) const;
@@ -401,7 +401,7 @@ namespace Faust
 			void delete_row(int offset);
 
 			MatDense<FPP,Cpu>* get_rows(faust_unsigned_int start_row_id, faust_unsigned_int num_rows) const;
-			MatDense<FPP,Cpu>* get_rows(faust_unsigned_int* row_ids, faust_unsigned_int n) const;
+			MatDense<FPP,Cpu>* get_rows(const faust_unsigned_int* row_ids, faust_unsigned_int n) const;
 
 			MatDense<FPP,Cpu> get_block(faust_unsigned_int i, faust_unsigned_int j, faust_unsigned_int nrows, faust_unsigned_int ncols);
 

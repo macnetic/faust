@@ -1180,7 +1180,7 @@ MatDense<FPP,Cpu>* MatDense<FPP,Cpu>::get_cols(faust_unsigned_int start_col_id, 
 }
 
 template<typename FPP>
-MatDense<FPP,Cpu>* MatDense<FPP,Cpu>::get_cols(faust_unsigned_int* col_ids, faust_unsigned_int n) const
+MatDense<FPP,Cpu>* MatDense<FPP,Cpu>::get_cols(const faust_unsigned_int* col_ids, faust_unsigned_int n) const
 {
 	//TODO: check args
 	FPP *data = new FPP[this->getNbRow()*n];
@@ -1219,7 +1219,7 @@ MatDense<FPP,Cpu>* MatDense<FPP,Cpu>::get_rows(faust_unsigned_int start_row_id, 
 }
 
 template<typename FPP>
-MatDense<FPP,Cpu>* MatDense<FPP,Cpu>::get_rows(faust_unsigned_int* row_ids, faust_unsigned_int n) const
+MatDense<FPP,Cpu>* MatDense<FPP,Cpu>::get_rows(const faust_unsigned_int* row_ids, faust_unsigned_int n) const
 {
 	//TODO: check args
 	FPP *data = new FPP[this->getNbCol()*n];
