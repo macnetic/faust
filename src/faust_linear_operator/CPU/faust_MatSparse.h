@@ -442,7 +442,7 @@ namespace Faust
 
 			//! *this = S * (*this)
 			friend void  Vect<FPP,Cpu>::multiplyLeft(MatSparse<FPP,Cpu> const& S,const char TransS);
-			friend double Transform<FPP,Cpu>::normL1(const bool transpose, const bool full_array/*=true*/) const;
+			friend double Transform<FPP,Cpu>::normL1(const bool transpose, const bool full_array/*=true*/, const int batch_sz/*=1*/) const;
 
 			/*friend void  MatDense<FPP,Cpu>::multiplyLeft(MatSparse<FPP,Cpu> const& S,const char TransS);*/
 

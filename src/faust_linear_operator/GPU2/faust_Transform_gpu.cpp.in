@@ -645,7 +645,7 @@ void Faust::Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::get_fact(const faust_unsigned
 		}
 
 	template<>
-		Real<@FAUST_SCALAR_FOR_GM@> Faust::Transform<@FAUST_SCALAR_FOR_GM@, GPU2>::normL1(const bool transpose /* = false */, const bool full_array/*=true*/) const
+		Real<@FAUST_SCALAR_FOR_GM@> Faust::Transform<@FAUST_SCALAR_FOR_GM@, GPU2>::normL1(const bool transpose /* = false */, const bool full_array/*=true*/, const int batch_size/*=1*/) const
 		{
 			double norm;
 			MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> full = get_product(transpose?'T':'N');

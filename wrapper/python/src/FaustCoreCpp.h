@@ -111,7 +111,7 @@ class FaustCoreCpp
     double norm2(double threshold=.001, int max_num_its=100) const;
     double normFro() const;
     double normInf() const;
-    double norm1(const bool full_array) const;
+    double norm1(const bool full_array, const int batch_size) const;
     double get_nb_factors() const;
     unsigned int get_fact_nb_rows(unsigned int& i) const;
     unsigned int get_fact_nb_cols(unsigned int& i) const;

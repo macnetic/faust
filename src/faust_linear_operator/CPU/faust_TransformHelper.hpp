@@ -931,9 +931,9 @@ template<typename FPP>
 
 
 template<typename FPP>
-	double TransformHelper<FPP,Cpu>::normL1(const bool full_array/*=true*/) const
+	double TransformHelper<FPP,Cpu>::normL1(const bool full_array/*=true*/, const int batch_sz/*=1*/) const
 	{
-		return this->transform->normL1(this->is_transposed, full_array);
+		return this->transform->normL1(this->is_transposed, full_array, batch_sz);
 	}
 
 template<typename FPP>

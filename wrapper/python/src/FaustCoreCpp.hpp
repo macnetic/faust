@@ -224,9 +224,9 @@ double FaustCoreCpp<FPP,DEV>::normInf() const
 }
 
 template<typename FPP, FDevice DEV>
-double FaustCoreCpp<FPP,DEV>::norm1(const bool full_array) const
+double FaustCoreCpp<FPP,DEV>::norm1(const bool full_array, const int batch_size) const
 {
-    return this->transform->normL1(full_array);
+    return this->transform->normL1(full_array, batch_size);
 }
 
 template<typename FPP, FDevice DEV>

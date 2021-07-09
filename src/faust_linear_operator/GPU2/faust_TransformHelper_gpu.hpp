@@ -169,9 +169,9 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		Real<FPP> TransformHelper<FPP,GPU2>::normL1(const bool full_array/*=true*/) const
+		Real<FPP> TransformHelper<FPP,GPU2>::normL1(const bool full_array/*=true*/, const int batch_size/*=1*/) const
 		{
-			return this->transform->normL1(full_array);
+			return this->transform->normL1(full_array, batch_size);
 		}
 
 	template<typename FPP>

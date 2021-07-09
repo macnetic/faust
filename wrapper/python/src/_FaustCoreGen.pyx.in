@@ -332,18 +332,21 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
         threshold = .001
         max_num_its = 100
         full_array = True;
+        batch_size = 1;
         if 'threshold' in kwargs.keys():
             threshold = kwargs['threshold']
         if 'max_num_its' in kwargs.keys():
             max_num_its = kwargs['max_num_its']
         if 'full_array' in kwargs.keys():
             full_array = kwargs['full_array']
+        if 'batch_size' in kwargs.keys():
+            batch_size = kwargs['batch_size']
         if ord == 2:
             norm = self.@CORE_OBJ@.norm2(threshold, max_num_its)
         elif ord == np.inf:
             norm = self.@CORE_OBJ@.normInf()
         elif ord == 1:
-            norm = self.@CORE_OBJ@.norm1(full_array);
+            norm = self.@CORE_OBJ@.norm1(full_array, batch_size);
         else:
             norm = self.@CORE_OBJ@.normFro()
         return norm

@@ -244,7 +244,7 @@ namespace Faust
 				float getRCG() const{return ((float)(getNbRow()*getNbCol()))/((float) get_total_nnz());}
 				double spectralNorm(const int nbr_iter_max, double threshold, int &flag) const;
 				FPP power_iteration(const faust_unsigned_int nbr_iter_max, const Real<FPP>& threshold, int & flag) const;
-				double normL1(const bool transpose=false, const bool full_array=true) const;
+				double normL1(const bool transpose=false, const bool full_array=true, const int batch_sz=1) const;
 				double normL1(const char opThis, const bool isConj) const;
 				double normFro() const;
 				double normFro(const char opThis, const bool isConj) const;
