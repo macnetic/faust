@@ -886,11 +886,19 @@ Real<FPP> Faust::MatSparse<FPP, Cpu>::normL1(const bool transpose /* default fal
 template<typename FPP>
 Faust::Vect<FPP,Cpu> Faust::MatSparse<FPP,Cpu>::get_col(faust_unsigned_int id) const
 {
+	Vect<FPP, Cpu> out_vec;
+	this->get_col(id, out_vec);
+	return out_vec;
+}
+
+template<typename FPP>
+void Faust::MatSparse<FPP,Cpu>::get_col(faust_unsigned_int id, Vect<FPP, Cpu>& out_vec) const
+{
 	if(id > this->getNbCol())
 		handleError("Faust::MatSparse", "Too big column index passed to get_col().");
-	Eigen::Matrix<FPP, Eigen::Dynamic,1> vec;
-	vec = mat.col(id);
-	return Vect<FPP,Cpu>(this->getNbRow(),vec.data());
+	if(out_vec.size() != this->getNbRow())
+		out_vec.resize(this->getNbRow());
+	out_vec.vec = mat.col(id);
 }
 
 template<typename FPP>
