@@ -1182,10 +1182,18 @@ MatDense<FPP,Cpu>* MatDense<FPP,Cpu>::get_cols(faust_unsigned_int start_col_id, 
 template<typename FPP>
 MatDense<FPP,Cpu>* MatDense<FPP,Cpu>::get_cols(const faust_unsigned_int* col_ids, faust_unsigned_int n) const
 {
-	//TODO: check args
 	FPP *data = new FPP[this->getNbRow()*n];
+	faust_unsigned_int j;
 	for(faust_unsigned_int i=0; i<n;i++)
+	{
+		j = col_ids[i];
+		if(j >= this->getNbCol())
+		{
+			delete[] data;
+			throw std::runtime_error("Index out of column range.");
+		}
 		memcpy(data+i*this->getNbRow(), getData()+col_ids[i]*this->getNbRow(), this->getNbRow()*sizeof(FPP));
+	}
 	MatDense<FPP, Cpu>* cols = new MatDense<FPP, Cpu>(data, this->getNbRow(), n);
 	delete[] data;
 	return cols;
@@ -1194,11 +1202,17 @@ MatDense<FPP,Cpu>* MatDense<FPP,Cpu>::get_cols(const faust_unsigned_int* col_ids
 template<typename FPP>
 MatDense<FPP,Cpu>* MatDense<FPP,Cpu>::get_cols(std::vector<int> col_ids) const
 {
-	//TODO: check args
 	int n = col_ids.size();
 	FPP *data = new FPP[this->getNbRow()*n];
-	for(int i=0; i<n;i++)
-		memcpy(data+i*this->getNbRow(), getData()+col_ids[i]*this->getNbRow(), this->getNbRow()*sizeof(FPP));
+	for(auto j: col_ids)
+	{
+		if(j >= this->getNbCol() || j < 0)
+		{
+			delete[] data;
+			throw std::runtime_error("Index out of column range.");
+		}
+		memcpy(data+i*this->getNbRow(), getData()+j*this->getNbRow(), this->getNbRow()*sizeof(FPP));
+	}
 	MatDense<FPP, Cpu>* cols = new MatDense<FPP, Cpu>(data, this->getNbRow(), n);
 	delete[] data;
 	return cols;
@@ -1210,9 +1224,8 @@ MatDense<FPP,Cpu>* MatDense<FPP,Cpu>::get_rows(faust_unsigned_int start_row_id, 
 	if(start_row_id >= this->getNbRow() || start_row_id+num_rows > this->getNbRow())
 		throw std::domain_error("get_rows: arguments out of row indices.");
 	FPP *data = new FPP[this->getNbCol()*num_rows];
-	for(faust_unsigned_int i = 0; i < this->getNbCol(); i++){
+	for(faust_unsigned_int i = 0; i < this->getNbCol(); i++)
 		memcpy(data+i*num_rows, getData()+start_row_id+i*this->getNbRow(), num_rows*sizeof(FPP));
-	}
 	MatDense<FPP, Cpu>* rows = new MatDense<FPP, Cpu>(data, num_rows, this->getNbCol());
 	delete[] data;
 	return rows;
@@ -1221,12 +1234,18 @@ MatDense<FPP,Cpu>* MatDense<FPP,Cpu>::get_rows(faust_unsigned_int start_row_id, 
 template<typename FPP>
 MatDense<FPP,Cpu>* MatDense<FPP,Cpu>::get_rows(const faust_unsigned_int* row_ids, faust_unsigned_int n) const
 {
-	//TODO: check args
 	FPP *data = new FPP[this->getNbCol()*n];
 	for(faust_unsigned_int i = 0; i < n; i++) // row_ids[i]
 		for(faust_unsigned_int j = 0; j < this->getNbCol(); j++)
+		{
+			if(row_ids[i] >= this->getNbRow())
+			{
+				delete[] data;
+				throw std::runtime_error("Index out of row range.");
+			}
 			//copy ele row_ids[i],j
 			data[j*n+i] = this->mat(row_ids[i],j);
+		}
 	MatDense<FPP, Cpu>* rows = new MatDense<FPP, Cpu>(data, n, this->getNbCol());
 	delete [] data;
 	return rows;
