@@ -348,6 +348,9 @@ namespace Faust
 			matvar_t* toMatIOVarDense(bool transpose, bool conjugate) const;
 			Real<FPP> normL1(const bool transpose=false) const;
 			Real<FPP> normL1(faust_unsigned_int&, const bool transpose=false) const;
+			Real<FPP> normInf(const bool transpose=false) const;
+			Real<FPP> normInf(faust_unsigned_int&, const bool transpose=false) const;
+
 			const FPP& operator()(faust_unsigned_int i, faust_unsigned_int j)const{return const_cast<Eigen::SparseMatrix<FPP,Eigen::RowMajor>*>(&mat)->coeffRef(i,j);}
 
 			Vect<FPP,Cpu> get_col(faust_unsigned_int id) const;

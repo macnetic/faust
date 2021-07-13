@@ -884,6 +884,18 @@ Real<FPP> Faust::MatSparse<FPP, Cpu>::normL1(const bool transpose /* default fal
 }
 
 template<typename FPP>
+Real<FPP> Faust::MatSparse<FPP, Cpu>::normInf(const bool transpose/*=false*/) const
+{
+	return normL1(!transpose);
+}
+
+template<typename FPP>
+Real<FPP> Faust::MatSparse<FPP, Cpu>::normInf(faust_unsigned_int& row_id, const bool transpose/*=false*/) const
+{
+	return normL1(row_id, !transpose);
+}
+
+template<typename FPP>
 Faust::Vect<FPP,Cpu> Faust::MatSparse<FPP,Cpu>::get_col(faust_unsigned_int id) const
 {
 	Vect<FPP, Cpu> out_vec;

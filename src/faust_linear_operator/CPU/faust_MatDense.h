@@ -384,6 +384,8 @@ namespace Faust
 			void real();
 			Real<FPP> normL1(const bool transpose=false) const;
 			Real<FPP> normL1(faust_unsigned_int&, const bool transpose=false) const;
+			Real<FPP> normInf(const bool transpose=false) const;
+			Real<FPP> normInf(faust_unsigned_int&, const bool transpose=false) const;
 			Vect<FPP,Cpu> get_col(faust_unsigned_int id) const;
 			Vect<FPP,Cpu> get_row(faust_unsigned_int id) const;
 			MatDense<FPP,Cpu>* get_cols(faust_unsigned_int start_col_id, faust_unsigned_int num_cols) const;
@@ -401,6 +403,8 @@ namespace Faust
 			void delete_row(int offset);
 
 			MatDense<FPP,Cpu>* get_rows(faust_unsigned_int start_row_id, faust_unsigned_int num_rows) const;
+			void get_rows(faust_unsigned_int start_row_id, faust_unsigned_int num_rows, MatDense<FPP, Cpu>& out_rows) const;
+			void get_rows(const faust_unsigned_int* row_ids, faust_unsigned_int n, MatDense<FPP, Cpu>& out_rows) const;
 			MatDense<FPP,Cpu>* get_rows(const faust_unsigned_int* row_ids, faust_unsigned_int n) const;
 
 			MatDense<FPP,Cpu> get_block(faust_unsigned_int i, faust_unsigned_int j, faust_unsigned_int nrows, faust_unsigned_int ncols);
