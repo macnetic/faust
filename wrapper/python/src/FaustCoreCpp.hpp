@@ -212,15 +212,15 @@ void FaustCoreCpp<FPP,DEV>::power_iteration(FPP* out, double threshold, int max_
 }
 
 template<typename FPP, FDevice DEV>
-double FaustCoreCpp<FPP,DEV>::normFro() const
+double FaustCoreCpp<FPP,DEV>::normFro(const bool full_array, const int batch_size) const
 {
-    return this->transform->normFro();
+    return this->transform->normFro(full_array, batch_size);
 }
 
 template<typename FPP, FDevice DEV>
-double FaustCoreCpp<FPP,DEV>::normInf() const
+double FaustCoreCpp<FPP,DEV>::normInf(const bool full_array, const int batch_size) const
 {
-    return this->transform->normInf();
+    return this->transform->normInf(full_array, batch_size);
 }
 
 template<typename FPP, FDevice DEV>

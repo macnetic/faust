@@ -344,11 +344,11 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
         if ord == 2:
             norm = self.@CORE_OBJ@.norm2(threshold, max_num_its)
         elif ord == np.inf:
-            norm = self.@CORE_OBJ@.normInf()
+            norm = self.@CORE_OBJ@.normInf(full_array, batch_size)
         elif ord == 1:
             norm = self.@CORE_OBJ@.norm1(full_array, batch_size);
         else:
-            norm = self.@CORE_OBJ@.normFro()
+            norm = self.@CORE_OBJ@.normFro(full_array, batch_size)
         return norm
 
 

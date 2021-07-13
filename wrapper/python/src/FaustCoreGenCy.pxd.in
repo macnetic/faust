@@ -23,8 +23,8 @@ cdef extern from "FaustCoreCpp.h":
         unsigned long long nnz() const
         void power_iteration(FPP* out, double threshold, int max_num_its) const;
         double norm2(double threshold, int max_num_its) const
-        double normFro() const
-        double normInf() const
+        double normFro(const bool full_array, const int batch_size) const
+        double normInf(const bool full_array, const int batch_size) const
         double norm1(const bool full_array, const int batch_size) const
         @CPP_CORE_CLASS@[FPP]* normalize(int ord) const
         double get_nb_factors() const

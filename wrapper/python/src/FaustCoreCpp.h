@@ -109,8 +109,8 @@ class FaustCoreCpp
     unsigned long long nnz()const;
     void power_iteration(FPP* out, double threshold=.001, int max_num_its=100) const;
     double norm2(double threshold=.001, int max_num_its=100) const;
-    double normFro() const;
-    double normInf() const;
+    double normFro(const bool full_array, const int batch_size) const;
+    double normInf(const bool full_array, const int batch_size) const;
     double norm1(const bool full_array, const int batch_size) const;
     double get_nb_factors() const;
     unsigned int get_fact_nb_rows(unsigned int& i) const;
