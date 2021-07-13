@@ -1425,8 +1425,10 @@ classdef Faust
 			ord2_valid_param = false;
 			threshold = 1e-3;
 			max_num_its = 100;
-			batch_size = 1;
+			batch_size = 1; % warning: batch_size and full_array default values are eventually calculated dynamically (see in the next)
 			full_array = true;
+			full_array_is_default = true;
+			batch_size_is_default = true;
 			if nargs >= 1
 				ord = varargin{1};
 				if ~ strcmp(ord, 'fro') && ord ~= 2 && ord ~= 1 && ord ~= inf
@@ -1450,6 +1452,7 @@ classdef Faust
 							if(nargs == i || ~ islogical(varargin{i+1}))
 								error('full_array keyword arg. is not followed by a logical')
 							else
+								full_array_is_default = false;
 								full_array = varargin{i+1};
 							end
 						case 'batch_size'
@@ -1457,11 +1460,26 @@ classdef Faust
 								error('batch_size keyword arg. is not followed by an integer')
 							else
 								batch_size = varargin{i+1};
+								batch_size_is_default = false;
 							end
 						otherwise
 							if(isstr(varargin{i}))
 								error([ varargin{i} ' unrecognized argument'])
 							end
+					end
+				end
+			end
+			if issparse(F) && ord ~= 2
+				% default values of batch_size and full_array in case the norm computed is not the 2-norm
+				% and the Faust is composed of only sparse factors
+				if full_array_is_default
+					full_array = false;
+				end
+				if batch_size_is_default
+					if strcmp(ord, 'fro') || ord == 1
+						batch_size =  floor(nnz_sum(F)/size(F,1));
+					else
+						batch_size  = floor(nnz_sum(F)/size(F,2));
 					end
 				end
 			end

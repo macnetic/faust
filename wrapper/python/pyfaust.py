@@ -1514,8 +1514,17 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             >>> F.norm(np.inf)
             18.509101197826254
         """
-        if(ord not in [1, 2, "fro", np.inf]):
+        if ord not in [1, 2, "fro", np.inf]:
             raise ValueError("ord must have the value 1, 2, 'fro' or numpy.inf.")
+        if ord != 2 and F.issparse():
+            # set full_array and batch_size arguments if not already set
+            if 'full_array' not in kwargs:
+                kwargs['full_array'] = False
+            if 'batch_size' not in kwargs:
+                if ord == 1 or ord == 'fro':
+                    kwargs['batch_size'] = F.nnz_sum()/F.shape[0]
+                else: # ord == inf
+                    kwargs['batch_size'] = f.nnz_sum()/F.shape[1]
         return F.m_faust.norm(ord, **kwargs)
 
     def power_iteration(self, threshold=1e-3, maxiter=100):
