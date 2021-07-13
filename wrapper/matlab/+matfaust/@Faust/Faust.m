@@ -89,7 +89,6 @@
 %> - Faust.mldivide().
 %> - element indexing (F(i,j) / __getitem__, but note that slicing
 %>   is memory efficient through memory views).
-%> - Faust.norm, except the 2-norm which doesn't imply a call to Faust.toarray().
 %>
 %>
 %> For more information about FAuST take a look at http://faust.inria.fr.
@@ -1376,10 +1375,13 @@ classdef Faust
 		%>
 		%> The norm of F is equal to the norm of full(F).
 		%>
-		%> @warning: all the norms except the 2-norm imply to compute full(F) which might be costly.
-		%>
-		%> @warning for the 2-norm the computation time can be expected to be of order n*min(size(F)) with n the time for multiplying F by a vector. Nevertheless, the implementation ensures that memory usage remains controlled by avoiding to explicitly compute full(F).
-		%>
+		%> @warning for the norm the computation time can be expected to be of order
+		%> n*min(F.shape) with n the time for multipliying F by a vector.
+		%> Nevertheless, in many cases the implementation ensures that memory usage remains
+		%> controlled by avoiding to explicitly compute full(F). Please pay
+		%> attention to the full_array (and batch_size) arguments for a better
+		%> understanding.
+
 		%> @b Usage
 		%>
 		%> &nbsp;&nbsp;&nbsp; @b n = @b norm(F, 2) the 2-norm or maximum singular value of F: approximately norm(full(F),2) == max(svd(full(F))).<br/><br/>
@@ -1391,9 +1393,24 @@ classdef Faust
 		%>
 		%> @param F the Faust object.
 		%> @param p (optional) the norm order or type. Respectively 1, 2 or inf for the 1-norm, 2-norm and inf-norm or 'fro' for the Frobenius norm (by default the 2-norm is computed).
-		%> @param threshold (optional) power iteration algorithm threshold (default to .001). Used only for norm(2). It's passed in a key-value pair fashion: 'threshold', .001
-		%> @param max_num_its (optional) maximum number of iterations for power iteration algorithm. Used only for norm(2). It's passed in a key-value pair fashion: 'max_num_its', 1000.
-		%>
+		%> @param 'threshold',real (optional) power iteration algorithm threshold (default to .001). Used only for norm(2). It's passed in a key-value pair fashion: 'threshold', .001
+		%> @param 'max_num_its',int (optional) maximum number of iterations for power iteration algorithm. Used only for norm(2). It's passed in a key-value pair fashion: 'max_num_its', 1000.
+		%> @param 'full_array',bool (optional) this argument is only used for 1-norm,
+		%> inf-norm and Frobenius norm. If true the Faust full array
+		%> is computed before computing the norm otherwise it is not. By
+		%> default, if the Faust is composed of only sparse factors full_array
+		%> is set to false. In other cases, full_array is set to true but note
+		%> that in this case too configurations may exist in which full_array == false can be
+		%> more efficient but it needs to finetune the batch_size argument.
+		%> @param 'batch_size',int (optional) this argument is only used when the
+		%> full_array argument is set to true (for the 1-norm, inf-norm and
+		%> Frobenius norm). It determines the number of Faust columns (resp. rows)
+		%> that are built in memory in order to compute the Frobenius norm and
+		%> the 1-norm (resp. the inf-norm). This parameter is primary in the
+		%> efficiency of the computation and memory consumption. By  default, if all the factors
+		%> composing the Faust are sparse this parameter is set to
+		%> nnz_sum(F)/size(F, 1) (resp. nnz_sum(F)/size(F, 2)), a value that has
+		%> experimentally shown good performances.
 		%>
 		%> @retval n the norm (real).
 		%>
