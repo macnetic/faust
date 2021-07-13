@@ -1047,6 +1047,7 @@ classdef Faust
 				factors = factors{j};
 			end
 		end
+
 		%================================================================
 		%> Returns the left hand side factors of F from index 1 to i included (in 1-base index).
 		%===
@@ -1137,6 +1138,22 @@ classdef Faust
 		%==========================================================================================
 		function num_factors = numfactors(F)
 			num_factors = call_mex(F, 'numfactors');
+		end
+
+		%==========================================================================================
+		%> @brief Returns true if F factors are all sparse matrices false otherwise.
+		%>
+		%==========================================================================================
+		function is_sparse = issparse(F)
+			is_sparse = call_mex(F, 'is_all_sparse');
+		end
+
+		%==========================================================================================
+		%> @brief Returns true if F factors are all dense matrices/arrays false otherwise.
+		%>
+		%==========================================================================================
+		function is_dense = isdense(F)
+			is_dense = call_mex(F, 'is_all_dense');
 		end
 
 		%==========================================================================================

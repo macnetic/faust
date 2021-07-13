@@ -464,5 +464,26 @@ namespace Faust
 			return typeid(FPP) == typeid(double) || typeid(FPP) == typeid(float);
 		}
 
+	template<typename FPP, FDevice DEV>
+		bool TransformHelperGen<FPP, DEV>::is_all_sparse() const
+		{
+			for(int i=0;i<this->size();i++)
+			{
+				if(! dynamic_cast<const MatSparse<FPP,DEV>*>(this->get_gen_fact(i)))
+					return false;
+			}
+			return true;
+		}
+
+	template<typename FPP, FDevice DEV>
+		bool TransformHelperGen<FPP, DEV>::is_all_dense() const
+		{
+			for(int i=0;i<this->size();i++)
+			{
+				if(! dynamic_cast<const MatDense<FPP,DEV>*>(this->get_gen_fact(i)))
+					return false;
+			}
+			return true;
+		}
 
 }

@@ -605,4 +605,15 @@ FaustCoreCpp<FPP,DEV>::~FaustCoreCpp()
     transform = nullptr;
 }
 
+template<typename FPP, FDevice DEV>
+bool FaustCoreCpp<FPP,DEV>::is_all_sparse() const
+{
+    return transform->is_all_sparse();
+}
+
+template<typename FPP, FDevice DEV>
+bool FaustCoreCpp<FPP,DEV>::is_all_dense() const
+{
+    return transform->is_all_dense();
+}
 

@@ -1951,11 +1951,13 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         """
         Returns True if all factors are sparse (csr_matrix format) False otherwise.
         """
-        issparse = True
-        for f in [F.factors(i) for i in range(0,F.numfactors())]:
-            if not isinstance(f, csr_matrix):
-                return False
-        return issparse
+        return F.m_faust.is_all_sparse()
+
+    def isdense(F):
+        """
+        Returns True if all factors are dense arrays (as np.ndarray-s) False otherwise.
+        """
+        return F.m_faust.is_all_dense()
 
     def swap_cols(F, id1, id2, permutation=False, inplace=False):
         """

@@ -43,6 +43,8 @@ cdef extern from "FaustCoreCpp.h":
                       const bool transpose) const
         unsigned int get_fact_nnz(const unsigned int i) const
         bool is_fact_sparse(const unsigned int i) const
+        bool is_all_sparse() const;
+        bool is_all_dense() const;
         @CPP_CORE_CLASS@[FPP]* right(const unsigned int) const
         @CPP_CORE_CLASS@[FPP]* left(const unsigned int) const
         @CPP_CORE_CLASS@[FPP]* get_slice(unsigned int, unsigned int, unsigned int,

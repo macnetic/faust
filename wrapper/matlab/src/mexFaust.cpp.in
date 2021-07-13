@@ -80,6 +80,7 @@
 #include "faust_nbytes.h"
 #include "faust_numfactors.h"
 #include "faust_factors.h"
+#include "faust_is_all_sparse_dense.h"
 #include "faust_rand.h"
 #include "faust_save.h"
 #include "faust_conj.h"
@@ -174,6 +175,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			faust_numfactors<SCALAR, DEV>(prhs, nrhs, plhs, nlhs);
 		else if (!strcmp("factors", cmd))
 			faust_factors<SCALAR, DEV>(prhs, nrhs, plhs, nlhs);
+		else if (!strcmp("is_all_sparse", cmd))
+			faust_is_all_sparse<SCALAR, DEV>(prhs, nrhs, plhs, nlhs);
+		else if (!strcmp("is_all_dense", cmd))
+			faust_is_all_dense<SCALAR, DEV>(prhs, nrhs, plhs, nlhs);
 		else if (!strcmp("save", cmd))
 			faust_save<SCALAR, DEV>(prhs, nrhs, plhs, nlhs);
 		else if(!strcmp("conj", cmd))

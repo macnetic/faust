@@ -369,6 +369,12 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
         nb_factors = int(self.@CORE_OBJ@.get_nb_factors())
         return nb_factors
 
+    def is_all_sparse(self):
+        return self.@CORE_OBJ@.is_all_sparse()
+
+    def is_all_dense(self):
+        return self.@CORE_OBJ@.is_all_dense()
+
     def get_fact(self,i):
         if(i >=  self.get_nb_factors() or i < 0):
             raise ValueError("factor index must be greater or equal 0 and "
