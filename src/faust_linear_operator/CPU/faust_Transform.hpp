@@ -627,6 +627,93 @@ FPP Faust::Transform<FPP,Cpu>::power_iteration(const faust_unsigned_int nbr_iter
 	return Faust::power_iteration(*this, nbr_iter_max, threshold, flag);
 }
 
+template<typename FPP>
+Real<FPP> Faust::Transform<FPP,Cpu>::normInf(const bool transpose/*=false*/, const bool full_array/*=true*/, const int batch_sz/*=1*/) const
+{
+	Real<FPP> norm = 0;
+	Real<FPP> abs_sum;
+	Faust::MatDense<FPP, Cpu>* dff = nullptr; // dense first factor
+	Faust::MatSparse<FPP, Cpu>* sff = nullptr; // sparse first factor
+	Faust::Vect<FPP, Cpu> t_row(this->getNbCol()); // transform row
+	Faust::MatSparse<FPP, Cpu> sff_rows; // first factor block of batch_sz rows // used only if last factor of this is a MatSparse
+	Faust::MatDense<FPP, Cpu> dff_rows; // first factor block of batch_sz rows // used only if last factor of this is a MatSparse
+	Faust::MatDense<FPP, Cpu> t_rows(this->getNbCol(), batch_sz); // transform rows (used when batch_sz > 1
+	auto first_fac = *(data.begin());
+	if(full_array)
+	{
+
+		MatDense<FPP, Cpu> full = get_product(transpose?'T':'N');
+		norm = std::abs(full.normInf(/*transpose*/)); //transpose not necessary because full is already transposed if needed
+	}
+	else if(transpose)
+		return this->normL1(false, full_array, batch_sz);
+	else
+	{
+
+		std::vector<Faust::MatGeneric<FPP, Cpu>*> last_factors(data.begin()+1, data.end());
+		// faust with all the factors except the first one
+		Transform<FPP, Cpu> ff_transform(last_factors, 1, false, false);
+		FPP* trow_ptr = nullptr;
+		int be_sz; // batch effective size according to the number of rows left
+		auto compute_norm_candidate = [&dff_rows /*&trow_ptr*/, &abs_sum, &norm, &be_sz, &ff_transform, &t_rows]()
+		{
+			// compute the block of rows j to j+be_sz of this
+//			ff_transform.multiply(trow_ptr, be_sz, t_rows.getData(), 'T');
+			auto t_rows = ff_transform.multiply(dff_rows, 'T');
+			// now that we have the columns, compute the abs sum
+			abs_sum = t_rows.mat.cwiseAbs().colwise().sum().maxCoeff();
+			if(abs_sum > norm) // abs_sum gets a chance to be the norm
+				norm = abs_sum;
+		};
+		for(int j=0;j<this->getNbRow();j+=batch_sz)
+		{
+			be_sz = j+batch_sz<first_fac->getNbRow()?batch_sz:first_fac->getNbRow()-j;
+			// compute the Transform column j without a get_product
+			if(dff = dynamic_cast<Faust::MatDense<FPP, Cpu>*>(first_fac))
+			{
+				dff->get_rows(j, be_sz, dff_rows);
+				dff_rows.transpose();
+				trow_ptr = dff_rows.getData();
+				compute_norm_candidate();
+			}
+			else if(sff = dynamic_cast<Faust::MatSparse<FPP, Cpu>*>(first_fac))
+			{
+				if(batch_sz > 1)
+				{
+					// last fact is a MatSparse, copy it to a MatSparse
+					sff->get_rows(j, be_sz, sff_rows);
+					sff_rows.transpose();
+					// compute the block of columns j to j+be_sz of this
+					auto tf_rows = ff_transform.multiply(/*Faust::MatDense<FPP,Cpu>(*/sff_rows/*)*/, 'T'); // rows are transposed
+					for(int j=0;j<be_sz;j++)
+					{
+						abs_sum = std::abs(tf_rows.mat.block(0, j, tf_rows.getNbRow(), 1).sum());
+						if(abs_sum > norm)
+							norm = abs_sum;
+					}
+//					dff_rows = sff_rows;
+//					compute_norm_candidate();
+				}
+				else
+				{ // it is faster to treat the batch_sz == 1 as a particular case
+					sff->get_rows(j, 1, sff_rows);
+//					Faust::MatDense<FPP, Cpu> ff_row(sff_rows); // first factor row
+					// no need to transpose, this is only one row
+//					trow_ptr = ff_row.getData();
+					sff_rows.transpose();
+					dff_rows = sff_rows;
+					compute_norm_candidate();
+				}
+			}
+			else
+			{
+				throw std::runtime_error("normL1 without a full array works only if the last factor is a MatDense or a MatSparse");
+			}
+
+		}
+	}
+	return norm;
+}
 
 template<typename FPP>
 double Faust::Transform<FPP,Cpu>::normL1(const bool transpose /* = false */, const bool full_array/*=true*/, const int batch_sz/*=1*/) const
@@ -639,7 +726,7 @@ double Faust::Transform<FPP,Cpu>::normL1(const bool transpose /* = false */, con
 	Faust::Vect<FPP, Cpu> t_col(this->getNbRow()); // transform column
 	Faust::MatSparse<FPP, Cpu> lf_cols; //last factor block of batch_sz columns // used only if last factor of this is a MatSparse
 	Faust::MatDense<FPP, Cpu> t_cols(this->getNbRow(), batch_sz);
-	faust_unsigned_int lf_nrows = (*(data.end()-1))->getNbRow(); // last factor nrows
+	faust_unsigned_int f_nrows = this->getNbRow(); // this nrows
 	auto last_fac = *(data.end()-1);
 	if(full_array)
 	{
@@ -647,21 +734,24 @@ double Faust::Transform<FPP,Cpu>::normL1(const bool transpose /* = false */, con
 		MatDense<FPP, Cpu> full = get_product(transpose?'T':'N');
 		norm = std::abs(full.normL1(/*transpose*/)); //transpose not necessary because full is already transposed if needed
 	}
+	else if(transpose)
+		return this->normInf(false, full_array, batch_sz);
 	else
 	{
 		std::vector<Faust::MatGeneric<FPP, Cpu>*> first_factors(data.begin(), data.end()-1);
-		// faust with all the factors excep the last one
+		// faust with all the factors except the last one
 		Transform<FPP, Cpu> ff_transform(first_factors, 1, false, false);
 		FPP* col_ptr = nullptr;
 		int be_sz; // batch effective size according to the number of column left
-		auto compute_norm_candidate = [&col_ptr, &abs_sum, &norm, &be_sz, &ff_transform, &t_cols, &lf_nrows]()
+		auto compute_norm_candidate = [&col_ptr, &abs_sum, &norm, &be_sz, &ff_transform, &t_cols, &f_nrows]()
 		{
+			t_cols.resize(f_nrows, be_sz);
 			ff_transform.multiply(col_ptr, be_sz, t_cols.getData());
 			// now that we have the columns, compute the abs sum
 			abs_sum = 0;
 			for(int j=0;j<be_sz;j++)
 			{
-				for(int i=0;i<lf_nrows;i++)
+				for(int i=0;i<f_nrows;i++)
 				{
 					abs_sum += std::abs(t_cols(i, j));
 				}
@@ -683,12 +773,12 @@ double Faust::Transform<FPP,Cpu>::normL1(const bool transpose /* = false */, con
 			}
 			else if(slf = dynamic_cast<Faust::MatSparse<FPP, Cpu>*>(last_fac))
 			{
-				if(batch_sz > 1)
+				if(be_sz > 1)
 				{
 					// last fact is a MatSparse, copy it to a MatSparse
 					slf->get_cols(j, be_sz, lf_cols);
 					// compute the block of columns j to j+be_sz of this
-					auto ff_cols = ff_transform.multiply(Faust::MatDense<FPP,Cpu>(lf_cols));
+					auto ff_cols = ff_transform.multiply(/*Faust::MatDense<FPP,Cpu>(*/lf_cols/*)*/);
 					for(int j=0;j<be_sz;j++)
 					{
 						abs_sum = std::abs(ff_cols.mat.block(0, j, this->getNbRow(), 1).sum());
@@ -732,12 +822,74 @@ double Faust::Transform<FPP,Cpu>::normFro(const char opThis, const bool isConj) 
 }
 
 template<typename FPP>
-double Faust::Transform<FPP,Cpu>::normFro() const
+double Faust::Transform<FPP,Cpu>::normFro(const bool full_array/*=true*/, const int batch_sz/*=1*/) const
 {
-	double norm;
-	MatDense<FPP, Cpu> fact = get_product();
-	norm = std::abs(fact.norm());
-	return norm;
+	double norm = 0;
+	double abs_sum;
+	Faust::MatDense<FPP, Cpu>* dlf = nullptr; // dense last factor
+	Faust::MatSparse<FPP, Cpu>* slf = nullptr; // sparse last factor
+	Faust::Vect<FPP, Cpu> lf_col; // last factor column
+	Faust::Vect<FPP, Cpu> t_col(this->getNbRow()); // transform column
+	Faust::MatSparse<FPP, Cpu> lf_cols; //last factor block of batch_sz columns // used only if last factor of this is a MatSparse
+	Faust::MatDense<FPP, Cpu> t_cols(this->getNbRow(), batch_sz);
+	faust_unsigned_int f_nrows = this->getNbRow(); // last factor nrows
+	auto last_fac = *(data.end()-1);
+	if(full_array)
+	{
+
+		MatDense<FPP, Cpu> full = get_product();
+		norm = std::abs(full.norm());
+	}
+	else
+	{
+		std::vector<Faust::MatGeneric<FPP, Cpu>*> first_factors(data.begin(), data.end()-1);
+		// faust with all the factors except the last one
+		Transform<FPP, Cpu> ff_transform(first_factors, 1, false, false);
+		FPP* col_ptr = nullptr;
+		int be_sz; // batch effective size according to the number of column left
+		auto compute_norm_candidate = [&col_ptr, &abs_sum, &norm, &be_sz, &ff_transform, &t_cols, &f_nrows]()
+		{
+			t_cols.resize(f_nrows, be_sz);
+			ff_transform.multiply(col_ptr, be_sz, t_cols.getData());
+			// now that we have the columns, compute the abs sum
+			norm += t_cols.mat.squaredNorm();
+		};
+		for(int j=0;j<this->getNbCol();j+=batch_sz)
+		{
+			be_sz = j+batch_sz<last_fac->getNbCol()?batch_sz:last_fac->getNbCol()-j;
+			// compute the Transform column j without a get_product
+			if(dlf = dynamic_cast<Faust::MatDense<FPP, Cpu>*>(last_fac))
+			{
+				// last fact is a MatDense, no need to copy the columns
+				col_ptr = dlf->getData()+j*dlf->getNbRow();
+				// compute the block of columns j to j+be_sz of this
+				compute_norm_candidate();
+			}
+			else if(slf = dynamic_cast<Faust::MatSparse<FPP, Cpu>*>(last_fac))
+			{
+				if(be_sz > 1)
+				{
+					// last fact is a MatSparse, copy it to a MatSparse
+					slf->get_cols(j, be_sz, lf_cols);
+					// compute the block of columns j to j+be_sz of this
+					auto ff_cols = ff_transform.multiply(/*Faust::MatDense<FPP,Cpu>(*/lf_cols/*)*/);
+					norm += ff_cols.mat.squaredNorm();
+				}
+				else
+				{ // it is faster to treat the batch_sz == 1 as a particular case
+					slf->get_col(j, lf_col);
+					col_ptr = lf_col.getData();
+					compute_norm_candidate();
+				}
+			}
+			else
+			{
+				throw std::runtime_error("fro-norm without a full array works only if the last factor is a MatDense or a MatSparse");
+			}
+
+		}
+	}
+	return std::sqrt(norm);
 }
 
 	template<typename FPP>
@@ -1243,7 +1395,7 @@ void Faust::Transform<FPP,Cpu>::get_nonortho_interior_prod_ids(int &start_id, in
 }
 
 template<typename FPP>
-Faust::MatSparse<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::MatSparse<FPP,Cpu> A,const char opThis) const
+Faust::MatSparse<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::MatSparse<FPP,Cpu> &A,const char opThis) const
 {
 	if (size() == 0)
 		handleWarning("Faust::Transform<FPP,Cpu> : multiply : empty Faust::Transform<FPP,Cpu>");

@@ -937,13 +937,13 @@ template<typename FPP>
 	}
 
 template<typename FPP>
-	double TransformHelper<FPP,Cpu>::normInf() const
+	double TransformHelper<FPP,Cpu>::normInf(const bool full_array/*=true*/, const int batch_sz/*=1*/) const
 	{
-		return this->transform->normL1(!this->is_transposed);
+		return this->transform->normInf(this->is_transposed, full_array, batch_sz);
 	}
 
 template<typename FPP>
-	double TransformHelper<FPP,Cpu>::normFro() const
+	double TransformHelper<FPP,Cpu>::normFro(const bool full_array/*=true*/, const int batch_sz/*=1*/) const
 	{
 		vector <MatGeneric<FPP, Cpu>*>& orig_facts = this->transform->data;
 		int start_id, end_id;
@@ -951,10 +951,10 @@ template<typename FPP>
 		if(start_id < 0)
 			return Faust::fabs(MatDense<FPP,Cpu>::eye(this->getNbCol(), this->getNbCol()).norm());
 		else if(start_id == 0)
-			return this->transform->normFro();
+			return this->transform->normFro(full_array, batch_sz);
 		vector<MatGeneric<FPP,Cpu>*> non_ortho_start(orig_facts.begin()+start_id, orig_facts.end());
 		TransformHelper<FPP, Cpu> t(non_ortho_start, 1.0, false, false);
-		return t.transform->normFro();
+		return t.transform->normFro(full_array, batch_sz);
 	}
 
 template<typename FPP>

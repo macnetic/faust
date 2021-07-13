@@ -246,7 +246,8 @@ namespace Faust
 				FPP power_iteration(const faust_unsigned_int nbr_iter_max, const Real<FPP>& threshold, int & flag) const;
 				double normL1(const bool transpose=false, const bool full_array=true, const int batch_sz=1) const;
 				double normL1(const char opThis, const bool isConj) const;
-				double normFro() const;
+				Real<FPP> normInf(const bool transpose=false, const bool full_array=true, const int batch_sz=1) const;
+				double normFro(const bool full_array=true, const int batch_sz=1) const;
 				double normFro(const char opThis, const bool isConj) const;
 
 				~Transform(){
@@ -264,7 +265,7 @@ namespace Faust
 				}
 
 				/*!
-				 * \brief multiplication between with vector x
+				 * \brief multiplication by vector x
 				 *  x = op((*this)) * x
 				 <br>
 				 * op((*this)) = (*this) if opThis='N', op((*this)= = transpose((*this)) if opThis='T'<br>
@@ -279,11 +280,11 @@ namespace Faust
 				}
 
 				/*!
-				 * \brief multiplication between with vector x
-				 *  x = op((*this)) * x
+				 * \brief multiplication by MatDense A
+				 *  A = op((*this)) * A
 				 <br>
 				 * op((*this)) = (*this) if opThis='N', op((*this)= = transpose((*this)) if opThis='T'<br>
-				 *! \tparam  x :  the vector to be multiplied
+				 *! \tparam  A :  the MatDense to be multiplied
 				 *! \tparam opThis : character
 				 */
 				MatDense<FPP,Cpu> multiply(const MatDense<FPP,Cpu> &A,const char opThis='N') const;
@@ -300,7 +301,7 @@ namespace Faust
 				 */
 				void multiply(const FPP* A, int A_ncols, FPP* C, const char opThis='N') const;
 
-				MatSparse<FPP,Cpu> multiply(const MatSparse<FPP,Cpu> A,const char opThis='N') const;
+				MatSparse<FPP,Cpu> multiply(const MatSparse<FPP,Cpu> &A,const char opThis='N') const;
 
 
 				/** \brief Move assign operator overload. Factors are not duplicated in memory but T loses its.*/

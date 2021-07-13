@@ -47,9 +47,9 @@ namespace Faust
 				Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> &x, const bool transpose=false, const bool conjugate=false);
 				void multiply(const FPP* cpu_x, FPP* cpu_y, const bool transpose=false, const bool conjugate=false);
 				void multiply(const FPP* cpu_x, int x_ncols, FPP* cpu_y, const bool transpose=false, const bool conjugate=false);
-				Real<FPP> normFro() const;
+				Real<FPP> normFro(const bool full_array=true, const int batch_size=1) const;
 				Real<FPP> normL1(const bool full_array=true, const int batch_size=1) const;
-				Real<FPP> normInf() const;
+				Real<FPP> normInf(const bool full_array=true, const int batch_size=1) const;
 				faust_unsigned_int size() const;
 				void update_total_nnz() const;
 				Real<FPP> spectralNorm(int32_t nb_iter_max, float threshold, int& flag);

@@ -163,7 +163,7 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		Real<FPP> TransformHelper<FPP,GPU2>::normFro() const
+		Real<FPP> TransformHelper<FPP,GPU2>::normFro(const bool full_array/*=true*/, const int batch_size/*=1*/) const
 		{
 			return this->transform->get_product().norm();
 		}
@@ -171,13 +171,13 @@ namespace Faust
 	template<typename FPP>
 		Real<FPP> TransformHelper<FPP,GPU2>::normL1(const bool full_array/*=true*/, const int batch_size/*=1*/) const
 		{
-			return this->transform->normL1(full_array, batch_size);
+			return this->transform->normL1(this->is_transposed, full_array, batch_size);
 		}
 
 	template<typename FPP>
-		Real<FPP> TransformHelper<FPP,GPU2>::normInf() const
+		Real<FPP> TransformHelper<FPP,GPU2>::normInf(const bool full_array/*=true*/, const int batch_size/*=1*/) const
 		{
-			return this->transform->normL1(!this->is_transposed);
+			return this->transform->normL1(!this->is_transposed, full_array, batch_size);
 		}
 
 	template<typename FPP>
