@@ -1400,54 +1400,60 @@ classdef Faust
 		%> @endcode
 		%>
 		%======================================================================
-		function n = norm(F,varargin)
-			%% 
-			nb_input = length(varargin);
-			if (nb_input > 5)
-				error('Too many input arguments');
-			end
-
+		function n = norm(F, varargin)
+			%%
+			nargs = length(varargin);
+			% set parameter default values
 			ord = 2;
-			args = {ord};
 			ord2_valid_param = false;
-			if nb_input >= 1
-				if(varargin{1} == 'fro')
-					n = call_mex(F, 'normfro');
-					return
-				end
-				if varargin{1} ~= 2 && varargin{1} ~= 1 && varargin{1} ~= inf
-					error('only 1, 2, inf or Frobenius norms are supported for the Faust');
-				end
+			threshold = 1e-3;
+			max_num_its = 100;
+			batch_size = 1;
+			full_array = true;
+			if nargs >= 1
 				ord = varargin{1};
-				args = {ord};
-				extra_opts = cell(2);
-				if(ord == 2)
-					keys = {'threshold', 'max_num_its'};
-					i = 2;
-					while i <= nb_input
-						for j=1:length(keys)
-							if(strcmp(varargin{i}, keys{j}))
-								if(nb_input>i && isnumeric(varargin{i+1}) && isreal(varargin{i+1}))
-									eval 'extra_opts{j} = varargin{i+1};';
-									ord2_valid_param = true;
-									i = i + 1;
-								else
-									error(['Parameter value (argument index ' num2str(i+2) ') not valid for parameter key ' keys{j}]);
-								end
+				if ~ strcmp(ord, 'fro') && ord ~= 2 && ord ~= 1 && ord ~= inf
+					error('only 1, 2, inf or Frobenius norms are supported for a Faust');
+				end
+				for i=2:nargs
+					switch(varargin{i})
+						case 'threshold'
+							tmparg = varargin{i+1};
+							if(nargs == i || ~ isnumeric(tmparg) || ~ isreal(tmparg) || ~ isscalar(tmparg) || tmparg < 0)
+								error('threshold keyword arg. is not followed by a positive real number')
 							end
-						end
-						if(~ ord2_valid_param)
-							error(['invalid argument ' num2str(i+1)])
-						end
-						i = i + 1;
-						ord2_valid_param = false;
+							threshold = varargin{i+1};
+						case 'max_num_its'
+							if(nargs == i ||  ~ isnumeric(varargin{i+1}) || varargin{i+1}-floor(varargin{i+1}) > 0)
+								error('max_num_its keyword arg. is not followed by an integer')
+							else
+								max_num_its = varargin{i+1};
+							end
+						case 'full_array'
+							if(nargs == i || ~ islogical(varargin{i+1}))
+								error('full_array keyword arg. is not followed by a logical')
+							else
+								full_array = varargin{i+1};
+							end
+						case 'batch_size'
+							if(nargs == i ||  ~ isnumeric(varargin{i+1}) || varargin{i+1}-floor(varargin{i+1}) > 0)
+								error('batch_size keyword arg. is not followed by an integer')
+							else
+								batch_size = varargin{i+1};
+							end
+						otherwise
+							if(isstr(varargin{i}))
+								error([ varargin{i} ' unrecognized argument'])
+							end
 					end
 				end
 			end
-			if(ord == 2 && nb_input > 2)
-				args = [ args, extra_opts{:} ];
+			if(ord == 2)
+				extra_opts = {threshold, max_num_its};
+			else % fro, 1, inf
+				extra_opts = {full_array, batch_size};
 			end
-			n = call_mex(F, 'norm', args{:});
+			n = call_mex(F, lower([num2str(ord) 'norm']), extra_opts{:});
 		end
 
 		%==========================================================
@@ -1480,7 +1486,7 @@ classdef Faust
 						case 'threshold'
 							tmparg = varargin{i+1};
 							if(argc == i || ~ isnumeric(tmparg) || ~ isreal(tmparg) || ~ isscalar(tmparg) || tmparg < 0)
-								error('thres holdkeyword arg. is not followed by a positive integer')
+								error('threshold keyword arg. is not followed by a positive real number')
 							end
 							threshold = varargin{i+1};
 						case 'maxiter'

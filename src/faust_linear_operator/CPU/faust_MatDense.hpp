@@ -1216,7 +1216,7 @@ MatDense<FPP,Cpu>* MatDense<FPP,Cpu>::get_cols(std::vector<int> col_ids) const
 {
 	int n = col_ids.size();
 	MatDense<FPP, Cpu>* cols = new MatDense<FPP, Cpu>(this->getNbRow(), n);
-	FPP *data = cols.getData();
+	FPP *data = cols->getData();
 	int i = 0;
 	for(auto j: col_ids)
 	{

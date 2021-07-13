@@ -43,10 +43,18 @@
 /*  <https://hal.archives-ouvertes.fr/hal-01167948v1>                       */
 #ifndef __MEX_FAUST_NORM__
 #define __MEX_FAUST_NORM__
-template <typename SCALAR, FDevice DEV>
-void faust_norm(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs);
 
 template <typename SCALAR, FDevice DEV>
 void faust_norm_fro(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs);
+
+template <typename SCALAR, FDevice DEV>
+void faust_norm_inf(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs);
+
+template <typename SCALAR, FDevice DEV>
+void faust_norm_1(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs);
+
+template <typename SCALAR, FDevice DEV>
+void faust_norm_2(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs);
+
 #include "faust_norm.hpp"
 #endif

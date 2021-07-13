@@ -154,12 +154,16 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			faust_nnz<SCALAR, DEV>(prhs, nrhs, plhs, nlhs);
 		else if(!strcmp("full", cmd))
 			faust_full<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
-		else if(!strcmp("norm", cmd))
-			faust_norm<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("2norm", cmd))
+			faust_norm_2<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("fronorm", cmd))
+			faust_norm_fro<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("1norm", cmd))
+			faust_norm_1<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("infnorm", cmd))
+			faust_norm_inf<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
 		else if(!strcmp("power_ite", cmd))
 			faust_power_ite<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
-		else if(!strcmp("normfro", cmd))
-			faust_norm_fro<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
 		else if(!strcmp("normalize", cmd))
 			faust_normalize<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
 		else if(!strcmp("copy", cmd))
