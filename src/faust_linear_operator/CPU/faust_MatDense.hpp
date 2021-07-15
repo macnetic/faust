@@ -1054,36 +1054,13 @@ matvar_t* MatDense<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate) const
 }
 
 template<typename FPP>
-Real<FPP> MatDense<FPP, Cpu>::normL1(faust_unsigned_int& col_id, const bool transpose /* default false */) const
+Real<FPP> MatDense<FPP, Cpu>::normL1(faust_unsigned_int& id, const bool transpose /* default false */) const
 {
-	//TODO: refactor this function with MatSparse::normL1()
-	faust_unsigned_int i, j, max_j;
 	Real<FPP> sum, max_sum;
-	Eigen::Matrix<FPP, Eigen::Dynamic,Eigen::Dynamic> vec;
-	int dim1, dim2;
-	if(transpose){
-		dim1 = this->getNbRow();
-		dim2 = this->getNbCol();
-	}
-	{
-		dim1 = this->getNbCol();
-		dim2 = this->getNbRow();
-	}
-	for(j=0;j<dim1;j++)
-	{
-		if(transpose) //get a row
-			vec=mat.block(j,0,1,this->getNbCol());
-		else //get a column
-			vec=mat.block(0,j,this->getNbRow(),1);
-		for(i=0,sum=0;i<dim2;i++)
-			sum += std::abs(vec.data()[i]);
-		if(j==0 || std::abs(sum) > std::abs(max_sum))
-		{
-			max_sum = sum;
-			max_j = j;
-		}
-	}
-	col_id = max_j;
+	if(transpose)
+		max_sum = mat.cwiseAbs().rowwise().sum().maxCoeff();
+	else
+		max_sum = mat.cwiseAbs().colwise().sum().maxCoeff();
 	return max_sum;
 }
 

@@ -639,14 +639,14 @@ Real<FPP> Faust::Transform<FPP,Cpu>::normInf(const bool transpose/*=false*/, con
 	Faust::MatDense<FPP, Cpu> dff_rows; // first factor block of batch_sz rows // used only if last factor of this is a MatSparse
 	Faust::MatDense<FPP, Cpu> t_rows(this->getNbCol(), batch_sz); // transform rows (used when batch_sz > 1
 	auto first_fac = *(data.begin());
+	if(transpose)
+		return this->normL1(false, full_array, batch_sz);
 	if(full_array)
 	{
 
-		MatDense<FPP, Cpu> full = get_product(transpose?'T':'N');
+		MatDense<FPP, Cpu> full = get_product();
 		norm = std::abs(full.normInf(/*transpose*/)); //transpose not necessary because full is already transposed if needed
 	}
-	else if(transpose)
-		return this->normL1(false, full_array, batch_sz);
 	else
 	{
 
@@ -728,14 +728,14 @@ double Faust::Transform<FPP,Cpu>::normL1(const bool transpose /* = false */, con
 	Faust::MatDense<FPP, Cpu> t_cols(this->getNbRow(), batch_sz);
 	faust_unsigned_int f_nrows = this->getNbRow(); // this nrows
 	auto last_fac = *(data.end()-1);
+	if(transpose)
+		return this->normInf(false, full_array, batch_sz);
 	if(full_array)
 	{
 
-		MatDense<FPP, Cpu> full = get_product(transpose?'T':'N');
+		MatDense<FPP, Cpu> full = get_product();
 		norm = std::abs(full.normL1(/*transpose*/)); //transpose not necessary because full is already transposed if needed
 	}
-	else if(transpose)
-		return this->normInf(false, full_array, batch_sz);
 	else
 	{
 		std::vector<Faust::MatGeneric<FPP, Cpu>*> first_factors(data.begin(), data.end()-1);
@@ -888,8 +888,9 @@ double Faust::Transform<FPP,Cpu>::normFro(const bool full_array/*=true*/, const 
 			}
 
 		}
+		norm = std::sqrt(norm);
 	}
-	return std::sqrt(norm);
+	return norm;
 }
 
 	template<typename FPP>
