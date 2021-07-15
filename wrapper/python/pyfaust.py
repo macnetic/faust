@@ -1101,6 +1101,12 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             any_G_is_cplx |= G.dtype == np.complex
             largs.append(G)
 
+            if(axis == 0 and F.shape[1] != G.shape[1] or axis == 1 and F.shape[0]
+               != G.shape[0]): raise ValueError("The dimensions of "
+                                                "the two Fausts must "
+                                                "agree.")
+
+
         if any_G_is_cplx:
             # one Faust is complex convert all real Faust to complex
             for i in range(len(largs)):
@@ -1109,10 +1115,6 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             if F.dtype != np.complex:
                 F = F.astype(np.complex)
 
-        if(axis == 0 and F.shape[1] != G.shape[1] or axis == 1 and F.shape[0]
-           != G.shape[0]): raise ValueError("The dimensions of "
-                                            "the two Fausts must "
-                                            "agree.")
 
         if all([isFaust(G) for G in largs]) and not "iterative" in kwargs.keys() or kwargs['iterative']:
             # use iterative meth.
