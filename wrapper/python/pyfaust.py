@@ -1465,9 +1465,9 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         The norm of F is equal to the numpy.linalg.norm of F.toarray().
 
-        WARNING: for the norm the computation time can be expected to be of order
+        WARNING: the norm computation time can be expected to be of order
         n*min(F.shape) with n the time for multipliying F by a vector.
-        Nevertheless, in many cases the implementation ensures that memory usage remains
+        Nevertheless, the implementation allows that memory usage remains
         controlled by avoiding to explicitly compute F.toarray(). Please pay
         attention to the full_array (and batch_size) arguments for a better
         understanding.
@@ -1480,22 +1480,21 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             to .001). Used only for norm(2).
             max_num_its: (optional) maximum number of iterations for
             power iteration algorithm (default to 100). Used only for norm(2).
-            full_array: (optional) this argument is only used for 1-norm,
+            full_array: (optional) this argument applies only for 1-norm,
             inf-norm and Frobenius norm. If True the Faust full array
             is computed before computing the norm otherwise it is not. By
-            default, if the Faust is composed of only sparse factors full_array
-            is set to False. In other cases, full_array is set to True but note
-            that in this case too configurations may exist in which full_array == False can be
-            more efficient but it needs to finetune the batch_size argument.
-            batch_size: (optional) this argument is only used when the
-            full_array argument is set to True (for the 1-norm, inf-norm and
+            default it is set to False. Many configurations exist in which
+            full_array == False can be more efficient but it needs to
+            finetune the batch_size argument.
+            batch_size: (optional) this argument applies only when the
+            full_array argument is set to False (for the 1-norm, inf-norm and
             Frobenius norm). It determines the number of Faust columns (resp. rows)
             that are built in memory in order to compute the Frobenius norm and
             the 1-norm (resp. the inf-norm). This parameter is primary in the
-            efficiency of the computation and memory consumption. By  default, if all the factors
-            composing the Faust are sparse this parameter is set to
-            F.nnz_sum()/F.shape\[0\] (resp. F.nnz_sum()/F.shape\[1\])), a value
-            that has experimentally shown good performances.
+            efficiency of the computation and memory consumption. By  default,
+            it is set to 1 (which is certainly not the optimal configuration in
+            many cases in matter of computation time but always the best in
+            term of memory cost).
 
         Returns:
             the norm (float).
@@ -1530,15 +1529,6 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         """
         if ord not in [1, 2, "fro", np.inf]:
             raise ValueError("ord must have the value 1, 2, 'fro' or numpy.inf.")
-        if ord != 2 and F.issparse():
-            # set full_array and batch_size arguments if not already set
-            if 'full_array' not in kwargs:
-                kwargs['full_array'] = False
-            if 'batch_size' not in kwargs:
-                if ord == 1 or ord == 'fro':
-                    kwargs['batch_size'] = F.nnz_sum()/F.shape[0]
-                else: # ord == inf
-                    kwargs['batch_size'] = F.nnz_sum()/F.shape[1]
         return F.m_faust.norm(ord, **kwargs)
 
     def power_iteration(self, threshold=1e-3, maxiter=100):

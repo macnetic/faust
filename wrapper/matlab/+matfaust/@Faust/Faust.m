@@ -1375,9 +1375,9 @@ classdef Faust
 		%>
 		%> The norm of F is equal to the norm of full(F).
 		%>
-		%> @warning for the norm the computation time can be expected to be of order
+		%> @warning The norm computation time can be expected to be of order
 		%> n*min(F.shape) with n the time for multipliying F by a vector.
-		%> Nevertheless, in many cases the implementation ensures that memory usage remains
+		%> Nevertheless, the implementation allows that memory usage remains
 		%> controlled by avoiding to explicitly compute full(F). Please pay
 		%> attention to the full_array (and batch_size) arguments for a better
 		%> understanding.
@@ -1395,22 +1395,21 @@ classdef Faust
 		%> @param p (optional) the norm order or type. Respectively 1, 2 or inf for the 1-norm, 2-norm and inf-norm or 'fro' for the Frobenius norm (by default the 2-norm is computed).
 		%> @param 'threshold',real (optional) power iteration algorithm threshold (default to .001). Used only for norm(2). It's passed in a key-value pair fashion: 'threshold', .001
 		%> @param 'max_num_its',int (optional) maximum number of iterations for power iteration algorithm. Used only for norm(2). It's passed in a key-value pair fashion: 'max_num_its', 1000.
-		%> @param 'full_array',bool (optional) this argument is only used for 1-norm,
+		%> @param 'full_array',bool (optional) this argument applies only for 1-norm,
 		%> inf-norm and Frobenius norm. If true the Faust full array
 		%> is computed before computing the norm otherwise it is not. By
-		%> default, if the Faust is composed of only sparse factors full_array
-		%> is set to false. In other cases, full_array is set to true but note
-		%> that in this case too configurations may exist in which full_array == false can be
-		%> more efficient but it needs to finetune the batch_size argument.
-		%> @param 'batch_size',int (optional) this argument is only used when the
-		%> full_array argument is set to true (for the 1-norm, inf-norm and
+		%> default it is set to false. Many configurations exist in which
+		%> full_array == False can be more efficient but it needs to
+		%> finetune the batch_size argument.
+		%> @param 'batch_size',int (optional) this argument applies only when the
+		%> full_array argument is set to false (for the 1-norm, inf-norm and
 		%> Frobenius norm). It determines the number of Faust columns (resp. rows)
 		%> that are built in memory in order to compute the Frobenius norm and
 		%> the 1-norm (resp. the inf-norm). This parameter is primary in the
-		%> efficiency of the computation and memory consumption. By  default, if all the factors
-		%> composing the Faust are sparse this parameter is set to
-		%> nnz_sum(F)/size(F, 1) (resp. nnz_sum(F)/size(F, 2)), a value that has
-		%> experimentally shown good performances.
+		%> efficiency of the computation and memory consumption. By  default,
+		%> it is set to 1 (which is certainly not the optimal configuration in
+		%> many cases in matter of computation time but always the best in
+		%> term of memory cost).
 		%>
 		%> @retval n the norm (real).
 		%>
@@ -1483,20 +1482,6 @@ classdef Faust
 							if(isstr(varargin{i}))
 								error([ varargin{i} ' unrecognized argument'])
 							end
-					end
-				end
-			end
-			if issparse(F) && ord ~= 2
-				% default values of batch_size and full_array in case the norm computed is not the 2-norm
-				% and the Faust is composed of only sparse factors
-				if full_array_is_default
-					full_array = false;
-				end
-				if batch_size_is_default
-					if strcmp(ord, 'fro') || ord == 1
-						batch_size =  floor(nnz_sum(F)/size(F,1));
-					else
-						batch_size  = floor(nnz_sum(F)/size(F,2));
 					end
 				end
 			end
