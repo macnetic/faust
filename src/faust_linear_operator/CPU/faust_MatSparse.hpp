@@ -958,24 +958,29 @@ void Faust::MatSparse<FPP,Cpu>::get_cols(const faust_unsigned_int* orig_col_ids,
 	std::vector<T> tripletList;
 	faust_unsigned_int count = 0; // nnz of the out_cols sp mat
 	faust_unsigned_int* col_ids = new faust_unsigned_int[num_cols];
-	std::map<faust_unsigned_int, faust_unsigned_int> inv_col_ids; // given the col_ids[i] (the key) it returns i (the value)
+	std::map<faust_unsigned_int, std::vector<faust_unsigned_int>> inv_col_ids; // given the col_ids[i] (the key) it returns i (the value)
 	// copy the ids because of the sort (don't want to alter orig_col_ids)
 	memcpy(col_ids, orig_col_ids, sizeof(faust_unsigned_int)*num_cols);
 	// set the map
 	for(int i=0;i<num_cols;i++)
 		if(col_ids[i] < 0 || col_ids[i] > this->getNbCol())
 			throw std::runtime_error("a column index is out of range.");
-		else
-			inv_col_ids[col_ids[i]] = i;
+		else if(inv_col_ids.find(col_ids[i]) != inv_col_ids.end()) // key col_ids[i] is already known
+			inv_col_ids[col_ids[i]].push_back(i);
+		else // key col_ids[i] is still unknown
+			inv_col_ids[col_ids[i]] = std::vector<faust_unsigned_int>(1, i);
 	// sort the ids
 	std::sort(col_ids, col_ids+num_cols);
 	for(int i=0 ; i < mat.outerSize() ; i++)
 		for(typename Eigen::SparseMatrix<FPP,Eigen::RowMajor>::InnerIterator it(mat,i); it; ++it)
 			if(std::binary_search(col_ids, col_ids+num_cols, it.col()))
 			{
-				// it.col() is in col_ids, add the entry in the corresponding column (given by the map)
-				tripletList.push_back(T(it.row(), inv_col_ids[it.col()], it.value()));
-				count++;
+				for(auto j: inv_col_ids[it.col()])
+				{
+					// it.col() is in col_ids, add the entry in the corresponding column (given by the map)
+					tripletList.push_back(T(it.row(), j, it.value()));
+					count++;
+				}
 			}
 	tripletList.resize(count);
 	out_cols.resize(count, this->getNbRow(), num_cols);

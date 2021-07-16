@@ -57,6 +57,7 @@
 #include "faust_Transform.h"
 #include "matio.h"
 #include <random>
+#include <vector>
 #include "faust_WHT.h"
 //! \class Faust::MatSparse<FPP,Cpu> faust_MatSparse.h
 //! \brief Class template representing sparse matrix <br>
