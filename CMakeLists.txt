@@ -698,6 +698,7 @@ if(FAUST_TORCH)
 	include_directories(${FAUST_TARGET} ${Torch_DIR}/../include ${Torch_DIR}/../include/torch/csrc/api/include)
 	#	target_link_libraries(${FAUST_TARGET} torch c10)
 	target_include_directories(${FAUST_TARGET} PUBLIC  ${Torch_DIR}/../include ${Torch_DIR}/../include/torch/csrc/api/include)
+	target_include_directories(${FAUST_LINEAR_OPERATOR_TARGET} PUBLIC  ${Torch_DIR}/../include ${Torch_DIR}/../include/torch/csrc/api/include)
 endif()
 
 if(BUILD_MULTITHREAD)
