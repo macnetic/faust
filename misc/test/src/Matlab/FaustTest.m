@@ -534,10 +534,39 @@ classdef FaustTest < matlab.unittest.TestCase
 						D = [F H_];
 					end
 					this.verifyEqual(full(C), full(D), 'AbsTol', 1e-11)
-					this.verifyEqual(full(C), cat(dimcat, full(F),full(H)),'AbsTol', 1e-11)
+					this.verifyEqual(full(C), cat(dimcat, full(F),full(H)),'AbsTol', 1e-3)
 					C = cat(dimcat,F,H)
-					this.verifyEqual(full(C), cat(dimcat, full(F),full(H)),'AbsTol', 1e-11)
+					this.verifyEqual(full(C), cat(dimcat, full(F),full(H)),'AbsTol', 1e-3)
 				end
+			end
+			% test random number of Fausts concatenation
+			for dim_cat=1:2
+				n = randi([3,18]);
+				fausts = cell(n, 1);
+				arrays = cell(n, 1);
+				field_names = {'real', 'complex'};
+				fac_types = {'sparse', 'dense', 'mixed'};
+				for i=1:n
+					fac_type_id =   randi([1, 3]);
+					field_id = randi([1,2]);
+					is_faust = randi([0, 1]) || i == 1;
+					if dim_cat == 1
+						nrows = randi([2, 128]);
+						ncols = size(F, 2);
+					else %dim_cat == 2
+						nrows = size(F, 1);
+						ncols = randi([2, 128]);
+					end
+					if is_faust
+						fausts{i} = matfaust.rand(nrows, ncols, 'fac_type', fac_types{fac_type_id}, 'field', field_names{field_id});
+					else
+						fausts{i} = full(matfaust.rand(nrows, ncols, 'fac_type', fac_types{fac_type_id}, 'field', field_names{field_id}, 'num_factors', 1));
+					end
+					arrays{i} =  full(fausts{i});
+				end
+				Fc = cat(dim_cat, fausts{:});
+				Mc = cat(dim_cat, arrays{:});
+				this.verifyEqual(Mc, full(Fc), 'AbsTol', 1e-6);
 			end
 		end
 
