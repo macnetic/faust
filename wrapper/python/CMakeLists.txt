@@ -18,9 +18,16 @@ if(${USE_MATIO_STATIC_LIBS})
 		set(PYTHON_EXT_EXTRA_OBJECTS "[ '${MATIO_STATIC_LIB_PATH}', '${HDF5_STATIC_LIB_PATH}', '${Z_STATIC_LIB_PATH}']") # the order matters for compilation
 	else() # WIN32 # intended for Visual Studio!
 		# compile the pyx and all faust .cpp needed (instead to link to faust.lib)
-		set(PY_EXT_SOURCES "${PY_EXT_SOURCES}+glob('${FAUST_PYTHON_SRC_SRC_DIR}/*.cpp')+glob('${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}/*.cpp')+glob('${FAUST_SRC_LINEAR_OPERATOR_DIR}/*.cpp')+glob('${FAUST_ALGORITHM_CONSTRAINT_SRC_DIR}/*.cpp')+glob('${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR}/*.cpp')+glob('${FAUST_UTILS_SRC_DIR}/*.cpp')")
+		set(PY_EXT_SOURCES "${PY_EXT_SOURCES}+glob('${FAUST_PYTHON_SRC_SRC_DIR}/*.cpp')+glob('${FAUST_SRC_LINEAR_OPERATOR_DIR}/*.cpp')+glob('${FAUST_ALGORITHM_CONSTRAINT_SRC_DIR}/*.cpp')+glob('${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR}/*.cpp')+glob('${FAUST_UTILS_SRC_DIR}/*.cpp')")
 		if(USE_GPU_MOD)
 			set(PY_EXT_SOURCES "${PY_EXT_SOURCES}+glob('${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR}/*.cpp')")
+		endif()
+		if(FAUST_TORCH)
+			set(PY_EXT_SOURCES "${PY_EXT_SOURCES}+glob('${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}/*.cpp')")
+		else()
+			set(PY_EXT_SOURCES "${PY_EXT_SOURCES}+['${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}/faust_Slice.cpp']")
+			# WARNING: add manually other files here
+			#TODO: use a cmake file(GLOB) list and ignore faust_torch.cpp to construct the py list
 		endif()
 		# extract the name (without .lib suffix) and the path of each libs:
 		# 1/ matio
