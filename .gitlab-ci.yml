@@ -388,6 +388,10 @@ pages:
 pkg_macos_purepy_rev:
     extends: .pkg_purepy_rev
     variables: {MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a", EXPERIMENTAL_PKG: "ON", BUILD_MULTITHREAD: "ON", NOPY2: "ON"}
+    before_script:
+      - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
+      - cmake -DCMAKE_CXX_COMPILER=/opt/local/bin/clang++-mp-8.0 ..
+      - cd ..
     tags:
         - macos
     needs:
@@ -424,18 +428,30 @@ pkg_linux_purepy_rev:
 pkg_macos_purepy_release:
     extends: .pkg_purepy_release
     variables: {MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a", BUILD_MULTITHREAD: "ON", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", NOPY2: "ON"}
+    before_script:
+      - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
+      - cmake -DCMAKE_CXX_COMPILER=/opt/local/bin/clang++-mp-8.0 ..
+      - cd ..
     tags:
         - macos
 
 pkg_macos_purepy_release_extra_pyver:
     extends: .pkg_purepy_release
     variables: {MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a", BUILD_MULTITHREAD: "ON", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", NOPY2: "ON", PYTHON_PATH: '/opt/local/bin/python3.9', JOB_PYTHON: 'python3.9'}
+    before_script:
+      - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
+      - cmake -DCMAKE_CXX_COMPILER=/opt/local/bin/clang++-mp-8.0 ..
+      - cd ..
     tags:
         - macos
 
 pkg_macos_purepy_release_torch_linked:
     extends: pkg_macos_purepy_release
     variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a", FAUST_TORCH: "ON", CMAKE_PREFIX_PATH: "/opt/local/libtorch/share/cmake/Torch", BUILD_MULTITHREAD: "ON", EXPERIMENTAL_PKG: "OFF", NOPY2: "ON"}
+    before_script:
+      - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
+      - cmake -DCMAKE_CXX_COMPILER=/opt/local/bin/clang++-mp-8.0 ..
+      - cd ..
 
 pkg_linux_purepy_release:
     extends: .pkg_purepy_release
