@@ -115,3 +115,6 @@ cdef extern from "FaustCoreCpp.h":
         @CPP_CORE_CLASS@[FPP]* eyeFaust(unsigned int n, unsigned int m)
 
 
+    cdef cppclass @CPP_CORE_CLASS@2[FPP, FPP2]:
+        @staticmethod
+        @CPP_CORE_CLASS@[FPP2]* real(@CPP_CORE_CLASS@[FPP]*)

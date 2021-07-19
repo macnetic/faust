@@ -577,6 +577,12 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
         core.@CORE_OBJ@ = self.@CORE_OBJ@.adjoint()
         return core
 
+    def real(self):
+        core = @CORE_CLASS_REAL@(core=True)
+        (<@CORE_CLASS_REAL@>core).@CORE_OBJ_REAL@ = \
+        <FaustCoreCy.@CPP_CORE_CLASS@[@REAL_TYPE@]*>FaustCoreCy.@CPP_CORE_CLASS@2[@TYPE@, double].real((<@CORE_CLASS@?>self).@CORE_OBJ@)
+        return core
+
     def zpruneout(self, nnz_tres, npasses, only_forward):
         core = @CORE_CLASS@(core=True)
         core.@CORE_OBJ@ = self.@CORE_OBJ@.zpruneout(nnz_tres,

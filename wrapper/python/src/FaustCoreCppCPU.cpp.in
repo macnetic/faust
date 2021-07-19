@@ -121,3 +121,9 @@ void  FaustCoreCpp<@TYPE@,Cpu>::device(char* dev) const
 {
 	std::strncpy(dev, "cpu", 4);
 }
+
+template<>
+FaustCoreCpp<Real<@TYPE@>,Cpu>* FaustCoreCpp2<@TYPE@, Real<@TYPE@>, Cpu>::real(FaustCoreCpp<@TYPE@,Cpu>* core)
+{
+    return core->real();
+}

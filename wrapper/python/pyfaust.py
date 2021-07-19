@@ -1851,7 +1851,11 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             return Faust([F.factors(i).astype(np.complex) for i in
                           range(F.numfactors())], dev=F.device)
         else:
-            raise ValueError("complex -> float conversion not yet supported.")
+            if F.device == 'cpu':
+                return Faust(core_obj=F.m_faust.real())
+            else:
+                raise ValueError("complex -> float conversion not yet"
+                                 " supported on GPU.")
 
     def asarray(F, *args, **kwargs):
         return F

@@ -746,6 +746,15 @@ template<typename FPP>
 		{
 			TransformHelperGen<FPP,GPU2>::get_fact(id, elts, num_rows, num_cols, transpose);
 		}
+
+
+	template<typename FPP>
+		template<typename FPP2>
+		TransformHelper<FPP2,GPU2>* TransformHelper<FPP,GPU2>::real()
+		{
+			throw std::runtime_error("real is not yet implemented for GPU2.");
+			return nullptr; //never reached
+		}
 }
 
 #include "faust_TransformHelper_cat_gpu.hpp"

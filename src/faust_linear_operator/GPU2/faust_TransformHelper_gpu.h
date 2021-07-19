@@ -61,6 +61,8 @@ namespace Faust
 				void replace(const MatGeneric<FPP, GPU2>* M, const faust_unsigned_int id);
 				void convertToSparse();
 				void convertToDense();
+				template<typename FPP2>
+				TransformHelper<FPP2, GPU2>* real();
 
 				void operator=(TransformHelper<FPP,GPU2>& th);
 				typename Transform<FPP,GPU2>::iterator begin() const;

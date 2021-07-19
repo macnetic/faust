@@ -102,3 +102,9 @@ FaustCoreCpp<@TYPE@,GPU2>* FaustCoreCpp<@TYPE@,GPU2>::clone(int dev_id/*=-1*/) c
     FaustCoreCpp<@TYPE@, GPU2>* core = new FaustCoreCpp<@TYPE@, GPU2>(th);
     return core;
 }
+
+template<>
+FaustCoreCpp<Real<@TYPE@>,GPU2>* FaustCoreCpp2<@TYPE@,Real<@TYPE@>,GPU2>::real(FaustCoreCpp<@TYPE@,GPU2>* core)
+{
+    return core->real();
+}

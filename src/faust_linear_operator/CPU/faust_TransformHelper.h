@@ -210,6 +210,8 @@ namespace Faust
 			void replace(const MatGeneric<FPP, Cpu>* M, const faust_unsigned_int fact_id);
 			void convertToSparse();
 			void convertToDense();
+			template<typename FPP2>
+			TransformHelper<Real<FPP>, Cpu>* real();
 		};
 
 
