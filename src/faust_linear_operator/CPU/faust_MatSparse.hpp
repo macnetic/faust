@@ -1437,4 +1437,10 @@ void Faust::copy_sp_mat(Faust::MatSparse<FPP,Cpu>& src, Faust::MatSparse<FPP, Cp
 	memcpy(dst.getRowPtr(), src.getRowPtr(), (src.getNbRow()+1)*sizeof(int));
 }
 
+template<typename FPP>
+void Faust::MatSparse<FPP,Cpu>::real(MatSparse<Real<FPP>, Cpu> &real_mat) const
+{
+	real_mat.resize(this->nnz, this->getNbRow(), this->getNbCol());
+	real_mat.mat = mat.real().eval().template cast<Real<FPP>>();
+}
 #endif

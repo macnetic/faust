@@ -43,6 +43,7 @@
 
 
 
+#include <type_traits>
 #include "faust_linear_algebra.h"
 #include <limits>
 
@@ -428,6 +429,13 @@ namespace Faust
 		void MatDense<FPP,Cpu>::real()
 		{
 			mat = mat.real().eval().template cast<FPP>();
+		}
+
+	template<typename FPP>
+		void MatDense<FPP,Cpu>::real(MatDense<Real<FPP>, Cpu> & real_mat) const
+		{
+			real_mat.resize(this->getNbRow(), this->getNbCol());
+			real_mat.mat = mat.real().eval().template cast<Real<FPP>>();
 		}
 
 	template<typename FPP>

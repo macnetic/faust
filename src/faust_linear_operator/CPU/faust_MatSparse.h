@@ -126,6 +126,8 @@ namespace Faust
 			friend TransformHelperPoly<FPP>; // TODO: limit to needed member functions only
 			friend void wht_factors<>(unsigned int n, std::vector<MatGeneric<FPP,Cpu>*>&  factors, const bool, const bool);
 			friend class MatDense<FPP,Cpu>;
+			friend class MatSparse<std::complex<double>, Cpu>;
+			friend class MatSparse<double, Cpu>;
 			//friend void MatDense<FPP,Cpu>::operator+=(const MatSparse<FPP,Cpu>& S);
 
 			public:
@@ -405,6 +407,9 @@ namespace Faust
 			 * \brief Concatenates horizontally left and right matrices, resizing this if necessary.
 			 */
 			void hstack(MatSparse<FPP, Cpu>& left, MatSparse<FPP, Cpu>& right);
+
+			void real(MatSparse<Real<FPP>, Cpu> & real_mat) const;
+
 
 			void print_bufs(const std::string name="");
 			void print_asarray(const std::string name="");

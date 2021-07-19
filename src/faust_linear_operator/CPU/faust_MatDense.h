@@ -382,6 +382,7 @@ namespace Faust
 			//
 			//	If the matrix is real, it does nothing.
 			void real();
+			void real(MatDense<Real<FPP>, Cpu> & real_mat) const;
 			Real<FPP> normL1(const bool transpose=false) const;
 			Real<FPP> normL1(faust_unsigned_int&, const bool transpose=false) const;
 			Real<FPP> normInf(const bool transpose=false) const;
