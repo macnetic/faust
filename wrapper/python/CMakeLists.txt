@@ -25,9 +25,14 @@ if(${USE_MATIO_STATIC_LIBS})
 		if(FAUST_TORCH)
 			set(PY_EXT_SOURCES "${PY_EXT_SOURCES}+glob('${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}/*.cpp')")
 		else()
-			set(PY_EXT_SOURCES "${PY_EXT_SOURCES}+['${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}/faust_Slice.cpp']")
-			# WARNING: add manually other files here
-			#TODO: use a cmake file(GLOB) list and ignore faust_torch.cpp to construct the py list
+			# add all cpp files except faust_torch.cpp
+			file(GLOB LIN_OP_CPP_FILES ${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}/*.cpp)
+			foreach(CPP_FILE IN LISTS LIN_OP_CPP_FILES)
+				if(NOT ${CPP_FILE} MATCHES .*faust_torch.cpp)
+					message(STATUS "OK to add:"${CPP_FILE})
+					set(PY_EXT_SOURCES "${PY_EXT_SOURCES}+['${CPP_FILE}']")
+				endif()
+			endforeach()
 		endif()
 		# extract the name (without .lib suffix) and the path of each libs:
 		# 1/ matio
@@ -186,6 +191,7 @@ configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/_FaustCorePy.pyx ${FAUST_PYTHON_BIN_D
 
 
 ############### generate pxd file
+set(REAL_FPP double)
 set(CPP_CORE_CLASS FaustCoreCppCPU)
 configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/FaustCoreCy.pxd ${FAUST_PYTHON_BIN_DIR}/FaustCoreCy.pxd COPYONLY)
 configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/FaustCoreGenCy.pxd.in ${FAUST_PYTHON_BIN_DIR}/FaustCoreGenCyCPU.pxd @ONLY)
@@ -205,7 +211,7 @@ endif()
 ########## end of pxd file generation
 
 # This function generates pyx files from generic ones (pyx.in)
-function (Generate_pyx TYPE_NAME TYPE PROC CORE_OBJ_SUFFIX FUNC_TYPE_SUFFIX)
+function (Generate_pyx TYPE_NAME TYPE REAL_TYPE_NAME REAL_TYPE PROC CORE_OBJ_SUFFIX FUNC_TYPE_SUFFIX CORE_OBJ_REAL_SUFFIX)
 	# warning: TYPE is used in configure_file
 	set(CORE_CLASS_CPU FaustCoreGen${TYPE_NAME}CPU)
 	set(CORE_CLASS_GPU FaustCoreGen${TYPE_NAME}GPU)
@@ -221,7 +227,9 @@ function (Generate_pyx TYPE_NAME TYPE PROC CORE_OBJ_SUFFIX FUNC_TYPE_SUFFIX)
 
 	set(CPP_CORE_CLASS FaustCoreCpp${PROC})
 	set(CORE_CLASS FaustCoreGen${TYPE_NAME}${PROC})
+	set(CORE_CLASS_REAL FaustCoreGen${REAL_TYPE_NAME}${PROC})
 	set(CORE_OBJ core_faust_${CORE_OBJ_SUFFIX})
+	set(CORE_OBJ_REAL core_faust_${CORE_OBJ_REAL_SUFFIX})
 	set(PYX_LIST _FaustCoreGen _FaustAlgoGenProc)
 	if(${PROC} MATCHES CPU)
 		list(APPEND PYX_LIST _FaustAlgoGen) # this pyx is only on CPU
@@ -237,9 +245,9 @@ function (Generate_pyx TYPE_NAME TYPE PROC CORE_OBJ_SUFFIX FUNC_TYPE_SUFFIX)
 endfunction()
 
 foreach(PROC IN LISTS PROC_LIST)
-	Generate_pyx(Dbl double ${PROC} dbl "")
+	Generate_pyx(Dbl double Dbl double ${PROC} dbl "" dbl)
 	if(BUILD_COMPLEX_PYX)
-		Generate_pyx(CplxDbl complex ${PROC} cplx _cplx)
+		Generate_pyx(CplxDbl complex Dbl double ${PROC} cplx _cplx dbl)
 		# Generate and include the complex-only class
 		configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/_FaustAlgoCplxDblGenProc.pyx.in ${FAUST_PYTHON_BIN_DIR}/_FaustAlgoCplxDblGen${PROC}.pyx @ONLY)
 		file(READ ${FAUST_PYTHON_BIN_DIR}/_FaustAlgoCplxDblGen${PROC}.pyx PYX_VAR)
