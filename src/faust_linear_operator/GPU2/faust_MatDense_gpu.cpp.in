@@ -737,4 +737,15 @@ namespace Faust
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
 			dsm_funcs->prox_spcol(gpu_mat, k, normalized, pos);
 		}
+
+	template<>
+		void Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::real(Faust::MatDense<Real<@FAUST_SCALAR_FOR_GM@>, GPU2>& real_mat) const
+		{
+			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
+			auto real_gpu_mat = dsm_funcs->real(gpu_mat);
+			if(real_mat.gpu_mat != nullptr)
+				dsm_funcs->free(real_mat.gpu_mat);
+			real_mat.gpu_mat = real_gpu_mat;
+		}
+
 };

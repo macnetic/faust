@@ -14,7 +14,8 @@ typedef @TEST_FPP@ FPP;
 using namespace std;
 using namespace Faust;
 
-double calc_err(MatDense<FPP, GPU2> &gpu_mat, MatDense<FPP, Cpu> &cpu_mat)
+template<typename U>
+double calc_err(MatDense<U, GPU2> &gpu_mat, MatDense<U, Cpu> &cpu_mat)
 {
 	auto gpu_mat_to_cpu = gpu_mat.tocpu();
 	auto err_diff = cpu_mat;
@@ -479,9 +480,31 @@ void test_trace()
 {
 }
 
+void test_real()
+{
+	cout << "test real()" << endl;
+	faust_unsigned_int nrows = 10, ncols = 10;
+	auto cpu_mat1 = Faust::MatDense<FPP,Cpu>::randMat(nrows,ncols);
+	cout << "cpu_mat1" << endl;
+	cpu_mat1->Display();
+	MatDense<Real<FPP>, Cpu> cpu_mat_ref;
+	cpu_mat1->real(cpu_mat_ref);
+	cout << "cpu_mat_ref" << endl;
+	cpu_mat_ref.Display();
+	cout << cpu_mat_ref.norm() << endl;
+	MatDense<FPP,GPU2> gpu_mat1(nrows, ncols, cpu_mat1->getData());
+	MatDense<Real<FPP>, GPU2> gpu_mat2;
+	gpu_mat1.real(gpu_mat2);
+	cout << "gpu_mat2" << endl;
+	gpu_mat2.Display();
+	cout << gpu_mat2.norm() << endl;
+	assert(calc_err<Real<FPP>>(gpu_mat2, cpu_mat_ref) < 1e-6);
+}
+
 int main(int argc, char** argv)
 {
 	Faust::enable_gpu_mod();
+	test_real();
 	test_mul_gpu_dense();
 	test_resize();
 	test_setones();

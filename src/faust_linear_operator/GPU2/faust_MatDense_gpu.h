@@ -19,6 +19,7 @@ namespace Faust
 		{
 			friend Transform<FPP,GPU2>; // need to access to get_gpu_mat_ptr
 			friend MatSparse<FPP,GPU2>;
+			friend MatDense<std::complex<double>,GPU2>; // TODO limit to real function
 //			friend void gemm<>(const MatDense<FPP, GPU2> &A, const MatDense<FPP, GPU2> &B, MatDense<FPP, GPU2> &C, const FPP& alpha, const FPP& beta, const char opA, const char opB);
 //
 //			friend void gemv<>(const MatDense<FPP, GPU2> &A, const Vect<FPP, GPU2> &B, Vect<FPP, GPU2> &C, const FPP& alpha, const FPP& beta, const char opA, const char opB);
@@ -128,6 +129,7 @@ namespace Faust
 				void prox_sp(int32_t k, bool normalized=false, bool pos=false) const;
 				void prox_spcol(int32_t k, bool normalized=false, bool pos=false) const;
 				void prox_splin(int32_t k, bool normalized=false, bool pos=false) const;
+				void real(MatDense<Real<FPP>, GPU2>& real_mat) const;
 				static void gemm(const MatDense<FPP, GPU2> &A, const MatDense<FPP, GPU2> &B, MatDense<FPP, GPU2> &C, const FPP& alpha, const FPP& beta, const char opA, const char opB);
 				static void gemv(const MatDense<FPP, GPU2> &A, const Vect<FPP, GPU2> &B, Vect<FPP, GPU2> &C, const FPP& alpha, const FPP& beta, const char opA, const char opB='N');
 
