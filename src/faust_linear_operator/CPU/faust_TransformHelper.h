@@ -4,7 +4,7 @@
 /*  of the project : <http://faust.inria.fr>                         */
 /*                                                                          */
 /*                              License:                                    */
-/*  Copyright (2019):    Hakim Hadj-Djilani, Nicolas Bellot, Adrien Leman, Thomas Gautrais,      */
+/*  Copyright (2021):    Hakim Hadj-Djilani, Nicolas Bellot, Adrien Leman, Thomas Gautrais,      */
 /*                      Luc Le Magoarou, Remi Gribonval                     */
 /*                      INRIA Rennes, FRANCE                                */
 /*                      http://www.inria.fr/                                */
@@ -42,6 +42,7 @@
 #ifndef __FAUST_TRANSFORM_HELPER___
 #define __FAUST_TRANSFORM_HELPER___
 
+#define NOMINMAX // avoids VS min/max issue with std::min/max.
 #include <memory>
 #include "faust_TransformHelperGen.h"
 #include "faust_RefManager.h"

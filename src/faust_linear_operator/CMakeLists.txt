@@ -25,20 +25,13 @@ endif()
 if (BUILD_VERBOSE)
 	set(FAUST_VERBOSE "1")
 endif()
-	
-# permet de definir ou non la variable de compilation FAUST_SINGLE
-configure_file(${FAUST_SRC_LINEAR_OPERATOR_DIR}/faust_constant.h.in ${FAUST_SRC_LINEAR_OPERATOR_DIR}/faust_constant.h @ONLY)
 
-#message(STATUS "AAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-#add_library(${FAUST_FAUSTCORE_TARGET} OBJECT ${HPP_FILES})
-#add_library(${FAUST_MATRIX_TARGET} OBJECT ${CPP_FILES})
+configure_file(${FAUST_SRC_LINEAR_OPERATOR_DIR}/faust_constant.h.in ${FAUST_SRC_LINEAR_OPERATOR_DIR}/faust_constant.h @ONLY)
 
 add_library(${FAUST_LINEAR_OPERATOR_TARGET} OBJECT ${CPP_FILES} ${HPP_FILES})
 
+target_compile_definitions(${FAUST_LINEAR_OPERATOR_TARGET} PRIVATE NOMINMAX)
 
-
-#set_target_properties(${FAUST_LINEAR_OPERATOR_TARGET} PROPERTIES LINKER_LANGUAGE CXX)
-#set_target_properties(${FAUST_FAUSTCORE_TARGET} PROPERTIES LINKER_LANGUAGE CXX) #comme il n y a que des hpp, force la compilation en  langage C++ pour eviter des erreurs et des warnings
 
 
 
