@@ -429,6 +429,7 @@ pkg_macos_purepy_release:
     extends: .pkg_purepy_release
     variables: {MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a", BUILD_MULTITHREAD: "ON", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", NOPY2: "ON"}
     before_script:
+      - VERSION=$CI_COMMIT_TAG
       - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
       - cmake -DCMAKE_CXX_COMPILER=/opt/local/bin/clang++-mp-8.0 ..
       - cd ..
@@ -436,12 +437,8 @@ pkg_macos_purepy_release:
         - macos
 
 pkg_macos_purepy_release_extra_pyver:
-    extends: .pkg_purepy_release
+    extends: pkg_macos_purepy_release
     variables: {MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a", BUILD_MULTITHREAD: "ON", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", NOPY2: "ON", PYTHON_PATH: '/opt/local/bin/python3.9', JOB_PYTHON: 'python3.9'}
-    before_script:
-      - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-      - cmake -DCMAKE_CXX_COMPILER=/opt/local/bin/clang++-mp-8.0 ..
-      - cd ..
     tags:
         - macos
 
