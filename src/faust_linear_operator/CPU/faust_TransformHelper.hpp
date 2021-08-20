@@ -234,7 +234,6 @@ namespace Faust {
 					break;
 				case DYNPROG:
 					{ // specific scope for variable initialized here
-						//TODO: check move
 						std::vector<Faust::MatGeneric<FPP,Cpu>*> data = this->transform->data;
 						if(this->is_transposed)
 							std::reverse(data.begin(), data.end());
@@ -294,8 +293,6 @@ namespace Faust {
 		{
 			// choose the quickest method for the Faust "toarray"
 			auto t = this->optimize_time_full(transp, inplace, nsamples);
-			// choose the quickest method for the Faust-vector mul
-			t = t->optimize_time_Fv(transp, inplace, nsamples);
 			return t;
 		}
 
@@ -357,8 +354,6 @@ namespace Faust {
 				auto start = std::chrono::system_clock::now();
 				for(int j=0;j < nmuls; j++)
 				{
-					//				auto FM = this->multiply(*M, transp);
-//					this->get_product();
 					f();
 				}
 				auto end = std::chrono::system_clock::now();
