@@ -59,6 +59,7 @@
 #include "faust_Vect.h"
 #include "faust_Transform.h"
 
+#include "faust_linear_algebra.h"
 #include "faust_BlasHandle.h"
 #include "matio.h"
 #include <random>
@@ -116,9 +117,6 @@ namespace Faust
 	template<typename FPP>
 		void spgemm(const MatDense<FPP,Cpu> & A,const MatSparse<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char typeA, char typeB);
 
-
-	// cf. faust_linear_algebra.h
-	template<typename FPP> void gemm_gen(const MatGeneric<FPP, Cpu>& A, const MatGeneric<FPP, Cpu>& B, MatDense<FPP, Cpu>& out, const FPP alpha, const FPP beta, const char opA, const char opB);
 
 	template<typename FPP, FDevice DEVICE>
 		class MatDense;
@@ -456,6 +454,7 @@ namespace Faust
 			//	friend void  MatSparse<FPP,Cpu>::multiply(MatDense<FPP,Cpu> & M,const char opThis) const;
 			friend double Transform<FPP,Cpu>::normL1(const bool transpose, const bool full_array/*=true*/, const int batch_sz/*=1*/) const;
 
+			// cf. faust_linear_algebra.h
 			friend void gemm_gen<>(const MatGeneric<FPP, Cpu>& A, const MatGeneric<FPP, Cpu>& B, MatDense<FPP, Cpu>& out, const FPP alpha, const FPP beta, const char opA, const char opB);
 
 			bool estNulle()const{return isZeros;}

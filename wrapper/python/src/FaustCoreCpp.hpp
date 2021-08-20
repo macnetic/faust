@@ -178,9 +178,9 @@ void FaustCoreCpp<FPP,DEV>::polyCoeffs(int d, int n, const FPP* basisX, const FP
 
 
 template<typename FPP, FDevice DEV>
-void FaustCoreCpp<FPP,DEV>::set_FM_mul_mode(const int mode)
+void FaustCoreCpp<FPP,DEV>::set_FM_mul_mode(const int mode, const bool silent/*=true*/)
 {
-    this->transform->set_FM_mul_mode(mode);
+    this->transform->set_FM_mul_mode(mode, silent);
 }
 
 template<typename FPP, FDevice DEV>

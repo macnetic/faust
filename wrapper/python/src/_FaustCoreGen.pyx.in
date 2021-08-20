@@ -298,8 +298,8 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
 
         return y
 
-    def set_FM_mul_mode(self, mode):
-        self.@CORE_OBJ@.set_FM_mul_mode(mode)
+    def set_FM_mul_mode(self, mode, silent=True):
+        self.@CORE_OBJ@.set_FM_mul_mode(mode, silent)
 
     def set_Fv_mul_mode(self, mode):
         self.@CORE_OBJ@.set_Fv_mul_mode(mode)

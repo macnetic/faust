@@ -203,7 +203,7 @@ namespace Faust {
 			this->is_conjugate ^= conjugate;
 			Faust::MatDense<FPP,Cpu> M;
 #ifdef FAUST_TORCH
-			if(this->mul_order_opt_mode >= 7 && this->mul_order_opt_mode <= 9 && !tensor_data.size())
+			if(this->mul_order_opt_mode >= TORCH_CPU && this->mul_order_opt_mode <= TORCH_CPU_DENSE_ROW_TO_TORCH && !tensor_data.size())
 			{
 				// init tensor data cache
 				convMatGenListToTensorList(this->transform->data, tensor_data, at::kCPU, /* clone */ false, /* transpose */ ! this->is_transposed);
@@ -211,31 +211,34 @@ namespace Faust {
 			}
 #endif
 
+
 			switch(this->mul_order_opt_mode)
 			{
 				case ORDER_ALL_ENDS:
 				case ORDER_1ST_BEST:
 				case ORDER_ALL_BEST_CONVDENSE:
 				case ORDER_ALL_BEST_MIXED:
-					{
-						//					this->transform->data.push_back(const_cast<Faust::MatDense<FPP,Cpu>*>(&A)); // it's ok
-						std::vector<Faust::MatGeneric<FPP,Cpu>*> data(this->transform->size()+1);
-						if(transpose)
+					{ // specific scope for variable initialized here
+						std::vector<Faust::MatGeneric<FPP,Cpu>*> data(this->transform->data);
+						data.resize(data.size()+1); // for the matrix multiplying Faust
+						data[data.size()-1] = const_cast<Faust::MatDense<FPP,Cpu>*>(&A);
+						std::vector<char> transconj_flags = {'N'}; // 'N' for all Faust factors and the matrix A
+						if(this->is_transposed)
 						{
-							int i = this->transform->size();
-							for(auto fac: this->transform->data)
-								data[i--] = fac;
-							data[0] = const_cast<Faust::MatDense<FPP,Cpu>*>(&A);
+							transconj_flags = std::vector<char>(data.size(), this->isTransposed2char()); // TODO: use assign in C++ 20
+							*(transconj_flags.end()-1) = 'N'; // the matrix multiplying is not transposed
+							std::reverse(data.begin(), data.end()-1); // reversing the Faust factors (because they are transposed or transconjugate)
 						}
-						else
-						{
-							int i = 0;
-							for(auto fac: this->transform->data)
-								data[i++] = fac;
-							data[i] = const_cast<Faust::MatDense<FPP,Cpu>*>(&A);
-						}
-						Faust::multiply_order_opt(this->mul_order_opt_mode, data, M, /*alpha */ FPP(1.0), /* beta */ FPP(0.0), {this->isTransposed2char()});
-						//					this->transform->data.erase(this->transform->data.end()-1);
+						Faust::multiply_order_opt(this->mul_order_opt_mode, data, M, /*alpha */ FPP(1.0), /* beta */ FPP(0.0), transconj_flags);
+					}
+					break;
+				case DYNPROG:
+					{ // specific scope for variable initialized here
+						//TODO: check move
+						std::vector<Faust::MatGeneric<FPP,Cpu>*> data = this->transform->data;
+						if(this->is_transposed)
+							std::reverse(data.begin(), data.end());
+						M = std::move(dynprog_multiply(data, this->isTransposed2char(), &A));
 					}
 					break;
 				case CPP_PROD_PAR_REDUC:
@@ -261,7 +264,7 @@ namespace Faust {
 			}
 			this->is_conjugate ^= conjugate;
 			this->is_transposed ^= transpose;
-			return M;
+			return std::move(M);
 		}
 
 	template<typename FPP>
@@ -331,7 +334,7 @@ namespace Faust {
 			cout << "nsamples used to measure time: " << nmuls << endl;
 #endif
 #ifdef FAUST_TORCH
-			if(this->mul_order_opt_mode >= 7 && this->mul_order_opt_mode <= 9 && !tensor_data.size())
+			if(this->mul_order_opt_mode >= TORCH_CPU && this->mul_order_opt_mode <= TORCH_CPU_DENSE_ROW_TO_TORCH && !tensor_data.size())
 			{
 				// init tensor data cache
 				convMatGenListToTensorList(this->transform->data, tensor_data, at::kCPU, /* clone */ false, /* transpose */ ! this->is_transposed);
@@ -844,25 +847,33 @@ template<typename FPP>
 
 
 template<typename FPP>
-	MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::get_product(const int mul_order_opt_mode/*=DEFAULT*/) // const
+	MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::get_product(const int mul_order_opt_mode/*=-1*/) // const
 	{
 		int old_FM_mul_mod = -1;
 		MatDense<FPP, Cpu> P;
 		// keep current mul mode to restore it on the function end
-		if(mul_order_opt_mode != this->mul_order_opt_mode)
+		if(mul_order_opt_mode > -1 && mul_order_opt_mode != this->mul_order_opt_mode)
 		{
 			old_FM_mul_mod = this->mul_order_opt_mode;
 			this->set_FM_mul_mode(mul_order_opt_mode);
 		}
 		if(this->mul_order_opt_mode)
-			switch(this->mul_order_opt_mode)
+		{
+			if(this->mul_order_opt_mode == DYNPROG)
 			{
-				default:
-					//TODO: avoid to add one factor for all methods if possible
-					MatDense<FPP,Cpu> Id(this->getNbCol(), this->getNbCol());
-					Id.setEyes();
-					P = this->multiply(Id);
+				std::vector<Faust::MatGeneric<FPP,Cpu>*> data = this->transform->data;
+				if(this->is_transposed)
+					std::reverse(data.begin(), data.end());
+				P = std::move(dynprog_multiply(data, this->isTransposed2char()));
 			}
+			else
+			{
+				// TODO: it should be a MatSparse // it needs to update TransformHelper::multiply(MatSparse)
+				MatDense<FPP,Cpu> Id(this->getNbCol(), this->getNbCol());
+				Id.setEyes();
+				P = this->multiply(Id);
+			}
+		}
 		else
 			P = this->transform->get_product(this->isTransposed2char(), this->is_conjugate);
 		if(old_FM_mul_mod != - 1)
@@ -873,7 +884,7 @@ template<typename FPP>
 	}
 
 template<typename FPP>
-	void TransformHelper<FPP,Cpu>::get_product(Faust::MatDense<FPP,Cpu>& prod, const int mul_order_opt_mode/*=DEFAULT*/) //const
+	void TransformHelper<FPP,Cpu>::get_product(Faust::MatDense<FPP,Cpu>& prod, const int mul_order_opt_mode/*=-1*/) //const
 	{
 		if(mul_order_opt_mode != DEFAULT)
 			prod = this->get_product(mul_order_opt_mode);

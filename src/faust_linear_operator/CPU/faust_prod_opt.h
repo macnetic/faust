@@ -16,6 +16,7 @@ namespace Faust
 		ORDER_1ST_BEST,
 		ORDER_ALL_BEST_CONVDENSE,
 		ORDER_ALL_BEST_MIXED,
+		DYNPROG,
 		CPP_PROD_PAR_REDUC,
 		OMP_PROD_PAR_REDUC,
 		TORCH_CPU,
@@ -95,6 +96,11 @@ namespace Faust
 	template<typename FPP, FDevice DEVICE>
 	MatDense<FPP,DEVICE> multiply_par(const std::vector<MatGeneric<FPP,DEVICE>*>& data, const MatDense<FPP,DEVICE> A, const char opThis);
 
+	/**
+	 * Multipy the matrix chain "factors" using the dynamic programming method to determine the order (parenthesis positions) in the product (reducing the computation cost).
+	 */
+	template<typename FPP>
+		MatDense<FPP, Cpu> dynprog_multiply(std::vector<MatGeneric<FPP, Cpu>*>& factors, const char op='N', const MatGeneric<FPP, Cpu>* A=nullptr);
 }
 #include "faust_prod_opt.hpp"
 #endif

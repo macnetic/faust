@@ -108,6 +108,7 @@ void Faust::multiply_order_opt_all_best(std::vector<Faust::MatDense<FPP,DEVICE>*
 		Sj = facts[idx+1];
 		for(auto Tit = tmp_facts.begin(); Tit != tmp_facts.end(); Tit++)
 		{
+			// TODO: both Sj and Si can be tmp_factor
 			if(Sj == *Tit)
 			{// Sj is original fact
 				multiplying_tmp_factor = true;
@@ -138,9 +139,13 @@ void Faust::multiply_order_opt_all_best(std::vector<Faust::MatDense<FPP,DEVICE>*
 		if(facts.size() > 2)
 		{
 			if(idx > 0)
-				complexity[idx-1] = facts[idx-1]->getNbRow() * facts[idx-1]->getNbCol() * facts[idx]->getNbCol();
+				complexity[idx-1] = facts[idx-1]->getNbRow() * facts[idx-1]->getNbCol() * facts[idx]->getNbCol(); //whether facts[idx-1] is transposed or not, it's the same
 			if(idx < facts.size()-1)
-				complexity[idx] = facts[idx]->getNbRow() * facts[idx]->getNbCol() * facts[idx+1]->getNbCol();
+				complexity[idx] = facts[idx]->getNbRow() * facts[idx]->getNbCol();
+				if(transconj_flags.size() > idx && transconj_flags[idx+1] != 'N')
+					complexity[idx] *= facts[idx+1]->getNbRow();
+				else
+					complexity[idx] *= facts[idx+1]->getNbCol();
 		}
 		multiplying_tmp_factor = false;
 	}
@@ -189,44 +194,6 @@ void Faust::multiply_order_opt_all_best(std::vector<Faust::MatGeneric<FPP,DEVICE
 				return 'H';
 		}
 	};
-	auto prod_SiSj = [&reverse_transp_flag, &type_err, &tmp_sp1, &tmp_sp2, &tmp_ds1, &tmp_ds2, &transconj_flags](Faust::MatGeneric<FPP,DEVICE> *Si, Faust::MatGeneric<FPP,DEVICE> *Sj, Faust::MatDense<FPP,DEVICE> &tmp, char Si_flag, char Sj_flag, FPP alpha=1.0, FPP beta=0.0)
-	{
-		if((tmp_sp1 = dynamic_cast<Faust::MatSparse<FPP,DEVICE>*>(Si)))
-		{
-			if((tmp_sp2 = dynamic_cast<Faust::MatSparse<FPP,DEVICE>*>(Sj)))
-			{
-				Faust::MatDense<FPP,Cpu> tmp_ds2_(*tmp_sp2);
-				return spgemm(*tmp_sp1, tmp_ds2_, tmp, (FPP) alpha, (FPP) beta, Si_flag, Sj_flag);
-			}
-			else if(! (tmp_ds2 = dynamic_cast<Faust::MatDense<FPP,DEVICE>*>(Sj)))
-				throw std::runtime_error(type_err);
-			spgemm(*tmp_sp1, *tmp_ds2, tmp, (FPP) alpha, (FPP) beta, Si_flag, Sj_flag);
-		}
-		else
-		{
-			// Si is dense
-			tmp_ds1 = dynamic_cast<Faust::MatDense<FPP,DEVICE>*>(Si);
-			if((tmp_sp2 = dynamic_cast<Faust::MatSparse<FPP,DEVICE>*>(Sj)))
-			{
-				// Sj is sparse
-				char Si_flag_inv = reverse_transp_flag(Si_flag);
-				char Sj_flag_inv = reverse_transp_flag(Sj_flag);
-				spgemm(*tmp_sp2, *tmp_ds1, tmp, (FPP) alpha, (FPP) beta, Sj_flag_inv, Si_flag_inv);
-				if(typeid(FPP) == typeid(std::complex<double>) || typeid(FPP) == typeid(std::complex<float>))
-				{
-					tmp.conjugate(false);
-					tmp.transpose();
-				}
-				else
-					tmp.transpose();
-			}
-			else if(! (tmp_ds2 = dynamic_cast<Faust::MatDense<FPP,DEVICE>*>(Sj)))
-				throw std::runtime_error(type_err);
-			else
-				gemm(*tmp_ds1, *tmp_ds2, tmp, (FPP) alpha, (FPP) beta, Si_flag, Sj_flag);
-		}
-	};
-
 	for(int i = 0; i <nfacts-1; i++)
 	{
 		Si = facts[i];
@@ -243,12 +210,16 @@ void Faust::multiply_order_opt_all_best(std::vector<Faust::MatGeneric<FPP,DEVICE
 		Sj = facts[idx+1];
 		tmp = new Faust::MatDense<FPP, DEVICE>();
 		tmp_facts.push_back(tmp);
-		prod_SiSj(Si, Sj, *tmp, transconj_flags[transconj_flags.size()>idx?idx:0], transconj_flags[transconj_flags.size()>idx+1?idx+1:0]);
+		gemm_gen(*Si, *Sj, *tmp, (FPP)1.0, (FPP)0.0, transconj_flags[transconj_flags.size()>idx?idx:0], transconj_flags[transconj_flags.size()>idx+1?idx+1:0]);
 		facts.erase(facts.begin()+idx+1);
 		complexity.erase(complexity.begin()+idx); //complexity size == facts size - 1
 		facts[idx] = tmp;
 		if(transconj_flags.size() > idx)
+		{
+			if(transconj_flags.size() > idx+1)
+				transconj_flags.erase(transconj_flags.begin()+idx+1);
 			transconj_flags[idx] = 'N';
+		}
 		// update complexity around the new factor
 		if(facts.size() > 2)
 		{
@@ -260,7 +231,7 @@ void Faust::multiply_order_opt_all_best(std::vector<Faust::MatGeneric<FPP,DEVICE
 		multiplying_tmp_factor = false;
 	}
 	// last mul
-	prod_SiSj(facts[0], facts[1], out, transconj_flags[0], transconj_flags.size()>1?transconj_flags[1]:'N', alpha, beta_out);
+	gemm_gen(*facts[0], *facts[1], out, alpha, beta_out, transconj_flags[0], transconj_flags.size()>1?transconj_flags[1]:'N');
 	facts.erase(facts.begin(), facts.end());
 	// delete all tmp facts
 	for(auto Tit = tmp_facts.begin(); Tit != tmp_facts.end(); Tit++)
@@ -642,4 +613,156 @@ void Faust::multiply_par_run(int nth, int thid, int num_per_th, int data_size, c
 
 
 	}
+}
+
+namespace Faust
+{
+	template<typename FPP>
+		MatGeneric<FPP, Cpu>* dynprog_multiply_rec(const std::vector<MatGeneric<FPP, Cpu>*>& factors, int** inds, int i, int j, const char op='N', const char last_op='N')
+		{
+			int j_minus_i = j-i;
+			int p_nrows, p_ncols; // prod numbers rows, cols
+			char op_left, op_right;
+			if(j_minus_i == 0)
+				return factors[i];
+			else if(j_minus_i == 1)
+			{
+				op_left = op; // i < factors.size()-1 because j_minus_i == 1
+				if(j < factors.size()-1)
+					op_right = op;
+				else // j == last factor
+					op_right = last_op;
+				if(op_left == 'N')
+					p_nrows = factors[i]->getNbRow();
+
+				else
+					p_nrows = factors[i]->getNbCol();
+				if(op_right == 'N')
+					p_ncols = factors[j]->getNbCol();
+				else
+					p_ncols = factors[j]->getNbRow();
+				auto prod = new MatDense<FPP, Cpu>(p_nrows, p_ncols);
+//				std::cout << factors[i]->getNbRow() << "x" << factors[i]->getNbCol() << "*" << factors[j]->getNbRow() << "x" << factors[j]->getNbCol() << std::endl;
+				gemm_gen(*factors[i], *factors[j], *prod, (FPP)1.0, (FPP)0.0, op_left, op_right);
+				return prod;
+			}
+			else
+			{
+				auto k = inds[i][j];
+
+
+				auto prod1 = dynprog_multiply_rec(factors, inds, i, k, op, last_op);
+				auto prod2 = dynprog_multiply_rec(factors, inds, k+1, j, op, last_op);
+
+				if(i == k)
+					op_left = op;
+				else // prod1 was computed here, it's not one of factors[i], so no need to take care of op
+					op_left = 'N';
+				if(k+1 == j)
+					if(j == factors.size()-1)
+						op_right = last_op;
+					else
+						op_right = op;
+				else // prod2 was computed here, it's not one of factors[i], so no need to take care of op
+					op_right = 'N';
+
+				if(op_left == 'N')
+					p_nrows = prod1->getNbRow();
+				else
+					p_nrows = prod1->getNbCol();
+
+				if(op_right == 'N')
+					p_ncols = prod2->getNbCol();
+				else
+					p_ncols = prod2->getNbRow();
+
+				auto prod12 = new MatDense<FPP, Cpu>(p_nrows, p_ncols);
+//				std::cout << prod1->getNbRow() << "x" << prod1->getNbCol() << "*" << prod2->getNbRow() << "x" << prod2->getNbCol() << std::endl;
+				gemm_gen(*prod1, *prod2, *prod12, FPP(1.0), FPP(0.0), op_left, op_right);
+				//TODO/ verify if a memory leak exists
+				// delete matrices allocated in this function's recursive calls
+				if(k-i > 1)
+					delete prod1;
+				if(j-k-1 > 1)
+					delete prod2;
+				return prod12;
+			}
+		}
+
+
+	template<typename FPP>
+		MatDense<FPP, Cpu> dynprog_multiply(std::vector<MatGeneric<FPP, Cpu>*>& factors, const char op/*='N'*/, const MatGeneric<FPP, Cpu>* A/*=nullptr*/)
+		{
+			//TODO: manage useless cases when factors.size is too small
+			char last_op = op;
+			if(A != nullptr)
+			{
+				factors.push_back(const_cast<MatGeneric<FPP, Cpu>*>(A)); // A won't be touched
+				last_op = 'N';
+			}
+			const int n = factors.size();
+			int** c = new int*[n]; // TODO: reduce the memory used because only the upper triangle of the array is used
+			int** inds = new int*[n]; // TODO: idem
+			int j, k, cost;
+			for(int i=0;i<n;i++)
+			{
+				c[i] = new int[n];
+				inds[i] = new int[n];
+				c[i][i] = 0;
+			}
+			for(int p=1;p<n;p++)
+				for(int i=0;i<n-p;i++)
+				{
+					j = p + i;
+					k = i;
+					c[i][j] = std::numeric_limits<int>::max();
+					while(k < j)
+					{
+						cost = c[i][k] + c[k+1][j];
+						if(j < factors.size()-1 || A == nullptr)
+						{
+							if(op == 'N')
+								cost += factors[i]->getNbRow() * factors[k]->getNbCol() * factors[j]->getNbCol();
+							else
+								cost += factors[i]->getNbCol() * factors[k]->getNbRow() * factors[j]->getNbRow();
+						}
+						else
+						{ // j == factors.size()-1 && A == factors[n-1]
+							// last_op == 'N'
+							if(op == 'N')
+								cost += factors[i]->getNbRow() * factors[k]->getNbCol() * factors[j]->getNbCol();
+							else
+								cost += factors[i]->getNbCol() * factors[k]->getNbRow() * factors[j]->getNbCol();
+						}
+						if(cost < c[i][j])
+						{
+							c[i][j] = cost;
+							inds[i][j] = k;
+						}
+						k++;
+					}
+				}
+//			std::cout << "inds:" << std::endl;
+//			for(int i=0;i<n;i++)
+//			{
+//				for(int j=i+1;j<n;j++)
+//				{
+//					std::cout << inds[i][j] << " ";
+//				}
+//				std::cout << std::endl;
+//			}
+			auto prod = dynamic_cast<MatDense<FPP, Cpu>*>(dynprog_multiply_rec(factors, inds, 0, n-1, op, last_op));
+			for(int i=0;i<n;i++)
+			{
+				delete[] c[i];
+				delete[] inds[i];
+			}
+			delete[] c;
+			delete[] inds;
+			auto M = std::move(*prod);
+			delete prod;
+			if(A != nullptr)
+				factors.erase(factors.end()-1);
+			return std::move(M);
+		}
 }

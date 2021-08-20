@@ -55,6 +55,7 @@
 
 
 #include "faust_Transform.h"
+#include "faust_linear_algebra.h"
 #include "matio.h"
 #include <random>
 #include <vector>
@@ -101,16 +102,6 @@ namespace Faust
 	//template<typename FPP> void wht_factors(unsigned int n, std::vector<MatGeneric<FPP,Cpu>*>&  factors, const bool, const bool);
 	template<typename FPP>
 		void multiply(const Transform<FPP,Cpu> & A, const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP & alpha, char typeA, char typeMult);
-
-	//! modif NB v1102 : comment useless function
-
-	template<typename FPP>
-		void spgemm(const MatSparse<FPP,Cpu> & A,const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB);
-	template<typename FPP>
-		void spgemm(const MatDense<FPP,Cpu> & A,const MatSparse<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB);
-
-	// cf. faust_linear_algebra.h
-	template<typename FPP> void gemm_gen(const MatGeneric<FPP, Cpu>& A, const MatGeneric<FPP, Cpu>& B, MatDense<FPP, Cpu>& out, const FPP alpha, const FPP beta, const char opA, const char opB);
 
 
 	template<typename FPP>
@@ -462,9 +453,9 @@ namespace Faust
 
 			//! modif NB v1102 : comment useless function
 
+			// cf. faust_linear_algebra.h
 			friend void spgemm<>(const MatSparse<FPP,Cpu> & A,const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB);
 			friend void spgemm<>(const MatDense<FPP,Cpu> & A,const MatSparse<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB);
-
 			friend void gemm_gen<>(const MatGeneric<FPP, Cpu>& A, const MatGeneric<FPP, Cpu>& B, MatDense<FPP, Cpu>& out, const FPP alpha, const FPP beta, const char opA, const char opB);
 		};
 
