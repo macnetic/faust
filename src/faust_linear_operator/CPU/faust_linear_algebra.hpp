@@ -901,7 +901,21 @@ namespace Faust
 				return op_e_spm;
 			};
 			out.resize(opA == 'N'?A.getNbRow():A.getNbCol(), opB == 'N'?B.getNbCol():B.getNbRow());
-			out.mat = alpha*to_eigen_sp(dynamic_cast<const MatSparse<FPP, Cpu>&>(A).mat, opA)*to_eigen_sp(dynamic_cast<const MatSparse<FPP, Cpu>&>(B).mat, opB) + beta*out.mat;
+#ifdef _MSC_VER
+			// MS VC compiling an old version of eigen the expression must be separated in two (if beta != 0) and eval() must be used
+			if(beta != FPP(0.0))
+			{
+				out.mat = beta*out.mat;
+				out.mat += (alpha*to_eigen_sp(dynamic_cast<const MatSparse<FPP, Cpu>&>(A).mat, opA)*to_eigen_sp(dynamic_cast<const MatSparse<FPP, Cpu>&>(B).mat, opB)).eval();
+			}
+			else
+				out.mat = (alpha*to_eigen_sp(dynamic_cast<const MatSparse<FPP, Cpu>&>(A).mat, opA)*to_eigen_sp(dynamic_cast<const MatSparse<FPP, Cpu>&>(B).mat, opB)).eval();
+#else
+			if(beta != FPP(0.0))
+				out.mat = alpha*to_eigen_sp(dynamic_cast<const MatSparse<FPP, Cpu>&>(A).mat, opA)*to_eigen_sp(dynamic_cast<const MatSparse<FPP, Cpu>&>(B).mat, opB) + beta*out.mat;
+			else
+				out.mat = alpha*to_eigen_sp(dynamic_cast<const MatSparse<FPP, Cpu>&>(A).mat, opA)*to_eigen_sp(dynamic_cast<const MatSparse<FPP, Cpu>&>(B).mat, opB);
+#endif
 		}
 		else
 		{
