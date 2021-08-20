@@ -117,6 +117,8 @@ namespace Faust
 		void spgemm(const MatDense<FPP,Cpu> & A,const MatSparse<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char typeA, char typeB);
 
 
+	// cf. faust_linear_algebra.h
+	template<typename FPP> void gemm_gen(const MatGeneric<FPP, Cpu>& A, const MatGeneric<FPP, Cpu>& B, MatDense<FPP, Cpu>& out, const FPP alpha, const FPP beta, const char opA, const char opB);
 
 	template<typename FPP, FDevice DEVICE>
 		class MatDense;
@@ -453,6 +455,9 @@ namespace Faust
 			friend void gemv<>(const MatDense<FPP,Cpu> & A,const Vect<FPP,Cpu> & x,Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);
 			//	friend void  MatSparse<FPP,Cpu>::multiply(MatDense<FPP,Cpu> & M,const char opThis) const;
 			friend double Transform<FPP,Cpu>::normL1(const bool transpose, const bool full_array/*=true*/, const int batch_sz/*=1*/) const;
+
+			friend void gemm_gen<>(const MatGeneric<FPP, Cpu>& A, const MatGeneric<FPP, Cpu>& B, MatDense<FPP, Cpu>& out, const FPP alpha, const FPP beta, const char opA, const char opB);
+
 			bool estNulle()const{return isZeros;}
 
 			static MatDense<FPP,Cpu>* randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols);

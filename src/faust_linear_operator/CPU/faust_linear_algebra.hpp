@@ -49,33 +49,11 @@
 #include "faust_MatDense.h"
 #include "faust_constant.h"
 #include "faust_Vect.h"
+#include <Eigen/SparseCore>
 
 #ifdef __COMPILE_TIMERS__
     #include "faust_Timer.h"
 #endif
-template<typename FPP>
-void Faust::gemm_gen(const Faust::MatGeneric<FPP,Cpu> & A,const Faust::MatGeneric<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB)
-{
-	const MatSparse<FPP, Cpu>* spA;
-	const MatSparse<FPP, Cpu>* spB;
-	const MatDense<FPP, Cpu>* dsA;
-	const MatDense<FPP, Cpu>* dsB;
-	// downcast an call the proper function
-	spA = dynamic_cast<const Faust::MatSparse<FPP,Cpu>*>(&A);
-	if(! spA)
-		dsA = dynamic_cast<const Faust::MatDense<FPP,Cpu>*>(&A);
-	spB = dynamic_cast<const Faust::MatSparse<FPP,Cpu>*>(&B);
-	if(! spB)
-		dsB = dynamic_cast<const Faust::MatDense<FPP,Cpu>*>(&B);
-	if(spA && spB)
-		throw std::runtime_error("gemm on two MatSparse is not supported.");
-	else if(spA)
-		spgemm(*spA, *dsB, C, alpha, beta, typeA, typeB);
-	else if(spB)
-		spgemm(*dsA, *spB, C, alpha, beta, typeA, typeB);
-	else
-		gemm(*dsA, *dsB, C, alpha, beta, typeA, typeB);
-}
 
 template<typename FPP>
 void Faust::spgemm(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatSparse<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB)
@@ -95,7 +73,7 @@ void Faust::spgemm(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatSparse<FPP
 		_A = copy_A;
 	}
 
-	if (typeA == 'T' || typeA == 'H')
+	if (typeA != 'N') // 'H' or 'T'
 	{
 		nbRowOpA = _A.getNbCol();
 		nbColOpA = _A.getNbRow();
@@ -106,7 +84,7 @@ void Faust::spgemm(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatSparse<FPP
 	}
 
 
-	if (typeB == 'T' || typeA == 'H')
+	if (typeB != 'N') // 'H' or 'T'
 	{
 		nbRowOpB = B.getNbCol();
 		nbColOpB = B.getNbRow();
@@ -293,22 +271,24 @@ void Faust::spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP
 		handleError("linear_algebra", " Faust::spgemm : C is the same object as A or B");
 	}
 
-	if (typeA == 'T' || typeA == 'H')
+	if (typeA != 'N') // 'T' or 'H'
 	{
 		nbRowOpA = A.getNbCol();
 		nbColOpA = A.getNbRow();
-	}else
+	}
+	else
 	{
 		nbRowOpA = A.getNbRow();
 		nbColOpA = A.getNbCol();
 	}
 
 
-	if (typeB == 'T' || typeA == 'H')
+	if (typeB != 'N') // 'T' or 'H'
 	{
 		nbRowOpB = B.getNbCol();
 		nbColOpB = B.getNbRow();
-	}else
+	}
+	else
 	{
 		nbRowOpB = B.getNbRow();
 		nbColOpB = B.getNbCol();
@@ -881,7 +861,54 @@ Faust::Vect<FPP,Cpu> Faust::operator*(const Faust::MatSparse<FPP,Cpu>& M, const 
 	return vec;
 }
 
-
+namespace Faust
+{
+	template<typename FPP> void gemm_gen(const MatGeneric<FPP, Cpu>& A, const MatGeneric<FPP, Cpu>& B, MatDense<FPP, Cpu>& out, const FPP alpha/*=FPP(1.0)*/, const FPP beta/*=(0.0)*/, const char opA/*='N'*/, const char opB/*='N'*/)
+	{
+		if(dynamic_cast<const MatDense<FPP, Cpu>*>(&A) != nullptr && dynamic_cast<const MatDense<FPP, Cpu>*>(&B) != nullptr)
+		{
+			gemm<FPP>(dynamic_cast<const MatDense<FPP, Cpu>&>(A), dynamic_cast<const MatDense<FPP, Cpu>&>(B), out, alpha, beta, opA, opB);
+		}
+		else if(dynamic_cast<const MatDense<FPP, Cpu>*>(&A) && dynamic_cast<const MatSparse<FPP, Cpu>*>(&B))
+		{
+			spgemm<FPP>(dynamic_cast<const MatDense<FPP, Cpu>&>(A),
+					dynamic_cast<const MatSparse<FPP, Cpu>&>(B),
+					out, alpha, beta, opA, opB);
+		}
+		else if(dynamic_cast<const MatSparse<FPP, Cpu>*>(&A) && dynamic_cast<const MatDense<FPP, Cpu>*>(&B))
+		{
+			spgemm<FPP>(dynamic_cast<const MatSparse<FPP, Cpu>&>(A),
+					dynamic_cast<const MatDense<FPP, Cpu>&>(B),
+					out, alpha, beta, opA, opB);
+		}
+		else if(dynamic_cast<const MatSparse<FPP, Cpu>*>(&A) && dynamic_cast<const MatSparse<FPP, Cpu>*>(&B))
+		{
+			auto to_eigen_sp = [](const Eigen::SparseMatrix<FPP,Eigen::RowMajor> & e_spm, const char op)
+			{
+				Eigen::SparseMatrix<FPP,Eigen::RowMajor> op_e_spm;
+				switch(op)
+				{
+					case 'N':
+						op_e_spm = e_spm;
+						break;
+					case 'T':
+						op_e_spm = e_spm.transpose();
+						break;
+					case 'H':
+						op_e_spm = e_spm.adjoint();
+						break;
+				}
+				return op_e_spm;
+			};
+			out.resize(opA == 'N'?A.getNbRow():A.getNbCol(), opB == 'N'?B.getNbCol():B.getNbRow());
+			out.mat = alpha*to_eigen_sp(dynamic_cast<const MatSparse<FPP, Cpu>&>(A).mat, opA)*to_eigen_sp(dynamic_cast<const MatSparse<FPP, Cpu>&>(B).mat, opB) + beta*out.mat;
+		}
+		else
+		{
+			throw std::runtime_error("faust_linear_algebra mul function doesn't handle other type of factors than MatDense or MatSparse");
+		}
+	}
+}
 
 
 template<typename FPP>
