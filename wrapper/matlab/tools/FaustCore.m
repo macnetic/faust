@@ -118,15 +118,6 @@ classdef FaustCore < handle
 			end
 		end
 
-		function set_Fv_mul_mode(this, mode)
-			if(isa(this.objectHandle, 'integer'))
-				if (this.isRealFlag)
-					mexFaustReal('set_Fv_mul_mode', this.objectHandle, mode);
-				else
-					mexFaustCplx('set_Fv_mul_mode', this.objectHandle, mode);
-				end
-			end
-		end
 	end
 
 end

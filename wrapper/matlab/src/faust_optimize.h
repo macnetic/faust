@@ -48,8 +48,6 @@ void faust_optimize(const mxArray **prhs, const int nrhs, mxArray **plhs, const 
 
 template <typename SCALAR, FDevice DEV>
 void set_FM_mul_mode(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs);
-template <typename SCALAR, FDevice DEV>
-void set_Fv_mul_mode(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs);
 
 #include "faust_optimize.hpp"
 #endif

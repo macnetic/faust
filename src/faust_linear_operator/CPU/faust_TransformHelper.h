@@ -102,7 +102,6 @@ namespace Faust
 			virtual MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> &A, const bool transpose=false, const bool conjugate=false);
 			virtual void update_total_nnz();
 			void set_FM_mul_mode(const int mul_order_opt_mode, const bool silent=true);
-			void set_Fv_mul_mode(const int mode);
 			virtual MatDense<FPP, Cpu> multiply(const MatSparse<FPP,Cpu> &A, const bool transpose=false, const bool conjugate=false);
 
 			virtual TransformHelper<FPP, Cpu>* multiply(const TransformHelper<FPP, Cpu>*) const;
@@ -172,7 +171,6 @@ namespace Faust
 			virtual TransformHelper<FPP,Cpu>* optimize_multiply(std::function<void()> f, const bool transp=false, const bool inplace=false, const int nsamples=1, const char* op_name="unamed_op");
 			virtual TransformHelper<FPP,Cpu>* optimize_time(const bool transp=false, const bool inplace=false, const int nsamples=1);
 			virtual TransformHelper<FPP,Cpu>* optimize_time_full(const bool transp=false, const bool inplace=false, const int nsamples=1);
-			virtual TransformHelper<FPP,Cpu>* optimize_time_Fv(const bool transp=false, const bool inplace=false, const int nsamples=1);
 			/**
 			  \brief Returns the left hand side factors of this from index 0 to id included (as a new TransformHelper obj).
 

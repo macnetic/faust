@@ -303,21 +303,6 @@ namespace Faust {
 		}
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::optimize_time_Fv(const bool transp /* deft to false */, const bool inplace, /* deft to 1 */ const int nsamples)
-		{
-			// generate a random vector
-			Faust::Vect<FPP,Cpu> *v = nullptr;
-			if(transp)
-				v = Faust::Vect<FPP,Cpu>::rand(this->getNbRow());
-			else
-				v = Faust::Vect<FPP,Cpu>::rand(this->getNbCol());
-			return this->optimize_multiply([this, &v, &transp, &inplace, &nsamples]()
-					{
-						this->multiply(*v, transp);
-					}, transp, inplace, nsamples, "Faust-vector mul.");
-		}
-
-	template<typename FPP>
 		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::optimize_multiply(std::function<void()> f, const bool transp /* deft to false */, const bool inplace, /* deft to 1 */ const int nsamples, const char* op_name)
 		{
 			TransformHelper<FPP,Cpu>* t_opt = nullptr;
@@ -526,16 +511,6 @@ namespace Faust {
 				std::cout << std::endl;
 			}
 
-		}
-
-	template<typename FPP>
-		void TransformHelper<FPP,Cpu>::set_Fv_mul_mode(const int Fv_mul_mode)
-		{
-			this->Fv_mul_mode = Fv_mul_mode;
-			std::cout << "changed Faust-vector mul. mode to: " << this->Fv_mul_mode;
-			if(! this->Fv_mul_mode)
-				std::cout << " (opt. disabled, default mul.)";
-			std::cout << std::endl;
 		}
 
 	template<typename FPP>

@@ -1,5 +1,5 @@
 
-%> \brief Enumeration class of all matrix chain multiplication methods available to multiply a Faust to a matrix, to a vector or to compute Faust.toarray().
+%> \brief Enumeration class of all matrix chain multiplication methods available to multiply a Faust to a matrix or to compute Faust.full().
 %> These methods are used by Faust.optimize_time().
 % =========================================================
 classdef FaustMulMode

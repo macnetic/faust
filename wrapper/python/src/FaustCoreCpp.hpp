@@ -184,12 +184,6 @@ void FaustCoreCpp<FPP,DEV>::set_FM_mul_mode(const int mode, const bool silent/*=
 }
 
 template<typename FPP, FDevice DEV>
-void FaustCoreCpp<FPP,DEV>::set_Fv_mul_mode(const int mode)
-{
-    this->transform->set_Fv_mul_mode(mode);
-}
-
-template<typename FPP, FDevice DEV>
 unsigned long long FaustCoreCpp<FPP,DEV>::nnz() const
 {
     return this->transform->get_total_nnz();

@@ -3019,7 +3019,7 @@ class FaustTorch:
 
 class FaustMulMode:
     """
-    <b/> Enumeration class of all matrix chain multiplication methods available to multiply a Faust to a matrix, to a vector or to compute Faust.toarray().
+    <b/> Enumeration class of all matrix chain multiplication methods available to multiply a Faust to a matrix or to compute Faust.toarray().
 
     These methods are used by Faust.optimize_time().
 
@@ -3031,8 +3031,6 @@ class FaustMulMode:
         >>> from numpy.random import rand
         >>> F = frand(100, 100, 5, [100, 1024])
         >>> F.m_faust.set_FM_mul_mode(FaustMulMode.ORDER_ALL_BEST_MIXED) # method used to compute Faust-matrix product or Faust.toarray()
-        >>> F.m_faust.set_Fv_mul_mode(FaustMulMode.DEFAULT) # method used to compute Faust-vector product
-        >>> F*rand(F.shape[1],1) # Faust-vector mul. using the DEFAULT method
         >>> F*rand(F.shape[1], 512) # Faust-matrix mul. using method ORDER_ALL_BEST_MIXED
         >>> F.toarray() # using the same method
     """

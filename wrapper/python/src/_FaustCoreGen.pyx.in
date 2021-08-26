@@ -301,10 +301,6 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
     def set_FM_mul_mode(self, mode, silent=True):
         self.@CORE_OBJ@.set_FM_mul_mode(mode, silent)
 
-    def set_Fv_mul_mode(self, mode):
-        self.@CORE_OBJ@.set_Fv_mul_mode(mode)
-
-
     # print information about the faust (size, number of factor, type of factor (dense/sparse) ...)
     def display(self):
         self.@CORE_OBJ@.Display()
