@@ -316,7 +316,7 @@ void Faust::multiply_order_opt_first_best(std::vector<Faust::MatDense<FPP,DEVICE
 template<typename FPP, FDevice DEVICE>
 void Faust::multiply_order_opt(const int mode, std::vector<Faust::MatGeneric<FPP,DEVICE>*>& facts, Faust::MatDense<FPP,DEVICE>& out, FPP alpha/* =1.0*/, FPP beta_out/*=.0*/, std::vector<char> transconj_flags /* = {'N'}*/)
 {
-	if(mode == ORDER_ALL_BEST_MIXED)
+	if(mode == GREEDY_ALL_BEST_GENMAT)
 	{
 		// no need to copy/convert for this method
 		Faust::multiply_order_opt_all_best(facts, out, alpha, beta_out, transconj_flags);
@@ -337,13 +337,13 @@ void Faust::multiply_order_opt(const int mode, std::vector<Faust::MatGeneric<FPP
 	}
 	switch(mode)
 	{
-		case ORDER_ALL_ENDS:
+		case GREEDY_ALL_ENDS:
 			Faust::multiply_order_opt_all_ends(dfacts, out, alpha, beta_out, transconj_flags);
 			break;
-		case ORDER_1ST_BEST:
+		case GREEDY_1ST_BEST:
 			Faust::multiply_order_opt_first_best(dfacts, out, alpha, beta_out, transconj_flags);
 			break;
-		case ORDER_ALL_BEST_CONVDENSE:
+		case GREEDY_ALL_BEST_CONVDENSE:
 			Faust::multiply_order_opt_all_best(dfacts, out, alpha, beta_out, transconj_flags);
 			break;
 		default:

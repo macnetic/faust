@@ -3030,34 +3030,34 @@ class FaustMulMode:
         >>> from pyfaust import rand as frand
         >>> from numpy.random import rand
         >>> F = frand(100, 100, 5, [100, 1024])
-        >>> F.m_faust.set_FM_mul_mode(FaustMulMode.ORDER_ALL_BEST_MIXED) # method used to compute Faust-matrix product or Faust.toarray()
-        >>> F*rand(F.shape[1], 512) # Faust-matrix mul. using method ORDER_ALL_BEST_MIXED
+        >>> F.m_faust.set_FM_mul_mode(FaustMulMode.GREEDY_ALL_BEST_MIXED) # method used to compute Faust-matrix product or Faust.toarray()
+        >>> F*rand(F.shape[1], 512) # Faust-matrix mul. using method GREEDY_ALL_BEST_MIXED
         >>> F.toarray() # using the same method
     """
     ## \brief The default method. Multiplying from the right to the left.
-    DEFAULT=0
+    DEFAULT_L2R=0
     ## \brief This method computes the product by its ends.
     ##
     ## For each iteration/multiplication it chooses to multiply the most right
     ## or the most left pair of matrices (in order to decrease the computation cost).
     ## The computational cost depends on the matrix dimensions.
-    ORDER_ALL_ENDS=1
+    GREEDY_ALL_ENDS=1
     ## \brief This method computes the product starting by the pair of matrices whose the computation cost is the smallest.
     ##
     ## After this first multiplication the rest of the factors are multiplied
     ## on the left side (from the right to the left) and then the right factors are
     ## multiplied (from the left to the right).
     ## The computational cost depends on the matrix dimensions.
-    ORDER_1ST_BEST=2
+    GREEDY_1ST_BEST=2
     ## \brief This method computes a chain of matrices by ordering the product according to the minimal computation cost order.
     ##
     ## The computational cost depends on the matrix dimensions.
-    ORDER_ALL_BEST_CONVDENSE=3
-    ## \brief This method follows the same principle as ORDER_ALL_BEST_CONVDENSE method but is capable to multiply dense matrices as well as sparse matrices.
+    GREEDY_ALL_BEST_CONVDENSE=3
+    ## \brief This method follows the same principle as GREEDY_ALL_BEST_CONVDENSE method but is capable to multiply dense matrices as well as sparse matrices.
     ##
     ## The computational cost depends on the matrix dimensions and the number
     ## of nonzeros (when a matrix is in sparse format).
-    ORDER_ALL_BEST_MIXED=4
+    GREEDY_ALL_BEST_GENMAT=4
     ## \brief This method implements the classic dynamic programming solution
     ## to the chain matrix problem (see https://en.wikipedia.org/wiki/Matrix_chain_multiplication#A_dynamic_programming_algorithm).
     DYNPROG=5

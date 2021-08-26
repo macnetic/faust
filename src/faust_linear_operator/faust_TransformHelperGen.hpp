@@ -73,7 +73,7 @@ namespace Faust
 		}
 
 	template <typename FPP, FDevice DEV>
-		void TransformHelperGen<FPP,DEV>::pack_factors(const int mul_order_opt_mode/*=DEFAULT*/)
+		void TransformHelperGen<FPP,DEV>::pack_factors(const int mul_order_opt_mode/*=DEFAULT_L2R*/)
 		{
 			//pack all factors in one
 			this->pack_factors(0, this->size()-1, mul_order_opt_mode);

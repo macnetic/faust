@@ -214,10 +214,10 @@ namespace Faust {
 
 			switch(this->mul_order_opt_mode)
 			{
-				case ORDER_ALL_ENDS:
-				case ORDER_1ST_BEST:
-				case ORDER_ALL_BEST_CONVDENSE:
-				case ORDER_ALL_BEST_MIXED:
+				case GREEDY_ALL_ENDS:
+				case GREEDY_1ST_BEST:
+				case GREEDY_ALL_BEST_CONVDENSE:
+				case GREEDY_ALL_BEST_GENMAT:
 					{ // specific scope for variable initialized here
 						std::vector<Faust::MatGeneric<FPP,Cpu>*> data(this->transform->data);
 						data.resize(data.size()+1); // for the matrix multiplying Faust
@@ -856,7 +856,7 @@ template<typename FPP>
 template<typename FPP>
 	void TransformHelper<FPP,Cpu>::get_product(Faust::MatDense<FPP,Cpu>& prod, const int mul_order_opt_mode/*=-1*/) //const
 	{
-		if(mul_order_opt_mode != DEFAULT)
+		if(mul_order_opt_mode != DEFAULT_L2R)
 			prod = this->get_product(mul_order_opt_mode);
 		else
 			this->transform->get_product(prod, this->isTransposed2char(), this->is_conjugate);
@@ -1207,7 +1207,7 @@ template<typename FPP>
 	}
 
 template<typename FPP>
-	void Faust::TransformHelper<FPP,Cpu>::pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id, const int mul_order_opt_mode/*=DEFAULT*/)
+	void Faust::TransformHelper<FPP,Cpu>::pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id, const int mul_order_opt_mode/*=DEFAULT_L2R*/)
 	{
 		if(start_id < 0 || start_id >= size())
 			throw out_of_range("start_id is out of range.");
@@ -1253,9 +1253,9 @@ template<typename FPP>
 	}
 
 template <typename FPP>
-	void TransformHelper<FPP,Cpu>::pack_factors(const int mul_order_opt_mode/*=DEFAULT*/)
+	void TransformHelper<FPP,Cpu>::pack_factors(const int mul_order_opt_mode/*=DEFAULT_L2R*/)
 {
-	TransformHelperGen<FPP,Cpu>::pack_factors(mul_order_opt_mode/*=DEFAULT*/);
+	TransformHelperGen<FPP,Cpu>::pack_factors(mul_order_opt_mode/*=DEFAULT_L2R*/);
 }
 
 template<typename FPP>

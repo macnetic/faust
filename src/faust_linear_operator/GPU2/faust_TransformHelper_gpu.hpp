@@ -440,7 +440,7 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		void Faust::TransformHelper<FPP,GPU2>::pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id,const int mul_order_opt_mode/*=DEFAULT*/)
+		void Faust::TransformHelper<FPP,GPU2>::pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id,const int mul_order_opt_mode/*=DEFAULT_L2R*/)
 		{
 			if(start_id < 0 || start_id >= size())
 				throw out_of_range("start_id is out of range.");

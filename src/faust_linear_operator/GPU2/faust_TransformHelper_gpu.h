@@ -56,7 +56,7 @@ namespace Faust
 				FPP power_iteration(const faust_unsigned_int nbr_iter_max, const Real<FPP>& threshold, int & flag);
 				const MatGeneric<FPP,GPU2>* get_gen_fact(const faust_unsigned_int id) const;
 				MatGeneric<FPP,GPU2>* get_gen_fact_nonconst(const faust_unsigned_int id) const;
-				void pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id, const int mul_order_opt_mode=DEFAULT);
+				void pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id, const int mul_order_opt_mode=DEFAULT_L2R);
 				void update(const MatGeneric<FPP, GPU2>& M, const faust_unsigned_int id);
 				void replace(const MatGeneric<FPP, GPU2>* M, const faust_unsigned_int id);
 				void convertToSparse();

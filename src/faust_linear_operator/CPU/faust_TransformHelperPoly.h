@@ -89,9 +89,9 @@ namespace Faust
 			faust_unsigned_int get_fact_nnz(const faust_unsigned_int id) const;
 			bool is_fact_sparse(const faust_unsigned_int id) const;
 			bool is_fact_dense(const faust_unsigned_int id) const;
-			void pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id, const int mul_order_opt_mode=DEFAULT);
+			void pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id, const int mul_order_opt_mode=DEFAULT_L2R);
 
-			void pack_factors(const int mul_order_opt_mode=DEFAULT);
+			void pack_factors(const int mul_order_opt_mode=DEFAULT_L2R);
 			TransformHelper<FPP,Cpu>* left(const faust_unsigned_int id, const bool copy=false) const;
 			TransformHelper<FPP,Cpu>* right(const faust_unsigned_int id, const bool copy=false) const;
 			TransformHelper<FPP,Cpu>* optimize_storage(const bool time=true);
@@ -106,8 +106,8 @@ namespace Faust
 			void resize(faust_unsigned_int);
 			string to_string() const;
 
-			MatDense<FPP,Cpu> get_product(const int mul_order_opt_mode=DEFAULT);// const;
-			void get_product(MatDense<FPP,Cpu>& prod, const int mul_order_opt_mode=DEFAULT); //const;
+			MatDense<FPP,Cpu> get_product(const int mul_order_opt_mode=DEFAULT_L2R);// const;
+			void get_product(MatDense<FPP,Cpu>& prod, const int mul_order_opt_mode=DEFAULT_L2R); //const;
 			void save_mat_file(const char* filename) const;
 			double spectralNorm(const int nbr_iter_max, double threshold, int &flag) const;
 			TransformHelper<FPP,Cpu>* vertcat(const TransformHelper<FPP,Cpu>*);

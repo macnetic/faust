@@ -978,14 +978,14 @@ namespace Faust
 
 
 	template<typename FPP>
-		void TransformHelperPoly<FPP>::pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id, const int mul_order_opt_mode/*=DEFAULT*/)
+		void TransformHelperPoly<FPP>::pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id, const int mul_order_opt_mode/*=DEFAULT_L2R*/)
 		{
 			ERROR_ON_FAC_NUM_CHANGE();
 		}
 
 
 	template<typename FPP>
-		void TransformHelperPoly<FPP>::pack_factors(const int mul_order_opt_mode/*=DEFAULT*/)
+		void TransformHelperPoly<FPP>::pack_factors(const int mul_order_opt_mode/*=DEFAULT_L2R*/)
 		{
 			ERROR_ON_FAC_NUM_CHANGE();
 		}
@@ -1094,7 +1094,7 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		MatDense<FPP,Cpu> TransformHelperPoly<FPP>::get_product(const int mul_order_opt_mode/*=DEFAULT*/)
+		MatDense<FPP,Cpu> TransformHelperPoly<FPP>::get_product(const int mul_order_opt_mode/*=DEFAULT_L2R*/)
 		{
 			//TODO: optimize: could multiply by Identity
 			auto this_ = const_cast<TransformHelperPoly<FPP>*>(this);
@@ -1106,7 +1106,7 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		void TransformHelperPoly<FPP>::get_product(MatDense<FPP,Cpu>& prod, const int mul_order_opt_mode/*=DEFAULT*/)
+		void TransformHelperPoly<FPP>::get_product(MatDense<FPP,Cpu>& prod, const int mul_order_opt_mode/*=DEFAULT_L2R*/)
 		{
 			//TODO: optimize: could multiply by Identity
 			auto this_ = const_cast<TransformHelperPoly<FPP>*>(this);

@@ -185,8 +185,8 @@ namespace Faust
 			transf_iterator<FPP> begin() const;
 			transf_iterator<FPP> end() const;
 
-			void pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id, const int mul_order_opt_mode=DEFAULT);
-			void pack_factors(const int mul_order_opt_mode=DEFAULT);
+			void pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id, const int mul_order_opt_mode=DEFAULT_L2R);
+			void pack_factors(const int mul_order_opt_mode=DEFAULT_L2R);
 
 			virtual TransformHelper<FPP,Cpu>* swap_cols(const faust_unsigned_int id1, const faust_unsigned_int id2, const bool permutation=false, const bool inplace=false, const bool check_transpose=true);
 			virtual TransformHelper<FPP,Cpu>* swap_rows(const faust_unsigned_int id1, const faust_unsigned_int id2, const bool permutation=false, const bool inplace=false, const bool check_transpose=true);
