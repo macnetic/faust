@@ -203,7 +203,7 @@ namespace Faust {
 			this->is_conjugate ^= conjugate;
 			Faust::MatDense<FPP,Cpu> M;
 #ifdef FAUST_TORCH
-			if(this->mul_order_opt_mode >= TORCH_CPU && this->mul_order_opt_mode <= TORCH_CPU_DENSE_ROW_TO_TORCH && !tensor_data.size())
+			if(this->mul_order_opt_mode >= TORCH_CPU_L2R && this->mul_order_opt_mode <= TORCH_CPU_DENSE_DYNPROG_SPARSE_L2R && !tensor_data.size())
 			{
 				// init tensor data cache
 				convMatGenListToTensorList(this->transform->data, tensor_data, at::kCPU, /* clone */ false, /* transpose */ ! this->is_transposed);
@@ -247,13 +247,13 @@ namespace Faust {
 					M = Faust::multiply_omp(this->transform->data, A, this->isTransposed2char());
 					break;
 #ifdef FAUST_TORCH
-				case TORCH_CPU:
+				case TORCH_CPU_L2R:
 					Faust::tensor_chain_mul(tensor_data, M, &A, /* on_gpu */ false, /*clone */ false, /* chain_opt */ false, /* contiguous_dense_to_torch */ false, !this->is_transposed);
 					break;
-				case TORCH_CPU_BEST_ORDER:
+				case TORCH_CPU_GREEDY:
 					Faust::tensor_chain_mul(tensor_data, M, &A, /* on_gpu */ false,  /*clone */ false,/* chain_opt */ true, /* contiguous_dense_to_torch */ false, !this->is_transposed);
 					break;
-				case TORCH_CPU_DENSE_ROW_TO_TORCH:
+				case TORCH_CPU_DENSE_DYNPROG_SPARSE_L2R:
 					Faust::tensor_chain_mul(tensor_data, M, &A, /* on_gpu */ false, /*clone */ false, /* chain_opt */ false, /* contiguous_dense_to_torch */ true, !this->is_transposed);
 					break;
 #endif
@@ -320,16 +320,16 @@ namespace Faust {
 			cout << "nsamples used to measure time: " << nmuls << endl;
 #endif
 #ifdef FAUST_TORCH
-			if(this->mul_order_opt_mode >= TORCH_CPU && this->mul_order_opt_mode <= TORCH_CPU_DENSE_ROW_TO_TORCH && !tensor_data.size())
+			if(this->mul_order_opt_mode >= TORCH_CPU_L2R && this->mul_order_opt_mode <= TORCH_CPU_DENSE_DYNPROG_SPARSE_L2R && !tensor_data.size())
 			{
 				// init tensor data cache
 				convMatGenListToTensorList(this->transform->data, tensor_data, at::kCPU, /* clone */ false, /* transpose */ ! this->is_transposed);
 //				display_TensorList(tensor_data);
 			}
 #else
-			disabled_meths.push_back(TORCH_CPU);
-			disabled_meths.push_back(TORCH_CPU_BEST_ORDER);
-			disabled_meths.push_back(TORCH_CPU_DENSE_ROW_TO_TORCH);
+			disabled_meths.push_back(TORCH_CPU_L2R);
+			disabled_meths.push_back(TORCH_CPU_GREEDY);
+			disabled_meths.push_back(TORCH_CPU_DENSE_DYNPROG_SPARSE_L2R);
 #endif
 
 			for(int i=0; i < NMETS; i++)

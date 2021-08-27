@@ -49,23 +49,23 @@ namespace Faust
 		// \brief This method computes the product of the matrix chain from the left to the right using the Torch C++ library (CPU backend).
 		//
 		// This method is only available for the specific packages pyfaust_torch.
-		TORCH_CPU,
-		// \brief This method computes the product following the minimal cost order using the Torch C++ library (CPU backend).
+		TORCH_CPU_L2R,
+		// \brief The method is basically the same as GREEDY_ALL_BEST_GENMAT but it is implemented using the Torch library.
 		//
-		// The method is basically the same as DYNPROG but it is implemented by the Torch library (chain_matmul function).
+		// This method is only available for the specific packages pyfaust_torch.
+		TORCH_CPU_GREEDY,
+		// \brief The same as TORCH_CPU_L2R except that torch::chain_matmul is used to
+		// compute in one call the intermediary product of dense contiguous
+		// factors, then the result is multiplied by sparse factors if any remains.
+		//
+		// torch::chain_matmul follows the dynamic programming principle as DYNPROG method does (but the former handles only dense matrices).
 		//
 		// References:
 		// https://pytorch.org/cppdocs/api/function_namespaceat_1aee491a9ff453b6033b4106516bc61a9d.html?highlight=chain_matmul
 		// https://pytorch.org/docs/stable/generated/torch.chain_matmul.html?highlight=chain_matmul#torch.chain_matmul
-		//
+
 		// This method is only available for the specific packages pyfaust_torch.
-		TORCH_CPU_BEST_ORDER,
-		// \brief The same as TORCH_CPU except that torch::chain_matmul is used to
-		// compute in one call the intermediary product of dense contiguous
-		// factors, then the result is multiplied by sparse factors if any remains.
-		//
-		// This method is only available for the specific packages pyfaust_torch.
-		TORCH_CPU_DENSE_ROW_TORCH
+		TORCH_CPU_DENSE_DYNPROG_SPARSE_L2R
 	};
 
 	/**

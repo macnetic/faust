@@ -29,7 +29,7 @@ void FaustCoreCpp<@TYPE@,GPU2>::multiply(@TYPE@* value_y,int nbrow_y,int nbcol_y
     }
     if (nbcol_x == 1)
     {
-        if(this->transform->get_Fv_mul_mode() == Faust::DEFAULT)
+        if(this->transform->get_Fv_mul_mode() == Faust::DEFAULT_L2R)
         {
             // assuming that x and y are pointers to memory allocated to the proper
             // sizes
@@ -47,7 +47,7 @@ void FaustCoreCpp<@TYPE@,GPU2>::multiply(@TYPE@* value_y,int nbrow_y,int nbcol_y
     }
     else
     {
-        if(this->transform->get_mul_order_opt_mode() == Faust::DEFAULT)
+        if(this->transform->get_mul_order_opt_mode() == Faust::DEFAULT_L2R)
         {
             //assuming that value_x and value_y are allocated properly (to the good
             //sizes) in numpy world

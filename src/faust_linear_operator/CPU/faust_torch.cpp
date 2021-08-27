@@ -111,8 +111,8 @@ namespace Faust
 			else
 				tlc.push_back(*op);
 		}
-		if(all_dense)
-			return torch::chain_matmul(tlc); //chain_opt is useless because I suppose torch does its own chain opt.
+		if(all_dense && contiguous_dense_to_torch)
+			return torch::chain_matmul(tlc); //chain_opt is useless because torch does its own chain opt (dynprog).
 		if(chain_opt)
 			return std::move(tensor_chain_mul_opt(tlc, nullptr, dev));
 		auto it = tlc.end()-1;
