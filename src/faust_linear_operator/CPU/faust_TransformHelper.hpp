@@ -312,6 +312,10 @@ namespace Faust {
 			int old_meth = this->get_mul_order_opt_mode();
 			int nmuls = nsamples, opt_meth=0;
 			std::vector<int> disabled_meths = {CPP_PROD_PAR_REDUC, OMP_PROD_PAR_REDUC}; // skip openmp/C++ threads methods because they are unfruitful when Eigen is multithreaded
+			// disable experimental (mostly less efficient) greedy methods
+			disabled_meths.push_back(GREEDY_ALL_ENDS);
+			disabled_meths.push_back(GREEDY_1ST_BEST);
+			disabled_meths.push_back(GREEDY_ALL_BEST_CONVDENSE);
 #if DEBUG_OPT_MUL
 			cout << "nsamples used to measure time: " << nmuls << endl;
 #endif
