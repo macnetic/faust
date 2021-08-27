@@ -218,9 +218,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		else if(!strcmp("set_FM_mul_mode", cmd))
 			// def in module faust_optimize
 			set_FM_mul_mode<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
-		else if(!strcmp("set_Fv_mul_mode", cmd))
-			// def in module faust_optimize
-			set_Fv_mul_mode<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
 		else if(!strcmp("fourier", cmd))
 			faust_fourier<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
 		else if(!strcmp("hadamard", cmd))

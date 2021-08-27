@@ -2,7 +2,7 @@
 namespace Faust
 {
 	template<typename FPP, FDevice DEV>
-		TransformHelperGen<FPP,DEV>::TransformHelperGen() : is_transposed(false), is_conjugate(false), is_sliced(false), is_fancy_indexed(false), transform(std::make_shared<Transform<FPP,DEV>>()), mul_order_opt_mode(0), Fv_mul_mode(0)
+		TransformHelperGen<FPP,DEV>::TransformHelperGen() : is_transposed(false), is_conjugate(false), is_sliced(false), is_fancy_indexed(false), transform(std::make_shared<Transform<FPP,DEV>>()), mul_order_opt_mode(0)
 
 	{
 	}
@@ -249,19 +249,12 @@ namespace Faust
 		void TransformHelperGen<FPP,DEV>::copy_mul_mode_state(const TransformHelper<FPP,DEV>& th)
 		{
 			this->mul_order_opt_mode = th.mul_order_opt_mode;
-			this->Fv_mul_mode = th.Fv_mul_mode;
 		}
 
 	template<typename FPP, FDevice DEV>
 		int TransformHelperGen<FPP,DEV>::get_mul_order_opt_mode() const
 		{
 			return this->mul_order_opt_mode;
-		}
-
-	template<typename FPP, FDevice DEV>
-		int TransformHelperGen<FPP,DEV>::get_Fv_mul_mode() const
-		{
-			return this->Fv_mul_mode;
 		}
 
 	template<typename FPP, FDevice DEV>
