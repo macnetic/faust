@@ -2134,7 +2134,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         F_opt = Faust(core_obj=F.m_faust.optimize(transp))
         return F_opt
 
-    def optimize_time(F, transp=False, inplace=False, nsamples=1):
+    def optimize_time(F, transp=False, inplace=False, nsamples=1, mat=None):
         """
         Returns a Faust configured with the quickest Faust-matrix multiplication mode (benchmark ran on the fly).
 
@@ -2142,11 +2142,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         available differ by the order used to compute the matrix chain
         multiplication or by the use (or unuse) of libraries to performs the
         calculation.
-        The evaluated methods in the benchmark are listed in
-        pyfaust.FaustMulMode but note that FaustMulMode.CPP_PROD_PAR_REDUC and
-        FaustMulMode.OMP_PROD_PAR_REDUC are excluded from the benchmark because
-        it doesn't worth it in any case when Eigen multithread is enabled
-        (which is the case in any package of pyfaust delivered).
+        The evaluated methods in the benchmark are listed in pyfaust.FaustMulMode.
         Although depending on the package you installed and the capability of your
         hardware the methods based on Torch library can be used.
 
@@ -2159,6 +2155,10 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             calculated in order to measure time taken by each method (it could matter
             to discriminate methods when the performances are similar). By default,
             only one product is computed to evaluate the method.
+            mat: if not None must be a numpy.ndarray or a
+            scipy.sparse.csr_matrix. Use this argument to run the benchmark on
+            the Faust multiplication by mat instead of Faust.toarray() (if mat
+            is None).
 
         Returns:
             The optimized Faust.
@@ -2167,11 +2167,11 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         """
         if(inplace):
-            F.m_faust.optimize_time(transp, inplace, nsamples)
+            F.m_faust.optimize_time(transp, inplace, nsamples, M=mat)
             return F
         else:
             F_opt = Faust(core_obj=F.m_faust.optimize_time(transp, inplace,
-                                                          nsamples))
+                                                          nsamples, M=mat))
             return F_opt
 
     def copy(F, dev='cpu'):

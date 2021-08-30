@@ -90,6 +90,8 @@ namespace Faust
 				TransformHelper<FPP,GPU2>* conjugate();
 				TransformHelper<FPP,GPU2>* adjoint();
 				TransformHelper<FPP,GPU2>* optimize_time(const bool transp=false, const bool inplace=false, const int nsamples=1);
+
+				TransformHelper<FPP,GPU2>* optimize_time_prod(const MatGeneric<FPP, Cpu>* test_mat, const bool transp/*=false*/, const bool inplace/*=false*/, const int nsamples/*=1*/);
 				TransformHelper<FPP,GPU2>* optimize(const bool transp=false);
 				TransformHelper<FPP,GPU2>* clone(int32_t dev_id=-1, void* stream=nullptr);
 				void get_fact(const faust_unsigned_int id,

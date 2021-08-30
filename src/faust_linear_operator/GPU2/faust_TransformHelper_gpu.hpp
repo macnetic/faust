@@ -440,7 +440,7 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		void Faust::TransformHelper<FPP,GPU2>::pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id,const int mul_order_opt_mode/*=DEFAULT_L2R*/)
+		void Faust::TransformHelper<FPP,GPU2>::pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id,const int mul_order_opt_mode/*=DEFAULT*/)
 		{
 			if(start_id < 0 || start_id >= size())
 				throw out_of_range("start_id is out of range.");
@@ -609,6 +609,13 @@ namespace Faust
 //			auto gpu_thn = new TransformHelper<FPP,GPU2>(*thn, -1, nullptr);
 //			delete thn;
 //			return gpu_thn;
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::optimize_time_prod(const MatGeneric<FPP, Cpu>* test_mat, const bool transp/*=false*/, const bool inplace/*=false*/, const int nsamples/*=1*/)
+		{
+			throw std::runtime_error("optimize_time_prod is yet to implement in Faust C++ core for GPU.");
+			return nullptr;
 		}
 
 	template<typename FPP>

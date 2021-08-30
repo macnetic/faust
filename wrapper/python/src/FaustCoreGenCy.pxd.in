@@ -61,6 +61,12 @@ cdef extern from "FaustCoreCpp.h":
 
         @CPP_CORE_CLASS@[FPP]* optimize_time(const bool transp, const bool inplace,
                                        const int nsamples)
+        @CPP_CORE_CLASS@[FPP]* optimize_time(FPP* x_data, int* x_row_ptr, int* x_id_col, int x_nnz, int x_nrows, int x_ncols, const bool transp, const bool inplace,
+                                       const int nsamples)
+
+        @CPP_CORE_CLASS@[FPP]* optimize_time(FPP* x_data, int x_nrows, int
+                                             x_ncols, const bool transp, const bool inplace,
+                                       const int nsamples)
         @CPP_CORE_CLASS@[FPP]* optimize(const bool transp)
         @CPP_CORE_CLASS@[FPP]* optimize_storage(const bool time)
         const bool isTransposed()

@@ -553,15 +553,63 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
         core.@CORE_OBJ@ = self.@CORE_OBJ@.optimize(transp)
         return core
 
-    def optimize_time(self, transp=False, inplace=False, nsamples=1):
-        if(inplace):
-            self.@CORE_OBJ@.optimize_time(transp, inplace, nsamples)
+    def optimize_time(self, transp=False, inplace=False, nsamples=1, M=None):
+        cdef @TYPE@[:,:] M_data
+        cdef int [:] M_indices
+        cdef int [:] M_indptr
+        cdef @TYPE@ [:] M_csr_data
+
+        M_is_dense = False
+        if M is None:
+            # optimize time according to Faust.toarray()
+            if(inplace):
+                self.@CORE_OBJ@.optimize_time(transp, inplace, nsamples)
+            else:
+                core = @CORE_CLASS@(core=True)
+                core.@CORE_OBJ@ = self.@CORE_OBJ@.optimize_time(transp,
+                                                                inplace,
+                                                                nsamples)
+                return core
         else:
-            core = @CORE_CLASS@(core=True)
-            core.@CORE_OBJ@ = self.@CORE_OBJ@.optimize_time(transp,
-                                                            inplace,
-                                                            nsamples)
-            return core
+            # optimize time according to F@M
+            if isinstance(M, np.ndarray):
+                M_is_dense = True
+                M_nrows = M.shape[0]
+                M_ncols = M.shape[1]
+                M_data = M
+            elif isinstance(M, csr_matrix):
+                M_nrows = M.shape[0]
+                M_ncols = M.shape[1]
+                M_csr_data = M.data
+                M_indices = M.indices
+                M_indptr = M.indptr
+                M_nnz = M.nnz
+            else:
+                 raise TypeError("M must be a np.ndarray or a csr_matrix.")
+            if(inplace):
+                if M_is_dense:
+                    self.@CORE_OBJ@.optimize_time(&M_data[0,0], M_nrows, M_ncols, transp, inplace, nsamples)
+                else:
+                    self.@CORE_OBJ@.optimize_time(&M_csr_data[0], &M_indptr[0],
+                                                  &M_indices[0],
+                                                  M_nnz, M_nrows, M_ncols, transp, inplace, nsamples)
+            else:
+                core = @CORE_CLASS@(core=True)
+                if M_is_dense:
+                    core.@CORE_OBJ@ = \
+                    self.@CORE_OBJ@.optimize_time(&M_data[0,0], M_nrows, M_ncols,
+                                                                    transp,
+                                                                    inplace,
+                                                                    nsamples)
+                else:
+                    core.@CORE_OBJ@ = \
+                    self.@CORE_OBJ@.optimize_time(&M_csr_data[0], &M_indptr[0],
+                                                  &M_indices[0],
+                                                  M_nnz, M_nrows, M_ncols,
+                                                  transp,
+                                                  inplace,
+                                                  nsamples)
+                return core
 
     def conj(self):
         core = @CORE_CLASS@(core=True)

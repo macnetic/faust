@@ -142,6 +142,9 @@ class FaustCoreCpp
     FaustCoreCpp<FPP,DEV>* optimize_storage(const bool time=false);
     FaustCoreCpp<FPP,DEV>* optimize(const bool transp=false);
     FaustCoreCpp<FPP,DEV>* optimize_time(const bool transp=false, const bool inplace=false, const int nsamples=1);
+    FaustCoreCpp<FPP,DEV>* optimize_time(const FPP* value_x,int nbrow_x,int nbcol_x, const bool transp=false, const bool inplace=false, const int nsamples=1);
+    FaustCoreCpp<FPP,DEV>* optimize_time(const FPP* x_data, int* x_row_ptr, int* x_id_col, int x_nnz, int x_nrows, int x_ncols, const bool transp=false, const bool inplace=false, const int nsamples=1);
+
     const bool isTransposed();
     FaustCoreCpp<FPP,DEV>* transpose()const;
     FaustCoreCpp<FPP,DEV>* conjugate()const;

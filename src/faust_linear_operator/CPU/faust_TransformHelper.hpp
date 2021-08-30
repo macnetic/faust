@@ -164,7 +164,6 @@ namespace Faust {
 			}
 #endif
 
-
 			switch(this->mul_order_opt_mode)
 			{
 				case GREEDY_ALL_ENDS:
@@ -186,7 +185,12 @@ namespace Faust {
 					}
 					break;
 				case DYNPROG:
-					this->multiply_dynprog(A, M);
+					{
+						std::vector<Faust::MatGeneric<FPP,Cpu>*> data = this->transform->data;
+						if(this->is_transposed)
+							std::reverse(data.begin(), data.end());
+						M = std::move(dynprog_multiply(data, this->isTransposed2char(), &A));
+					}
 					break;
 				case CPP_PROD_PAR_REDUC:
 				case OMP_PROD_PAR_REDUC:
@@ -249,16 +253,6 @@ namespace Faust {
 			memcpy(y, y_vec.getData(), sizeof(FPP)*y_vec.size());
 		}
 
-template<typename FPP>
-	MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply_dynprog(const MatGeneric<FPP,Cpu> &A, MatDense<FPP, Cpu> &out)
-	{ // specific scope for variable initialized here
-		std::vector<Faust::MatGeneric<FPP,Cpu>*> data = this->transform->data;
-		if(this->is_transposed)
-			std::reverse(data.begin(), data.end());
-		out = std::move(dynprog_multiply(data, this->isTransposed2char(), &A));
-	}
-
-
 	template<typename FPP>
 		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const MatDense<FPP,Cpu> &A, const bool transpose, const bool conjugate)
 		{
@@ -273,7 +267,6 @@ template<typename FPP>
 //				display_TensorList(tensor_data);
 			
 #endif
-
 
 			switch(this->mul_order_opt_mode)
 			{
@@ -297,7 +290,10 @@ template<typename FPP>
 					break;
 				case DYNPROG:
 					{
-						this->multiply_dynprog(A, M);
+						std::vector<Faust::MatGeneric<FPP,Cpu>*> data = this->transform->data;
+						if(this->is_transposed)
+							std::reverse(data.begin(), data.end());
+						M = std::move(dynprog_multiply(data, this->isTransposed2char(), &A));
 					}
 					break;
 				case CPP_PROD_PAR_REDUC:
@@ -360,6 +356,21 @@ template<typename FPP>
 		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::optimize_time_full(const bool transp /* deft to false */, const bool inplace, /* deft to 1 */ const int nsamples)
 		{
 			return this->optimize_multiply([this](){this->get_product();}, transp, inplace, nsamples, "Faust-toarray");
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::optimize_time_prod(const MatGeneric<FPP, Cpu>* test_mat, const bool transp /* deft to false */, const bool inplace, /* deft to 1 */ const int nsamples)
+		{
+			std::function<void(void)> benchmark_func;
+			auto md = dynamic_cast<const MatDense<FPP,Cpu>*>(test_mat);
+			auto ms = dynamic_cast<const MatSparse<FPP,Cpu>*>(test_mat);
+			if(! md && ! ms)
+				throw std::runtime_error("optimize_time_prod supports only MatDense or MatSparse benchmarking.");
+			return this->optimize_multiply([this, ms, md]()
+					{
+					if(md) this->multiply(*md);
+					else /* ms != nullptr */ this->multiply(*ms);
+					}, transp, inplace, nsamples, "Faust-matrix product");
 		}
 
 	template<typename FPP>
