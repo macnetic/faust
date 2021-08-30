@@ -136,6 +136,8 @@ namespace Faust
 				convMatSparseToTensor(*spm, top, on_gpu?at::kCUDA:at::kCPU, clone, transpose);
 			else if(dm = dynamic_cast<const Faust::MatDense<FPP,D>*>(op))
 				convMatDenseToTensor(*dm, top, on_gpu?at::kCUDA:at::kCPU, clone, transpose);
+			else
+				throw std::runtime_error("Only MatSparse and MatDense conversions to tensor are handled.");
 			tres = tensor_chain_mul(tl, &top, on_gpu?at::kCUDA:at::kCPU, chain_opt, contiguous_dense_to_torch, transpose /* op_on_left if transpose */);
 		}
 		else
