@@ -67,7 +67,8 @@ namespace Faust
 
 
 	template<typename FPP>
-		class TransformHelper<FPP,Cpu> : public TransformHelperGen<FPP,Cpu> {
+		class TransformHelper<FPP,Cpu> : public TransformHelperGen<FPP,Cpu> 
+		{
 
 			friend TransformHelper<FPP,Cpu>* vertcat<FPP>(const std::vector<TransformHelper<FPP,Cpu>*>& THs);
 			static std::default_random_engine generator;
@@ -171,6 +172,7 @@ namespace Faust
 			virtual TransformHelper<FPP,Cpu>* optimize_multiply(std::function<void()> f, const bool transp=false, const bool inplace=false, const int nsamples=1, const char* op_name="unamed_op");
 			virtual TransformHelper<FPP,Cpu>* optimize_time(const bool transp=false, const bool inplace=false, const int nsamples=1);
 			virtual TransformHelper<FPP,Cpu>* optimize_time_full(const bool transp=false, const bool inplace=false, const int nsamples=1);
+
 			/**
 			  \brief Returns the left hand side factors of this from index 0 to id included (as a new TransformHelper obj).
 
@@ -211,6 +213,8 @@ namespace Faust
 			void convertToDense();
 			template<typename FPP2>
 			TransformHelper<Real<FPP>, Cpu>* real();
+			private:
+			MatDense<FPP,Cpu> multiply_dynprog(const MatGeneric<FPP,Cpu> &A, MatDense<FPP, Cpu> &out);
 		};
 
 

@@ -151,12 +151,65 @@ namespace Faust {
 	template<typename FPP>
 		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const MatSparse<FPP,Cpu> &A, const bool transpose /* deft to false */, const bool conjugate)
 		{
+			//TODO: refactor with multiply(MatDense)
 			this->is_transposed ^= transpose;
 			this->is_conjugate ^= conjugate;
-			MatDense<FPP,Cpu> M = this->transform->multiply(A, this->isTransposed2char());
-			this->is_transposed ^= transpose;
+			Faust::MatDense<FPP,Cpu> M;
+#ifdef FAUST_TORCH
+			if(this->mul_order_opt_mode >= TORCH_CPU_L2R && this->mul_order_opt_mode <= TORCH_CPU_DENSE_DYNPROG_SPARSE_L2R && !tensor_data.size())
+			{
+				// init tensor data cache
+				convMatGenListToTensorList(this->transform->data, tensor_data, at::kCPU, /* clone */ false, /* transpose */ ! this->is_transposed);
+//				display_TensorList(tensor_data);
+			}
+#endif
+
+
+			switch(this->mul_order_opt_mode)
+			{
+				case GREEDY_ALL_ENDS:
+				case GREEDY_1ST_BEST:
+				case GREEDY_ALL_BEST_CONVDENSE:
+				case GREEDY_ALL_BEST_GENMAT:
+					{
+						std::vector<Faust::MatGeneric<FPP,Cpu>*> data(this->transform->data);
+						data.resize(data.size()+1); // for the matrix multiplying Faust
+						data[data.size()-1] = const_cast<Faust::MatSparse<FPP,Cpu>*>(&A);
+						std::vector<char> transconj_flags = {'N'}; // 'N' for all Faust factors and the matrix A
+						if(this->is_transposed)
+						{
+							transconj_flags = std::vector<char>(data.size(), this->isTransposed2char()); // TODO: use assign in C++ 20
+							*(transconj_flags.end()-1) = 'N'; // the matrix multiplying is not transposed
+							std::reverse(data.begin(), data.end()-1); // reversing the Faust factors (because they are transposed or transconjugate)
+						}
+						Faust::multiply_order_opt(this->mul_order_opt_mode, data, M, /*alpha */ FPP(1.0), /* beta */ FPP(0.0), transconj_flags);
+					}
+					break;
+				case DYNPROG:
+					this->multiply_dynprog(A, M);
+					break;
+				case CPP_PROD_PAR_REDUC:
+				case OMP_PROD_PAR_REDUC:
+					throw std::runtime_error("CPP_PROD_PAR_REDUC and OMP_PROD_PAR_REDUC are not capable to handle Faust-MatSparse product (only Faust-MatDense product is available).");
+					break;
+#ifdef FAUST_TORCH
+				case TORCH_CPU_L2R:
+					Faust::tensor_chain_mul(tensor_data, M, &A, /* on_gpu */ false, /*clone */ false, /* chain_opt */ false, /* contiguous_dense_to_torch */ false, !this->is_transposed);
+					break;
+				case TORCH_CPU_GREEDY:
+					Faust::tensor_chain_mul(tensor_data, M, &A, /* on_gpu */ false,  /*clone */ false,/* chain_opt */ true, /* contiguous_dense_to_torch */ false, !this->is_transposed);
+					break;
+				case TORCH_CPU_DENSE_DYNPROG_SPARSE_L2R:
+					Faust::tensor_chain_mul(tensor_data, M, &A, /* on_gpu */ false, /*clone */ false, /* chain_opt */ false, /* contiguous_dense_to_torch */ true, !this->is_transposed);
+					break;
+#endif
+				default:
+					M = this->transform->multiply(A, this->isTransposed2char());
+					break;
+			}
 			this->is_conjugate ^= conjugate;
-			return M;
+			this->is_transposed ^= transpose;
+			return std::move(M);
 		}
 
 
@@ -196,6 +249,16 @@ namespace Faust {
 			memcpy(y, y_vec.getData(), sizeof(FPP)*y_vec.size());
 		}
 
+template<typename FPP>
+	MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply_dynprog(const MatGeneric<FPP,Cpu> &A, MatDense<FPP, Cpu> &out)
+	{ // specific scope for variable initialized here
+		std::vector<Faust::MatGeneric<FPP,Cpu>*> data = this->transform->data;
+		if(this->is_transposed)
+			std::reverse(data.begin(), data.end());
+		out = std::move(dynprog_multiply(data, this->isTransposed2char(), &A));
+	}
+
+
 	template<typename FPP>
 		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const MatDense<FPP,Cpu> &A, const bool transpose, const bool conjugate)
 		{
@@ -208,7 +271,7 @@ namespace Faust {
 				// init tensor data cache
 				convMatGenListToTensorList(this->transform->data, tensor_data, at::kCPU, /* clone */ false, /* transpose */ ! this->is_transposed);
 //				display_TensorList(tensor_data);
-			}
+			
 #endif
 
 
@@ -218,7 +281,7 @@ namespace Faust {
 				case GREEDY_1ST_BEST:
 				case GREEDY_ALL_BEST_CONVDENSE:
 				case GREEDY_ALL_BEST_GENMAT:
-					{ // specific scope for variable initialized here
+					{
 						std::vector<Faust::MatGeneric<FPP,Cpu>*> data(this->transform->data);
 						data.resize(data.size()+1); // for the matrix multiplying Faust
 						data[data.size()-1] = const_cast<Faust::MatDense<FPP,Cpu>*>(&A);
@@ -233,11 +296,8 @@ namespace Faust {
 					}
 					break;
 				case DYNPROG:
-					{ // specific scope for variable initialized here
-						std::vector<Faust::MatGeneric<FPP,Cpu>*> data = this->transform->data;
-						if(this->is_transposed)
-							std::reverse(data.begin(), data.end());
-						M = std::move(dynprog_multiply(data, this->isTransposed2char(), &A));
+					{
+						this->multiply_dynprog(A, M);
 					}
 					break;
 				case CPP_PROD_PAR_REDUC:
