@@ -3,7 +3,7 @@ variables:
     # used by package build scripts
     # Warning: DURL is the base url without the filename
     DURL: "https://gitlab.inria.fr/faustgrp/gforge_files/-/raw/master/"
-    DFILE: "faust_data-2.6.0.zip"
+    DFILE: "faust_data-3.5.2.zip"
     JOB_PYTHON: "python3" # if set again in job, it hides this one (precedence: https://docs.gitlab.com/13.6/ee/ci/variables/#priority-of-environment-variables)
     WIN_PY_VER: '3.9' # default python version used to build python wrapper on windows (for both whl package and nsis .exe)
     NIX_PY_VER: '3.9' # default python version used to build python wrapper for "unix" system packages (pkg/macos, rpm/deb/linux)
