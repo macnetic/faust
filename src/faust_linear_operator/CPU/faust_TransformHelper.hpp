@@ -265,7 +265,7 @@ namespace Faust {
 				// init tensor data cache
 				convMatGenListToTensorList(this->transform->data, tensor_data, at::kCPU, /* clone */ false, /* transpose */ ! this->is_transposed);
 //				display_TensorList(tensor_data);
-			
+			}
 #endif
 
 			switch(this->mul_order_opt_mode)
