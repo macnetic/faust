@@ -850,7 +850,7 @@ classdef Faust
 			end
 			args = {transp, inplace, nsamples};
 			mex_func = 'optimize_time';
-			if(ismatrix(mat))
+			if(~ islogical(mat) && ismatrix(mat))
 				% mat is a matrix on which to run the benchmark
 				args = [ args {mat} ];
 				mex_func = 'optimize_time_prod';

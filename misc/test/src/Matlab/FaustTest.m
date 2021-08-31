@@ -363,6 +363,38 @@ classdef FaustTest < matlab.unittest.TestCase
             %TODO
         end
 
+		function testProdOpt(this)
+			disp('Test GREEDY and DYNPROG prod opt methods and optimize_time')
+			F = this.test_faust;
+			H = clone(F);
+			set_FM_mul_mode(H, matfaust.FaustMulMode.GREEDY);
+			G = clone(F);
+			set_FM_mul_mode(G, matfaust.FaustMulMode.GREEDY);
+			this.verifyEqual(full(F), full(H), 'RelTol', 1e-5)
+			this.verifyEqual(full(F), full(G), 'RelTol', 1e-5)
+			M = rand(size(F,2), size(F,1))
+			this.verifyEqual(F*M, H*M, 'RelTol', 1e-5)
+			this.verifyEqual(F*M, G*M, 'RelTol', 1e-5)
+			S = sprand(size(F,2), size(F,1), .2)
+			this.verifyEqual(F*S, H*S, 'RelTol', 1e-5)
+			this.verifyEqual(F*S, G*S, 'RelTol', 1e-5)
+			% test any method chosen by optimize_time
+			I = optimize_time(F)
+			this.verifyEqual(full(F), full(I), 'RelTol', 1e-5)
+			this.verifyEqual(F*M, I*M, 'RelTol', 1e-5)
+			this.verifyEqual(F*S, I*S, 'RelTol', 1e-5)
+			% using the F*M benchmark
+			J = optimize_time('mat', M)
+			this.verifyEqual(full(F), full(J), 'RelTol', 1e-5)
+			this.verifyEqual(F*M, J*M, 'RelTol', 1e-5)
+			this.verifyEqual(F*S, J*S, 'RelTol', 1e-5)
+			% using the F*S benchmark
+			K = optimize_time('mat', M)
+			this.verifyEqual(full(F), full(K), 'RelTol', 1e-5)
+			this.verifyEqual(F*M, K*M, 'RelTol', 1e-5)
+			this.verifyEqual(F*S, K*S, 'RelTol', 1e-5)
+		end
+
 
 		function testMul(this)
 			disp('Test Faust.mtimes()')
