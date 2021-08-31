@@ -336,7 +336,7 @@ class TestFaustPy(unittest.TestCase):
         self.assertTrue((F_rows.toarray() == F.toarray()[row_ids,:]).all())
         print("test fancy indexing on cols")
         num_inds = self.r.randint(1,F.shape[1])
-        col_ids = [ self.r.randint(0,F.shape[1]-1) for i in
+        col_ids = [ int(self.r.randint(0,F.shape[1]-1)) for i in
                    range(0,num_inds)]
         F_cols = F[:,col_ids]
         n1 = norm(F_cols.toarray() - F.toarray()[:,col_ids])
@@ -527,6 +527,37 @@ class TestFaustPy(unittest.TestCase):
             test_F = F/s
             ref_full_F = self.mulFactors()/s
             self.assertAlmostEqual(norm(test_F.toarray()-ref_full_F), 0, places=3)
+
+    def test_prod_opt(self):
+        from pyfaust import FaustMulMode
+        print("test GREEDY and DYNPROG prod opt methods and optimize_time.")
+        H = self.F.clone()
+        H.m_faust.set_FM_mul_mode(FaustMulMode.GREEDY)
+        G = self.F.clone()
+        G.m_faust.set_FM_mul_mode(FaustMulMode.DYNPROG)
+        self.assertTrue(np.allclose(self.F.toarray(), H.toarray()))
+        self.assertTrue(np.allclose(self.F.toarray(), G.toarray()))
+        M = np.random.rand(self.F.shape[1], self.F.shape[0])
+        self.assertTrue(np.allclose(self.F@M, H@M))
+        self.assertTrue(np.allclose(self.F@M, G@M))
+        S = sparse.random(self.F.shape[1], self.F.shape[0], .2, format='csr')
+        self.assertTrue(np.allclose(self.F@S, H@S))
+        self.assertTrue(np.allclose(self.F@S, G@S))
+        # test any method chosen by optimize_time
+        I = self.F.optimize_time()
+        self.assertTrue(np.allclose(self.F.toarray(), I.toarray()))
+        self.assertTrue(np.allclose(self.F@M, I@M))
+        self.assertTrue(np.allclose(self.F@S, I@S))
+        # using the F@M benchmark
+        J = self.F.optimize_time(mat=M)
+        self.assertTrue(np.allclose(self.F.toarray(), J.toarray()))
+        self.assertTrue(np.allclose(self.F@M, J@M))
+        self.assertTrue(np.allclose(self.F@S, J@S))
+        # using the F@S benchmark
+        K = self.F.optimize_time(mat=S)
+        self.assertTrue(np.allclose(self.F.toarray(), K.toarray()))
+        self.assertTrue(np.allclose(self.F@M, K@M))
+        self.assertTrue(np.allclose(self.F@S, K@S))
 
     def testMul(self):
         print("testMul()")
