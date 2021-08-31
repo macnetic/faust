@@ -376,6 +376,8 @@ namespace Faust {
 	template<typename FPP>
 		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::optimize_multiply(std::function<void()> f, const bool transp /* deft to false */, const bool inplace, /* deft to 1 */ const int nsamples, const char* op_name)
 		{
+			std::vector<string> meth_names = {"DEFAULT_L2R", "GREEDY_ALL_ENDS", "GREEDY_1ST_BEST", "GREEDY_ALL_BEST_CONVDENSE", "GREEDY", "DYNPROG", "CPP_PROD_PAR_REDUC", "OMP_PROD_PAR_REDUC", "TORCH_CPU_L2R", "TORCH_CPU_GREEDY","TORCH_CPU_DENSE_DYNPROG_SPARSE_L2R" }; //TODO: it should be a function of faust_prod_opt module
+			// GREEDY_ALL_BEST_GENMAT is printed out as GREEDY to follow the wrappers name
 			TransformHelper<FPP,Cpu>* t_opt = nullptr;
 			int NMETS = 11;
 			std::chrono::duration<double> * times = new std::chrono::duration<double>[NMETS]; //use heap because of VS14 (error C3863)
@@ -431,7 +433,7 @@ namespace Faust {
 			else
 			{
 				t_opt = new TransformHelper<FPP,Cpu>(this->transform->data, 1.0, false, false, true);
-				cout << "best method measured in time on operation "<< op_name << " is: " << opt_meth << endl;
+				cout << "best method measured in time on operation "<< op_name << " is: " << meth_names[opt_meth] << endl;
 #if DEBUG_OPT_MUL
 				cout << "all times: ";
 				for(int i = 0; i < NMETS; i ++)
