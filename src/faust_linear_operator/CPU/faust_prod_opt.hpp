@@ -693,7 +693,24 @@ namespace Faust
 	template<typename FPP>
 		MatDense<FPP, Cpu> dynprog_multiply(std::vector<MatGeneric<FPP, Cpu>*>& factors, const char op/*='N'*/, const MatGeneric<FPP, Cpu>* A/*=nullptr*/)
 		{
-			//TODO: manage useless cases when factors.size is too small
+			// manage useless cases when factors.size is too small
+			if(factors.size() == 1)
+			{
+				MatDense<FPP, Cpu> P;
+				if(A != nullptr)
+				{
+					gemm_gen(*factors[0], *A, P, (FPP)1.0, (FPP)0.0, op, 'N');
+					return P;
+				}
+				else
+				{
+					auto sp_mat = dynamic_cast<MatSparse<FPP, Cpu>*>(factors[0]);
+					if(sp_mat)
+						return MatDense<FPP,Cpu>(*sp_mat);
+					else
+						*dynamic_cast<MatDense<FPP, Cpu>*>(factors[0]);
+				}
+			}
 			char last_op = op;
 			if(A != nullptr)
 			{
