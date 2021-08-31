@@ -193,6 +193,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			faust_optimize_storage<SCALAR, DEV>(prhs, nrhs, plhs, nlhs);
 		else if(!strcmp("optimize_time", cmd))
 			faust_optimize_time<SCALAR, DEV>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("optimize_time_prod", cmd))
+			faust_optimize_time_prod<SCALAR, DEV>(prhs, nrhs, plhs, nlhs);
 		else if(!strcmp("optimize", cmd))
 			faust_optimize<SCALAR, DEV>(prhs, nrhs, plhs, nlhs);
 		else if (!strcmp("multiply", cmd))

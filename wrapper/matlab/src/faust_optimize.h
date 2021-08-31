@@ -45,6 +45,8 @@
 #define __MEX_FAUST_OPTIMIZE__
 template <typename SCALAR, FDevice DEV>
 void faust_optimize(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs);
+template <typename SCALAR, FDevice DEV>
+void faust_optimize_prod(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs);
 
 template <typename SCALAR, FDevice DEV>
 void set_FM_mul_mode(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs);

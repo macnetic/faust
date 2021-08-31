@@ -799,7 +799,7 @@ classdef Faust
 		%> calculated in order to measure time taken by each method (it could matter
 		%> to discriminate methods when the performances are similar). By default,
 		%> only one product is computed to evaluate the method.
- 
+		%> @param 'mat', matrix (optional) Use this argument to run the benchmark on the Faust multiplication by the matrix mat instead of Faust.full().
 		%>
 		%> @retval OF The optimized Faust.
 		%>
@@ -810,8 +810,10 @@ classdef Faust
 			inplace = false;
 			nsamples = 1;
 			argc = length(varargin);
+			mat = false;
 			if(argc > 0)
-				for i=1:argc
+				i = 1;
+				while(i < argc)
 					switch(varargin{i})
 						case {'transp', 'transpose'}
 							if(argc == i || ~ islogical(varargin{i+1}))
@@ -831,18 +833,33 @@ classdef Faust
 							else
 								nsamples = varargin{i+1}
 							end
+						case 'mat'
+							if(argc == i || ~ isnumeric(varargin{i+1}) || ~ ismatrix(varargin{i+1}))
+								error('mat keyword argument is not followed by a matrix.')
+							else
+								mat = varargin{i+1}
+								i = i + 1; % ignore mat from parsing (switch can handle only scalar or char vec
+							end
 						otherwise
 							if(isstr(varargin{i}))
 								error([ varargin{i} ' unrecognized argument'])
 							end
 					end
+					i = i + 1;
 				end
 			end
+			args = {transp, inplace, nsamples};
+			mex_func = 'optimize_time';
+			if(ismatrix(mat))
+				% mat is a matrix on which to run the benchmark
+				args = [ args {mat} ];
+				mex_func = 'optimize_time_prod';
+			end
 			if(inplace)
-				call_mex(F, 'optimize_time', transp, inplace, nsamples);
+				call_mex(F, mex_func, args{:});
 				OF = F
 			else
-				OF = matfaust.Faust(F, call_mex(F, 'optimize_time', transp, inplace, nsamples));
+				OF = matfaust.Faust(F, call_mex(F, mex_func, args{:}));
 			end
 		end
 

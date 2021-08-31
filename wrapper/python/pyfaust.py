@@ -2157,7 +2157,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             only one product is computed to evaluate the method.
             mat: if not None must be a numpy.ndarray or a
             scipy.sparse.csr_matrix. Use this argument to run the benchmark on
-            the Faust multiplication by mat instead of Faust.toarray() (if mat
+            the Faust multiplication by the matrix mat instead of Faust.toarray() (if mat
             is None).
 
         Returns:
