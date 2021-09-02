@@ -317,7 +317,7 @@ pkg_linux_release_static:
     only:
         - tags
 
-pages:
+.pages:
     stage: gitlab_pages
     script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
@@ -438,7 +438,7 @@ pkg_macos_purepy_release:
 
 pkg_macos_purepy_release_extra_pyver:
     extends: pkg_macos_purepy_release
-    variables: {MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a", BUILD_MULTITHREAD: "ON", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", NOPY2: "ON", PYTHON_PATH: '/opt/local/bin/python3.9', JOB_PYTHON: 'python3.9'}
+    variables: {MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a", BUILD_MULTITHREAD: "ON", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", NOPY2: "ON", PYTHON_PATH: '/opt/local/bin/python3.8', JOB_PYTHON: 'python3.8'}
     tags:
         - macos
 
@@ -459,7 +459,7 @@ pkg_linux_purepy_release:
 
 pkg_linux_purepy_release_extra_pyver:
     extends: .pkg_purepy_release
-    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a", BUILD_MULTITHREAD: "ON", NOPY2: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "../gpu_mod", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", PYTHON_PATH: '/usr/local/bin/python3.9', JOB_PYTHON: 'python3.9'}
+    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a", BUILD_MULTITHREAD: "ON", NOPY2: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "../gpu_mod", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", PYTHON_PATH: '/usr/local/bin/python3.8', JOB_PYTHON: 'python3.8'}
     tags:
         - linux
         - tux_packager
@@ -549,7 +549,7 @@ pkg_win_purepy_release:
 
 pkg_win_purepy_release_extra_pyver:
     extends: .pkg_win_purepy
-    variables: {BUILD_CONFIG: "Release", GIT_SUBMODULE_STRATEGY: recursive, EXPERIMENTAL_PKG: "OFF", WIN_PY_VER: '3.7'}
+    variables: {BUILD_CONFIG: "Release", GIT_SUBMODULE_STRATEGY: recursive, EXPERIMENTAL_PKG: "OFF", WIN_PY_VER: '3.8'}
     before_script:
         - 'set VERSION=%CI_COMMIT_TAG%'
     artifacts:
@@ -646,7 +646,7 @@ test_macos_purepy_release:
     - macos_pkg_tester
 
 test_macos_purepy_release_extra_pyver:
-  variables: {JOB_PYTHON: 'python3.9'} # take care to keep this variable consistent with the version used in pkg_macos_purepy_release_extra_pyver
+  variables: {JOB_PYTHON: 'python3.8'} # take care to keep this variable consistent with the version used in pkg_macos_purepy_release_extra_pyver
   extends: .test_unix_purepy_pkg
   needs:
     - job: pkg_macos_purepy_release_extra_pyver
@@ -665,7 +665,7 @@ test_nux_purepy_release:
     - linux
 
 test_nux_purepy_release_extra_pyver:
-  variables: {JOB_PYTHON: 'python3.9'}
+  variables: {JOB_PYTHON: 'python3.8'}
   extends: .test_unix_purepy_pkg
   needs:
     - job: pkg_linux_purepy_release_extra_pyver
@@ -695,12 +695,12 @@ test_win_purepy_pkg:
 
 test_win_purepy_pkg_extra_pyver:
   extends: test_win_purepy_pkg
-  variables: {JOB_PYTHON: 'py', WIN_PY_VER: '3.7'}
+  variables: {JOB_PYTHON: 'py', WIN_PY_VER: '3.8'}
   needs:
     - job: pkg_win_purepy_release_extra_pyver
       artifacts: true
 
-pypi_pub:
+.pypi_pub:
   stage: pkg_pub
   script:
     - python3 -m pip install --user twine
