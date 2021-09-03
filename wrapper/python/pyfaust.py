@@ -53,7 +53,6 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
     certain functions (e.g. with the `inplace` argument of the
     functions Faust.swap_rows, Faust.swap_cols, Faust.optimize_time).
 
-
     Other noticeable limitations are that one cannot:
         - compute the real and imaginary parts of a Faust,
         - perform elementwise operations between two Fausts (e.g. elementwise
@@ -76,20 +75,16 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
     Faust.toarray() obtained by the multiplication of the Faust factors.
 
     List of functions that are memory costly:
-        - Faust.toarray(),
-        - Faust.pinv(),
-        - element indexing (F[i,j] / __getitem__, but note that slicing is memory
-        efficient through memory views).
+    - element indexing (F[i,j] / __getitem__, but note that slicing is memory efficient through memory views),
+    - function Faust.toarray(),
+    - function Faust.pinv().
 
     For more information about FAuST take a look at http://faust.inria.fr.
     """
 
     def  __init__(F, factors=None, filepath=None, **kwargs):
         """ Creates a Faust from a list of factors or alternatively from a file.
-
-            Other easy ways to create a Faust is to call one of the
-            following functions: pyfaust.rand(),
-            pyfaust.dft() or pyfaust.wht().
+        Other easy ways to create a Faust is to call one of the following functions: pyfaust.rand, pyfaust.dft or pyfaust.wht.
 
         Args:
             factors: list of numpy/scipy array/matrices or a single array/matrix.<br/>
@@ -133,7 +128,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             >>> Faust(np.random.rand(10,10)) # creating a Faust with only one
                                              # factor
 
-        <b/> See also Faust.save, pyfaust.rand
+        <b>See also</b> Faust.save, pyfaust.rand
 
         """
         is_on_gpu = False
@@ -254,7 +249,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             >>> nrows = F.shape[0]
             >>> ncols = F.shape[1]
 
-        <b/> See also Faust.nnz_sum, Faust.size
+        <b>See also</b> Faust.nnz_sum, Faust.size
         """
         return F.m_faust.shape()
 
@@ -286,7 +281,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             >>> F.size
             2500
 
-        <b/> See also Faust.shape
+        <b>See also</b> Faust.shape
 
         """
         return np.prod(F.shape)
@@ -313,7 +308,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Examples:
             >>> tF = F.transpose()
 
-        <b/> See also Faust.conj, Faust.getH, Faust.H, Faust.T
+        <b>See also</b> Faust.conj, Faust.getH, Faust.H, Faust.T
         """
         F_trans = Faust(core_obj=F.m_faust.transpose())
         return F_trans
@@ -336,7 +331,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Examples:
             >>> tF = F.T
 
-        <b/> See also Faust.conj, Faust.getH, Faust.H, Faust.T
+        <b>See also</b> Faust.conj, Faust.getH, Faust.H, Faust.T
         """
         return F.transpose()
 
@@ -358,7 +353,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             >>> F = rand(50, 50, field='complex')
             >>> Fc = F.conj()
 
-        <b/> See also Faust.transpose, Faust.getH, Faust.H
+        <b>See also</b> Faust.transpose, Faust.getH, Faust.H
         """
         F_conj = Faust(core_obj=F.m_faust.conj())
         return F_conj
@@ -381,7 +376,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             >>> F = rand(50, 50, field='complex')
             >>> Fc = F.conjugate()
 
-        <b/> See also Faust.transpose, Faust.getH, Faust.H
+        <b>See also</b> Faust.transpose, Faust.getH, Faust.H
         """
         return F.conj()
 
@@ -406,7 +401,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             >>> (H1.toarray() == H2.toarray()).all()
             True
 
-        <b/> See also Faust.transpose, Faust.conj, Faust.H
+        <b>See also</b> Faust.transpose, Faust.conj, Faust.H
         """
         F_ctrans = Faust(core_obj=F.m_faust.getH())
         return F_ctrans
@@ -432,7 +427,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             >>> (H1.toarray() == H2.toarray()).all()
             True
 
-        <b/> See also Faust.transpose, Faust.conj, Faust.getH
+        <b>See also</b> Faust.transpose, Faust.conj, Faust.getH
         """
         return F.getH()
 
@@ -477,9 +472,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         return F_prunedout
 
     def __repr__(F):
-        """
-        Returns a str object representing the Faust object.
-
+        """Returns a str object representing the Faust object.
         This method overloads a Python function.
 
         NOTE: Ideally this function is intended to return a valid Python
@@ -496,7 +489,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             >>> # the same function is called when typing F in a terminal:
             >>> F
 
-        <b/>See also Faust.nnz_sum, Faust.rcg, Faust.shape, Faust.factors,
+        <b>See also</b> Faust.nnz_sum, Faust.rcg, Faust.shape, Faust.factors,
         <b/>Faust.numfactors, Faust.display
 
         """
@@ -533,7 +526,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             FACTOR 0 (real) SPARSE, size 50x63, density 0.492063, nnz 1550 <br/>
             FACTOR 1 (real) SPARSE, size 63x100, density 0.5, nnz 3150 <br/>
 
-        <b/>See also Faust.nnz_sum, Faust.density, Faust.shape, Faust.factors,
+        <b>See also</b> Faust.nnz_sum, Faust.density, Faust.shape, Faust.factors,
         <b/>Faust.numfactors, Faust.__repr__
 
         """
@@ -632,10 +625,8 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         return F
 
     def __radd__(F,lhs_op):
-        """
-        Returns lhs_op+F.
-
-        <b/>See also Faust.__add__
+        """Returns lhs_op+F.
+        <b>See also</b> Faust.__add__
         """
         return F.__add__(lhs_op)
 
@@ -659,7 +650,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             >>> G = F-F
             >>> H = F-2
 
-        <b/>See also Faust.__add__
+        <b>See also</b> Faust.__add__
         """
 
         nargs = []
@@ -668,19 +659,14 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         return F.__add__(*nargs)
 
     def __rsub__(F,lhs_op):
-        """
-        Returns lhs_op-F.
-
-        <b/>See also Faust.__sub__
+        """Returns lhs_op-F.
+        <b>See also</b> Faust.__sub__
         """
         return F.__mul__(-1).__radd__(lhs_op)
 
     def __truediv__(F,s):
-        """
-        Divides F by the scalar s.
-
-        This method overloads the Python function/operator `/' (whether s is a
-        float or an integer).
+        """Divides F by the scalar s.
+        This method overloads the Python function/operator `/' (whether s is a float or an integer).
 
         Args:
         F: the Faust object.
@@ -689,7 +675,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Returns:
             the division result as a Faust object.
 
-        <b/> See also Faust.__mul__, Faust.__itruediv__
+        <b>See also</b> Faust.__mul__, Faust.__itruediv__
         """
         if isinstance(s, (float, np.complex, int)) or isinstance(s, np.ndarray):
             return F*(1./s)
@@ -698,9 +684,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                   "divided by a scalar.")
 
     def __itruediv__(F, s):
-        """
-        divides F by the scalar s inplace.
-
+        """Divides F by the scalar s inplace.
         This method overloads the Python function/operator `/=' (whether s is a
         float or an integer).
 
@@ -711,7 +695,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Returns:
             the division result as a Faust object.
 
-        <b/> See also Faust.__mul__, Faust.__truediv__
+        <b>See also</b> Faust.__mul__, Faust.__truediv__
 
         """
         F = F/s
@@ -746,11 +730,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         return F
 
     def __matmul__(F, A):
-        """
-        Multiplies F by A which is a dense numpy.matrix/numpy.ndarray or a Faust object.
-
-        @warning The operator @ is not supported in Python 2, you can use *.
-
+        """Multiplies F by A which is a dense numpy.matrix/numpy.ndarray or a Faust object.
         This method overloads a Python function/operator (@).
 
         <b>The primary goal</b> of this function is to implement “fast” multiplication by a
@@ -777,9 +757,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             <br/> Note that performing a Faust-csr_matrix product is often
             slower than converting first the csr_matrix to a dense
             representation (toarray()) and then proceed to the
-            Faust-dense_matrix multiplication. In some cases though, it stays
-            quicker: moreover when the Faust is composed of a small number of
-            factors.
+            Faust-dense_matrix multiplication. In some cases though, it stays quicker: moreover when the Faust is composed of a small number of factors.
 
         Returns: The result of the multiplication
             - as a numpy.ndarray if A is a ndarray,<br/>
@@ -806,7 +784,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             >>> H = F@G
             >>> # H is a Faust because F and G are
 
-        <b/>See also Faust.__init__, Faust.rcg, Faust.__mul__, Faust.__matmul__, Faust.dot
+        <b>See also</b> Faust.__init__, Faust.rcg, Faust.__mul__, Faust.__matmul__, Faust.dot
         """
         if(isinstance(A, Faust)):
             if(F.shape[1] != A.shape[0]): raise ValueError("The dimensions of "
@@ -848,14 +826,12 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             raise TypeError("can't multiply a Faust by something that is not a Faust, a np.ndarray, a csr_matrix or a dia_matrix.")
 
     def dot(F, A, *args, **kwargs):
-        """
-        Performs equivalent operation of numpy.dot() between the Faust F and A.
-
+        """Performs equivalent operation of numpy.dot() between the Faust F and A.
         More specifically:
             - Scalar multiplication if A is a scalar but F*A is preferred.
             - Matrix multiplication if A is a Faust or numpy.ndarray/numpy.matrix but F @ A is preferred.
 
-        <b/>See also Faust.__init__, Faust.rcg, Faust.__mul__, Faust.__matmul__, Faust.dot
+        <b>See also</b> Faust.__init__, Faust.rcg, Faust.__mul__, Faust.__matmul__, Faust.dot
         """
         if(isinstance(A, (float, int, np.complex))):
             return F*A
@@ -868,9 +844,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         return F.dot(x)
 
     def __mul__(F, A):
-        """
-        Multiplies the Faust F by A.
-
+        """Multiplies the Faust F by A.
         This method overloads a Python function/operator (*).
 
         More specifically:
@@ -913,7 +887,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             True
             >>> F_times_two = F*2
 
-        <b/>See also Faust.__init__, Faust.rcg, Faust.__mul__, Faust.__matmul__, Faust.dot
+        <b>See also</b> Faust.__init__, Faust.rcg, Faust.__mul__, Faust.__matmul__, Faust.dot
         """
         if(isinstance(A, (float, int, np.complex))):
             if isinstance(A, int):
@@ -946,8 +920,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
     def __rmul__(F, lhs_op):
         """ lhs_op*F
-
-        <b/>See also Faust.__mul__
+        <b>See also</b> Faust.__mul__
         """
         if isinstance(lhs_op, (float, int, np.complex)):
             return F.__mul__(lhs_op)
@@ -969,9 +942,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             raise TypeError("invalid type operand for Faust.__rmul__.")
 
     def __rmatmul__(F, lhs_op):
-        """
-        Returns lhs_op.__matmul__(F).
-
+        """Returns lhs_op.__matmul__(F).
         <b>See also Faust.__matmul__</b>
 
         Examples:
@@ -992,16 +963,15 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             raise TypeError("invalid type operand for Faust.__matmul__.")
 
     def concatenate(F, *args, **kwargs):
-        """
-            Concatenates F with len(args) Faust objects, numpy arrays or scipy sparse matrices.
+        """Concatenates F with len(args) Faust objects, numpy arrays or scipy sparse matrices.
+        The resulting Faust:
+                C = F.concatenate(G, H, ... ,axis)
+        verifies that:
+                C.toarray() == numpy.concatenate((F.toarray(), G.toarray(),
+                H.toarray(),...), axis)
 
-            The resulting Faust <code>C = F.concatenate(G, H, ... ,axis)</code> verifies that:
-            <code>
-            C.toarray() == numpy.concatenate((F.toarray(), G.toarray(),
-            H.toarray(),...), axis)
-            </code>
-            <br/>N.B.: you could have an elementwise non-significant absolute
-            difference between the two members.
+        <br/>N.B.: you could have an elementwise non-significant absolute
+        difference between the two members.
 
 
            Args:
@@ -1164,7 +1134,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             ...
             MemoryError
 
-        <b/>See also Faust.todense
+        <b>See also</b> Faust.todense
         """
         return F.m_faust.get_product()
 
@@ -1203,7 +1173,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             (...)
             MemoryError
 
-        <b/>See also Faust.toarray
+        <b>See also</b> Faust.toarray
         """
         warnings.warn("Faust.todense() is deprecated and will be deleted in the "
              "future.")
@@ -1211,11 +1181,8 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
 
     def __getitem__(F, indices):
-        """
-        Indexes or slices a Faust.
-
+        """Indexes or slices a Faust.
         Returns a Faust representing a submatrix of F.toarray() or a scalar element if that Faust can be reduced to a single element.
-
         This function overloads a Python built-in.
 
         WARNING:
@@ -1392,9 +1359,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         return sub_F
 
     def nnz_sum(F):
-        """
-        Gives the total number of non-zero elements in the factors of F.
-
+        """Gives the total number of non-zero elements in the factors of F.
         The function sums together the number of non-zero elements of
         each factor and returns the result. Note that for efficiency the sum is
         computed at Faust creation time and kept in cache.
@@ -1402,7 +1367,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Returns:
             the number of non-zeros.
 
-        <b/> See also Faust.rcg, Faust.density.
+        <b>See also</b> Faust.rcg, Faust.density.
         """
         return F.m_faust.nnz()
 
@@ -1427,15 +1392,13 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         >>> F = rand(5, 50, density=.5)
         >>> dens = F.density()
 
-        <b/> See also Faust.nnz_sum, Faust.rcg, Faust.size, Faust.toarray
+        <b>See also</b> Faust.nnz_sum, Faust.rcg, Faust.size, Faust.toarray
         """
         return float(F.nnz_sum())/F.size
 
 
     def rcg(F):
-        """
-        Computes the Relative Complexity Gain.
-
+        """Computes the Relative Complexity Gain.
         RCG is the theoretical gain brought by the Faust representation relatively to its dense
         matrix equivalent. <br/>The higher is the RCG, the more computational
         savings will be made.
@@ -1449,7 +1412,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Returns:
             the RCG value (float).
 
-        <b/> See also: Faust.density, Faust.nnz_sum, Faust.shape.
+        <b>See also</b>: Faust.density, Faust.nnz_sum, Faust.shape.
         """
         d = F.density()
         if(d > 0):
@@ -1460,14 +1423,12 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             return float(-1)
 
     def norm(F, ord='fro', **kwargs): #**kwargs):
-        """
-        Computes the norm of F.
-
+        """Computes the norm of F.
         Several types of norm are available: 1-norm, 2-norm, inf-norm and Frobenius norm.
-
         The norm of F is equal to the numpy.linalg.norm of F.toarray().
 
-        WARNING: the norm computation time can be expected to be of order
+        WARNING:
+            The norm computation time can be expected to be of order
         n*min(F.shape) with n the time for multipliying F by a vector.
         Nevertheless, the implementation allows that memory usage remains
         controlled by avoiding to explicitly compute F.toarray(). Please pay
@@ -1534,9 +1495,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         return F.m_faust.norm(ord, **kwargs)
 
     def power_iteration(self, threshold=1e-3, maxiter=100):
-        """
-        Performs the power iteration algorithm to compute the greatest eigenvalue of the Faust.
-
+        """Performs the power iteration algorithm to compute the greatest eigenvalue of the Faust.
         For the algorithm to succeed the Faust should be diagonalizable
         (similar to a digonalizable Faust), ideally, a symmetric positive-definite Faust.
 
@@ -1559,22 +1518,14 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                                             max_num_its=maxiter)
 
     def normalize(F, ord='fro', axis=1):
-        """
-        Normalizes F along the axis dimension using the ord-norm.
-
+        """Normalizes F along the axis dimension using the ord-norm.
         The function is able to normalize the columns (default axis=1):
-        <br/><code>
-            NF = F.normalize(ord) is such that for all i in
-        range(0,F.shape[1]) NF.toarray()[:,i] ==
-        F.toarray()[:,i]/norm(F.toarray(), ord)
-        </code>
+
+            NF = F.normalize(ord) is such that for all i in range(0,F.shape[1]) NF.toarray()[:,i] == F.toarray()[:,i]/norm(F.toarray(), ord)
 
         Likewise for normalization of the rows (axis=0):
-        <br/><code>
-            NF = F.normalize(ord, axis=0) is such that for all i in
-            range(0,F.shape[0]) NF.toarray()[i,:] ==
-            F.toarray()[i,:]/norm(F.toarray(), ord)
-        </code>
+
+            NF = F.normalize(ord, axis=0) is such that for all i in range(0,F.shape[0]) NF.toarray()[i,:] == F.toarray()[i,:]/norm(F.toarray(), ord)
 
         The variable ord designates one of the Faust.norm() compatible norms.
 
@@ -1585,7 +1536,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Returns:
             the normalized Faust
 
-        <b/> See also: Faust.norm
+        <b>See also</b>: Faust.norm
         """
         if(ord not in [1, 2, np.inf, "fro"]):
             raise ValueError("ord must have the value 1, 2, 'fro' or "
@@ -1622,7 +1573,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         >>> nf == len(F)
         True
 
-        <b/> See also Faust.factors, Faust.__len__
+        <b>See also</b> Faust.factors, Faust.__len__
         """
         return F.m_faust.get_nb_factors()
 
@@ -1640,7 +1591,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         >>> nf == len(F)
         True
 
-        <b/> See also Faust.factors, Faust.numfactors
+        <b>See also</b> Faust.factors, Faust.numfactors
         """
         return F.numfactors()
 
@@ -1674,7 +1625,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             >>> f0 = F.factors(0)
             >>> G = F.factors(range(3,5)) # a new Faust composed of the two last factors of F
 
-        <b/> See also Faust.numfactors, Faust.transpose
+        <b>See also</b> Faust.numfactors, Faust.transpose
         """
         if(hasattr(indices, '__iter__')):
             indices = list(indices)
@@ -1795,15 +1746,13 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             >>> F = rand(5, 10)
             >>> f0 = F.factors(0)
 
-        <b/> See also Faust.numfactors
+        <b>See also</b> Faust.numfactors
         """
         fact = F.m_faust.get_fact(i)
         return fact
 
     def save(F, filepath, format="Matlab"):
-        """
-        Saves the Faust F into a file.
-
+        """Saves the Faust F into a file.
         The file is saved in Matlab format version 5 (.mat extension).
 
         NOTE: storing F should typically use rcg(F) times less disk space than
@@ -1827,7 +1776,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             >>> F.save("F.mat")
             >>> G = Faust(filepath="F.mat")
 
-            <b/> See also Faust.__init__, Faust.rcg.
+            <b>See also</b> Faust.__init__, Faust.rcg.
         """
         if(format not in ["Matlab"]):
             raise ValueError("Only Matlab or Matlab_core format is supported.")
@@ -1911,7 +1860,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         >>> plt.show()
 
 
-        <b/> See also Faust.display.
+        <b>See also</b> Faust.display.
         """
         import matplotlib.pyplot as plt
         if(not isinstance(name, str)): raise TypeError('name must be a str.')
@@ -2038,8 +1987,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 			- FACTOR 4 (real) DENSE,  size 10x10, density 0.5, nnz 50
 			- FACTOR 5 (real) SPARSE, size 10x10, density 0.1, nnz 10
 
-
-        <b/> See also Faust.swap_rows
+        <b>See also</b> Faust.swap_rows
         """
         if(inplace):
             F.m_faust.swap_cols(id1, id2, permutation,
@@ -2093,7 +2041,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 			- FACTOR 4 (real) SPARSE, size 10x10, density 0.5, nnz 50
 			- FACTOR 5 (real) DENSE,  size 10x10, density 0.5, nnz 50
 
-        <b/> See also Faust.swap_cols
+        <b>See also</b> Faust.swap_cols
         """
         if(inplace):
             F.m_faust.swap_rows(id1, id2, permutation,
@@ -2110,7 +2058,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Returns:
             The optimized Faust.
 
-        <b/> See also Faust.optimize
+        <b>See also</b> Faust.optimize
         """
         F_opt = Faust(core_obj=F.m_faust.optimize_storage(False))
         return F_opt
@@ -2129,7 +2077,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Faust.optimize_time, Faust.optimize_memory or Faust.pruneout to be
         more specific about the optimization to proceed.
 
-        <b/> See also Faust.optimize_time, Faust.optimize_memory, Faust.pruneout
+        <b>See also</b> Faust.optimize_time, Faust.optimize_memory, Faust.pruneout
         """
         F_opt = Faust(core_obj=F.m_faust.optimize(transp))
         return F_opt
@@ -2163,7 +2111,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Returns:
             The optimized Faust.
 
-        <b/> See also Faust.optimize
+        <b>See also</b> Faust.optimize
 
         """
         if(inplace):
@@ -2175,17 +2123,14 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             return F_opt
 
     def copy(F, dev='cpu'):
-        """
-        clone alias function (here just to mimic numpy API).
-
-        <b/> See also Faust.clone
+        """Clone alias function (here just to mimic numpy API).
+        <b>See also</b> Faust.clone
         """
         check_dev(dev)
         return F.clone(dev)
 
     def clone(F, dev=None):
-        """
-        Clones the Faust (in a new memory space).
+        """Clones the Faust (in a new memory space).
 
         Args:
             dev (optional): 'cpu' to clone on CPU RAM, 'gpu[:id]' to clone on
@@ -2431,7 +2376,7 @@ def faust_fact(*args, **kwargs):
     """
     This function is a shorthand for pyfaust.fact.hierarchical.
 
-    <b/> See also pyfaust.fact.hierarchical
+    <b>See also</b> pyfaust.fact.hierarchical
     """
     import pyfaust.fact
     return pyfaust.fact.hierarchical(*args, **kwargs)
@@ -2446,7 +2391,7 @@ def norm(F, ord='fro', **kwargs):
     """
         Returns Faust.norm(F, ord) or numpy.linalg.norm(F, ord) depending of F type.
 
-    <b/>See also Faust.norm
+    <b>See also</b> Faust.norm
     """
     if(Faust.isFaust(F)):
         return F.norm(ord, **kwargs)
@@ -2461,10 +2406,8 @@ def norm(F, ord='fro', **kwargs):
 
 @implements(np.dot)
 def dot(A, B, **kwargs):
-    """
-        Returns Faust.dot(A,B) if A or B is a Faust object, returns numpy.dot(A,B) ortherwise.
-
-    <b/>See also Faust.norm
+    """Returns Faust.dot(A,B) if A or B is a Faust object, returns numpy.dot(A,B) ortherwise.
+    <b>See also</b> Faust.norm
     """
     if(Faust.isFaust(A)):
         return A.dot(B)
@@ -2761,7 +2704,7 @@ def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
         FACTOR 2 (real) DENSE, size 10x13, density 0.515385, nnz 67<br/>
         FACTOR 3 (real) DENSE, size 13x16, density 0.495192, nnz 103<br/>
 
-    <b/> See also Faust.__init__
+    <b>See also</b> Faust.__init__
     """
     check_dev(dev)
     if(field == 'real'):

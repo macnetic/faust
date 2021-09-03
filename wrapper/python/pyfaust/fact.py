@@ -715,12 +715,9 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
         >>> stop_crit2 = StoppingCriterion(num_its=200)
         >>> param = ParamsHierarchical(fact_cons, res_cons, stop_crit1, stop_crit2)
         >>> F = hierarchical(M, param)
-        Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorization
-        1/3<br/>
-        Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorization
-        2/3<br/>
-        Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorization
-        3/3<br/>
+        factorization 1/3<br/>
+        factorization 2/3<br/>
+        factorization 3/3<br/>
         >>> F
         Faust size 500x32, density 0.189063, nnz_sum 3025, 4 factor(s):
             - FACTOR 0 (real) SPARSE, size 500x32, density 0.15625, nnz 2500
@@ -770,24 +767,15 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
        >>> MEG16 = hierarchical(MEG, ['rectmat', num_facts, k, s])
        >>> MEG16
        Faust size 204x8193, density 0.0631655, nnz_sum 105573, 9 factor(s):
-           - FACTOR 0 (real) SPARSE, size 204x204, density 0.293613, nnz
-           12219
-           - FACTOR 1 (real) SPARSE, size 204x204, density 0.0392157, nnz
-           1632
-           - FACTOR 2 (real) SPARSE, size 204x204, density 0.0392157, nnz
-           1632
-           - FACTOR 3 (real) SPARSE, size 204x204, density 0.0392157, nnz
-           1632
-           - FACTOR 4 (real) SPARSE, size 204x204, density 0.0392157, nnz
-           1632
-           - FACTOR 5 (real) SPARSE, size 204x204, density 0.0392157, nnz
-           1632
-           - FACTOR 6 (real) SPARSE, size 204x204, density 0.0392157, nnz
-           1632
-           - FACTOR 7 (real) SPARSE, size 204x204, density 0.0392157, nnz
-           1632
-           - FACTOR 8 (real) SPARSE, size 204x8193, density 0.0490196, nnz
-           81930
+           - FACTOR 0 (real) SPARSE, size 204x204, density 0.293613, nnz 12219
+           - FACTOR 1 (real) SPARSE, size 204x204, density 0.0392157, nnz 1632
+           - FACTOR 2 (real) SPARSE, size 204x204, density 0.0392157, nnz 1632
+           - FACTOR 3 (real) SPARSE, size 204x204, density 0.0392157, nnz 1632
+           - FACTOR 4 (real) SPARSE, size 204x204, density 0.0392157, nnz 1632
+           - FACTOR 5 (real) SPARSE, size 204x204, density 0.0392157, nnz 1632
+           - FACTOR 6 (real) SPARSE, size 204x204, density 0.0392157, nnz 1632
+           - FACTOR 7 (real) SPARSE, size 204x204, density 0.0392157, nnz 1632
+           - FACTOR 8 (real) SPARSE, size 204x8193, density 0.0490196, nnz 81930
 
        >>> # verify the constraint k == 10, on column 4
        >>> count_nonzero(MEG16.factors(8)[:,4].toarray())

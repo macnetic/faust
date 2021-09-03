@@ -56,11 +56,7 @@ def get_data_dirpath(silent=True):
     return path
 
 def runall():
-    """
-    Runs all the demos in a row.
-
-    ## @fn pyfaust.demo.runall
-
+    """Runs all the demos in a row.
     Example:
         >>> from pyfaust.demo import runall, allfigs
         >>> runall()
@@ -574,9 +570,7 @@ class hadamard:
 
     @staticmethod
     def run_fact(output_dir=DEFT_RESULTS_DIR):
-        """
-        This demo hierarchically factorizes the Hadamard dictionary and then plots the results.
-
+        """This demo hierarchically factorizes the Hadamard dictionary and then plots the results.
         This essentially reproduces figure 2 from [1].
 
         [1] Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse
@@ -1007,9 +1001,7 @@ class bsl:
 
     @staticmethod
     def sparse_coeffs(D, ntraining, sparsity):
-        """
-        Generates sparse coefficients.
-
+        """Generates sparse coefficients.
         Gamma = sparse_coeffs(D, ntraining, sparsity) generates ntraining sparse
         vectors stacked in a matrix Gamma.
 
@@ -1034,12 +1026,9 @@ class bsl:
     @staticmethod
     def run(input_data_dir=get_data_dirpath(silent=False),
             output_dir=DEFT_RESULTS_DIR, on_gpu=False):
-        """
-        This function performs brain source localization.
-
+        """This function performs brain source localization.
         It uses several gain matrices [2], including FAuSTs, and OMP solver.
         It reproduces the source localization experiment of [1].
-
         The results are stored in output_dir+"results_BSL_user.mat".
 
         Args:
@@ -1049,9 +1038,9 @@ class bsl:
         DURATION:
             Computations should take around 3 minutes.
 
-            The MEG gain matrices used are the precomputed ones in
-            get_data_dirpath()+"/faust_MEG_rcg_X.mat"
-            (in the installation directory of the FAuST toolbox)
+        The MEG gain matrices used are the precomputed ones in
+        get_data_dirpath()+"/faust_MEG_rcg_X.mat"
+        (in the installation directory of the FAuST toolbox)
 
             References:
 
@@ -1179,10 +1168,8 @@ class bsl:
 
     @staticmethod
     def fig(input_dir=DEFT_RESULTS_DIR, output_dir=DEFT_FIG_DIR):
-        """
-            Calls all fig*() functions of bsl demo.
-
-            Note: Must be call after the bsl.run function.
+        """Calls all fig*() functions of bsl demo.
+        Note: Must be call after the bsl.run function.
         """
         bsl.fig_time_cmp(input_dir, output_dir)
         bsl.fig_speedup(input_dir, output_dir)
@@ -1288,11 +1275,9 @@ class bsl:
 
     @staticmethod
     def fig_convergence(input_dir=DEFT_RESULTS_DIR, output_dir=DEFT_FIG_DIR):
-        """
-        This function builds a figure similar to the BSL figure (Fig 9) used in [1].
+        """This function builds a figure similar to the BSL figure (Fig 9) used in [1].
 
         References:
-
             [1] Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse
             approximations of matrices and applications", Journal of Selected
             Topics in Signal Processing, 2016.
