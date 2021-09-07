@@ -1370,8 +1370,8 @@ def _create_dir_if_doesnt_exist(output_dir):
         os.mkdir(output_dir)
 
 # time comparison function to use
-from time import time, clock
+from time import time, process_time
 if sys.platform == 'win32':
-    _timer = clock
+    _timer = process_time
 else:
     _timer = time
