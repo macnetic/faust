@@ -411,13 +411,13 @@ namespace Faust
 				else
 				{ // storage size is the main criterion
 					sparse_weight = fac->getNonZeros()*(sizeof(FPP)+sizeof(int))+(fac->getNbRow()+1)*sizeof(int);
-					if(sparse_weight <= fac->getNBytes())
+					if(sparse_weight < fac->getNBytes())
 					{
 						// choose CSR format
 						if(dfac)
 							opt_factors.push_back(new Faust::MatSparse<FPP, DEV>(*dfac));
 						else
-							opt_factors.push_back(new Faust::MatSparse<FPP, DEV>(*sfac));
+							opt_factors.push_back(fac);
 					}
 					else
 					{
@@ -425,11 +425,11 @@ namespace Faust
 						if(sfac)
 							opt_factors.push_back(new Faust::MatDense<FPP, DEV>(*sfac));
 						else
-							opt_factors.push_back(new Faust::MatDense<FPP, DEV>(*dfac));
+							opt_factors.push_back(fac);
 					}
 				}
 			}
-			TransformHelper<FPP,DEV> *pth = new TransformHelper<FPP,DEV>(opt_factors, 1, false, false, true);
+			TransformHelper<FPP,DEV> *pth = new TransformHelper<FPP,DEV>(opt_factors, FPP(1), false, false, true);
 			return pth;
 
 		}
