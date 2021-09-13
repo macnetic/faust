@@ -721,6 +721,7 @@ namespace Faust
 			int** c = new int*[n]; // TODO: reduce the memory used because only the upper triangle of the array is used
 			int** inds = new int*[n]; // TODO: idem
 			int j, k, cost;
+			int c_i, c_j;
 			for(int i=0;i<n;i++)
 			{
 				c[i] = new int[n];
@@ -736,21 +737,26 @@ namespace Faust
 					while(k < j)
 					{
 						cost = c[i][k] + c[k+1][j];
-						if(j < factors.size()-1 || A == nullptr)
-						{
-							if(op == 'N')
-								cost += factors[i]->getNbRow() * factors[k]->getNbCol() * factors[j]->getNbCol();
-							else
-								cost += factors[i]->getNbCol() * factors[k]->getNbRow() * factors[j]->getNbRow();
-						}
+						if(k == i && dynamic_cast<MatSparse<FPP, Cpu>*>(factors[i]))
+							c_i = factors[i]->getNonZeros();
 						else
-						{ // j == factors.size()-1 && A == factors[n-1]
-							// last_op == 'N'
 							if(op == 'N')
-								cost += factors[i]->getNbRow() * factors[k]->getNbCol() * factors[j]->getNbCol();
+								c_i = factors[i]->getNbRow() * factors[k]->getNbCol();
 							else
-								cost += factors[i]->getNbCol() * factors[k]->getNbRow() * factors[j]->getNbCol();
-						}
+								c_i = factors[i]->getNbCol() * factors[k]->getNbRow();
+						if(j == i+1 && dynamic_cast<MatSparse<FPP, Cpu>*>(factors[j]))
+							c_j = factors[j]->getNonZeros();
+						else
+							if(j < factors.size()-1 || A == nullptr)
+								if(op == 'N')
+									c_j = factors[j]->getNbCol();
+								else
+									c_j = factors[j]->getNbRow();
+							else
+								// j == factors.size()-1 && A == factors[n-1]
+								// last_op == 'N'
+								c_j = factors[j]->getNbCol();
+						cost += c_i * c_j;
 						if(cost < c[i][j])
 						{
 							c[i][j] = cost;
