@@ -122,7 +122,7 @@ int main(int argc, const char** argv)
 
 	params.Display();
 
-#ifndef USE_GPU_MOD
+#if defined(ON_CPU)
 	// the 2016 impl. is not GPU2 ready
 	if(impl == 2016 || argc < 2)
 	{
