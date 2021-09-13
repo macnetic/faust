@@ -18,7 +18,10 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 {
 	std::chrono::duration<double> norm2_duration = std::chrono::duration<double>::zero();
 	std::chrono::duration<double> fgrad_duration = std::chrono::duration<double>::zero();
-	int prod_mod = GREEDY_ALL_BEST_GENMAT;
+	char* str_env_prod_mod = getenv("PROD_MOD");
+	int prod_mod = DYNPROG; // GREEDY_ALL_BEST_GENMAT; DYNPROG is a bit better to factorize the MEG matrix and not slower to factorize a Hadamard matrix
+	if(str_env_prod_mod)
+		prod_mod = std::atoi(str_env_prod_mod);
 	double norm1, norm2;
 //	std::cout << "palm4msa2 "<< std::endl;
 	if(constraints.size() == 0)
@@ -272,7 +275,7 @@ void Faust::compute_n_apply_grad2(const int f_id, const Faust::MatDense<FPP,DEVI
 			_R = pR[f_id]->get_gen_fact_nonconst(0);
 		else
 		{
-//			__R = pR[f_id]->get_product(prod_mod); // disabled because  GREEDY_ALL_BEST_GENMAT is slower than DEFAULT_L2R for Hadamard factorization
+//			__R = pR[f_id]->get_product(prod_mod); // disabled because GREEDY_ALL_BEST_GENMAT is slower than DEFAULT_L2R for Hadamard factorization
 			__R = pR[f_id]->get_product();
 			_R = &__R;
 		}
@@ -284,7 +287,7 @@ void Faust::compute_n_apply_grad2(const int f_id, const Faust::MatDense<FPP,DEVI
 			_L = pL[f_id]->get_gen_fact_nonconst(0);
 		else
 		{
-//			__L = pL[f_id]->get_product(prod_mod); // disabled because  GREEDY_ALL_BEST_GENMAT is slower than DEFAULT_L2R for Hadamard factorization
+//			__L = pL[f_id]->get_product(prod_mod); // disabled because GREEDY_ALL_BEST_GENMAT is slower than DEFAULT_L2R for Hadamard factorization
 			__L = pL[f_id]->get_product();
 			_L = &__L;
 		}
