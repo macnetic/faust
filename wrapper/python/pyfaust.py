@@ -2101,12 +2101,12 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             transp: True in order to optimize the Faust according to its transpose.
             nsamples: the number of Faust-Dense matrix products
             calculated in order to measure time taken by each method (it could matter
-            to discriminate methods when the performances are similar). By default,
+            to discriminate methods when the performance is similar). By default,
             only one product is computed to evaluate the method.
             mat: if not None must be a numpy.ndarray or a
             scipy.sparse.csr_matrix. Use this argument to run the benchmark on
             the Faust multiplication by the matrix mat instead of Faust.toarray() (if mat
-            is None).
+            is None). Note that mat must be of the same dtype as F.
 
         Returns:
             The optimized Faust.
@@ -2990,7 +2990,7 @@ class FaustMulMode:
     ##
     ## This method is only available for the specific packages pyfaust_torch.
     TORCH_CPU_L2R=8
-	## \brief The method is basically the same as GREEDY_ALL_BEST_GENMAT but it is implemented using the Torch library.
+	## \brief The method is basically the same as GREEDY but it is implemented using the Torch library.
 	##
 	## This method is only available for the specific packages pyfaust_torch.
     TORCH_CPU_GREEDY=9

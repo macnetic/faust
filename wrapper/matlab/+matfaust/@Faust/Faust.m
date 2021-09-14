@@ -799,7 +799,7 @@ classdef Faust
 		%> calculated in order to measure time taken by each method (it could matter
 		%> to discriminate methods when the performances are similar). By default,
 		%> only one product is computed to evaluate the method.
-		%> @param 'mat', matrix (optional) Use this argument to run the benchmark on the Faust multiplication by the matrix mat instead of Faust.full().
+		%> @param 'mat', matrix (optional) Use this argument to run the benchmark on the Faust multiplication by the matrix mat instead of Faust.full(). Note that mat must be of the same scalar type as F.
 		%>
 		%> @retval OF The optimized Faust.
 		%>

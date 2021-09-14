@@ -18,7 +18,7 @@ classdef FaustMulMode
 		%>
 		%> This method is only available for the specific packages pyfaust_torch.
 		TORCH_CPU_L2R=8
-        %> \brief The method is basically the same as GREEDY_ALL_BEST_GENMAT but it is implemented using the Torch library.
+        %> \brief The method is basically the same as GREEDY but it is implemented using the Torch library.
         %>
         %> This method is only available for the specific packages pyfaust_torch.
         TORCH_CPU_GREEDY=9

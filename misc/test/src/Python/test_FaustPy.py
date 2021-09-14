@@ -537,10 +537,10 @@ class TestFaustPy(unittest.TestCase):
         G.m_faust.set_FM_mul_mode(FaustMulMode.DYNPROG)
         self.assertTrue(np.allclose(self.F.toarray(), H.toarray()))
         self.assertTrue(np.allclose(self.F.toarray(), G.toarray()))
-        M = np.random.rand(self.F.shape[1], self.F.shape[0])
+        M = np.random.rand(self.F.shape[1], self.F.shape[0]).astype(self.F.dtype)
         self.assertTrue(np.allclose(self.F@M, H@M))
         self.assertTrue(np.allclose(self.F@M, G@M))
-        S = sparse.random(self.F.shape[1], self.F.shape[0], .2, format='csr')
+        S = sparse.random(self.F.shape[1], self.F.shape[0], .2, format='csr').astype(self.F.dtype)
         self.assertTrue(np.allclose(self.F@S, H@S))
         self.assertTrue(np.allclose(self.F@S, G@S))
         # test any method chosen by optimize_time
