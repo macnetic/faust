@@ -499,66 +499,64 @@ template<typename FPP>
 void Faust::Transform<FPP,Cpu>::get_product(Faust::MatDense<FPP,Cpu> &mat, const char opThis, const bool isConj)const
 {
 
-
 	if (size() == 0)
-	{
 		handleError(m_className,"get_product : empty Faust::Transform");
+
+	if (opThis == 'N')
+	{
+		if(data.size() == 1)
+		{
+			// just one matrix in the Faust, return a copy as dense matrix
+			if(dynamic_cast<MatSparse<FPP,Cpu>*>(data[this->size()-1]))
+				mat = *dynamic_cast<MatSparse<FPP,Cpu>*>(data[this->size()-1]);
+			else if(dynamic_cast<MatDense<FPP,Cpu>*>(data[this->size()-1]))
+				mat = *dynamic_cast<MatDense<FPP,Cpu>*>(data[this->size()-1]);
+			if(isConj)
+				mat.conjugate();
+			return;
+		}
+		else
+		{
+			// at least two factors, compute the first product (of the last two matrices)
+			// it avoids making a copy of the last factor
+			gemm_gen(*data[this->size()-2], *data[this->size()-1], mat);
+		}
+		for (int i=this->size()-3; i >= 0; i--)
+		{
+			data[i]->multiply(mat,opThis);
+		}
+	}else
+	{
+		if(data.size() == 1)
+		{
+			// just one matrix in the Faust, return a transposed or transconjugate copy as dense matrix
+			if(dynamic_cast<MatSparse<FPP,Cpu>*>(data[0]))
+				mat = *dynamic_cast<MatSparse<FPP,Cpu>*>(data[0]);
+			else if(dynamic_cast<MatDense<FPP,Cpu>*>(data[0]))
+				mat = *dynamic_cast<MatDense<FPP,Cpu>*>(data[0]);
+			if(opThis == 'H' || opThis == 'T' && isConj)
+				mat.adjoint();
+			else if(opThis == 'T')
+				mat.transpose();
+			else if(isConj)
+				mat.conjugate();
+			return;
+		}
+		else
+		{
+			// at least two factors, compute the first product (of the last two matrices)
+			// it avoids making a copy of the first factor
+			gemm_gen(*data[1], *data[0], mat, FPP(1.0), FPP(0.0), opThis, opThis);
+		}
+		for (int i=2; i < this->size(); i++)
+		{
+			data[i]->multiply(mat, opThis);
+		}
+
 	}
-
-	// modif NB v1102 : new method compatible with factor as MatGeneric
-	faust_unsigned_int dim;
-	if (opThis == 'T' || opThis == 'H')
-		dim = data[0]->getNbRow();
-	else
-		dim = data[size()-1]->getNbCol();
-
-	Faust::MatDense<FPP,Cpu> prod(dim);
-
-	prod.setEyes();
-
-	mat = this->multiply(prod, opThis);
 
 	if(isConj && opThis != 'H') mat.conjugate();
 
-	/* modif NB v1102 : factor are no longer MatSparse, they are MatGeneric now
-	   Faust::MatDense<FPP,Cpu> prod(data[0].getNbRow());
-
-	   if(getNbRow()<getNbCol())
-	   {
-	   prod.resize(getNbRow());
-	   prod.setEyes();
-	   for(int i=0 ; i<data.size() ; i++)
-	   prod *= data[i];
-	   }else
-	   {
-	   prod.resize(getNbCol());
-	   prod.setEyes();
-	   for(int i=data.size()-1 ; i>=0 ; i--)
-	   prod.multiplyLeft(data[i]);
-	   }
-	   if (opThis == 'T')
-	   prod.transpose();
-	   */
-	//complexity of evaluating a Faust::Transform
-	// from left to right is (dim1*total_nnz)
-	// from right to left is (dim2*total_nnz)
-
-	/*Faust::MatDense<FPP,Cpu> prod;
-	  if ( (data[0].getNonZeros()+getNbRow()*(totalNonZeros-data[0].getNonZeros())) < (data[size()-1].getNonZeros()+getNbCol()*(totalNonZeros-data[size()-1].getNonZeros())) )
-	  {
-	  prod = data[0];
-	  for(int i=1 ; i<data.size() ; i++)
-	  prod *= data[i];
-	  }else
-	  {
-	  prod = data[size()-1];
-	  for(int i=data.size()-2 ; i>=0 ; i--)
-	  prod.multiplyLeft(data[i]);
-	  }	*/
-
-
-
-	//return prod;
 }
 
 template<typename FPP>

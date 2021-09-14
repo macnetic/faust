@@ -915,8 +915,7 @@ template<typename FPP>
 			}
 			else
 			{
-				// TODO: it should be a MatSparse // it needs to update TransformHelper::multiply(MatSparse)
-				MatDense<FPP,Cpu> Id(this->getNbCol(), this->getNbCol());
+				MatSparse<FPP,Cpu> Id(this->getNbCol(), this->getNbCol());
 				Id.setEyes();
 				P = this->multiply(Id);
 			}
