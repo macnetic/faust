@@ -169,17 +169,77 @@ void Faust::multiply_order_opt_all_best(std::vector<Faust::MatGeneric<FPP,DEVICE
 	int nfacts = facts.size();
 	Faust::MatGeneric<FPP,DEVICE> *Si, *Sj;
 	std::vector<int> complexity(nfacts-1);
-	auto calc_cost = [](Faust::MatGeneric<FPP,DEVICE> *Si, Faust::MatGeneric<FPP,DEVICE> *Sj)
+	auto calc_cost = [&transconj_flags](Faust::MatGeneric<FPP,DEVICE> *Si, Faust::MatGeneric<FPP,DEVICE> *Sj, int i, int j)
 	{
 		Faust::MatSparse<FPP,Cpu> * tmp_sp;
 		int complexity;
-		if((tmp_sp = dynamic_cast<Faust::MatSparse<FPP,DEVICE>*>(Si)))
-			complexity = Si->getNonZeros() * Sj->getNbCol();
+		auto op_i = transconj_flags[transconj_flags.size()>i?i:0];
+		auto op_j = transconj_flags[transconj_flags.size()>j?j:0];
+		if(dynamic_cast<Faust::MatSparse<FPP,DEVICE>*>(Si))
+			if(op_j == 'N')
+				complexity = Si->getNonZeros() * Sj->getNbCol();
+			else
+				complexity = Si->getNonZeros() * Sj->getNbRow();
 		else // Si dense
-			if((tmp_sp = dynamic_cast<Faust::MatSparse<FPP,DEVICE>*>(Sj)))
-				complexity = Si->getNbRow() * Sj->getNonZeros();
+			if(dynamic_cast<Faust::MatSparse<FPP,DEVICE>*>(Sj))
+				if(op_i == 'N')
+					complexity = Si->getNbRow() * Sj->getNonZeros();
+				else
+					complexity = Si->getNbCol() * Sj->getNonZeros();
 		else // Si and Sj dense
-			complexity = Si->getNbRow() * Si->getNbCol() * Sj->getNbCol();
+		{
+			complexity = Si->getNbRow() * Si->getNbCol();
+			if(op_j == 'N')
+				complexity *= Sj->getNbCol();
+			else
+				complexity *= Sj->getNbRow();
+		}
+		return complexity;
+	};
+	// calc_cost2 is not used but kept for later (the complexities are evaluated differently, closer to what is done with DYNPROG)
+	auto calc_cost2 = [&transconj_flags](Faust::MatGeneric<FPP,DEVICE> *Si, Faust::MatGeneric<FPP,DEVICE> *Sj, int i, int j)
+	{
+		Faust::MatSparse<FPP,Cpu> * tmp_sp;
+		int complexity;
+		auto op_i = transconj_flags[transconj_flags.size()>i?i:0];
+		auto op_j = transconj_flags[transconj_flags.size()>j?j:0];
+		int c1, c2;
+		if(dynamic_cast<Faust::MatSparse<FPP,DEVICE>*>(Si) && dynamic_cast<Faust::MatSparse<FPP,DEVICE>*>(Sj))
+		{
+			c1 = Si->getNonZeros() * Sj->getNonZeros();
+			if(op_j == 'N')
+				c2 = Sj->getNbRow();
+			else
+				c2 = Sj->getNbCol();
+			complexity = c1 / c2;
+		}
+		else if(dynamic_cast<Faust::MatSparse<FPP,DEVICE>*>(Si) && dynamic_cast<Faust::MatDense<FPP,DEVICE>*>(Sj))
+		{
+			c1 = Si->getNonZeros();
+			if(op_j = 'N')
+				c2 = Sj->getNbCol();
+			else
+				c2 = Sj->getNbRow();
+			complexity = c1 * c2;
+		}
+		else if(dynamic_cast<Faust::MatDense<FPP,DEVICE>*>(Si) && dynamic_cast<Faust::MatSparse<FPP,DEVICE>*>(Sj))
+		{
+			c2 = Sj->getNonZeros();
+			if(op_i = 'N')
+				c1 = Si->getNbRow();
+			else
+				c1 = Si->getNbCol();
+			complexity = c1 * c2;
+		}
+		else // Si and Sj dense
+		{
+			c1 = Si->getNbRow() * Si->getNbCol();
+			if(op_j == 'N')
+				c2 = Sj->getNbCol();
+			else
+				c2 = Sj->getNbRow();
+			complexity = c1*c2;
+		}
 		return complexity;
 	};
 	std::string type_err = "Sj shouldn't be anything else than a MatSparse or MatDense.";
@@ -198,7 +258,7 @@ void Faust::multiply_order_opt_all_best(std::vector<Faust::MatGeneric<FPP,DEVICE
 	{
 		Si = facts[i];
 		Sj = facts[i+1];
-		complexity[i] = calc_cost(Si, Sj);
+		complexity[i] = calc_cost(Si, Sj, i, i+1);
 	}
 	int idx; // marks the factor to update with a product of contiguous factors
 	bool multiplying_tmp_factor = false; // allows to avoid to allocate uselessly a tmp factor if Si or Sj are already tmp factors
@@ -224,9 +284,9 @@ void Faust::multiply_order_opt_all_best(std::vector<Faust::MatGeneric<FPP,DEVICE
 		if(facts.size() > 2)
 		{
 			if(idx > 0)
-				complexity[idx-1] = calc_cost(facts[idx-1], facts[idx]);
+				complexity[idx-1] = calc_cost(facts[idx-1], facts[idx], idx-1, idx);
 			if(idx < facts.size()-1)
-				complexity[idx] = calc_cost(facts[idx], facts[idx+1]);
+				complexity[idx] = calc_cost(facts[idx], facts[idx+1], idx, idx+1);
 		}
 		multiplying_tmp_factor = false;
 	}
@@ -734,29 +794,47 @@ namespace Faust
 					j = p + i;
 					k = i;
 					c[i][j] = std::numeric_limits<int>::max();
+					auto i_nrows = factors[i]->getNbRow();
+					auto i_ncols = factors[i]->getNbCol();
+					auto j_nrows = factors[j]->getNbRow();
+					auto j_ncols = factors[j]->getNbCol();
 					while(k < j)
 					{
 						cost = c[i][k] + c[k+1][j];
-						if(k == i && dynamic_cast<MatSparse<FPP, Cpu>*>(factors[i]))
-							c_i = factors[i]->getNonZeros();
-						else
+						// sparse matrices can exist only in the starting sequence of factors because any product of two matrices gives a dense matrix here
+						auto fac_i_sparse = k == i && dynamic_cast<MatSparse<FPP, Cpu>*>(factors[i]);
+						auto fac_kp1_sparse = k + 1 == j && dynamic_cast<MatSparse<FPP, Cpu>*>(factors[j]);
+						auto k_nrows = factors[k]->getNbRow();
+						auto k_ncols = factors[k]->getNbCol();
+						if(! fac_i_sparse && ! fac_kp1_sparse)
+						{
+							// i-th and k-th factors are dense matrices
 							if(op == 'N')
-								c_i = factors[i]->getNbRow() * factors[k]->getNbCol();
+								cost += i_nrows*k_ncols*j_ncols;
 							else
-								c_i = factors[i]->getNbCol() * factors[k]->getNbRow();
-						if(j == i+1 && dynamic_cast<MatSparse<FPP, Cpu>*>(factors[j]))
-							c_j = factors[j]->getNonZeros();
-						else
-							if(j < factors.size()-1 || A == nullptr)
-								if(op == 'N')
-									c_j = factors[j]->getNbCol();
-								else
-									c_j = factors[j]->getNbRow();
+								cost += i_ncols*k_nrows*j_nrows;
+						}
+						else if(fac_i_sparse && fac_kp1_sparse)
+						{
+							if(op == 'N')
+								cost += factors[i]->getNonZeros()*factors[j]->getNonZeros()/i_nrows;
 							else
-								// j == factors.size()-1 && A == factors[n-1]
-								// last_op == 'N'
-								c_j = factors[j]->getNbCol();
-						cost += c_i * c_j;
+								cost += factors[i]->getNonZeros()*factors[j]->getNonZeros()/i_ncols;
+						}
+						else if(fac_i_sparse && ! fac_kp1_sparse)
+						{
+							if(op == 'N')
+								cost += factors[i]->getNonZeros()*j_ncols;
+							else
+								cost += factors[i]->getNonZeros()*j_nrows;
+						}
+						else // ! fac_i_sparse && fac_kp1_sparse
+						{
+							if(op == 'N')
+								cost += factors[j]->getNonZeros()*i_nrows;
+							else
+								cost += factors[j]->getNonZeros()*i_ncols;
+						}
 						if(cost < c[i][j])
 						{
 							c[i][j] = cost;
@@ -765,15 +843,6 @@ namespace Faust
 						k++;
 					}
 				}
-//			std::cout << "inds:" << std::endl;
-//			for(int i=0;i<n;i++)
-//			{
-//				for(int j=i+1;j<n;j++)
-//				{
-//					std::cout << inds[i][j] << " ";
-//				}
-//				std::cout << std::endl;
-//			}
 			auto prod = dynamic_cast<MatDense<FPP, Cpu>*>(dynprog_multiply_rec(factors, inds, 0, n-1, op, last_op));
 			for(int i=0;i<n;i++)
 			{

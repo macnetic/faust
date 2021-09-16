@@ -2973,25 +2973,24 @@ class FaustMulMode:
         >>> from pyfaust import rand as frand
         >>> from numpy.random import rand
         >>> F = frand(100, 100, 5, [100, 1024])
-        >>> F.m_faust.set_FM_mul_mode(FaustMulMode.GREEDY) # method used to compute Faust-matrix product or Faust.toarray()
-        >>> F*rand(F.shape[1], 512) # Faust-matrix mul. using method GREEDY_ALL_BEST_MIXED
+        >>> F.m_faust.set_FM_mul_mode(FaustMulMode.DYNPROG) # method used to compute Faust-matrix product or Faust.toarray()
+        >>> F*rand(F.shape[1], 512) # Faust-matrix mul. using method DYNPROG
         >>> F.toarray() # using the same method
     """
     ## \brief The default method, it computes the product from the right to the left.
     DEFAULT_L2R=0
-    ## \brief This method follows a greedy principle: it chooses to multiply the less costly product of two matrices at each step of the whole product computation.
-    ##
-    ## The computational cost depends on the matrix dimensions and the number of nonzeros (when a matrix is in sparse format).
-    GREEDY=4
     ## \brief This method implements the classic dynamic programming solution
+    ##
     ## to the chain matrix problem (see https://en.wikipedia.org/wiki/Matrix_chain_multiplication#A_dynamic_programming_algorithm).
+    ## Note that the standard method is extended in order to take into account the complexity of multiplications including a sparse matrix (because that's not the same cost than multiplying dense matrices).
     DYNPROG=5
     ## \brief This method computes the product of the matrix chain from the left to the right using the Torch C++ library (CPU backend).
     ##
     ## This method is only available for the specific packages pyfaust_torch.
     TORCH_CPU_L2R=8
-	## \brief The method is basically the same as GREEDY but it is implemented using the Torch library.
-	##
+    ## \brief This method is implemented using the Torch library and follows a greedy principle: it chooses to multiply the less costly product of two matrices at each step of the whole product computation.
+    ##
+    ## The computational cost depends on the matrix dimensions and the number of nonzeros (when a matrix is in sparse format).
 	## This method is only available for the specific packages pyfaust_torch.
     TORCH_CPU_GREEDY=9
     ## \brief The same as TORCH_CPU_L2R except that torch::chain_matmul is used to
@@ -3003,6 +3002,5 @@ class FaustMulMode:
     ## References:
     ## https://pytorch.org/cppdocs/api/function_namespaceat_1aee491a9ff453b6033b4106516bc61a9d.html?highlight=chain_matmul
     ## https://pytorch.org/docs/stable/generated/torch.chain_matmul.html?highlight=chain_matmul#torch.chain_matmul
-
     ## This method is only available for the specific packages pyfaust_torch.
     TORCH_CPU_DENSE_DYNPROG_SPARSE_L2R=10

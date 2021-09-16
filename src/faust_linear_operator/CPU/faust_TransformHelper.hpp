@@ -178,7 +178,7 @@ namespace Faust {
 						if(this->is_transposed)
 						{
 							transconj_flags = std::vector<char>(data.size(), this->isTransposed2char()); // TODO: use assign in C++ 20
-							*(transconj_flags.end()-1) = 'N'; // the matrix multiplying is not transposed
+							*(transconj_flags.end()-1) = 'N'; // the matrix multiplyed is not transposed
 							std::reverse(data.begin(), data.end()-1); // reversing the Faust factors (because they are transposed or transconjugate)
 						}
 						Faust::multiply_order_opt(this->mul_order_opt_mode, data, M, /*alpha */ FPP(1.0), /* beta */ FPP(0.0), transconj_flags);
@@ -389,6 +389,8 @@ namespace Faust {
 			disabled_meths.push_back(GREEDY_ALL_ENDS);
 			disabled_meths.push_back(GREEDY_1ST_BEST);
 			disabled_meths.push_back(GREEDY_ALL_BEST_CONVDENSE);
+			// even the GREEDY_ALL_BEST_GENMAT that is far better than previous ones
+			disabled_meths.push_back(GREEDY_ALL_BEST_GENMAT);
 #if DEBUG_OPT_MUL
 			cout << "nsamples used to measure time: " << nmuls << endl;
 #endif

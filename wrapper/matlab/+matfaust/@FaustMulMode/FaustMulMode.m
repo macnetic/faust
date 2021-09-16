@@ -6,19 +6,18 @@ classdef FaustMulMode
 	properties(SetAccess = public, Constant)
         %> \brief The default method, it computes the product from the right to the left.
 		DEFAULT_L2R=0
-        %% \brief This method follows a greedy principle: it chooses to multiply the less costly product of two matrices at each step of the whole product computation.
-        %%
-        %% The computational cost depends on the matrix dimensions and the number of nonzeros (when a matrix is in sparse format).
-		GREEDY=4
-        %> \brief This method implements the classic dynamic programming
-        %> solution of the chain matrix problem (see
-        %> https://en.wikipedia.org/wiki/Matrix_chain_multiplication#A_dynamic_programming_algorithm).
+        %> \brief This method implements the classic dynamic programming solution of the chain matrix problem.
+        %>
+        %> See https://en.wikipedia.org/wiki/Matrix_chain_multiplication#A_dynamic_programming_algorithm.
+        %> Note that the standard method is extended in order to take into account the complexity of multiplications including a sparse matrix (because that's not the same cost than multiplying dense matrices).
         DYNPROG=5
 		%> \brief This method computes the product of the matrix chain from the left to the right using the Torch C++ library (CPU backend).
 		%>
 		%> This method is only available for the specific packages pyfaust_torch.
 		TORCH_CPU_L2R=8
-        %> \brief The method is basically the same as GREEDY but it is implemented using the Torch library.
+        %% \brief This method is implemented using the Torch library and follows a greedy principle: it chooses to multiply the less costly product of two matrices at each step of the whole product computation.
+        %>
+        %> The computational cost depends on the matrix dimensions and the number of nonzeros (when a matrix is in sparse format).
         %>
         %> This method is only available for the specific packages pyfaust_torch.
         TORCH_CPU_GREEDY=9
