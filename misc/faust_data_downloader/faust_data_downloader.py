@@ -15,7 +15,7 @@ ARCH_NAME = "@REMOTE_DATA_FILE@"
 BASE_URL = "@REMOTE_DATA_URL@"
 
 def download_uncompress(uncompress_dir=None, base_url=BASE_URL,
-                        arch_name=ARCH_NAME, data_name="FAµST data",
+                        arch_name=ARCH_NAME, data_name="FAuST data",
                         already_downloaded_msg=False,
                         extra_file_to_check_dl=None):
     ARCH_URL = "/".join([base_url, arch_name])

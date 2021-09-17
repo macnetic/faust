@@ -116,7 +116,7 @@ Section "" ; no component so name not needed
   ; check the python version matches python major.minor version used to build the the wrapper shared library
   Exec "python --version | python -c $\"import re; ver = input(); exit(0) if re.match('Python @WIN_PY_VER@', ver) else exit(1)$\""
   IfErrors 0 +2
-  MessageBox MB_OK "Error: this version of FAµST is pre-compiled for Python @WIN_PY_VER@ which must be installed and configured as the default python on your system (i.e. it must be available as $\"python$\" command in the PATH environment variable)." /SD IDOK IDOK data_dl
+  MessageBox MB_OK "Error: this version of FAuST is pre-compiled for Python @WIN_PY_VER@ which must be installed and configured as the default python on your system (i.e. it must be available as $\"python$\" command in the PATH environment variable)." /SD IDOK IDOK data_dl
   MessageBox MB_OK "The pyfaust wrapper will be installed for Python @WIN_PY_VER@." /SD IDOK
 
   ; post install pyfaust auto-setup in environment (works only if python is installed in path)
