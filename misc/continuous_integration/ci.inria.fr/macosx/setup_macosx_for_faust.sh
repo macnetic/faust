@@ -38,14 +38,17 @@ ln -sf /opt/local/bin/clang-mp-8.0 /opt/local/bin/clang
 ln -sf /opt/local/bin/clang++-mp-8.0 /opt/local/bin/clang++
 ### 5. Install Python packages and dependencies
 yes | port install graphviz doxygen
-yes | port install python37 py37-pip
+yes | port install python39 py39-pip
 yes | port install jpeg # pillow (indirect denpendency of pyfaust needs this to build)
-port select --set python python37
-port select --set pip pip37
-ln -sf /opt/local/bin/python3.7 /opt/local/bin/python3
-yes | port install py37-cython
-yes | port select --set cython cython37
-yes |pip install doxypypy wheel pygsp numpy
+port select --set python python39
+port select --set pip pip39
+ln -sf /opt/local/bin/python3.9 /opt/local/bin/python3
+yes | port install py39-cython
+yes | port select --set cython cython39
+yes |pip install doxypypy chardet wheel pygsp numpy
+wget https://raw.githubusercontent.com/Feneric/doxypypy/master/doxypypy/doxypypy.py
+# use rather the github doxypypy instead of the pypy version
+mv doxypypy.py $(dirname $(python3 -c "import doxypypy; print(doxypypy.__file__)"))
 yes | pip install matplotlib # separately because it could fail 
 #### 6. Install C++ libtorch
 wget https://download.pytorch.org/libtorch/cpu/libtorch-macos-1.4.0.zip
