@@ -2435,15 +2435,13 @@ def concatenate(F, *args, axis=0, **kwargs):
     """
     A package function alias for the member function Faust.concatenate.
 
-
-    <b>See also</b> numpy.concatenate
-
     Example:
         >>> from pyfaust import *
         >>> F1 = rand(5,50)
         >>> F2 = rand(5,50)
         >>> concatenate((F1, F2), axis=0)
 
+    <b>See also</b> numpy.concatenate
     """
     if not isinstance(F, tuple):
         raise TypeError("first arg must be a tuple")
@@ -2499,38 +2497,38 @@ def isFaust(obj):
 
 def wht(n, normed=True, dev="cpu", dtype='double'):
     """
-       Constructs a Faust implementing the Hadamard transform of dimension n.
+    Constructs a Faust implementing the Hadamard transform of dimension n.
 
-       The resulting Faust has n sparse factors of order n, each one having
-       2 nonzero elements per row and per column.
+    The resulting Faust has n sparse factors of order n, each one having
+    2 nonzero elements per row and per column.
 
-       Args:
-           n: the power of two exponent for a Hadamard matrix of order n
-           and a factorization in log2(n) factors.
-           normed: default to True to normalize the Hadamard Faust as if you called
-           Faust.normalize() and False otherwise.
-           dev: device to create the Faust on.
-           dtype: the Faust dtype, it must be 'double' or 'complex'.
-       Returns:
-           The Faust implementing the Hadamard transform of dimension n.
+    Args:
+       n: the power of two exponent for a Hadamard matrix of order n
+       and a factorization in log2(n) factors.
+       normed: default to True to normalize the Hadamard Faust as if you called
+       Faust.normalize() and False otherwise.
+       dev: device to create the Faust on.
+       dtype: the Faust dtype, it must be 'double' or 'complex'.
 
-      Examples:
-          >>> from pyfaust import wht
-          >>> wht(1024)
-          Faust size 1024x1024, density 0.0195312, nnz_sum 20480, 10 factor(s):
-              - FACTOR 0 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
-              - FACTOR 1 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
-              - FACTOR 2 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
-              - FACTOR 3 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
-              - FACTOR 4 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
-              - FACTOR 5 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
-              - FACTOR 6 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
-              - FACTOR 7 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
-              - FACTOR 8 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
-              - FACTOR 9 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
-          >>> wht(1024, normed=True) # is equiv. to next call
-          >>> wht(1024, normed=False).normalize() # which is less optimized though
+    Returns:
+       The Faust implementing the Hadamard transform of dimension n.
 
+    Examples:
+      >>> from pyfaust import wht
+      >>> wht(1024)
+      Faust size 1024x1024, density 0.0195312, nnz_sum 20480, 10 factor(s):
+          - FACTOR 0 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+          - FACTOR 1 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+          - FACTOR 2 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+          - FACTOR 3 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+          - FACTOR 4 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+          - FACTOR 5 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+          - FACTOR 6 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+          - FACTOR 7 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+          - FACTOR 8 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+          - FACTOR 9 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+      >>> wht(1024, normed=True) # is equiv. to next call
+      >>> wht(1024, normed=False).normalize() # which is less optimized though
     """
     if dtype not in ['double', 'complex']:
         raise ValueError('dtype argument must be double or complex')
@@ -2553,41 +2551,41 @@ def wht(n, normed=True, dev="cpu", dtype='double'):
 
 def dft(n, normed=True, dev='cpu'):
     """
-        Constructs a Faust F such that F.toarray() is the Discrete Fourier Transform square matrix of order n.
+    Constructs a Faust F such that F.toarray() is the Discrete Fourier Transform square matrix of order n.
 
-        The factorization algorithm used is Cooley-Tukey.
+    The factorization algorithm used is Cooley-Tukey.
 
-        The resulting Faust is complex and has (log2(n)+1) sparse factors
-        whose the log2(n) first has 2 non-zero elements per row and per column.
-        The last factor is a permutation matrix.
+    The resulting Faust is complex and has (log2(n)+1) sparse factors
+    whose the log2(n) first has 2 non-zero elements per row and per column.
+    The last factor is a permutation matrix.
 
-        Args:
-            n: the power of two exponent for a DFT of order n and a
-            factorization in log2(n)+1 factors.
-            normed: default to True to normalize the DFT Faust as if you called
-            Faust.normalize() and False otherwise.
-            dev: device to create the Faust on.
+    Args:
+        n: the power of two exponent for a DFT of order n and a
+        factorization in log2(n)+1 factors.
+        normed: default to True to normalize the DFT Faust as if you called
+        Faust.normalize() and False otherwise.
+        dev: device to create the Faust on.
 
-        Returns:
-            The Faust implementing the DFT of dimension n.
+    Returns:
+        The Faust implementing the DFT of dimension n.
 
-        Examples:
-            >>> from pyfaust import dft
-            >>> dft(1024)
-            Faust size 1024x1024, density 0.0205078, nnz_sum 21504, 11 factor(s):
-            - FACTOR 0 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
-            - FACTOR 1 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
-            - FACTOR 2 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
-            - FACTOR 3 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
-            - FACTOR 4 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
-            - FACTOR 5 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
-            - FACTOR 6 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
-            - FACTOR 7 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
-            - FACTOR 8 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
-            - FACTOR 9 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
-            - FACTOR 10 (complex) SPARSE, size 1024x1024, density 0.000976562, nnz 1024
-            >>> dft(1024, normed=True) # is equiv. to next call
-            >>> dft(1024, normed=False).normalize() # which is less optimized though
+    Examples:
+        >>> from pyfaust import dft
+        >>> dft(1024)
+        Faust size 1024x1024, density 0.0205078, nnz_sum 21504, 11 factor(s):
+        - FACTOR 0 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+        - FACTOR 1 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+        - FACTOR 2 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+        - FACTOR 3 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+        - FACTOR 4 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+        - FACTOR 5 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+        - FACTOR 6 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+        - FACTOR 7 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+        - FACTOR 8 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+        - FACTOR 9 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+        - FACTOR 10 (complex) SPARSE, size 1024x1024, density 0.000976562, nnz 1024
+        >>> dft(1024, normed=True) # is equiv. to next call
+        >>> dft(1024, normed=False).normalize() # which is less optimized though
     """
     log2n = np.floor(np.log2(n))
     if(n > 2**log2n): raise ValueError("n must be a power of 2.")

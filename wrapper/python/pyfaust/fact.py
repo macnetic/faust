@@ -534,17 +534,17 @@ def palm4msa(M, p, ret_lambda=False, backend=2016, on_gpu=False):
         return F
 
 def palm4msa_mhtp(M, palm4msa_p, mhtp_p, ret_lambda=False, on_gpu=False):
-    """ Runs the MHTP-PALM4MSA algorithm to factorize the matrix M.
+    """
+    Runs the MHTP-PALM4MSA algorithm to factorize the matrix M.
 
-        MHTP stands for Multilinear Hard Tresholding Pursuit.
-        This is a generalization of the Bilinear HTP algorithm describe in [1].
+    MHTP stands for Multilinear Hard Tresholding Pursuit.
+    This is a generalization of the Bilinear HTP algorithm describe in [1].
 
-        [1] Quoc-Tung Le, Rémi Gribonval. Structured Support Exploration For
-        Multilayer Sparse Matrix Fac-
-        torization. ICASSP 2021 - IEEE International Conference on Acoustics,
-        Speech and Signal Processing,
-        Jun 2021, Toronto, Ontario, Canada. pp.1-5. <a
-        href="https://hal.inria.fr/hal-03132013/document">hal-03132013</a>
+    [1] Quoc-Tung Le, Rémi Gribonval. Structured Support Exploration For
+    Multilayer Sparse Matrix Factorization. ICASSP 2021 - IEEE International Conference on Acoustics,
+    Speech and Signal Processing,
+    Jun 2021, Toronto, Ontario, Canada. pp.1-5. <a
+    href="https://hal.inria.fr/hal-03132013/document">hal-03132013</a>
 
 
 
