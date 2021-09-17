@@ -477,6 +477,8 @@ def palm4msa(M, p, ret_lambda=False, backend=2016, on_gpu=False):
         M: the numpy array to factorize.
         p: the The pyfaust.factparams.ParamsPalm4MSA instance to define the algorithm parameters.
         ret_lambda: set to True to ask the function to return the scale factor (False by default).
+        backend: the C++ implementation to use (default to 2016, 2020 backend
+        should be faster for most of the factorizations).
         on_gpu: if True the GPU implementation is executed (this option applies only to 2020 backend).
 
     Returns:
@@ -677,8 +679,7 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
             pyfaust.factparams.ParamsHierarchical and pyfaust.factparams.ParamsHierarchicalRectMat).
             <br/>The residuum has a sparsity of P*rho^(num_facts-1). <br/> By default, rho == .8 and P = 1.4. It's possible to set custom values with for example p == ( ['rectmat', j, k, s], {'rho':.4, 'P':.7 }). <br/>The sparsity is here the number of non-zero elements.
         backend: the C++ implementation to use (default to 2016, 2020 backend
-        should be faster for certain configurations - e.g. factorizing a
-        Hadamard matrix).
+        should be faster for most of the factorizations).
         on_gpu: if True the GPU implementation is executed (this option applies only to 2020 backend).
 
         ret_lambda: set to True to ask the function to return the scale factor (False by default).

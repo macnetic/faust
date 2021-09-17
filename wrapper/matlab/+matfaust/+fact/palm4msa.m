@@ -4,7 +4,7 @@
 %>
 %> @param M the dense matrix to factorize.
 %> @param p the matfaust.factparams.ParamsPalm4MSA instance to define the algorithm parameters.
-%> @param 'backend',int (optional) the backend (the C++ implementation) chosen. Must be 2016 (the default) or 2020 (which should be quicker for certain configurations - e.g. factorizing a Hadamard matrix).
+%> @param 'backend',int (optional) the backend to use (the C++ implementation). Must be 2016 (the default) or 2020 (which should be faster for most of the factorizations).
 %> @param 'gpu', bool (optional) set to true to execute the algorithm using the GPU implementation. This option is only available when backend==2020.
 %>
 %> @retval F the Faust object result of the factorization.
