@@ -837,7 +837,7 @@ classdef Faust
 							if(argc == i || ~ isnumeric(varargin{i+1}) || ~ ismatrix(varargin{i+1}))
 								error('mat keyword argument is not followed by a matrix.')
 							else
-								mat = varargin{i+1}
+								mat = varargin{i+1};
 								i = i + 1; % ignore mat from parsing (switch can handle only scalar or char vec
 							end
 						otherwise
