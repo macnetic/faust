@@ -13,6 +13,7 @@ You might also be interested in this introduction to pyfaust through Jupyter Not
 - [Using the GPU with pyfaust](./using_gpu_pyfaust.html)
 - [Using the poly module](./pyfaust_poly.html)
 - [Using the PALM4MSA-MHTP algorithm](./MHTP_algorithms.html)
+- [Faust Optimizations](./Faust_optimizations.html)
 
 Download all the notebooks (.ipynb) [here](./pyfaust_notebooks.zip).
 
@@ -26,5 +27,6 @@ Besides, if you're more familiar with Matlab, some livescripts are also availabl
 - [Using the GPU with matfaust](./using_gpu_matfaust.html)
 - [Using the poly module](./matfaust_poly.html)
 - [Using the PALM4MSA-MHTP algorithm](./MHTP_algorithms.mlx.html)
+- [Faust Optimizations](./Faust_optimizations.mlx.html)
 
 Download all the livescripts (.mlx) [here](./matfaust_livescripts.zip).
