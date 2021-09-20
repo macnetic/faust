@@ -28,7 +28,7 @@ Please ensure these packages are installed on your system. One way to install th
 Note that you probably have to install those packages for all versions of Python you want to use (each one have normally its associated pip executable).<br/>
 Note also that you can rely on your system package manager to install the Python packages (e.g. dnf/yum repositories on Fedora/Centos Linux systems).
 
-FAµST supports at least Python 2.7.15 and is also compiled for Python @PY3_VER@.
+FAµST is compiled for Python @PY3_VER@.
 
 Note that starting from january 2020 python2.7 won't be supported anymore and FAµST newer packages won't deliver any python 2.7 wrapper too.
 Anyway, the python 3 versions are more advanced and it's highly recommended to move to these versions.
@@ -107,7 +107,7 @@ To test whether the FaµST Python wrapper has been setup properly, simply open a
 
 	python2 -c "import pyfaust; print('It works.')"
 
-	# it could be python2.7, python3, python@PY3_VER@ or just python,
+	# it could be python3, python@PY3_VER@ or just python,
 	# depending on your configuration and the python version you want to use
 
 It goes without saying that if the wrapper is set up properly you'll see the message "It works." as a result of the command above.
@@ -194,7 +194,7 @@ Note that the doxygen documentation for the Matlab API is also available locally
 
 In the same spirit than the Matlab tutorial showed in the previous section, you can execute the quick start script for Python.
 
-	$ python2.7 -c "from pyfaust.demo import quickstart; quickstart.run()"
+	$ python3 -c "from pyfaust.demo import quickstart; quickstart.run()"
 	dimension of the Faust :  (1000, 2000)
 	multiplication SPEED-UP using Faust
 	Faust is 1.83845941093 faster than a full matrix
@@ -208,7 +208,7 @@ In the same spirit than the Matlab tutorial showed in the previous section, you 
 
 You can also go through the Python terminal to build a FAµST product and call its object methods.
 
-	$ python2.7
+	$ python3
 	>>> import pyfaust
 	>>> A = pyfaust.Faust(filepath='A.mat') # A is the FAµST created through quickstart script
 	>>> A.rcg()
