@@ -89,6 +89,15 @@ Page instfiles
 
 Section "" ; no component so name not needed
 
+  ifFileExists "$INSTDIR\uninstall.exe" +1 start_install
+  MessageBox MB_YESNO "Another Faust install was found on your system. Do you want to uninstall it before to install this one (recommended) ?" IDYES +1 IDNO start_install
+
+  ; try to uninstall (silently) old install of Faust
+  ExecWait "$INSTDIR\uninstall.exe /S"
+  ifErrors +2 0
+  MessageBox MB_OK "Old version FAuST was uninstalled from $INSTDIR" /SD IDOK IDOK +1
+
+  start_install:
   CreateDirectory $INSTDIR\matlab
   CreateDirectory $INSTDIR\python
   CreateDirectory $INSTDIR\doc\html
