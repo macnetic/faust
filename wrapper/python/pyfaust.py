@@ -2538,7 +2538,7 @@ def wht(n, normed=True, dev="cpu", dtype='double'):
       >>> wht(1024, normed=True) # is equiv. to next call
       >>> wht(1024, normed=False).normalize() # which is less optimized though
     """
-    if dtype not in ['double', 'complex']:
+    if dtype not in ['double', 'complex', 'float']:
         raise ValueError('dtype argument must be double or complex')
     check_dev(dev)
     log2n = np.floor(np.log2(n))
@@ -2548,11 +2548,15 @@ def wht(n, normed=True, dev="cpu", dtype='double'):
     if dev == "cpu":
         if dtype == 'double':
             H = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUDbl.hadamardFaust(log2n, normed))
+        elif dtype == 'float':
+            H = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUFlt.hadamardFaust(log2n, normed))
         else: # dtype == 'complex'
             H = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUCplxDbl.hadamardFaust(log2n, normed))
     elif dev.startswith("gpu"):
         if dtype == 'double':
             H = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUDbl.hadamardFaust(log2n, normed))
+        elif dtype == 'float':
+            raise TypeError("float is not yet supported by GPU wht")
         else: # dtype == 'complex'
             H = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUCplxDbl.hadamardFaust(log2n, normed))
     return H
@@ -2628,17 +2632,21 @@ def eye(m, n=None, t='real', dev="cpu"):
             FACTOR 0 (complex) SPARSE, size 5x4, density 0.2, nnz 4<br/>
     """
     check_dev(dev)
-    if(t not in ['complex', 'real']):
-        raise ValueError("t must be 'real' or 'complex'")
+    if(t not in ['complex', 'real', 'double', 'float']):
+        raise ValueError("t must be 'real' (or 'double', 'float') or 'complex'")
     if(n == None): n = m
     if dev == "cpu":
-        if t == 'real':
+        if t in ['real', 'double']:
             rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUDbl.eyeFaust(m, n))
+        elif t == 'float':
+            rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUFlt.eyeFaust(m, n))
         else:
             rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUCplxDbl.eyeFaust(m, n))
     elif dev.startswith("gpu"):
-        if t == 'real':
+        if t in ['real', 'double']:
             rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUDbl.eyeFaust(m, n))
+        elif t == 'float':
+            raise TypeError("float is not yet supported by GPU wht")
         else:
             rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUCplxDbl.eyeFaust(m, n))
     return rF
@@ -2654,7 +2662,7 @@ def eye(m, n=None, t='real', dev="cpu"):
 
 def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
          density=None, fac_type="sparse",
-         field='real', per_row=True, dev="cpu"):
+         field='real', per_row=True, dev="cpu", dtype='double'):
     """
     Generates a random Faust.
 
@@ -2686,8 +2694,8 @@ def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
             sparse matrices in the generated Faust (choice's done according
             to an uniform distribution).
                         The default value is "sparse".
-            field: (optional) a str to set the Faust field: 'real' or
-            'complex'. By default, the value is 'real'.
+            field: (optional) a str to set the Faust field: 'real'(or 'double'
+            or 'float' for simple precision) or 'complex'. By default, the value is 'real'.
             per_row: if True the factor matrix is constructed per row
             applying the density to each row. If False the construction is
             made with the density applied on each column.
@@ -2713,8 +2721,10 @@ def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
     <b>See also</b> Faust.__init__
     """
     check_dev(dev)
-    if(field == 'real'):
+    field = field.lower()
+    if field in ['real', 'double', 'float']:
         is_real = True
+        type = 'double' if field == 'real' else field
     elif(field == 'complex'):
         is_real = False
     else:
@@ -2737,7 +2747,7 @@ def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
     if(not isinstance(is_real, bool)):
         raise ValueError('rand(): argument is_real must be a'
                          'boolean.')
-    if(is_real):
+    if is_real:
         field = REAL
     else:
         field = COMPLEX
@@ -2771,10 +2781,16 @@ def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
         raise ValueError("rand(): density must be a float")
     if dev == "cpu":
         if field == REAL:
-            rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUDbl.randFaust(num_rows,
-                                                                       num_cols,
-                                                                       fac_type_map[fac_type], min_num_factors, max_num_factors,
-                                                                       min_dim_size, max_dim_size, density, per_row))
+            if type == 'double':
+                rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUDbl.randFaust(num_rows,
+                                                                              num_cols,
+                                                                              fac_type_map[fac_type], min_num_factors, max_num_factors,
+                                                                              min_dim_size, max_dim_size, density, per_row))
+            else: # type == 'float'
+                rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUFlt.randFaust(num_rows,
+                                                                              num_cols,
+                                                                              fac_type_map[fac_type], min_num_factors, max_num_factors,
+                                                                              min_dim_size, max_dim_size, density, per_row))
         elif field == COMPLEX:
             rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUCplxDbl.randFaust(num_rows,
                                                                            num_cols,
