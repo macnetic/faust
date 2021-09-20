@@ -121,6 +121,9 @@ Section "" ; no component so name not needed
   File /nonfatal /r /x old_matlab @PROJECT_BINARY_DIR@\wrapper\matlab\*.m @PROJECT_BINARY_DIR@\wrapper\matlab\*.@MEX_EXT@ @PROJECT_BINARY_DIR@\wrapper\matlab\*.mat
   ; nonfatal useful in case of data *.mat not used/present (because they are downloaded at installation)
 
+  ; workaround to the installation of a directory that shouldn't be installed (because normally excluded by CMake. I think it happens only on Windows)
+  ; TODO: fix this issue directly in CMake (if possible)
+  RMDir /r "$INSTDIR\matlab\expfiltered"
 
   ; check the python version matches python major.minor version used to build the the wrapper shared library
   Exec "python --version | python -c $\"import re; ver = input(); exit(0) if re.match('Python @WIN_PY_VER@', ver) else exit(1)$\""
