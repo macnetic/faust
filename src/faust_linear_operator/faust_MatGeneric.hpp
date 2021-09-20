@@ -156,7 +156,17 @@ std::string Faust::MatGeneric<FPP,DEVICE>::to_string(const bool transpose /* set
 template<typename FPP, FDevice DEVICE>
 std::string Faust::MatGeneric<FPP,DEVICE>::get_scalar_type_str()
 {
-	return std::is_same<FPP,Real<FPP>>::value?"real":"complex";
+	std::string type_str;
+	if (! std::is_same<FPP,Real<FPP>>::value)
+		type_str = "complex";
+	else
+	{
+		if(std::is_same<FPP, float>::value)
+			type_str = "float";
+		else
+			type_str = "double";
+	}
+	return type_str;
 }
 
 
