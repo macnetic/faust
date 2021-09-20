@@ -1,3 +1,5 @@
+def type2dtype(type):
+    return 'float32' if type == 'float' else type
 
 cdef class FaustCoreGen@TYPE_NAME@@PROC@:
 
@@ -46,12 +48,12 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
                 #print('FaustCorePy.pyx type factor=',type(factor))
                 #print("FaustCorePy.pyx factor=",factor)
                 if(isinstance(factor, np.ndarray)):
-                    data=factor.astype('@TYPE@','F')
+                    data=factor.astype(type2dtype('@TYPE@'),'F')
                     self.@CORE_OBJ@.push_back(&data[0,0], nbrow,
                                                    nbcol, optimizedCopy)
                 else:
                     #print("FaustCore, factor dims:", nbrow, nbcol)
-                    data1d = factor.data.astype('@TYPE@', 'F')
+                    data1d = factor.data.astype(type2dtype('@TYPE@'), 'F')
                     indices=factor.indices.astype(np.int32, 'F')
                     indptr=factor.indptr.astype(np.int32, 'F')
                     self.@CORE_OBJ@.push_back(&data1d[0], &indptr[0],
@@ -106,7 +108,7 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
         cdef @TYPE@[:,:] y_data
 
         y_arr = np.empty((self.@CORE_OBJ@.getNbRow(), self.@CORE_OBJ@.getNbCol()),
-                         dtype='@TYPE@',
+                         dtype=type2dtype('@TYPE@'),
                          order='F')
         y_data = y_arr
         self.@CORE_OBJ@.get_product(&y_data[0,0], y_arr.shape[0],
@@ -215,14 +217,14 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
             dtype_err = ValueError('out dtype isn\'t valid.')
             if not Y.flags['F_CONTIGUOUS']:
                 raise ValueError('the array must be in fortran/column continous order.')
-            if Y.dtype != '@TYPE@':
+            if Y.dtype != type2dtype('@TYPE@'):
                 raise dtype_err
             Yview = Y
             Xview = X
             cview = coeffs
         else:
             cview = coeffs
-            Y = np.empty((X.shape[0], n), dtype='@TYPE@', order='F')
+            Y = np.empty((X.shape[0], n), dtype=type2dtype('@TYPE@'), order='F')
             Yview = Y
             Xview = X
 
@@ -284,7 +286,7 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
 
         cdef y
         cdef @TYPE@[:,:] yview
-        y = np.empty([nbrow_y, nbcol_y], dtype='@TYPE@', order='F')
+        y = np.empty([nbrow_y, nbcol_y], dtype=type2dtype('@TYPE@'), order='F')
         yview = y
 
         if ndim_M == 1:
@@ -400,7 +402,7 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
             # to optimize copy
             nnz = self.@CORE_OBJ@.get_fact_nnz(i)
             col_ids = np.ndarray([nnz], dtype=np.int32)
-            elts = np.ndarray([1,nnz], dtype='@TYPE@')
+            elts = np.ndarray([1,nnz], dtype=type2dtype('@TYPE@'))
             col_ids_view = col_ids
             shape = [self.@CORE_OBJ@.get_fact_nb_rows(i),
              self.@CORE_OBJ@.get_fact_nb_cols(i)]
@@ -432,8 +434,7 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
             else:
                 order = 'F'
             fact = np.ndarray([self.@CORE_OBJ@.get_fact_nb_rows(i),
-                         self.@CORE_OBJ@.get_fact_nb_cols(i)], dtype='@TYPE@',
-                        order=order)
+                         self.@CORE_OBJ@.get_fact_nb_cols(i)], dtype=type2dtype('@TYPE@'), order=order)
             fact_view = fact
             self.@CORE_OBJ@.get_fact_dense(i, &fact_view[0, 0],
                                                <unsigned int*>NULL,
@@ -624,7 +625,8 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
     def real(self):
         core = @CORE_CLASS_REAL@(core=True)
         (<@CORE_CLASS_REAL@>core).@CORE_OBJ_REAL@ = \
-        <FaustCoreCy.@CPP_CORE_CLASS@[@REAL_TYPE@]*>FaustCoreCy.@CPP_CORE_CLASS@2[@TYPE@, double].real((<@CORE_CLASS@?>self).@CORE_OBJ@)
+        <FaustCoreCy.@CPP_CORE_CLASS@[@REAL_TYPE@]*>FaustCoreCy.@CPP_CORE_CLASS@2[@TYPE@,
+                                                                                 @REAL_TYPE@].real((<@CORE_CLASS@?>self).@CORE_OBJ@)
         return core
 
     def zpruneout(self, nnz_tres, npasses, only_forward):

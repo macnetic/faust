@@ -88,6 +88,14 @@ foreach(PROC IN LISTS PROC_LIST)
 	endforeach()
 endforeach()
 
+# TODO: support complex float and GPU (when ok put this in the foreach loop above)
+if(BUILD_FLOAT_PYX)
+	set(TYPE_NAME float)
+	set(PROC CPU)
+	set(TYPE float)
+	configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/FaustCoreCpp${PROC}.cpp.in ${FAUST_PYTHON_BIN_DIR}/FaustCoreCpp${PROC}${TYPE_NAME}.cpp)
+endif()
+
 
 set(PY_EXT_SOURCES "${PY_EXT_SOURCES}+glob('${FAUST_PYTHON_BIN_DIR}/FaustCoreCppCPU*.cpp')+['${FAUST_PYTHON_SRC_SRC_DIR}/FaustCoreCpp.cpp']")
 
@@ -230,9 +238,12 @@ function (Generate_pyx TYPE_NAME TYPE REAL_TYPE_NAME REAL_TYPE PROC CORE_OBJ_SUF
 	set(CORE_CLASS_REAL FaustCoreGen${REAL_TYPE_NAME}${PROC})
 	set(CORE_OBJ core_faust_${CORE_OBJ_SUFFIX})
 	set(CORE_OBJ_REAL core_faust_${CORE_OBJ_REAL_SUFFIX})
-	set(PYX_LIST _FaustCoreGen _FaustAlgoGenProc)
-	if(${PROC} MATCHES CPU)
-		list(APPEND PYX_LIST _FaustAlgoGen) # this pyx is only on CPU
+	set(PYX_LIST _FaustCoreGen)
+	if(NOT ${TYPE} MATCHES float) # float not yet supported by algorithms
+		list(APPEND PYX_LIST _FaustAlgoGenProc)
+		if(${PROC} MATCHES CPU)
+			list(APPEND PYX_LIST _FaustAlgoGen) # this pyx is only on CPU
+		endif()
 	endif()
 	if(USE_GPU_MOD)
 		list(APPEND PYX_LIST _FaustCoreGenNonMemberFuncs)
@@ -255,6 +266,10 @@ foreach(PROC IN LISTS PROC_LIST)
 	endif()
 endforeach()
 
+# TODO: support complex float and GPU (when ok put this in the foreach loop above)
+if(BUILD_FLOAT_PYX)
+	Generate_pyx(Flt float Flt float CPU flt "" flt)
+endif()
 
 if(NOT REMOTE_DATA_URL OR NOT REMOTE_DATA_FILE)
 	# install data files used by pyfaust.demo

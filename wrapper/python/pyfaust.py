@@ -164,10 +164,15 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                 raise Exception("factors must be a non-empty list of/or a numpy.ndarray, "
                                 "scipy.sparse.csr.csr_matrix/csc.csc_matrix.")
             F._is_real = True
+            # verify if all factors has the same dtype (mandatory)
+            dtype = None
             for f in factors:
                 if(isinstance(f[0,0], (np.complex, np.complex64))):
                     F._is_real = False
-                    break
+                if dtype is None:
+                    dtype = f.dtype
+                elif dtype != f.dtype:
+                    raise TypeError('All Faust factors must have the same dtype.')
             if(factors is not None and len(factors) > 0):
                 if(is_on_gpu):
                     if F._is_real:
@@ -175,7 +180,10 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                     else:
                         F.m_faust = _FaustCorePy.FaustCoreGenCplxDblGPU(factors, scale)
                 elif F._is_real:
-                    F.m_faust = _FaustCorePy.FaustCoreGenDblCPU(factors, scale)
+                    if dtype == 'double':
+                        F.m_faust = _FaustCorePy.FaustCoreGenDblCPU(factors, scale)
+                    elif dtype == 'float32':
+                        F.m_faust = _FaustCorePy.FaustCoreGenFltCPU(factors, scale)
                 else:
                     F.m_faust = _FaustCorePy.FaustCoreGenCplxDblCPU(factors, scale)
             else:

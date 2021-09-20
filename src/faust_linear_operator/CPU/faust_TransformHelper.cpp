@@ -2,6 +2,7 @@
 
 namespace Faust
 {
+	//TODO: a generic cpp.in would refactor things
 
 	template<>
 		template<>
@@ -38,4 +39,19 @@ namespace Faust
 		{
 			return this->clone();
 		}
+
+	template<>
+		template<>
+		TransformHelper<float, Cpu>* TransformHelper<float, Cpu>::real<float>()
+		{
+			return this->clone();
+		}
+
+	template<>
+		template<>
+		TransformHelper<float, Cpu>* TransformHelper<std::complex<float>, Cpu>::real<double>()
+		{
+			throw std::runtime_error("real conversion from complex double to float is not yet supported.");
+		}
+
 }
