@@ -8,6 +8,7 @@
 [1. How can I launch the integrated unit tests of pyfaust?](#py_one)  
 [2. How to launch the demos with pyfaust?](#py_two)  
 [3. How to run the PALM4MSA algorithm in a step-by-step fashion?](#py_three)  
+[4. Why do I get the error 'Library not loaded: @rpath/libomp.dylib' when I use pyfaust on Mac OS X and How to fix it?](#py_four)  
 
 **About matfaust:**  
 [1. Why did I get a file-not-found error when running demos or examples?](#mat_one)  
@@ -248,4 +249,13 @@ Below is an example of output you should obtain running the script (into which y
 	Relative error comparing the final Fausts obtained either by in step-by-step PALM4MSA versus all-iterations-at-once PALM4MSA:  2.1117031467008879e-16
 
 
+\anchor py_four
 
+## Why do I get the error 'Library not loaded: @rpath/libomp.dylib' when I use pyfaust on Mac OS X and How to fix it?
+
+Well pyfaust has many dependencies, certain of them are built within the pyfaust shared library, other are linked dynamically as is OpenMP. So to use pyfaust you need to install OpenMP on Mac OS X. We advise to install it through MacPorts because pyfaust is compiled and linked using the Mac Ports provided version of OpenMP.
+To install MacPorts go on their [website](https://www.macports.org/) and download the pkg, that's pretty straightforward.
+Once Macports is installed, launch a terminal and type this command:
+  
+  	sudo port install libomp
+  	sudo port -f activate libomp

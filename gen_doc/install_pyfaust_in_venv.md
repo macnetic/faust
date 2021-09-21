@@ -35,35 +35,7 @@ As a result, you should see the version of pyfaust installed if all went properl
 
 \note In the virtual environment python is necessarily python version 3 (because the creation was made through python3 above).
 
-Python 2.7.15+
-=============
-
-You need at first to install virtualenv:
-
-	$ pip install virtualenv
-
-\note Take care to use the good version of pip (corresponding to the python 2.7 version you want to use).
-
-Then you can create your python 2.7 virtual environment:
-
-	$ virtualenv test_pyfaust-2.7
-
-The next is all the same as for python 3, you enter the virtual env.:
-
-	$ source ./test_pyfaust-2.7/bin/activate
-
-\note For Windows users the command is rather:
-
-	C:\> call .\test_pyfaust-2.7\Scripts\activate
-
-Install the pip wheel package:
-
-	$ pip install pyfaust-*.whl
-
-And finally launch the version test command to check the whole process:
-
-	$ python -c 'from pyfaust import version; print(version())'
-
+\note On Mac OS X you might need to install OpenMP for pyfaust to work, for further information please look at this [FAQ entry](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/FAQ.html#py_four).
 
 Anaconda
 ========
