@@ -125,18 +125,29 @@ Section "" ; no component so name not needed
   ; TODO: fix this issue directly in CMake (if possible)
   RMDir /r "$INSTDIR\matlab\expfiltered"
 
-  ; check the python version matches python major.minor version used to build the the wrapper shared library
-  Exec "python --version | python -c $\"import re; ver = input(); exit(0) if re.match('Python @WIN_PY_VER@', ver) else exit(1)$\""
+;  ; check the python version matches python major.minor version used to build the the wrapper shared library
+;  Exec "python --version | python -c $\"import re; ver = input(); exit(0) if re.match('Python @WIN_PY_VER@', ver) else exit(1)$\""
+;  IfErrors 0 +2
+;  MessageBox MB_OK "Error: this version of FAuST is pre-compiled for Python @WIN_PY_VER@ which must be installed and configured as the default python on your system (i.e. it must be available as $\"python$\" command in the PATH environment variable)." /SD IDOK IDOK data_dl
+;  MessageBox MB_OK "The pyfaust wrapper will be installed for Python @WIN_PY_VER@." /SD IDOK
+
+  Exec "py -@WIN_PY_VER@ -c $\"print()$\""
   IfErrors 0 +2
-  MessageBox MB_OK "Error: this version of FAuST is pre-compiled for Python @WIN_PY_VER@ which must be installed and configured as the default python on your system (i.e. it must be available as $\"python$\" command in the PATH environment variable)." /SD IDOK IDOK data_dl
+  MessageBox MB_OK "Error: this version of FAuST is pre-compiled for Python @WIN_PY_VER@ which must be installed and available through the py command wrapper which must have been installed too (https://docs.python.org/3/using/windows.html#launcher)." /SD IDOK IDOK data_dl
   MessageBox MB_OK "The pyfaust wrapper will be installed for Python @WIN_PY_VER@." /SD IDOK
 
   ; post install pyfaust auto-setup in environment (works only if python is installed in path)
   ${StrRep} '$0' $TEMP '\' '\\'
-  Exec "python -c $\"import site;dir=site.getsitepackages()[1];f=open('$0\\tmp_site_pkg', 'w');f.write(dir);f.close()$\""
+;  Exec "python -c $\"import site;dir=site.getsitepackages()[1];f=open('$0\\tmp_site_pkg', 'w');f.write(dir);f.close()$\""
+;  IfErrors 0 +2
+;  MessageBox MB_OK "Error: no python found into your PATH environment variable. You'll have to do the Faust setup manually (you'll see how in the documentation)." /SD IDOK IDOK data_dl
+;  MessageBox MB_OK "Faust installed in your python environment (the version found into your PATH environment variable)." /SD IDOK
+
+  Exec "py -@WIN_PY_VER@ -c $\"import site;dir=site.getsitepackages()[1];f=open('$0\\tmp_site_pkg', 'w');f.write(dir);f.close()$\""
   IfErrors 0 +2
-  MessageBox MB_OK "Error: no python found into your PATH environment variable. You'll have to do the Faust setup manually (you'll see how in the documentation)." /SD IDOK IDOK data_dl
-  MessageBox MB_OK "Faust installed in your python environment (the version found into your PATH environment variable)." /SD IDOK
+  MessageBox MB_OK "Error: py not found for this version or for any version." /SD IDOK IDOK data_dl ; can't happen since it was already tested above (as success or exit)
+  MessageBox MB_OK "Faust installed in your python environment (version @WIN_PY_VER@)." /SD IDOK
+
 
   FileOpen $1 "$TEMP\tmp_site_pkg" r
   FileRead $1 $2
@@ -166,7 +177,7 @@ Section "" ; no component so name not needed
   FileWrite $1 "$\r$\n_NSI_INSTALL_PATH='$INSTDIR'"
   FileClose $1
 
-  ExecWait "python -m pip install @PYFAUST_PYTHON_REQUIREMENTS@"
+  ExecWait "py -@WIN_PY_VER@ -m pip install @PYFAUST_PYTHON_REQUIREMENTS@"
   ; ExecWait doesn't work with this command, if eventually pip install command fails, the user will be noticed when importing pyfaust
   ;IfErrors 0 +2
   ;MessageBox MB_OK "Error: failed partly or totally to install the pyfaust python packages through pip, please install them manually to get a workable pyfaust, list of packages: @PYFAUST_PYTHON_REQUIREMENTS@." IDOK data_dl
@@ -178,10 +189,10 @@ Section "" ; no component so name not needed
   ; create data folder
   ; try with python first
   ${StrRep} '$3' $INSTDIR '\' '\\'
-  Exec "python -c $\"from os import mkdir; mkdir('$3\\matlab\\data')$\""
+  Exec "py -@WIN_PY_VER@ -c $\"from os import mkdir; mkdir('$3\\matlab\\data')$\""
   ; download data
   ClearErrors ; in case the data dir was already existing
-  Exec "python $2\pyfaust\datadl.py $\"$INSTDIR\matlab\data$\""
+  Exec "py -@WIN_PY_VER@ $2\pyfaust\datadl.py $\"$INSTDIR\matlab\data$\""
   IfErrors 0 after_data_dl
   MessageBox MB_OK "Downloading FAuST data with python seems to have failed (or maybe it's already done), now trying with powershell." /SD IDOK
   ClearErrors
