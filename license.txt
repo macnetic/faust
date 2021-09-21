@@ -26,8 +26,8 @@ Authors:
 		Luc Le Magoarou,
 		Remi Gribonval
 
-	INRIA Rennes, FRANCE
-	http://www.inria.fr/
+	INRIA Rennes et Grenoble-Rhône Aples (France)
+	https://www.inria.fr/
 
 
 
