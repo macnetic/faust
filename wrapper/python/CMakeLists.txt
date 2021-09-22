@@ -240,11 +240,11 @@ function (Generate_pyx TYPE_NAME TYPE REAL_TYPE_NAME REAL_TYPE PROC CORE_OBJ_SUF
 	set(CORE_OBJ_REAL core_faust_${CORE_OBJ_REAL_SUFFIX})
 	set(PYX_LIST _FaustCoreGen)
 		list(APPEND PYX_LIST _FaustAlgoGenProc)
-	if(NOT ${TYPE} MATCHES float) # float not yet supported by algorithms
+		#if(NOT ${TYPE} MATCHES float) # float not yet supported by algorithms
 		if(${PROC} MATCHES CPU)
 			list(APPEND PYX_LIST _FaustAlgoGen) # this pyx is only on CPU
 		endif()
-	endif()
+		#endif()
 	if(USE_GPU_MOD)
 		list(APPEND PYX_LIST _FaustCoreGenNonMemberFuncs)
 	endif()

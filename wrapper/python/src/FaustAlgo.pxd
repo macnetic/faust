@@ -101,43 +101,43 @@ cdef extern from "FaustFact.h":
                                              PyxParamsHierarchicalFactFFT[FPP,FPP2]*,
                                                        FPP*)
 
-    cdef FaustCoreCppCPU[FPP]* hierarchical2020[FPP](FPP* mat, unsigned int
+    cdef FaustCoreCppCPU[FPP]* hierarchical2020[FPP, FPP2](FPP* mat, unsigned int
                                                   num_rows, unsigned int
                                                   num_cols,
                                                   #unsigned int nites,
-                                                  PyxStoppingCriterion[double]*,
+                                                  PyxStoppingCriterion[FPP2]*,
                                                   PyxConstraintGeneric**
                                                   constraints, unsigned int
                                                   num_cons, unsigned int
-                                                  num_facts, double*
+                                                  num_facts, FPP2*
                                                   inout_lambda, bool
                                                   is_update_way_R2L, bool
                                                   is_fact_side_left, int
                                                   factor_format, bool packing_RL,
-                                                  PyxMHTPParams[double] mhtpp,
+                                                  PyxMHTPParams[FPP2] mhtpp,
                                                   unsigned int norm2_max_iter,
-                                                  double norm2_threshold, bool
+                                                  FPP2 norm2_threshold, bool
                                                   is_verbose, bool
                                                   constant_step_size,
-                                                  double step_size,
+                                                  FPP2 step_size,
                                                   const bool full_gpu)
 
-    cdef FaustCoreCppCPU[FPP]* palm4msa2020[FPP](FPP* mat,
+    cdef FaustCoreCppCPU[FPP]* palm4msa2020[FPP, FPP2](FPP* mat,
                                               unsigned int num_rows,
                                               unsigned int num_cols,
                                               PyxConstraintGeneric** constraints,
                                               unsigned int num_cons,
-                                              double* inout_lambda,
-                                              PyxStoppingCriterion[double] sc,
+                                              FPP2* inout_lambda,
+                                              PyxStoppingCriterion[FPP2] sc,
                                               bool is_update_way_R2L,
                                               int factor_format,
                                               bool packing_RL,
-                                              PyxMHTPParams[double] mhtpp,
+                                              PyxMHTPParams[FPP2] mhtpp,
                                               unsigned int norm2_max_iter,
-                                              double norm2_threshold,
+                                              FPP2 norm2_threshold,
                                               bool is_verbose,
                                               bool constant_step_size,
-                                              double step_size,
+                                              FPP2 step_size,
                                               const bool full_gpu,
                                               FaustCoreCppCPU[FPP]* cth)
 
@@ -150,7 +150,7 @@ cdef extern from "FaustFactGivensFGFT.h":
     cdef FaustCoreCppCPU[FPP]* fact_givens_fgft[FPP,FPP2](const FPP* Lap, unsigned int num_rows,
                                                        unsigned int num_cols, unsigned int J,
                                                        unsigned int t, FPP* D, unsigned int verbosity,
-                                                       const double stoppingError,
+                                                       const FPP2 stoppingError,
                                                        const bool errIsRel,
                                                        const int order,
                                                        const bool enable_large_Faust)
@@ -160,7 +160,7 @@ cdef extern from "FaustFactGivensFGFT.h":
                                                               unsigned int num_cols, unsigned int J,
                                                               unsigned int t, FPP* D,
                                                               unsigned int verbosity,
-                                                              const double stoppingError,
+                                                              const FPP2 stoppingError,
                                                               const bool errIsRel,
                                                               const int order,
                                                               const bool enable_large_Faust)
@@ -170,7 +170,7 @@ cdef extern from "FaustFactGivensFGFT.h":
                                                             unsigned int num_cols, unsigned int J,
                                                             unsigned int t,
                                                             FPP2* D, unsigned int verbosity,
-                                                            const double stoppingError,
+                                                            const FPP2 stoppingError,
                                                             const bool errIsRel,
                                                             const int order,
                                                             const bool enable_large_Faust)
@@ -181,7 +181,7 @@ cdef extern from "FaustFactGivensFGFT.h":
                                                                     unsigned int t,
                                                                     FPP2* D,
                                                                     unsigned int verbosity,
-                                                                    const double stoppingError,
+                                                                    const FPP2 stoppingError,
                                                                     const bool errIsRel,
                                                                     const int order,
                                                                     const bool enable_large_Faust)
@@ -189,23 +189,23 @@ cdef extern from "FaustFactGivensFGFT.h":
     cdef void svdtj[FPP, FPP2](FaustCoreCppCPU[FPP]** U, FaustCoreCppCPU[FPP] **V, FPP* S,
                          const FPP* M_data, unsigned int num_rows, unsigned int
                          num_cols, unsigned int J, unsigned int t, unsigned int
-                         verbosity, const double stoppingError, const bool errIsRel, const bool enable_large_Faust)
+                         verbosity, const FPP2 stoppingError, const bool errIsRel, const bool enable_large_Faust)
 
     cdef void svdtj_sparse[FPP, FPP2](FaustCoreCppCPU[FPP]** U, FaustCoreCppCPU[FPP] **V, FPP* S,
                                       const FPP* data, int* row_ptr, int* id_col, int
                                       nnz, int nrows, int ncols, unsigned int J,
                                       unsigned int t, unsigned int verbosity,
-                                      const double stoppingError, const bool errIsRel, const bool enable_large_Faust)
+                                      const FPP2 stoppingError, const bool errIsRel, const bool enable_large_Faust)
 
     cdef void svdtj_cplx[FPP, FPP2](FaustCoreCppCPU[FPP]** U, FaustCoreCppCPU[FPP] **V, FPP* S,
                          const FPP* M_data, unsigned int num_rows, unsigned int
                          num_cols, unsigned int J, unsigned int t, unsigned int
-                         verbosity, const double stoppingError, const bool errIsRel, const bool enable_large_Faust)
+                         verbosity, const FPP2 stoppingError, const bool errIsRel, const bool enable_large_Faust)
 
     cdef void svdtj_sparse_cplx[FPP, FPP2](FaustCoreCppCPU[FPP]** U, FaustCoreCppCPU[FPP] **V, FPP* S,
                                       const FPP* data, int* row_ptr, int* id_col, int
                                       nnz, int nrows, int ncols, unsigned int J,
                                       unsigned int t, unsigned int verbosity,
-                                      const double stoppingError, const bool errIsRel, const bool enable_large_Faust)
+                                      const FPP2 stoppingError, const bool errIsRel, const bool enable_large_Faust)
 
 

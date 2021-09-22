@@ -303,7 +303,7 @@ def _check_fact_mat(funcname, M, is_real=None):
         raise Exception(funcname+" 1st argument must be a numpy ndarray.")
 
     use_is_real = isinstance(is_real, (list, np.ndarray))
-    if M.dtype in ['float64']:
+    if M.dtype in ['float64', 'float32']:
         if use_is_real:
             is_real[0] = True
     elif M.dtype in ['complex128']:
@@ -519,7 +519,10 @@ def palm4msa(M, p, ret_lambda=False, backend=2016, on_gpu=False):
             core_obj, _lambda = _FaustCorePy.FaustAlgoGenCplxDbl.fact_palm4msa(M, p)
     elif(backend == 2020):
         if is_real:
-            core_obj, _lambda = _FaustCorePy.FaustAlgoGenDbl.palm4msa2020(M, p, on_gpu)
+            if M.dtype == 'float64':
+                core_obj, _lambda = _FaustCorePy.FaustAlgoGenDbl.palm4msa2020(M, p, on_gpu)
+            else: # M.dtype == 'float32': ensured by _check_fact_mat
+                core_obj, _lambda = _FaustCorePy.FaustAlgoGenFlt.palm4msa2020(M, p, on_gpu)
         else:
             if M.dtype == np.complex and p.factor_format != 'dense':
                 p.factor_format = 'dense'
@@ -828,8 +831,12 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
             core_obj,_lambda = _FaustCorePy.FaustAlgoGenCplxDbl.fact_hierarchical(M, p)
     elif(backend == 2020):
         if is_real:
-            core_obj, _lambda = _FaustCorePy.FaustAlgoGenDbl.hierarchical2020(M, p,
-                                                                        on_gpu)
+            if M.dtype == 'float64':
+                core_obj, _lambda = _FaustCorePy.FaustAlgoGenDbl.hierarchical2020(M, p,
+                                                                                  on_gpu)
+            else: #M.dtype = 'float32': # after _prepare_hierarchical_fact it is ensured
+                core_obj, _lambda = _FaustCorePy.FaustAlgoGenFlt.hierarchical2020(M, p,
+                                                                                  on_gpu)
         else:
 #            if M.dtype == np.complex and p.factor_format != 'dense':
 #                p.factor_format = 'dense'
