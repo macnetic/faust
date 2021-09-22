@@ -4,23 +4,28 @@
 
 
 
-**About pyfaust:**  
-[1. How can I launch the integrated unit tests of pyfaust?](#py_one)  
-[2. How to launch the demos with pyfaust?](#py_two)  
-[3. How to run the PALM4MSA algorithm in a step-by-step fashion?](#py_three)  
-[4. Why do I get the error 'Library not loaded: @rpath/libomp.dylib' when I use pyfaust on Mac OS X and How to fix it?](#py_four)  
+**1. About matfaust:**  
+[1.1. Why did I get a file-not-found error when running demos or examples?](#mat_one)  
+[1.2. How to fix mex not found error: "Undefined function or variable 'mexFaustReal'"?](#mat_two)  
+[1.3. How to launch the demos with matfaust?](#mat_three)  
+[1.4. How can I launch the integrated unit tests of matfaust?](#mat_four)  
+[1.5. How to run the PALM4MSA algorithm in a step-by-step fashion?](#mat_five)  
 
-**About matfaust:**  
-[1. Why did I get a file-not-found error when running demos or examples?](#mat_one)  
-[2. How to fix mex not found error: "Undefined function or variable 'mexFaustReal'"?](#mat_two)  
-[3. How to launch the demos with matfaust?](#mat_three)  
-[4. How can I launch the integrated unit tests of matfaust?](#mat_four)  
-[5. How to run the PALM4MSA algorithm in a step-by-step fashion?](#mat_five)  
+**2. About pyfaust:**  
+[2.1. How can I launch the integrated unit tests of pyfaust?](#py_one)  
+[2.2. How to launch the demos with pyfaust?](#py_two)  
+[2.3. How to run the PALM4MSA algorithm in a step-by-step fashion?](#py_three)  
+[2.4. Why do I get the error 'Library not loaded: @rpath/libomp.dylib' when I use pyfaust on Mac OS X and How to fix it?](#py_four)  
 
-# About matfaust
+
+**3. About CUDA (for GPU FAµST API support)**  
+[3.1 Where can I find the CUDA 9.2 installer for my system?](#cuda_one)  
+[3.2 How do I need to configure the CUDA 9.2 installer on Windows 10?](#cuda_two)  
+
+# 1. About matfaust
 
 \anchor mat_one
-## 1. Why did I get a file-not-found error when running demos or examples?
+## 1.1. Why did I get a file-not-found error when running demos or examples?
 
 
 For example, running this matlab command if quickstart.mat file is not found you'll get the following error:
@@ -49,11 +54,11 @@ The same kind of error might happen also with pyfaust, the python wrapper, which
 Normally, at installation stage the FAµST externalized data (basically a bunch of matlab .mat files) is downloaded from a remote web server and unarchived in FAµST installation path.
 Nevertheless, it might not work properly for any reason (e.g. network issue happening at installation), so here are two ways to download the data manually.
 
-#### 1.1. The Easy Way:
+#### 1.1.1. The Easy Way:
 
 Just reinstall FAµST! It will relaunch the data download if your network connection is properly enabled. If it doesn't work, repeat the operation after having deleted the data folder located in FAµST installation path or python site-packages/pyfaust folder (read the 1.2 below to determine this path).
 
-#### 1.2. The Manual Way:
+#### 1.1.2. The Manual Way:
 
 This is assumed that you installed the pyfaust wrapper from a pip package or through one of the installers/packages.
 
@@ -89,7 +94,7 @@ Second, run these commands to download and uncompress the data:
 If finally you still don't manage to retrieve the data, please write an [email](index.html) with all the details (at least the version of FAµST, the installer used and of course your system).
 
 \anchor mat_two
-## 2. How to fix mex not found error: "Undefined function or variable 'mexFaustReal'"?
+## 1.2. How to fix mex not found error: "Undefined function or variable 'mexFaustReal'"?
 
 If something went wrong, for example at install stage, it is possible that Matlab doesn't find FAµST (in particular the mex or even matlab files `.m`).  
 In this case, an error similar to two examples might be raised:
@@ -121,7 +126,7 @@ To fix this issue, you have to update the Matlab path manually, however a script
 	 launch quick_start or run_all_demo.m 
 
 \anchor mat_three
-## 3. How to launch the demos with matfaust?
+## 1.3. How to launch the demos with matfaust?
 
 You might run all the demos at once or one by one. In the former case you should run this matlab code:
 
@@ -163,19 +168,19 @@ And for the last and simplest demo, the [quickstart script](https://faustgrp.git
 	>> quickstart.construct_Faust_from_factors()
 
 \anchor mat_four
-## 4. How can I launch the integrated unit tests of matfaust?
+## 1.4. How can I launch the integrated unit tests of matfaust?
 
 TODO (in the meanwhile you can see the pyfaust entry)
 
 \anchor mat_five
 
-## 5. How to run the PALM4MSA algorithm in a step-by-step fashion?
+## 1.5. How to run the PALM4MSA algorithm in a step-by-step fashion?
 
 TODO (in the meanwhile you can see the pyfaust entry)
 
-# About pyfaust
+# 2. About pyfaust
 \anchor py_one
-## 1. How can I launch the integrated unit tests of pyfaust?
+## 2.1. How can I launch the integrated unit tests of pyfaust?
 
 That's actually quite simple, if pyfaust is properly installed, you just have to type this command in a terminal:
 
@@ -185,7 +190,7 @@ That's actually quite simple, if pyfaust is properly installed, you just have to
 Note: in the above test, the Faust class is tested for the CPU C++ backend and real Faust objects (i.e. dtype == np.float). If you want to test GPU complex Faust, just replace the arguments as this: ``run_tests('gpu', 'complex')``.
 
 \anchor py_two
-## 2. How to launch the demos with pyfaust?
+## 2.2. How to launch the demos with pyfaust?
 
 You might run all the demos at once or one by one. In the former case you should run this python code:
 
@@ -234,7 +239,7 @@ And for the last and simplest demo, the [quickstart script](https://faustgrp.git
 
 \anchor py_three
 
-## 3. How to run the PALM4MSA algorithm in step-by-step fashion?
+## 2.3. How to run the PALM4MSA algorithm in step-by-step fashion?
 
 Although the verbose mode of the PALM4MSA implementation allows displaying some info, it might be useful in order to analayze the algorithm (e.g. build the loss function or check the matrix supports evolution), to be able to run just one iteration at a time, get all the Faut layers, the scale factor (lambda), do whatever one needs with them, and then continue to the next iteration.
 
@@ -251,7 +256,7 @@ Below is an example of output you should obtain running the script (into which y
 
 \anchor py_four
 
-## Why do I get the error 'Library not loaded: @rpath/libomp.dylib' when I use pyfaust on Mac OS X and How to fix it?
+## 2.4 Why do I get the error 'Library not loaded: @rpath/libomp.dylib' when I use pyfaust on Mac OS X and How to fix it?
 
 Well pyfaust has many dependencies, certain of them are built within the pyfaust shared library, other are linked dynamically as is OpenMP. So to use pyfaust you need to install OpenMP on Mac OS X. We advise to install it through MacPorts because pyfaust is compiled and linked using the Mac Ports provided version of OpenMP.
 To install MacPorts go on their [website](https://www.macports.org/) and download the pkg, that's pretty straightforward.
@@ -259,3 +264,35 @@ Once Macports is installed, launch a terminal and type this command:
   
   	sudo port install libomp
   	sudo port -f activate libomp
+
+# 3. About CUDA (for GPU FAµST API support)
+
+\anchor cuda_one
+
+## 3.1 Where can I find the CUDA 9.2 installer for my system?
+
+FAµST wrappers GPU API needs CUDA 9.2 to work. To install this toolkit you need to download the approriate archive [here](https://developer.nvidia.com/cuda-92-download-archive). Select your system an architecture and download the package/installer.
+
+## 3.2 How do I need to configure the CUDA 9.2 installer on Windows 10?
+
+After downloading the installer [here](https://developer.nvidia.com/cuda-92-download-archive?target_os=Windows&target_arch=x86_64&target_version=10&target_type=exenetwork), you can launch it to start the install. You shall see several panels during the process, they are listed below with the options you should select.
+
+Of course the CUDA 9.2 will work only if you have a NVIDIA card fully installed with its approriate driver compatible to CUDA 9.2.
+
+Panel 1: system verification (nothing special to do).
+Panel 2: user license (you must accept to continue).
+Panel 3: Installation Options: choose "advanced"/"personalised".
+
+In the option panel:
+- Disable ``Driver components`` and ``Other components`` (however note that you must have installed/updated your NVIDIA card driver).
+- In the CUDA section keep enabled ``Visual Studio Integration`` and disable ``Samples`` and ``Documentation``.
+- In ``CUDA > Runtime`` disable ``Demo Suite`` and keep ``CUDART``, ``CUBLAS`` and ``CUSPARSE`` in ``Libraries``.
+- In ``CUDA > Development > Compiler > Libraries``: keep enabled ``CUBLAS`` and ``CUSPARSE``.
+- In ``CUDA > Development > Complier``: keep ``nvcc`` disable others.
+- In ``CUDA > Tools``: disable all.
+
+Continue to the last panel and finish the install.
+
+\note After install don't forget to configure your ``PATH`` environment variable. During the CUDA 9.2 install the variables ``CUDA_PATH`` and ``CUDA_PATH_V9_2`` have been set automatically. You need to add ``%CUDA_PATH_V9_2%\bin`` to your ``PATH`` (otherwise pyfaust and matfaust won't load the ``CUSPARSE`` and ``CUBLAS`` needed libraries at runtime).
+
+
