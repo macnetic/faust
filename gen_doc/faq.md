@@ -258,12 +258,12 @@ Below is an example of output you should obtain running the script (into which y
 
 ## 2.4 Why do I get the error 'Library not loaded: @rpath/libomp.dylib' when I use pyfaust on Mac OS X and How to fix it?
 
-Well pyfaust has many dependencies, certain of them are built within the pyfaust shared library, other are linked dynamically as is OpenMP. So to use pyfaust you need to install OpenMP on Mac OS X. We advise to install it through MacPorts because pyfaust is compiled and linked using the Mac Ports provided version of OpenMP.
-To install MacPorts go on their [website](https://www.macports.org/) and download the pkg, that's pretty straightforward.
-Once Macports is installed, launch a terminal and type this command:
-  
-  	sudo port install libomp
-  	sudo port -f activate libomp
+Well pyfaust has many dependencies, certain of them are built within the pyfaust shared library, other are linked dynamically as is OpenMP. So to use pyfaust you need to install OpenMP on Mac OS X. We advise to install it through MacPorts because pyfaust is compiled and linked using the MacPorts provided version of OpenMP.  
+To install MacPorts go on their [website](https://www.macports.org/) and download the pkg, that's pretty straightforward (take care to take the version that matches your Mac OS X version).  
+Once Macports is installed, launch a terminal and type this command:  
+
+        sudo port install libomp
+        sudo port -f activate libomp
 
 # 3. About CUDA (for GPU FAµST API support)
 
