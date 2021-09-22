@@ -599,6 +599,16 @@ if(USE_GPU_MOD)
 		set(GPU_MOD_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/gpu_mod/src) # fallback to submodule directory in case find_package didn't work
 	endif()
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GPU_MOD_CFLAGS} -I${GPU_MOD_INCLUDE_DIR} -DUSE_GPU_MOD")
+	# TODO: set a function or a foreach to factorize the code configuration
+
+	set(FAUST_SCALAR_FOR_GM float)
+	set(GM_SCALAR float)
+	set(GM_REINTERPRET_CAST_SCALAR float)
+	configure_file(${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR}/faust_MatDense_gpu.cpp.in ${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR}/faust_MatDense_gpu_float.cpp)
+	configure_file(${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR}/faust_MatSparse_gpu.cpp.in ${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR}/faust_MatSparse_gpu_float.cpp)
+	configure_file(${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR}/faust_Transform_gpu.cpp.in ${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR}/faust_Transform_gpu_float.cpp)
+	configure_file(${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR}/faust_Vect_gpu.cpp.in ${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR}/faust_Vect_gpu_float.cpp)
+
 	set(FAUST_SCALAR_FOR_GM double)
 	set(GM_SCALAR double)
 	set(GM_REINTERPRET_CAST_SCALAR double)
