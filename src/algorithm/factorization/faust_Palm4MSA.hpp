@@ -237,7 +237,7 @@ void Faust::Palm4MSA<FPP,DEVICE,FPP2>::compute_grad_over_c_ext_opt()
 	else
 		facts = {&LorR, &error, &RorL[m_indFact]};
 	tc_flags = {TorH, 'N', TorH};
-	mul_3_facts(facts, grad_over_c, (FPP) m_lambda/c, (FPP)0, tc_flags);
+	mul_3_facts(facts, grad_over_c, FPP(m_lambda/c), (FPP)0, tc_flags);
 	isGradComputed = true;
 }
 
@@ -392,14 +392,14 @@ sprintf(nomFichier,"error_1_%d_device.tmp",cmpt);*/
          // tmp3 = m_lambda*L'*error (= m_lambda*L' * (m_lambda*L*S*R - data) )
          gemm(LorR, error, tmp3, FPP(m_lambda),(FPP) 0.0, TorH, 'N', blas_handle);
          // grad_over_c = 1/c*tmp3*R' (= 1/c*m_lambda*L' * (m_lambda*L*S*R - data) * R' )
-         gemm(tmp3, RorL[m_indFact], grad_over_c,(FPP) 1.0/c,(FPP) 0.0,'N',TorH, blas_handle);
+         gemm(tmp3, RorL[m_indFact], grad_over_c, FPP(1.0/c),(FPP) 0.0,'N',TorH, blas_handle);
       }
       else
       {
          // tmp3 = m_lambda*L'*error (= m_lambda*L' * (m_lambda*L*S*R - data) )
          gemm(RorL[m_indFact], error, tmp3, FPP(m_lambda), (FPP) 0.0, TorH, 'N', blas_handle);
          // grad_over_c = 1/c*tmp3*R' (= 1/c*m_lambda*L' * (m_lambda*L*S*R - data) * R' )
-         gemm(tmp3, LorR, grad_over_c, (FPP) 1.0/c, (FPP) (FPP) 0.0,'N',TorH, blas_handle);
+         gemm(tmp3, LorR, grad_over_c, FPP(1.0/c), (FPP) (FPP) 0.0,'N',TorH, blas_handle);
       }
    }
    else // computing error*R' first, then L'*(error*R')
@@ -409,14 +409,14 @@ sprintf(nomFichier,"error_1_%d_device.tmp",cmpt);*/
          // tmp3 = m_lambda*error*R' (= m_lambda*(m_lambda*L*S*R - data) * R' )
          gemm(error, RorL[m_indFact], tmp3, FPP(m_lambda), (FPP) 0.0, 'N', TorH, blas_handle);
          // grad_over_c = 1/c*L'*tmp3 (= 1/c*L' * m_lambda*(m_lambda*L*S*R - data) * R' )
-         gemm(LorR, tmp3, grad_over_c,(FPP) 1.0/c, (FPP) 0.0,TorH,'N', blas_handle);
+         gemm(LorR, tmp3, grad_over_c, FPP(1.0/c), (FPP) 0.0,TorH,'N', blas_handle);
       }
       else
       {
          // tmp3 = m_lambda*error*R' (= m_lambda * (m_lambda*L*S*R - data) * R' )
          gemm(error, LorR, tmp3, FPP(m_lambda), (FPP) 0.0, 'N', TorH, blas_handle);
          // grad_over_c = 1/c*L'*tmp3 (= 1/c*L' * m_lambda*(m_lambda*L*S*R - data) * R' )
-         gemm(RorL[m_indFact], tmp3, grad_over_c, (FPP) 1.0/c, (FPP) 0.0,TorH,'N', blas_handle);
+         gemm(RorL[m_indFact], tmp3, grad_over_c, FPP(1.0/c), (FPP) 0.0,TorH,'N', blas_handle);
       }
 
     }

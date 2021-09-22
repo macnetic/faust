@@ -111,7 +111,7 @@ void Palm4MSAFGFT<FPP,DEVICE,FPP2>::compute_grad_over_c()
 			gemm(tmp1, this->LorR, tmp2, FPP(this->m_lambda), (FPP) 0, 'N', this->TorH, this->blas_handle);
 		}
 		// grad_over_c = 1/this->c*tmp3*tmp2
-		gemm(tmp3, tmp2, this->grad_over_c, (FPP) 1.0/this->c, (FPP) 0.0,'N','N', this->blas_handle);
+		gemm(tmp3, tmp2, this->grad_over_c, (FPP) (1.0/this->c), (FPP) 0.0,'N','N', this->blas_handle);
 
 	}
 	else // computing this->error*R' first, then L'*(this->error*lambda*LSRD*R')
@@ -123,7 +123,7 @@ void Palm4MSAFGFT<FPP,DEVICE,FPP2>::compute_grad_over_c()
 			// tmp3 = this->m_lambda*this->error*tmp2
 			gemm(this->error, tmp2, tmp3, FPP(this->m_lambda), (FPP) 0.0, 'N', 'N', this->blas_handle);
 			// grad_over_c = 1/this->c*L'*tmp3
-			gemm(this->LorR, tmp3, this->grad_over_c,(FPP) 1.0/this->c, (FPP) 0.0,this->TorH,'N', this->blas_handle);
+			gemm(this->LorR, tmp3, this->grad_over_c,(FPP) (1.0/this->c), (FPP) 0.0,this->TorH,'N', this->blas_handle);
 		}
 		else
 		{
@@ -132,7 +132,7 @@ void Palm4MSAFGFT<FPP,DEVICE,FPP2>::compute_grad_over_c()
 			// tmp3 = this->m_lambda*this->error*tmp2
 			gemm(this->error, tmp2, tmp3, FPP(this->m_lambda), (FPP) 0.0, 'N', 'N', this->blas_handle);
 			// grad_over_c = 1/this->c*L'*tmp3
-			gemm(this->RorL[this->m_indFact], tmp3, this->grad_over_c, (FPP) 1.0/this->c, (FPP) 0.0,this->TorH,'N', this->blas_handle);
+			gemm(this->RorL[this->m_indFact], tmp3, this->grad_over_c, (FPP) (1.0/this->c), (FPP) 0.0,this->TorH,'N', this->blas_handle);
 		}
 
 	}
