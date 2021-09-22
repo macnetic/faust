@@ -25,5 +25,12 @@
 ##target_link_libraries(${FAUST_PALM4MSA_TARGET} ${FAUST_MATRIX_TARGET} ${FAUST_EXCEPTION_TARGET})
 ##target_link_libraries(${FAUST_PALM4MSA_CU_TARGET} ${FAUST_MATRIX_CU_TARGET} ${FAUST_EXCEPTION_TARGET})
 
-
+foreach(REAL_TYPE IN ITEMS float double)
+  if(REAL_TYPE MATCHES double)
+    set(SVD_COMPLEX 1)
+  else()
+    set(SVD_COMPLEX 0)
+  endif()
+  configure_file(${FAUST_ALGORITHM_SRC_DIR}/factorization/faust_SVDTJ.cpp.in ${FAUST_ALGORITHM_SRC_DIR}/factorization/faust_SVDTJ_${REAL_TYPE}.cpp)
+endforeach()
 

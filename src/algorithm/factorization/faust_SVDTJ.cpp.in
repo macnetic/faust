@@ -1,0 +1,42 @@
+#include "faust_GivensFGFT.h"
+#include "faust_GivensFGFTParallel.h"
+#include "faust_GivensFGFTParallelComplex.h"
+#include "faust_GivensFGFTComplex.h"
+#include "faust_SVDTJ.h"
+#include <complex>
+namespace Faust
+{
+
+#if(@SVD_COMPLEX@==1)
+	template<>
+		void instantiate_algos<complex<@REAL_TYPE@>, Cpu, @REAL_TYPE@>(GivensFGFTGen<Real<complex<@REAL_TYPE@>>, Cpu, @REAL_TYPE@, complex<@REAL_TYPE@>>** algoW1, GivensFGFTGen<Real<complex<@REAL_TYPE@>>, Cpu, @REAL_TYPE@, complex<@REAL_TYPE@>>** algoW2, Faust::MatDense<complex<@REAL_TYPE@>,Cpu> &dM_M, Faust::MatDense<complex<@REAL_TYPE@>,Cpu> &dMM_,int J, int t, unsigned int verbosity, @REAL_TYPE@ tol, bool relErr, bool enable_large_Faust)
+		{
+			if(t <= 1)
+			{
+				*algoW1 = new GivensFGFTComplex<complex<@REAL_TYPE@>,Cpu,@REAL_TYPE@>(dMM_, J, verbosity, tol, relErr, enable_large_Faust);
+				*algoW2 = new GivensFGFTComplex<complex<@REAL_TYPE@>,Cpu,@REAL_TYPE@>(dM_M, J, verbosity, tol, relErr, enable_large_Faust);
+			}
+			else
+			{
+				*algoW1 = new GivensFGFTParallelComplex<complex<@REAL_TYPE@>,Cpu,@REAL_TYPE@>(dMM_, J, t, verbosity, tol, relErr, enable_large_Faust);
+				*algoW2 = new GivensFGFTParallelComplex<complex<@REAL_TYPE@>,Cpu,@REAL_TYPE@>(dM_M, J, t, verbosity, tol, relErr, enable_large_Faust);
+			}
+		}
+#endif
+
+	template<>
+		void instantiate_algos<@REAL_TYPE@, Cpu, @REAL_TYPE@>(GivensFGFTGen<Real<@REAL_TYPE@>, Cpu, @REAL_TYPE@, @REAL_TYPE@>** algoW1, GivensFGFTGen<Real<@REAL_TYPE@>, Cpu, @REAL_TYPE@, @REAL_TYPE@>** algoW2, Faust::MatDense<@REAL_TYPE@,Cpu> &dM_M, Faust::MatDense<@REAL_TYPE@,Cpu> &dMM_,int J, int t, unsigned int verbosity, @REAL_TYPE@ tol, bool relErr, bool enable_large_Faust)
+		{
+
+			if(t <= 1)
+			{
+				*algoW1 = new GivensFGFT<@REAL_TYPE@,Cpu,@REAL_TYPE@>(dMM_, J, verbosity, tol, relErr, enable_large_Faust);
+				*algoW2 = new GivensFGFT<@REAL_TYPE@,Cpu,@REAL_TYPE@>(dM_M, J, verbosity, tol, relErr, enable_large_Faust);
+			}
+			else
+			{
+				*algoW1 = new GivensFGFTParallel<@REAL_TYPE@,Cpu,@REAL_TYPE@>(dMM_, J, t, verbosity, tol, relErr, enable_large_Faust);
+				*algoW2 = new GivensFGFTParallel<@REAL_TYPE@,Cpu,@REAL_TYPE@>(dM_M, J, t, verbosity, tol, relErr, enable_large_Faust);
+			}
+		}
+}
