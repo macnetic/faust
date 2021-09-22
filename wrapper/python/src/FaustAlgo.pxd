@@ -120,7 +120,7 @@ cdef extern from "FaustFact.h":
                                                   is_verbose, bool
                                                   constant_step_size,
                                                   FPP2 step_size,
-                                                  const bool full_gpu)
+                                                  bool full_gpu)
 
     cdef FaustCoreCppCPU[FPP]* palm4msa2020[FPP, FPP2](FPP* mat,
                                               unsigned int num_rows,
@@ -138,7 +138,7 @@ cdef extern from "FaustFact.h":
                                               bool is_verbose,
                                               bool constant_step_size,
                                               FPP2 step_size,
-                                              const bool full_gpu,
+                                              bool full_gpu,
                                               FaustCoreCppCPU[FPP]* cth)
 
     cdef FaustCoreCppCPU[FPP]* butterfly_hierarchical[FPP](FPP* mat, unsigned int,
