@@ -15,7 +15,7 @@ namespace Faust
 	template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 		class GivensFGFTParallelGen;
 
-	template<typename FPP, FDevice DEVICE, typename FPP2 = float, typename FPP4 = FPP>
+	template<typename FPP, FDevice DEVICE, typename FPP2 = Real<FPP>, typename FPP4 = FPP>
 		class GivensFGFTGen {
 			/**
 			 * \class GivensFGFTGen

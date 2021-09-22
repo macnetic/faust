@@ -10,7 +10,7 @@ namespace Faust
 {
 
 
-	template<typename FPP, FDevice DEVICE, typename FPP2 = float>
+	template<typename FPP, FDevice DEVICE, typename FPP2 = Real<FPP>>
 		class GivensFGFTParallelComplex : public GivensFGFTComplex<FPP,DEVICE,FPP2>, public GivensFGFTParallelGen<typename FPP::value_type, DEVICE, FPP2, FPP>
 	{
 		/**

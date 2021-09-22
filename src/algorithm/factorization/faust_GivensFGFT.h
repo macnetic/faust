@@ -14,7 +14,7 @@ namespace Faust
 {
 
 
-	template<typename FPP, FDevice DEVICE, typename FPP2 = float>
+	template<typename FPP, FDevice DEVICE, typename FPP2 = Real<FPP>>
 		class GivensFGFT : public GivensFGFTGen<FPP, DEVICE, FPP2> {
 			/**
 			 * \class GivensFGFT
