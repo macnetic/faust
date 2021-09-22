@@ -531,8 +531,9 @@ class TestFaustPy(unittest.TestCase):
     def test_prod_opt(self):
         from pyfaust import FaustMulMode
         print("test GREEDY and DYNPROG prod opt methods and optimize_time.")
+        GREEDY = 4
         H = self.F.clone()
-        H.m_faust.set_FM_mul_mode(FaustMulMode.GREEDY)
+        H.m_faust.set_FM_mul_mode(GREEDY) # FaustMulMode.GREEDY replaced by GREEDY local variable because GREEDY is not a visible opt. method anymore
         G = self.F.clone()
         G.m_faust.set_FM_mul_mode(FaustMulMode.DYNPROG)
         self.assertTrue(np.allclose(self.F.toarray(), H.toarray()))

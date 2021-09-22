@@ -367,7 +367,9 @@ classdef FaustTest < matlab.unittest.TestCase
 			disp('Test GREEDY and DYNPROG prod opt methods and optimize_time')
 			F = this.test_faust;
 			H = clone(F);
-			set_FM_mul_mode(H, matfaust.FaustMulMode.GREEDY);
+			GREEDY = 4
+			% FaustMulMode.GREEDY replaced by GREEDY local variable because GREEDY is not a visible opt. method anymore
+			set_FM_mul_mode(H, GREEDY); % matfaust.FaustMulMode.GREEDY);
 			G = clone(F);
 			set_FM_mul_mode(G, matfaust.FaustMulMode.GREEDY);
 			this.verifyEqual(full(F), full(H), 'RelTol', 1e-5)
