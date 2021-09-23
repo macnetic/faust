@@ -111,4 +111,4 @@ def enable_gpu_mod(libpaths=None, backend='cuda', silent=False, fatal=False):
 import sys, os, pyfaust
 # tries to load the libgm library silently,
 # if not enabled at build time it will do nothing
-enable_gpu_mod(silent=True)
+enable_gpu_mod(silent=False)
