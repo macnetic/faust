@@ -205,10 +205,17 @@ namespace Faust
 			return out;
 		}
 
+	// TODO: specializations should be in .cpp file
 	template<>
 		void bit_reversal_factor<double>(int nfactors, std::vector<Faust::MatSparse<double, Cpu>*> &out)
 		{
 			//nothing to do for double matrices
+		}
+
+	template<>
+		void bit_reversal_factor<float>(int nfactors, std::vector<Faust::MatSparse<float, Cpu>*> &out)
+		{
+			//nothing to do for float matrices
 		}
 
 	template<>
