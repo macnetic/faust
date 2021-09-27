@@ -521,6 +521,20 @@ namespace Faust
 			char2gm_Op(opA, gop_A);
 			char2gm_Op(opB, gop_B);
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
+			if(C.gpu_mat == nullptr)
+			{
+				int C_nrows;
+				int C_ncols;
+				if(opA == 'N')
+					C_nrows = A.getNbRow();
+				else
+					C_nrows = A.getNbCol();
+				if(opB == 'N')
+					C_ncols = B.getNbCol();
+				else
+					C_ncols = B.getNbRow();
+				C.resize(C_nrows, C_ncols);
+			}
 			dsm_funcs->gemm(A.gpu_mat, B.gpu_mat, C.gpu_mat, (@GM_SCALAR@*) reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&alpha), (@GM_SCALAR@*) reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&beta), gop_A, gop_B);
 		}
 
@@ -532,6 +546,7 @@ namespace Faust
 			char2gm_Op(opA, gop_A);
 			char2gm_Op(opB, gop_B);
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
+			//TODO: verify if C.gpu_mat is nullptr and resize(-allocate) if it is
 			dsm_funcs->gemm(A.gpu_mat, B.gpu_mat, C.gpu_mat, (@GM_SCALAR@*) reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&alpha), (@GM_SCALAR@*) reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&beta), gop_A, gop_B);
 		}
 
