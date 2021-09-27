@@ -19,7 +19,7 @@ stages:
     - pkg_pub
     - gitlab_pages
 
-ctest:
+.ctest:
     <<: *ctest_script
     variables: {SLOW_TESTS: "OFF", BUILD_MULTITHREAD: "ON"} # the CDashConfScript is able to retrieve OpenMP_gomp_LIBRARY and OpenMP_INC_DIR from environment (it's necessary on macOS, so the runner's env. must be configured)
     script:
