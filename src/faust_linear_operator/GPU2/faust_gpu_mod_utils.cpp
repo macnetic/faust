@@ -7,7 +7,7 @@ namespace Faust {
 
 	GPUModHandler* GPUModHandler::singleton = nullptr;
 
-	GPUModHandler::GPUModHandler() : gm_handle(nullptr), marr_funcs_double(nullptr), marr_funcs_float(nullptr), marr_funcs_cuComplex(nullptr), marr_funcs_cuDoubleComplex(nullptr), dsm_funcs_double(nullptr), dsm_funcs_float(nullptr), dsm_funcs_cuComplex(nullptr), dsm_funcs_cuDoubleComplex(nullptr), spm_funcs_double(nullptr), spm_funcs_float(nullptr), spm_funcs_cuComplex(nullptr), spm_funcs_cuDoubleComplex(nullptr)
+	GPUModHandler::GPUModHandler() : gm_handle(nullptr), marr_funcs_double(nullptr), marr_funcs_float(nullptr), marr_funcs_cuComplex(nullptr), marr_funcs_cuDoubleComplex(nullptr), dsm_funcs_double(nullptr), dsm_funcs_float(nullptr), dsm_funcs_cuComplex(nullptr), dsm_funcs_cuDoubleComplex(nullptr), spm_funcs_double(nullptr), spm_funcs_float(nullptr), spm_funcs_cuComplex(nullptr), spm_funcs_cuDoubleComplex(nullptr), gp_funcs_(nullptr)
 	{
 		// class is only instatiatable with get_singleton (private ctor)
 	}
