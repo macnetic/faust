@@ -2799,10 +2799,16 @@ def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
         # no else possible (see above)
     elif dev.startswith("gpu"):
         if field == REAL:
-            rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUDbl.randFaust(num_rows,
-                                                                       num_cols,
-                                                                       fac_type_map[fac_type], min_num_factors, max_num_factors,
-                                                                       min_dim_size, max_dim_size, density, per_row))
+            if type == 'double': 
+                rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUDbl.randFaust(num_rows,
+                                                                              num_cols,
+                                                                              fac_type_map[fac_type], min_num_factors, max_num_factors,
+                                                                              min_dim_size, max_dim_size, density, per_row))
+            else: # type == float:
+                rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUFlt.randFaust(num_rows,
+                                                                           num_cols,
+                                                                           fac_type_map[fac_type], min_num_factors, max_num_factors,
+                                                                           min_dim_size, max_dim_size, density, per_row))
         elif field == COMPLEX:
             rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUCplxDbl.randFaust(num_rows,
                                                                            num_cols,
