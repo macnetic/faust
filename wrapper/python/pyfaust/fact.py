@@ -166,10 +166,17 @@ def svdtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
     M = _check_fact_mat('svdtj()', M, is_real)
 
     if is_real:
+        is_float = M.dtype == 'float32'
         if(isinstance(M, np.ndarray)):
-            Ucore, S, Vcore =  _FaustCorePy.FaustAlgoGenDbl.svdtj(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
+            if is_float:
+                Ucore, S, Vcore =  _FaustCorePy.FaustAlgoGenFlt.svdtj(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
+            else:
+                Ucore, S, Vcore =  _FaustCorePy.FaustAlgoGenDbl.svdtj(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
         elif(isinstance(M, csr_matrix)):
-            Ucore, S, Vcore =  _FaustCorePy.FaustAlgoGenDbl.svdtj_sparse(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
+            if is_float:
+                Ucore, S, Vcore =  _FaustCorePy.FaustAlgoGenFlt.svdtj_sparse(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
+            else:
+                Ucore, S, Vcore =  _FaustCorePy.FaustAlgoGenDbl.svdtj_sparse(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
         else:
             raise ValueError("invalid type for M (first argument): only np.ndarray "
                              "or scipy.sparse.csr_matrix are supported.")
@@ -259,19 +266,19 @@ def eigtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
         >>> # get a graph Laplacian to diagonalize
         >>> demo_path = sep.join((get_data_dirpath(),'Laplacian_256_community.mat'))
         >>> data_dict = loadmat(demo_path)
-        >>> Lap = data_dict['Lap'].astype(np.float)
+        >>> Lap = data_dict['Lap'].astype('float64')
         >>> Dhat, Uhat = eigtj(Lap, nGivens=Lap.shape[0]*100, enable_large_Faust=True)
         >>> # Uhat is the Fourier matrix/eigenvectors approximation as a Faust
         >>> # (200 factors)
         >>> # Dhat the eigenvalues diagonal matrix approx.
-        >>> print("err: ", norm(Lap-Uhat*np.diag(Dhat)*Uhat.H)/norm(Lap)) # about 6.5e-3
+        >>> print("err: ", norm(Lap-Uhat@np.diag(Dhat)@Uhat.H)/norm(Lap)) # about 6.5e-3
         >>> print(Uhat)
         >>> print(Dhat)
         >>> Dhat2, Uhat2 = eigtj(Lap, tol=0.01)
-        >>> assert(norm(Lap-Uhat2*np.diag(Dhat2)*Uhat2.H)/norm(Lap) < .011)
+        >>> assert(norm(Lap-Uhat2@np.diag(Dhat2)@Uhat2.H)/norm(Lap) < .011)
         >>> # and then asking for an absolute error
         >>> Dhat3, Uhat3 = eigtj(Lap, tol=0.1, relerr=False)
-        >>> assert(norm(Lap-Uhat3*np.diag(Dhat3)*Uhat3.H) < .11)
+        >>> assert(norm(Lap-Uhat3@np.diag(Dhat3)@Uhat3.H) < .11)
         >>> # now recompute Uhat2, Dhat2 but asking a descending order of eigenvalues
         >>> Dhat4, Uhat4 = eigtj(Lap, tol=0.01, order='descend')
         >>> assert((Dhat4[::-1] == Dhat2[::]).all())
@@ -289,9 +296,15 @@ def eigtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
         is_real = (M.dtype == np.float)
 
     if is_real:
-        D, core_obj = _FaustCorePy.FaustAlgoGenDbl.eigtj(M, nGivens, tol, relerr,
-                                                   nGivens_per_fac, verbosity, order,
-                                                   enable_large_Faust)
+        if M.dtype == 'float32':
+            D, core_obj = _FaustCorePy.FaustAlgoGenFlt.eigtj(M, nGivens, tol, relerr,
+                                                             nGivens_per_fac, verbosity, order,
+                                                             enable_large_Faust)
+
+        else:
+            D, core_obj = _FaustCorePy.FaustAlgoGenDbl.eigtj(M, nGivens, tol, relerr,
+                                                             nGivens_per_fac, verbosity, order,
+                                                             enable_large_Faust)
     else:
         D, core_obj = _FaustCorePy.FaustAlgoGenCplxDbl.eigtj(M, nGivens, tol, relerr,
                                                    nGivens_per_fac, verbosity, order,
@@ -514,7 +527,11 @@ def palm4msa(M, p, ret_lambda=False, backend=2016, on_gpu=False):
     if(backend == 2016):
         if on_gpu: raise ValueError("on_gpu applies only on 2020 backend.")
         if is_real:
-            core_obj, _lambda = _FaustCorePy.FaustAlgoGenDbl.fact_palm4msa(M, p)
+            is_float = M.dtype == 'float32'
+            if is_float:
+                core_obj, _lambda = _FaustCorePy.FaustAlgoGenFlt.fact_palm4msa(M, p)
+            else:
+                core_obj, _lambda = _FaustCorePy.FaustAlgoGenDbl.fact_palm4msa(M, p)
         else:
             core_obj, _lambda = _FaustCorePy.FaustAlgoGenCplxDbl.fact_palm4msa(M, p)
     elif(backend == 2020):
@@ -826,7 +843,10 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
     if(backend == 2016):
         if on_gpu: raise ValueError("on_gpu applies only on 2020 backend.")
         if is_real:
-            core_obj,_lambda = _FaustCorePy.FaustAlgoGenDbl.fact_hierarchical(M, p)
+            if M.dtype == 'float64':
+                core_obj,_lambda = _FaustCorePy.FaustAlgoGenDbl.fact_hierarchical(M, p)
+            else:
+                core_obj,_lambda = _FaustCorePy.FaustAlgoGenFlt.fact_hierarchical(M, p)
         else:
             core_obj,_lambda = _FaustCorePy.FaustAlgoGenCplxDbl.fact_hierarchical(M, p)
     elif(backend == 2020):
@@ -1174,6 +1194,10 @@ def butterfly(M, dir="right"):
     is_real = np.empty((1,))
     M = _check_fact_mat('butterfly()', M, is_real)
     if is_real:
-        return Faust(core_obj=_FaustCorePy.FaustAlgoGenDbl.butterfly_hierarchical(M, dir))
+        is_float = M.dtype == 'float32'
+        if is_float:
+            return Faust(core_obj=_FaustCorePy.FaustAlgoGenFlt.butterfly_hierarchical(M, dir))
+        else:
+            return Faust(core_obj=_FaustCorePy.FaustAlgoGenDbl.butterfly_hierarchical(M, dir))
     else:
         return Faust(core_obj=_FaustCorePy.FaustAlgoGenCplxDbl.butterfly_hierarchical(M, dir))

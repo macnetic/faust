@@ -61,9 +61,8 @@ cdef check_matrix(isReal, M, message=""):
         if not isinstance(M, (np.ndarray) ):
             raise ValueError(message+'input must be a numpy ndarray')
         if(isReal):
-            if not M.dtype=='double':
-                raise ValueError(message+'input numpy array dtype must be double (not'
-                                 ' float)')
+            if M.dtype not in ['double', 'float32']:
+                raise ValueError(message+'input numpy array dtype must be double or float32.')
         else:
 #            M=M.astype(complex,'F')
             if(M.dtype not in ['complex', 'complex128'] ): #could fail if complex128 etc.

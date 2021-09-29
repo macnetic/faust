@@ -65,9 +65,16 @@ def Chebyshev(L, K, dev='cpu', T0=None, impl='native'):
                                                                         dev.startswith('gpu')),
                           impl='native')
         else:
-            F = FaustPoly(core_obj=_FaustCorePy.FaustAlgoGenDbl.polyBasis(L, K, T0,
-                                                                          dev.startswith('gpu')),
-                          impl='native')
+            is_float = L.dtype == 'float32'
+            if is_float:
+                F = FaustPoly(core_obj=_FaustCorePy.FaustAlgoGenFlt.polyBasis(L, K, T0,
+                                                                              dev.startswith('gpu')),
+                              impl='native')
+
+            else:
+                F = FaustPoly(core_obj=_FaustCorePy.FaustAlgoGenDbl.polyBasis(L, K, T0,
+                                                                              dev.startswith('gpu')),
+                              impl='native')
         return F
     else:
         raise ValueError(impl+" is an unknown implementation.")
@@ -317,15 +324,23 @@ def _poly_arr_py(coeffs, basisX, d, dev='cpu', out=None):
 def _poly_arr_cpp(coeffs, basisX, d, dev='cpu', out=None):
     is_real = np.empty((1,))
     basisX = _check_fact_mat('_poly_arr_cpp()', basisX, is_real)
+    if is_real:
+        is_float = basisX.dtype == 'float32'
     if coeffs.ndim == 1:
         if is_real:
-            return _FaustCorePy.FaustAlgoGenDbl.polyCoeffs(d, basisX, coeffs, dev, out)
+            if is_float:
+                return _FaustCorePy.FaustAlgoGenFlt.polyCoeffs(d, basisX, coeffs, dev, out)
+            else:
+                return _FaustCorePy.FaustAlgoGenDbl.polyCoeffs(d, basisX, coeffs, dev, out)
         else:
             return _FaustCorePy.FaustAlgoGenCplxDbl.polyCoeffs(d, basisX, coeffs, dev, out)
     elif coeffs.ndim == 2:
         K = coeffs.shape[1]-1
         if is_real:
-            return _FaustCorePy.FaustAlgoGenDbl.polyGroupCoeffs(d, K, basisX, coeffs, dev, out)
+            if is_float:
+                return _FaustCorePy.FaustAlgoGenFlt.polyGroupCoeffs(d, K, basisX, coeffs, dev, out)
+            else:
+                return _FaustCorePy.FaustAlgoGenDbl.polyGroupCoeffs(d, K, basisX, coeffs, dev, out)
         else:
             return _FaustCorePy.FaustAlgoGenCplxDbl.polyGroupCoeffs(d, K, basisX, coeffs, dev, out)
     else:
