@@ -191,3 +191,13 @@ void Faust::MatDiag<FPP>::setZeros()
 	isZeros = true;
 	this->is_identity = false;
 }
+
+template<typename FPP>
+bool Faust::MatDiag<FPP>::containsNaN()
+{
+
+	for(int i=0;i < min(this->dim1, this->dim2);i++)
+		if(std::isnan(std::real(getData()[i])))
+			return true;
+	return false;
+}

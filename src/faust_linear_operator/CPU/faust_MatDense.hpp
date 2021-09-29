@@ -1101,6 +1101,20 @@ void MatDense<FPP,Cpu>::normalize()
 		throw std::domain_error("the norm is zero, can't normalize");
 }
 
+template<typename FPP>
+bool MatDense<FPP,Cpu>::containsNaN()
+{
+
+#if(EIGEN_WORLD_VERSION > 3 || EIGEN_WORLD_VERSION >= 3 && EIGEN_MAJOR_VERSION >= 3)
+	return Eigen::isnan(mat.array()).any();
+#else
+	for(int i=0;i < this->dim1*this->dim2;i++)
+		if(std::isnan(std::real(getData()[i])))
+			return true;
+	return false;
+#endif
+}
+
 	template<typename FPP>
 void MatDense<FPP,Cpu>::copyBuf(FPP* dst_buf) const
 {
@@ -1284,12 +1298,13 @@ bool MatDense<FPP,Cpu>::eq_rows(const MatDense<FPP, Cpu> & other, faust_unsigned
 template<typename FPP>
 void MatDense<FPP, Cpu>::best_low_rank(const int &r, MatDense<FPP,Cpu> &bestX, MatDense<FPP, Cpu> &bestY) const
 {
-#ifdef _MSC_VER
+#if(EIGEN_WORLD_VERSION > 3 || EIGEN_WORLD_VERSION >= 3 && EIGEN_MAJOR_VERSION >= 3)
+	Eigen::BDCSVD<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>> svd(this->mat, Eigen::ComputeThinU | Eigen::ComputeThinV);
+#else
+//#ifdef _MSC_VER
 	// as far as I tested eigen3.4rc1 doesn't compile with VS 14
 	// so use JacobiSVD
 	Eigen::JacobiSVD<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>> svd(this->mat, Eigen::ComputeThinU | Eigen::ComputeThinV);
-#else
-	Eigen::BDCSVD<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>> svd(this->mat, Eigen::ComputeThinU | Eigen::ComputeThinV);
 #endif
 	if(bestX.getNbRow() != this->getNbRow() || r != bestX.getNbCol())
 		bestX.resize(this->getNbRow(), r);

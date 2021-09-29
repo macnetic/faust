@@ -93,6 +93,7 @@ namespace Faust
 			void Display() const;
 			void setZeros();
 
+			bool containsNaN();
 			const FPP* getData() const { return mat.diagonal().data();};
 
 		};

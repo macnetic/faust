@@ -1443,4 +1443,13 @@ void Faust::MatSparse<FPP,Cpu>::real(MatSparse<Real<FPP>, Cpu> &real_mat) const
 	real_mat.resize(this->nnz, this->getNbRow(), this->getNbCol());
 	real_mat.mat = mat.real().eval().template cast<Real<FPP>>();
 }
+
+template<typename FPP>
+bool Faust::MatSparse<FPP,Cpu>::containsNaN()
+{
+	for(int i=0;i < getNonZeros();i++)
+		if(std::isnan(std::real(getValuePtr()[i])))
+			return true;
+	return false;
+}
 #endif

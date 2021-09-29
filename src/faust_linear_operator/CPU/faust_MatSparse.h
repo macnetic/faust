@@ -404,6 +404,7 @@ namespace Faust
 			void real(MatSparse<Real<FPP>, Cpu> & real_mat) const;
 
 
+			bool containsNaN();
 			void print_bufs(const std::string name="");
 			void print_asarray(const std::string name="");
 			static MatSparse<FPP, Cpu>* randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, Real<FPP> density);
