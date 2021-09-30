@@ -421,13 +421,12 @@ class blockdiag(proj_gen):
 >>> from pyfaust.proj import blockdiag
 >>> from numpy.random import rand
 >>> M = rand(15,15)
->>> p = blockdiag(M.shape, [(1,1), (3,3), (6,6), (10,10), (15,15)])
+>>> p = blockdiag(M.shape, [(1,1), (2,2), (3,3), (4,4), (5,5)])
 >>> M_ = p(M)
 >>> for i in range(M.shape[0]):
-	...   for j in range(M.shape[1]):
-	...     print(("%2.1f" % (M_[i,j])), " ", end='')
-	...   print()
-	...
+>>>     for j in range(M.shape[1]):
+>>>         print(("%2.1f" % (M_[i,j])), " ", end='')
+>>>     print()
 	0.3  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
 	0.0  0.2  0.4  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
 	0.0  0.1  0.9  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
@@ -488,8 +487,14 @@ class blockdiag(proj_gen):
         is_real = np.empty((1,))
         M = _check_fact_mat('prox_blockdiag.__call__', M, is_real)
         if is_real:
-            return _FaustCorePy.ConstraintMatCoreDbl.prox_blockdiag(M, self._block_shapes, self.normalized,
-                                                             self.pos)
+            is_float = M.dtype == 'float32'
+            if is_float:
+                return _FaustCorePy.ConstraintMatCoreFlt.prox_blockdiag(M, self._block_shapes, self.normalized,
+                                                                        self.pos)
+            else:
+                return _FaustCorePy.ConstraintMatCoreDbl.prox_blockdiag(M, self._block_shapes, self.normalized,
+                                                                        self.pos)
+
         else:
             return _FaustCorePy.ConstraintMatCoreCplxDbl.prox_blockdiag(M, self._block_shapes, self.normalized,
                                                              self.pos)
