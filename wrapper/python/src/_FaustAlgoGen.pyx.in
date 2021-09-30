@@ -816,7 +816,7 @@ cdef class FaustAlgoGen@TYPE_NAME@:
             dtype_err = ValueError('out dtype isn\'t valid.')
             if not y.flags['F_CONTIGUOUS']:
                 raise ValueError('the array must be in fortran/column continous order.')
-            if y.dtype != '@TYPE@':
+            if y.dtype != type2dtype('@TYPE@'):
                 raise dtype_err
             yview = y
         else:
@@ -897,7 +897,7 @@ cdef class FaustAlgoGen@TYPE_NAME@:
                 dtype_err = ValueError('out dtype isn\'t valid.')
                 if not y.flags['F_CONTIGUOUS']:
                     raise ValueError('the array must be in fortran/column continous order.')
-                if y.dtype != '@TYPE@':
+                if y.dtype != type2dtype('@TYPE@'):
                     raise dtype_err
                 addr = y.__array_interface__['data'][0]
                 yview[i] = <@TYPE@*> addr
