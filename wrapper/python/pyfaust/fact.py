@@ -96,7 +96,8 @@ def svdtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
         NOTE: this function is based on fact.eigtj. See below the example for further details on how svdtj is defined using eigtj.
 
         Args:
-            M: a real matrix (np.ndarray or scipy.sparse.csr_matrix).
+            M: a real matrix (np.ndarray or scipy.sparse.csr_matrix). The dtype must be float32, float64
+            or complex128 (the dtype might have a large impact on performance).
             nGivens: see fact.eigtj
             tol: see fact.eigtj (the error tolerance is not exactly for
             the svd but for the subsequent eigtj calls).
@@ -207,7 +208,9 @@ def eigtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
 
     Args:
         M: (numpy.ndarray or csr_matrix) the matrix to diagonalize. Must be
-        real and symmetric, or complex hermitian. Can be in dense or sparse format.
+        real and symmetric, or complex hermitian. Can be in dense or sparse
+        format. The dtype must be float32, float64
+        or complex128 (the dtype might have a large impact on performance).
         nGivens: (int) targeted number of Givens rotations (this argument is optional
         only if tol is set).
         tol: (float) the tolerance error at which the algorithm stops. The
@@ -487,7 +490,8 @@ def palm4msa(M, p, ret_lambda=False, backend=2016, on_gpu=False):
     Factorizes the matrix M with Palm4MSA algorithm using the parameters set in p.
 
     Args:
-        M: the numpy array to factorize.
+        M: the numpy array to factorize. The dtype must be float32, float64
+        or complex128 (the dtype might have a large impact on performance).
         p: the The pyfaust.factparams.ParamsPalm4MSA instance to define the algorithm parameters.
         ret_lambda: set to True to ask the function to return the scale factor (False by default).
         backend: the C++ implementation to use (default to 2016, 2020 backend
@@ -569,7 +573,8 @@ def palm4msa_mhtp(M, palm4msa_p, mhtp_p, ret_lambda=False, on_gpu=False):
 
 
     Args:
-        M: the numpy array to factorize.
+        M: the numpy array to factorize. The dtype must be float32, float64
+        or complex128 (the dtype might have a large impact on performance).
         palm4msa_p: the The pyfaust.factparams.ParamsPalm4MSA instance to
         define the PALM4MSA algorithm parameters.
         mhtp_p: the pyfaust.factparams.MHTPParams instance to define the MHTP algorithm parameters.
@@ -613,7 +618,8 @@ def hierarchical_mhtp(M, hierar_p, mhtp_p, ret_lambda=False, ret_params=False,
     pyfaust.fact.hierarchical.
 
     Args:
-        M: the numpy array to factorize.
+        M: the numpy array to factorize. The dtype must be float32, float64
+        or complex128 (the dtype might have a large impact on performance).
         p: is a set of hierarchical factorization parameters. See pyfaust.fact.hierarchical.
         mhtp_p: the pyfaust.factparams.MHTPParams instance to define the MHTP algorithm parameters.
         on_gpu: if True the GPU implementation is executed.
@@ -686,7 +692,8 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
             </code>
 
     Args:
-        M: the numpy array to factorize.
+        M: the numpy array to factorize. The dtype must be float32, float64
+        or complex128 (the dtype might have a large impact on performance).
         p: is a set of hierarchical factorization parameters. It might be a fully defined instance of parameters (pyfaust.factparams.ParamsHierarchical) or a simplified expression which designates a pre-defined parametrization:
             - 'squaremat' to use pre-defined parameters typically used to factorize a Hadamard square matrix of order a power of two (see pyfaust.demo.hadamard).
             - ['rectmat', j, k, s] to use pre-defined parameters used for
@@ -1184,6 +1191,8 @@ def butterfly(M, dir="right"):
     Factorizes M according to a butterfly support.
 
     Args:
+        M: the numpy ndarray. The dtype must be float32, float64
+        or complex128 (the dtype might have a large impact on performance).
         dir: (str) the direction of factorization 'right'ward or 'left'ward
         (more precisely: at each stage of the factorization the most right factor or
         the most left factor is split in two).

@@ -87,6 +87,7 @@ def basis(L, K, basis_name, dev='cpu', T0=None, **kwargs):
 
     Args:
         L: the sparse scipy square matrix in CSR format (scipy.sparse.csr_matrix).
+        The dtype must be float32, float64 or complex128 (the dtype might have a large impact on performance).
         K: the degree of the last polynomial, i.e. the K+1 first polynomials are built.
         basis_name: 'chebyshev', and others yet to come.
         dev (optional): the device to instantiate the returned Faust ('cpu' or 'gpu').
@@ -161,12 +162,14 @@ def poly(coeffs, basis='chebyshev', L=None, X=None, dev='cpu', out=None,
         Computes the linear combination of the polynomials defined by basis.
 
         Args:
-            coeffs: the linear combination coefficients (vector as a numpy.ndarray).
+            coeffs: the linear combination coefficients (vector as a
+            numpy.ndarray). Must be in the same dtype as L and X if they are set.
             basis: either the name of the polynomial basis to build on L or the
             basis if already built externally (as a FaustPoly or an equivalent
             np.ndarray -- if X is not None, basis can only be a FaustPoly).
             L: the sparse scipy square matrix in CSR format
-            (scipy.sparse.csr_matrix) on which the polynomial basis is built if basis is not already a Faust or a numpy.ndarray.
+            (scipy.sparse.csr_matrix) on which the polynomial basis is built if basis is not already a Faust or a numpy.ndarray. The dtype must be float32, float64 or complex128 (the dtype might have a large impact on performance).
+
             It can't be None if basis is not a FaustPoly or a numpy.ndarray.
             X: (np.darray) if X is not None, the linear combination of basis@X
             is computed (note that the memory space is optimized compared to
@@ -597,7 +600,7 @@ def expm_multiply(A, B, t, K=10, tradeoff='time', dev='cpu', **kwargs):
         group_coeffs = kwargs['group_coeffs']
         print("expm_multiply group_coeffs:", group_coeffs)
     phi = eigsh(A, k=1, return_eigenvectors=False)[0] / 2
-    T = basis(A/phi-seye(*A.shape), K, 'chebyshev', dev=dev)
+    T = basis((A/phi-seye(*A.shape)).astype(A.dtype), K, 'chebyshev', dev=dev)
     if isinstance(t, float):
         t = list(t)
     m = B.shape[0]
