@@ -374,7 +374,7 @@ void Faust::update_lambda(Faust::TransformHelper<FPP,DEVICE>& S, std::vector<Tra
 	gemm(A_H, S_mat, A_H_S, (FPP) 1.0, (FPP) 0.0, 'N', 'N');
 	tr = A_H_S.trace();
 	nS = S_mat.norm();
-	if(std::numeric_limits<Real<FPP>>::epsilon() >= nS)
+	if(Real<FPP>(0) == nS)
 		if(no_lambda_error)
 		{
 			// don't change lambda
@@ -383,6 +383,15 @@ void Faust::update_lambda(Faust::TransformHelper<FPP,DEVICE>& S, std::vector<Tra
 		}
 		else
 			throw std::runtime_error("Error in update_lambda: S Frobenius norm is zero, can't compute lambda.");
+	if(std::isnan(std::real(tr)) || std::isnan(nS))
+		if(no_lambda_error)
+		{
+			// don't change lambda
+			std::cout << "WARNING: lambda didn't change because S contains NaN." << std::endl;
+			return;
+		}
+		else
+			throw std::runtime_error("Error in update_lambda: S (the Faust) contains nan elements in at least one of its matrices, can't compute lambda.");
 	lambda = std::real(tr)/(nS*nS);
 }
 
