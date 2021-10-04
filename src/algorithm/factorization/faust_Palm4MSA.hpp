@@ -461,7 +461,7 @@ t_local_compute_lambda.start();
    if (Xhatt_Xhat_tr != FPP(0))
    {
 		m_lambda = Faust::fabs(Xt_Xhat.trace()/Xhatt_Xhat_tr);
-		if (isnan(m_lambda) || isnan(m_lambda))
+		if (std::isnan(m_lambda))
 		{
 			handleError(m_className,"compute_lambda : Xhatt_Xhat_tr is too small or Xt_Xhat.trace is too big so lambda is infinite");
 		}
