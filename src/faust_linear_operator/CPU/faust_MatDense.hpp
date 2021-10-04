@@ -922,6 +922,14 @@ void MatDense<FPP,Cpu>::operator+=(const MatSparse<FPP,Cpu>& S)
 
 
 	template<typename FPP>
+void MatDense<FPP,Cpu>::nonzerosToOnes() //TODO: rename nonZerosToOnes
+{
+	auto a = (Eigen::abs(mat.array()) > 0 || Eigen::isnan(mat.array()) || Eigen::isinf(mat.array())).select(mat, Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>::Ones(this->dim1, this->dim2));
+	this->is_identity = false;
+	isZeros = false;
+}
+
+	template<typename FPP>
 void MatDense<FPP,Cpu>::scalarMultiply(MatDense<FPP,Cpu> const& A)
 {
 	if(this->dim1!=A.dim1 || this->dim2!=A.dim2)
@@ -932,7 +940,6 @@ void MatDense<FPP,Cpu>::scalarMultiply(MatDense<FPP,Cpu> const& A)
 	this->is_identity = false;
 	isZeros = false;
 }
-
 
 	template<typename FPP>
 void MatDense<FPP,Cpu>::multiplyLeft(const MatSparse<FPP,Cpu>& S,const char TransS)
@@ -1092,13 +1099,30 @@ Real<FPP> Faust::MatDense<FPP, Cpu>::normInf(faust_unsigned_int& row_id, const b
 }
 
 	template<typename FPP>
-void MatDense<FPP,Cpu>::normalize()
+void MatDense<FPP,Cpu>::normalize(int norm_type/*=-2*/)
 {
-	auto n = norm();
+	Real<FPP> n;
+	switch(norm_type)
+	{
+		case -2: // frobenius
+			n = norm();
+			break;
+		case 2:
+			int flag; // not used
+			n = spectralNorm(FAUST_NORM2_MAX_ITER, FAUST_PRECISION, flag);
+		case 1:
+			n = normL1();
+			break;
+		case -1:
+			n = normInf();
+			break;
+		default:
+			throw std::runtime_error("Unknown kind of norm asked for normalization.");
+	}
 	if(n != FPP(0))
 		scalarMultiply(FPP(1.0/n));
 	else
-		throw std::domain_error("the norm is zero, can't normalize");
+		throw std::domain_error("the norm is zero, can't normalize.");
 }
 
 template<typename FPP>

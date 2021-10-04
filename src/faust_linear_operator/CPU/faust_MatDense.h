@@ -314,8 +314,9 @@ namespace Faust
 			//! \return  the Frobenius norm
 			Real<FPP> norm() const {return mat.norm();}
 
-			//!  \brief Normalize the matrix according to its Frobenius norm
-			void normalize();
+			//!  \brief Normalize the matrix according to its Frobenius norm (norm_type==-2) by default.
+			// \param norm_type: the type of norm used to normalize the matrix. -2 Frobenius norm, 1 1-norm, 2 2-norm (spectral norm), -1 inf-norm.
+			void normalize(int norm_type=-2);
 
 
 			//!	\param nbr_iter_max : maximum number of iteration for the power algo
@@ -350,6 +351,9 @@ namespace Faust
 
 			//!  \brief replace this by lambda * (*this) using element by element multiplication
 			void scalarMultiply(MatDense<FPP,Cpu> const& A);
+
+			//! Replaces the matrix by its support (all nonzeros are set to ones).
+			void nonzerosToOnes();
 
 			//! \brief (*this) = (*this) + A
 			void add(MatDense<FPP,Cpu> const& A);
