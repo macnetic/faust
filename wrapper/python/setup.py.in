@@ -16,6 +16,12 @@ if(version == ''):
                     # (not for packaging with a proper version)
                     # it avoids error PEP440
 
+from sys import platform
+if platform == "linux": # or platform == "darwin": # no need to specify we use clang on MacOS X because it's the default compiler
+    # compile with clang on Linux and MacOS X
+    from distutils import sysconfig
+    sysconfig.get_config_vars()['CC'] = 'clang'
+
 
 PyFaust = Extension('_FaustCorePy',
                     sources = @PY_EXT_SOURCES@,
@@ -27,7 +33,6 @@ PyFaust = Extension('_FaustCorePy',
                     extra_link_args = [ @FAUST_SETUP_PY_LFLAGS@ ],
                     extra_objects = @PYTHON_EXT_EXTRA_OBJECTS@
                    )
-
 
 setup(
     name = 'pyfaust@PYFAUST_PKG_SUFFIX@',
