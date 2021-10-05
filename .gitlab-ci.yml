@@ -130,15 +130,17 @@ pkg_macos:
 #        - git submodule update --init --recursive
 #TODO: loop for cuda 9.2 and 11.4
         - cd gpu_mod
-        - if NOT EXIST build (mkdir build-cu9.2) else (rmdir /S /Q build-cu9.2 & mkdir build-cu9.2)
-        - cd build-cu9.2
-        - cmake -G "Visual Studio 14 Win64" ..
+        - if NOT EXIST build-cu11.4 (mkdir build-cu11.4) else (rmdir /S /Q build-cu11.4 & mkdir build-cu11.4)
+        - cd build-cu11.4
+        - cmake -G "Visual Studio 16 2019" ..
           #- cmake -G "MinGW Makefiles" -DCMAKE_CUDA_COMPILER="E:/NVIDIA GPU Computing Toolkit/CUDA/v9.2/bin/nvcc.exe" .. #-DCUDA_HOST_COMPILER="E:/TDM-GCC-64/bin/g++.exe" ..
         - cmake --build . --config %BUILD_CONFIG%
         - move %BUILD_CONFIG%\gm.dll .
         - cd ..
-        - if NOT EXIST build (mkdir build-cu11.4) else (rmdir /S /Q build-cu11.4 & mkdir build-cu11.4)
-        - cd build-cu11.4
+        - set CUDA_PATH=%CUDA_PATH_V9_2%
+        - set CUDA_PATH_V11_4=
+        - if NOT EXIST build-cu9.2 (mkdir build-cu9.2) else (rmdir /S /Q build-cu9.2 & mkdir build-cu9.2)
+        - cd build-cu9.2
         - cmake -G "Visual Studio 14 Win64" ..
           #- cmake -G "MinGW Makefiles" -DCMAKE_CUDA_COMPILER="E:/NVIDIA GPU Computing Toolkit/CUDA/v9.2/bin/nvcc.exe" .. #-DCUDA_HOST_COMPILER="E:/TDM-GCC-64/bin/g++.exe" ..
         - cmake --build . --config %BUILD_CONFIG%
@@ -511,10 +513,22 @@ pkg_linux_purepy_release_torch_linked:
 .pkg_win_purepy: &pkg_win_purepy
     stage: pkg
     script:
+#TODO: loop for cuda 9.2 and 11.4 (factorize in a script with pkg win)
+# cuda11.4 build must be the first because this is the default CUDA on VM
         - cd gpu_mod
-        - if NOT EXIST build (mkdir build) else (rmdir /S /Q build & mkdir build)
-        - cd build
+        - if NOT EXIST build-cu11.4 (mkdir build-cu11.4) else (rmdir /S /Q build-cu11.4 & mkdir build-cu11.4)
+        - cd build-cu11.4
+        - cmake -G "Visual Studio 16 2019" ..
+          #- cmake -G "MinGW Makefiles" -DCMAKE_CUDA_COMPILER="E:/NVIDIA GPU Computing Toolkit/CUDA/v9.2/bin/nvcc.exe" .. #-DCUDA_HOST_COMPILER="E:/TDM-GCC-64/bin/g++.exe" ..
+        - cmake --build . --config %BUILD_CONFIG%
+        - move %BUILD_CONFIG%\gm.dll .
+        - cd ..
+        - set CUDA_PATH=%CUDA_PATH_V9_2%
+        - set CUDA_PATH_V11_4=
+        - if NOT EXIST build-cu9.2 (mkdir build-cu9.2) else (rmdir /S /Q build-cu9.2 & mkdir build-cu9.2)
+        - cd build-cu9.2
         - cmake -G "Visual Studio 14 Win64" ..
+          #- cmake -G "MinGW Makefiles" -DCMAKE_CUDA_COMPILER="E:/NVIDIA GPU Computing Toolkit/CUDA/v9.2/bin/nvcc.exe" .. #-DCUDA_HOST_COMPILER="E:/TDM-GCC-64/bin/g++.exe" ..
         - cmake --build . --config %BUILD_CONFIG%
         - move %BUILD_CONFIG%\gm.dll .
         - cd ..\..
