@@ -17,8 +17,8 @@ if(version == ''):
                     # it avoids error PEP440
 
 from sys import platform
-if platform == "linux": # or platform == "darwin": # no need to specify we use clang on MacOS X because it's the default compiler
-    # compile with clang on Linux and MacOS X
+if platform == "linux":# or platform == "darwin":
+    # compile with clang on Linux (on macOS it's the default choice)
     from distutils import sysconfig
     sysconfig.get_config_vars()['CC'] = 'clang'
 
@@ -58,6 +58,6 @@ setup(
     install_requires = [@PYFAUST_PYTHON_REQUIREMENTS_AS_PYLIST@],
     license = "3-clause BSD 2.0",
     package_data = {
-        'pyfaust': [ 'data/*.mat', 'license*.txt', '@GPU_MOD_LIB_PATH@']
+        'pyfaust': [ 'data/*.mat', 'license*.txt', 'lib/*.so']
     }
 )

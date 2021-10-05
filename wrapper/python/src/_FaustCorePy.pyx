@@ -80,30 +80,36 @@ def _is_gpu_mod_enabled():
     return FaustCoreCy._is_gpu_mod_enabled()
 
 def enable_gpu_mod(libpaths=None, backend='cuda', silent=False, fatal=False):
-    #TODO: extract out of Faust class
     cdef char * c_libpath
     cdef void* gm_handle
     if libpaths == None:
         # use default paths
         pyfaust_path = os.path.dirname(pyfaust.__file__)
         # don't use os.path.join or os.path.sep because anyway
-        # lib name suffix or prefix depend on OS
-        if sys.platform == 'linux':
-            libpaths = [pyfaust_path+"/lib/libgm.so"]
-        elif sys.platform == 'darwin':
-            libpaths = [pyfaust_path+"/lib/libgm.dylib"]
-        elif sys.platform == 'win32':
-            libpaths = [pyfaust_path+"\lib\gm.dll"]
+        # lib name suffix and prefix depend on OS
+        libpaths = []
+        for gpu_backend in ['-cu11.2', '-cu9.2', '']: # the last one is
+        # for descendant/backward compatibility
+        # (the backend are sorted per order of preference)
+            if sys.platform == 'linux':
+                libpaths += [pyfaust_path+"/lib/libgm"+gpu_backend+".so"]
+            elif sys.platform == 'darwin':
+                libpaths += [pyfaust_path+"/lib/libgm"+gpu_backend+".dylib"]
+            elif sys.platform == 'win32':
+                libpaths += [pyfaust_path+"\lib\gm"+gpu_backend+".dll"]
     for libpath in libpaths:
         blibpath = libpath.encode('utf-8')
         c_libpath = blibpath
         #c_libpath = libpath
         gm_handle = FaustCoreCy._enable_gpu_mod(c_libpath, silent);
+        if gm_handle != NULL:
+            # the backend is successfully loaded, end the loading loop
+            break
         if gm_handle == NULL:
             if fatal and libpaths[-1] == libpath:
-                raise Exception("Can't load gpu_mod library, maybe the path ("
-                                +libpath+") is not"
-                                " correct or the backend (cuda) is not installed or"
+                raise Exception("Can't load gpu_mod library, tried all the candidate paths ("
+                                +libpaths+"). Maybe they are not"
+                                " correct or the backends (CUDA) are not installed or"
                                 " configured properly so"
                                 " the libraries are not found.")
 
