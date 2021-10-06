@@ -88,7 +88,7 @@ def enable_gpu_mod(libpaths=None, backend='cuda', silent=False, fatal=False):
         # don't use os.path.join or os.path.sep because anyway
         # lib name suffix and prefix depend on OS
         libpaths = []
-        for gpu_backend in ['-cu11.4', '-cu9.2', '']: # the last one is
+        for gpu_backend in ['-cu9.2', '-cu11.4', '']: # the last one is
         # for descendant/backward compatibility
         # (the backend are sorted per order of preference)
             if sys.platform == 'linux':
@@ -102,10 +102,11 @@ def enable_gpu_mod(libpaths=None, backend='cuda', silent=False, fatal=False):
         c_libpath = blibpath
         #c_libpath = libpath
         gm_handle = FaustCoreCy._enable_gpu_mod(c_libpath, silent);
-        if gm_handle != NULL:
+#        if gm_handle != NULL:
+        if _is_gpu_mod_enabled():
             # the backend is successfully loaded, end the loading loop
             break
-        if gm_handle == NULL:
+        else:
             if fatal and libpaths[-1] == libpath:
                 raise Exception("Can't load gpu_mod library, tried all the candidate paths ("
                                 +libpaths+"). Maybe they are not"
