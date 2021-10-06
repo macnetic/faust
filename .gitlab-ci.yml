@@ -312,6 +312,7 @@ pkg_linux_release:
 
 
 pkg_linux_release_static:
+    <<: *build_gpu_mod
     stage: pkg
     script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
