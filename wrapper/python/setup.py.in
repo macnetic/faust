@@ -18,9 +18,14 @@ if(version == ''):
 
 from sys import platform
 if platform == "linux":# or platform == "darwin":
-    # compile with clang on Linux (on macOS it's the default choice)
+    # compile with clang on Linux and MacOS X
     from distutils import sysconfig
     sysconfig.get_config_vars()['CC'] = 'clang'
+    lib_ext = 'so'
+elif platform == 'darwin':
+    lib_ext = 'dylib'
+elif platform == 'win32':
+    lib_ext = 'dll'
 
 
 PyFaust = Extension('_FaustCorePy',
@@ -58,6 +63,6 @@ setup(
     install_requires = [@PYFAUST_PYTHON_REQUIREMENTS_AS_PYLIST@],
     license = "3-clause BSD 2.0",
     package_data = {
-        'pyfaust': [ 'data/*.mat', 'license*.txt', 'lib/*.so']
+        'pyfaust': [ 'data/*.mat', 'license*.txt', 'lib/*.'+lib_ext]
     }
 )

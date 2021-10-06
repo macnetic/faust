@@ -88,7 +88,7 @@ def enable_gpu_mod(libpaths=None, backend='cuda', silent=False, fatal=False):
         # don't use os.path.join or os.path.sep because anyway
         # lib name suffix and prefix depend on OS
         libpaths = []
-        for gpu_backend in ['-cu11.2', '-cu9.2', '']: # the last one is
+        for gpu_backend in ['-cu11.4', '-cu9.2', '']: # the last one is
         # for descendant/backward compatibility
         # (the backend are sorted per order of preference)
             if sys.platform == 'linux':
