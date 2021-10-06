@@ -435,9 +435,14 @@ pkg_linux_purepy_rev:
         - VERSION=$CI_COMMIT_TAG
         - if [[ -n "$USE_GPU_MOD" ]]; then GPU_MOD_SHA=$(git submodule foreach git log --oneline -n1 | sed -e 's/ .*//' | tail -1); fi
         - echo GPU_MOD_SHA=$GPU_MOD_SHA
-        - if [[ -n "$USE_GPU_MOD" ]]; then cd gpu_mod; if [[ ! -d build ]]; then mkdir build; fi; cd build; fi
+          # TODO: loop on CUDA VERSIONS instead of duplicating the commands
+        - if [[ -n "$USE_GPU_MOD" ]]; then cd gpu_mod; if [[ ! -d build-cu9.2 ]]; then mkdir build-cu9.2; fi; cd build-cu9.2; fi
           # don't build the lib if already installed
-        - if [[ -n "$USE_GPU_MOD" ]]; then cmake -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda-9.2 -DCMAKE_CUDA_COMPILER=/usr/local/cuda-9.2/bin/nvcc ..;L=$HOME"/libgm-$GPU_MOD_SHA.so"; echo LIB=$L; if [[ -r "$L" ]]; then cp "$L" ./libgm.so; else make; cp ./libgm.so "$L";fi;fi
+        - if [[ -n "$USE_GPU_MOD" ]]; then cmake -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda-9.2 -DCMAKE_CUDA_COMPILER=/usr/local/cuda-9.2/bin/nvcc ..;L=$HOME"/libgm-$GPU_MOD_SHA-cu9.2.so"; echo LIB=$L; if [[ -r "$L" ]]; then cp "$L" ./libgm.so; else make; cp ./libgm.so "$L";fi;fi
+        - if [[ -n "$USE_GPU_MOD" ]]; then cd ../..; fi
+        - if [[ -n "$USE_GPU_MOD" ]]; then cd gpu_mod; if [[ ! -d build-cu11.4 ]]; then mkdir build-cu11.4; fi; cd build-cu11.4; fi
+          # don't build the lib if already installed
+        - if [[ -n "$USE_GPU_MOD" ]]; then cmake -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda-11.4 -DCMAKE_CUDA_COMPILER=/usr/local/cuda-11.4/bin/nvcc ..;L=$HOME"/libgm-$GPU_MOD_SHA-cu11.4.so"; echo LIB=$L; if [[ -r "$L" ]]; then cp "$L" ./libgm.so; else make; cp ./libgm.so "$L";fi;fi
         - if [[ -n "$USE_GPU_MOD" ]]; then cd ../..; fi
     artifacts:
         expire_in: '50 yrs'
