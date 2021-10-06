@@ -19,8 +19,8 @@ if(version == ''):
 from sys import platform
 if platform == "linux":# or platform == "darwin":
     # compile with clang on Linux and MacOS X
-    from distutils import sysconfig
-    sysconfig.get_config_vars()['CC'] = 'clang'
+    #from distutils import sysconfig
+    #sysconfig.get_config_vars()['CC'] = 'clang'
     lib_ext = 'so'
 elif platform == 'darwin':
     lib_ext = 'dylib'
