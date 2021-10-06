@@ -14,7 +14,8 @@ namespace Faust {
 
 	GPUModHandler::~GPUModHandler()
 	{
-		gm_close_lib(gm_handle);
+		if(gm_handle != nullptr)
+			gm_close_lib(gm_handle);
 		delete_mat_funcs(float); // it looks strange because load_all_mat_funcs is a macro (using a string tokenizer)
 		delete_mat_funcs(double); // look def in faust_gpu_mod_utils.h
 		delete_mat_funcs(cuComplex);
@@ -63,7 +64,8 @@ namespace Faust {
 		else
 			if(! silent)
 				std::cerr << "Warning: gm_lib is already loaded (can't reload it)." << endl;
-		load_gm_functions();
+		if(this->gm_handle != nullptr)
+			load_gm_functions();
 		return this->gm_handle;
 	}
 
