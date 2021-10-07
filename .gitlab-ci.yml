@@ -347,9 +347,9 @@ pages:
         - mkdir -p ../public/last-doc
         - cp -Rf doc/html ../public/last-doc/
         - mkdir -p ../public/packages
-#        - ../gen_doc/gen_pkg_dl_page.sh $CI_COMMIT_TAG # download.html generated
-#        - mv download.html ../public/packages/
-#        - mv *.pkg *.rpm *.deb *.exe ../public/packages/
+        - ../gen_doc/gen_pkg_dl_page.sh $CI_COMMIT_TAG # download.html generated
+        - mv download.html ../public/packages/
+        - mv *.pkg *.rpm *.deb *.exe ../public/packages/
     needs:
       - job: pkg_macos_release
         artifacts: true
@@ -745,7 +745,7 @@ test_win_purepy_pkg_extra_pyver:
     - job: pkg_win_purepy_release_extra_pyver
       artifacts: true
 
-.pypi_pub:
+pypi_pub:
   stage: pkg_pub
   script:
     - python3 -m pip install --user twine
