@@ -102,14 +102,19 @@ if(USE_GPU_MOD)
 endif()
 add_library(${FAUST_MEXTOOLS_TARGET} OBJECT ${CPP_MEXTOOLS_FILES})
 
-foreach(SCALAR_AND_FSUFFIX double:Real std::complex<double>:Cplx) # TODO: float and complex<float> versions
+foreach(SCALAR_AND_FSUFFIX double:Real float:RealFloat std::complex<double>:Cplx) # TODO: complex<float> versions
 	# configuration de mexFaust.cpp.in
 	# specialization of the class mexFaust template scalar with real or complex
 	string(REGEX REPLACE "(.*):.*" "\\1" SCALAR ${SCALAR_AND_FSUFFIX})
 	string(REGEX REPLACE ".*:(.*)" "\\1" FSUFFIX ${SCALAR_AND_FSUFFIX})
 	set(FAUST_SCALAR ${SCALAR})
-	set(FAUST_FPP double)
-	set(FACT_FPP double) # TODO: we could allow float also
+	if (FSUFFIX MATCHES RealFloat)
+		set(FAUST_FPP float)
+		set(FACT_FPP float)
+	else()
+		set(FAUST_FPP double)
+		set(FACT_FPP double)
+	endif()
 	set(DEV Cpu)
 	set(DEV_IS_CPU 1)
 	configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexFaust.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexFaust${FSUFFIX}.cpp @ONLY)
@@ -119,6 +124,7 @@ foreach(SCALAR_AND_FSUFFIX double:Real std::complex<double>:Cplx) # TODO: float 
 		#configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexFaustGPU.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexFaustGPU${FSUFFIX}.cpp @ONLY)
 		configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexFaust.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexFaustGPU${FSUFFIX}.cpp @ONLY)
 	endif()
+	configure_file(${FAUST_MATLAB_DOC_SRC_DIR}/mexFaust.m.in ${FAUST_MATLAB_DOC_SRC_DIR}/mexFaust${FSUFFIX}.m @ONLY)
 	configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexPalm4MSA.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexPalm4MSA${FSUFFIX}.cpp @ONLY)
 	configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexHierarchical_fact.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexHierarchical_fact${FSUFFIX}.cpp @ONLY)
 	configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexButterfly.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexButterfly${FSUFFIX}.cpp @ONLY)

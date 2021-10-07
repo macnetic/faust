@@ -100,6 +100,7 @@ classdef Faust
 		matrix; % Handle to the FaustCore class instance
 		isReal;
 		dev; % cpu or gpu
+		dtype; % double (for complex or real), or float
 	end
 %	properties (Constant)
 %	end
@@ -157,8 +158,9 @@ classdef Faust
 			%%
 			err_msg = 'matfaust.Faust() error: the arguments are not valid.';
 			% scale argument is hidden for user (deprecated) but it's still available
-			if(nargin < 1 || nargin > 3)
-				error([err_msg ' Number of arguments passed is zero or greater than three.'])
+			max_nargin = 5;
+			if(nargin < 1 || nargin > max_nargin)
+				error([err_msg ' Number of arguments passed is zero or greater than ' str(max_nargin) '.'])
 			elseif(iscell(varargin{1}))
 				% init a Faust from factor list
 				% check if the factors are real or complex, one complex factor implies a complex faust
@@ -170,12 +172,16 @@ classdef Faust
 				F.isReal = true;
 				scale = 1;
 				F.dev = 'cpu';
+				F.dtype = 'double';
 				optCopy = false;
 				for i=1:length(factors)
 					if (~isreal(factors{i}))
 						F.isReal = false;
 						break
 					end
+				end
+				if(strcmp(class(factors{1}), 'single'))
+					F.dtype = 'float';
 				end
 				for i=2:nargin
 					switch(varargin{i})
@@ -197,14 +203,19 @@ classdef Faust
 								error([err_msg ' the ''optCopy'' argument must be followed by a logical'])
 							end
 							optCopy = varargin{i+1};
+						case 'dtype'
+							if(nargin < i+1 || ~ strcmp(varargin{i+1}, 'double') && ~ strcmp(varargin{i+1}, 'float'))
+								error([err_msg ' the ''dtype'' argument must be followed by ''float'' or ''double'''])
+							end
+							F.dtype = varargin{i+1};
 						otherwise
-							if(isstr(varargin{i}) && (~ strcmp(varargin{i}, 'cpu') && ~ strcmp(varargin{i}, 'gpu')))
+							if(isstr(varargin{i}) && ~ strcmp(varargin{i}, 'cpu') && ~ strcmp(varargin{i}, 'gpu') && (~ strcmp(varargin{i}, 'float') && ~ strcmp(varargin{i}, 'double')))
 								error([ varargin{i} ' unrecognized argument'])
 							end
 						end
 
 					end
-				F.matrix = FaustCore(factors, scale, optCopy, F.isReal, F.dev);
+				F.matrix = FaustCore(factors, scale, optCopy, F.isReal, F.dev, F.dtype);
 			elseif(ischar(varargin{1}))
 				% init a Faust from file
 				filename=varargin{1};
@@ -222,7 +233,7 @@ classdef Faust
 				% create a Faust from another one but not with the same
 				% handle to set inside the FaustCore object (matrix)
 				oF = varargin{1};
-				F.matrix = FaustCore(varargin{2}, oF.isReal, oF.dev);
+				F.matrix = FaustCore(varargin{2}, oF.isReal, oF.dev, oF.dtype);
 				F.isReal = oF.isReal;
 				F.dev = oF.dev;
 			elseif(isa(varargin{1}, 'integer') && islogical(varargin{2}))
@@ -233,7 +244,12 @@ classdef Faust
 				else
 					F.dev = 'cpu';
 				end
-				F.matrix = FaustCore(varargin{1}, varargin{2}, F.dev);
+				if(nargin >= 4)
+					F.dtype = varargin{4};
+				else
+					F.dtype = 'double';
+				end
+				F.matrix = FaustCore(varargin{1}, varargin{2}, F.dev, F.dtype);
 				% hack to raise an error in case of non-consistent handle and isReal arg.
 				try
 					n = numfactors(F);
@@ -2139,13 +2155,21 @@ classdef Faust
 		function varargout = call_mex(F, func_name, varargin)
 			if (strcmp(F.dev, 'cpu'))
 				if(F.isReal)
-					[varargout{1:nargout}] = mexFaustReal(func_name, F.matrix.objectHandle, varargin{:});
+					if(strcmp(F.dtype, 'double'))
+						[varargout{1:nargout}] = mexFaustReal(func_name, F.matrix.objectHandle, varargin{:});
+					else % float
+						[varargout{1:nargout}] = mexFaustRealFloat(func_name, F.matrix.objectHandle, varargin{:});
+					end
 				else
 					[varargout{1:nargout}] = mexFaustCplx(func_name, F.matrix.objectHandle, varargin{:});
 				end
 			elseif(startsWith(F.dev, 'gpu'))
 				if(F.isReal)
-					[varargout{1:nargout}] = mexFaustGPUReal(func_name, F.matrix.objectHandle, varargin{:});
+					if(strcmp(F.dtype, 'double'))
+						[varargout{1:nargout}] = mexFaustGPUReal(func_name, F.matrix.objectHandle, varargin{:});
+					else % float
+						[varargout{1:nargout}] = mexFaustRealGPUFloat(func_name, F.matrix.objectHandle, varargin{:});
+					end
 				else
 					[varargout{1:nargout}] = mexFaustGPUCplx(func_name, F.matrix.objectHandle, varargin{:});
 				end

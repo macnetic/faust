@@ -280,7 +280,56 @@ mxArray*  FaustSpMat2mxArray(const Faust::MatSparse<FPP,Cpu>& M)
 	return sparseMat;
 }
 
-
+	template<FDevice DEV>
+mxArray* transformFact2SparseMxArray(faust_unsigned_int id, Faust::TransformHelper<float, DEV>* core_ptr)
+{
+	mxArray* sparseMat = mxCreateSparse(core_ptr->get_fact_nb_rows(id),
+			core_ptr->get_fact_nb_cols(id),
+			core_ptr->get_fact_nnz(id),
+			mxREAL);
+	mwIndex* ir = mxGetIr(sparseMat);
+	mwIndex* jc = mxGetJc(sparseMat);
+	//	std::cout << "transformFact2SparseMxArray()" << std::endl;
+	//	FPP* pr = static_cast<FPP*>(mxGetDoubles(sparseMat)); //given up because fails to compile with template FPP
+	double* pr = static_cast<double*>(mxGetPr(sparseMat));
+	faust_unsigned_int nnz, num_rows, num_cols;
+	// sadly we can't do a direct copy into ir and jc because MatSparse uses int type for indices
+	// (not mwIndex which is in fact a size_t)
+	// so we need to copy in intermediate buffers and then affect their elements
+	// into jc, ir
+	int * i_ir = (int*) malloc(sizeof(int)*mxGetNzmax(sparseMat)); //TODO: use new[]/delete[]
+	int * i_jc = (int*) malloc(sizeof(int)*(mxGetN(sparseMat)+1));
+	// last arg. transpose == true, because Faust works with csr/row-major order matrices
+	// while matlab works with csc/column-major order matrices, so we ask transposition to obtain the proper repr.
+	// the case when the Faust is transposed is handled internally (by not transposing the buffers in csr to get transpose in csc)
+	// the reordering operation costs additional calculation time
+	//TODO: remove nnz, num_rows, num_cols when get_fact() will authorize NULL
+	float* flt_pr = new float[nnz];
+	core_ptr->get_fact(id, i_jc, i_ir, flt_pr, &nnz, &num_rows, &num_cols, true);
+	for(int i=0;i<nnz;i++)
+	{
+		ir[i] = (mwIndex)i_ir[i];
+		//		cout << ir[i] << " ";
+		pr[i] = static_cast<double>(flt_pr[i]);
+	}
+	delete [] flt_pr;
+	//	cout << endl;
+	//	for(int i=0;i<nnz;i++)
+	//	{
+	//		cout << pr[i] << " ";
+	//	}
+	//	cout << endl;
+	for(int i=0;i<mxGetN(sparseMat)+1;i++)
+	{
+		jc[i] = (mwIndex)i_jc[i];
+		//		cout << jc[i] << " ";
+	}
+	//	cout << endl;
+	//	std::cout << "transformFact2SparseMxArray()" << std::endl;
+	free(i_ir);
+	free(i_jc);
+	return sparseMat;
+}
 	template<typename FPP, FDevice DEV>
 mxArray* transformFact2SparseMxArray(faust_unsigned_int id, Faust::TransformHelper<FPP, DEV>* core_ptr)
 {

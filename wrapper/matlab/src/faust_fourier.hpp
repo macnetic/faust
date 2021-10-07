@@ -11,9 +11,9 @@ void faust_fourier(const mxArray **prhs, const int nrhs, mxArray **plhs, const i
 	unsigned int n  = (unsigned int) mxGetScalar(prhs[1]);
 	bool norma = (bool) mxGetScalar(prhs[2]);
 
-	Faust::TransformHelper<complex<Real<SCALAR>>,DEV>* F = Faust::TransformHelper<complex<Real<SCALAR>>,DEV>::fourierFaust(n, norma);
+	Faust::TransformHelper<complex<double>,DEV>* F = Faust::TransformHelper<complex<double>,DEV>::fourierFaust(n, norma);
 	if(F) //not NULL
-		plhs[0]=convertPtr2Mat<Faust::TransformHelper<complex<Real<SCALAR>>,DEV> >(F);
+		plhs[0]=convertPtr2Mat<Faust::TransformHelper<complex<double>,DEV> >(F);
 	else
 	{
 		plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);

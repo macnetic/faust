@@ -138,7 +138,7 @@ void mxArray2FaustspMat(const mxArray* spMat_array,Faust::MatSparse<FPP,DEV> & S
 	//pr = (double *) mxCalloc(nnzMax,sizeof(double));
 
 
-	mxArray2Ptr(spMat_array,ptr_data);
+	mxArray2Ptr(spMat_array,ptr_data); // NOTE: it's ok that FPP == float while spMat_array is a double (the conversion is handled mxArray2PtrBase)
 
 
 	S.set(nnzMax,nbRow,nbCol,ptr_data,ir,jc);
@@ -147,7 +147,6 @@ void mxArray2FaustspMat(const mxArray* spMat_array,Faust::MatSparse<FPP,DEV> & S
 
 
 }
-
 
 
 template<typename FPP,class FUNCTOR>
@@ -289,51 +288,51 @@ void mxArray2Ptr(const mxArray* mxMat, FPP* & ptr_data)
 template<typename FPP>
 void mxArray2Ptr(const mxArray* mxMat, std::complex<FPP>* & ptr_data)
 {
-				
-		const mxClassID V_CLASS_ID = mxGetClassID(mxMat);
 
-		size_t nb_element_tmp;
-		
-		if (mxIsSparse(mxMat))
-			nb_element_tmp = mxGetNzmax(mxMat);
-		else
-			nb_element_tmp = mxGetNumberOfElements(mxMat);		
-		
-		const size_t NB_ELEMENTS = nb_element_tmp;
-		
-		// get the real part of the Matlab Matrix
-		FPP* ptr_real_part_data;
-		mxArray2Ptr(mxMat,ptr_real_part_data);
-		
-		ptr_data = new std::complex<FPP>[NB_ELEMENTS];
-		
-		if (mxIsComplex(mxMat))
-		{
-			
-			// Complex Matlab Matrix			
-			// get the imaginary part of the Matlab Matrix
-			FPP* ptr_imag_part_data;
-			mxArray2PtrBase(mxMat,ptr_imag_part_data,mxGetImagData);
-			
-			// copy the values in the output vector	
-			for (int i=0;i < NB_ELEMENTS;i++)
-				ptr_data[i]=std::complex<FPP>(ptr_real_part_data[i],ptr_imag_part_data[i]);			
-		
+	const mxClassID V_CLASS_ID = mxGetClassID(mxMat);
 
-			if(ptr_imag_part_data) {delete [] ptr_imag_part_data ; ptr_imag_part_data = NULL;}				
+	size_t nb_element_tmp;
 
-			
-		}else
-		{
-			// Real Matlab Matrix
-			// copy only the real part of the matrix (the imaginary part is set to zero
-			for (int i=0;i < NB_ELEMENTS;i++)
-				ptr_data[i]=std::complex<FPP>(ptr_real_part_data[i],(FPP) 0.0);
-	
-			
-		}
+	if (mxIsSparse(mxMat))
+		nb_element_tmp = mxGetNzmax(mxMat);
+	else
+		nb_element_tmp = mxGetNumberOfElements(mxMat);
 
-		if(ptr_real_part_data) {delete [] ptr_real_part_data ; ptr_real_part_data = NULL;}
+	const size_t NB_ELEMENTS = nb_element_tmp;
+
+	// get the real part of the Matlab Matrix
+	FPP* ptr_real_part_data;
+	mxArray2Ptr(mxMat,ptr_real_part_data);
+
+	ptr_data = new std::complex<FPP>[NB_ELEMENTS];
+
+	if (mxIsComplex(mxMat))
+	{
+
+		// Complex Matlab Matrix
+		// get the imaginary part of the Matlab Matrix
+		FPP* ptr_imag_part_data;
+		mxArray2PtrBase(mxMat,ptr_imag_part_data,mxGetImagData);
+
+		// copy the values in the output vector
+		for (int i=0;i < NB_ELEMENTS;i++)
+			ptr_data[i]=std::complex<FPP>(ptr_real_part_data[i],ptr_imag_part_data[i]);
+
+
+		if(ptr_imag_part_data) {delete [] ptr_imag_part_data ; ptr_imag_part_data = NULL;}
+
+
+	}else
+	{
+		// Real Matlab Matrix
+		// copy only the real part of the matrix (the imaginary part is set to zero
+		for (int i=0;i < NB_ELEMENTS;i++)
+			ptr_data[i]=std::complex<FPP>(ptr_real_part_data[i],(FPP) 0.0);
+
+
+	}
+
+	if(ptr_real_part_data) {delete [] ptr_real_part_data ; ptr_real_part_data = NULL;}
 }
 
 
@@ -931,7 +930,6 @@ const ParamsPalm<SCALAR,Cpu,FPP2>* mxArray2FaustParamsPALM4MSA(const mxArray* ma
 	{
 		mxCurrentField = mxGetField(matlab_params, 0, "factor_format");
 		factors_format = static_cast<FactorsFormat>((int)mxGetScalar(mxCurrentField));
-		std::cout << "mx2Faust factors_format:" << factors_format << std::endl;
 	}
 	if(presentFields[17])
 	{

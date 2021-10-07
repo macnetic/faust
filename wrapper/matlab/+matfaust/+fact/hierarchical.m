@@ -2,7 +2,7 @@
 %> @brief Factorizes the matrix M with Hierarchical Factorization using the parameters set in p.
 %>
 %>
-%> @param M the dense matrix to factorize.
+%> @param M the dense matrix to factorize. The class(M) value can be double or single (only if isreal(M) is true). This class has a major impact on performance.
 %> @param p is a set of factorization parameters. It might be a fully defined instance of parameters (matfaust.factparams.ParamsHierarchical) or a simplified expression which designates a pre-defined parametrization:
 %> - 'squaremat' to use pre-defined parameters typically used to factorize a Hadamard square matrix of order a power of two (see matfaust.demo.hadamard).
 %> - {'rectmat', j, k, s} to use pre-defined parameters used for instance in factorization of the MEG matrix which is a rectangular matrix of size m*n such that m < n (see matfaust.demo.bsl); j is the number of factors, k the sparsity of the main factor's columns, and s the sparsity of rows for all other factors except the residuum (that is the first factor here because the factorization is made toward the left -- is_side_fact_left == true, cf. matfaust.factparams.ParamsHierarchical).
@@ -180,6 +180,12 @@ function varargout = hierarchical(M, p, varargin)
 	backend = 2016;
 	nargin = length(varargin);
 	gpu = false;
+	is_float = strcmp(class(M), 'single');
+	if(is_float)
+		dtype = 'float';
+	else
+		dtype = 'double'; % also for complex double
+	end
 	if(nargin > 0)
 		for i=1:nargin
 			switch(varargin{i})
@@ -207,17 +213,29 @@ function varargout = hierarchical(M, p, varargin)
 	end
 	if(backend == 2016)
 		if(isreal(M))
-			[lambda, core_obj] = mexHierarchical_factReal(M, mex_params);
+			if(is_float)
+				[lambda, core_obj] = mexHierarchical_factRealFloat(M, mex_params);
+			else
+				[lambda, core_obj] = mexHierarchical_factReal(M, mex_params);
+			end
 		else
 			[lambda, core_obj] = mexHierarchical_factCplx(M, mex_params);
 		end
-		F = Faust(core_obj, isreal(M));
+		F = Faust(core_obj, isreal(M), 'cpu', dtype);
 	elseif(backend == 2020)
 		if(isreal(M))
 			if(gpu)
-				[lambda, core_obj] = mexHierarchical2020_gpu2Real(M, mex_params);
+				if(is_float)
+					[lambda, core_obj] = mexHierarchical2020_gpu2RealFloat(M, mex_params);
+				else
+					[lambda, core_obj] = mexHierarchical2020_gpu2Real(M, mex_params);
+				end
 			else
-				[lambda, core_obj] = mexHierarchical2020Real(M, mex_params);
+				if(is_float)
+					[lambda, core_obj] = mexHierarchical2020RealFloat(M, mex_params);
+				else
+					[lambda, core_obj] = mexHierarchical2020Real(M, mex_params);
+				end
 			end
 		else
 			if(gpu)
@@ -226,7 +244,7 @@ function varargout = hierarchical(M, p, varargin)
 				[lambda, core_obj] = mexHierarchical2020Cplx(M, mex_params);
 			end
 		end
-		F = Faust(core_obj, isreal(M));
+		F = Faust(core_obj, isreal(M), 'cpu', dtype);
 	end
 	varargout = {F, lambda, p};
 end

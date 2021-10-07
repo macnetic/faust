@@ -53,6 +53,7 @@
 %>                  The default value is 'real'.
 %>
 %> @param 'dev', 'gpu or 'cpu' (optional) to create the random Faust on CPU or GPU (by default on CPU).
+%> @param 'dtype', 'double' (by default) or 'float' (optional) to select the scalar type used for the Faust generated.
 %>
 %>
 %> @retval F the random Faust.
@@ -128,6 +129,7 @@ function F = rand(M, N, varargin)
 	max_dim_size = max(num_rows, num_cols);
 	argc = length(varargin);
 	dev = 'cpu';
+	dtype = 'double';
 	if(argc > 0)
 		for i=1:2:argc
 			if(argc > i)
@@ -189,6 +191,12 @@ function F = rand(M, N, varargin)
 					else
 						dev = tmparg;
 					end
+				case 'dtype'
+					if(argc == i || ~ strcmp(tmparg, 'double') && ~ startsWith(tmparg, 'float'))
+						error('dtype keyword argument is not followed by a valid value: float, double.')
+					else
+						dtype = tmparg;
+					end
 				otherwise
 					if((isstr(varargin{i}) || ischar(varargin{i}))  && ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu') && ~ strcmp(tmparg, 'dense') && ~ strcmp(tmparg, 'sparse') && ~ strcmp(tmparg, 'mixed') && ~ strcmp(tmparg, 'real') && ~ strcmp(tmparg, 'complex'))
 						error([ tmparg ' unrecognized argument'])
@@ -219,7 +227,11 @@ function F = rand(M, N, varargin)
 			core_obj = mexFaustCplx('rand', num_rows, num_cols, fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
 			is_real = false;
 		else %if(field == REAL)
-			core_obj = mexFaustReal('rand', num_rows, num_cols, fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
+			if(strcmp(dtype, 'double'))
+				core_obj = mexFaustReal('rand', num_rows, num_cols, fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
+			else % float
+				core_obj = mexFaustRealFloat('rand', num_rows, num_cols, fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
+			end
 			is_real = true;
 		end
 	else
@@ -227,12 +239,16 @@ function F = rand(M, N, varargin)
 			core_obj = mexFaustGPUCplx('rand', num_rows, num_cols, fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
 			is_real = false;
 		else %if(field == REAL)
-			core_obj = mexFaustGPUReal('rand', num_rows, num_cols, fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
+			if(strcmp(dtype, 'double'))
+				core_obj = mexFaustGPUReal('rand', num_rows, num_cols, fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
+			else % float
+				core_obj = mexFaustGPURealFloat('rand', num_rows, num_cols, fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
+			end
 			is_real = true;
 		end
 	end
 	if(core_obj == 0)
 		throw(e)
 	end
-	F = matfaust.Faust(core_obj, is_real, dev);
+	F = matfaust.Faust(core_obj, is_real, dev, dtype);
 end

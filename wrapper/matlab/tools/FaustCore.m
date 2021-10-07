@@ -47,11 +47,12 @@ classdef FaustCore < handle
 		objectHandle; % Handle to the underlying C++ class instance
 		isRealFlag;
 		dev;
+		dtype;
 	end
 	methods
 		%% Constructor - Create a new C++ class instance
 		function this = FaustCore(varargin)
-			if(nargin == 3) && ~iscell(varargin{1}) %&& isa(varargin{1}, 'handle'))
+			if(nargin == 4) && ~iscell(varargin{1}) %&& isa(varargin{1}, 'handle'))
 				%if(~ isvalid(varargin{1}))
 				%    error('FaustCore: invalid handle to copy passed to the constructor.')
 				%end
@@ -61,6 +62,7 @@ classdef FaustCore < handle
 				end
 				this.isRealFlag = varargin{2};
 				this.dev = varargin{3};
+				this.dtype = varargin{4};
 			elseif(nargin >= 1)
 				factors = varargin{1};
 				scale = varargin{2};
@@ -68,17 +70,29 @@ classdef FaustCore < handle
 				isRealFlag = varargin{4};
 				this.dev = varargin{5};
 				onGPU = startsWith(this.dev, 'gpu');
+				this.dtype = 'double';
+				if(nargin >= 6)
+					this.dtype = varargin{6};
+				end
 				% varargin{2} is lambda (optional)
 				% varargin{3} is optimizedCopy boolean (not documented).
 				if(onGPU)
 					if (isRealFlag)
-						this.objectHandle = mexFaustGPUReal('new',varargin{1:3});
+						if(strcmp(this.dtype, 'double'))
+							this.objectHandle = mexFaustGPUReal('new',varargin{1:3});
+						else
+							this.objectHandle = mexFaustGPURealFloat('new',varargin{1:3});
+						end
 					else
 						this.objectHandle = mexFaustGPUCplx('new',varargin{1:3});
 					end
 				else
 					if (isRealFlag)
-						this.objectHandle = mexFaustReal('new',varargin{1:3});
+						if(strcmp(this.dtype, 'double'))
+							this.objectHandle = mexFaustReal('new',varargin{1:3});
+						else % float
+							this.objectHandle = mexFaustRealFloat('new',varargin{1:3});
+						end
 					else
 						this.objectHandle = mexFaustCplx('new',varargin{1:3});
 					end
@@ -93,14 +107,22 @@ classdef FaustCore < handle
 			if(isa(this.objectHandle, 'integer'))
 				if(startsWith(this.dev, 'gpu'))
 					if (this.isRealFlag)
-						mexFaustGPUReal('delete', this.objectHandle);
+						if(strcmp(this.dtype, 'double'))
+							mexFaustGPUReal('delete', this.objectHandle);
+						else % float
+							mexFaustGPURealFloat('delete', this.objectHandle);
+						end
 					else
 						mexFaustGPUCplx('delete', this.objectHandle);
 					end
 
 				else
 					if (this.isRealFlag)
-						mexFaustReal('delete', this.objectHandle);
+						if(strcmp(this.dtype, 'double'))
+							mexFaustReal('delete', this.objectHandle);
+						else % float
+							mexFaustRealFloat('delete', this.objectHandle);
+						end
 					else
 						mexFaustCplx('delete', this.objectHandle);
 					end
@@ -111,7 +133,11 @@ classdef FaustCore < handle
 		function set_FM_mul_mode(this, mode)
 			if(isa(this.objectHandle, 'integer'))
 				if (this.isRealFlag)
-					mexFaustReal('set_FM_mul_mode', this.objectHandle, mode);
+					if(strcmp(this.dtype, 'double'))
+						mexFaustReal('set_FM_mul_mode', this.objectHandle, mode);
+					else % float
+						mexFaustRealFloat('set_FM_mul_mode', this.objectHandle, mode);
+					end
 				else
 					mexFaustCplx('set_FM_mul_mode', this.objectHandle, mode);
 				end
