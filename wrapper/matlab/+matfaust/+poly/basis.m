@@ -6,6 +6,7 @@
 %> @param basis_name 'chebyshev', and others yet to come.
 %> @param 'T0', matrix (optional): a sparse matrix to replace the identity as a 0-degree polynomial of the basis.
 %> @param 'dev', str (optional): the computing device ('cpu' or 'gpu').
+%> @param 'dtype', str (optional): to decide in which data type the resulting Faust will be encoded ('float' or 'double' by default).
 %>
 %> @retval F the Faust of the basis composed of the K+1 orthogonal polynomials.
 %>
@@ -59,6 +60,7 @@ function F = basis(L, K, basis_name, varargin)
 	T0 = []; % no T0 by default
 	argc = length(varargin);
 	dev = 'cpu';
+	dtype = 'double';
 	if(argc > 0)
 		for i=1:2:argc
 			if(argc > i)
@@ -79,6 +81,12 @@ function F = basis(L, K, basis_name, varargin)
 					else
 						dev = tmparg;
 					end
+				case 'dtype'
+					if(argc == i || ~ strcmp(tmparg, 'float') && ~ startsWith(tmparg, 'double'))
+						error('dtype keyword argument is not followed by a valid value: float or double.')
+					else
+						dtype = tmparg;
+					end
 				otherwise
 					if((isstr(varargin{i}) || ischar(varargin{i}))  && ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu'))
 						error([ tmparg ' unrecognized argument'])
@@ -87,6 +95,7 @@ function F = basis(L, K, basis_name, varargin)
 		end
 	end
 
+	is_float = strcmp(class(L), 'single') || strcmp(dtype, 'float'); % since it's impossible to create a float sparse matrix in matlab use a dtype argument
 	mex_args = {basis_name, L, K, startsWith(dev, 'gpu')};
 
 	if(T0_is_set)
@@ -101,7 +110,11 @@ function F = basis(L, K, basis_name, varargin)
 
 	if(strcmp(basis_name, 'chebyshev'))
 		if(is_real)
-			core_obj = mexPolyReal(mex_args{:});
+			if(is_float)
+				core_obj = mexPolyRealFloat(mex_args{:});
+			else
+				core_obj = mexPolyReal(mex_args{:});
+			end
 		else
 			core_obj = mexPolyCplx(mex_args{:});
 		end
@@ -109,5 +122,5 @@ function F = basis(L, K, basis_name, varargin)
 		error(['unknown basis name: ' basis_name])
 	end
 
-	F = matfaust.poly.FaustPoly(core_obj, is_real);
+	F = matfaust.poly.FaustPoly(core_obj, is_real, 'cpu', dtype);
 end

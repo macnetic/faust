@@ -23,11 +23,15 @@ classdef FaustPoly < matfaust.Faust
 		%================================================================
 		function M = next(self)
 			if(self.isreal)
-				core_obj = mexPolyReal('nextPolyFaust', self.matrix.objectHandle);
+				if(strcmp(self.dtype, 'float'))
+					core_obj = mexPolyRealFloat('nextPolyFaust', self.matrix.objectHandle);
+				else
+					core_obj = mexPolyReal('nextPolyFaust', self.matrix.objectHandle);
+				end
 			else
 				core_obj = mexPolyCplx('nextPolyFaust', self.matrix.objectHandle);
 			end
-			M = matfaust.poly.FaustPoly(core_obj, self.isreal);
+			M = matfaust.poly.FaustPoly(core_obj, self.isreal, 'cpu', self.dtype);
 		end
 
 	end
@@ -42,11 +46,15 @@ classdef FaustPoly < matfaust.Faust
 			if(iscell(X))
 				% X is {}: no X passed (see matfaust.poly.poly())
 				if(self.isreal)
-					core_obj = mexPolyReal('polyFaust', coeffs, self.matrix.objectHandle);
+					if(strcmp(class(self), 'single'))
+						core_obj = mexPolyRealFloat('polyFaust', coeffs, self.matrix.objectHandle);
+					else
+						core_obj = mexPolyReal('polyFaust', coeffs, self.matrix.objectHandle);
+					end
 				else
 					core_obj = mexPolyCplx('polyFaust', coeffs, self.matrix.objectHandle);
 				end
-				M = matfaust.poly.FaustPoly(core_obj, self.isreal);
+				M = matfaust.poly.FaustPoly(core_obj, self.isreal, 'cpu', self.dtype);
 			elseif(ismatrix(X))
 				if(issparse(X))
 					error('X must be a dense matrix')
@@ -55,7 +63,11 @@ classdef FaustPoly < matfaust.Faust
 					error('The faust and X dimensions must agree.')
 				end
 				if(self.isreal)
-					M = mexPolyReal('mulPolyFaust', coeffs, self.matrix.objectHandle, X);
+					if(strcmp(self.dtype, 'float'))
+						M = mexPolyRealFloat('mulPolyFaust', coeffs, self.matrix.objectHandle, X);
+					else
+						M = mexPolyReal('mulPolyFaust', coeffs, self.matrix.objectHandle, X);
+					end
 				else
 					M = mexPolyCplx('mulPolyFaust', coeffs, self.matrix.objectHandle, X);
 				end

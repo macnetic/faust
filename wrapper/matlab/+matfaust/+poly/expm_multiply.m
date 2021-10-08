@@ -8,6 +8,7 @@
 %> @param 'K', integer (default value is 10) the greatest polynomial degree of the Chebyshev polynomial basis. The greater it is, the better is the approximate accuracy but note that a larger K increases the computational cost.
 %> @param 'tradeoff', str (optional): 'memory' or 'time' to specify what matters the most: a small memory footprint or a small time of execution. It changes the implementation of pyfaust.poly.poly used behind. It can help when the memory size is limited relatively to the value of rel_err or the size of A and B.
 %> @param 'dev', str (optional): the computing device ('cpu' or 'gpu').
+%> @param 'dtype', str (optional): to decide in which data type the resulting array C will be encoded ('float' or 'double' by default).
 %>
 %>
 %> @retval C the approximate of e^{t_k A} B. C is a tridimensional array of size (sizef(A,1), size(B,2), size(t, 1)), each slice C(:,:,i) is the action of the matrix exponentatial of A on B according to the time point t(i).
@@ -36,6 +37,7 @@ function C = expm_multiply(A, B, t, varargin)
 	argc = length(varargin);
 	dev = 'cpu';
 	tradeoff = 'time';
+	dtype = 'double';
 	if(argc > 0)
 		for i=1:2:argc
 			if(argc > i)
@@ -73,6 +75,12 @@ function C = expm_multiply(A, B, t, varargin)
 					else
 						group_coeffs = tmparg;
 					end
+				case 'dtype'
+					if(argc == i || ~ strcmp(tmparg, 'float') && ~ startsWith(tmparg, 'double'))
+						error('dtype keyword argument is not followed by a valid value: float or double.')
+					else
+						dtype = tmparg;
+					end
 				otherwise
 					if((isstr(varargin{i}) || ischar(varargin{i}))  && ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu'))
 						error([ tmparg ' unrecognized argument'])
@@ -102,7 +110,7 @@ function C = expm_multiply(A, B, t, varargin)
 		error('A must be symmetric positive definite')
 	end
 	phi = eigs(A, 1) / 2;
-	T = matfaust.poly.basis(A/phi-speye(size(A)), K, 'chebyshev', 'dev', dev);
+	T = matfaust.poly.basis(A/phi-speye(size(A)), K, 'chebyshev', 'dev', dev, 'dtype', dtype);
 	if (~ ismatrix(t) || ~ isreal(t) || size(t, 1) ~= 1 && size(t, 2) ~= 1)
 		error('t must be a real value or a real vector')
 	end

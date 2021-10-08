@@ -9,6 +9,7 @@
 %> @param 'L', matrix the sparse matrix on which the polynomial basis is built if basis is not already a Faust or a full array.
 %> @param 'X', matrix if X is set, the linear combination of basis*X is computed (note that the memory space is optimized compared to the manual way of doing first B = basis*X and then calling poly on B without X set).
 %> @param 'dev', str (optional): the computating device ('cpu' or 'gpu').
+%> @param 'dtype', str (optional): to decide in which data type the resulting Faust or array will be encoded ('float' or 'double' by default). If basis is a Faust or an array its dtype/class is prioritary over this parameter which is in fact useful only if basis is the name of the basis (a str/char array).
 %> @retval LC The linear combination Faust or full array depending on if basis is itself a Faust or a np.ndarray.
 %>
 %> @b Example
@@ -75,6 +76,7 @@ function LC = poly(coeffs, basis, varargin)
 	X = {}; % by default no X argument is passed, set it as a cell (see why in matfaust.Faust.poly)
 	argc = length(varargin);
 	dev = 'cpu';
+	dtype = 'double';
 	if(argc > 0)
 		for i=1:2:argc
 			if(argc > i)
@@ -100,6 +102,12 @@ function LC = poly(coeffs, basis, varargin)
 					else
 						X = tmparg;
 					end
+				case 'dtype'
+					if(argc == i || ~ strcmp(tmparg, 'float') && ~ startsWith(tmparg, 'double'))
+						error('dtype keyword argument is not followed by a valid value: float or double.')
+					else
+						dtype = tmparg;
+					end
 				otherwise
 					if((isstr(varargin{i}) || ischar(varargin{i}))  && ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu'))
 						error([ tmparg ' unrecognized argument'])
@@ -118,17 +126,22 @@ function LC = poly(coeffs, basis, varargin)
 		error('coeffs and basis must be of the same scalar type (real or complex)')
 	end
 
-	K = size(coeffs, 1)-1;
+	if isvector(coeffs)
+		K = numel(coeffs)-1;
+	else
+		K = size(coeffs, 1)-1;
+	end
 
 	if(isstr(basis) || ischar(basis))
 		if(exist('L') ~= 1)
 			error('L key-value pair argument is missing in the argument list.')
 		end
-		basis = matfaust.poly.basis(L, K, basis, 'dev', dev);
+		basis = matfaust.poly.basis(L, K, basis, 'dev', dev, 'dtype', dtype);
 	end
 
 
 	is_real = isreal(basis);
+	is_float = strcmp(class(basis), 'single') || strcmp('dtype', 'float');
 	if(matfaust.isFaust(basis))
 		if(numfactors(basis) ~= numel(coeffs))
 			error('coeffs and basis dimensions must agree.')
@@ -142,13 +155,21 @@ function LC = poly(coeffs, basis, varargin)
 		d = floor(size(basis,1) / (K+1));
 		if(size(coeffs, 2) == 1)
 			if(is_real)
-				LC = mexPolyReal('polyMatrix', d, K, size(basis,2), coeffs, basis, on_gpu);
+				if(is_float)
+					LC = mexPolyRealFloat('polyMatrix', d, K, size(basis,2), coeffs, basis, on_gpu);
+				else
+					LC = mexPolyReal('polyMatrix', d, K, size(basis,2), coeffs, basis, on_gpu);
+				end
 			else
 				LC = mexPolyCplx('polyMatrix', d, K, size(basis,2), coeffs, basis, on_gpu);
 			end
 		else
 			if(is_real)
-				LC = mexPolyReal('polyMatrixGroupCoeffs', d, K, size(basis,2), size(coeffs, 2), coeffs, basis, on_gpu);
+				if(is_float)
+					LC = mexPolyRealFloat('polyMatrixGroupCoeffs', d, K, size(basis,2), size(coeffs, 2), coeffs, basis, on_gpu);
+				else
+					LC = mexPolyReal('polyMatrixGroupCoeffs', d, K, size(basis,2), size(coeffs, 2), coeffs, basis, on_gpu);
+				end
 			else
 				LC = mexPolyCplx('polyMatrixGroupCoeffs', d, K, size(basis,2), size(coeffs, 2), coeffs, basis, on_gpu);
 			end
