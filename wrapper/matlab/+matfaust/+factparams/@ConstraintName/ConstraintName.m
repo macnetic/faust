@@ -123,13 +123,13 @@ classdef ConstraintName
 				case 'const'
 					id = ConstraintName.CONST;
 				case 'circ'
-					id = ConstraintName.CIRC
+					id = ConstraintName.CIRC;
 				case 'toeplitz'
-					id = ConstraintName.TOEPLITZ
+					id = ConstraintName.TOEPLITZ;
 				case 'hankel'
-					id = ConstraintName.HANKEL
+					id = ConstraintName.HANKEL;
 				case 'blockdiag'
-					id = ConstraintName.BLKDIAG
+					id = ConstraintName.BLKDIAG;
 				otherwise
 					error(err_msg)
 			end

@@ -58,7 +58,11 @@ classdef (Abstract) ConstraintGeneric
 
 		function pM = project(this, M)
 			if(isreal(M))
-				pM = mexFaustReal('prox', M, this.name.name, this.param, this.normalized, this.pos);
+				if(strcmp(class(M), 'single'))
+					pM = mexFaustRealFloat('prox', M, this.name.name, this.param, this.normalized, this.pos);
+				else
+					pM = mexFaustReal('prox', M, this.name.name, this.param, this.normalized, this.pos);
+				end
 			else
 				pM = mexFaustCplx('prox', M, this.name.name, this.param, this.normalized, this.pos);
 			end

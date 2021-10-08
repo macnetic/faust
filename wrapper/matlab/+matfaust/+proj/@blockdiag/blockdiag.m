@@ -97,7 +97,11 @@
 				M = S.subs{1};
 				% pM = self.constraint.project(M);
 				if(isreal(M))
-					pM = mexFaustReal('prox_blockdiag', M, self.m_vec, self.n_vec, self.normalized, self.pos);
+					if(strcmp(class(M), 'single'))
+						pM = mexFaustRealFloat('prox_blockdiag', M, self.m_vec, self.n_vec, self.normalized, self.pos);
+					else
+						pM = mexFaustReal('prox_blockdiag', M, self.m_vec, self.n_vec, self.normalized, self.pos);
+					end
 				else
 					pM = mexFaustCplx('prox_blockdiag', M, self.m_vec, self.n_vec, self.normalized, self.pos);
 				end
