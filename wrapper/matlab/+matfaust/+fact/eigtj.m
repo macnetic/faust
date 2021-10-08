@@ -18,7 +18,7 @@
 %>&nbsp;&nbsp;&nbsp; <b>[V,D]= eigtj(M,’nGivens’,n,’order’,’descend’) </b> same as above where the diagonal entries of D are the approximate eigenvalues in descending order (and with columns of V permuted accordingly).<br/>
 %>&nbsp;&nbsp;&nbsp; <b>eigtj(M, 'nGivens', n, 'nGivens_per_fac', t, 'tol', 0.01, 'relerr', true)</b> uses a stopping criterion based on absolute error norm(V*D*V'-M, 'fro'). This criterion is concurrent to nGivens (here n).<br/>
 %>
-%> @param M the matrix to diagonalize. Must be real and symmetric, or complex hermitian. Can be in dense or sparse format.
+%> @param M the matrix to diagonalize. Must be real and symmetric, or complex hermitian. Can be in dense or sparse format. The class(M) value can be double or single (only if isreal(M) is true).
 %> @param nGivens, integer [optional if tol is set] targeted number of Givens rotations.
 %> The number of rotations per factor of V is defined by nGivens_per_fac.
 %> @param 'tol', number [optional if nGivens is set] the tolerance error at which the algorithm stops. The default value is zero so that stopping is based on reaching the targeted nGivens.
@@ -157,7 +157,13 @@ function [V,D] = eigtj(M, varargin)
 	if(nGivens > 0)
 		nGivens_per_fac = min(nGivens_per_fac, nGivens);
 	end
-	[core_obj, D] = mexfgftgivensReal(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, order, enable_large_Faust);
-	D = sparse(diag(real(D)));
-	V = Faust(core_obj, isreal(M));
+	if(strcmp(class(M), 'single'))
+		[core_obj, D] = mexfgftgivensRealFloat(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, order, enable_large_Faust);
+		D = sparse(diag(real(double(D))));
+		V = Faust(core_obj, isreal(M), 'cpu', 'float');
+	else
+		[core_obj, D] = mexfgftgivensReal(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, order, enable_large_Faust);
+		D = sparse(diag(real(D)));
+		V = Faust(core_obj, isreal(M));
+	end
 end

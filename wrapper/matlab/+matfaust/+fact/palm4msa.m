@@ -2,7 +2,7 @@
 %> @brief Factorizes the matrix M with Palm4MSA algorithm using the parameters set in p.
 %>
 %>
-%> @param M the dense matrix to factorize.
+%> @param M the dense matrix to factorize. The class(M) value can be double or single (only if isreal(M) is true). This class has a major impact on performance.
 %> @param p the matfaust.factparams.ParamsPalm4MSA instance to define the algorithm parameters.
 %> @param 'backend',int (optional) the backend to use (the C++ implementation). Must be 2016 (the default) or 2020 (which should be faster for most of the factorizations).
 %> @param 'gpu', bool (optional) set to true to execute the algorithm using the GPU implementation. This option is only available when backend==2020.
@@ -47,6 +47,12 @@ function  [F,lambda] = palm4msa(M, p, varargin)
 	backend = 2016;
 	nargin = length(varargin);
 	gpu = false;
+	is_float = strcmp(class(M), 'single');
+	if(is_float)
+		dtype = 'float';
+	else
+		dtype = 'double'; % also for complex double
+	end
 	if(nargin > 0)
 		for i=1:nargin
 			switch(varargin{i})
@@ -74,7 +80,11 @@ function  [F,lambda] = palm4msa(M, p, varargin)
 	end
 	if(backend == 2016)
 		if(isreal(M))
-			[lambda, core_obj] = mexPalm4MSAReal(mex_params);
+			if(is_float)
+				[lambda, core_obj] = mexPalm4MSARealFloat(mex_params);
+			else
+				[lambda, core_obj] = mexPalm4MSAReal(mex_params);
+			end
 		else
 			[lambda, core_obj] = mexPalm4MSACplx(mex_params);
 		end
@@ -82,11 +92,19 @@ function  [F,lambda] = palm4msa(M, p, varargin)
 		% no need to keep the ParamsPalm4MSA extracted/generated cell for init_facts
 		% mex_params = rmfield(mex_params, 'init_facts')
 		if(isreal(M))
-			init_faust = matfaust.Faust(p.init_facts);
+			init_faust = matfaust.Faust(p.init_facts, 'dtype', dtype);
 			if(gpu)
-				[lambda, core_obj] = mexPALM4MSA2020_gpu2Real(mex_params, get_handle(init_faust));
+				if(is_float)
+					[lambda, core_obj] = mexPALM4MSA2020_gpu2RealFloat(mex_params, get_handle(init_faust));
+				else
+					[lambda, core_obj] = mexPALM4MSA2020_gpu2Real(mex_params, get_handle(init_faust));
+				end
 			else
-				[lambda, core_obj] = mexPALM4MSA2020Real(mex_params, get_handle(init_faust));
+				if(is_float)
+					[lambda, core_obj] = mexPALM4MSA2020RealFloat(mex_params, get_handle(init_faust));
+				else
+					[lambda, core_obj] = mexPALM4MSA2020Real(mex_params, get_handle(init_faust));
+				end
 			end
 		else
 			init_faust = complex(matfaust.Faust(p.init_facts));
@@ -97,5 +115,5 @@ function  [F,lambda] = palm4msa(M, p, varargin)
 			end
 		end
 	end
-	F = Faust(core_obj, isreal(M));
+	F = Faust(core_obj, isreal(M), 'cpu', dtype);
 end

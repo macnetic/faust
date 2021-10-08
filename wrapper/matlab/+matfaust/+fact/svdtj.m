@@ -14,7 +14,7 @@
 %> &nbsp;&nbsp;&nbsp; @b       <b>[U,S,V] = svdtj(M,’nGivens’,n,’tol’,0.01,’nGivens_per_fac’,t) </b>same as above with (up to) t Givens rotations per factor<br/>
 %>
 %>
-%> @param M: a real or complex, dense or sparse matrix.
+%> @param M: a real or complex, dense or sparse matrix. The class(M) value can be double or single (only if isreal(M) is true).
 %> @param nGivens, integer: see fact.eigtj
 %> @param 'tol', number see fact.eigtj (NB: as described below, the error tolerance is not exactly for the approximate SVD but for the subsequent eigtj calls).
 %> @param 'relerr', bool see fact.eigtj
@@ -154,8 +154,15 @@ function [U,S,V] = svdtj(M, varargin)
 	if(nGivens > 0)
 		nGivens_per_fac = min(nGivens_per_fac, nGivens);
 	end
-	[core_obj1, S, core_obj2] = mexsvdtjReal(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, order, enable_large_Faust);
-	S = sparse(diag(real(S)));
-	U = Faust(core_obj1, isreal(M));
-	V = Faust(core_obj2, isreal(M));
+	if(strcmp(class(M), 'single'))
+		[core_obj1, S, core_obj2] = mexsvdtjRealFloat(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, order, enable_large_Faust);
+		S = sparse(diag(real(double(S))));
+		U = Faust(core_obj1, isreal(M), 'cpu', 'float');
+		V = Faust(core_obj2, isreal(M), 'cpu', 'float');
+	else
+		[core_obj1, S, core_obj2] = mexsvdtjReal(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, order, enable_large_Faust);
+		S = sparse(diag(real(S)));
+		U = Faust(core_obj1, isreal(M));
+		V = Faust(core_obj2, isreal(M));
+	end
 end

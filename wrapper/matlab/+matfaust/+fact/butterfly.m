@@ -28,10 +28,15 @@ function F = butterfly(M, varargin)
         elseif(strcmp(dir, 'left'))
                 dir = 0;
         end
-        if(isreal(M))
-                core_obj = mexButterflyReal(M, dir);
-        else
-                core_obj = mexButterflyCplx(M, dir);
-        end
-        F = Faust(core_obj, isreal(M));
+		if(strcmp(class(M), 'single'))
+				core_obj = mexButterflyRealFloat(M, dir);
+				F = Faust(core_obj, isreal(M), 'cpu', 'float');
+		else
+			if(isreal(M))
+				core_obj = mexButterflyReal(M, dir);
+			else
+				core_obj = mexButterflyCplx(M, dir);
+			end
+			F = Faust(core_obj, isreal(M));
+		end
 end

@@ -55,7 +55,7 @@ typedef @FACT_FPP@ FPP2;
 
 using namespace Faust;
 
-void fgft_givens(const mxArray* matlab_matrix, int J, int t, double tol, unsigned int verbosity, bool rel_err,  int order, const bool enable_large_Faust, mxArray **plhs);
+void fgft_givens(const mxArray* matlab_matrix, int J, int t, Real<SCALAR> tol, unsigned int verbosity, bool rel_err,  int order, const bool enable_large_Faust, mxArray **plhs);
 
 void fgft_givens_cplx(const mxArray* matlab_matrix, int J, int t, double tol, unsigned int verbosity, bool rel_err, int order, const bool enable_large_Faust, mxArray **plhs);
 
@@ -98,7 +98,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 }
 
-void fgft_givens(const mxArray* matlab_matrix, int J, int t, double tol, unsigned int verbosity, bool rel_err, int order, const bool enable_large_Faust, mxArray **plhs)
+void fgft_givens(const mxArray* matlab_matrix, int J, int t, Real<SCALAR> tol, unsigned int verbosity, bool rel_err, int order, const bool enable_large_Faust, mxArray **plhs)
 {
 	// initialization of the matrix that will be factorized
 	Faust::MatGeneric<SCALAR,Cpu>* Lap;
