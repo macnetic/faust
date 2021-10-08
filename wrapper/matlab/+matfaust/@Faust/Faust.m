@@ -2118,6 +2118,20 @@ classdef Faust
 			dev = F.dev
 		end
 
+		%================================================================
+		%> Returns the Faust class ('single' or 'double').
+		%===
+		%>
+		%> @retval c: the Faust class.
+		%================================================================
+		function c = class(F)
+			if(strcmp(F.dtype, 'float'))
+				c = 'single';
+			else
+				c = 'double';
+			end
+		end
+
 	end
 	methods(Access = public, Hidden = true)
 		function set_FM_mul_mode(self, mode)
