@@ -14,6 +14,7 @@
 %>
 %> @param n: the power of two for a FFT of order n and a factorization in log2(n)+1 factors.
 %> @param normed: (optional) true (by default) to normalize the returned Faust as if Faust.normalize() was called, false otherwise.
+%> @param 'dev', 'gpu or 'cpu' (optional) to create the Faust on CPU or GPU (by default on CPU).
 %>
 %>
 %> @retval F the Faust implementing the FFT transform of dimension n.
