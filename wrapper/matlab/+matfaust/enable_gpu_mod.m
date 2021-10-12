@@ -17,22 +17,28 @@ function enable_gpu_mod(varargin)
 	backend = 'cuda';
 	silent = true;
 	osstr = computer;
-	switch(osstr)
-		case 'PCWIN64'
-			libpath = 'C:\Program Files\Faust\lib\gm.dll';
-		case 'GLNXA64'
-			libpath = '/opt/local/faust/lib/libgm.so';
-		case 'MACI64'
-			libpath = '/opt/local/faust/lib/libgm.dylib';
-		otherwise
-			% not reachable
-	end
-	if(~ exist(libpath))
-		% if filepath doesn't exist, try to find lib in cwd
-		[~, name, ext] = fileparts(libpath);
-		libfile = [name ext];
-		libpath = libfile;
-	end
+	backend_suffixes = {'-cu11.4', '-cu9.2', ''};
+	libpaths = {};
+	for bi = 1:length(backend_suffixes)
+		bs = backend_suffixes{bi};
+		switch(osstr)
+			case 'PCWIN64'
+				libpath = [ 'C:\Program Files\Faust\lib\gm' bs '.dll'];
+			case 'GLNXA64'
+				libpath = [ '/opt/local/faust/lib/libgm' bs '.so' ];
+			case 'MACI64'
+				libpath = [ '/opt/local/faust/lib/libgm' bs '.dylib' ];
+			otherwise
+				% not reachable
+			end
+			if(~ exist(libpath))
+				% if filepath doesn't exist, try to find lib in cwd
+				[~, name, ext] = fileparts(libpath);
+				libfile = [name ext];
+				libpath = libfile;
+			end
+			libpaths = [libpaths libpath];
+		end
 	if(nargin > 0)
 		i = 1;
 		while (i <= nargin)
@@ -42,6 +48,8 @@ function enable_gpu_mod(varargin)
 					if(nargin == i || ~ isstr(libpath))
 						error('libpath must be a char array or string')
 					end
+					% add this path as first path to try
+					libpaths = [libpath libpaths];
 				case 'backend'
 					if(nargin == i || ~ isstr(libpath))
 						error('libpath must be a char array or string')
@@ -63,5 +71,11 @@ function enable_gpu_mod(varargin)
 			i = i + 2;
 		end
 	end
-	mexFaustReal('enable_gpu_mod', libpath, backend, silent); % it should load the library for complex Faust too
+	handle = 0;
+	i = 1;
+	while(handle == 0 && i < length(libpaths))
+		libpath = libpaths{i};
+		handle = mexFaustReal('enable_gpu_mod', libpath, backend, silent); % it should load the library for complex Faust too
+		i = i + 1;
+	end
 end
