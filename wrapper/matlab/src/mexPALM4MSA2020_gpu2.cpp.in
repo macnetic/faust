@@ -139,9 +139,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			}
 			else if(cons->is_constraint_parameter_real<SCALAR,GPU2>())
 			{
-				auto c = dynamic_cast<const Faust::ConstraintFPP<SCALAR,Cpu>*>(cons);
-				//				c->Display();
-				noconst_cons.push_back(new Faust::ConstraintFPP<SCALAR, GPU2>(c->get_constraint_type(), c->get_parameter(), c->get_rows(), c->get_cols()));
+				auto c = dynamic_cast<const Faust::ConstraintFPP<SCALAR,Cpu, FPP2>*>(cons);
+				noconst_cons.push_back(new Faust::ConstraintFPP<SCALAR, GPU2, FPP2>(c->get_constraint_type(), c->get_parameter(), c->get_rows(), c->get_cols()));
 				//				noconst_cons[0]->Display();
 			}
 			else

@@ -91,8 +91,12 @@ function  [F,lambda] = palm4msa(M, p, varargin)
 	elseif(backend == 2020)
 		% no need to keep the ParamsPalm4MSA extracted/generated cell for init_facts
 		% mex_params = rmfield(mex_params, 'init_facts')
+		dev = 'cpu';
+		if(gpu)
+			dev = 'gpu';
+		end
 		if(isreal(M))
-			init_faust = matfaust.Faust(p.init_facts, 'dtype', dtype);
+			init_faust = matfaust.Faust(p.init_facts, 'dtype', dtype, 'dev', dev);
 			if(gpu)
 				if(is_float)
 					[lambda, core_obj] = mexPALM4MSA2020_gpu2RealFloat(mex_params, get_handle(init_faust));
@@ -107,7 +111,7 @@ function  [F,lambda] = palm4msa(M, p, varargin)
 				end
 			end
 		else
-			init_faust = complex(matfaust.Faust(p.init_facts));
+			init_faust = complex(matfaust.Faust(p.init_facts, 'dev', dev));
 			if(gpu)
 				[lambda, core_obj] = mexPALM4MSA2020_gpu2Cplx(mex_params, get_handle(init_faust));
 			else
