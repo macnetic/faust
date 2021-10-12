@@ -2077,7 +2077,7 @@ classdef Faust
 						facs{i} = complex(facs{i});
 					end
 				end
-				cF = matfaust.Faust(facs);
+				cF = matfaust.Faust(facs, 'dev', F.dev, 'dtype', dtype);
 			end
 		end
 
