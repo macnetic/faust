@@ -13,6 +13,7 @@
 %> @param n the power of two exponent for a Hadamard matrix of order n and a factorization into log2(n) factors.
 %> @param 'normed',bool: (optional) true (by default) to normalize the returned Faust as if Faust.normalize() was called, false otherwise.
 %> @param 'dev',str: (optional) 'cpu' to create a CPU Faust (default choice) and 'gpu' for a GPU Faust.
+%> @param 'dtype', 'double' (by default) or 'float' (optional) to select the scalar type used for the Faust generated.
 %>
 %> @retval H the Faust implementing the Hadamard transform of dimension n.
 %>
@@ -54,6 +55,7 @@ function H = wht(n, varargin)
 	end
 	normed = true; % normalization by default
 	dev = 'cpu';
+	dtype = 'double';
 	argc = length(varargin);
 	if(argc > 0)
 		for i=1:2:argc
@@ -74,22 +76,36 @@ function H = wht(n, varargin)
 					else
 						dev = tmparg;
 					end
+				case 'dtype'
+					if(argc == i || ~ strcmp(tmparg, 'float') && ~ strcmp(tmparg, 'double'))
+						error('dtype keyword argument is not followed by a valid value: float, double.')
+					else
+						dtype = tmparg;
+					end
 				otherwise
-					if((isstr(varargin{i}) || ischar(varargin{i}))  && ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu'))
+					if((isstr(varargin{i}) || ischar(varargin{i}))  && ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu') && ~ strcmp(tmparg, 'float') && ~ strcmp(tmparg, 'double'))
 						error([ tmparg ' unrecognized argument'])
 					end
 			end
 		end
 	end
 	if(strcmp(dev, 'cpu'))
-		core_obj = mexFaustReal('hadamard', log2n, normed);
+		if(strcmp(dtype, 'double'))
+			core_obj = mexFaustReal('hadamard', log2n, normed);
+		else % float
+			core_obj = mexFaustRealFloat('hadamard', log2n, normed);
+		end
 	else
-		core_obj = mexFaustGPUReal('hadamard', log2n, normed);
+		if(strcmp(dtype, 'double'))
+			core_obj = mexFaustGPUReal('hadamard', log2n, normed);
+		else % float
+			core_obj = mexFaustGPURealFloat('hadamard', log2n, normed);
+		end
 	end
 	is_real = true;
 	e = MException('FAUST:OOM', 'Out of Memory');
 	if(core_obj == 0)
 		throw(e)
 	end
-	H = matfaust.Faust(core_obj, is_real, dev);
+	H = matfaust.Faust(core_obj, is_real, dev, dtype);
 end
