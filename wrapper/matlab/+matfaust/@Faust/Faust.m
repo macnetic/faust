@@ -2182,7 +2182,7 @@ classdef Faust
 					if(strcmp(F.dtype, 'double'))
 						[varargout{1:nargout}] = mexFaustGPUReal(func_name, F.matrix.objectHandle, varargin{:});
 					else % float
-						[varargout{1:nargout}] = mexFaustRealGPUFloat(func_name, F.matrix.objectHandle, varargin{:});
+						[varargout{1:nargout}] = mexFaustGPURealFloat(func_name, F.matrix.objectHandle, varargin{:});
 					end
 				else
 					[varargout{1:nargout}] = mexFaustGPUCplx(func_name, F.matrix.objectHandle, varargin{:});
