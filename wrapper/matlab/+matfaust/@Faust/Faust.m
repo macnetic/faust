@@ -160,7 +160,7 @@ classdef Faust
 			% scale argument is hidden for user (deprecated) but it's still available
 			max_nargin = 5;
 			if(nargin < 1 || nargin > max_nargin)
-				error([err_msg ' Number of arguments passed is zero or greater than ' str(max_nargin) '.'])
+				error([err_msg ' Number of arguments passed is zero or greater than ' int2str(max_nargin) '.'])
 			elseif(iscell(varargin{1}))
 				% init a Faust from factor list
 				% check if the factors are real or complex, one complex factor implies a complex faust
@@ -236,6 +236,7 @@ classdef Faust
 				F.matrix = FaustCore(varargin{2}, oF.isReal, oF.dev, oF.dtype);
 				F.isReal = oF.isReal;
 				F.dev = oF.dev;
+				F.dtype = oF.dtype;
 			elseif(isa(varargin{1}, 'integer') && islogical(varargin{2}))
 				% create a Faust directly with the c++ object handler/pointer without any pre-existing Faust
 				F.isReal = varargin{2};
@@ -249,7 +250,7 @@ classdef Faust
 				else
 					F.dtype = 'double';
 				end
-				F.matrix = FaustCore(varargin{1}, varargin{2}, F.dev, F.dtype);
+				F.matrix = FaustCore(varargin{1}, F.isReal, F.dev, F.dtype);
 				% hack to raise an error in case of non-consistent handle and isReal arg.
 				try
 					n = numfactors(F);
@@ -319,9 +320,9 @@ classdef Faust
 					end
 					C = [F,G];
 					if(~ C.isReal)
-						Fid = matfaust.eye(size(C,2)/2, 'complex');
+						Fid = matfaust.eye(size(C,2)/2, 'complex', 'dtype', F.dtype, 'dev', F.dev)
 					else
-						Fid = matfaust.eye(size(C,2)/2);
+						Fid = matfaust.eye(size(C,2)/2, 'dtype', F.dtype, 'dev', F.dev);
 					end
 					F = C*[Fid;Fid];
 				elseif(isscalar(G))
@@ -1074,7 +1075,7 @@ classdef Faust
 				factors{j} = call_mex(F, 'factors', i);
 			end
 			if(length(factors) > 1)
-				factors = matfaust.Faust(factors);
+				factors = matfaust.Faust(factors, 'dev', F.dev);
 			else
 				factors = factors{j};
 			end
@@ -1850,7 +1851,7 @@ classdef Faust
 				for i=3:nargin
 					A = varargin{i};
 					if(ismatrix(A) && ~ isa(A, 'matfaust.Faust'))
-						A = matfaust.Faust({A});
+						A = matfaust.Faust({A}, 'dtype', F.dtype, 'dev', F.dev);
 					end
 					if(~ isa(A, 'matfaust.Faust'))
 						error('Can''t concatenate a Faust to something that is not a Faust or a matrix.')
@@ -2077,7 +2078,7 @@ classdef Faust
 						facs{i} = complex(facs{i});
 					end
 				end
-				cF = matfaust.Faust(facs, 'dev', F.dev, 'dtype', dtype);
+				cF = matfaust.Faust(facs, 'dev', F.dev);
 			end
 		end
 
@@ -2115,7 +2116,7 @@ classdef Faust
 		%> @retval dev: the Faust device.
 		%================================================================
 		function dev = device(F)
-			dev = F.dev
+			dev = F.dev;
 		end
 
 		%================================================================
