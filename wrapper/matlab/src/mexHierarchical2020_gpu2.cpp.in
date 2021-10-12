@@ -68,8 +68,8 @@ void convert_cons_vec_cpu2gpu(vector<const Faust::ConstraintGeneric*>& cpu_cons,
 		}
 		else if(cons->is_constraint_parameter_real<SCALAR,GPU2>())
 		{
-			auto c = dynamic_cast<const Faust::ConstraintFPP<SCALAR,Cpu>*>(cons);
-			gpu_cons.push_back(new Faust::ConstraintFPP<SCALAR, GPU2>(c->get_constraint_type(), c->get_parameter(), c->get_rows(), c->get_cols()));
+			auto c = dynamic_cast<const Faust::ConstraintFPP<SCALAR,Cpu, FPP2>*>(cons);
+			gpu_cons.push_back(new Faust::ConstraintFPP<SCALAR, GPU2, FPP2>(c->get_constraint_type(), c->get_parameter(), c->get_rows(), c->get_cols()));
 		}
 		else if(cons->is_constraint_parameter_mat<SCALAR,GPU2>())
 		{
