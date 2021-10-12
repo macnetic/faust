@@ -304,7 +304,7 @@ mxArray* transformFact2SparseMxArray(faust_unsigned_int id, Faust::TransformHelp
 	// the case when the Faust is transposed is handled internally (by not transposing the buffers in csr to get transpose in csc)
 	// the reordering operation costs additional calculation time
 	//TODO: remove nnz, num_rows, num_cols when get_fact() will authorize NULL
-	float* flt_pr = new float[nnz];
+	float* flt_pr = new float[mxGetNzmax(sparseMat)];
 	core_ptr->get_fact(id, i_jc, i_ir, flt_pr, &nnz, &num_rows, &num_cols, true);
 	for(int i=0;i<nnz;i++)
 	{
