@@ -192,7 +192,7 @@ function F = rand(M, N, varargin)
 						dev = tmparg;
 					end
 				case 'dtype'
-					if(argc == i || ~ strcmp(tmparg, 'double') && ~ startsWith(tmparg, 'float'))
+					if(argc == i || ~ strcmp(tmparg, 'double') && ~ strcmp(tmparg, 'float'))
 						error('dtype keyword argument is not followed by a valid value: float, double.')
 					else
 						dtype = tmparg;
