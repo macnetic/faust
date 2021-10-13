@@ -1049,6 +1049,8 @@ classdef Faust
 		%>
 		%> @retval factors a matrix copy of the i-th factor if i is a single index or a new Faust composed of i-th to the j-th factors of F. The factors copies keep the storage organization of the source matrix (full or sparse).
 		%>
+		%> @note Matlab doesn't support float sparse matrices, but matfaust does! Hence when you call Faust.factors on a float sparse Faust to retrieve one factor you'll get a double sparse matrix as a copy of the float sparse matrix.
+		%>
 		%> @b Example
 		%> @code
 		%>	F = matfaust.rand(5, 10);
