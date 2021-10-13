@@ -225,7 +225,7 @@ pkg_macos_release:
     script:
         - export PYTHON_PATH=$(which python$NIX_PY_VER)
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DOpenMP_gomp_LIBRARY=/opt/local/lib/libomp/libgomp.dylib -DBUILD_WRAPPER_PYTHON=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DCMAKE_BUILD_TYPE=Release -DEXCLUDE_FAUST_LIB_INSTALL=ON -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DBUILD_MULTITHREAD=ON -DNOPY2=ON -DCMAKE_CXX_COMPILER=/opt/local/bin/clang++-mp-8.0 -DBUILD_FLOAT_PYX=ON ..'
+        - 'cmake -DOpenMP_gomp_LIBRARY=/opt/local/lib/libomp/libgomp.dylib -DBUILD_WRAPPER_PYTHON=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DCMAKE_BUILD_TYPE=Release -DEXCLUDE_FAUST_LIB_INSTALL=ON -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DBUILD_MULTITHREAD=ON -DNOPY2=ON -DCMAKE_CXX_COMPILER=/opt/local/bin/clang++-mp-8.0 -DBUILD_FLOAT_PYX=ON -DBUILD_FLOAT_MEX=ON ..'
         - make LANG=en_GB.UTF-8
         # to compile matlab wrappers use matlab libiomp5 but backup the clang lib first
         #- sudo mv /opt/local/lib/libomp/libomp.dylib /opt/local/lib/libomp/libomp.dylib.bak
@@ -274,7 +274,7 @@ pkg_win_release:
         - cd build
           #- 'cmake -G "MinGW Makefiles" -DBUILD_WRAPPER_MATLAB=ON -DBUILD_WRAPPER_PYTHON=ON -DSLOW_TESTS=OFF -DCPACK_PACKAGE_VERSION=%CI_COMMIT_TAG% -DBUILD_DOCUMENTATION=ON -DEXCLUDE_FAUST_LIB_INSTALL=ON -DCMAKE_INSTALL_PREFIX=win_pkg_build -DBUILD_TESTING=OFF -DAPI_DOC_BASE_URL="file:///C:/Program Files/Faust/doc/" -DREMOTE_DATA_URL="%DURL%" -DREMOTE_DATA_FILE="%DFILE%" -DUSE_GPU_MOD=ON -DCMAKE_PREFIX_PATH=../gpu_mod ..'
           # - make
-        - 'cmake -G "Visual Studio 14 Win64" -DBUILD_WRAPPER_MATLAB=ON -DBUILD_WRAPPER_PYTHON=ON -DSLOW_TESTS=OFF -DCPACK_PACKAGE_VERSION=%CI_COMMIT_TAG% -DBUILD_DOCUMENTATION=ON -DEXCLUDE_FAUST_LIB_INSTALL=ON -DCMAKE_INSTALL_PREFIX=win_pkg_build -DBUILD_TESTING=OFF -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH="C:/Users/faust/Downloads/matio-1.5.13/visual_studio/x64/Release/libmatio.lib" -DZ_STATIC_LIB_PATH="C:/Users/faust/Downloads/zlib-1.2.11/contrib/vstudio/vc14/x64/ZlibStatDebug/zlibstat.lib" -DHDF5_STATIC_LIB_PATH="C:/Users/faust/Downloads/hdf5-1.10.3/build/bin/Release/libhdf5.lib" -DAPI_DOC_BASE_URL="file:///C:/Program Files/Faust/doc/" -DREMOTE_DATA_URL="%DURL%" -DREMOTE_DATA_FILE="%DFILE%" -DEXPERIMENTAL_PKG=OFF -DUSE_GPU_MOD=ON -DCMAKE_PREFIX_PATH=../gpu_mod -DPYTHON_ENCODING=windows-1252 -DBUILD_MULTITHREAD=ON -DBUILD_FLOAT_PYX=ON ..'
+        - 'cmake -G "Visual Studio 14 Win64" -DBUILD_WRAPPER_MATLAB=ON -DBUILD_WRAPPER_PYTHON=ON -DSLOW_TESTS=OFF -DCPACK_PACKAGE_VERSION=%CI_COMMIT_TAG% -DBUILD_DOCUMENTATION=ON -DEXCLUDE_FAUST_LIB_INSTALL=ON -DCMAKE_INSTALL_PREFIX=win_pkg_build -DBUILD_TESTING=OFF -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH="C:/Users/faust/Downloads/matio-1.5.13/visual_studio/x64/Release/libmatio.lib" -DZ_STATIC_LIB_PATH="C:/Users/faust/Downloads/zlib-1.2.11/contrib/vstudio/vc14/x64/ZlibStatDebug/zlibstat.lib" -DHDF5_STATIC_LIB_PATH="C:/Users/faust/Downloads/hdf5-1.10.3/build/bin/Release/libhdf5.lib" -DAPI_DOC_BASE_URL="file:///C:/Program Files/Faust/doc/" -DREMOTE_DATA_URL="%DURL%" -DREMOTE_DATA_FILE="%DFILE%" -DEXPERIMENTAL_PKG=OFF -DUSE_GPU_MOD=ON -DCMAKE_PREFIX_PATH=../gpu_mod -DPYTHON_ENCODING=windows-1252 -DBUILD_MULTITHREAD=ON -DBUILD_FLOAT_PYX=ON -DBUILD_FLOAT_MEX=ON ..'
         # explicitely configure distutils (to use the VS configuration we'll tell in next bat script) because by default it uses the most recent VS version but we need to use VS 2015 (because libmatio etc. are compiled with this version)
         - set DISTUTILS_USE_SDK=1
         - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\vcvarsx86_amd64.bat"
@@ -296,7 +296,7 @@ pkg_linux_release:
     script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
         - export PYTHON_PATH=$(which python$NIX_PY_VER)
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_FILE_NAME=faust-$CI_COMMIT_TAG -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DEXCLUDE_FAUST_LIB_INSTALL=ON  -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DNOPY2=ON -DUSE_GPU_MOD=ON -DCMAKE_PREFIX_PATH=$PWD/../gpu_mod -DBUILD_FLOAT_PYX=ON ..'
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_FILE_NAME=faust-$CI_COMMIT_TAG -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DEXCLUDE_FAUST_LIB_INSTALL=ON  -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DNOPY2=ON -DUSE_GPU_MOD=ON -DCMAKE_PREFIX_PATH=$PWD/../gpu_mod -DBUILD_FLOAT_PYX=ON -DBUILD_FLOAT_MEX=ON ..'
         - make
         - cpack -G RPM -C CPackConfig.cmake
         - cpack -G DEB -C CPackConfig.cmake
@@ -320,7 +320,7 @@ pkg_linux_release_static:
     script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
         - export PYTHON_PATH=$(which python$NIX_PY_VER)
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_FILE_NAME=faust-$CI_COMMIT_TAG-static -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DEXCLUDE_FAUST_LIB_INSTALL=ON -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=/opt/local/matio-1.5.7/src/.libs/libmatio.a -DZ_STATIC_LIB_PATH=/opt/local/zlib-1.2.11/libz.a -DHDF5_STATIC_LIB_PATH=/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DBUILD_MULTITHREAD=ON -DNOPY2=ON -DUSE_GPU_MOD=ON -DCMAKE_PREFIX_PATH=$PWD/../gpu_mod -DBUILD_FLOAT_PYX=ON ..'
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_FILE_NAME=faust-$CI_COMMIT_TAG-static -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DEXCLUDE_FAUST_LIB_INSTALL=ON -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=/opt/local/matio-1.5.7/src/.libs/libmatio.a -DZ_STATIC_LIB_PATH=/opt/local/zlib-1.2.11/libz.a -DHDF5_STATIC_LIB_PATH=/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DBUILD_MULTITHREAD=ON -DNOPY2=ON -DUSE_GPU_MOD=ON -DCMAKE_PREFIX_PATH=$PWD/../gpu_mod -DBUILD_FLOAT_PYX=ON -DBUILD_FLOAT_MEX=ON ..'
         - make
         - cpack -G RPM -C CPackConfig.cmake
         - cpack -G DEB -C CPackConfig.cmake

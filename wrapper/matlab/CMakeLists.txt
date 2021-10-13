@@ -102,11 +102,16 @@ if(USE_GPU_MOD)
 endif()
 add_library(${FAUST_MEXTOOLS_TARGET} OBJECT ${CPP_MEXTOOLS_FILES})
 
-foreach(SCALAR_AND_FSUFFIX double:Real float:RealFloat std::complex<double>:Cplx) # TODO: complex<float> versions
+set(MEX_TYPES_AND_SUFFIXES double:Real std::complex<double>:Cplx)
+if(BUILD_FLOAT_MEX)
+	list(APPEND MEX_TYPES_AND_SUFFIXES float:RealFloat)
+endif()
+foreach(SCALAR_AND_FSUFFIX IN LISTS MEX_TYPES_AND_SUFFIXES) # TODO: complex<float> versions
 	# configuration de mexFaust.cpp.in
 	# specialization of the class mexFaust template scalar with real or complex
 	string(REGEX REPLACE "(.*):.*" "\\1" SCALAR ${SCALAR_AND_FSUFFIX})
 	string(REGEX REPLACE ".*:(.*)" "\\1" FSUFFIX ${SCALAR_AND_FSUFFIX})
+	message(STATUS "${SCALAR} ${FSUFFIX}")
 	set(FAUST_SCALAR ${SCALAR})
 	if (FSUFFIX MATCHES RealFloat)
 		set(FAUST_FPP float)
