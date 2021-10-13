@@ -222,6 +222,9 @@ function F = rand(M, N, varargin)
 		error('field has an unknown char array value.')
 	end
 	e = MException('FAUST:OOM', 'Out of Memory');
+	if(field == COMPLEX && strcmp(dtype, 'float'))
+		warning('Complex Faust-s are not available in single precision (only double precision is possible).')
+	end
 	if(strcmp(dev, 'cpu'))
 		if(field == COMPLEX)
 			core_obj = mexFaustCplx('rand', num_rows, num_cols, fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
