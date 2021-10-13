@@ -179,9 +179,16 @@ classdef Faust
 						F.isReal = false;
 						break
 					end
-				end
-				if(strcmp(class(factors{1}), 'single'))
-					F.dtype = 'float';
+					if(i == 1 && strcmp(class(factors{1}), 'single'))
+							F.dtype = 'float';
+					elseif(~ strcmp(class(factors{1}), class(factors{i})))
+						if(strcmp(F.dtype, 'float'))
+							factors{i} = single(factors{i});
+						else
+							factors{i} = double(factors{i});
+						end
+						warning(['Faust constructor: first factor is ' dtype ' but the ' int2str(i) '-th factor is ' class(factors{i}) '. It has been auto-converted to ' dtype ])
+					end
 				end
 				for i=2:nargin
 					switch(varargin{i})
