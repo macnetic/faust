@@ -1807,17 +1807,19 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             A Faust copy of F converted to dtype.
         """
         #TODO: full list of numpy args or **kw_unknown
-        if(dtype == F.dtype):
+        if np.dtype(dtype) not in [np.complex, np.float32, np.double]:
+            raise TypeError("Faust supports only complex, double or float32 dtype-s")
+        if dtype == F.dtype:
             return F.clone(dev=F.device)
-        elif dtype == np.complex:
-            return Faust([F.factors(i).astype(np.complex) for i in
-                          range(F.numfactors())], dev=F.device)
-        else:
+        elif F.dtype == np.complex and dtype == 'double':
             if F.device == 'cpu':
                 return Faust(core_obj=F.m_faust.real())
             else:
                 raise ValueError("complex -> float conversion not yet"
                                  " supported on GPU.")
+        else:
+            return Faust([F.factors(i).astype(dtype) for i in
+                          range(F.numfactors())], dev=F.device)
 
     def asarray(F, *args, **kwargs):
         return F
