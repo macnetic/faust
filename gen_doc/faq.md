@@ -19,8 +19,8 @@
 
 
 **3. About CUDA (for GPU FAµST API support)**  
-[3.1 Where can I find the CUDA 9.2 installer for my system?](#cuda_one)  
-[3.2 How do I need to configure the CUDA 9.2 installer on Windows 10?](#cuda_two)  
+[3.1 Where can I find the CUDA 9 / 11 installer for my system?](#cuda_one)  
+[3.2 How do I need to configure the CUDA 9 / 11 installer on Windows 10?](#cuda_two)  
 
 # 1. About matfaust
 
@@ -269,15 +269,17 @@ Once Macports is installed, launch a terminal and type this command:
 
 \anchor cuda_one
 
-## 3.1 Where can I find the CUDA 9.2 installer for my system?
+## 3.1 Where can I find the CUDA 9 / 11 installer for my system?
 
-FAµST wrappers GPU API needs CUDA 9.2 to work. To install this toolkit you need to download the approriate archive [here](https://developer.nvidia.com/cuda-92-download-archive). Select your system an architecture and download the package/installer.
+FAµST wrappers GPU API needs CUDA 9 (or 11) to work. To install this toolkit you need to download the approriate archive [here for CUDA 9](https://developer.nvidia.com/cuda-92-download-archive) (or [here for CUDA 11](https://developer.nvidia.com/cuda-downloads?target_os=Linux)). Select your system and architecture then download the package/installer.
 
-## 3.2 How do I need to configure the CUDA 9.2 installer on Windows 10?
+**Note**: it's recommended to install the most recent version of CUDA 11 (instead of CUDA 9).
 
-After downloading the installer [here](https://developer.nvidia.com/cuda-92-download-archive?target_os=Windows&target_arch=x86_64&target_version=10&target_type=exenetwork), you can launch it to start the install. You shall see several panels during the process, they are listed below with the options you should select.
+## 3.2 How do I need to configure the CUDA 9 / 11 installer on Windows 10?
 
-Of course the CUDA 9.2 will work only if you have a NVIDIA card fully installed with its approriate driver compatible to CUDA 9.2.
+After downloading the installer throug one link given in question 3.1, you can launch it to start the install. You shall see several panels during the process, they are listed below with the options you should select.
+
+Of course the CUDA 9 / 11 will work only if you have a NVIDIA card fully installed with its approriate driver compatible to CUDA 9 / 11 (however the CUDA installer proposes to install the driver).
 
 Panel 1: system verification (nothing special to do).
 Panel 2: user license (you must accept to continue).
@@ -293,6 +295,6 @@ In the option panel:
 
 Continue to the last panel and finish the install.
 
-\note After install don't forget to configure your ``PATH`` environment variable. During the CUDA 9.2 install the variables ``CUDA_PATH`` and ``CUDA_PATH_V9_2`` have been set automatically. You need to add ``%CUDA_PATH_V9_2%\bin`` to your ``PATH`` (otherwise pyfaust and matfaust won't load the ``CUSPARSE`` and ``CUBLAS`` needed libraries at runtime).
+\note After install don't forget to configure your ``PATH`` environment variable. During the CUDA 9 / 11 install the variables ``CUDA_PATH`` and ``CUDA_PATH_V9_2`` (or CUDA_PATH_V11_4 etc.) have been set automatically. You need to add ``%CUDA_PATH_V9_2%\bin`` (``%CUDA_PATH_V11_4%\bin``) to your ``PATH`` (otherwise pyfaust and matfaust won't load the ``CUSPARSE`` and ``CUBLAS`` needed libraries at runtime).
 
 
