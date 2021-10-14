@@ -582,12 +582,12 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             max_ncols = np.max([a.shape[1] for a in args if isinstance(a,
                                                                        (Faust,
                                                                         *array_types))])
-            F = F@Faust(np.ones(1, max_ncols), dev=F.device)
+            F = F@Faust(np.ones(1, max_ncols, dtype=F.dtype), dev=F.device)
             if(F.shape[0] == 1):
                 max_nrows = np.max([a.shape[0] for a in args if isinstance(a,
                                                                            (Faust,
                                                                             *array_types))])
-            F = Faust(np.ones(max_nrows, 1), dev=F.device)@F
+            F = Faust(np.ones(max_nrows, 1, dtype=F.dtype), dev=F.device)@F
         def scalar2Faust(G):
             if isinstance(G, int):
                 G = float(G)
@@ -595,18 +595,18 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                 raise TypeError("scalar must be int, float or complex")
             G, Gdtype = (float(G), np.float) if isinstance(G, np.float) else (G,
                                                                               np.complex)
-            return Faust([np.ones((F.shape[0], 1))*G,
-                          np.ones((1, F.shape[1])).astype(Gdtype)],
+            return Faust([np.ones((F.shape[0], 1), dtype=F.dtype)*G,
+                          np.ones((1, F.shape[1]), dtype=F.dtype).astype(Gdtype)],
                          dev=F.device)
         def broadcast_to_F(G):
             if G.shape[0] == 1:
                 if G.shape[1] != F.shape[1]:
                     raise ve
-                G = Faust(np.ones((F.shape[0], 1)), dev=F.device) @ G
+                G = Faust(np.ones((F.shape[0], 1), dtype=F.dtype), dev=F.device) @ G
             elif G.shape[1] == 1:
                 if G.shape[0] != F.shape[0]:
                     raise ve
-                G = G @ Faust(np.ones((1, F.shape[1])), dev=F.device)
+                G = G @ Faust(np.ones((1, F.shape[1]), dtype=F.dtype), dev=F.device)
             return G
         # prepare the list of Fausts
         largs = []
@@ -623,14 +623,14 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                 if(G.size == 1):
                     G = scalar2Faust(G.reshape(1,)[0])
                 if G.ndim == 1:
-                    G = Faust([np.ones((F.shape[0], 1)), G.reshape(1, G.size)], dev=F.device)
+                    G = Faust([np.ones((F.shape[0], 1), dtype=F.dtype), G.reshape(1, G.size)], dev=F.device)
                 else:
                     G = broadcast_to_F(Faust(G, dev=F.device))
             elif isinstance(G,(int, float, np.complex)):
                 G = scalar2Faust(G)
             largs.append(G)
 
-        id = np.eye(F.shape[1])
+        id = np.eye(F.shape[1], dtype=F.dtype)
         id_vstack = np.vstack([id for i in range(0,
                                        len(largs)+1)])
         C = F.concatenate(*largs, axis=1)
