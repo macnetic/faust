@@ -101,6 +101,7 @@ if(USE_GPU_MOD)
 	include_directories(${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR} ${GPU_MOD_INCLUDE_DIR} ${GPU_MOD_INCLUDE_DIR}/../build-cu9.2)
 endif()
 add_library(${FAUST_MEXTOOLS_TARGET} OBJECT ${CPP_MEXTOOLS_FILES})
+target_compile_definitions(${FAUST_MEXTOOLS_TARGET} PRIVATE MATLAB_DEFAULT_RELEASE=R2017b) # for complex (deprecated) separate complex API
 
 set(MEX_TYPES_AND_SUFFIXES double:Real std::complex<double>:Cplx)
 if(BUILD_FLOAT_MEX)
@@ -178,11 +179,12 @@ endif()
 
 add_custom_target(${FAUST_MEX_TARGET} ALL DEPENDS ${MEXFILE_TARGET_LIST})
 
-
+#message(FATAL_ERROR "MEXFILE_TARGET_LIST=${MEXFILE_TARGET_LIST}")
 foreach(mex_target ${MEXFILE_TARGET_LIST})
 	matlab_add_mex(NAME ${mex_target} SHARED SRC "${FAUST_MATLAB_MEX_SRC_DIR}/${mex_target}.cpp" R2017b)
 	set_target_properties(${mex_target} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${FAUST_MATLAB_MEX_BIN_DIR})
 	target_link_options(${mex_target} PRIVATE $<TARGET_PROPERTY:${FAUST_TARGET},LINK_OPTIONS>)
+	target_compile_definitions(${mex_target} PRIVATE MATLAB_DEFAULT_RELEASE=R2017b) # for complex (deprecated) separate complex API
 	if(WIN32)
 
 		#target_compile_options(${mex_target} PRIVATE "${OMP_CXX_FLAGS}")
@@ -191,7 +193,7 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 		target_compile_options(${mex_target} PRIVATE "/VERBOSE") # doesn't work at least with MSVC
 		# complete static libs (linked later) by objects of libs if needed (fallback solution from environment)
 		target_link_options(${mex_target} PRIVATE $ENV{WIN_HDF5_OBJS_DIR}/*.obj  $ENV{WIN_SZIP_OBJS_DIR}/*.obj)
-		target_compile_definitions(${mex_target} PRIVATE NOMINMAX MATLAB_DEFAULT_RELEASE=R2017b) # it seems necessary for windows while R2017b flag of matlab_add_mex is enough for Unix
+		target_compile_definitions(${mex_target} PRIVATE NOMINMAX)
 	else()
 		target_link_options(${mex_target} PRIVATE ${OpenMP_CXX_LIBRARIES}) # do nothing if BUILD_MULTITHREAD is OFF
 		target_compile_definitions(${mex_target} PRIVATE MATLAB_DEFAULT_RELEASE=R2017b)
