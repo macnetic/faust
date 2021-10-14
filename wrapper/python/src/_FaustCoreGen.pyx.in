@@ -1,5 +1,5 @@
 def type2dtype(type):
-    return 'float32' if type == 'float' else type
+    return np.dtype('float32') if type == 'float' else np.dtype(type)
 
 cdef class FaustCoreGen@TYPE_NAME@@PROC@:
 
@@ -628,6 +628,9 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
         <FaustCoreCy.@CPP_CORE_CLASS@[@REAL_TYPE@]*>FaustCoreCy.@CPP_CORE_CLASS@2[@TYPE@,
                                                                                  @REAL_TYPE@].real((<@CORE_CLASS@?>self).@CORE_OBJ@)
         return core
+
+    def dtype(self):
+        return type2dtype('@TYPE@')
 
     def zpruneout(self, nnz_tres, npasses, only_forward):
         core = @CORE_CLASS@(core=True)

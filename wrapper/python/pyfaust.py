@@ -173,16 +173,21 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                     dtype = f.dtype
                 elif dtype != f.dtype:
                     raise TypeError('All Faust factors must have the same dtype.')
+            if dtype not in ['double', 'float32', 'complex128']:
+                raise TypeError('Unmanaged factor dtype:'+str(dtype)+' (must be float32, double or complex128')
             if(factors is not None and len(factors) > 0):
                 if(is_on_gpu):
                     if F._is_real:
-                        F.m_faust = _FaustCorePy.FaustCoreGenDblGPU(factors, scale)
+                        if dtype == 'double':
+                            F.m_faust = _FaustCorePy.FaustCoreGenDblGPU(factors, scale)
+                        else: # if dtype == 'float32':
+                            F.m_faust = _FaustCorePy.FaustCoreGenFltGPU(factors, scale)
                     else:
                         F.m_faust = _FaustCorePy.FaustCoreGenCplxDblGPU(factors, scale)
                 elif F._is_real:
                     if dtype == 'double':
                         F.m_faust = _FaustCorePy.FaustCoreGenDblCPU(factors, scale)
-                    elif dtype == 'float32':
+                    else: # if dtype == 'float32':
                         F.m_faust = _FaustCorePy.FaustCoreGenFltCPU(factors, scale)
                 else:
                     F.m_faust = _FaustCorePy.FaustCoreGenCplxDblCPU(factors, scale)
@@ -1846,10 +1851,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
 
         """
-        if(F.m_faust.isReal()):
-            return np.dtype(np.float64)
-        else:
-            return np.dtype(np.complex)
+        return F.m_faust.dtype()
 
     def imshow(F, name='F'):
         """
