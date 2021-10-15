@@ -14639,7 +14639,7 @@ Looking at <code>S_constraints</code> initialization, we see in the first line <
 <li>$ \forall i \in \{1,...,J-1\}, \| R_i \|_0 = {n^2 \over 2^i}  \hspace{1cm} (C2)$</li>
 </ul>
 <p>Enough of explanations! I let you decrypt why <code>R_constraints</code> correspond likewise to (C2).</p>
-<p>But wait a minute, what would happen if we have a set of one hundred constraints? Don't worry! The pyfaust API allows to alternatively set the constraints one by one:</p>
+<p>But wait a minute, what would happen if we had a set of one hundred constraints? Don't worry! The pyfaust API allows to alternatively set the constraints one by one:</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
@@ -14811,7 +14811,7 @@ You have to define two stopping criteria, one for the <em>local optimization</em
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust.proj</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="n">S_projs</span> <span class="o">=</span> <span class="p">[</span> <span class="n">splincol</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span> <span class="p">]</span>
 <span class="n">R_projs</span> <span class="o">=</span> <span class="p">[</span> <span class="n">splincol</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">2</span><span class="o">**</span><span class="n">i</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span> <span class="p">]</span>
-<span class="n">params</span> <span class="o">=</span> <span class="n">ParamsHierarchical</span><span class="p">(</span><span class="n">S_constraints</span><span class="p">,</span> <span class="n">R_constraints</span><span class="p">,</span> <span class="n">loc_stop</span><span class="p">,</span> <span class="n">glob_stop</span><span class="p">,</span>
+<span class="n">params</span> <span class="o">=</span> <span class="n">ParamsHierarchical</span><span class="p">(</span><span class="n">S_projs</span><span class="p">,</span> <span class="n">R_projs</span><span class="p">,</span> <span class="n">loc_stop</span><span class="p">,</span> <span class="n">glob_stop</span><span class="p">,</span>
                                 <span class="n">is_update_way_R2L</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># the argument order matters!</span>
 <span class="c1"># launch the factorization</span>
 <span class="n">FH4</span> <span class="o">=</span> <span class="n">faust_fact</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
@@ -14862,8 +14862,8 @@ Again, I can only advise you to read the dedicated notebook about projectors if 
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h2 id="2.-The-GFT-Algorithm">2. The GFT Algorithm<a class="anchor-link" href="#2.-The-GFT-Algorithm">&#182;</a></h2><p>Since version 2.4, FAµST is able to compute Fast Graph Fourier Transforms.
-Indeed, FAµST includes the Truncated Jabcobi Algorithm algorithm for this goal. It allows to diagonalize symmetric positive definite matrices.</p>
-<p>It is implemented in C++ and a Python wrapper make it available from pyfaust.</p>
+Indeed, FAµST includes the Truncated Jabcobi algorithm for this goal. It allows to diagonalize symmetric positive definite matrices.</p>
+<p>It is implemented in C++ and a Python wrapper makes it available from pyfaust.</p>
 <p>Here again the theory isn't what matters but feel free to take a look at the following papers:</p>
 <ul>
 <li><p>Le Magoarou L., Gribonval R., Tremblay N., <a href="https://hal.inria.fr/hal-01416110">“Approximate fast graph Fourier transforms via multi-layer sparse approximation“,Transactions on Signal and Information Processing over Networks</a></p>
@@ -14934,7 +14934,7 @@ Indeed, FAµST includes the Truncated Jabcobi Algorithm algorithm for this goal.
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Let's run the first algorithm (truncated Jacobi for eigen decomposition, hence the name <code>eigtj</code>) on the Minnesota Laplacian example. You'll see it's really straightforward!</p>
+<p>Let's run the truncated Jacobi algorithm (for eigen decomposition, hence the name <code>eigtj</code>) on the Minnesota Laplacian example. You'll see it's really straightforward!</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
