@@ -14260,7 +14260,7 @@ a.anchor-link {
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h1 id="Using-The-FA&#181;ST-Projectors-API">Using The FA&#181;ST Projectors API<a class="anchor-link" href="#Using-The-FA&#181;ST-Projectors-API">&#182;</a></h1><p>This notebook put the focus on the <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacepyfaust_1_1proj.html"><code>proj</code></a> module of the pyfaust API. This module provides a bunch of projectors which are for instance necessary to implement proximal operators in <a href="https://link.springer.com/article/10.1007/s10107-013-0701-9">PALM</a> algorithms.</p>
-<p>Indeed these projectors matter in the parametrization of the <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacepyfaust_1_1fact.html#a686e523273cf3e38b1b614a69f4b48af">PALM4MSA</a> and <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacepyfaust_1_1fact.html#a7ff9e21a4f0b4acd2107629d788c441c">hierarchical factorization</a> algorithms, so let's maintain their configuration as simple as possible by using projectors!</p>
+<p>Indeed these projectors matter in the parameterization of the <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacepyfaust_1_1fact.html#a686e523273cf3e38b1b614a69f4b48af">PALM4MSA</a> and <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacepyfaust_1_1fact.html#a7ff9e21a4f0b4acd2107629d788c441c">hierarchical factorization</a> algorithms, so let's maintain their configuration as simple as possible by using projectors!</p>
 <p>First let's explain some generalities about projectors:</p>
 <ul>
 <li>They are all functor objects (objects that you can call as a function).</li>
@@ -14843,7 +14843,7 @@ For detailed definitions of these kinds of matrices you can refer to wikipedia:<
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="The-NORMLIN-and-NORMCOL-projectors">The NORMLIN and NORMCOL projectors<a class="anchor-link" href="#The-NORMLIN-and-NORMCOL-projectors">&#182;</a></h3><p>The <code>pyfaust.proj</code> module provides two projectors, <code>normlin</code> (resp. <code>normcol</code>) that project a matrix onto the closest matrix with rows (resp. columns) of a prescribed 2-norm.</p>
+<h3 id="The-NORMLIN-and-NORMCOL-projectors">The NORMLIN and NORMCOL projectors<a class="anchor-link" href="#The-NORMLIN-and-NORMCOL-projectors">&#182;</a></h3><p>The <code>pyfaust.proj</code> module provides two projectors, <code>normlin</code> (resp. <code>normcol</code>) that projects a matrix onto the closest matrix with rows (resp. columns) of a prescribed 2-norm.</p>
 <p>Let's try them:</p>
 
 </div>
