@@ -13980,7 +13980,7 @@ Indeed, several operations are available in the FAµST API to optimize a Faust o
 <h2 id="1.-Faust.optimize_memory">1. Faust.optimize_memory<a class="anchor-link" href="#1.-Faust.optimize_memory">&#182;</a></h2><p>As you probably already know, a Faust can be composed of dense or sparse factors. In the FAµST C++ core, a dense matrix is encoded as a column-major order array in memory while a sparse matrix follows the <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csr_matrix.html">CSR format</a>. Although this is not memory efficient, it is totally possible to encode a sparse matrix in the dense format and conversely a dense matrix in the CSR format. There is no reason to do this but in many situations you might end up with a Faust encoded in a non-optimal format in your code.<br>
 That's where the <code>Faust.optimize_memory</code> function comes up, it takes a Faust and gives you back a new one for which the format of each factor is ensured to be memory efficient. It means that depending on the number of nonzeros of the considered matrix, the format will be chosen by the function to minimize the memory used for the whole Faust.</p>
 <p>Let's show this principle with a very simple example:</p>
-<p>I build a Faust creating my own CSR matrix using <a href="https://www.scipy.org/">scipy</a> and a dense matrix using a <a href="https://numpy.org/">numpy</a> array. On purpose I choose to create a CSR matrix of size NxN whose nnz is equal to N^2 (something that obviously must be encoded as a numpy array) and likewise I create a numpy array of size NxN whose nnz is 1 (here again the format is not well chosen because a CSR matrix would be far lighter in memory).</p>
+<p>we build a Faust creating my own CSR matrix using <a href="https://www.scipy.org/">scipy</a> and a dense matrix using a <a href="https://numpy.org/">numpy</a> array. On purpose we choose to create a CSR matrix of size NxN whose nnz is equal to N^2 (something that obviously must be encoded as a numpy array) and likewise we create a numpy array of size NxN whose nnz is 1 (here again the format is not well chosen because a CSR matrix would be far lighter in memory).</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
@@ -14465,10 +14465,10 @@ The following figure illustrates a basic iteration of pruneout on a product AB. 
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>The example above is trivial but when a Faust contain many factors including very sparse matrices, the benefit can be quite significant.
+<p>The example above is trivial but when a Faust contains many factors including very sparse matrices, the benefit can be quite significant.
 The reason why is that <code>pruneout</code> repeats the removal operation iteratively until there is no zero column/row eligible to this operation anymore.</p>
 <p>Note that of course the resulting Faust gives the same full matrix (i.e. <code>Faust.toarray</code> must give the same result after a <code>Faust.pruneout</code>).</p>
-<p>In the next section of code I show with a figure how a sliced DFT Faust can benefit of <code>Faust.pruneout</code> in terms of computation time.</p>
+<p>In the next section of code we show with a figure how a sliced DFT Faust can benefit of <code>Faust.pruneout</code> in terms of computation time.</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
