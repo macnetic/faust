@@ -14279,14 +14279,14 @@ It comes after the first notebook (available <a href="https://faustgrp.gitlabpag
 <a href="#2.7-Faust-Indexing-and-Slicing">2.7 Faust Indexing and Slicing</a><br/></p>
 <h1 id="1.-Getting-Basic-Information-about-a-Faust-Object">1. Getting Basic Information about a Faust Object<a class="anchor-link" href="#1.-Getting-Basic-Information-about-a-Faust-Object">&#182;</a></h1><p>First of all, given any object, you might ask yourself if it's a Faust or not (typically when you receive an object in a function, python being built on dynamic types, you can't say for sure it's a Faust). 
 <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1Faust.html#a965047e6c0161e59a1c3e08f2b60e806">Faust.isFaust()</a> is the function to verify an object is a Faust.
-Its use is straighforward as you can see in the <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1Faust.html#a965047e6c0161e59a1c3e08f2b60e806">documentation</a>. Note by the way, that a more accessible alias is available at the package root (<code>pyfaust.isFaust</code>).</p>
+Its use is straighforward as you can see in the <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1Faust.html#a965047e6c0161e59a1c3e08f2b60e806">documentation</a>. Note by the way, that a more accessible alias is available at the package root (<a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacepyfaust.html#a8e9ce6bb49c094e7380fed832e23baba">pyfaust.isFaust()</a>).</p>
 <h3 id="1.1-Obtaining-Dimension-and-Scalar-Type-Information">1.1 Obtaining Dimension and Scalar Type Information<a class="anchor-link" href="#1.1-Obtaining-Dimension-and-Scalar-Type-Information">&#182;</a></h3><p>Firstly, let's list basic Faust informative methods/attributes you're probably used to for numpy arrays:</p>
 <ul>
 <li><a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1Faust.html#a64b167c138d18a23bb5b9794fcb03ef1">shape</a>,</li>
 <li><a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1Faust.html#a6505fdc600b4868bbe77d8fc4a48b350">size</a>,</li>
 <li><a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1Faust.html#ad0615fb9508899a95af2c7de42377e91">dtype</a>.</li>
 </ul>
-<p>To keep it really clear, let's show some examples operated on a random Faust.</p>
+<p>To keep it really clear, let's show some examples performed on a random Faust.</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
@@ -14464,7 +14464,7 @@ Most of them are also available independently with specific functions.</p>
 <p>For instance, if you want information about factors, nothing is more simple than calling directly the next functions:</p>
 <ul>
 <li><a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1Faust.html#ab6e7f82d0a34b9ec90c73f9c887a2b51">numfactors()</a> ; which gives you the number of factors (aka layers) a Faust object is composed of.</li>
-<li><a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1Faust.html#a9cefcbcee255b2af0747b6d7693b26b4">factors()</a> ; which allows you to copy any of the Faust's factors givens its index.</li>
+<li><a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1Faust.html#a9cefcbcee255b2af0747b6d7693b26b4">factors()</a> ; which allows you to copy any of the Faust's factors given its index.</li>
 </ul>
 <p>Going back to our F object, let's call these functions:</p>
 
@@ -14554,13 +14554,13 @@ Most of them are also available independently with specific functions.</p>
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Note that, since Faust 2.3, the function doesn't alterate the factor format. If the Faust object contains a sparse factor then you'll receive a sparse (CSR) matrix.</p>
+<p>Note that, since FAµST 2.3, the function doesn't alterate the factor format. If the Faust object contains a sparse factor then you'll receive a sparse (CSR) matrix.</p>
 
 </div>
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Since Faust 2.3 again, it's possible to retrieve a sub-sequence of Faust factors.</p>
+<p>Since FAµST 2.3 again, it's possible to retrieve a sub-sequence of Faust factors.</p>
 <p>Go straight to the example, extracting factors from F:</p>
 
 </div>
@@ -14656,7 +14656,7 @@ Most of them are also available independently with specific functions.</p>
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <p>OK, that's not awful but I let you imagine how much complicated it is with more factors (even with a list comprehension, it's longer to write).</p>
 <h3 id="1.3-Plotting-a-Faust">1.3 Plotting a Faust<a class="anchor-link" href="#1.3-Plotting-a-Faust">&#182;</a></h3><p>It's quite useful to print a Faust as we've seen before, calling <code>print(F)</code> or <code>F.display()</code> or just <code>F</code> in an interactive terminal but this is wordy. 
-How about plotting a Faust in a more graphical fashion ?</p>
+How about plotting a Faust in a more graphical fashion?</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
@@ -14704,7 +14704,7 @@ How about plotting a Faust in a more graphical fashion ?</p>
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>What do we see above ? On the bottom right is the dense matrix associated to F, obtained with <code>F.toarray()</code>. On the top are the indexed factors of F.
+<p>What do we see above? On the bottom right is the dense matrix associated to F, obtained with <code>F.toarray()</code>. On the top are the indexed factors of F.
 Note that you can change the default <a href="https://matplotlib.org/tutorials/colors/colormaps.html">colormap</a> in matplotlib parameters.</p>
 <p>Let's look at a last example:</p>
 
@@ -14957,7 +14957,7 @@ Note that you can change the default <a href="https://matplotlib.org/tutorials/c
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <p>Isn't it obvious now that the smaller the density the better?! Indeed, for two Faust objects of the same shape and the same number of factors, a smaller density (linearly) implies a smaller file size for storage.
 This point applies also to the memory (RAM) space to work on a Faust.</p>
-<p>We'll see later how the computation can benefit of a bigger RCG (or smaller density). But let's point out right now that the sparsity is often a tradeoff with accuracy, as the following plot shows about the truncated <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.linalg.svd.html">SVD</a> of a matrix $M \in {\mathbb R}^{512 \times 512}$. Note beforehand that the SVD of M (truncated or not) can be seen as a Faust which approximates M.</p>
+<p>We'll see later how the computation can benefit of a larger RCG (or smaller density). But let's point out right now that when it comes to matrix factorizations the sparsity is often a tradeoff with accuracy, as the following plot shows about the truncated <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.linalg.svd.html">SVD</a> of a matrix $M \in {\mathbb R}^{512 \times 512}$. Note beforehand that the SVD of M (truncated or not) can be seen as a Faust which approximates M.</p>
 
 <pre><code>Faust([U,S,Vt])</code></pre>
 <p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAABmJLR0QA/wD/AP+gvaeTAAAACXBI
@@ -15556,7 +15556,7 @@ AElFTkSuQmCC"/></p>
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>What really matters here is that the results of G.T, G.conj() and G.H are all Faust objects. Behind the scene, there is just one memory zone allocated to the factors. Strictly speaking they are memory views shared between G, G.T and G.H. So don't hesitate to use!</p>
+	<p>What really matters here is that the results of <code>G.T</code>, <code>G.conj()</code> and <code>G.H</code> are all Faust objects. Behind the scene, there is just one memory zone allocated to the factors. Strictly speaking they are memory views shared between <code>G</code>, <code>G.T</code> and <code>G.H</code>. So don't hesitate to use!</p>
 
 </div>
 </div>
@@ -16193,7 +16193,7 @@ FG is a Faust too!</p>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <p>Let's launch a timer to compare the execution times of Faust-vector multiplication and Faust's dense matrix-vector multiplication</p>
-<p>Note that appliying a Faust on a <code>numpy.ndarray</code> can be done with the function dot().</p>
+<p>Note that appliying a Faust on a <code>numpy.ndarray</code> can also be done with the function dot().</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
