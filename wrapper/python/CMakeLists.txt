@@ -262,14 +262,14 @@ function (Generate_pyx TYPE_NAME TYPE REAL_TYPE_NAME REAL_TYPE PROC CORE_OBJ_SUF
 	set(CORE_OBJ core_faust_${CORE_OBJ_SUFFIX})
 	set(CORE_OBJ_REAL core_faust_${CORE_OBJ_REAL_SUFFIX})
 	set(PYX_LIST _FaustCoreGen)
+	if(NOT DISABLE_ALGO_PYX)
 		list(APPEND PYX_LIST _FaustAlgoGenProc)
-		#if(NOT ${TYPE} MATCHES float) # float not yet supported by algorithms
 		if(${PROC} MATCHES CPU)
 			list(APPEND PYX_LIST _FaustAlgoGen) # this pyx is only on CPU
 		endif()
-		#endif()
-	if(USE_GPU_MOD)
-		list(APPEND PYX_LIST _FaustCoreGenNonMemberFuncs)
+		if(USE_GPU_MOD)
+			list(APPEND PYX_LIST _FaustCoreGenNonMemberFuncs)
+		endif()
 	endif()
 	foreach(PYX_NAME IN LISTS PYX_LIST)
 		configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/${PYX_NAME}.pyx.in ${FAUST_PYTHON_BIN_DIR}/${PYX_NAME}${TYPE_NAME}${PROC}.pyx @ONLY)
