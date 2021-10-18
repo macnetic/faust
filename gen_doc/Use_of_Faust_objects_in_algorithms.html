@@ -14260,8 +14260,8 @@ a.anchor-link {
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h1 id="Using-the-FA&#181;ST-API-in-Algorithms">Using the FA&#181;ST API in Algorithms<a class="anchor-link" href="#Using-the-FA&#181;ST-API-in-Algorithms">&#182;</a></h1><p>After the little tour we've done in the previous notebooks, about the <a href="#creation_links">creation of Faust objects</a>, and their <a href="#manip_links">manipulation</a>, we shall see in this third notebook how the FAµST API can be deployed seamlessly in algorithms.
-Our example, already alluded in the <a href="#manip_links">second notebook</a>, will be the Orthogonal Matching Pursuit algorithm (OMP).</p>
-<p>This algorithm intervenes in the dictionary learning problem. Of course, I will not treat the theory behind but I assume the reader is already familiar with it.
+Our example, already mentioned in the <a href="#manip_links">second notebook</a>, will be the Orthogonal Matching Pursuit algorithm (OMP).</p>
+<p>This algorithm comes up in the dictionary learning problem. Assuming that the reader is already familiar with this problem we will not treat the theory behind.
 There is not so much to say so let's go straight to the code example.</p>
 
 </div>
@@ -14304,7 +14304,7 @@ There is not so much to say so let's go straight to the code example.</p>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <p>The most important point to notice in this code is that except the import part in the header, all the code seems to be a natural numpy implementation of OMP.<br>
-This is in fact the core philosophy of the FAµST API, as explained in previous notebooks and also in the API documentation, we made sure that a Faust can be seen as a numpy array (or rather as a <code>numpy.matrix</code>) hence this code is in fact totally compatible with the two APIs: the function argument D, which is the dictionary, can be indifferently a <code>pyfaust.Faust</code> object or a <code>numpy.matrix</code> object.<br>
+This is in fact the core philosophy of the FAµST API, as explained in previous notebooks and also in the API documentation, we made sure that a Faust can be seen as a numpy array. Hence this code is in fact totally compatible with the two APIs: the function argument D, which is the dictionary, can be indifferently a <code>pyfaust.Faust</code> object or a numpy array.<br>
 A secondary point is that this implementation is more like a toy concept (as indicated by the "t" in the function name). A more advanced and optimized version is introduced in the <a href="#4.-An-OMP-Cholesky-Implementation">last part of this notebook</a> and in particular allows to define the algorithm stopping criterion according to the error tolerance the user wants.</p>
 <p>Next we will test this implementation in both cases. But first, let us define a test case.</p>
 
@@ -14328,7 +14328,7 @@ I_n &amp; H_n \\
 \end{array}
 \right]
 $</p>
-<p>$I_n$ is the identity or Dirac matrix and $H_n$ the orthonormal Hadamard matrix, with n being a power of two.</p>
+<p>$I_n$ is the identity matrix and $H_n$ the orthonormal Hadamard matrix, with n being a power of two.</p>
 <p>The condition on which the uniqueness of the sparse representation $x$ of a vector $y$  is ensured is defined by the following inequality:<br>
 $ \| x \|_0 &lt; (1 + 1/\mu)/2 $ where $\mu$ denotes the coherence of the dictionary and in case of our specially crafted dictionary $\mu = {1 \over \sqrt n}$.</p>
 <p>So let's construct the Faust of D, compute y for a sparse enough x and test our OMP implementation to find out if we effectively retrieve this unique x as we should according to this theorem.</p>
@@ -14507,7 +14507,7 @@ $ \| x \|_0 &lt; (1 + 1/\mu)/2 $ where $\mu$ denotes the coherence of the dictio
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>We tested OMP on a Faust, go ahead and verify what I was aiming at in the first part of the notebook: is this OMP implementation really working identically on a Faust and a <code>numpy.matrix</code>?</p>
+<p>We tested OMP on a Faust, go ahead and verify what we were aiming at in the first part of the notebook: is this OMP implementation really working identically on a Faust and a numpy array?</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
@@ -14594,7 +14594,7 @@ omp(y, D, maxiter=None, tol=0, relerr=True, verbose=False)
     Runs the greedy OMP algorithm optimized by Cholesky decomposition.
     
     Args:
-        y: the vector to approximate by D*x.
+        y: the vector to approximate by D@x.
         D: the dictionary as a numpy array or a Faust.
         maxiter: the maximum number of iterations of the algorithm.
         By default (None) it&#39;s y&#39;s dimension: max(y.shape).
@@ -14605,7 +14605,7 @@ omp(y, D, maxiter=None, tol=0, relerr=True, verbose=False)
         verbose: to enable the verbosity (value to True).
     
     Returns:
-        x: the solution of y = D*x (according to the error).
+        x: the solution of y = D@x (according to the error).
     
     Example:
         &gt;&gt;&gt; from pyfaust.tools import omp
@@ -14693,13 +14693,13 @@ To show off a little, let's run this demo.</p>
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>What we see in this figure is that it takes a few dozens of milliseconds (the median time) to compute the BSL experiment on the dense matrix M. This is well above the time it takes with Faust approximates $\hat M_6$ to $\hat M_{23}$ in which the numbers 6 and 23 denote the Faust <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1Faust.html#a6a51a05c20041504a0b8f2a73dd8d05a">RCG</a>. The greater the RCG the better the computation time is, as we already saw in the <a href="#manip_links">notebook about Faust manipulations</a>.</p>
+<p>What we see in this figure is that it takes a few dozens of milliseconds (the median time) to compute the BSL experiment on the dense matrix M. This is well above the time it takes with Faust approximates $\hat M_6$ to $\hat M_{26}$ in which the numbers 6 and 26 denote the Faust <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1Faust.html#a6a51a05c20041504a0b8f2a73dd8d05a">RCG</a>. The greater the RCG the better the computation time is, as we already saw in the <a href="#manip_links">notebook about Faust manipulations</a>.</p>
 
 </div>
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>As a complementary test, let's verify that the two runs of <code>omp()</code> on FD and D we constructed before for the toy omp give the same results even if the vector to retrieve is not very sparse. Here for instance, $ \| x_1 \|_0 = 98 $</p>
+<p>As a complementary test, let's verify that the two runs of <code>omp()</code> on FD and D we constructed before for the toy OMP give the same results even if the vector to retrieve is not very sparse. Here for instance, $ \| x_1 \|_0 = 98 $</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
