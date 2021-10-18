@@ -14259,24 +14259,24 @@ a.anchor-link {
 
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h1 id="Using-the-PALM4MSA-MHTP-Algorithm">Using the PALM4MSA-MHTP Algorithm<a class="anchor-link" href="#Using-the-PALM4MSA-MHTP-Algorithm">&#182;</a></h1><p>In this notebook we shall see how to use the PALM4MSA-MHTP algorithm. A notebook has already been written on the Hierarchical PALM4MSA algorithm and its wrappers and is a prerequisite to the reading of this notebook.</p>
+	<h1 id="Using-the-PALM4MSA-MHTP-Algorithm">Using the PALM4MSA-MHTP Algorithm<a class="anchor-link" href="#Using-the-PALM4MSA-MHTP-Algorithm">&#182;</a></h1><p>In this notebook we shall see how to use the PALM4MSA-MHTP algorithm. A <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/Faust_factorization.html">notebook</a> has already been written on the Hierarchical PALM4MSA algorithm and its wrappers and is a prerequisite to the reading of this notebook.</p>
 <p>The PALM4MSA-MHTP is a variant of PALM4MSA in which intervenes the Multilinear Hard Tresholdhing Pursuit algorithm (MHTP).</p>
 <p>The interest of this variant is to avoid the situation in which PALM4MSA tends to stuck on some matrix supports without any way out. MHTP allows to explore the support more freely and hopefully find a more accurate factorization at the cost of just a few more dozens iterations of the gradient descent algorithm.</p>
 <p>For more information on the theory, you can read the following paper in which is treated the particular case of the BHTP (Bilinear HTP, that is running the MHTP on only two factors).</p>
 <p><a name="[1]">[1]</a> Quoc-Tung Le, Rémi Gribonval. Structured Support Exploration For Multilayer Sparse Matrix Fac- torization. ICASSP 2021 - IEEE International Conference on Acoustics, Speech and Signal Processing, Jun 2021, Toronto, Ontario, Canada. pp.1-5. <a href="https://hal.inria.fr/hal-03132013/document">hal-03132013</a>.</p>
-<h2 id="Configuring-and-Running-PALM4MSA-MHTP">Configuring and Running PALM4MSA-MHTP<a class="anchor-link" href="#Configuring-and-Running-PALM4MSA-MHTP">&#182;</a></h2><p>This variant works very similarly to a classic run of PALM4MSA, that is with at least the same set of parameters. The main difference is that periodically (in term of PALM4MSA iterations) the MHTP algorithm is launched to renew each layer of the Faust being refined.</p>
+<h2 id="Configuring-and-Running-PALM4MSA-MHTP">Configuring and Running PALM4MSA-MHTP<a class="anchor-link" href="#Configuring-and-Running-PALM4MSA-MHTP">&#182;</a></h2><p>This variant works very similarly to a classic run of PALM4MSA, that is with at least the same set of parameters. The main difference is that periodically (in term of PALM4MSA number of iterations) the MHTP algorithm is launched to renew each layer of the Faust being refined.</p>
 <p>Hence running the PALM4MSA-MHTP needs two sets of parameters: <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1factparams_1_1ParamsPalm4MSA.html">ParamsPalm4MSA</a> and <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1factparams_1_1MHTPParams.html">MHTPParams</a> objects. The former should not be really new if you are used to PALM4MSA, the latter is dedicated to the configuartion of the MHTP part of PALM4MSA-MHTP.</p>
 <p>The arguments to configure <code>MHTPParams</code> are basically:</p>
 <ul>
 <li><code>num_its</code>: the number of iterations MHTP runs on each layer of the Faust. Remember that this number of iterations is for each factor. If you have two factors the overall number of iterations is <code>2 x num_its</code> (exactly as it is for PALM4MSA).</li>
-<li><code>constant_step_size</code> and <code>step_size</code>: that determines if the MHTP gradient descent will be ran according to a constant step size, and in that case how long is the step size. By default, the step size is not constant and recomputed dynamically with the Lipschitz coefficient as in PALM4MSA. In most case, it is recommended to not use a constant step size to achieve a better loss function.</li>
+<li><code>constant_step_size</code> and <code>step_size</code>: that determines if the MHTP gradient descent will be ran according to a constant step size, and in that case how long is the step size. By default, the step size is not constant and recomputed dynamically with the Lipschitz coefficient as in PALM4MSA. In most cases, it is recommended to not use a constant step size to achieve a better loss function.</li>
 <li><code>palm4msa_period</code>: which governs how many times to evenly run the MHTP algorithm inside PALM4MSA itself. By default, the value is 50. It means that for example if PALM4MSA is running for 200 iterations, MHTP will run 4 times: at iterations 0, 49, 99, 149 and 199 of PALM4MSA. Every time it runs MHTP will run for <code>num_its</code> iterations.</li>
 <li><code>updating_lambda</code>: this boolean when set to <code>True</code> allows to update the scale factor of the Faust (the same one that is used in PALM4MSA) in the end of each iteration of MHTP.</li>
 </ul>
 <p>So let's run PALM4MSA-MHTP on a small example: we propose to factorize a 500x32 matrix into two factors.</p>
 <b>First</b> we configure PALM4MSA as usual:
 <ul>
-<li>The number of iterations of PALM4SA with the StoppingCriterion (here 200 iterations).</li>
+	<li>The number of iterations of PALM4MSA with the <code>StoppingCriterion</code> (here 200 iterations).</li>
 <li>Then we define the constraints / projectors to use, here the SPLIN projector for the first factor of size 500x32 into which we want to count 5 nonzeros per row and the NORMCOL projector for the second factor in which each column must be normalized.</li>
 </ul>
 
@@ -14502,7 +14502,7 @@ PALM4MSA error 0.36661565702911475
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <p>The MEG (for magnetoencephalography) matrix is also used in <a href="#[1]">[1]</a> to compare PALM4MSA and PALM4MSA-MHTP performance.<br>
-The goal is to factorize the MEG matrix as $M_{MEG} \approx A \times B$ with $M_{MEG} \in \mathbb{R}^{8293 \times 204}, A \in \mathbb{R}^{8193 \times 204}$ and $B \in \mathbb{R}^{204 \times 204}$.  A and B are subject to sparsity constraints. Here we'll test only one sparsity configuration of the two factors ($k_0$ = 100 and $k_1 = 25$ being respectively the per-row number of nonzeros of A and B).</p>
+The goal is to factorize the MEG matrix as $M_{MEG} \approx A \times B$ with $M_{MEG} \in \mathbb{R}^{8193 \times 204}, A \in \mathbb{R}^{8193 \times 204}$ and $B \in \mathbb{R}^{204 \times 204}$.  A and B are subject to sparsity constraints. Here we'll test only one sparsity configuration of the two factors ($k_0$ = 100 and $k_1 = 25$ being respectively the per-row number of nonzeros of A and B).</p>
 <p>Let's load the MEG matrix which is embedded in FAµST data package (which should be downloaded automatically).</p>
 
 </div>
