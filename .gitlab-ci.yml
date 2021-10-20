@@ -337,7 +337,7 @@ pkg_linux_release_static:
     only:
         - tags
 
-pages:
+.pages:
     stage: gitlab_pages
     script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
@@ -745,7 +745,7 @@ test_win_purepy_pkg_extra_pyver:
     - job: pkg_win_purepy_release_extra_pyver
       artifacts: true
 
-pypi_pub:
+.pypi_pub:
   stage: pkg_pub
   script:
     - python3 -m pip install --user twine
