@@ -762,6 +762,15 @@ template<typename FPP>
 			throw std::runtime_error("real is not yet implemented for GPU2.");
 			return nullptr; //never reached
 		}
+
+	template<typename FPP>
+		FPP TransformHelper<FPP,GPU2>::get_item(faust_unsigned_int i, faust_unsigned_int j)
+		{
+			MatDense<FPP, GPU2> M;
+			faust_unsigned_int out_id;
+			TransformHelperGen<FPP,GPU2>::get_item(i, j, M, out_id);
+			return M.tocpu().getData()[out_id];
+		}
 }
 
 #include "faust_TransformHelper_cat_gpu.hpp"

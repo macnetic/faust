@@ -1425,7 +1425,14 @@ template<typename FPP>
 }
 
 
-
+	template<typename FPP>
+FPP TransformHelper<FPP,Cpu>::get_item(faust_unsigned_int i, faust_unsigned_int j)
+{
+	MatDense<FPP, Cpu> M;
+	faust_unsigned_int out_id;
+	TransformHelperGen<FPP,Cpu>::get_item(i, j, M, out_id);
+	return M.getData()[out_id];
+}
 	template<typename FPP> bool TransformHelper<FPP,Cpu>::seed_init = false;
 	template<typename FPP> std::default_random_engine TransformHelper<FPP,Cpu>::generator(time(NULL));
 

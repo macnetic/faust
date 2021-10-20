@@ -479,4 +479,23 @@ namespace Faust
 			return true;
 		}
 
+	template<typename FPP, FDevice DEV>
+		void TransformHelperGen<FPP, DEV>::get_item(faust_unsigned_int i, faust_unsigned_int j, MatDense<FPP, DEV> &out, faust_unsigned_int &out_id)
+		{
+			FPP item;
+			TransformHelper<FPP, DEV> *th;
+			if(this->getNbCol() < this->getNbRow())
+			{
+				th = this->slice(i, i+1, 0, this->getNbCol()-1);
+				th->transpose();
+				out_id = j;
+			}
+			else
+			{
+				th = this->slice(0, this->getNbRow()-1, j, j+1);
+				out_id = i;
+			}
+			out = th->get_product();
+			delete th;
+		}
 }

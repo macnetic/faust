@@ -1295,6 +1295,12 @@ classdef Faust
 				error(' subsref invalid slicing must have 2 index since F is a 2D-array');
 			end
 
+			if(numel(S.subs{1}) == 1 && nume(S.subs{2}) == 1)
+				% accessing a single item
+				submatrix = call_mex(F, 'get_item', S.subs{1}, S.subs{2});
+				return
+			end
+
 			end_ids = zeros(1,2);
 			start_ids = zeros(1,2);
 			indexing_by_slice = [ true, true ];

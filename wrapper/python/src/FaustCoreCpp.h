@@ -157,6 +157,7 @@ class FaustCoreCpp
     FaustCoreCpp<FPP,DEV>* polyNext() const;
 	void device(char* dev) const;
     FaustCoreCpp<Real<FPP>,DEV>* real();
+    FPP get_item(unsigned long int i, unsigned long int j);
     ~FaustCoreCpp();
     static FaustCoreCpp<FPP,DEV>* randFaust(unsigned int t,
             unsigned int min_num_factors, unsigned int max_num_factors,

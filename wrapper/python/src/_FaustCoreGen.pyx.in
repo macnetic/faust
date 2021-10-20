@@ -639,6 +639,9 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
                                                     only_forward)
         return core
 
+    def get_item(self, i, j):
+        return self.@CORE_OBJ@.get_item(i,j)
+
     def __dealloc__(self):
         del self.@CORE_OBJ@
 

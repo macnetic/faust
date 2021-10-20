@@ -653,4 +653,9 @@ FaustCoreCpp<Real<FPP>,DEV>* FaustCoreCpp<FPP,DEV>::real()
     return core;
 }
 
+template<typename FPP, FDevice DEV>
+FPP FaustCoreCpp<FPP,DEV>::get_item(unsigned long int i, unsigned long int j)
+{
+    return transform->get_item(i, j);
+}
 

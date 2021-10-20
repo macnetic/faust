@@ -93,6 +93,11 @@ namespace Faust
 			virtual TransformHelper<FPP,DEV>* clone();
 			virtual void convertToSparse()=0;
 			virtual void convertToDense()=0;
+			/**
+			 * \brief Returns Faust-matrix element without computing the Faust full array.
+			 */
+			virtual FPP get_item(faust_unsigned_int i, faust_unsigned_int j)=0;
+			void get_item(faust_unsigned_int i, faust_unsigned_int j, MatDense<FPP, DEV>& out_mat, faust_unsigned_int &out_id);
 
 		protected:
 			void init_fancy_idx_transform(TransformHelper<FPP,DEV>* th, faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols);

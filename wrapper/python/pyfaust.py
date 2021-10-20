@@ -14,6 +14,7 @@ import pyfaust.factparams
 import warnings
 import decimal
 import numpy.lib.mixins
+from os import environ
 
 HANDLED_FUNCTIONS = {}
 
@@ -1276,7 +1277,10 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             if(len(indices) == 2):
                 out_indices = [0,0]
                 if(isinstance(indices[0], int) and isinstance(indices[1],int)):
-                    return F.toarray()[indices[0],indices[1]]
+                    if 'OPT_GET_ITEM' in environ and environ['OPT_GET_ITEM'] == '0':
+                        return F.toarray()[indices[0],indices[1]]
+                    else:
+                        return F.m_faust.get_item(indices[0], indices[1])
                 if(isinstance(indices[0], np.ndarray)):
                     indices = (list(indices[0]), indices[1])
                 if(isinstance(indices[1], np.ndarray)):

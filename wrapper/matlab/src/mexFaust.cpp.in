@@ -108,6 +108,7 @@
 #else
 #include "faust_clone.h"
 #endif
+#include "faust_get_item.h"
 
 typedef @FAUST_SCALAR@ SCALAR;
 typedef @FAUST_FPP@ FPP;
@@ -235,6 +236,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		else if(!strcmp("clone_gpu2cpu", cmd))
 			faust_clone_gpu2cpu<SCALAR, DEV>(prhs, nrhs, plhs, nlhs);
 #endif
+		else if(!strcmp("get_item", cmd))
+			faust_get_item<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
 		else
 			mexErrMsgTxt("Command not recognized.");
 	}

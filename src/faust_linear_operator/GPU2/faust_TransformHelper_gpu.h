@@ -109,6 +109,7 @@ namespace Faust
 						const bool transpose  = false) const;
 
 				void save_mat_file(const char* filepath) const;
+				FPP get_item(faust_unsigned_int i, faust_unsigned_int j);
 				static TransformHelper<FPP,GPU2>* hadamardFaust(unsigned int n, const bool norma=true);
 				static TransformHelper<FPP,GPU2>* fourierFaust(unsigned int n, const bool norma=true);
 				static TransformHelper<FPP,GPU2>* eyeFaust(unsigned int n, unsigned int m);
