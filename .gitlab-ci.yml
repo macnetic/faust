@@ -505,6 +505,10 @@ pkg_linux_purepy_release_extra_pyver:
 pkg_linux_purepy_release_torch_linked:
     extends: pkg_linux_purepy_release
     variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a", BUILD_MULTITHREAD: "ON", NOPY2: "ON", FAUST_TORCH: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "/opt/local/libtorch/share/cmake/Torch;../gpu_mod", EXPERIMENTAL_PKG: "OFF", CMAKE_CXX_COMPILER: "clang++"}
+    tags:
+      - torch
+      - linux
+      - tux_packager
 
 .pkg_purepy_release_rasp:
     stage: pkg
