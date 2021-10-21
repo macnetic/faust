@@ -195,8 +195,14 @@ pkg_linux:
         - SHA_START=$(echo $CI_COMMIT_SHA | sed -e 's/^\(.\{8\}\).*/\1/')
         - export PYTHON_PATH=$(which python$NIX_PY_VER)
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DCPACK_PACKAGE_FILE_NAME=faust-$SHA_START -DCPACK_PACKAGE_VERSION=$SHA_START -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DEXPERIMENTAL_PKG=ON -DNOPY2=ON -DUSE_GPU_MOD=ON -DCMAKE_PREFIX_PATH=$PWD/../gpu_mod -DBUILD_FLOAT_PYX=ON ..'
+        # build python and matlab wrappers separately to use clang for python and gcc for matlab
+        - 'cmake -DBUILD_WRAPPER_PYTHON=OFF -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DCPACK_PACKAGE_FILE_NAME=faust-$SHA_START -DCPACK_PACKAGE_VERSION=$SHA_START -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DEXPERIMENTAL_PKG=ON -DNOPY2=ON -DUSE_GPU_MOD=ON -DCMAKE_PREFIX_PATH=$PWD/../gpu_mod -DBUILD_FLOAT_PYX=ON ..'
         - make
+        - 'cmake -DCMAKE_CXX_COMPILER=clang++ ..' # it needs to be made separately because it cleans up other variables (for building both faust.a and python wrapper with clang -- necessary to avoid unresolved c++ symbols which happens by mixing up gcc and clang objects)
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DCPACK_PACKAGE_FILE_NAME=faust-$SHA_START -DCPACK_PACKAGE_VERSION=$SHA_START -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DEXPERIMENTAL_PKG=ON -DNOPY2=ON -DUSE_GPU_MOD=ON -DCMAKE_PREFIX_PATH=$PWD/../gpu_mod -DBUILD_FLOAT_PYX=ON ..'
+        - make clean
+        - make faust
+        - make faust_python
           # generate package via cpack
         - cpack -G RPM -C CPackConfig.cmake
         - cpack -G DEB -C CPackConfig.cmake
@@ -337,7 +343,7 @@ pkg_linux_release_static:
     only:
         - tags
 
-pages:
+.pages:
     stage: gitlab_pages
     script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
@@ -375,6 +381,7 @@ pages:
 .pkg_purepy: &pkg_purepy
     script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
+        - cmake -DCMAKE_CXX_COMPILER=$CMAKE_CXX_COMPILER ..
         - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=OFF -DBUILD_DOCUMENTATION=ON -DCPACK_PACKAGE_VERSION=$VERSION -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DBUILD_TESTING=OFF -DEXCLUDE_FAUST_LIB_INSTALL=ON -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=$MATIO_STATIC_LIB_PATH -DZ_STATIC_LIB_PATH=$Z_STATIC_LIB_PATH -DHDF5_STATIC_LIB_PATH=$HDF5_STATIC_LIB_PATH -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DEXPERIMENTAL_PKG=$EXPERIMENTAL_PKG -DFAUST_TORCH=$FAUST_TORCH -DCMAKE_PREFIX_PATH="$CMAKE_PREFIX_PATH" -DNOPY2=$NOPY2 -DBUILD_MULTITHREAD=$BUILD_MULTITHREAD -DUSE_GPU_MOD=$USE_GPU_MOD -DEXPERIMENTAL_PKG=$EXPERIMENTAL_PKG -DFAUST_TORCH=$FAUST_TORCH -DBUILD_FLOAT_PYX=ON ..'
         - make
         - cd wrapper/python
@@ -412,10 +419,10 @@ pages:
 
 pkg_macos_purepy_rev:
     extends: .pkg_purepy_rev
-    variables: {MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a", EXPERIMENTAL_PKG: "ON", BUILD_MULTITHREAD: "ON", NOPY2: "ON"}
+    variables: {MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a", EXPERIMENTAL_PKG: "ON", BUILD_MULTITHREAD: "ON", NOPY2: "ON", CMAKE_CXX_COMPILER: "/opt/local/bin/clang++-mp-8.0"}
     before_script:
       - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-      - cmake -DCMAKE_CXX_COMPILER=/opt/local/bin/clang++-mp-8.0 ..
+      - cmake -DCMAKE_CXX_COMPILER=$CMAKE_CXX_COMPILER ..
       - cd ..
     tags:
         - macos
@@ -425,7 +432,7 @@ pkg_macos_purepy_rev:
 
 pkg_linux_purepy_rev:
     extends: .pkg_purepy_rev
-    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a", BUILD_MULTITHREAD: "ON", NOPY2: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "../gpu_mod", EXPERIMENTAL_PKG: "ON"} #, PYTHON_PATH: '/usr/local/bin/python3.9', JOB_PYTHON: 'python3.9'}
+    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a", BUILD_MULTITHREAD: "ON", NOPY2: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "../gpu_mod", EXPERIMENTAL_PKG: "ON", CMAKE_CXX_COMPILER: "clang++"} #, PYTHON_PATH: '/usr/local/bin/python3.9', JOB_PYTHON: 'python3.9'}
     tags:
         - linux
         - tux_packager
@@ -457,27 +464,27 @@ pkg_linux_purepy_rev:
 
 pkg_macos_purepy_release:
     extends: .pkg_purepy_release
-    variables: {MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a", BUILD_MULTITHREAD: "ON", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", NOPY2: "ON"}
+    variables: {MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a", BUILD_MULTITHREAD: "ON", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", NOPY2: "ON", CMAKE_CXX_COMPILER: "/opt/local/bin/clang++-mp-8.0"}
     before_script:
       - VERSION=$CI_COMMIT_TAG
       - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-      - cmake -DCMAKE_CXX_COMPILER=/opt/local/bin/clang++-mp-8.0 ..
+      - cmake -DCMAKE_CXX_COMPILER=$CMAKE_CXX_COMPILER ..
       - cd ..
     tags:
         - macos
 
 pkg_macos_purepy_release_extra_pyver:
     extends: pkg_macos_purepy_release
-    variables: {MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a", BUILD_MULTITHREAD: "ON", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", NOPY2: "ON", PYTHON_PATH: '/opt/local/bin/python3.8', JOB_PYTHON: 'python3.8'}
+    variables: {MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a", BUILD_MULTITHREAD: "ON", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", NOPY2: "ON", PYTHON_PATH: '/opt/local/bin/python3.8', JOB_PYTHON: 'python3.8', CMAKE_CXX_COMPILER: "/opt/local/bin/clang++-mp-8.0"}
     tags:
         - macos
 
 pkg_macos_purepy_release_torch_linked:
     extends: pkg_macos_purepy_release
-    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a", FAUST_TORCH: "ON", CMAKE_PREFIX_PATH: "/opt/local/libtorch/share/cmake/Torch", BUILD_MULTITHREAD: "ON", EXPERIMENTAL_PKG: "OFF", NOPY2: "ON"}
+    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a", FAUST_TORCH: "ON", CMAKE_PREFIX_PATH: "/opt/local/libtorch/share/cmake/Torch", BUILD_MULTITHREAD: "ON", EXPERIMENTAL_PKG: "OFF", NOPY2: "ON", CMAKE_CXX_COMPILER: "/opt/local/bin/clang++-mp-8.0"}
     before_script:
       - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-      - cmake -DCMAKE_CXX_COMPILER=/opt/local/bin/clang++-mp-8.0 ..
+      - cmake -DCMAKE_CXX_COMPILER=$CMAKE_CXX_COMPILER ..
       - cd ..
 
 pkg_linux_purepy_release:
@@ -497,7 +504,7 @@ pkg_linux_purepy_release_extra_pyver:
 
 pkg_linux_purepy_release_torch_linked:
     extends: pkg_linux_purepy_release
-    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a", BUILD_MULTITHREAD: "ON", NOPY2: "ON", FAUST_TORCH: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "/opt/local/libtorch/share/cmake/Torch;../gpu_mod", EXPERIMENTAL_PKG: "OFF"}
+    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a", BUILD_MULTITHREAD: "ON", NOPY2: "ON", FAUST_TORCH: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "/opt/local/libtorch/share/cmake/Torch;../gpu_mod", EXPERIMENTAL_PKG: "OFF", CMAKE_CXX_COMPILER: "clang++"}
 
 .pkg_purepy_release_rasp:
     stage: pkg
@@ -745,7 +752,7 @@ test_win_purepy_pkg_extra_pyver:
     - job: pkg_win_purepy_release_extra_pyver
       artifacts: true
 
-pypi_pub:
+.pypi_pub:
   stage: pkg_pub
   script:
     - python3 -m pip install --user twine

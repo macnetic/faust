@@ -17,10 +17,23 @@ if(version == ''):
                     # it avoids error PEP440
 
 from sys import platform
+lib_ext = 'so'
+extra_link_args = [@FAUST_SETUP_PY_LFLAGS@]
+extra_objects = @PYTHON_EXT_EXTRA_OBJECTS@
 if platform == "linux":# or platform == "darwin":
-    # compile with clang on Linux and MacOS X
-    #from distutils import sysconfig
-    #sysconfig.get_config_vars()['CC'] = 'clang'
+    # compile with clang on Linux (and MacOS X, this is the default choice)
+    from distutils import sysconfig
+    sysconfig.get_config_vars()['CC'] = 'clang++'
+    sysconfig.get_config_vars()['CXX'] = 'clang++'
+    sysconfig.get_config_vars()['LDCXXSHARED'] = 'clang++ -shared -fopenmp'
+    for opt in [@FAUST_SETUP_PY_LFLAGS@]+[]:
+        if '-fopenmp' not in extra_link_args and opt.find('-fopenmp'):
+            extra_link_args.append('-fopenmp') # because the LDCXXSHARED modif above is not enough (distutils ignores the -fopenmp flag)
+    # note: libfaust.a must have been compiled with clang too (cmake -DCMAKE_CXX_COMPILER=clang++) or link errors might occur
+    if extra_objects is None:
+        extra_objects = ['@PROJECT_BINARY_DIR@/lib/libfaust.a']
+    else:
+        extra_objects += ['@PROJECT_BINARY_DIR@/lib/libfaust.a']
     lib_ext = 'so'
 elif platform == 'darwin':
     lib_ext = 'dylib'
@@ -35,8 +48,8 @@ PyFaust = Extension('_FaustCorePy',
                     library_dirs=[@FAUST_PYTHON_LIB_DIR@],
                     libraries=[ @FAUST_PYTHON_LIBS@],
                     extra_compile_args = [ @FAUST_SETUP_PY_CFLAGS@ ],
-                    extra_link_args = [ @FAUST_SETUP_PY_LFLAGS@ ],
-                    extra_objects = @PYTHON_EXT_EXTRA_OBJECTS@
+                    extra_link_args = extra_link_args,
+                    extra_objects = extra_objects
                    )
 
 setup(
