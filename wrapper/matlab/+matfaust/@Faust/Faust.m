@@ -187,7 +187,7 @@ classdef Faust
 						else
 							factors{i} = double(factors{i});
 						end
-						warning(['Faust constructor: first factor is ' dtype ' but the ' int2str(i) '-th factor is ' class(factors{i}) '. It has been auto-converted to ' dtype ])
+						warning(['Faust constructor: first factor is ' F.dtype ' but the ' int2str(i) '-th factor is ' class(factors{i}) '. It has been auto-converted to ' F.dtype ])
 					end
 				end
 				for i=2:nargin

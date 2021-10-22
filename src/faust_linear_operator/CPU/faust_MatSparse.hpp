@@ -758,19 +758,28 @@ matvar_t* Faust::MatSparse<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate)
 	sparse.ndata = (int) this->nnz;
 	int* jc;
 	int* ir = new int[sparse.nzmax];
-	double* data;
+	Real<FPP>* data;
 	mat_complex_split_t z = {0,};
 	int nir = 0; //incremented later row by row
 	int i = 0;
 
-	int opt = typeid(getValuePtr()[0])==typeid(complex<double>(1.0,1.0))?MAT_F_COMPLEX:0;
-
-	if(opt) {
-		z.Re = new double[sparse.nzmax];
-		z.Im = new double[sparse.nzmax];
+	matio_types matio_type;
+	if(std::is_same<FPP, float>::value)
+	{
+		matio_type = MAT_T_SINGLE;
 	}
 	else
-		data = new double[sparse.nzmax];
+	{
+		matio_type = MAT_T_DOUBLE;
+	}
+	int opt = typeid(getValuePtr()[0])==typeid(complex<Real<FPP>>(1.0,1.0))?MAT_F_COMPLEX:0;
+
+	if(opt) {
+		z.Re = new Real<FPP>[sparse.nzmax];
+		z.Im = new Real<FPP>[sparse.nzmax];
+	}
+	else
+		data = new Real<FPP>[sparse.nzmax];
 
 	if(transpose)
 	{
@@ -809,14 +818,14 @@ matvar_t* Faust::MatSparse<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate)
 			if(jc[it.row()] < 0) jc[it.row()] = nir;
 			ir[nir] = it.col();
 			if(opt) {
-				((double*)z.Re)[nir] = std::real((complex<double>)it.value());
+				((Real<FPP>*)z.Re)[nir] = std::real((complex<Real<FPP>>)it.value());
 				if(conjugate)
-					((double*)z.Im)[nir] = -std::imag((complex<double>)it.value());
+					((Real<FPP>*)z.Im)[nir] = -std::imag((complex<Real<FPP>>)it.value());
 				else
-					((double*)z.Im)[nir] = std::imag((complex<double>)it.value());
+					((Real<FPP>*)z.Im)[nir] = std::imag((complex<Real<FPP>>)it.value());
 			}
 			else
-				data[nir] = std::real(complex<double>(it.value()));
+				data[nir] = std::real(complex<Real<FPP>>(it.value()));
 			nir++;
 		}
 	i=1;
@@ -832,7 +841,7 @@ matvar_t* Faust::MatSparse<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate)
 	}
 	else
 		sparse.data = data;
-	var = Mat_VarCreate(NULL /* no-name */, MAT_C_SPARSE, MAT_T_DOUBLE, 2, dims, &sparse, opt);
+	var = Mat_VarCreate(NULL /* no-name */, MAT_C_SPARSE, matio_type, 2, dims, &sparse, opt);
 	//	if(var != NULL)
 	//		Mat_VarPrint(var,1);
 	delete[] jc;

@@ -1018,8 +1018,20 @@ matvar_t* MatDense<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate) const
 {
 	matvar_t *var = nullptr;
 	size_t dims[2];
-	int opt = typeid(mat(0,0))==typeid(std::complex<double>(1.0,1.0))?MAT_F_COMPLEX:0;
+	int opt = typeid(mat(0,0))==typeid(std::complex<Real<FPP>>(1.0,1.0))?MAT_F_COMPLEX:0;
 	mat_complex_split_t z = {nullptr,nullptr};
+	matio_types matio_type;
+	matio_classes matio_class;
+	if(std::is_same<FPP, float>::value)
+	{
+		matio_type = MAT_T_SINGLE;
+		matio_class = MAT_C_SINGLE;
+	}
+	else
+	{
+		matio_type = MAT_T_DOUBLE;
+		matio_class = MAT_C_SINGLE;
+	}
 	//
 	if(transpose)
 	{
@@ -1028,21 +1040,21 @@ matvar_t* MatDense<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate) const
 		if(!opt){
 			Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic> mat_copy(mat.transpose().eval());
 			//		mat_copy.transposeInPlace(); //undoing the transposition
-			var = Mat_VarCreate(nullptr, MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dims, (FPP*) mat_copy.data() /*mat.transpose().eval().data() //  doesn't work so we copy above */, opt);
+			var = Mat_VarCreate(nullptr, matio_class, matio_type, 2, dims, (FPP*) mat_copy.data() /*mat.transpose().eval().data() //  doesn't work so we copy above */, opt);
 		}
 		else {
-			Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> dst_re(mat.rows(), mat.cols());
-			Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> dst_im(mat.rows(), mat.cols());
-			dst_re = mat.real()/*.transpose()*/.template cast<double>();
+			Eigen::Matrix<Real<FPP>,Eigen::Dynamic,Eigen::Dynamic> dst_re(mat.rows(), mat.cols());
+			Eigen::Matrix<Real<FPP>,Eigen::Dynamic,Eigen::Dynamic> dst_im(mat.rows(), mat.cols());
+			dst_re = mat.real()/*.transpose()*/.template cast<Real<FPP>>();
 			if(conjugate)
-				dst_im = (-(mat.imag()))/*.transpose()*/.template cast<double>();
+				dst_im = (-(mat.imag()))/*.transpose()*/.template cast<Real<FPP>>();
 			else
-				dst_im = mat.imag()/*.transpose()*/.template cast<double>();
+				dst_im = mat.imag()/*.transpose()*/.template cast<Real<FPP>>();
 			dst_re.transposeInPlace();
 			dst_im.transposeInPlace();
 			z.Re = dst_re.data();
 			z.Im = dst_im.data();
-			var = Mat_VarCreate(nullptr, MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dims, &z /*mat.transpose().eval().data() //  doesn't work so we copy above */, opt);
+			var = Mat_VarCreate(nullptr, matio_class, matio_type, 2, dims, &z /*mat.transpose().eval().data() //  doesn't work so we copy above */, opt);
 		}
 	}
 	else
@@ -1051,18 +1063,18 @@ matvar_t* MatDense<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate) const
 		dims[1] = this->getNbCol();
 		if(!opt) // we use directly the data pointer (col-major order organized)
 			// but without the MAT_F_DONT_COPY_DATA flag, MatIO copies the data internally
-			var = Mat_VarCreate(nullptr, MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dims, (FPP*) mat.data(), opt);
+			var = Mat_VarCreate(nullptr, matio_class, matio_type, 2, dims, (FPP*) mat.data(), opt);
 		else {
-			Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> dst_re(mat.rows(), mat.cols());
-			Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> dst_im(mat.rows(), mat.cols());
-			dst_re = mat.real().template cast<double>();
+			Eigen::Matrix<Real<FPP>,Eigen::Dynamic,Eigen::Dynamic> dst_re(mat.rows(), mat.cols());
+			Eigen::Matrix<Real<FPP>,Eigen::Dynamic,Eigen::Dynamic> dst_im(mat.rows(), mat.cols());
+			dst_re = mat.real().template cast<Real<FPP>>();
 			if(conjugate)
-				dst_im = (-(mat.imag())).template cast<double>();
+				dst_im = (-(mat.imag())).template cast<Real<FPP>>();
 			else
-				dst_im = mat.imag().template cast<double>();
+				dst_im = mat.imag().template cast<Real<FPP>>();
 			z.Re = dst_re.data();
 			z.Im = dst_im.data();
-			var = Mat_VarCreate(nullptr, MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dims, &z /*mat.transpose().eval().data() //  doesn't work so we copy above */, opt);
+			var = Mat_VarCreate(nullptr, matio_class, matio_type, 2, dims, &z /*mat.transpose().eval().data() //  doesn't work so we copy above */, opt);
 		}
 	}
 	return var;
