@@ -767,7 +767,11 @@ pypi_pub:
     - TOKEN=$(echo $PYPI_TOKEN | base64 -d)
     - echo -e "__token__\n$TOKEN" | python3 -m twine upload *.whl
   needs:
+    - job: pkg_macos_purepy_release_torch_linked
+      artifacts: true
     - job: pkg_macos_purepy_release
+      artifacts: true
+    - job: pkg_linux_purepy_release_torch_linked
       artifacts: true
     - job: pkg_linux_purepy_release
       artifacts: true
