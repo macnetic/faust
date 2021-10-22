@@ -14,6 +14,7 @@ variables:
 
 stages:
     - test
+    - pkg_purepy
     - pkg
     - pkg_test
     - pkg_pub
@@ -121,6 +122,8 @@ pkg_macos:
     needs:
       - job: ctest_python
       - job: ctest_matlab
+      - job: pkg_macos_purepy_rev # avoid to build again the python wrapper
+        artifacts: true
 
 .win_build_gpu_mod: &win_build_gpu_mod
     before_script:
@@ -176,6 +179,9 @@ pkg_win:
     needs:
         - job: ctest_python
         - job: ctest_matlab
+        - job: pkg_win_purepy_rev # avoid to build again the python wrapper
+          artifacts: true
+
 
 .build_gpu_mod: &build_gpu_mod
       before_script: # TODO: loop on 9.2 and 11.4 (cuda versions)
@@ -222,6 +228,9 @@ pkg_linux:
     needs:
         - job: ctest_python
         - job: ctest_matlab
+        - job: pkg_linux_purepy_rev # avoid to build again the python wrapper
+          artifacts: true
+
 
           # jobs triggered by git tag can force cpack to use the tag name as version but it's not necessary for MacOSX (not using cpack for that sys.)
           #it's done for linux packages
@@ -391,13 +400,14 @@ pages:
         - if [[ "$NOPY2" != "ON" ]]; then python2 setup.py bdist_egg; fi
     artifacts:
         paths:
-            - build/wrapper/python/dist
+          #- build/wrapper/python/dist
+            - build/wrapper # not only the package but also the python wrapper shared lib
     except:
         - schedules
 
 .pkg_purepy_rev:
     extends: .pkg_purepy
-    stage: pkg
+    stage: pkg_purepy
     before_script:
         - VERSION=$(echo $CI_COMMIT_SHA | sed -e 's/^\(.\{8\}\).*/\1/')
         - if [[ -n "$USE_GPU_MOD" ]]; then GPU_MOD_SHA=$(git submodule foreach git log --oneline -n1 | sed -e 's/ .*//' | tail -1); fi
@@ -534,7 +544,7 @@ pkg_linux_purepy_release_torch_linked:
 ########### pip binary packages for windows
 
 .pkg_win_purepy: &pkg_win_purepy
-    stage: pkg
+    stage: pkg_purepy
     script:
 #TODO: loop for cuda 9.2 and 11.4 (factorize in a script with pkg win)
 # cuda11.4 build must be the first because this is the default CUDA on VM
@@ -591,7 +601,7 @@ pkg_win_purepy_rev:
         - schedules
         - tags
     needs:
-#        - job: ctest_python
+        - job: ctest_python
 
 pkg_win_purepy_release:
     extends: .pkg_win_purepy
