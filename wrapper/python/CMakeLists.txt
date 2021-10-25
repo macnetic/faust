@@ -169,9 +169,10 @@ if(FAUST_TORCH)
 	set(PYFAUST_PKG_SUFFIX "_torch")
 endif()
 
-if(APPLE AND BUILD_MULTITHREAD)
+
+if(APPLE AND BUILD_MULTITHREAD OR ${CMAKE_CXX_COMPILER} MATCHES .*clang.*)
 	# insert the libomp py code loader
-	file(READ ${FAUST_PYTHON_SRC_DIR}/macos_libomp_loading.py MACOS_OMP_LIB_LOADING)
+	file(READ ${FAUST_PYTHON_SRC_DIR}/libomp_loading.py OMP_LIB_LOADING)
 endif()
 
 if(USE_GPU_MOD)
@@ -379,9 +380,17 @@ if(UNIX)
 			set(PY3_MINOR_VER ${PY3_MINOR_VER} PARENT_SCOPE)
 		endif()
 		add_custom_command(TARGET ${FAUST_PYTHON_TARGET}
+			DEPENDS faust ${FAUST_PYTHON_SRC_DIR}/_FaustCorePy.pyx.in
 			COMMAND   ${PYTHON_EXE}
 			ARGS "${FAUST_PYTHON_BIN_DIR}/setup.py"  "build_ext" "--inplace" 
 			COMMENT   "Creating pyfaust${PY_VER}")
+		if(APPLE)
+			set(LIBEXT dylib)
+		else()
+			set(LIBEXT so)
+		endif()
+		add_custom_target(EMBED_LIBOMP_IN_PYFAUST
+			COMMAND cmake -P ${PROJECT_SOURCE_DIR}/CMake/embed_sys_libomp_into_pyfaust.txt DEPENDS ${FAUST_PYTHON_TARGET})
 	endforeach()
 elseif(WIN32)
 	if(${CMAKE_GENERATOR} MATCHES "Visual Studio")
