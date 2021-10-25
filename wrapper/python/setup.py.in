@@ -2,6 +2,7 @@
 # @PYFAUST_LICENSE_HEADER@
 
 from setuptools import setup, Extension
+import sysconfig
 #from distutils.core import setup, Extension
 from Cython.Build import cythonize
 import numpy
@@ -40,6 +41,11 @@ elif platform == 'darwin':
 elif platform == 'win32':
     lib_ext = 'dll'
 
+lib_path = "_FaustCorePy"+sysconfig.get_config_vars()['EXT_SUFFIX']
+from os.path import exists, dirname, join
+if sys.argv[1] == "build_ext" and exists(join(dirname(sys.argv[0]),lib_path)):
+    print("The shared library", lib_path, "already exists, please delete it to build again.")
+    exit(0)
 
 PyFaust = Extension('_FaustCorePy',
                     sources = @PY_EXT_SOURCES@,
@@ -79,3 +85,5 @@ setup(
         'pyfaust': [ 'data/*.mat', 'license*.txt', 'lib/*.'+lib_ext]
     }
 )
+
+
