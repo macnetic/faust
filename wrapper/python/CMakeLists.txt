@@ -389,8 +389,10 @@ if(UNIX)
 		else()
 			set(LIBEXT so)
 		endif()
-		add_custom_target(EMBED_LIBOMP_IN_PYFAUST
-			COMMAND cmake -P ${PROJECT_SOURCE_DIR}/CMake/embed_sys_libomp_into_pyfaust.txt DEPENDS ${FAUST_PYTHON_TARGET})
+		if(APPLE AND BUILD_MULTITHREAD OR ${CMAKE_CXX_COMPILER} MATCHES .*clang.*)
+			add_custom_target(EMBED_LIBOMP_IN_PYFAUST ALL
+				COMMAND cmake -P ${PROJECT_SOURCE_DIR}/CMake/embed_sys_libomp_into_pyfaust.txt DEPENDS ${FAUST_PYTHON_TARGET} COMMENT "Embedding the libomp library in pyfaust/lib directory")
+		endif()
 	endforeach()
 elseif(WIN32)
 	if(${CMAKE_GENERATOR} MATCHES "Visual Studio")
