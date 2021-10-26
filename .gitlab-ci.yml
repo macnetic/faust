@@ -279,6 +279,9 @@ pkg_macos_release:
         - macos
     only:
         - tags
+    needs:
+      - job: pkg_macos_purepy_release
+        artifacts: true
 
 pkg_win_release:
     variables: {BUILD_CONFIG: "Release", GIT_SUBMODULE_STRATEGY: recursive}
@@ -304,6 +307,9 @@ pkg_win_release:
         - win10
     only:
         - tags
+    needs:
+      - job: pkg_win_purepy_release
+        artifacts: true
 
 pkg_linux_release:
     <<: *build_gpu_mod
@@ -327,6 +333,10 @@ pkg_linux_release:
         - tux_packager
     only:
         - tags
+    needs:
+      - job: pkg_linux_purepy_release
+        artifacts: true
+
 
 
 pkg_linux_release_static:
@@ -351,6 +361,9 @@ pkg_linux_release_static:
         - tux_packager
     only:
         - tags
+    needs:
+      - job: pkg_linux_purepy_release
+        artifacts: true
 
 pages:
     stage: gitlab_pages
