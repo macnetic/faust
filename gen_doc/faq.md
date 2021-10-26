@@ -265,6 +265,8 @@ Once Macports is installed, launch a terminal and type this command:
         sudo port install libomp
         sudo port -f activate libomp
 
+Note that starting from pyfaust 3.11.1 the libomp library is embedded in the pyfaust package, so you shouldn't meet this issue again for this version and the next.
+
 # 3. About CUDA (for GPU FAµST API support)
 
 \anchor cuda_one
