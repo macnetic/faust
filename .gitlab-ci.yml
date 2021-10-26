@@ -451,7 +451,7 @@ pkg_linux_purepy_rev:
         - job: ctest_python
 
 .pkg_purepy_release:
-    stage: pkg
+    stage: pkg_purepy
     extends: .pkg_purepy
     before_script:
         - VERSION=$CI_COMMIT_TAG
