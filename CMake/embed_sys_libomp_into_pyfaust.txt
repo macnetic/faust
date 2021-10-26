@@ -1,17 +1,30 @@
 # the script suppose that PWD is the <build directory>/wrapper/python
-file(GLOB LIBS _FaustCorePy*dylib _FaustCorePy*dll _FaustCorePy*pyd _FaustCorePy*so) # only one must exist, depending on the OS building pyfaust
+file(GLOB LIBS _FaustCorePy*dylib _FaustCorePy*dll _FaustCorePy*pxd _FaustCorePy*so) # only one can exist
 list(GET LIBS 0 PYLIB)
-message(STATUS "pyfaust lib: ${PYLIB}")
-file(GET_RUNTIME_DEPENDENCIES LIBRARIES ${PYLIB} RESOLVED_DEPENDENCIES_VAR LIBS UNRESOLVED_DEPENDENCIES_VAR ERR_LIBS)
-#message(STATUS "libs=${LIBS}")
+# add paths of (DY)LD_LIBRARY_PATH in considered directories because GET_RUNTIME_DEPENDENCIES doesn't take it into account
+if(APPLE)
+        #message(STATUS DYLD_LIBRARY_PATH=$ENV{DYLD_LIBRARY_PATH})
+        if(DEFINED ENV{DYLD_LIBRARY_PATH})
+                string(REPLACE ":" ";" LIB_PATHS "$ENV{DYLD_LIBRARY_PATH}")
+        endif()
+elseif(UNIX)
+        #message(STATUS LD_LIBRARY_PATH=$ENV{LD_LIBRARY_PATH})
+        if(DEFINED ENV{LD_LIBRARY_PATH})
+                string(REPLACE ":" ";" LIB_PATHS "$ENV{LD_LIBRARY_PATH}")
+        endif()
+endif()
+#message(STATUS "pyfaust lib: ${PYLIB} LIB_PATHS:${LIB_PATHS}")
+file(GET_RUNTIME_DEPENDENCIES LIBRARIES ${PYLIB} RESOLVED_DEPENDENCIES_VAR LIBS UNRESOLVED_DEPENDENCIES_VAR ERR_LIBS DIRECTORIES ${LIB_PATHS})
+#message(STATUS "libs=${LIBS} err_libs=${ERR_LIBS}")
 foreach(LIB IN LISTS LIBS)
-	string(REGEX MATCH ".*libomp.*" RES ${LIB})
-	string(LENGTH "${RES}" RES_LEN)
-	if(${RES_LEN} GREATER 0)
-		message(STATUS "system libomp: ${LIB}")
-		# copy the libomp in pyfaust/lib
-		message("copying libomp to wrapper/python/pyfaust/lib")
-		configure_file(${LIB} pyfaust/lib/libomp.${LIBEXT} COPYONLY)
-	endif()
+        string(REGEX MATCH ".*libomp.*" RES ${LIB})
+        string(LENGTH "${RES}" RES_LEN)
+	get_filename_component(LIB_FILE ${LIB} NAME)
+        if(${RES_LEN} GREATER 0)
+                message(STATUS "system libomp: ${LIB}")
+                # copy the libomp in pyfaust/lib
+                message("copying libomp to wrapper/python/pyfaust/lib/${LIB_FILE}")
+                configure_file(${LIB} pyfaust/lib/${LIB_FILE} COPYONLY)
+        endif()
 endforeach()
 
