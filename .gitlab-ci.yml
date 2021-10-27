@@ -7,6 +7,7 @@ variables:
     JOB_PYTHON: "python3" # if set again in job, it hides this one (precedence: https://docs.gitlab.com/13.6/ee/ci/variables/#priority-of-environment-variables)
     WIN_PY_VER: '3.9' # default python version used to build python wrapper on windows (for both whl package and nsis .exe)
     NIX_PY_VER: '3.9' # default python version used to build python wrapper for "unix" system packages (pkg/macos, rpm/deb/linux)
+    GEN_EGG: 'OFF'
 
 .ctest_template: &ctest_script
     script:
@@ -408,9 +409,9 @@ pages:
         - make
         - cd wrapper/python
         - $JOB_PYTHON setup.py bdist_wheel
-        - $JOB_PYTHON setup.py bdist_egg
+        - if [[ "$GEN_EGG" != "OFF" ]]; then $JOB_PYTHON setup.py bdist_egg;fi
         - if [[ "$NOPY2" != "ON" ]]; then python2 setup.py bdist_wheel; fi
-        - if [[ "$NOPY2" != "ON" ]]; then python2 setup.py bdist_egg; fi
+        - if [[ "$NOPY2" != "ON" && "$GEN_EGG" != "OFF" ]]; then python2 setup.py bdist_egg; fi
     artifacts:
         paths:
           #- build/wrapper/python/dist
@@ -593,7 +594,7 @@ pkg_linux_purepy_release_torch_linked:
           #- 'call "%PYTHON_PATH%" setup.py bdist_wheel'
           #- 'call "%PYTHON_PATH%" setup.py bdist_egg'
         - py -%WIN_PY_VER% setup.py bdist_wheel
-        - py -%WIN_PY_VER% setup.py bdist_egg
+        - if "%GEN_EGG%" == "ON" (py -%WIN_PY_VER% setup.py bdist_egg)
     artifacts:
         paths:
             - build\wrapper\python\dist
