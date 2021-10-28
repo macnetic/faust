@@ -114,6 +114,7 @@ cdef extern from "FaustFact.h":
                                                   is_update_way_R2L, bool
                                                   is_fact_side_left, int
                                                   factor_format, bool packing_RL,
+                                                  bool no_normalization,
                                                   PyxMHTPParams[FPP2] mhtpp,
                                                   unsigned int norm2_max_iter,
                                                   FPP2 norm2_threshold, bool
@@ -132,6 +133,7 @@ cdef extern from "FaustFact.h":
                                               bool is_update_way_R2L,
                                               int factor_format,
                                               bool packing_RL,
+                                              bool no_normalization,
                                               PyxMHTPParams[FPP2] mhtpp,
                                               unsigned int norm2_max_iter,
                                               FPP2 norm2_threshold,

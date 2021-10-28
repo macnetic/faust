@@ -396,6 +396,7 @@ cdef class FaustAlgoGen@TYPE_NAME@:
                                              cpp_stop_crit,
                                              p.is_update_way_R2L,
                                              p.factor_format, p.packing_RL,
+                                             p.no_normalization,
                                              cpp_MHTPParams,
                                              p.norm2_max_iter,
                                              p.norm2_threshold,
@@ -443,6 +444,7 @@ cdef class FaustAlgoGen@TYPE_NAME@:
         packing_RL = p.packing_RL
         norm2_max_iter = p.norm2_max_iter
         norm2_threshold = p.norm2_threshold
+        no_normalization = p.no_normalization
         cdef PyxMHTPParams[@REAL_TYPE@] cpp_MHTPParams
         cdef PyxStoppingCriterion[@REAL_TYPE@]* cpp_stop_crits
         cpp_stop_crits = <PyxStoppingCriterion[@REAL_TYPE@]*>\
@@ -532,6 +534,7 @@ cdef class FaustAlgoGen@TYPE_NAME@:
                                                      is_fact_side_left,
                                                      p.factor_format,
                                                      packing_RL,
+                                                     no_normalization,
                                                      cpp_MHTPParams,
                                                      norm2_max_iter,
                                                      norm2_threshold,

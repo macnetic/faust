@@ -822,7 +822,8 @@ class ParamsFact(ABC):
     def __init__(self, num_facts, is_update_way_R2L, init_lambda,
                  constraints, step_size, constant_step_size,
                  is_verbose, factor_format='dynamic',
-                 packing_RL=True, norm2_max_iter=100,
+                 packing_RL=True, no_normalization=False,
+                 norm2_max_iter=100,
                  norm2_threshold=1e-6,
                  grad_calc_opt_mode=EXTERNAL_OPT,
                  **kwargs):
@@ -849,6 +850,7 @@ class ParamsFact(ABC):
         if factor_format not in ['dense', 'sparse', 'dynamic']:
             raise ValueError("factor_format must be either 'dense', 'sparse' or 'dynamic'")
         self.packing_RL = packing_RL
+        self.no_normalization = no_normalization
         self.use_MHTP = False
         if 'use_MHTP' in kwargs.keys():
             if not (isinstance(use_MHTP, bool) and use_MHTP == False) \
@@ -870,6 +872,7 @@ class ParamsFact(ABC):
         "norm2_threshold="+str(self.norm2_threshold)+'\r\n'
         "factor_format="+str(self.factor_format)+'\r\n'
         "packing_RL="+str(self.packing_RL)+'\r\n'
+        "no_normalization="+str(self.no_normalization)+'\r\n'
         "is_verbose="+str(self.is_verbose)+'\r\n'
         "constraints="+str(self.constraints)+'\r\n'
         "use_MHTP="+str(self.use_MHTP)+("\r\n" if self.use_MHTP == False else
@@ -927,6 +930,7 @@ class ParamsHierarchical(ParamsFact):
                  is_verbose=False,
                  factor_format='dynamic',
                  packing_RL=True,
+                 no_normalization=False,
                  norm2_max_iter=100,
                  norm2_threshold=1e-6,
                  grad_calc_opt_mode=ParamsFact.EXTERNAL_OPT,
@@ -973,6 +977,9 @@ class ParamsHierarchical(ParamsFact):
             or pyfaust.fact.palm4msa_mhtp, pyfaust.fact.hierarchical_mhtp.
             packing_RL: True (by default) to pre-compute R and L products
             (only available with 2020 backend of pyfaust.fact.hierarchical).
+            no_normalization: False (by default), if True it disables the
+            normalization of prox output matrix in PALM4MSA algorithm. Note
+            that this option is experimental (only available with 2020 backend of pyfaust.fact.hierarchical).
             norm2_max_iter: maximum number of iterations of power iteration
             algorithm. Used for computing 2-norm.
             norm2_threshold: power iteration algorithm threshold (default to
@@ -1019,6 +1026,7 @@ class ParamsHierarchical(ParamsFact):
                                                  is_verbose,
                                                  factor_format,
                                                  packing_RL,
+                                                 no_normalization,
                                                  norm2_max_iter,
                                                  norm2_threshold,
                                                  grad_calc_opt_mode,
@@ -1365,6 +1373,10 @@ class ParamsPalm4MSA(ParamsFact):
                 It can be one value among pyfaust.factparams.ParamsFact.EXTERNAL_OPT,
                 pyfaust.factparams.ParamsFact.INTERNAL_OPT or pyfaust.factparams.ParamsFact.DISABLED_OPT. This
                 parameter is experimental, its value shouldn't be changed.
+                no_normalization: False (by default), if True it disables the
+                normalization of prox output matrix in PALM4MSA algorithm. Note
+                that this option is experimental.
+
         """
         if(not isinstance(constraints, list) and not
            isinstance(constraints, ConstraintList)):
