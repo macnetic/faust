@@ -10,17 +10,20 @@
 [1.3. How to launch the demos with matfaust?](#mat_three)  
 [1.4. How can I launch the integrated unit tests of matfaust?](#mat_four)  
 [1.5. How to run the PALM4MSA algorithm in a step-by-step fashion?](#mat_five)  
+[2.6. Why this no_normalization parameter for PALM4MSA and hierarchical factorization?](#mat_six)
 
 **2. About pyfaust:**  
 [2.1. How can I launch the integrated unit tests of pyfaust?](#py_one)  
 [2.2. How to launch the demos with pyfaust?](#py_two)  
 [2.3. How to run the PALM4MSA algorithm in a step-by-step fashion?](#py_three)  
 [2.4. Why do I get the error 'Library not loaded: @rpath/libomp.dylib' when I use pyfaust on Mac OS X and How to fix it?](#py_four)  
+[2.5. Why this no_normalization parameter for PALM4MSA and hierarchical factorization?](#py_five)
 
 
 **3. About CUDA (for GPU FAµST API support)**  
 [3.1 Where can I find the CUDA 9 / 11 installer for my system?](#cuda_one)  
 [3.2 How do I need to configure the CUDA 9 / 11 installer on Windows 10?](#cuda_two)  
+
 
 # 1. About matfaust
 
@@ -170,13 +173,19 @@ And for the last and simplest demo, the [quickstart script](https://faustgrp.git
 \anchor mat_four
 ## 1.4. How can I launch the integrated unit tests of matfaust?
 
-TODO (in the meanwhile you can see the pyfaust entry)
+TODO (in the meanwhile you can read the [pyfaust entry](#py_two))
 
 \anchor mat_five
 
 ## 1.5. How to run the PALM4MSA algorithm in a step-by-step fashion?
 
-TODO (in the meanwhile you can see the pyfaust entry)
+TODO (in the meanwhile you can read the [pyfaust entry](#py_three))
+
+\anchor mat_six
+
+## 1.5  Why this no_normalization parameter for PALM4MSA and hierarchical factorization?
+
+TODO (in the meanwhile you can read the [pyfaust entry](#py_five))
 
 # 2. About pyfaust
 \anchor py_one
@@ -266,6 +275,70 @@ Once Macports is installed, launch a terminal and type this command:
         sudo port -f activate libomp
 
 Note that starting from pyfaust 3.11.1 the libomp library is embedded in the pyfaust package, so you shouldn't meet this issue again for this version and the next.
+
+\anchor py_five
+
+## 2.5 Why this no_normalization parameter for PALM4MSA and hierarchical factorization?
+
+Well, you must know that in PALM4MSA updating a factor consists to first applying the gradient on it and then passing the resulting matrix through a proximity operator to enforce the structure/sparsity. After this two stages, the prox output matrix is often normalized.
+Experiments have shown that it is totally possible to fail the normalization stage when the norm of the matrix is too high to be a number (or at least to be encoded in a floating point data type), it is in fact infinite. So you might end up with a zero matrix after normalization. In other close cases it can give NaN as matrix elements.
+Hence disabling the normalization can help to avoid those overflows. That's why this option has been added to the parameters in both [pyfaust](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1factparams_1_1ParamsHierarchical.html#a663cfce79af6baa7006ee0af7006e18e) and [matfaust](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1factparams_1_1ParamsHierarchical.html#a0e596bab0beffb2d5892fadbe3e185aa).
+For example, running the hierarchical factorization algorithm on a Hadamard matrix of numpy dtype float32 and size 512x512 is a case where this kind of error occur.
+Below I reproduce the code firstly with the normalization enabled and the error it produces, secondly without normalization to show that if fixes the issue.
+Note that this new parameter is limited to the 2020 implementations of PALM4MSA and the hierarchical algorithm.
+
+
+Error case:
+
+	from pyfaust import wht
+	from pyfaust.fact import hierarchical
+	from time import time
+	import numpy as np
+	dim = 512
+	H = wht(dim, dtype='float')
+	M = H.toarray()
+	F = hierarchical(M, 'hadamard', on_gpu=False, backend=2020)
+	print("error:", (F-H).norm()/H.norm())
+
+	Output:
+	Faust::hierarchical: 1/8
+	Faust::hierarchical: 2/8
+	Faust::hierarchical: 3/8
+	Faust::hierarchical: 4/8
+	Faust::hierarchical: 5/8
+	Faust::hierarchical: 6/8
+	Faust::hierarchical: 7/8
+	Faust::hierarchical: 8/8
+	terminate called after throwing an instance of 'std::runtime_error'
+	  what():  Error in update_lambda: S (the Faust) contains nan elements in at least one of its matrices, can't compute lambda.
+	Aborted
+
+Fixed case:
+
+	from pyfaust import wht
+	from pyfaust.fact import hierarchical
+	from pyfaust.factparams import ParamsHierarchicalSquareMat
+	from time import time
+	import numpy as np
+	dim = 512
+	H = wht(dim, dtype='float')
+	M = H.toarray()
+	p = ParamsHierarchicalSquareMat.createParams(M, 'hadamard')
+	p.no_normalization = True
+	F = hierarchical(M, p, on_gpu=False, backend=2020)
+	print("error:", (F-H).norm()/H.norm())
+
+	Output:
+	Faust::hierarchical: 1/8
+	Faust::hierarchical: 2/8
+	Faust::hierarchical: 3/8
+	Faust::hierarchical: 4/8
+	Faust::hierarchical: 5/8
+	Faust::hierarchical: 6/8
+	Faust::hierarchical: 7/8
+	Faust::hierarchical: 8/8
+	error: 3.3585222552295126e-05
+
 
 # 3. About CUDA (for GPU FAµST API support)
 
