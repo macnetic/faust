@@ -36,11 +36,12 @@ download_uncompress(uncompress_dir=DOWNLOAD_PATH, base_url=BASE_URL,
                     already_downloaded_msg=False,
                     extra_file_to_check_dl='libtorch')
 
-from os import system
-# modify the rpath of libtorch in order for the linker to find the libiomp5 to
-# load from libtorch lib directory (so we're not using OpenMP from MacPorts
-# here)
-system('install_name_tool -add_rpath "/Users/$USER/libtorch/lib" /Users/$USER/libtorch/lib/libtorch.dylib 2>/dev/null')
+if sys.platform == 'darwin':
+    from os import system
+    # modify the rpath of libtorch in order for the linker to find the libiomp5 to
+    # load from libtorch lib directory (so we're not using OpenMP from MacPorts
+    # here)
+    system('install_name_tool -add_rpath "/Users/$USER/libtorch/lib" /Users/$USER/libtorch/lib/libtorch.dylib 2>/dev/null')
 
 # load shared libraries in memory
 for libname in [C10_LIB, TORCH_LIB]: #, GOMP_LIB]:
