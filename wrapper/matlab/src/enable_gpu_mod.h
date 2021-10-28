@@ -13,11 +13,12 @@ void enable_gpu_mod(const mxArray **prhs, const int nrhs, mxArray **plhs, const 
 	mxGetString(prhs[2], backend, sizeof(backend));
 	silent = (bool) mxGetScalar(prhs[3]);
 	// backend is not yet used (only CUDA is available)
+	void *ptr = nullptr;
 #ifdef USE_GPU_MOD
-	void* ptr = Faust::enable_gpu_mod(libpath, silent);
+	ptr = Faust::enable_gpu_mod(libpath, silent);
+#endif
 	plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
 	double* ptr_out = (double*) mxGetData(plhs[0]);
 	ptr_out[0] = (double)((unsigned long long)ptr);
-#endif
 }
 #endif
