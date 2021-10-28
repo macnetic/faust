@@ -147,22 +147,22 @@ void Faust::ConstraintMat<FPP,DEVICE>::project(Faust::MatDense<FPP,DEVICE> & mat
    {
       case CONSTRAINT_NAME_CONST:
          //mat=m_parameter;
-		 Faust::prox_const(mat, m_parameter, false);
+		 Faust::prox_const(mat, m_parameter, false); // normalizing is ignored for the CONST prox
          break;
       case CONSTRAINT_NAME_SUPP:
-         Faust::prox_supp(mat,m_parameter, true);
+         Faust::prox_supp(mat,m_parameter, normalizing);
          break;
 	  case CONSTRAINT_NAME_TOEPLITZ:
-		 Faust::prox_toeplitz(mat);
+		 Faust::prox_toeplitz(mat, normalizing);
 		 break;
 	  case CONSTRAINT_NAME_CIRC:
-		 Faust::prox_circ(mat);
+		 Faust::prox_circ(mat, normalizing);
 		 break;
 	  case CONSTRAINT_NAME_HANKEL:
-		 Faust::prox_hankel(mat);
+		 Faust::prox_hankel(mat, normalizing);
 		 break;
 	  case CONSTRAINT_NAME_BLKDIAG:
-		 Faust::prox_blockdiag(mat, m_parameter, true);
+		 Faust::prox_blockdiag(mat, m_parameter, normalizing);
 		 break;
       default:
          handleError(m_className,"project : invalid constraint_name");
@@ -177,17 +177,17 @@ Faust::MatGeneric<FPP,DEVICE>* Faust::ConstraintMat<FPP,DEVICE>::project_gen(Fau
    {
       case CONSTRAINT_NAME_CONST:
          //mat=m_parameter;
-		return  Faust::prox_const_gen(mat, m_parameter, false);
+		return  Faust::prox_const_gen(mat, m_parameter, false); // normalizing is ignored for the CONST prox
       case CONSTRAINT_NAME_SUPP:
-         return Faust::prox_supp_gen(mat,m_parameter, true);
+         return Faust::prox_supp_gen(mat,m_parameter, normalizing);
 	  case CONSTRAINT_NAME_TOEPLITZ:
-//		 return Faust::prox_toeplitz_gen(mat);
+		 return Faust::prox_toeplitz_gen(mat, normalizing);
 	  case CONSTRAINT_NAME_CIRC:
-		 return Faust::prox_circ_gen(mat);
+		 return Faust::prox_circ_gen(mat, normalizing);
 	  case CONSTRAINT_NAME_HANKEL:
-		 return Faust::prox_hankel_gen(mat);
+		 return Faust::prox_hankel_gen(mat, normalizing);
 	  case CONSTRAINT_NAME_BLKDIAG:
-		 return Faust::prox_blockdiag_gen(mat, m_parameter, true);
+		 return Faust::prox_blockdiag_gen(mat, m_parameter, normalizing);
       default:
          handleError(m_className,"project : invalid constraint_name");
          break;

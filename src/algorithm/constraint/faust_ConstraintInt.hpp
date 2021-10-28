@@ -156,22 +156,22 @@ void Faust::ConstraintInt<FPP,DEVICE>::project(Faust::MatDense<FPP,DEVICE> & mat
    switch (this->m_constraintName)
    {
       case CONSTRAINT_NAME_SP:
-         Faust::prox_sp(mat,m_parameter);
+         Faust::prox_sp(mat,m_parameter, normalizing);
          break;
       case CONSTRAINT_NAME_SPCOL:
-         Faust::prox_spcol(mat,m_parameter);
+         Faust::prox_spcol(mat,m_parameter, normalizing);
          break;
       case CONSTRAINT_NAME_SPLIN:
-         Faust::prox_splin(mat,m_parameter);
+         Faust::prox_splin(mat,m_parameter, normalizing);
          break;
       case CONSTRAINT_NAME_SPLINCOL:
-         Faust::prox_splincol(mat,m_parameter);
+         Faust::prox_splincol(mat,m_parameter, normalizing);
          break;
       case CONSTRAINT_NAME_SP_POS:
-         Faust::prox_sp_pos(mat,m_parameter);
+         Faust::prox_sp_pos(mat,m_parameter, normalizing);
          break;
       case CONSTRAINT_NAME_SKPERM:
-         Faust::prox_skperm(mat,m_parameter);
+         Faust::prox_skperm(mat,m_parameter, normalizing);
          break;
       default:
 		handleError(m_className,"project : cannot project with this constraint name");
@@ -185,17 +185,17 @@ Faust::MatGeneric<FPP,DEVICE>* Faust::ConstraintInt<FPP,DEVICE>::project_gen(Fau
    switch (this->m_constraintName)
    {
       case CONSTRAINT_NAME_SP:
-         return Faust::prox_sp_gen(mat,m_parameter);
+         return Faust::prox_sp_gen(mat,m_parameter, normalizing);
       case CONSTRAINT_NAME_SPCOL:
-         return Faust::prox_spcol_gen(mat,m_parameter);
+         return Faust::prox_spcol_gen(mat,m_parameter, normalizing);
       case CONSTRAINT_NAME_SPLIN:
-         return Faust::prox_splin_gen(mat,m_parameter);
+         return Faust::prox_splin_gen(mat,m_parameter, normalizing);
       case CONSTRAINT_NAME_SPLINCOL:
-         return Faust::prox_splincol_gen(mat,m_parameter);
+         return Faust::prox_splincol_gen(mat,m_parameter, normalizing);
       case CONSTRAINT_NAME_SP_POS:
-         return Faust::prox_sp_gen(mat, m_parameter, /*normalized */ true, /*pos*/ true);
+         return Faust::prox_sp_gen(mat, m_parameter, normalizing, /*pos*/ true);
       case CONSTRAINT_NAME_SKPERM:
-         return Faust::prox_skperm_gen(mat,m_parameter);
+         return Faust::prox_skperm_gen(mat,m_parameter, normalizing);
       default:
 		handleError(m_className,"project : cannot project with this constraint name");
          break;

@@ -133,6 +133,7 @@ void Faust::ConstraintFPP<FPP,DEVICE,FPP2>::set_default_parameter()
 template<typename FPP,FDevice DEVICE,typename FPP2>
 void Faust::ConstraintFPP<FPP,DEVICE,FPP2>::project(Faust::MatDense<FPP,DEVICE> & mat)const
 {
+	// no normalization on the whole matrix for this kind of constraint/prox (normalizing attribute ignored)
 	switch (this->m_constraintName)
    	{
       		case CONSTRAINT_NAME_NORMCOL:

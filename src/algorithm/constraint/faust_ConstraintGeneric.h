@@ -80,20 +80,23 @@ namespace Faust
     class ConstraintGeneric
     {
 	public:
-	    ConstraintGeneric() : m_constraintName(CONSTRAINT_NAME_SP),m_nbRows(32),m_nbCols(32) {} // contrainte par defaut (a voir avec Luc)
+	    ConstraintGeneric() : m_constraintName(CONSTRAINT_NAME_SP),m_nbRows(32),m_nbCols(32), normalizing(true) {} // contrainte par defaut (a voir avec Luc)
 
 	    ConstraintGeneric(
 		    const faust_constraint_name& constraintName_,
 		    const faust_unsigned_int nbRows_,
-		    const faust_unsigned_int nbCols_) :
+		    const faust_unsigned_int nbCols_,
+			const bool normalizing=true) :
 		m_constraintName(constraintName_),
 		m_nbRows(nbRows_),
-		m_nbCols(nbCols_){}
+		m_nbCols(nbCols_),
+		normalizing(normalizing){}
 
 	    ConstraintGeneric(const ConstraintGeneric& constraint) :
 		m_constraintName(constraint.m_constraintName),
 		m_nbRows(constraint.m_nbRows),
-		m_nbCols(constraint.m_nbCols){}
+		m_nbCols(constraint.m_nbCols),
+		normalizing(constraint.normalizing){}
 
 
 
@@ -115,6 +118,7 @@ namespace Faust
 		virtual void Display() const;
 	    virtual void set_default_parameter()=0;
 	    virtual void check_constraint_name()const=0;
+		void set_normalizing(const bool normalizing) {this->normalizing = normalizing;}
 		template<typename FPP, FDevice DEVICE>
 		/*virtual*/ void project(MatDense<FPP,DEVICE> & mat)const;//=0; //template with (pure) virtual not authorized (otherwise it must be templates from class, not function)
 		template<typename FPP, FDevice DEVICE, typename FPP2>
@@ -131,6 +135,8 @@ namespace Faust
 	    //const parameter_type parameter;
 	    const faust_unsigned_int m_nbRows;
 	    const faust_unsigned_int m_nbCols;
+		// \brief if normalizing is true the project function should normalize the result matrix
+		bool normalizing;
 
 	private :
 	    static const char * m_className;
