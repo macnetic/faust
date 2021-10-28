@@ -17,6 +17,7 @@ classdef (Abstract) ParamsFact
 		norm2_max_iter
 		norm2_threshold
 		use_MHTP
+		no_normalization
 	end
 	properties (Constant, SetAccess = protected, Hidden)
 		DEFAULT_STEP_SIZE = 10^-16
@@ -26,6 +27,7 @@ classdef (Abstract) ParamsFact
 		DEFAULT_IS_UPDATE_WAY_R2L = false
 		DEFAULT_PACKING_RL = true
 		DEFAULT_FACTOR_FORMAT = 'dynamic'
+		DEFAULT_NO_NORMALIZATION = false
 		%> @note 0 means the default value defined in C++ core (100).
 		DEFAULT_NORM2_MAX_ITER = 0 % norm2 parameters to 0 in order to use default parameters from C++ core
 		%> @note 0 means the default value defined in C++ core (1e-6).
@@ -41,6 +43,7 @@ classdef (Abstract) ParamsFact
 		IDX_NORM2_THRESHOLD = 8
 		IDX_FACTOR_FORMAT = 9
 		IDX_PACKING_RL = 10
+		IDX_NO_NORMALIZATION = 11
 		% flags to control the optimization of the multiplication L'(LSR)R' in PALM4MSA
 		%> gradient product optimization is disabled
 		DISABLED_OPT = 0
@@ -51,7 +54,7 @@ classdef (Abstract) ParamsFact
 		%> default is EXTERNAL_OPT
 		DEFAULT_OPT = 2
 		% the order of names matters and must respect the indices above
-		OPT_ARG_NAMES = {'is_update_way_R2L', 'init_lambda', 'step_size', 'constant_step_size', 'is_verbose', 'grad_calc_opt_mode', 'norm2_max_iter', 'norm2_threshold', 'factor_format', 'packing_RL'}
+		OPT_ARG_NAMES = {'is_update_way_R2L', 'init_lambda', 'step_size', 'constant_step_size', 'is_verbose', 'grad_calc_opt_mode', 'norm2_max_iter', 'norm2_threshold', 'factor_format', 'packing_RL', 'no_normalization'}
 	end
 	methods
 		function p = ParamsFact(num_facts, constraints, varargin)
@@ -74,6 +77,7 @@ classdef (Abstract) ParamsFact
 			norm2_max_iter = ParamsFact.DEFAULT_NORM2_MAX_ITER;
 			factor_format = ParamsFact.DEFAULT_FACTOR_FORMAT;
 			packing_RL = ParamsFact.DEFAULT_PACKING_RL;
+			no_normalization = ParamsFact.DEFAULT_NO_NORMALIZATION;
 			% check mandatory arguments
 			if(~ isscalar(num_facts) || ~ isreal(num_facts))
 				error('matfaust.factparams.ParamsFact num_facts argument must be an integer.')
@@ -131,6 +135,9 @@ classdef (Abstract) ParamsFact
 			if(opt_arg_map.isKey(ParamsFact.OPT_ARG_NAMES{ParamsFact.IDX_FACTOR_FORMAT}))
 				factor_format = opt_arg_map(ParamsFact.OPT_ARG_NAMES{ParamsFact.IDX_FACTOR_FORMAT});
 			end
+			if(opt_arg_map.isKey(ParamsFact.OPT_ARG_NAMES{ParamsFact.IDX_NO_NORMALIZATION}))
+				no_normalization = opt_arg_map(ParamsFact.OPT_ARG_NAMES{ParamsFact.IDX_NO_NORMALIZATION});
+			end
 			% then check validity of opt args (it's useless for default values but it's not too costfull)
 			% TODO: group argument verifs by type in loops
 			if(~ islogical(is_update_way_R2L))
@@ -158,6 +165,9 @@ classdef (Abstract) ParamsFact
 			if(~ islogical(packing_RL))
 				error(['matfaust.factparams.ParamsFact ', p.OPT_ARG_NAMES{ParamsFact.IDX_PACKING_RL},' argument must be logical.'])
 			end
+			if(~ islogical(no_normalization))
+				error(['matfaust.factparams.ParamsFact ', p.OPT_ARG_NAMES{ParamsFact.IDX_NO_NORMALIZATION},' argument must be logical.'])
+			end
 			if(~ isscalar(norm2_max_iter) || floor(norm2_max_iter) < norm2_max_iter)
 				norm2_max_iter
 				error(['matfaust.factparams.ParamsFact ', p.OPT_ARG_NAMES{ParamsFact.IDX_NORM2_MAX_ITER}, ' argument must be a int.'])
@@ -176,6 +186,7 @@ classdef (Abstract) ParamsFact
 			p.grad_calc_opt_mode = grad_calc_opt_mode;
 			p.factor_format = ParamsFact.factor_format_str2int(factor_format);
 			p.packing_RL = packing_RL;
+			p.no_normalization = no_normalization;
 			p.norm2_max_iter = norm2_max_iter;
 			p.norm2_threshold = norm2_threshold;
 			p.use_MHTP = false; % by default no MHTP in PALM4MSA, neither in hierarchical fact.

@@ -729,6 +729,13 @@ const Params<SCALAR, Cpu, FPP2>* mxArray2FaustParams(const mxArray* matlab_param
 	}
 	params->step_size = step_size;
 	params->isConstantStepSize = constant_step_size;
+	bool no_normalization = Params<SCALAR, Cpu, FPP2>::defaultNoNormalization;
+	if(presentFields[NO_NORMALIZATION])
+	{
+		mxCurrentField = mxGetField(matlab_params, 0, mat_field_type2str(NO_NORMALIZATION).c_str());
+		no_normalization = (bool) mxGetScalar(mxCurrentField);
+	}
+	params->no_normalization = no_normalization;
 	return params;
 }
 
@@ -936,6 +943,13 @@ const ParamsPalm<SCALAR,Cpu,FPP2>* mxArray2FaustParamsPALM4MSA(const mxArray* ma
 		mxCurrentField = mxGetField(matlab_params, 0, "packing_RL");
 		packing_RL = (bool) mxGetScalar(mxCurrentField);
 	}
+	bool no_normalization = Params<SCALAR, Cpu, FPP2>::defaultNoNormalization;
+	if(presentFields[18])
+	{
+		mxCurrentField = mxGetField(matlab_params, 0, "no_normalization");
+		no_normalization = (bool) mxGetScalar(mxCurrentField);
+	}
+
 	//compute_lambda
 	// bool compute_lambda = true;
 	// if (presentFields[8])
@@ -960,6 +974,7 @@ const ParamsPalm<SCALAR,Cpu,FPP2>* mxArray2FaustParamsPALM4MSA(const mxArray* ma
 	if(norm2_threshold != FPP2(0)) params->norm2_threshold = norm2_threshold;
 	params->factors_format = factors_format;
 	params->packing_RL = packing_RL;
+	params->no_normalization = no_normalization;
 
 	return params;
 }
