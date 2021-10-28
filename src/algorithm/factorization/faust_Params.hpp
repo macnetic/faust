@@ -75,6 +75,7 @@ template<typename FPP,FDevice DEVICE,typename FPP2> const Faust::GradientCalcOpt
 template<typename FPP,FDevice DEVICE,typename FPP2> const Faust::FactorsFormat Faust::Params<FPP,DEVICE,FPP2>::defaultFactorsFormat = AllDynamic;
 template<typename FPP,FDevice DEVICE,typename FPP2> const bool Faust::Params<FPP,DEVICE,FPP2>::defaultPackingRL = true;
 template<typename FPP,FDevice DEVICE,typename FPP2> const bool Faust::Params<FPP,DEVICE,FPP2>::defaultUseMHTP = false;
+template<typename FPP,FDevice DEVICE,typename FPP2> const bool Faust::Params<FPP,DEVICE,FPP2>::defaultNoNormalization = false;
 
 	template<typename FPP,FDevice DEVICE,typename FPP2>
 void Faust::Params<FPP,DEVICE,FPP2>::check_constraint_validity()
@@ -147,7 +148,8 @@ Faust::Params<FPP,DEVICE,FPP2>::Params(
 	norm2_max_iter(FAUST_NORM2_MAX_ITER),
 	packing_RL(defaultPackingRL),
 	factors_format(defaultFactorsFormat),
-	use_MHTP(defaultUseMHTP)
+	use_MHTP(defaultUseMHTP),
+	no_normalization(defaultNoNormalization)
 
 {
 	if (nbFact_ <= 2)
@@ -266,7 +268,8 @@ Faust::Params<FPP,DEVICE,FPP2>::Params(
 	norm2_max_iter(FAUST_NORM2_MAX_ITER),
 	factors_format(defaultFactorsFormat),
 	packing_RL(defaultPackingRL),
-	use_MHTP(defaultUseMHTP)
+	use_MHTP(defaultUseMHTP),
+	no_normalization(defaultNoNormalization)
 
 {
 	check_constraint_validity();
@@ -296,7 +299,8 @@ Faust::Params<FPP,DEVICE,FPP2>::Params() : m_nbRow(0),
 	norm2_max_iter(FAUST_NORM2_MAX_ITER),
 	packing_RL(defaultPackingRL),
 	factors_format(defaultFactorsFormat),
-	use_MHTP(defaultUseMHTP)
+	use_MHTP(defaultUseMHTP),
+	no_normalization(defaultNoNormalization)
 
 {}
 
@@ -324,6 +328,7 @@ void Faust::Params<FPP,DEVICE,FPP2>::Display() const
 	std::cout<<"ISCONSTANTSTEPSIZE : "<<isConstantStepSize<<std::endl;
 	std::cout <<"factors format (Dense:0, Sparse:1, Dynamic:2) :" << factors_format << std::endl;
 	std::cout <<"PACKING_RL:" << packing_RL << std::endl;
+	std::cout <<"No normalization:" << no_normalization << std::endl;
 	std::cout<<"step_size : "<<step_size<<std::endl;
 	std::cout<<"Matrix :  nbRow "<<m_nbRow<<" NbCol : "<< m_nbCol<<std::endl;
 	//	std::cout<<"stop_crit_2facts : "<<stop_crit_2facts.get_crit()<<std::endl;

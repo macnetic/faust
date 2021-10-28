@@ -171,6 +171,7 @@ void Faust::ParamsPalm<FPP,DEVICE,FPP2>::Display() const
 	std::cout << "norm2_max_iter:" << norm2_max_iter << std::endl;
 	std::cout << "factors_format (Dense:0, Sparse:1, Dynamic:2):" << factors_format << std::endl;
 	std::cout << "packing_RL:" << packing_RL << std::endl;
+	std::cout << "no_normalization:" << no_normalization << std::endl;
 
 	/*cout<<"INIT_FACTS :"<<endl;
 	  for (int L=0;L<init_fact.size();L++)init_fact[L].Display();*/

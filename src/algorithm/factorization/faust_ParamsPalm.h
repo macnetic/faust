@@ -110,6 +110,7 @@ namespace Faust
           unsigned int norm2_max_iter;
 		  FactorsFormat factors_format;
 		  bool packing_RL;
+		  bool no_normalization;
 		  bool use_MHTP;
           StoppingCriterion<Real<FPP>> stop_crit_MHTP;
 
