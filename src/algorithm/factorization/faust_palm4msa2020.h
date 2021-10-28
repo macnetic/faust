@@ -56,7 +56,7 @@ namespace Faust
 				const unsigned int norm2_max_iter=FAUST_NORM2_MAX_ITER,
 				const bool constant_step_size=false, const Real<FPP> step_size=FAUST_PRECISION,
 				const bool on_gpu=false,
-				const bool is_verbose=false); //TODO: this def of this decl must be updated in faust_palm4msa2020.hpp
+				const bool is_verbose=false); //TODO: the def of this decl must be updated in faust_palm4msa2020.hpp
 
 
 	template <typename FPP, FDevice DEVICE>
@@ -74,6 +74,7 @@ namespace Faust
 				const bool is_update_way_R2L=false,
 				const FactorsFormat factors_format=AllDynamic,
 				const bool packing_RL=true,
+				const bool no_normalization=false,
 				const MHTPParams<Real<FPP>> mhtp_params=MHTPParams<Real<FPP>>(),
 				const bool compute_2norm_on_array=false,
 				const Real<FPP> norm2_threshold=FAUST_PRECISION,

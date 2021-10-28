@@ -8,6 +8,7 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 		const bool is_update_way_R2L,
 		const FactorsFormat factors_format,
 		const bool packing_RL,
+		const bool no_normalization/*=false*/,
 		const MHTPParams<Real<FPP>> mhtp_params/*=MHTPParams<FPP>()*/,
 		const bool compute_2norm_on_array,
 		const Real<FPP> norm2_threshold,
@@ -45,7 +46,13 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 	std::vector<std::pair<faust_unsigned_int,faust_unsigned_int>> dims;
 	int norm2_flag; // return val
 	for(auto c: constraints)
+	{
 		dims.push_back(make_pair(c->get_rows(), c->get_cols()));
+		if(no_normalization)
+		{
+			c->set_normalizing(false);
+		}
+	}
 	//TODO: make it possible to receive a MatSparse A
 	if(is_verbose && mhtp_params.used)
 	{
@@ -257,6 +264,7 @@ void Faust::compute_n_apply_grad1(const int f_id, const Faust::MatDense<FPP,DEVI
 		}
 		alpha_L = -lambda/c;
 		beta_L = 1;
+
 		gemm(*LorR, tmp, D, alpha_L, beta_L, 'H', 'N');
 //		gemm_gen(*LorR, tmp, D, alpha_L, beta_L, 'H', 'N');
 	}
@@ -374,7 +382,7 @@ void Faust::update_lambda(Faust::TransformHelper<FPP,DEVICE>& S, std::vector<Tra
 	gemm(A_H, S_mat, A_H_S, (FPP) 1.0, (FPP) 0.0, 'N', 'N');
 	tr = A_H_S.trace();
 	nS = S_mat.norm();
-	if(Real<FPP>(0) == nS)
+	if(FPP(0) == nS)
 		if(no_lambda_error)
 		{
 			// don't change lambda

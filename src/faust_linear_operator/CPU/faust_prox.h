@@ -53,6 +53,7 @@
 #include <limits>
 #include <cstdlib>
 #include <type_traits>
+#include <cmath>
 
 /** \brief faust_prox.h contains the projection operator: <br>
 *   PALM relies on projections onto the constraint sets for each factor at each iteration, <br>
@@ -80,7 +81,7 @@ namespace Faust
 	template<typename FPP>
 		void prox_supp(MatDense<FPP,Cpu> & M, const MatDense<FPP,Cpu> & supp, const bool normalized=true, const bool pos=false);
 	template<typename FPP>
-		void prox_const(MatDense<FPP,Cpu> & M, const MatDense<FPP,Cpu> & supp, const bool normalized=true, const bool pos=false);
+		void prox_const(MatDense<FPP,Cpu> & M, const MatDense<FPP,Cpu> & supp, const bool normalized=false, const bool pos=false);
 
 	template<typename FPP, typename FPP2>
 		void prox_normcol(MatDense<FPP,Cpu> & M,FPP2 s, const bool normalized=false, const bool pos=false);
@@ -89,7 +90,7 @@ namespace Faust
 	//    template<typename FPP>
 	//    void prox_blkdiag(MatDense<FPP,Cpu> & M,faust_unsigned_int k);
 	template<typename FPP>
-		void prox_blockdiag(MatDense<FPP,Cpu> & M, std::vector<faust_unsigned_int>& m_vec, std::vector<faust_unsigned_int>& n_vec, const bool normalized = false, const bool pos = false);
+		void prox_blockdiag(MatDense<FPP,Cpu> & M, std::vector<faust_unsigned_int>& m_vec, std::vector<faust_unsigned_int>& n_vec, const bool normalized = true, const bool pos = false);
 	template<typename FPP>
 		void prox_blockdiag(MatDense<FPP,Cpu> & M, MatDense<FPP,Cpu> mn_vec, const bool normalized=true, const bool pos=false);
 

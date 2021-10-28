@@ -242,7 +242,6 @@ void Faust::prox_normcol(Faust::MatDense<FPP,Cpu> & M, FPP2 s, const bool normal
 	}
 
 	if(normalized) M.normalize();
-
 }
 
 template<typename FPP, typename FPP2>
@@ -285,7 +284,7 @@ void Faust::prox_blockdiag(Faust::MatDense<FPP,Cpu> & M, std::vector<faust_unsig
 }
 
 template<typename FPP>
-void Faust::prox_blockdiag(Faust::MatDense<FPP,Cpu> & M, Faust::MatDense<FPP,Cpu> mn_vec, const bool normalized /* default to false */, const bool pos)
+void Faust::prox_blockdiag(Faust::MatDense<FPP,Cpu> & M, Faust::MatDense<FPP,Cpu> mn_vec, const bool normalized /* default to true */, const bool pos)
 {
 	std::vector<faust_unsigned_int> m_vec;
 	std::vector<faust_unsigned_int> n_vec;
@@ -318,7 +317,6 @@ Faust::pre_prox_pos(MatDense<FPP,Cpu> & M)
 		if (is_real && std::complex<float>(ptr_data[i]).real() < 0)
 			ptr_data[i]=0;
 }
-
 
 template<typename FPP>
 void
@@ -374,7 +372,7 @@ void Faust::prox_blkdiag(Faust::MatDense<FPP,Cpu> & M,int k)
 
 
 template<typename FPP>
-void Faust::prox_supp(Faust::MatDense<FPP,Cpu> & M,const Faust::MatDense<FPP,Cpu> & supp, const bool normalized /* deft to false */, const bool pos)
+void Faust::prox_supp(Faust::MatDense<FPP,Cpu> & M,const Faust::MatDense<FPP,Cpu> & supp, const bool normalized /* deft to true */, const bool pos)
 {
 	if(pos) pre_prox_pos(M);
 	if ( (supp.getNbRow() != M.getNbRow()) || (supp.getNbCol() != M.getNbCol()) )
