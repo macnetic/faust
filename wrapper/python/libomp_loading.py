@@ -1,6 +1,6 @@
 
 from sys import platform as _pf
-libomp_loading_verbose = True
+libomp_loading_verbose = False
 internal_libomp_loading = True
 
 
