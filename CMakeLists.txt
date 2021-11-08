@@ -240,6 +240,7 @@ option(PYTHON_ENCODING "The *.py charset for pyfaust/__init__.py (utf-8, windows
 
 option(FAUST_TORCH "Faust torch backend for the Faust-Matrix/Vector product." OFF)
 option(USE_GPU_MOD "Faust cuda backend for the Faust-Matrix/Vector product." OFF)
+option(USE_OPENBLASO "Enable the use of OpenBLAS-OpenMP eigen backend in pyfaust (library embedded in the pip package)." OFF)
 option(BUILD_COMPLEX_PYX "Building the python wrapper in order to support complex matrices or not." ON)
 option(BUILD_FLOAT_PYX "Enabling the support of float matrices in the python wrapper." OFF)
 option(BUILD_FLOAT_MEX "Enabling the support of float matrices in the matlab wrappers." OFF)
