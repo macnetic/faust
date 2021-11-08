@@ -27,5 +27,22 @@ foreach(LIB IN LISTS LIBS)
                 # copy the libopenblaso in pyfaust/lib
                 message("copying libopenblaso to wrapper/python/pyfaust/lib/${LIB_FILE2}")
                 configure_file(${LIB} pyfaust/lib/${LIB_FILE2} COPYONLY)
+		set(LIB_OPENBLASO ${LIB})
         endif()
 endforeach()
+# libopenblaso also needs libgfortran
+file(GET_RUNTIME_DEPENDENCIES LIBRARIES ${LIB_OPENBLASO} RESOLVED_DEPENDENCIES_VAR LIBS UNRESOLVED_DEPENDENCIES_VAR ERR_LIBS DIRECTORIES ${LIB_PATHS})
+foreach(LIB IN LISTS LIBS)
+        string(REGEX MATCH ".*gfortran*" RES ${LIB})
+        string(LENGTH "${RES}" RES_LEN)
+	get_filename_component(LIB_FILE ${LIB} NAME)
+	# remove digit suffix in library name (to ease loading with an easier to determine library filename)
+	string(REGEX REPLACE "\\.[0-9]+.*$" "" LIB_FILE2 ${LIB_FILE})
+        if(${RES_LEN} GREATER 0)
+                message(STATUS "system libgfortran: ${LIB}")
+                # copy the libopenblaso in pyfaust/lib
+                message("copying libgfortran to wrapper/python/pyfaust/lib/${LIB_FILE2}")
+                configure_file(${LIB} pyfaust/lib/${LIB_FILE2} COPYONLY)
+        endif()
+endforeach()
+

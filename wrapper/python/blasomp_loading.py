@@ -5,6 +5,7 @@ blasomp_loading_verbose = True
 internal_blasomp_loading = True
 
 blasomp_name_noext = 'libopenblaso'
+gfortran_name_noext = 'libgfortran'
 
 
 def load_lib_blaso():
@@ -23,8 +24,9 @@ def load_lib_blaso():
         ext = 'dll'
     for p in sys.path:
         lib_path = join(p, 'pyfaust/lib/'+blasomp_name_noext+'.'+ext)
-        lib_path = glob(lib_path+"*")[0]
+        gfortran_lib_path = join(p, 'pyfaust/lib/'+gfortran_name_noext+'.'+ext)
         if exists(lib_path):
+            ctypes.CDLL(gfortran_lib_path) # gfortran is loaded first because openblaso depends on it
             ctypes.CDLL(lib_path)
             if blasomp_loading_verbose:
                 print(lib_path+" has been loaded successfully.")
