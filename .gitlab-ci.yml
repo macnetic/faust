@@ -8,6 +8,7 @@ variables:
     WIN_PY_VER: '3.9' # default python version used to build python wrapper on windows (for both whl package and nsis .exe)
     NIX_PY_VER: '3.9' # default python version used to build python wrapper for "unix" system packages (pkg/macos, rpm/deb/linux)
     GEN_EGG: 'OFF'
+    USE_OPENBLASO: 'OFF' # by default any pip whl pkg doesn't use openblas-openmp (eigen blas backend)
 
 .ctest_template: &ctest_script
     script:
@@ -366,7 +367,7 @@ pkg_linux_release_static:
       - job: pkg_linux_purepy_release
         artifacts: true
 
-pages:
+.pages:
     stage: gitlab_pages
     script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
@@ -405,7 +406,7 @@ pages:
     script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
         - cmake -DCMAKE_CXX_COMPILER=$CMAKE_CXX_COMPILER ..
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=OFF -DBUILD_DOCUMENTATION=ON -DCPACK_PACKAGE_VERSION=$VERSION -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DBUILD_TESTING=OFF -DEXCLUDE_FAUST_LIB_INSTALL=ON -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=$MATIO_STATIC_LIB_PATH -DZ_STATIC_LIB_PATH=$Z_STATIC_LIB_PATH -DHDF5_STATIC_LIB_PATH=$HDF5_STATIC_LIB_PATH -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DEXPERIMENTAL_PKG=$EXPERIMENTAL_PKG -DFAUST_TORCH=$FAUST_TORCH -DCMAKE_PREFIX_PATH="$CMAKE_PREFIX_PATH" -DNOPY2=$NOPY2 -DBUILD_MULTITHREAD=$BUILD_MULTITHREAD -DUSE_GPU_MOD=$USE_GPU_MOD -DEXPERIMENTAL_PKG=$EXPERIMENTAL_PKG -DFAUST_TORCH=$FAUST_TORCH -DBUILD_FLOAT_PYX=ON ..'
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=OFF -DBUILD_DOCUMENTATION=ON -DCPACK_PACKAGE_VERSION=$VERSION -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DBUILD_TESTING=OFF -DEXCLUDE_FAUST_LIB_INSTALL=ON -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=$MATIO_STATIC_LIB_PATH -DZ_STATIC_LIB_PATH=$Z_STATIC_LIB_PATH -DHDF5_STATIC_LIB_PATH=$HDF5_STATIC_LIB_PATH -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DEXPERIMENTAL_PKG=$EXPERIMENTAL_PKG -DFAUST_TORCH=$FAUST_TORCH -DCMAKE_PREFIX_PATH="$CMAKE_PREFIX_PATH" -DNOPY2=$NOPY2 -DBUILD_MULTITHREAD=$BUILD_MULTITHREAD -DUSE_GPU_MOD=$USE_GPU_MOD -DEXPERIMENTAL_PKG=$EXPERIMENTAL_PKG -DFAUST_TORCH=$FAUST_TORCH -DBUILD_FLOAT_PYX=ON -DUSE_OPENBLASO="$USE_OPENBLASO" ..'
         - make
         - cd wrapper/python
         - $JOB_PYTHON setup.py bdist_wheel
@@ -533,6 +534,13 @@ pkg_linux_purepy_release_torch_linked:
     variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a", BUILD_MULTITHREAD: "ON", NOPY2: "ON", FAUST_TORCH: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "/opt/local/libtorch/share/cmake/Torch;../gpu_mod", EXPERIMENTAL_PKG: "OFF", CMAKE_CXX_COMPILER: "clang++"}
     tags:
       - torch
+
+pkg_linux_purepy_release_openblaso:
+    extends: .pkg_purepy_release
+    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a", BUILD_MULTITHREAD: "ON", NOPY2: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "../gpu_mod", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", CMAKE_CXX_COMPILER: "clang++", USE_OPENBLASO: "ON"}
+    tags:
+        - linux
+        - tux_packager
 
 .pkg_purepy_release_rasp:
     stage: pkg
@@ -783,7 +791,7 @@ test_win_purepy_pkg_extra_pyver:
     - job: pkg_win_purepy_release_extra_pyver
       artifacts: true
 
-pypi_pub:
+.pypi_pub:
   stage: pkg_pub
   script:
     - python3 -m pip install --user twine
