@@ -215,7 +215,13 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 	else()
 		target_link_libraries(${mex_target} ${MATIO_LIB_FILE})
 	endif()
-	configure_file(${FAUST_MATLAB_DOC_SRC_DIR}/${mex_target}.m ${FAUST_MATLAB_MEX_BIN_DIR}/${mex_target}.m COPYONLY)
+	if(WIN32)
+		# not perfect patch to fix the issue of *.mexw64 located in Release subdir. with associated *.m only in the parent directory
+		# that's because of VS must be configured in Release mode for another reasong (debug symbols missing in other libraries)
+		configure_file(${FAUST_MATLAB_DOC_SRC_DIR}/${mex_target}.m ${FAUST_MATLAB_MEX_BIN_DIR}/Release/${mex_target}.m COPYONLY)
+	else()
+		configure_file(${FAUST_MATLAB_DOC_SRC_DIR}/${mex_target}.m ${FAUST_MATLAB_MEX_BIN_DIR}/${mex_target}.m COPYONLY)
+	endif()
 endforeach()
 
 
