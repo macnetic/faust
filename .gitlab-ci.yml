@@ -98,7 +98,7 @@ pkg_macos:
         #- sudo cp /opt/local/lib/libomp/libomp.dylib /opt/local/lib/libomp/libiomp5.dylib
         - sudo cp /opt/local/lib/libomp/libomp_macports.dylib /opt/local/lib/libomp/libomp.dylib
         # ensure the linking of libomp to the python wrapper shared lib is right (not overridden by matlab libomp)
-        - sudo install_name_tool -change @rpath/libiomp5.dylib /opt/local/lib/libomp/libomp.dylib wrapper/python/_FaustCorePy.cpython-*-darwin.so
+        - for l in wrapper/python/_FaustCorePy.cpython-*-darwin.so; do sudo install_name_tool -change @rpath/libiomp5.dylib /opt/local/lib/libomp/libomp.dylib $f;done
         - sudo make install LANG=en_GB.UTF-8
           #- 'sudo hdiutil create -volname Faust-$SHA_START-MatlabR2016a-Py2.7 -srcfolder /opt/local/faust-$SHA_START -ov -format UDRW faust-$SHA_START'
         - sudo pkgbuild --identifier fr.inria.faust --version $SHA_START --root /opt/local/faust-$SHA_START --install-location /opt/local/faust-$SHA_START --scripts . ./faust-$SHA_START.pkg
@@ -255,12 +255,12 @@ pkg_macos_release:
         - sudo cp /opt/local/lib/libomp/libomp_macports.dylib /opt/local/lib/libomp/libomp.dylib
           # ensure the linking of libomp to the python wrapper shared lib is right (not overridden by matlab libomp)
         - otool -L wrapper/python/_FaustCorePy.cpython-*-darwin.so
-        - sudo install_name_tool -change @rpath/libiomp5.dylib /opt/local/lib/libomp/libomp.dylib wrapper/python/_FaustCorePy.cpython-*-darwin.so
+        - for f in wrapper/python/_FaustCorePy.cpython-*-darwin.so; do sudo install_name_tool -change @rpath/libiomp5.dylib /opt/local/lib/libomp/libomp.dylib $f;done 
         - otool -L wrapper/python/_FaustCorePy.cpython-*-darwin.so
         - sudo rm -Rf /opt/local/faust # install dir
         - 'sudo make install LANG=en_GB.UTF-8'
         # ensure libomp path also in install path
-        - sudo install_name_tool -change @rpath/libiomp5.dylib /opt/local/lib/libomp/libomp.dylib /opt/local/faust/python/_FaustCorePy.cpython-*-darwin.so
+        - for f in wrapper/python/_FaustCorePy.cpython-*-darwin.so;do sudo install_name_tool -change @rpath/libiomp5.dylib /opt/local/lib/libomp/libomp.dylib $f;done
         - otool -L wrapper/python/_FaustCorePy.cpython-*-darwin.so
         - 'sudo hdiutil create -volname Faust-$CI_COMMIT_TAG-MatlabR2016a-Py2.7 -srcfolder /opt/local/faust -ov -format UDRW faust-$CI_COMMIT_TAG'
         - sudo pkgbuild --identifier fr.inria.faust --version $CI_COMMIT_TAG --root /opt/local/faust --install-location /opt/local/faust --scripts . ./faust-$CI_COMMIT_TAG.pkg
@@ -368,7 +368,7 @@ pkg_linux_release_static:
       - job: pkg_linux_purepy_release
         artifacts: true
 
-.pages:
+pages:
     stage: gitlab_pages
     script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
@@ -530,7 +530,7 @@ pkg_linux_purepy_release_extra_pyver:
         - tux_packager
 
 
-pkg_linux_purepy_release_torch_linked:
+.pkg_linux_purepy_release_torch_linked:
     extends: pkg_linux_purepy_release
     variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a", BUILD_MULTITHREAD: "ON", NOPY2: "ON", FAUST_TORCH: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "/opt/local/libtorch/share/cmake/Torch;../gpu_mod", EXPERIMENTAL_PKG: "OFF", CMAKE_CXX_COMPILER: "clang++"}
     tags:
@@ -801,7 +801,7 @@ test_win_purepy_pkg_extra_pyver:
     - job: pkg_win_purepy_release_extra_pyver
       artifacts: true
 
-.pypi_pub:
+pypi_pub:
   stage: pkg_pub
   script:
     - python3 -m pip install --user twine
@@ -816,8 +816,8 @@ test_win_purepy_pkg_extra_pyver:
       artifacts: true
     - job: pkg_macos_purepy_release
       artifacts: true
-    - job: pkg_linux_purepy_release_torch_linked
-      artifacts: true
+        #- job: pkg_linux_purepy_release_torch_linked
+        #artifacts: true
     - job: pkg_linux_purepy_release
       artifacts: true
     - job: pkg_linux_purepy_release_extra_pyver
