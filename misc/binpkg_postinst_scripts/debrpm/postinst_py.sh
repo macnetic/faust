@@ -12,7 +12,7 @@ SUPPORTED_PY3=@PY3_MINOR_VER@ # needed because python3 has ABI changes between m
 
 function link_py_files(){
 	PY_MAJOR_VER=$1
-	PY_MAJOR_MINOR_VER=$(python$PY_MAJOR_VER --version 2>&1 | sed -e 's/.*[[:blank:]]\{1,\}\([[:digit:]]\.[[:digit:]]\)\.[[:digit:]]\{1,\}/\1/')
+	PY_MAJOR_MINOR_VER=$(python$PY_MAJOR_VER --version 2>&1 | sed -e 's/.*[[:blank:]]\{1,\}\([[:digit:]]\.[[:digit:]]\{1,\}\)\.[[:digit:]]\{1,\}/\1/')
 	# on fedora python package path are suffixed by site-packages, on ubuntu it's rather dist-packages (TODO: on centos ? on debian ?)
 	PY_SITE_PACKAGES_PATH=$(python$PY_MAJOR_VER -c 'import os,site,re;print([path for path in site.getsitepackages() if (re.match(".*"+os.path.sep+"site-packages$", path) or re.match(".*"+os.path.sep+"dist-packages$", path)) and os.path.exists(path) ][0])')
 	[[ ! -d ${PY_SITE_PACKAGES_PATH} ]] && echo -e "\033[1mWARNING\033[0m: couldn't link the Faust py wrapper for python$PY_MAJOR_VER to your system. Either python$PY_MAJOR_VER is not installed on your system and that's pretty normal or it failed for another reason and you'll have to add Faust to your PYTHONPATH manually for using it (see the documentation)." >&2 && return 1
