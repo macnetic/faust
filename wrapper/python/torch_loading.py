@@ -1,7 +1,10 @@
 # this module loads libtorch libraries FAµST needs after downloading and
 # installing libtorch if necessary
 from os.path import dirname, basename, join
-from pathlib import Path
+#from pathlib import Path # pathlib failed to install with python3.10
+# https://stackoverflow.com/questions/69472308/pathlib-cannot-import-name-sequence-from-collections
+# temporarily use tempfile instead
+from tempfile import gettempdir
 import sys
 import ctypes
 import ctypes.util
@@ -27,7 +30,8 @@ else: #macOS
 
 BASE_URL = dirname(URL_LIB)
 ARCH_NAME = basename(URL_LIB)
-DOWNLOAD_PATH = Path.home()
+#DOWNLOAD_PATH = Path.home()
+DOWNLOAD_PATH = gettempdir()
 
 from .datadl import download_uncompress
 # download/uncompress libraries (if not here already)
