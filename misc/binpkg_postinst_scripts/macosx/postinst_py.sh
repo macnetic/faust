@@ -2,7 +2,7 @@
 
 SUPPORTED_PY3=@PY3_MINOR_VER@ # needed because python3 has ABI changes between minor versions (the pyfaust shared lib. is compiled specifically for python major and minor version)
 
-echo "$0 -- FAµST python wrapper post-install script START" | tee -a /tmp/log_faust_install
+echo "$0 -- FAµST python wrapper post-install script START $(date)" | tee -a /tmp/log_faust_install
 
 uid=$(id -u)
 [[ ! "$uid" = 0 ]] && echo "Error: need to be root." >&2 | tee -a /tmp/log_faust_install >&2 && exit 1 # not needed, we're supposed to be root at installation time
@@ -17,7 +17,7 @@ function link_py_files(){
 	DEBUG=1
 	[[ -n "$DEBUG" ]] && echo PYTHON=$PYTHON | tee -a /tmp/log_faust_install
 	[[ -d "$PYTHON" ]] && return
-	PY_MAJOR_MINOR_VER=$($PYTHON --version 2>&1 | sed -e 's/.*[[:blank:]]\{1,\}\([[:digit:]]\.[[:digit:]]\)\.[[:digit:]]\{1,\}/\1/')
+	PY_MAJOR_MINOR_VER=$($PYTHON --version 2>&1 | sed -e 's/.*[[:blank:]]\{1,\}\([[:digit:]]\.[[:digit:]]\{1,\}\)\.[[:digit:]]\{1,\}/\1/')
 	PY_SITE_PACKAGES_PATH=$($PYTHON -c 'import os,site,re;print([path for path in site.getsitepackages() if re.match(".*"+os.path.sep+"site-packages$", path) and os.path.exists(path) ][0])')
 	[[ ! -d "${PY_SITE_PACKAGES_PATH}" ]] && return
 	[[ -n "$DEBUG" ]] && echo PY_SITE_PACKAGES_PATH=${PY_SITE_PACKAGES_PATH} | tee -a /tmp/log_faust_install
