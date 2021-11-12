@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
     //algorithm
 
     Real<FPP> lambda;
-    bool isUpdateWayR2L = true, isFactSideLeft = false, packing_RL = false, no_normalization = false;
+    bool isUpdateWayR2L = true, isFactSideLeft = false, packing_RL = false, no_normalization = false, no_lambda = false;
 	Faust::FactorsFormat factors_format = Faust::AllDynamic;
     char* str_factors_format = getenv("FACTOR_FORMAT");
     char* str_norm2_threshold = getenv("NORM2_THRESHOLD");
@@ -151,7 +151,7 @@ int main(int argc, char* argv[])
 	vector<StoppingCriterion<Real<FPP>>> sc = {2,2};
 
     auto th = Faust::hierarchical(whtmat_gpu, sc, fac_cons, res_cons, lambda, isUpdateWayR2L,
-            isFactSideLeft, factors_format, packing_RL, no_normalization,
+            isFactSideLeft, factors_format, packing_RL, no_normalization, no_lambda,
 			Faust::MHTPParams<FPP>(),
             /* compute_2norm_on_array*/ false,
              norm2_threshold,

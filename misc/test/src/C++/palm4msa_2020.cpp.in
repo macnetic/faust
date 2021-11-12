@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
 	data.Display();
 	bool is_update_way_R2L = false;
 	FactorsFormat factors_format = AllDynamic;
-	bool packing_RL = true, no_normalization = false;
+	bool packing_RL = true, no_normalization = false, no_lambda = false;
 	packing_RL = false;
 	int nites = 200;
 	StoppingCriterion<Real<FPP>> sc(nites);
@@ -123,7 +123,7 @@ int main(int argc, char* argv[])
 	else if(meth == 2)
 	{
 		cout << "use impl2" << endl;
-		Faust::palm4msa2<FPP,Cpu>(data, constraints, facts, lambda, sc, is_update_way_R2L, factors_format, packing_RL, no_normalization, MHTPParams<FPP>(), compute_2norm_on_array, norm2_threshold, norm2_max_iter, false, FAUST_PRECISION, on_gpu);
+		Faust::palm4msa2<FPP,Cpu>(data, constraints, facts, lambda, sc, is_update_way_R2L, factors_format, packing_RL, no_normalization, no_lambda, MHTPParams<FPP>(), compute_2norm_on_array, norm2_threshold, norm2_max_iter, false, FAUST_PRECISION, on_gpu);
 	}
 #ifdef USE_GPU_MOD
 	else if(meth == 3)
@@ -131,7 +131,7 @@ int main(int argc, char* argv[])
 		cout << "use impl3" << endl;
 		Faust::MatDense<FPP,GPU2> gpu_data(data);
 		TransformHelper<FPP,GPU2> gpu_facts;
-		Faust::palm4msa2<FPP,GPU2>(gpu_data, gpu_constraints, gpu_facts, lambda, sc, is_update_way_R2L, factors_format, no_normalization, packing_RL, MHTPParams<FPP>(), compute_2norm_on_array, norm2_threshold, norm2_max_iter, false, FAUST_PRECISION, on_gpu);
+		Faust::palm4msa2<FPP,GPU2>(gpu_data, gpu_constraints, gpu_facts, lambda, sc, is_update_way_R2L, factors_format, no_normalization, no_lambda, packing_RL, MHTPParams<FPP>(), compute_2norm_on_array, norm2_threshold, norm2_max_iter, false, FAUST_PRECISION, on_gpu);
 		gpu_facts.display();
 		gpu_facts.tocpu(facts);
 	}
