@@ -561,7 +561,7 @@ FaustCoreCpp<FPP>* fact_hierarchical_gen(FPP* mat, FPP* mat2, unsigned int num_r
 }
 
 template<typename FPP, FDevice DEV, typename FPP2>
-TransformHelper<FPP, DEV>* palm4msa2020_gen(FPP* mat, unsigned int num_rows, unsigned int num_cols,  PyxConstraintGeneric** constraints, unsigned int num_cons, FPP2* out_buf, PyxStoppingCriterion<FPP2> sc, bool is_update_way_R2L, int factor_format, bool packing_RL, bool no_normalization, PyxMHTPParams<FPP2> &MHTP_params, unsigned int norm2_max_iter, FPP2 norm2_threshold, bool is_verbose, bool constant_step_size, FPP2 step_size, FaustCoreCpp<FPP, Cpu>* init_facts/*=nullptr*/)
+TransformHelper<FPP, DEV>* palm4msa2020_gen(FPP* mat, unsigned int num_rows, unsigned int num_cols,  PyxConstraintGeneric** constraints, unsigned int num_cons, FPP2* out_buf, PyxStoppingCriterion<FPP2> sc, bool is_update_way_R2L, int factor_format, bool packing_RL, bool no_normalization, bool no_lambda, PyxMHTPParams<FPP2> &MHTP_params, unsigned int norm2_max_iter, FPP2 norm2_threshold, bool is_verbose, bool constant_step_size, FPP2 step_size, FaustCoreCpp<FPP, Cpu>* init_facts/*=nullptr*/)
 {
     std::vector<Faust::ConstraintGeneric*> fact_cons;
     Faust::MatDense<FPP,DEV> inMat(num_rows, num_cols, mat);
@@ -634,6 +634,7 @@ TransformHelper<FPP, DEV>* palm4msa2020_gen(FPP* mat, unsigned int num_rows, uns
             static_cast<FactorsFormat>(factor_format),
             packing_RL,
             no_normalization,
+            no_lambda,
             _MHTP_params,
             false,
             norm2_threshold,
@@ -654,13 +655,13 @@ TransformHelper<FPP, DEV>* palm4msa2020_gen(FPP* mat, unsigned int num_rows, uns
 
 
 template<typename FPP, typename FPP2>
-FaustCoreCpp<FPP>* palm4msa2020_cpu(FPP* mat, unsigned int num_rows, unsigned int num_cols,  PyxConstraintGeneric** constraints, unsigned int num_cons, FPP2* out_buf, PyxStoppingCriterion<FPP2> sc, bool is_update_way_R2L, int factor_format, bool packing_RL, bool no_normalization, PyxMHTPParams<FPP2> &MHTP_params, unsigned int norm2_max_iter, FPP2 norm2_threshold, bool is_verbose, bool constant_step_size, FPP2 step_size, FaustCoreCpp<FPP>* cth/*=nullptr*/)
+FaustCoreCpp<FPP>* palm4msa2020_cpu(FPP* mat, unsigned int num_rows, unsigned int num_cols,  PyxConstraintGeneric** constraints, unsigned int num_cons, FPP2* out_buf, PyxStoppingCriterion<FPP2> sc, bool is_update_way_R2L, int factor_format, bool packing_RL, bool no_normalization, bool no_lambda, PyxMHTPParams<FPP2> &MHTP_params, unsigned int norm2_max_iter, FPP2 norm2_threshold, bool is_verbose, bool constant_step_size, FPP2 step_size, FaustCoreCpp<FPP>* cth/*=nullptr*/)
 {
     FaustCoreCpp<FPP> *core = nullptr;
     TransformHelper<FPP,Cpu> * th = nullptr, *th_times_lambda = nullptr;
     try
     {
-        th = palm4msa2020_gen<FPP,Cpu>(mat, num_rows, num_cols, constraints, num_cons, out_buf, sc, is_update_way_R2L, factor_format, packing_RL, no_normalization, MHTP_params, norm2_max_iter, norm2_threshold, is_verbose, constant_step_size, step_size, cth);
+        th = palm4msa2020_gen<FPP,Cpu>(mat, num_rows, num_cols, constraints, num_cons, out_buf, sc, is_update_way_R2L, factor_format, packing_RL, no_normalization, no_lambda, MHTP_params, norm2_max_iter, norm2_threshold, is_verbose, constant_step_size, step_size, cth);
         FPP _lambda = FPP(out_buf[0]);
         th_times_lambda = th->multiply(_lambda);
         delete th;
@@ -680,13 +681,13 @@ FaustCoreCpp<FPP>* palm4msa2020_cpu(FPP* mat, unsigned int num_rows, unsigned in
 
 #ifdef USE_GPU_MOD
 template<typename FPP, typename FPP2>
-FaustCoreCpp<FPP>* palm4msa2020_gpu2(FPP* mat, unsigned int num_rows, unsigned int num_cols,  PyxConstraintGeneric** constraints, unsigned int num_cons, FPP2* out_buf, PyxStoppingCriterion<FPP2> sc, bool is_update_way_R2L, int factor_format, bool packing_RL, bool no_normalization, PyxMHTPParams<FPP2> &MHTP_params, unsigned int norm2_max_iter, FPP2 norm2_threshold, bool is_verbose, bool constant_step_size, FPP2 step_size, FaustCoreCpp<FPP>* cth/*=nullptr*/)
+FaustCoreCpp<FPP>* palm4msa2020_gpu2(FPP* mat, unsigned int num_rows, unsigned int num_cols,  PyxConstraintGeneric** constraints, unsigned int num_cons, FPP2* out_buf, PyxStoppingCriterion<FPP2> sc, bool is_update_way_R2L, int factor_format, bool packing_RL, bool no_normalization, bool no_lambda, PyxMHTPParams<FPP2> &MHTP_params, unsigned int norm2_max_iter, FPP2 norm2_threshold, bool is_verbose, bool constant_step_size, FPP2 step_size, FaustCoreCpp<FPP>* cth/*=nullptr*/)
 {
     FaustCoreCpp<FPP> *core = nullptr;
     TransformHelper<FPP,Cpu> * th = nullptr;
     try
     {
-        auto gpu_th = palm4msa2020_gen<FPP,GPU2>(mat, num_rows, num_cols, constraints, num_cons, out_buf, sc, is_update_way_R2L, factor_format, packing_RL, no_normalization, MHTP_params, norm2_max_iter, norm2_threshold, is_verbose, constant_step_size, step_size, cth);
+        auto gpu_th = palm4msa2020_gen<FPP,GPU2>(mat, num_rows, num_cols, constraints, num_cons, out_buf, sc, is_update_way_R2L, factor_format, packing_RL, no_normalization, no_lambda, MHTP_params, norm2_max_iter, norm2_threshold, is_verbose, constant_step_size, step_size, cth);
         FPP lambda = FPP(out_buf[0]);
         gpu_th->multiply(lambda);
         if(is_verbose) gpu_th->display();
@@ -706,18 +707,18 @@ FaustCoreCpp<FPP>* palm4msa2020_gpu2(FPP* mat, unsigned int num_rows, unsigned i
 #endif
 
 template<typename FPP, typename FPP2>
-FaustCoreCpp<FPP>* palm4msa2020(FPP* mat, unsigned int num_rows, unsigned int num_cols,  PyxConstraintGeneric** constraints, unsigned int num_cons, FPP2* out_buf, PyxStoppingCriterion<FPP2> sc, bool is_update_way_R2L, int factor_format, bool packing_RL, bool no_normalization, PyxMHTPParams<FPP2> &MHTP_params, unsigned int norm2_max_iter, FPP2 norm2_threshold, bool is_verbose, bool constant_step_size, FPP2 step_size, bool full_gpu /*= false*/, FaustCoreCpp<FPP>* cth/*=nullptr*/)
+FaustCoreCpp<FPP>* palm4msa2020(FPP* mat, unsigned int num_rows, unsigned int num_cols,  PyxConstraintGeneric** constraints, unsigned int num_cons, FPP2* out_buf, PyxStoppingCriterion<FPP2> sc, bool is_update_way_R2L, int factor_format, bool packing_RL, bool no_normalization, bool no_lambda, PyxMHTPParams<FPP2> &MHTP_params, unsigned int norm2_max_iter, FPP2 norm2_threshold, bool is_verbose, bool constant_step_size, FPP2 step_size, bool full_gpu /*= false*/, FaustCoreCpp<FPP>* cth/*=nullptr*/)
 {
 #ifdef USE_GPU_MOD
     if(full_gpu)
-        return palm4msa2020_gpu2(mat, num_rows, num_cols, constraints, num_cons, out_buf, sc, is_update_way_R2L, factor_format, packing_RL, no_normalization, MHTP_params, norm2_max_iter, norm2_threshold, is_verbose, constant_step_size, step_size, cth);
+        return palm4msa2020_gpu2(mat, num_rows, num_cols, constraints, num_cons, out_buf, sc, is_update_way_R2L, factor_format, packing_RL, no_normalization, no_lambda, MHTP_params, norm2_max_iter, norm2_threshold, is_verbose, constant_step_size, step_size, cth);
     else
 #endif
-        return palm4msa2020_cpu(mat, num_rows, num_cols, constraints, num_cons, out_buf, sc, is_update_way_R2L, factor_format, packing_RL, no_normalization, MHTP_params, norm2_max_iter, norm2_threshold, is_verbose, constant_step_size, step_size, cth);
+        return palm4msa2020_cpu(mat, num_rows, num_cols, constraints, num_cons, out_buf, sc, is_update_way_R2L, factor_format, packing_RL, no_normalization, no_lambda, MHTP_params, norm2_max_iter, norm2_threshold, is_verbose, constant_step_size, step_size, cth);
 }
 
 template<typename FPP, FDevice DEV, typename FPP2>
-Faust::TransformHelper<FPP,DEV>* hierarchical2020_gen(FPP* mat, unsigned int num_rows, unsigned int num_cols, /* unsigned int nites*/PyxStoppingCriterion<FPP2>* sc, PyxConstraintGeneric** constraints, unsigned int num_cons, unsigned int num_facts, FPP2* inout_lambda, bool is_update_way_R2L, bool is_fact_side_left, int factor_format, bool packing_RL, bool no_normalization, PyxMHTPParams<FPP2>& MHTP_params, unsigned int norm2_max_iter, FPP2 norm2_threshold, bool is_verbose, bool constant_step_size, FPP2 step_size)
+Faust::TransformHelper<FPP,DEV>* hierarchical2020_gen(FPP* mat, unsigned int num_rows, unsigned int num_cols, /* unsigned int nites*/PyxStoppingCriterion<FPP2>* sc, PyxConstraintGeneric** constraints, unsigned int num_cons, unsigned int num_facts, FPP2* inout_lambda, bool is_update_way_R2L, bool is_fact_side_left, int factor_format, bool packing_RL, bool no_normalization, bool no_lambda, PyxMHTPParams<FPP2>& MHTP_params, unsigned int norm2_max_iter, FPP2 norm2_threshold, bool is_verbose, bool constant_step_size, FPP2 step_size)
 {
     Faust::MatDense<FPP,DEV> inMat(num_rows, num_cols, mat);
     vector<const Faust::ConstraintGeneric*> cons;
@@ -796,6 +797,7 @@ Faust::TransformHelper<FPP,DEV>* hierarchical2020_gen(FPP* mat, unsigned int num
             is_fact_side_left, static_cast<FactorsFormat>(factor_format),
             packing_RL,
             no_normalization,
+            no_lambda,
             _MHTP_params,
             /* compute_2norm_on_array*/ false,
             norm2_threshold,
@@ -806,24 +808,24 @@ Faust::TransformHelper<FPP,DEV>* hierarchical2020_gen(FPP* mat, unsigned int num
 }
 
 template<typename FPP, typename FPP2>
-FaustCoreCpp<FPP>* hierarchical2020(FPP* mat, unsigned int num_rows, unsigned int num_cols, /* unsigned int nites*/PyxStoppingCriterion<FPP2>* sc, PyxConstraintGeneric** constraints, unsigned int num_cons, unsigned int num_facts, FPP2* inout_lambda, bool is_update_way_R2L, bool is_fact_side_left, int factor_format, bool packing_RL, bool no_normalization, PyxMHTPParams<FPP2> &MHTP_params, unsigned int norm2_max_iter, FPP2 norm2_threshold, bool is_verbose, bool constant_step_size, FPP2 step_size, bool full_gpu /* = false*/)
+FaustCoreCpp<FPP>* hierarchical2020(FPP* mat, unsigned int num_rows, unsigned int num_cols, /* unsigned int nites*/PyxStoppingCriterion<FPP2>* sc, PyxConstraintGeneric** constraints, unsigned int num_cons, unsigned int num_facts, FPP2* inout_lambda, bool is_update_way_R2L, bool is_fact_side_left, int factor_format, bool packing_RL, bool no_normalization, bool no_lambda, PyxMHTPParams<FPP2> &MHTP_params, unsigned int norm2_max_iter, FPP2 norm2_threshold, bool is_verbose, bool constant_step_size, FPP2 step_size, bool full_gpu /* = false*/)
 {
 #ifdef USE_GPU_MOD
     if(full_gpu)
-        return hierarchical2020_gpu2(mat, num_rows, num_cols, sc, constraints, num_cons, num_facts, inout_lambda, is_update_way_R2L, is_fact_side_left, factor_format, packing_RL, no_normalization, MHTP_params, norm2_max_iter, norm2_threshold, is_verbose, constant_step_size, step_size);
+        return hierarchical2020_gpu2(mat, num_rows, num_cols, sc, constraints, num_cons, num_facts, inout_lambda, is_update_way_R2L, is_fact_side_left, factor_format, packing_RL, no_normalization, no_lambda, MHTP_params, norm2_max_iter, norm2_threshold, is_verbose, constant_step_size, step_size);
     else
 #endif
-        return hierarchical2020_cpu(mat, num_rows, num_cols, sc, constraints, num_cons, num_facts, inout_lambda, is_update_way_R2L, is_fact_side_left, factor_format, packing_RL, no_normalization, MHTP_params, norm2_max_iter, norm2_threshold, is_verbose, constant_step_size, step_size);
+        return hierarchical2020_cpu(mat, num_rows, num_cols, sc, constraints, num_cons, num_facts, inout_lambda, is_update_way_R2L, is_fact_side_left, factor_format, packing_RL, no_normalization, no_lambda, MHTP_params, norm2_max_iter, norm2_threshold, is_verbose, constant_step_size, step_size);
 }
 
 template<typename FPP, typename FPP2>
-FaustCoreCpp<FPP>* hierarchical2020_cpu(FPP* mat, unsigned int num_rows, unsigned int num_cols, /* unsigned int nites*/PyxStoppingCriterion<FPP2>* sc, PyxConstraintGeneric** constraints, unsigned int num_cons, unsigned int num_facts, FPP2* inout_lambda, bool is_update_way_R2L, bool is_fact_side_left, int factor_format, bool packing_RL, bool no_normalization, PyxMHTPParams<FPP2> &MHTP_params, unsigned int norm2_max_iter, FPP2 norm2_threshold, bool is_verbose, bool constant_step_size, FPP2 step_size)
+FaustCoreCpp<FPP>* hierarchical2020_cpu(FPP* mat, unsigned int num_rows, unsigned int num_cols, /* unsigned int nites*/PyxStoppingCriterion<FPP2>* sc, PyxConstraintGeneric** constraints, unsigned int num_cons, unsigned int num_facts, FPP2* inout_lambda, bool is_update_way_R2L, bool is_fact_side_left, int factor_format, bool packing_RL, bool no_normalization, bool no_lambda, PyxMHTPParams<FPP2> &MHTP_params, unsigned int norm2_max_iter, FPP2 norm2_threshold, bool is_verbose, bool constant_step_size, FPP2 step_size)
 {
     FaustCoreCpp<FPP>* core = nullptr;
     Faust::TransformHelper<FPP,Cpu>* th, *th_times_lambda;
     try
     {
-        th = hierarchical2020_gen<FPP,Cpu>(mat,num_rows,num_cols, sc, constraints, num_cons, num_facts, inout_lambda, is_update_way_R2L, is_fact_side_left, factor_format, packing_RL, no_normalization, MHTP_params, norm2_max_iter, norm2_threshold, is_verbose, constant_step_size, step_size);
+        th = hierarchical2020_gen<FPP,Cpu>(mat,num_rows,num_cols, sc, constraints, num_cons, num_facts, inout_lambda, is_update_way_R2L, is_fact_side_left, factor_format, packing_RL, no_normalization, no_lambda, MHTP_params, norm2_max_iter, norm2_threshold, is_verbose, constant_step_size, step_size);
         FPP lambda = FPP(inout_lambda[0]);
         th_times_lambda = th->multiply(lambda);
         delete th;
@@ -842,13 +844,13 @@ FaustCoreCpp<FPP>* hierarchical2020_cpu(FPP* mat, unsigned int num_rows, unsigne
 
 #ifdef USE_GPU_MOD
 template<typename FPP, typename FPP2>
-FaustCoreCpp<FPP>* hierarchical2020_gpu2(FPP* mat, unsigned int num_rows, unsigned int num_cols, /* unsigned int nites*/PyxStoppingCriterion<FPP2>* sc, PyxConstraintGeneric** constraints, unsigned int num_cons, unsigned int num_facts, FPP2* inout_lambda, bool is_update_way_R2L, bool is_fact_side_left, int factor_format, bool packing_RL, bool no_normalization, PyxMHTPParams<FPP2> &MHTP_params, unsigned int norm2_max_iter, FPP2 norm2_threshold, bool is_verbose, bool constant_step_size, FPP2 step_size)
+FaustCoreCpp<FPP>* hierarchical2020_gpu2(FPP* mat, unsigned int num_rows, unsigned int num_cols, /* unsigned int nites*/PyxStoppingCriterion<FPP2>* sc, PyxConstraintGeneric** constraints, unsigned int num_cons, unsigned int num_facts, FPP2* inout_lambda, bool is_update_way_R2L, bool is_fact_side_left, int factor_format, bool packing_RL, bool no_normalization, bool no_lambda, PyxMHTPParams<FPP2> &MHTP_params, unsigned int norm2_max_iter, FPP2 norm2_threshold, bool is_verbose, bool constant_step_size, FPP2 step_size)
 {
     FaustCoreCpp<FPP>* core = nullptr;
     Faust::TransformHelper<FPP,Cpu>* cpu_th = nullptr, *cpu_th1 = nullptr;
     try
     {
-        auto th = hierarchical2020_gen<FPP,GPU2>(mat,num_rows,num_cols, sc, constraints, num_cons, num_facts, inout_lambda, is_update_way_R2L, is_fact_side_left, factor_format, packing_RL, no_normalization, MHTP_params, norm2_max_iter, norm2_threshold, is_verbose, constant_step_size, step_size);
+        auto th = hierarchical2020_gen<FPP,GPU2>(mat,num_rows,num_cols, sc, constraints, num_cons, num_facts, inout_lambda, is_update_way_R2L, is_fact_side_left, factor_format, packing_RL, no_normalization, no_lambda, MHTP_params, norm2_max_iter, norm2_threshold, is_verbose, constant_step_size, step_size);
         if(is_verbose) th->display();
         FPP _lambda = FPP(inout_lambda[0]);
         Faust::TransformHelper<FPP,GPU2>* th_times_lambda = th->multiply(_lambda);

@@ -191,6 +191,7 @@ namespace Faust
 		bool use_MHTP;
 		// \brief this parameter is to disable the normalization of prox out matrices
 		bool no_normalization;
+		bool no_lambda;
 		StoppingCriterion<Real<FPP>> stop_crit_MHTP;
 
         //default value
@@ -209,6 +210,7 @@ namespace Faust
 		static const bool defaultPackingRL;
 		static const bool defaultUseMHTP;
 		static const bool defaultNoNormalization;
+		static const bool defaultNoLambda;
 
         //const int nb_rows; // number of rows of the first factor
         //const int nb_cols; // number of columns of the last factor

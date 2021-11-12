@@ -823,6 +823,7 @@ class ParamsFact(ABC):
                  constraints, step_size, constant_step_size,
                  is_verbose, factor_format='dynamic',
                  packing_RL=True, no_normalization=False,
+                 no_lambda=False,
                  norm2_max_iter=100,
                  norm2_threshold=1e-6,
                  grad_calc_opt_mode=EXTERNAL_OPT,
@@ -851,6 +852,7 @@ class ParamsFact(ABC):
             raise ValueError("factor_format must be either 'dense', 'sparse' or 'dynamic'")
         self.packing_RL = packing_RL
         self.no_normalization = no_normalization
+        self.no_lambda = no_lambda
         self.use_MHTP = False
         if 'use_MHTP' in kwargs.keys():
             if not (isinstance(use_MHTP, bool) and use_MHTP == False) \
@@ -873,6 +875,7 @@ class ParamsFact(ABC):
         "factor_format="+str(self.factor_format)+'\r\n'
         "packing_RL="+str(self.packing_RL)+'\r\n'
         "no_normalization="+str(self.no_normalization)+'\r\n'
+        "no_lambda="+str(self.no_lambda)+'\r\n'
         "is_verbose="+str(self.is_verbose)+'\r\n'
         "constraints="+str(self.constraints)+'\r\n'
         "use_MHTP="+str(self.use_MHTP)+("\r\n" if self.use_MHTP == False else
@@ -931,6 +934,7 @@ class ParamsHierarchical(ParamsFact):
                  factor_format='dynamic',
                  packing_RL=True,
                  no_normalization=False,
+                 no_lambda=False,
                  norm2_max_iter=100,
                  norm2_threshold=1e-6,
                  grad_calc_opt_mode=ParamsFact.EXTERNAL_OPT,
@@ -980,6 +984,10 @@ class ParamsHierarchical(ParamsFact):
             no_normalization: False (by default), if True it disables the
             normalization of prox output matrix in PALM4MSA algorithm. Note
             that this option is experimental (only available with 2020 backend of pyfaust.fact.hierarchical).
+            no_lambda: False (by default), if True it disables the lambda
+            scalar factor in the PALM4MSA algorithm which consists
+            basically to set it always to one (it also lowers the algorithm
+            cost).
             norm2_max_iter: maximum number of iterations of power iteration
             algorithm. Used for computing 2-norm.
             norm2_threshold: power iteration algorithm threshold (default to
@@ -1027,6 +1035,7 @@ class ParamsHierarchical(ParamsFact):
                                                  factor_format,
                                                  packing_RL,
                                                  no_normalization,
+                                                 no_lambda,
                                                  norm2_max_iter,
                                                  norm2_threshold,
                                                  grad_calc_opt_mode,
@@ -1376,6 +1385,10 @@ class ParamsPalm4MSA(ParamsFact):
                 no_normalization: False (by default), if True it disables the
                 normalization of prox output matrix in PALM4MSA algorithm. Note
                 that this option is experimental.
+                no_lambda: False (by default), if True it disables the lambda
+                scalar factor in the PALM4MSA algorithm which consists
+                basically to set it always to one (it lowers also the algorithm
+                cost).
 
         """
         if(not isinstance(constraints, list) and not

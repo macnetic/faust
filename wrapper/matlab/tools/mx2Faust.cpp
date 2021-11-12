@@ -108,6 +108,8 @@ const string mat_field_type2str(MAT_FIELD_TYPE f)
 			return "packing_RL";
 		case NO_NORMALIZATION:
 			return "no_normalization";
+		case NO_LAMBDA:
+			return "no_lambda";
 		case FACTOR_FORMAT:
 			return "factor_format";
 		case NORM2_MAX_ITER:
@@ -158,8 +160,8 @@ void testCoherencePALM4MSA(const mxArray* params,std::vector<bool> & presentFiel
 {
 	////TODO: this function should be modified to be more reliable/simple as the function testCoherence() in mx2Faust.cpp has been modified
 	int nbr_field=mxGetNumberOfFields(params);
-	presentFields.resize(19);
-	presentFields.assign(19,false);
+	presentFields.resize(20);
+	presentFields.assign(20,false);
 	if(nbr_field < 3)
 	{
 		mexErrMsgTxt("The number of field of params must be at least 3 ");
@@ -240,6 +242,8 @@ void testCoherencePALM4MSA(const mxArray* params,std::vector<bool> & presentFiel
 			presentFields[17] = true;
 		else if(strcmp(fieldName, "no_normalization") == 0)
 			presentFields[18] = true;
+		else if(strcmp(fieldName, "no_lambda") == 0)
+			presentFields[19] = true;
 	}
 
 }

@@ -187,13 +187,14 @@ enum MAT_FIELD_TYPE
 	PACKING_RL,
 	CONSTANT_STEP_SIZE,
 	STEP_SIZE,
-	NO_NORMALIZATION
+	NO_NORMALIZATION,
+	NO_LAMBDA
 };// if you want to add a field, don't forget to update mat_field_type2str() and MAT_FIELD_TYPE_LEN
 
 const string mat_field_type2str(MAT_FIELD_TYPE f);
 const MAT_FIELD_TYPE mat_field_str2type(const string& fstr);
 
-const unsigned int MAT_FIELD_TYPE_LEN = 25; // must be the number of fields in MAT_FIELD_TYPE
+const unsigned int MAT_FIELD_TYPE_LEN = 26; // must be the number of fields in MAT_FIELD_TYPE
 
 void testCoherence(const mxArray* params,std::vector<bool> & presentFields);
 

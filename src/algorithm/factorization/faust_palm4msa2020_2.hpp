@@ -9,6 +9,7 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 		const FactorsFormat factors_format,
 		const bool packing_RL,
 		const bool no_normalization/*=false*/,
+		const bool no_lambda/*=false*/,
 		const MHTPParams<Real<FPP>> mhtp_params/*=MHTPParams<FPP>()*/,
 		const bool compute_2norm_on_array,
 		const Real<FPP> norm2_threshold,
@@ -29,6 +30,11 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 	bool no_lambda_error = false;
 	if(str_env_no_lambda_error)
 		no_lambda_error = (bool) std::atoi(str_env_no_lambda_error);
+//	auto str_env_no_lambda = getenv("NO_LAMBDA");
+//	if(str_env_no_lambda)
+//	{
+//		no_lambda = (bool) std::atoi(str_env_no_lambda);
+//	}
 	bool use_grad1 = false;
 	auto str_env_use_grad1 = getenv("USE_GRAD1");
 	if(str_env_use_grad1)
@@ -180,7 +186,8 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 			next_fid(); // f_id updated to iteration factor index (pL or pR too)
 		}
 		//update lambda
-		update_lambda(S, pL, pR, A_H, lambda, no_lambda_error);
+		if(! no_lambda)
+			update_lambda(S, pL, pR, A_H, lambda, no_lambda_error);
 		if(is_verbose)
 		{
 			set_calc_err_ite_period(); //macro setting the variable ite_period

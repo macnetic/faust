@@ -93,7 +93,7 @@ Faust::ParamsPalm<FPP,DEVICE,FPP2>::ParamsPalm(
          const FPP2 init_lambda_ /* = 1.0 */,
 		 const bool constant_step_size_,
 		 const FPP2 step_size_,
-		 const GradientCalcOptMode gradCalcOptMode /* default INTERNAL_OPT*/, const bool use_MHTP/*= Params<FPP,DEVICE, FPP2>::defaultUseMHTP*/) :
+		 const GradientCalcOptMode gradCalcOptMode /* default INTERNAL_OPT*/, const bool use_MHTP/*= Params<FPP,DEVICE, FPP2>::defaultUseMHTP*/, const bool no_normalization, const bool no_lambda) :
             data(data_),
             nbFact(nbFact_),
             cons(cons_),
@@ -113,7 +113,7 @@ Faust::ParamsPalm<FPP,DEVICE,FPP2>::ParamsPalm(
 }
 
 template<typename FPP,FDevice DEVICE,typename FPP2>
-Faust::ParamsPalm<FPP,DEVICE,FPP2>::ParamsPalm() : data(0,0),nbFact(0),cons(std::vector<const Faust::ConstraintGeneric*>()),init_lambda(defaultLambda),isConstantStepSize(defaultConstantStepSize),step_size(defaultStepSize), gradCalcOptMode(Faust::Params<FPP,DEVICE,FPP2>::defaultGradCalcOptMode),  norm2_max_iter(FAUST_NORM2_MAX_ITER), norm2_threshold(FAUST_PRECISION) {}
+Faust::ParamsPalm<FPP,DEVICE,FPP2>::ParamsPalm() : data(0,0),nbFact(0),cons(std::vector<const Faust::ConstraintGeneric*>()),init_lambda(defaultLambda),isConstantStepSize(defaultConstantStepSize),step_size(defaultStepSize), gradCalcOptMode(Faust::Params<FPP,DEVICE,FPP2>::defaultGradCalcOptMode),  norm2_max_iter(FAUST_NORM2_MAX_ITER), norm2_threshold(FAUST_PRECISION), no_lambda(false), no_normalization(false) {}
 
 template<typename FPP,FDevice DEVICE,typename FPP2>
 void Faust::ParamsPalm<FPP,DEVICE,FPP2>::init_factors()
@@ -172,6 +172,7 @@ void Faust::ParamsPalm<FPP,DEVICE,FPP2>::Display() const
 	std::cout << "factors_format (Dense:0, Sparse:1, Dynamic:2):" << factors_format << std::endl;
 	std::cout << "packing_RL:" << packing_RL << std::endl;
 	std::cout << "no_normalization:" << no_normalization << std::endl;
+	std::cout << "no_lambda:" << no_lambda << std::endl;
 
 	/*cout<<"INIT_FACTS :"<<endl;
 	  for (int L=0;L<init_fact.size();L++)init_fact[L].Display();*/

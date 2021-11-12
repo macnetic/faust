@@ -736,6 +736,13 @@ const Params<SCALAR, Cpu, FPP2>* mxArray2FaustParams(const mxArray* matlab_param
 		no_normalization = (bool) mxGetScalar(mxCurrentField);
 	}
 	params->no_normalization = no_normalization;
+	bool no_lambda = Params<SCALAR, Cpu, FPP2>::defaultNoLambda;
+	if(presentFields[NO_LAMBDA])
+	{
+		mxCurrentField = mxGetField(matlab_params, 0, mat_field_type2str(NO_LAMBDA).c_str());
+		no_lambda = (bool) mxGetScalar(mxCurrentField);
+	}
+	params->no_lambda = no_lambda;
 	return params;
 }
 
@@ -949,7 +956,12 @@ const ParamsPalm<SCALAR,Cpu,FPP2>* mxArray2FaustParamsPALM4MSA(const mxArray* ma
 		mxCurrentField = mxGetField(matlab_params, 0, "no_normalization");
 		no_normalization = (bool) mxGetScalar(mxCurrentField);
 	}
-
+	bool no_lambda = Params<SCALAR, Cpu, FPP2>::defaultNoLambda;
+	if(presentFields[19])
+	{
+		mxCurrentField = mxGetField(matlab_params, 0, "no_lambda");
+		no_lambda = (bool) mxGetScalar(mxCurrentField);
+	}
 	//compute_lambda
 	// bool compute_lambda = true;
 	// if (presentFields[8])
@@ -975,6 +987,7 @@ const ParamsPalm<SCALAR,Cpu,FPP2>* mxArray2FaustParamsPALM4MSA(const mxArray* ma
 	params->factors_format = factors_format;
 	params->packing_RL = packing_RL;
 	params->no_normalization = no_normalization;
+	params->no_lambda = no_lambda;
 
 	return params;
 }

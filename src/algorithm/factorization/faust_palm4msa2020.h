@@ -75,6 +75,7 @@ namespace Faust
 				const FactorsFormat factors_format=AllDynamic,
 				const bool packing_RL=true,
 				const bool no_normalization=false,
+				const bool no_lambda=false,
 				const MHTPParams<Real<FPP>> mhtp_params=MHTPParams<Real<FPP>>(),
 				const bool compute_2norm_on_array=false,
 				const Real<FPP> norm2_threshold=FAUST_PRECISION,

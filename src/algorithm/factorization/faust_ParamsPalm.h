@@ -84,7 +84,9 @@ namespace Faust
              const bool constant_step_size_ = defaultConstantStepSize,
              const FPP2 step_size_ = defaultStepSize,
 			 const GradientCalcOptMode gradCalcOptMode = Params<FPP,DEVICE,FPP2>::defaultGradCalcOptMode,
-			 const bool use_MHTP = Params<FPP,DEVICE, FPP2>::defaultUseMHTP);
+			 const bool use_MHTP = Params<FPP,DEVICE, FPP2>::defaultUseMHTP,
+			 const bool no_normalization = Params<FPP, DEVICE, FPP2>::defaultNoNormalization,
+			 const bool no_lambda = Params<FPP,DEVICE, FPP2>::defaultNoLambda);
 
           void check_constraint_validity();
            ParamsPalm();
@@ -111,6 +113,7 @@ namespace Faust
 		  FactorsFormat factors_format;
 		  bool packing_RL;
 		  bool no_normalization;
+		  bool no_lambda;
 		  bool use_MHTP;
           StoppingCriterion<Real<FPP>> stop_crit_MHTP;
 

@@ -98,7 +98,7 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
 			tmp_dense = new MatDense<FPP,DEVICE>(*tmp_sparse);
 		}
 		else tmp_sparse = nullptr;
-		Faust::palm4msa2(*tmp_dense, Si_cons, Si_th, lambda_, p.stop_crit_2facts, is_update_way_R2L, factors_format, packing_RL, p.no_normalization, mhtp_params, compute_2norm_on_array,
+		Faust::palm4msa2(*tmp_dense, Si_cons, Si_th, lambda_, p.stop_crit_2facts, is_update_way_R2L, factors_format, packing_RL, p.no_normalization, p.no_lambda, mhtp_params, compute_2norm_on_array,
 				norm2_threshold, norm2_max_iter, constant_step_size, step_size, on_gpu, p.isVerbose, i+1);
 		if(tmp_sparse != nullptr)
 			// the Si factor has been converted into a MatDense in the memory
@@ -134,7 +134,7 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
 				glo_cons.push_back(const_cast<Faust::ConstraintGeneric*>(res_constraints[i]));
 
 		// global optimization
-		Faust::palm4msa2(A, glo_cons, *S, glo_lambda, p.stop_crit_global ,is_update_way_R2L, factors_format, packing_RL, p.no_normalization, mhtp_params, compute_2norm_on_array,
+		Faust::palm4msa2(A, glo_cons, *S, glo_lambda, p.stop_crit_global ,is_update_way_R2L, factors_format, packing_RL, p.no_normalization, p.no_lambda, mhtp_params, compute_2norm_on_array,
 				norm2_threshold, norm2_max_iter, constant_step_size, step_size, on_gpu, p.isVerbose, i+1);
 
 	}
@@ -152,6 +152,7 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
         const bool is_update_way_R2L, const bool is_fact_side_left,
         const FactorsFormat factors_format, const bool packing_RL,
 		const bool no_normalization,
+		const bool no_lambda,
 		const MHTPParams<Real<FPP>>& mhtp_params,
         const bool compute_2norm_on_array,
         const Real<FPP> norm2_threshold,
@@ -163,6 +164,7 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
 	p.factors_format = factors_format;
 	p.packing_RL = packing_RL;
 	p.no_normalization = no_normalization;
+	p.no_lambda = no_lambda;
 	p.norm2_threshold = norm2_threshold;
 	p.norm2_max_iter = norm2_max_iter;
     return Faust::hierarchical(A, p, lambda, compute_2norm_on_array, mhtp_params, on_gpu);
