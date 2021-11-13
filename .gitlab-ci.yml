@@ -98,7 +98,7 @@ pkg_macos:
         #- sudo cp /opt/local/lib/libomp/libomp.dylib /opt/local/lib/libomp/libiomp5.dylib
         - sudo cp /opt/local/lib/libomp/libomp_macports.dylib /opt/local/lib/libomp/libomp.dylib
         # ensure the linking of libomp to the python wrapper shared lib is right (not overridden by matlab libomp)
-        - for l in wrapper/python/_FaustCorePy.cpython-*-darwin.so; do sudo install_name_tool -change @rpath/libiomp5.dylib /opt/local/lib/libomp/libomp.dylib $f;done
+        - for f in wrapper/python/_FaustCorePy.cpython-*-darwin.so; do sudo install_name_tool -change @rpath/libiomp5.dylib /opt/local/lib/libomp/libomp.dylib $f;done
         - sudo make install LANG=en_GB.UTF-8
           #- 'sudo hdiutil create -volname Faust-$SHA_START-MatlabR2016a-Py2.7 -srcfolder /opt/local/faust-$SHA_START -ov -format UDRW faust-$SHA_START'
         - sudo pkgbuild --identifier fr.inria.faust --version $SHA_START --root /opt/local/faust-$SHA_START --install-location /opt/local/faust-$SHA_START --scripts . ./faust-$SHA_START.pkg
