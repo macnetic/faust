@@ -5,6 +5,7 @@ import numpy as np
 import _FaustCorePy
 import sys
 from abc import ABC, abstractmethod
+from warnings import warn
 
 
 ## @package pyfaust.factparams @brief The module for the parametrization of FAuST's algorithms (Palm4MSA and Hierarchical Factorization).
@@ -923,7 +924,7 @@ class ParamsHierarchical(ParamsFact):
         for the algorithm. But it exists simplified parametrizations for the
         same algorithm as child classes.
 
-        <b/> See also ParamsHierarchicalSquareMat,
+        <b/> See also ParamsHierarchicalWHT,
         ParamsHierarchicalRectMat, pyfaust.fact.hierarchical
     """
     def __init__(self, fact_constraints, res_constraints, stop_crit1,
@@ -1176,7 +1177,7 @@ class ParamsHierarchicalDFT(ParamsHierarchical):
         return v
 
 
-class ParamsHierarchicalSquareMat(ParamsHierarchical):
+class ParamsHierarchicalWHT(ParamsHierarchical):
     """
     The simplified parameterization class for factorizing a square matrix (of order a power of two) with the hierarchical factorization algorithm.
 
@@ -1199,7 +1200,7 @@ class ParamsHierarchicalSquareMat(ParamsHierarchical):
         cons_name = ConstraintName.str2name_int(proj_name)
         d = 2**int(n)
         stop_crit = StoppingCriterion(num_its=30)
-        super(ParamsHierarchicalSquareMat,
+        super(ParamsHierarchicalWHT,
               self).__init__([ConstraintInt(ConstraintName(cons_name),d,d,2)
                               for i in range(0,n-1)],
                              [ConstraintInt(ConstraintName(cons_name),d,d,int(d/2.**(i+1)))
@@ -1216,11 +1217,33 @@ class ParamsHierarchicalSquareMat(ParamsHierarchical):
                              'square matrix of order a power of '
                              'two.')
         pot = int(pot)
-        return ParamsHierarchicalSquareMat(pot)
+        return ParamsHierarchicalWHT(pot)
 
     def __repr__(self):
-        return super(ParamsHierarchicalSquareMat, self).__repr__()
+        return super(ParamsHierarchicalWHT, self).__repr__()
 
+
+# this is left here for descendant compatibility but it will be removed in a
+# next version
+class ParamsHierarchicalSquareMat(ParamsHierarchicalWHT):
+    """
+    This class is deprecated, please use ParamsHierarchicalWHT instead.
+    This class will be removed in a few minor versions of pyfaust.
+    """
+    @staticmethod
+    def _warn():
+        warn("ParamsHierarchicalSquareMat is deprecated, please use"
+             " ParamsHierarchicalWHT instead. This class will be deleted in a"
+             " few minor versions of pyfaust.")
+
+    def __init__(self, n, proj_name='splincol'):
+        super(ParamsHierarchicalSquareMat, self).__init__(n, proj_name)
+        ParamsHierarchicalSquareMat._warn()
+
+    @staticmethod
+    def createParams(M, p):
+        ParamsHierarchicalSquareMat._warn()
+        return ParamsHierarchicalWHT.createParams(M, p)
 
 class ParamsHierarchicalRectMat(ParamsHierarchical):
     """
@@ -1465,7 +1488,7 @@ class ParamsFactFactory:
         ParamsHierarchical instances.
 
         <b/> See also  ParamsHierarchicalRectMat,
-        ParamsHierarchicalSquareMat, pyfaust.fact.hierarchical()
+        ParamsHierarchicalWHT, pyfaust.fact.hierarchical()
     """
     SIMPLIFIED_PARAM_NAMES = [
         [ "squaremat", "hadamard"],
@@ -1484,7 +1507,7 @@ class ParamsFactFactory:
             p:
         """
         from pyfaust.factparams import \
-        (ParamsHierarchicalSquareMat,
+        (ParamsHierarchicalWHT,
         ParamsHierarchicalRectMat)
         param_id = None
         c = ParamsFactFactory # class alias
@@ -1493,7 +1516,7 @@ class ParamsFactFactory:
                             'parametrization.')
         param_id = c.get_simplification_name(p)
         if(param_id.lower() in c.SIMPLIFIED_PARAM_NAMES[c.SQRMAT_ID]):
-            return ParamsHierarchicalSquareMat.createParams(M, p)
+            return ParamsHierarchicalWHT.createParams(M, p)
         elif(param_id.lower() in c.SIMPLIFIED_PARAM_NAMES[c.RECTMAT_ID]):
             return ParamsHierarchicalRectMat.createParams(M, p)
         elif(param_id.lower() in c.SIMPLIFIED_PARAM_NAMES[c.DFTMAT_ID]):
