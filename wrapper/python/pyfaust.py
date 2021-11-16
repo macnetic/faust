@@ -925,7 +925,9 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             or A.ndim == 2 and A.shape[0] == 1:
                 return F@Faust(np.diag(A.squeeze()), dev=F.device)
         # A is a Faust, a numpy.ndarray (eg. numpy.matrix) or anything
-        raise Exception("* use")
+        raise Exception("* use is forbidden in this case. It is allowed only"
+                        " for Faust-scalar multiplication or Faust vector"
+                        " broadcasting.")
 #        warnings.warn("The * is deprecated as a matrix product and will soon"
 #                      " be removed")
         try:
