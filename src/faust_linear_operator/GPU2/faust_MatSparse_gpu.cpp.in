@@ -503,4 +503,15 @@ namespace Faust
 		{
 			return this->getNonZeros()*(sizeof(FSFG)+sizeof(int))+(this->getNbRow()+1)*sizeof(int);
 		}
+
+		template<>
+		void Faust::MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::real(Faust::MatSparse<Real<@FAUST_SCALAR_FOR_GM@>, GPU2>& real_mat) const
+		{
+			auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs(@FAUST_SCALAR_FOR_GM@(0));
+			auto real_gpu_mat = spm_funcs->real(gpu_mat);
+			if(real_mat.gpu_mat != nullptr)
+				spm_funcs->free(real_mat.gpu_mat);
+			real_mat.gpu_mat = real_gpu_mat;
+		}
+
 };

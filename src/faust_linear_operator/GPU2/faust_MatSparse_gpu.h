@@ -18,6 +18,7 @@ namespace Faust
 
 			friend Transform<FPP,GPU2>; // need to access to get_gpu_mat_ptr
 			friend MatDense<FPP,GPU2>;
+			friend MatSparse<std::complex<double>,GPU2>; // TODO limit to real function
 			public:
 				/** \brief Inits from CPU buffers.
 				 *
@@ -82,6 +83,7 @@ namespace Faust
 				void set(int32_t nnz, int32_t nrows, int32_t ncols, FPP* values, size_t* rowptr, size_t* colids);
 				MatSparse<FPP, GPU2>* clone(const int32_t dev_id=-1, const void* stream=nullptr) const;
 				MatGeneric<FPP,GPU2>* Clone(const bool isOptimize=false) const;
+				void real(MatSparse<Real<FPP>, GPU2>& real_mat) const;
 				void move(const int32_t dev_id=-1, const void* stream=nullptr);
 				int32_t getNbRow() const;
 				int32_t getNbCol() const;
