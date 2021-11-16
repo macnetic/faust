@@ -396,34 +396,34 @@ template<typename FPP, FDevice DEV>
 FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::optimize_time(const FPP* x_data, int* x_row_ptr, int* x_id_col, int x_nnz, int x_nrows, int x_ncols, const bool transp /* deft to false*/, const bool inplace /* default to false */, const int nsamples /* default to 1*/)
 {
 
-    Faust::MatSparse<FPP, Cpu> X(x_nnz, x_nrows, x_ncols, x_data, x_row_ptr, x_id_col);
-    if(inplace)
-        this->transform->optimize_time_prod(&X, transp, inplace, nsamples);
-    else
-    {
-        auto th = this->transform->optimize_time_prod(&X, transp, inplace, nsamples);
-        return new FaustCoreCpp<FPP,DEV>(th);
-    }
 #ifdef FAUST_VERBOSE
     std::cout << "FaustCoreCpp::optimize_time() th=" << th << "core=" << core << std::endl;
 #endif
+    Faust::MatSparse<FPP, Cpu> X(x_nnz, x_nrows, x_ncols, x_data, x_row_ptr, x_id_col);
+    if(inplace)
+    {
+        this->transform->optimize_time_prod(&X, transp, inplace, nsamples);
+        return this;
+    }
+    auto th = this->transform->optimize_time_prod(&X, transp, inplace, nsamples);
+    return new FaustCoreCpp<FPP,DEV>(th);
 }
 
 template<typename FPP, FDevice DEV>
 FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::optimize_time(const FPP* x_data, int x_nrows, int x_ncols, const bool transp /* deft to false*/, const bool inplace /* default to false */, const int nsamples /* default to 1*/)
 {
 
-    Faust::MatDense<FPP, Cpu> X(x_data, x_nrows, x_ncols);
-    if(inplace)
-        this->transform->optimize_time_prod(&X, transp, inplace, nsamples);
-    else
-    {
-        auto th = this->transform->optimize_time_prod(&X, transp, inplace, nsamples);
-        return new FaustCoreCpp<FPP,DEV>(th);
-    }
 #ifdef FAUST_VERBOSE
     std::cout << "FaustCoreCpp::optimize_time() th=" << th << "core=" << core << std::endl;
 #endif
+    Faust::MatDense<FPP, Cpu> X(x_data, x_nrows, x_ncols);
+    if(inplace)
+    {
+        this->transform->optimize_time_prod(&X, transp, inplace, nsamples);
+        return this;
+    }
+    auto th = this->transform->optimize_time_prod(&X, transp, inplace, nsamples);
+    return new FaustCoreCpp<FPP,DEV>(th);
 }
 
 template<typename FPP, FDevice DEV>
@@ -648,7 +648,8 @@ bool FaustCoreCpp<FPP,DEV>::is_all_dense() const
 template<typename FPP, FDevice DEV>
 FaustCoreCpp<Real<FPP>,DEV>* FaustCoreCpp<FPP,DEV>::real()
 {
-    auto th = this->transform->template real<Real<FPP>>();
+//    auto th = this->transform->template real<Real<FPP>>();
+    auto th = this->transform->real();
     auto core = new FaustCoreCpp<Real<FPP>,DEV>(th);
     return core;
 }

@@ -1817,11 +1817,8 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         if dtype == F.dtype:
             return F.clone(dev=F.device)
         elif F.dtype == np.complex and dtype == 'double':
-            if F.device == 'cpu':
-                return Faust(core_obj=F.m_faust.real())
-            else:
-                raise ValueError("complex -> float conversion not yet"
-                                 " supported on GPU.")
+            # complex float (single precision) is not yet available in FAµST
+            return Faust(core_obj=F.m_faust.real())
         else:
             return Faust([F.factors(i).astype(dtype) for i in
                           range(F.numfactors())], dev=F.device)

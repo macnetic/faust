@@ -61,8 +61,8 @@ namespace Faust
 				void replace(const MatGeneric<FPP, GPU2>* M, const faust_unsigned_int id);
 				void convertToSparse();
 				void convertToDense();
-				template<typename FPP2>
-				TransformHelper<FPP2, GPU2>* real();
+				TransformHelper<Real<FPP>, GPU2>* real();
+
 
 				void operator=(TransformHelper<FPP,GPU2>& th);
 				typename Transform<FPP,GPU2>::iterator begin() const;
@@ -110,6 +110,7 @@ namespace Faust
 
 				void save_mat_file(const char* filepath) const;
 				FPP get_item(faust_unsigned_int i, faust_unsigned_int j);
+				virtual ~TransformHelper() {};
 				static TransformHelper<FPP,GPU2>* hadamardFaust(unsigned int n, const bool norma=true);
 				static TransformHelper<FPP,GPU2>* fourierFaust(unsigned int n, const bool norma=true);
 				static TransformHelper<FPP,GPU2>* eyeFaust(unsigned int n, unsigned int m);

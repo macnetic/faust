@@ -203,7 +203,7 @@ namespace Faust
 			static TransformHelper<FPP,Cpu>* fourierFaust(unsigned int n, const bool norma=true);
 			static TransformHelper<FPP,Cpu>* eyeFaust(unsigned int n, unsigned int m);
 
-			~TransformHelper();
+			virtual ~TransformHelper();
 			unsigned long long get_fact_addr(const faust_unsigned_int id) const;
 			/* use carefully */
 			MatGeneric<FPP,Cpu>* get_gen_fact_nonconst(const faust_unsigned_int id) const;
@@ -213,7 +213,6 @@ namespace Faust
 			void convertToSparse();
 			void convertToDense();
 			FPP get_item(faust_unsigned_int i, faust_unsigned_int j);
-			template<typename FPP2>
 			TransformHelper<Real<FPP>, Cpu>* real();
 		};
 
