@@ -765,13 +765,13 @@ template<typename FPP>
 			{
 				if(curfac_ds = dynamic_cast<MatDense<FPP, GPU2>*>(curfac))
 				{
-					auto real_fac = new MatDense<Real<FPP>,GPU2>(curfac->getNbRow(), curfac->getNbCol());
+					auto real_fac = new MatDense<Real<FPP>,GPU2>(curfac->getNbRow(), curfac->getNbCol(), /* cpu_data*/ nullptr, /* no_alloc*/ false, /* dev_id*/ -1, /* stream*/ nullptr);
 					curfac_ds->real(*real_fac);
 					real_data.push_back(real_fac);
 				}
 				else if(curfac_sp = dynamic_cast<MatSparse<FPP, GPU2>*>(curfac))
 				{
-					auto real_fac = new MatSparse<Real<FPP>,GPU2>(curfac->getNbRow(), curfac->getNbCol());
+					auto real_fac = new MatSparse<Real<FPP>,GPU2>(curfac->getNbRow(), curfac->getNbCol(), /* nnz*/ 0, /* values */ nullptr, /* rowptr*/ nullptr, /* colinds*/ nullptr);
 					curfac_sp->real(*real_fac);
 					real_data.push_back(real_fac);
 				}
