@@ -131,11 +131,15 @@ namespace Faust
 	template<typename FPP>
 		class MatDiag;
 
+	template<typename FPP,FDevice DEVICE>
+		class MatBSR;
+
 	template<typename FPP>
 		class MatDense<FPP,Cpu> : public MatGeneric<FPP,Cpu>
 		{
 
 			friend class MatSparse<FPP,Cpu>;
+			friend class MatBSR<FPP, Cpu>;
 			friend TransformHelper<FPP,Cpu>; // TODO: limit to needed member functions only
 			friend Transform<FPP,Cpu>; //TODO: limit to needed member functions only (multiply)
 			friend void  MatDiag<FPP>::multiply(MatDense<FPP,Cpu> & M, char opThis) const;
@@ -156,8 +160,8 @@ namespace Faust
 																										 \tparam nbRow : number of row of the matrix
 																										 \tparam nbCol : number of column of the matrix
 																										 */
-			MatDense(const FPP  *data_,const faust_unsigned_int nbRow, const faust_unsigned_int nbCol );
-			MatDense(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, const FPP  *data_);
+			explicit MatDense(const FPP  *data_,const faust_unsigned_int nbRow, const faust_unsigned_int nbCol );
+			explicit MatDense(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, const FPP  *data_);
 			MatDense() : MatGeneric<FPP,Cpu>(), mat(0,0), isZeros(false) {}
 			/*!
 			 *  \brief Copy Constructor of MatDense
@@ -170,8 +174,8 @@ namespace Faust
 				MatDense(const MatSparse<FPP1,Cpu> & A)  {this->operator=(A);this->is_ortho = A.is_ortho;}
 			MatDense(const MatSparse<FPP,Cpu> & A)  {this->operator=(A);this->is_ortho = A.is_ortho;}
 
-			MatDense(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol) : MatGeneric<FPP,Cpu>(nbRow,nbCol), mat(nbRow,nbCol), isZeros(false){}
-			MatDense(const faust_unsigned_int nbRow) : MatGeneric<FPP,Cpu>(nbRow,nbRow), mat(nbRow,nbRow), isZeros(false){}
+			explicit MatDense(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol) : MatGeneric<FPP,Cpu>(nbRow,nbCol), mat(nbRow,nbCol), isZeros(false){}
+			explicit MatDense(const faust_unsigned_int nbRow) : MatGeneric<FPP,Cpu>(nbRow,nbRow), mat(nbRow,nbRow), isZeros(false){}
 			/// Destructor of MatDense
 			~MatDense(){resize(0,0);/*std::cout<<"destructor dense mat"<<std::endl;*/}
 

@@ -91,6 +91,9 @@ namespace Faust
 	template<typename FPP>
 		class MatDiag;
 
+	template<typename FPP,FDevice DEVICE>
+		class MatBSR;
+
    // friend function of faust_linear_algebra.h
    template<typename FPP>
    void gemv(const MatDense<FPP,Cpu> & A,const Vect<FPP,Cpu> & x,Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);
@@ -112,6 +115,7 @@ namespace Faust
 		friend class MatSparse<FPP,Cpu>; // TODO: limit friendship to the necessary functions
 //		friend void  MatDiag<FPP>::multiply(Vect<FPP,Cpu> & vec, char opThis) const;
 
+		friend class MatBSR<FPP, Cpu>;
 		friend TransformHelperPoly<FPP>; // TODO: limit to needed member functions only
 
         public :

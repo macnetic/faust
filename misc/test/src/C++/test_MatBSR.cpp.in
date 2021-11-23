@@ -1,0 +1,37 @@
+#include "faust_constant.h"
+#include "faust_MatDense.h"
+#include "faust_MatSparse.h"
+#include "faust_MatBSR.h"
+
+
+typedef @TEST_FPP@ FPP;
+
+using namespace std;
+using namespace Faust;
+
+void test_fro_norm(const MatBSR<FPP, Cpu>& bmat)
+{
+	cout << "testing bsr fro. norm:" << std::endl;
+	auto dmat = bmat.to_dense();
+	cout << "bsr mat fro-norm:" << bmat.norm() << std::endl;
+	cout << "dense mat fro-norm:" << dmat.norm() << std::endl;
+	assert(std::abs(bmat.norm()-dmat.norm()) < 1e-6);
+	cout << "fro-norm test is OK." << std::endl;
+}
+
+int main(int argc, char** argv)
+{
+	int m, n, bm, bn, bnnz;
+	m = 10;
+	n = 10;
+	bm = 2;
+	bn = 2;
+	bnnz = 8;
+	auto bmat = MatBSR<FPP, Cpu>::randMat(m, n, bm, bn, bnnz);
+	bmat->Display();
+	test_fro_norm(*bmat);
+	delete bmat;
+	return EXIT_SUCCESS;
+}
+
+

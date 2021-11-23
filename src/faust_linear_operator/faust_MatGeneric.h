@@ -67,6 +67,9 @@ namespace Faust
     class LinearOperator;
 
     template<typename FPP,FDevice DEVICE>
+    class MatBSR;
+
+    template<typename FPP,FDevice DEVICE>
     class MatGeneric : public Faust::LinearOperator<FPP,DEVICE>
 	{
 
@@ -146,7 +149,7 @@ namespace Faust
 			//! \return value between 0 and 1
 			float density() const{return ((float) this->getNonZeros())/((float)this->getNbCol()*this->getNbRow());}
 
-			//! \brief get the dynamic type of the matrix (SPARSE or DENSE)
+			//! \brief get the dynamic type of the matrix (SPARSE, DENSE, etc.)
 			virtual MatType getType() const=0;
 
 			//! \brief multiply a matrix by the given scalar alpha
@@ -217,7 +220,7 @@ namespace Faust
 
 			//! \brief
 			//! \warning : declare a virtual destructor is mandatory for an abstract class
-			//! in order to allow descendant class destructor to clean up in case of pointer to the abstract class
+			//! in order to allow child class destructor to clean up in case of pointer to the abstract class
 			virtual ~ MatGeneric()=0;
 
 

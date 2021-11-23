@@ -42,6 +42,7 @@
 
 // useful for optimize with multiplication
 #include "faust_Timer.h"
+#include "faust_MatBSR.h"
 
 
 template<typename FPP,FDevice DEVICE>
@@ -148,6 +149,8 @@ std::string Faust::MatGeneric<FPP,DEVICE>::to_string(const bool transpose /* set
 		type = Dense;
 	else if (dynamic_cast<const MatDiag<FPP>*>(this))
 		type = Diag;
+	else if (dynamic_cast<const MatBSR<FPP, DEVICE>*>(this))
+		type = BSR;
 	else
 		throw std::runtime_error("Unhandled matrix type in MatGeneric::to_string()"); // shouldn't happen
 	return this->to_string(getNbRow(), getNbCol(), transpose, this->density(), this->getNonZeros(), this->is_identity, type);
@@ -181,6 +184,8 @@ std::string Faust::MatGeneric<FPP,DEVICE>::to_string(int32_t nrows, int32_t ncol
 		str << "SPARSE,";
 	else if(type == Diag)
 		str << "DIAG,";
+	else if(type == BSR)
+		str << "BSR,";
 	else if(type == None)
 		str << "UNKNOWN MATRIX TYPE,";
 	else

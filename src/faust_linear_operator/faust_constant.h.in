@@ -93,6 +93,7 @@ enum MatType
    Dense, 
    Sparse, 
    Diag,
+   BSR,
    None
 };
 

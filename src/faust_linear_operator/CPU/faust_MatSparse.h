@@ -91,6 +91,7 @@ namespace Faust
 
 
 	template<typename FPP> class MatDiag;
+	template<typename FPP, FDevice DEVICE> class MatBSR;
 
 	//! MatDense class template of dense matrix
 	template<typename FPP,FDevice DEVICE> class MatDense;
@@ -108,6 +109,7 @@ namespace Faust
 		class MatSparse<FPP,Cpu> : public MatGeneric<FPP,Cpu>
 		{
 
+			friend MatBSR<FPP, Cpu>;
 			friend GivensFGFT<FPP,Cpu, double>;
 			friend GivensFGFTParallel<FPP,Cpu, double>;
 			friend GivensFGFT<FPP,Cpu, float>;
