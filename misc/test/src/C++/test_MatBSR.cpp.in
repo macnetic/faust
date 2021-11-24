@@ -46,7 +46,7 @@ void test_mul_vec(const MatBSR<FPP, Cpu>& bmat)
 	Vect<FPP, Cpu> vec(bmat.getNbCol(), md->getData());
 	Vect<FPP, Cpu> vec_cpy(bmat.getNbCol(), md->getData());
 	auto dmat = bmat.to_dense();
-	bmat.multiply(vec);
+	bmat.multiply(vec, 'N');
 	dmat.multiply(vec_cpy, 'N');
 //	cout << "ref vec:";vec_cpy.Display(); cout << "norm: " << vec_cpy.norm() << std::endl;
 //	cout << "test vec:";vec.Display(); cout << "norm: " << vec.norm() << std::endl;
@@ -67,6 +67,20 @@ void test_mul_vec(const MatBSR<FPP, Cpu>& bmat)
 	delete md;
 }
 
+void test_mul_vec2(const MatBSR<FPP, Cpu>& bmat)
+{
+	cout << "=== Testing Vect MatBSR::multiply(Vect)" << endl;
+	auto md = MatDense<FPP, Cpu>::randMat(bmat.getNbCol(), 1);
+	Vect<FPP, Cpu> vec(bmat.getNbCol(), md->getData());
+	auto dmat = bmat.to_dense();
+	Vect<FPP, Cpu> test_vec = bmat.multiply(vec);
+	Vect<FPP, Cpu> ref_vect = dmat.multiply(vec);
+//	cout << "ref test_vec:";ref_vect.Display(); cout << "norm: " << ref_vect.norm() << std::endl;
+//	cout << "test test_vec:";test_vec.Display(); cout << "norm: " << test_vec.norm() << std::endl;
+	assert(std::abs(test_vec.norm()-ref_vect.norm()) < 1e-6);
+	delete md;
+}
+
 int main(int argc, char** argv)
 {
 	int m, n, bm, bn, bnnz;
@@ -81,6 +95,7 @@ int main(int argc, char** argv)
 	test_1_norm(*bmat);
 	test_clone(*bmat);
 	test_mul_vec(*bmat);
+	test_mul_vec2(*bmat);
 	delete bmat;
 	return EXIT_SUCCESS;
 }

@@ -38,7 +38,7 @@ namespace Faust
 			MatBSR(BSRMat<FPP>& mat);
 			public:
 			MatGeneric<FPP,Cpu>* Clone(const bool isOptimize=false) const;
-			void multiply(Vect<FPP,Cpu> & vec, char opThis='N') const;
+			void multiply(Vect<FPP,Cpu> & vec, char opThis) const;
 			Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> &v) const; // from LinearOperator
 			void multiply(MatDense<FPP,Cpu> & M, char opThis) const;
 			void multiply(MatSparse<FPP, Cpu>& M, char opThis) const;

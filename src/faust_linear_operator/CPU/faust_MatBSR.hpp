@@ -29,7 +29,7 @@ namespace Faust
 
 
 	template <typename FPP>
-		void MatBSR<FPP,Cpu>::multiply(Faust::Vect<FPP,Cpu> & vec, char opThis/*='N'*/) const
+		void MatBSR<FPP,Cpu>::multiply(Faust::Vect<FPP,Cpu> & vec, char opThis) const
 		{
 			switch(opThis)
 			{
@@ -60,7 +60,10 @@ namespace Faust
 	template <typename FPP>
 	Vect<FPP,Cpu> MatBSR<FPP,Cpu>::multiply(const Vect<FPP,Cpu> &v) const
 	{
-		//TODO:
+		Vect<FPP, Cpu> vec;
+		vec.resize(this->dim1);
+		vec.vec = bmat.mul(v.vec);
+		return vec;
 	}
 
 	template <typename FPP>
