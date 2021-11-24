@@ -19,10 +19,11 @@ namespace Faust
 		{
 			//TODO: optimize to a MatDense or MatSparse by comparing the time of matrix-vector product?
 			MatBSR<FPP,Cpu> *clone = new MatBSR<FPP,Cpu>();
-			BSRMat<FPP> bmat(bmat);
-			clone->bmat = bmat;
-			clone->dim1 = bmat.m;
-			clone->dim2 = bmat.n;
+			BSRMat<FPP> clone_bmat(bmat);
+			clone->bmat = clone_bmat;
+			clone->bmat.print_bufs();
+			clone->dim1 = clone_bmat.m;
+			clone->dim2 = clone_bmat.n;
 			return clone;
 		}
 
@@ -239,7 +240,7 @@ namespace Faust
 		}
 
 	template <typename FPP>
-		Real<FPP> MatBSR<FPP,Cpu>::normL1(const bool transpose) const
+		Real<FPP> MatBSR<FPP,Cpu>::normL1(const bool transpose/*=false*/) const
 		{
 			return bmat.normL1();
 		}

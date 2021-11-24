@@ -54,7 +54,7 @@ namespace Faust
 			std::string to_string(MatType type, const bool transpose=false, const bool displaying_small_mat_elts=false) const;
 			std::string to_string(const bool transpose=false, const bool displaying_small_mat_elts=false) const;
 			matvar_t* toMatIOVar(bool transpose, bool conjugate) const;
-			Real<FPP> normL1(const bool transpose) const;
+			Real<FPP> normL1(const bool transpose=false) const;
 			Real<FPP> norm() const;
 			Real<FPP> normL1(faust_unsigned_int& col_id, const bool transpose) const;
 			Vect<FPP,Cpu> get_col(faust_unsigned_int id) const;

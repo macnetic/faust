@@ -11,12 +11,60 @@ using namespace Faust;
 
 void test_fro_norm(const MatBSR<FPP, Cpu>& bmat)
 {
-	cout << "testing bsr fro. norm:" << std::endl;
+	cout << "=== Testing MatBSR::norm:" << std::endl;
 	auto dmat = bmat.to_dense();
 	cout << "bsr mat fro-norm:" << bmat.norm() << std::endl;
 	cout << "dense mat fro-norm:" << dmat.norm() << std::endl;
 	assert(std::abs(bmat.norm()-dmat.norm()) < 1e-6);
-	cout << "fro-norm test is OK." << std::endl;
+	cout << "MatBSR::norm OK." << std::endl;
+}
+
+void test_1_norm(const MatBSR<FPP, Cpu>& bmat)
+{
+	cout << "=== Testing MatBSR::normL1:" << std::endl;
+	auto dmat = bmat.to_dense();
+	cout << "bsr mat fro-normL1:" << bmat.normL1() << std::endl;
+	cout << "dense mat fro-normL1:" << dmat.normL1() << std::endl;
+	assert(std::abs(bmat.normL1()-dmat.normL1()) < 1e-6);
+	cout << "MatBSR::normL1 OK." << std::endl;
+}
+
+void test_clone(const MatBSR<FPP, Cpu>& bmat)
+{
+	cout << "=== Testing MatBSR::clone" << endl;
+	auto clone = bmat.Clone();
+	cout << "bsr mat fro-norm:" << bmat.norm() << std::endl;
+	cout << "clone bsr mat fro-norm:" << clone->norm() << std::endl;
+	assert(std::abs(bmat.norm()-clone->norm()) < 1e-6);
+	cout << "MatBSR::clone OK" << std::endl;
+}
+
+void test_mul_vec(const MatBSR<FPP, Cpu>& bmat)
+{
+	cout << "=== Testing MatBSR::multiply(Vect)" << endl;
+	auto md = MatDense<FPP, Cpu>::randMat(bmat.getNbCol(), 1);
+	Vect<FPP, Cpu> vec(bmat.getNbCol(), md->getData());
+	Vect<FPP, Cpu> vec_cpy(bmat.getNbCol(), md->getData());
+	auto dmat = bmat.to_dense();
+	bmat.multiply(vec);
+	dmat.multiply(vec_cpy, 'N');
+//	cout << "ref vec:";vec_cpy.Display(); cout << "norm: " << vec_cpy.norm() << std::endl;
+//	cout << "test vec:";vec.Display(); cout << "norm: " << vec.norm() << std::endl;
+	assert(std::abs(vec.norm()-vec_cpy.norm()) < 1e-6);
+	cout << "MatBSR::multiply(Vect, 'N') OK" << endl;
+	bmat.multiply(vec, 'T');
+	dmat.multiply(vec_cpy, 'T');
+//	cout << "ref vec:";vec_cpy.Display(); cout << "norm: " << vec_cpy.norm() << std::endl;
+//	cout << "test vec:";vec.Display(); cout << "norm: " << vec.norm() << std::endl;
+	assert(std::abs(vec.norm()-vec_cpy.norm()) < 1e-6);
+	cout << "MatBSR::multiply(Vect, 'T') OK" << endl;
+	bmat.multiply(vec, 'H');
+	dmat.multiply(vec_cpy, 'H');
+//	cout << "ref vec:";vec_cpy.Display(); cout << "norm: " << vec_cpy.norm() << std::endl;
+//	cout << "test vec:";vec.Display(); cout << "norm: " << vec.norm() << std::endl;
+	assert(std::abs(vec.norm()-vec_cpy.norm()) < 1e-6);
+	cout << "MatBSR::multiply(Vect, 'H') OK" << endl;
+	delete md;
 }
 
 int main(int argc, char** argv)
@@ -30,6 +78,9 @@ int main(int argc, char** argv)
 	auto bmat = MatBSR<FPP, Cpu>::randMat(m, n, bm, bn, bnnz);
 	bmat->Display();
 	test_fro_norm(*bmat);
+	test_1_norm(*bmat);
+	test_clone(*bmat);
+	test_mul_vec(*bmat);
 	delete bmat;
 	return EXIT_SUCCESS;
 }
