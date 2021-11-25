@@ -410,6 +410,35 @@ void Faust::update_lambda(Faust::TransformHelper<FPP,DEVICE>& S, std::vector<Tra
 	lambda = std::real(tr)/(nS*nS);
 }
 
+template<typename FPP>
+	Real<FPP> Faust::compute_double_spectralNorm(MatDense<FPP, Cpu>& mat, int norm2_max_iter, double norm2_threshold)
+{
+	int flag;
+	MatDense<Real<FPP>, Cpu> rmat;
+	mat.real(rmat);
+	Faust::MatDense<double, Cpu> dmat;
+	dmat.resize(mat.getNbRow(), mat.getNbCol());
+	for(int i=0;i < dmat.getNbRow(); i++)
+		for(int j=0;j < dmat.getNbRow(); j++)
+			dmat.getData()[j*dmat.getNbRow()+i] = (double) rmat(i,j);
+	auto n = dmat.spectralNorm(norm2_max_iter, norm2_threshold, flag);
+	return (Real<FPP>)n;
+}
+
+#ifdef USE_GPU_MOD
+template<typename FPP>
+	Real<FPP> Faust::compute_double_spectralNorm(MatDense<FPP, GPU2>& mat, int norm2_max_iter, double norm2_threshold)
+{
+	int flag;
+
+	Faust::MatDense<Real<FPP>, GPU2> rmat(mat.getNbRow(), mat.getNbCol(), nullptr, true);
+	mat.real(rmat);
+	Faust::MatDense<Real<FPP>, Cpu> cpu_rmat;
+	rmat.tocpu(cpu_rmat);
+	return compute_double_spectralNorm(cpu_rmat, norm2_max_iter, norm2_threshold);
+}
+#endif
+
 	template<typename FPP, FDevice DEVICE>
 void Faust::update_fact(
 		Faust::MatGeneric<FPP,DEVICE>* cur_fac,
@@ -451,9 +480,34 @@ void Faust::update_fact(
 		if(is_verbose)
 			spectral_start = std::chrono::high_resolution_clock::now();
 		if(pR[f_id]->size() > 0)
+		{
 			nR = pR[f_id]->spectralNorm(norm2_max_iter, norm2_threshold, norm2_flag);
+			if(std::is_same<FPP, float>::value && std::isnan(nR))
+			{
+				auto M = pR[f_id]->get_product();
+				nR = compute_double_spectralNorm(M, norm2_max_iter, norm2_threshold);
+				if(is_verbose)
+					std::cout << "Corrected R NaN float 2-norm by recomputing as double 2-norm" << nR << std::endl;
+			}
+		}
 		if(pL[f_id]->size() > 0)
+		{
 			nL = pL[f_id]->spectralNorm(norm2_max_iter, norm2_threshold, norm2_flag);
+			if(std::is_same<FPP, float>::value && std::isnan(nL))
+			{
+				auto M = pL[f_id]->get_product();
+				nL = compute_double_spectralNorm(M, norm2_max_iter, norm2_threshold);
+				if(is_verbose)
+					std::cout << "Corrected L NaN float 2-norm by recomputing as double 2-norm:" << nL << std::endl;
+			}
+		}
+		if(std::isnan(nL) || std::isnan(nR))
+		{
+			std::cout << "R 2-norm:" << nR << std::endl;
+			std::cout << "L 2-norm:" << nL << std::endl;
+			std::cout << "S id:" << f_id << std::endl;
+			throw std::runtime_error("2-norm computation error: R or L 2-norm is NaN.");
+		}
 		if(is_verbose)
 		{
 			spectral_stop = std::chrono::high_resolution_clock::now();

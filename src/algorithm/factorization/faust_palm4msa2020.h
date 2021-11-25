@@ -150,6 +150,14 @@ namespace Faust
 				const Real<FPP>& lambda,
 				bool use_grad1=false);
 
+	/**
+	 * These two functions compute the mat 2-norm using double precision. Intended to be used only when FPP is float.
+	 * It is a workaround to the 2-norm float computation (NaN result) which occur on certain Fausts (cf. gitlab issue #236).
+	 */
+	template<typename FPP>
+		Real<FPP> compute_double_spectralNorm(MatDense<FPP, Cpu>& mat, int norm2_max_iter, double norm2_threshold);
+	template<typename FPP>
+		Real<FPP> compute_double_spectralNorm(MatDense<FPP, GPU2>& mat, int norm2_max_iter, double norm2_threshold);
 
 
 }
