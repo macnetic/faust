@@ -16,7 +16,7 @@ void test_fro_norm(const MatBSR<FPP, Cpu>& bmat)
 	cout << "bsr mat fro-norm:" << bmat.norm() << std::endl;
 	cout << "dense mat fro-norm:" << dmat.norm() << std::endl;
 	assert(std::abs(bmat.norm()-dmat.norm()) < 1e-6);
-	cout << "MatBSR::norm OK." << std::endl;
+	cout << "OK." << std::endl;
 }
 
 void test_1_norm(const MatBSR<FPP, Cpu>& bmat)
@@ -26,7 +26,7 @@ void test_1_norm(const MatBSR<FPP, Cpu>& bmat)
 	cout << "bsr mat fro-normL1:" << bmat.normL1() << std::endl;
 	cout << "dense mat fro-normL1:" << dmat.normL1() << std::endl;
 	assert(std::abs(bmat.normL1()-dmat.normL1()) < 1e-6);
-	cout << "MatBSR::normL1 OK." << std::endl;
+	cout << "OK." << std::endl;
 }
 
 void test_clone(const MatBSR<FPP, Cpu>& bmat)
@@ -36,7 +36,7 @@ void test_clone(const MatBSR<FPP, Cpu>& bmat)
 	cout << "bsr mat fro-norm:" << bmat.norm() << std::endl;
 	cout << "clone bsr mat fro-norm:" << clone->norm() << std::endl;
 	assert(std::abs(bmat.norm()-clone->norm()) < 1e-6);
-	cout << "MatBSR::clone OK" << std::endl;
+	cout << "OK" << std::endl;
 }
 
 void test_mul_vec(const MatBSR<FPP, Cpu>& bmat)
@@ -63,8 +63,8 @@ void test_mul_vec(const MatBSR<FPP, Cpu>& bmat)
 //	cout << "ref vec:";vec_cpy.Display(); cout << "norm: " << vec_cpy.norm() << std::endl;
 //	cout << "test vec:";vec.Display(); cout << "norm: " << vec.norm() << std::endl;
 	assert(std::abs(vec.norm()-vec_cpy.norm()) < 1e-6);
-	cout << "MatBSR::multiply(Vect, 'H') OK" << endl;
 	delete md;
+	cout << "OK" << endl;
 }
 
 void test_mul_vec2(const MatBSR<FPP, Cpu>& bmat)
@@ -75,10 +75,195 @@ void test_mul_vec2(const MatBSR<FPP, Cpu>& bmat)
 	auto dmat = bmat.to_dense();
 	Vect<FPP, Cpu> test_vec = bmat.multiply(vec);
 	Vect<FPP, Cpu> ref_vect = dmat.multiply(vec);
-//	cout << "ref test_vec:";ref_vect.Display(); cout << "norm: " << ref_vect.norm() << std::endl;
-//	cout << "test test_vec:";test_vec.Display(); cout << "norm: " << test_vec.norm() << std::endl;
 	assert(std::abs(test_vec.norm()-ref_vect.norm()) < 1e-6);
 	delete md;
+	cout << "OK" << endl;
+}
+
+void test_mul_dense(const MatBSR<FPP, Cpu>& bmat)
+{
+	cout << "=== Testing MatBSR::multiply(MatDense)" << endl;
+	auto rmd = MatDense<FPP, Cpu>::randMat(bmat.getNbCol(), 32);
+	MatDense<FPP, Cpu> rmd_copy(*rmd);
+	auto dmat = bmat.to_dense();
+	dmat.multiply(*rmd, 'N');
+	bmat.multiply(rmd_copy, 'N');
+	assert((*rmd).getNbRow() == rmd_copy.getNbRow() && (*rmd).getNbCol() == rmd_copy.getNbCol());
+	rmd_copy -= *rmd;
+	assert(rmd_copy.norm() < 1e-6);
+	delete rmd;
+	cout << "OK" << endl;
+}
+
+void test_mul_dense_transp(const MatBSR<FPP, Cpu>& bmat)
+{
+	cout << "=== Testing MatBSR::multiply(MatDense, T)" << endl;
+	auto rmd = MatDense<FPP, Cpu>::randMat(bmat.getNbRow(), 32);
+	MatDense<FPP, Cpu> rmd_copy(*rmd);
+	auto dmat = bmat.to_dense();
+	dmat.multiply(*rmd, 'T');
+	bmat.multiply(rmd_copy, 'T');
+	assert((*rmd).getNbRow() == rmd_copy.getNbRow() && (*rmd).getNbCol() == rmd_copy.getNbCol());
+	rmd_copy -= *rmd;
+	assert(rmd_copy.norm() < 1e-6);
+	delete rmd;
+	cout << "OK" << endl;
+}
+
+void test_mul_dense_transconj(const MatBSR<FPP, Cpu>& bmat)
+{
+	cout << "=== Testing MatBSR::multiply(MatDense, H)" << endl;
+	auto rmd = MatDense<FPP, Cpu>::randMat(bmat.getNbRow(), 32);
+	MatDense<FPP, Cpu> rmd_copy(*rmd);
+	auto dmat = bmat.to_dense();
+	dmat.multiply(*rmd, 'H');
+	bmat.multiply(rmd_copy, 'H');
+	assert((*rmd).getNbRow() == rmd_copy.getNbRow() && (*rmd).getNbCol() == rmd_copy.getNbCol());
+	rmd_copy -= *rmd;
+	assert(rmd_copy.norm() < 1e-6);
+	delete rmd;
+	cout << "OK" << endl;
+}
+
+void test_mul_sparse(const MatBSR<FPP, Cpu>& bmat)
+{
+	cout << "=== Testing MatBSR::multiply(MatSparse, N)" << endl;
+	auto rmd = MatDense<FPP, Cpu>::randMat(bmat.getNbCol(), 32);
+	MatSparse<FPP, Cpu> rms(*rmd);
+	MatSparse<FPP, Cpu> rms_copy(rms);
+	auto dmat = bmat.to_dense();
+	dmat.multiply(rms, 'N');
+	bmat.multiply(rms_copy, 'N');
+	assert(rms.getNbRow() == rms_copy.getNbRow() && rms.getNbCol() == rms_copy.getNbCol());
+	*rmd = rms;
+	MatDense<FPP, Cpu> rmd_copy(rms_copy);
+	rmd_copy -= *rmd;
+	assert(rmd_copy.norm() < 1e-6);
+	delete rmd;
+	cout << "OK" << endl;
+}
+
+void test_mul_sparse_transp(const MatBSR<FPP, Cpu>& bmat)
+{
+	cout << "=== Testing MatBSR::multiply(MatSparse, T)" << endl;
+	auto rmd = MatDense<FPP, Cpu>::randMat(bmat.getNbRow(), 32);
+	MatSparse<FPP, Cpu> rms(*rmd);
+	MatSparse<FPP, Cpu> rms_copy(rms);
+	auto dmat = bmat.to_dense();
+	dmat.multiply(rms, 'T');
+	bmat.multiply(rms_copy, 'T');
+	assert(rms.getNbRow() == rms_copy.getNbRow() && rms.getNbCol() == rms_copy.getNbCol());
+	*rmd = rms;
+	MatDense<FPP, Cpu> rmd_copy(rms_copy);
+	rmd_copy -= *rmd;
+	assert(rmd_copy.norm() < 1e-6);
+	delete rmd;
+	cout << "OK" << endl;
+}
+
+void test_mul_sparse_transconj(const MatBSR<FPP, Cpu>& bmat)
+{
+	cout << "=== Testing MatBSR::multiply(MatSparse, H)" << endl;
+	auto rmd = MatDense<FPP, Cpu>::randMat(bmat.getNbRow(), 32);
+	MatSparse<FPP, Cpu> rms(*rmd);
+	MatSparse<FPP, Cpu> rms_copy(rms);
+	auto dmat = bmat.to_dense();
+	dmat.multiply(rms, 'H');
+	bmat.multiply(rms_copy, 'H');
+	assert(rms.getNbRow() == rms_copy.getNbRow() && rms.getNbCol() == rms_copy.getNbCol());
+	*rmd = rms;
+	MatDense<FPP, Cpu> rmd_copy(rms_copy);
+	rmd_copy -= *rmd;
+	assert(rmd_copy.norm() < 1e-6);
+	delete rmd;
+	cout << "OK" << endl;
+}
+
+void test_mul_sparse_right(const MatBSR<FPP, Cpu>& bmat_orig)
+{
+	cout << "=== Testing MatBSR::multiplyRight(MatSparse)" << endl;
+	auto rmd = MatDense<FPP, Cpu>::randMat(bmat_orig.getNbCol(), 32);
+	MatSparse<FPP, Cpu> rms(*rmd);
+	auto dmat = bmat_orig.to_dense();
+	MatBSR<FPP, Cpu> bmat(bmat_orig);
+	dmat.multiplyRight(rms);
+	bmat.multiplyRight(rms);
+	auto dmat_copy = bmat.to_dense();
+//	dmat.Display();
+//	bmat.Display();
+	assert(bmat.getNbRow() == dmat.getNbRow() && bmat.getNbCol() == dmat.getNbCol());
+	dmat -= dmat_copy;
+	assert(dmat.norm() < 1e-6);
+	delete rmd;
+	cout << "OK" << endl;
+}
+
+void test_gemm_NN(const MatBSR<FPP, Cpu>& bmat)
+{
+	cout << "=== Testing MatBSR::faust_gemmNN" << endl;
+	auto B = MatDense<FPP, Cpu>::randMat(bmat.getNbCol(), 32);
+	auto C = MatDense<FPP, Cpu>::randMat(bmat.getNbRow(), 32);
+	MatDense<FPP, Cpu> C_copy(*C);
+	auto dmat = bmat.to_dense();
+	bmat.faust_gemm(*B, *C, (*B)(0,0), (*C)(0,0), 'N', 'N');
+	dmat.faust_gemm(*B, C_copy, (*B)(0,0), C_copy(0,0), 'N', 'N');
+	MatDense<FPP, Cpu> test = *C;
+	test -= C_copy;
+	assert(test.norm() < 1e-6);
+	delete B;
+	delete C;
+	cout << "OK" << endl;
+}
+
+void test_gemm_NT(const MatBSR<FPP, Cpu>& bmat)
+{
+	cout << "=== Testing MatBSR::faust_gemmNT" << endl;
+	auto B = MatDense<FPP, Cpu>::randMat(32, bmat.getNbCol());
+	auto C = MatDense<FPP, Cpu>::randMat(bmat.getNbRow(), 32);
+	MatDense<FPP, Cpu> C_copy(*C);
+	auto dmat = bmat.to_dense();
+	bmat.faust_gemm(*B, *C, (*B)(0,0), (*C)(0,0), 'N', 'T');
+	dmat.faust_gemm(*B, C_copy, (*B)(0,0), C_copy(0,0), 'N', 'T');
+	MatDense<FPP, Cpu> test = *C;
+	test -= C_copy;
+	assert(test.norm() < 1e-6);
+	delete B;
+	delete C;
+	cout << "OK" << endl;
+}
+
+void test_gemm_TT(const MatBSR<FPP, Cpu>& bmat)
+{
+	cout << "=== Testing MatBSR::faust_gemmTT" << endl;
+	auto B = MatDense<FPP, Cpu>::randMat(32, bmat.getNbRow());
+	auto C = MatDense<FPP, Cpu>::randMat(bmat.getNbCol(), 32);
+	MatDense<FPP, Cpu> C_copy(*C);
+	auto dmat = bmat.to_dense();
+	bmat.faust_gemm(*B, *C, (*B)(0,0), (*C)(0,0), 'T', 'T');
+	dmat.faust_gemm(*B, C_copy, (*B)(0,0), C_copy(0,0), 'T', 'T');
+	MatDense<FPP, Cpu> test = *C;
+	test -= C_copy;
+	assert(test.norm() < 1e-6);
+	delete B;
+	delete C;
+	cout << "OK" << endl;
+}
+
+void test_gemm_HH(const MatBSR<FPP, Cpu>& bmat)
+{
+	cout << "=== Testing MatBSR::faust_gemmHH" << endl;
+	auto B = MatDense<FPP, Cpu>::randMat(32, bmat.getNbRow());
+	auto C = MatDense<FPP, Cpu>::randMat(bmat.getNbCol(), 32);
+	MatDense<FPP, Cpu> C_copy(*C);
+	auto dmat = bmat.to_dense();
+	bmat.faust_gemm(*B, *C, (*B)(0,0), (*C)(0,0), 'H', 'H');
+	dmat.faust_gemm(*B, C_copy, (*B)(0,0), C_copy(0,0), 'H', 'H');
+	MatDense<FPP, Cpu> test = *C;
+	test -= C_copy;
+	assert(test.norm() < 1e-6);
+	delete B;
+	delete C;
+	cout << "OK" << endl;
 }
 
 int main(int argc, char** argv)
@@ -96,6 +281,17 @@ int main(int argc, char** argv)
 	test_clone(*bmat);
 	test_mul_vec(*bmat);
 	test_mul_vec2(*bmat);
+	test_mul_dense(*bmat);
+	test_mul_dense_transp(*bmat);
+	test_mul_dense_transconj(*bmat);
+	test_mul_sparse(*bmat);
+	test_mul_sparse_transp(*bmat);
+	test_mul_sparse_transconj(*bmat);
+	test_mul_sparse_right(*bmat);
+	test_gemm_NN(*bmat);
+	test_gemm_NT(*bmat);
+	test_gemm_TT(*bmat);
+	test_gemm_HH(*bmat);
 	delete bmat;
 	return EXIT_SUCCESS;
 }
