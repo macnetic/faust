@@ -146,8 +146,8 @@ namespace Faust
 			bmat.browptr = new int[2];
 			bmat.browptr[0] = 0;
 			bmat.browptr[1] = 1;
-			bmat.m = dmat.rows();
-			bmat.n = dmat.cols();
+			this->dim1 = bmat.m = dmat.rows();
+			this->dim2 = bmat.n = dmat.cols();
 			bmat.bnnz = 1;
 			bmat.bm = dmat.rows();
 			bmat.bn = dmat.cols();
@@ -158,7 +158,27 @@ namespace Faust
 	template <typename FPP>
 		void MatBSR<FPP,Cpu>::faust_gemm(const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char typeA, char typeB)const // from LinearOperator
 		{
-
+			MatBSR<FPP, Cpu> this_copy;
+			MatDense<FPP, Cpu> B_copy(B);
+			if(typeB == 'T')
+				B_copy.transpose();
+			else if(typeB == 'H')
+				B_copy.adjoint();
+			if(B.getNBytes() > this->getNBytes())
+			{
+				// B is heavier than this
+				// do the scalar mul on this
+				this_copy = *this;
+				this_copy.bmat.mul(alpha);
+				this_copy.multiply(B_copy, typeA);
+			}
+			else
+			{
+				B_copy *= alpha;
+				multiply(B_copy, typeA);
+			}
+			C *= beta;
+			C.add(B_copy);
 		}
 
 	template <typename FPP>
