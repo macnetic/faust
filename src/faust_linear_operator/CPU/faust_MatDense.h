@@ -527,7 +527,7 @@ namespace Faust
 			void set_row_coeffs(faust_unsigned_int row_id, const std::vector<int> &col_ids, const MatDense<FPP, Cpu> &values, faust_unsigned_int val_row_id);
 
 
-			bool containsNaN();
+			bool containsNaN() const;
 			private:
 			Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic> mat;
 			bool isZeros;

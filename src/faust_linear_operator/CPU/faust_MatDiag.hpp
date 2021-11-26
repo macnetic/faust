@@ -193,11 +193,7 @@ void Faust::MatDiag<FPP>::setZeros()
 }
 
 template<typename FPP>
-bool Faust::MatDiag<FPP>::containsNaN()
+bool Faust::MatDiag<FPP>::containsNaN() const
 {
-
-	for(int i=0;i < min(this->dim1, this->dim2);i++)
-		if(std::isnan(std::real(getData()[i])))
-			return true;
-	return false;
+	return Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>>(const_cast<FPP*>(getData()) /* no worry, just a read access */, min(this->dim1, this->dim2), 1).hasNaN();
 }

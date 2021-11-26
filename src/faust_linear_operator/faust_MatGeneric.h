@@ -211,7 +211,7 @@ namespace Faust
 			void set_id(const bool is_identity) { this->is_identity = is_identity; /* TODO: move def in hpp*/}
 
 			virtual void setZeros()=0;
-			virtual bool containsNaN()=0;
+			virtual bool containsNaN()const=0;
 			virtual const FPP& operator()(faust_unsigned_int i, faust_unsigned_int j)const =0;
 
 			bool is_orthogonal() { return this->is_ortho; /* TODO: move def in hpp*/}

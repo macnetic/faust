@@ -1454,11 +1454,8 @@ void Faust::MatSparse<FPP,Cpu>::real(MatSparse<Real<FPP>, Cpu> &real_mat) const
 }
 
 template<typename FPP>
-bool Faust::MatSparse<FPP,Cpu>::containsNaN()
+bool Faust::MatSparse<FPP,Cpu>::containsNaN() const
 {
-	for(int i=0;i < getNonZeros();i++)
-		if(std::isnan(std::real(getValuePtr()[i])))
-			return true;
-	return false;
+	return Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>>(const_cast<FPP*>(getValuePtr()) /* no worry, just a read access */, getNonZeros(), 1).hasNaN();
 }
 #endif

@@ -124,15 +124,15 @@ namespace Faust
 
 	template<typename FPP>
 		faust_unsigned_int MatDense<FPP,Cpu>::getNonZeros()const
-		{	
+		{
 			faust_unsigned_int nnz = 0;
 			for (int i=0; i < this->getNbRow()*this->getNbCol(); i++)
 			{
 				if ( (*this)[i] != FPP(0.0) )
-					nnz++; 
+					nnz++;
 			}
 
-			return nnz;	
+			return nnz;
 		}
 
 
@@ -1138,17 +1138,9 @@ void MatDense<FPP,Cpu>::normalize(int norm_type/*=-2*/)
 }
 
 template<typename FPP>
-bool MatDense<FPP,Cpu>::containsNaN()
+bool MatDense<FPP,Cpu>::containsNaN() const
 {
-
-#if(EIGEN_WORLD_VERSION > 3 || EIGEN_WORLD_VERSION >= 3 && EIGEN_MAJOR_VERSION >= 3)
-	return Eigen::isnan(mat.array()).any();
-#else
-	for(int i=0;i < this->dim1*this->dim2;i++)
-		if(std::isnan(std::real(getData()[i])))
-			return true;
-	return false;
-#endif
+	return mat.hasNaN();
 }
 
 	template<typename FPP>
