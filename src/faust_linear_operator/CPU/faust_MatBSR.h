@@ -67,6 +67,19 @@ namespace Faust
 			bool containsNaN();
 			const FPP& operator()(faust_unsigned_int i, faust_unsigned_int j)const ;
 			MatDense<FPP, Cpu> to_dense() const;
+			/**
+			 * Returns the number of nonzeros blocks.
+			 */
+			size_t getNBlocks() const;
+			size_t getNbBlocksPerDim(int dim_id) const;
+			/**
+			 * Returns number of rows of each nonzero block.
+			 */
+			size_t getNbBlockRow() const;
+			/**
+			 * Returns the number of columns of each nonzero block.
+			 */
+			size_t getNbBlockCol() const;
 			virtual ~MatBSR();
 			static MatBSR<FPP, Cpu>* randMat(int m, int n, int bm, int bn, int bnnz);
 		};
@@ -82,23 +95,23 @@ class BSRMat
 	// \brief the data of nonzero blocks (size bnnz*bm*bn).
 	T* data;
 	// \brief column indices of the nonzero blocks (size bnnz).
-	int* bcolinds;
+	int* bcolinds;// TODO: should be unsigned
 	// \brief the buffer of cumulative number of blocks per block row (size b_per_coldim+1).
-	int* browptr;
-	// \brief the number of nonzero blocks.
-	int bnnz;
+	int* browptr;// TODO: should be unsigned
+	// \brief the number of nonzero blocks
+	int bnnz;// TODO: should be unsigned
 	// \brief the number of matrix rows.
-	int m;
+	int m; // TODO: should be unsigned
 	// \brief the number of matrix columns.
-	int n;
+	int n;// TODO: should be unsigned
 	// \brief the number of block rows.
-	int bm;
+	int bm;// TODO: should be unsigned
 	// \brief the number of block columns.
-	int bn;
+	int bn;// TODO: should be unsigned
 	// \brief the number of blocks along the row dimension of the matrix (m/bm).
-	int b_per_rowdim;
+	int b_per_rowdim;// TODO: should be unsigned
 	// \brief the number of blocks along the column dimension of the matrix (n/bn).
-	int b_per_coldim;
+	int b_per_coldim;// TODO: should be unsigned
 
 	// private default constructor
 	BSRMat(): data(nullptr), bcolinds(nullptr), browptr(nullptr), bnnz(0), m(0), n(0), bm(0), bn(0), b_per_rowdim(0), b_per_coldim(0) {}

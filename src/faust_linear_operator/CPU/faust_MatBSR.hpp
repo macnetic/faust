@@ -185,6 +185,8 @@ namespace Faust
 		void MatBSR<FPP,Cpu>::transpose()
 		{
 			bmat.transpose(/*inplace*/ true);
+			this->dim1 = bmat.m;
+			this->dim2 = bmat.n;
 		}
 
 	template <typename FPP>
@@ -211,6 +213,38 @@ namespace Faust
 		size_t MatBSR<FPP,Cpu>::getNBytes()const
 		{
 			return bmat.nbytes();
+		}
+
+	template <typename FPP>
+		size_t MatBSR<FPP,Cpu>::getNbBlockRow()const
+		{
+			return bmat.bm;
+		}
+
+	template <typename FPP>
+		size_t MatBSR<FPP,Cpu>::getNbBlockCol()const
+		{
+			return bmat.bn;
+		}
+
+	template <typename FPP>
+		size_t MatBSR<FPP,Cpu>::getNbBlocksPerDim(int dim_id) const
+		{
+			switch(dim_id)
+			{
+				case 0:
+					return bmat.b_per_rowdim;
+				case 1:
+					return bmat.b_per_coldim;
+				default:
+					throw std::runtime_error("MatBSR::getNbBlocksPerDim invalid dimension id (must be 0 or 1).");
+			}
+		}
+
+	template <typename FPP>
+		size_t MatBSR<FPP,Cpu>::getNBlocks() const
+		{
+			return bmat.bnnz;
 		}
 
 	template <typename FPP>
@@ -286,6 +320,7 @@ namespace Faust
 		{
 			Vect<FPP, Cpu> v(this->dim1);
 			v.vec = bmat.get_col(id);
+			return v;
 		}
 
 	template <typename FPP>
@@ -514,7 +549,7 @@ void BSRMat<T,BlockStorageOrder>::print_bufs()
 
 template<typename T, int BlockStorageOrder> DenseMat<T> BSRMat<T, BlockStorageOrder>::to_dense() const
 {
-	DenseMat<T> dmat(this->m, this->n);
+	DenseMat<T> dmat = DenseMat<T>::Zero(this->m, this->n);
 	iter_block([&dmat, this](int mat_row_id, int mat_col_id, int block_offset)
 			{
 				dmat.block(mat_row_id, mat_col_id, bm, bn) = DenseMatMap<T>(data+block_offset*bm*bn, bm, bn);
@@ -708,8 +743,6 @@ BSRMat<T, BlockStorageOrder> BSRMat<T, BlockStorageOrder>::transpose(const bool 
 		for(int i=1;i<b_per_rowdim+1;i++)
 			browptr[i] += browptr[i-1];
 		free_bufs();
-		this->m = m;
-		this->n = n;
 		this->bm = bm;
 		this->bn = bn;
 		this->b_per_rowdim = b_per_rowdim;
