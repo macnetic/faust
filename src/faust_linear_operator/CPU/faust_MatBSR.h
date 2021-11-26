@@ -37,6 +37,7 @@ namespace Faust
 			MatBSR() : MatGeneric<FPP, Cpu>() {}
 			MatBSR(BSRMat<FPP>& mat);
 			public:
+			MatBSR(faust_unsigned_int nrows, faust_unsigned_int ncols, faust_unsigned_int bnrows, faust_unsigned_int bncols, faust_unsigned_int nblocks, const FPP* data, const int *block_rowptr, const int* block_colinds);
 			MatGeneric<FPP,Cpu>* Clone(const bool isOptimize=false) const;
 			void multiply(Vect<FPP,Cpu> & vec, char opThis) const;
 			Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> &v) const; // from LinearOperator
@@ -58,19 +59,24 @@ namespace Faust
 			Real<FPP> norm() const;
 			Real<FPP> normL1(faust_unsigned_int& col_id, const bool transpose) const;
 			Vect<FPP,Cpu> get_col(faust_unsigned_int id) const;
-			MatGeneric<FPP,Cpu>* get_cols(faust_unsigned_int col_id_start, faust_unsigned_int num_cols) const;
-			MatGeneric<FPP,Cpu>* get_rows(faust_unsigned_int row_id_start, faust_unsigned_int num_rows) const;
-			MatGeneric<FPP,Cpu>* get_cols(const faust_unsigned_int* col_ids, faust_unsigned_int num_cols) const;
-			MatGeneric<FPP,Cpu>* get_rows(const faust_unsigned_int* row_ids, faust_unsigned_int num_rows) const;
+			MatSparse<FPP,Cpu>* get_cols(faust_unsigned_int col_id_start, faust_unsigned_int num_cols) const;
+			MatSparse<FPP,Cpu>* get_rows(faust_unsigned_int row_id_start, faust_unsigned_int num_rows) const;
+			MatSparse<FPP,Cpu>* get_cols(const faust_unsigned_int* col_ids, faust_unsigned_int num_cols) const;
+			MatSparse<FPP,Cpu>* get_rows(const faust_unsigned_int* row_ids, faust_unsigned_int num_rows) const;
 			std::list<std::pair<int,int>> nonzeros_indices() const;
 			void setZeros();
-			bool containsNaN();
+			bool containsNaN() const;
 			const FPP& operator()(faust_unsigned_int i, faust_unsigned_int j)const ;
 			MatDense<FPP, Cpu> to_dense() const;
+			MatSparse<FPP, Cpu> to_sparse() const;
 			/**
 			 * Returns the number of nonzeros blocks.
 			 */
 			size_t getNBlocks() const;
+			/**
+			 * Returns the number of blocks along the dim_id dimension.
+			 * \param dim_id 0 for row dimension, 1 for column dimension.
+			 */
 			size_t getNbBlocksPerDim(int dim_id) const;
 			/**
 			 * Returns number of rows of each nonzero block.
@@ -116,6 +122,7 @@ class BSRMat
 	// private default constructor
 	BSRMat(): data(nullptr), bcolinds(nullptr), browptr(nullptr), bnnz(0), m(0), n(0), bm(0), bn(0), b_per_rowdim(0), b_per_coldim(0) {}
 	public:
+	BSRMat(unsigned long int nrows, unsigned long int ncols, unsigned long int bnrows, unsigned long int bncols, unsigned long int nblocks, const T* data, const int *block_rowptr, const int *block_colinds);
 	/** Copy constructor */
 	BSRMat(const BSRMat<T, BlockStorageOrder>& src_bmat);
 	/** Move constructor */

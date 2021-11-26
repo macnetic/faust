@@ -6,6 +6,11 @@
 
 namespace Faust
 {
+	template<typename FPP>
+		MatBSR<FPP, Cpu>::MatBSR(faust_unsigned_int nrows, faust_unsigned_int ncols, faust_unsigned_int bnrows, faust_unsigned_int bncols, faust_unsigned_int nblocks, const FPP* data, const int *block_rowptr, const int *block_colinds) : MatGeneric<FPP, Cpu>(nrows, ncols), bmat(nrows, ncols, bnrows, bncols, nblocks, data, block_rowptr, block_colinds)
+	{
+	}
+
 	template <typename FPP>
 		MatBSR<FPP,Cpu>::MatBSR(BSRMat<FPP>& bmat)
 		{
@@ -324,34 +329,38 @@ namespace Faust
 		}
 
 	template <typename FPP>
-		MatGeneric<FPP,Cpu>* MatBSR<FPP,Cpu>::get_cols(faust_unsigned_int col_id_start, faust_unsigned_int num_cols) const
+		MatSparse<FPP,Cpu>* MatBSR<FPP,Cpu>::get_cols(faust_unsigned_int col_id_start, faust_unsigned_int num_cols) const
 		{
 			auto smat = new MatSparse<FPP, Cpu>(this->dim1, num_cols);
-			smat->mat = bmat.get_rows(col_id_start, num_cols);
+			smat->mat = bmat.get_cols(col_id_start, num_cols);
+			smat->update_dim();
 			return smat;
 		}
 
 	template <typename FPP>
-		MatGeneric<FPP,Cpu>* MatBSR<FPP,Cpu>::get_rows(faust_unsigned_int row_id_start, faust_unsigned_int num_rows) const
+		MatSparse<FPP,Cpu>* MatBSR<FPP,Cpu>::get_rows(faust_unsigned_int row_id_start, faust_unsigned_int num_rows) const
 		{
 			auto smat = new MatSparse<FPP, Cpu>(num_rows, this->dim2);
 			smat->mat = bmat.get_rows(row_id_start, num_rows);
+			smat->update_dim();
 			return smat;
 		}
 
 	template <typename FPP>
-		MatGeneric<FPP,Cpu>* MatBSR<FPP,Cpu>::get_cols(const faust_unsigned_int* col_ids, faust_unsigned_int num_cols) const
+		MatSparse<FPP,Cpu>* MatBSR<FPP,Cpu>::get_cols(const faust_unsigned_int* col_ids, faust_unsigned_int num_cols) const
 		{
 			auto smat = new MatSparse<FPP, Cpu>(this->dim1, num_cols);
-			smat->mat = bmat.get_rows(col_ids, num_cols);
+			smat->mat = bmat.get_cols(col_ids, num_cols);
+			smat->update_dim();
 			return smat;
 		}
 
 	template <typename FPP>
-		MatGeneric<FPP,Cpu>* MatBSR<FPP,Cpu>::get_rows(const faust_unsigned_int* row_ids, faust_unsigned_int num_rows) const
+		MatSparse<FPP,Cpu>* MatBSR<FPP,Cpu>::get_rows(const faust_unsigned_int* row_ids, faust_unsigned_int num_rows) const
 		{
 			auto smat = new MatSparse<FPP, Cpu>(num_rows, this->dim2);
 			smat->mat = bmat.get_rows(row_ids, num_rows);
+			smat->update_dim();
 			return smat;
 		}
 
@@ -370,7 +379,7 @@ namespace Faust
 		}
 
 	template <typename FPP>
-		bool MatBSR<FPP,Cpu>::containsNaN()
+		bool MatBSR<FPP,Cpu>::containsNaN() const
 		{
 			return bmat.contains_nan();
 		}
@@ -384,9 +393,19 @@ namespace Faust
 	template <typename FPP>
 		MatDense<FPP, Cpu> MatBSR<FPP,Cpu>::to_dense()const
 		{
-			MatDense<FPP, Cpu> dmat(this->dim1, this->dim2);
+			MatDense<FPP, Cpu> dmat;
 			dmat.mat = bmat.to_dense();
+			dmat.dim1 = bmat.m;
+			dmat.dim2 = bmat.n;
 			return dmat;
+		}
+
+	template <typename FPP>
+		MatSparse<FPP, Cpu> MatBSR<FPP,Cpu>::to_sparse()const
+		{
+			MatSparse<FPP, Cpu> smat(this->dim1, this->dim2);
+			smat.mat = bmat.to_sparse();
+			return smat;
 		}
 
 	template <typename FPP>
@@ -410,6 +429,33 @@ template<typename T, int BlockStorageOrder>
 BSRMat<T, BlockStorageOrder>::BSRMat(const BSRMat<T, BlockStorageOrder>& src_bmat) : BSRMat<T, BlockStorageOrder>()
 {
 	*this = src_bmat;
+}
+
+template<typename T, int BlockStorageOrder>
+BSRMat<T, BlockStorageOrder>::BSRMat(unsigned long int nrows, unsigned long int ncols, unsigned long int bnrows, unsigned long int bncols, unsigned long int nblocks, const T* data, const int *block_rowptr, const int *block_colinds) : BSRMat<T, BlockStorageOrder>()
+{
+		// verify bm and bn evenly divide m and n
+		if(nrows%bnrows)
+			throw std::runtime_error("BSRMat error: bnrows must evenly divide nrows.");
+		if(ncols%bncols)
+			throw std::runtime_error("BSRMat error: bncols must evenly divide ncols.");
+		// enforce bnnz is less or equel to m*n/bm/bn
+		nblocks = std::min(nblocks, nrows*ncols/bnrows/bncols);
+		this->m = nrows;
+		this->n = ncols;
+		this->bm = bnrows;
+		this->bn = bncols;
+		this->bnnz = nblocks;
+		this->b_per_rowdim = this->n/this->bn;
+		this->b_per_coldim = this->m/this->bm;
+		int data_size = bnnz*bm*bn;
+		// init data
+		this->data = new T[data_size];
+		memcpy(this->data, data, sizeof(T)*nblocks);
+		this->browptr = new int[this->b_per_coldim+1];
+		memcpy(this->browptr, block_rowptr, sizeof(int)*(this->b_per_rowdim+1));
+		this->bcolinds = new int[this->bnnz];
+		memcpy(this->bcolinds, block_colinds, sizeof(int)*this->bnnz);
 }
 
 template<typename T, int BlockStorageOrder>
