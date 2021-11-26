@@ -2,6 +2,8 @@
 #include "faust_MatDense.h"
 #include "faust_MatSparse.h"
 #include "faust_MatBSR.h"
+#include <cstdlib>
+#include <algorithm>
 
 
 typedef @TEST_FPP@ FPP;
@@ -371,9 +373,203 @@ void test_get_col(const MatBSR<FPP, Cpu>& bmat)
 	cout << "OK" << endl;
 }
 
+
+void test_get_cols(const MatBSR<FPP, Cpu>& bmat)
+{
+	cout << "=== Testing MatBSR::get_cols(faust_unsigned_int, faust_unsigned_int)" << endl;
+	int n = bmat.getNbRow();
+	MatDense<FPP, Cpu> test;
+	auto dmat = bmat.to_dense();
+	for(int j=0;j<bmat.getNbCol()-1; j++)
+	{
+		auto ncols = bmat.getNbCol()-j;
+		auto dcols = dmat.get_cols(j, ncols);
+		auto bcols = bmat.get_cols(j, ncols);
+//		bcols->Display();
+//		dcols->Display();
+		assert(dcols->getNbCol() == bcols->getNbCol());
+		assert(dcols->getNbRow() == bcols->getNbRow());
+//		cout << bcols->norm() << " " << dcols->norm() << endl;
+		test = *dcols;
+		test -= MatDense<FPP, Cpu>(*bcols);
+		delete dcols;
+		delete bcols;
+		assert(test.norm() < 1e-6);
+	}
+	cout << "OK" << endl;
+}
+
+void test_get_rows(const MatBSR<FPP, Cpu>& bmat)
+{
+	cout << "=== Testing MatBSR::get_rows(faust_unsigned_int, faust_unsigned_int)" << endl;
+	int n = bmat.getNbRow();
+	MatDense<FPP, Cpu> test;
+	auto dmat = bmat.to_dense();
+	for(int i=0;i<bmat.getNbRow()-1; i++)
+	{
+		auto nrows = bmat.getNbRow()-i;
+		auto drows = dmat.get_rows(i, nrows);
+		auto brows = bmat.get_rows(i, nrows);
+//		brows->Display();
+//		drows->Display();
+		assert(drows->getNbCol() == brows->getNbCol());
+		assert(drows->getNbRow() == brows->getNbRow());
+//		cout << brows->norm() << " " << drows->norm() << endl;
+		test = *drows;
+		test -= MatDense<FPP, Cpu>(*brows);
+		delete drows;
+		delete brows;
+		assert(test.norm() < 1e-6);
+	}
+	cout << "OK" << endl;
+}
+
+void test_get_cols2(const MatBSR<FPP, Cpu>& bmat)
+{
+	cout << "=== Testing MatBSR::get_cols(faust_unsigned_int, faust_unsigned_int)" << endl;
+	int n = bmat.getNbRow();
+	MatDense<FPP, Cpu> test;
+	auto dmat = bmat.to_dense();
+	for(int j=0;j<bmat.getNbCol()-1; j++)
+	{
+		unsigned int ncols = bmat.getNbCol()-j;
+		auto col_ids = new unsigned long int[ncols];
+		for(int k=0;k<ncols;k++)
+			col_ids[k] = rand()*(ncols-1)/RAND_MAX;
+		auto dcols = dmat.get_cols(col_ids, ncols);
+		auto bcols = bmat.get_cols(col_ids, ncols);
+//		bcols->Display();
+//		dcols->Display();
+		assert(dcols->getNbCol() == bcols->getNbCol());
+		assert(dcols->getNbRow() == bcols->getNbRow());
+//		cout << bcols->norm() << " " << dcols->norm() << endl;
+		test = *dcols;
+		test -= MatDense<FPP, Cpu>(*bcols);
+		delete dcols;
+		delete bcols;
+		delete []col_ids;
+		assert(test.norm() < 1e-6);
+	}
+	cout << "OK" << endl;
+}
+
+void test_get_rows2(const MatBSR<FPP, Cpu>& bmat)
+{
+	cout << "=== Testing MatBSR::get_rows(faust_unsigned_int, faust_unsigned_int)" << endl;
+	int n = bmat.getNbRow();
+	MatDense<FPP, Cpu> test;
+	auto dmat = bmat.to_dense();
+	for(int i=0;i<bmat.getNbRow()-1; i++)
+	{
+		unsigned int nrows = bmat.getNbRow()-i;
+		auto row_ids = new unsigned long int[nrows];
+		for(int k=0;k<nrows;k++)
+			row_ids[k] = rand()*(nrows-1)/RAND_MAX;
+		auto drows = dmat.get_rows(row_ids, nrows);
+		auto brows = bmat.get_rows(row_ids, nrows);
+//		brows->Display();
+//		drows->Display();
+		assert(drows->getNbCol() == brows->getNbCol());
+		assert(drows->getNbRow() == brows->getNbRow());
+//		cout << brows->norm() << " " << drows->norm() << endl;
+		test = *drows;
+		test -= MatDense<FPP, Cpu>(*brows);
+		delete drows;
+		delete brows;
+		delete []row_ids;
+		assert(test.norm() < 1e-6);
+	}
+	cout << "OK" << endl;
+}
+
+void test_nonzero_indices(const MatBSR<FPP, Cpu>& bmat)
+{
+	cout << "=== Testing MatBSR::nonzeros_indices" << endl;
+	MatDense<FPP, Cpu> dmat = bmat.to_dense();
+	auto dnzi = dmat.nonzeros_indices();
+	auto bnzi = bmat.nonzeros_indices();
+	for(auto p: dnzi)
+	{
+		assert(find(begin(bnzi), end(bnzi), p) != end(bnzi));
+	}
+	assert(bnzi.size() == dnzi.size());
+	cout << "OK" << endl;
+}
+
+void test_set_zeros(const MatBSR<FPP, Cpu>& bmat)
+{
+	cout << "=== Testing MatBSR::nonzeros_indices" << endl;
+	MatBSR<FPP, Cpu> bmat_z(bmat);
+	assert(bmat_z.norm() != FPP(0));
+	bmat_z.setZeros();
+	assert(bmat_z.norm() == FPP(0));
+	cout << "OK" << endl;
+}
+
+
+void test_has_nan(const MatBSR<FPP, Cpu>& bmat)
+{
+	cout << "=== Testing MatBSR::containsNaN" << endl;
+	assert(!bmat.containsNaN());
+	// generate a randome MatBSR and put a NaN in data
+	auto browptr = new int[bmat.getNbBlocksPerDim(0)+1];
+	browptr[0] = 0;
+	for(int i=1;i<bmat.getNbBlocksPerDim(0)+1;i++)
+	{
+		auto nblocks = rand()*(bmat.getNbBlocksPerDim(1))/RAND_MAX;
+		browptr[i] = browptr[i-1] + nblocks;
+	}
+	auto nblocks = browptr[bmat.getNbBlocksPerDim(0)];
+	auto bcolinds = new int[nblocks];
+	auto data = new FPP[nblocks];
+	for(int i=0;i<nblocks;i++)
+	{
+		bcolinds[i] = rand()*(bmat.getNbBlocksPerDim(1)-1)/RAND_MAX;
+		for(int bi=0;bi<bmat.getNbBlocksPerDim(0);bi++)
+			for(int bj=0;bj<bmat.getNbBlocksPerDim(1);bj++)
+			{
+				data[i*bmat.getNbBlockRow()*bmat.getNbBlockCol()+bj*bmat.getNbBlockRow()+bi] = FPP(rand());
+			}
+	}
+	data[0] = FPP(NAN);
+	cout << data[0] << std::endl;
+	MatBSR<FPP, Cpu> bmat_copy(bmat.getNbRow(), bmat.getNbCol(), bmat.getNbBlockRow(), bmat.getNbBlockCol(), bmat.getNBlocks(), data, browptr, bcolinds);
+	assert(bmat_copy.containsNaN());
+	delete[] browptr;
+	delete[] bcolinds;
+	delete[] data;
+	cout << "OK" << endl;
+}
+
+void test_getitem(const MatBSR<FPP, Cpu>& bmat)
+{
+	cout << "=== Testing MatBSR::operator(int,int)" << endl;
+	auto dmat = bmat.to_dense();
+	for(int i=0;i < bmat.getNbRow();i++)
+	{
+		for(int j=0;j < bmat.getNbCol();j++)
+		{
+			assert(dmat(i,j) == bmat(i,j));
+		}
+	}
+	cout << "OK" << endl;
+}
+
+void test_tosparse(const MatBSR<FPP, Cpu>& bmat)
+{
+	cout << "=== Testing MatBSR::to_sparse" << endl;
+	auto smat = bmat.to_sparse();
+	MatDense<FPP, Cpu> test(smat);
+	auto dmat = bmat.to_dense();
+	test -= dmat;
+	assert(test.norm() < 1e-6);
+	cout << "OK" << endl;
+}
+
 int main(int argc, char** argv)
 {
 	int m, n, bm, bn, bnnz;
+	srand(time(NULL));
 	m = 10;
 	n = 10;
 	bm = 2;
@@ -405,6 +601,15 @@ int main(int argc, char** argv)
 	test_get_type(*bmat);
 	test_mul_scal(*bmat);
 	test_get_col(*bmat);
+	test_get_cols(*bmat);
+	test_get_rows(*bmat);
+	test_get_cols2(*bmat);
+	test_get_rows2(*bmat);
+	test_nonzero_indices(*bmat);
+	test_set_zeros(*bmat);
+//	test_has_nan(*bmat);
+	test_getitem(*bmat);
+	test_tosparse(*bmat);
 	delete bmat;
 	return EXIT_SUCCESS;
 }
