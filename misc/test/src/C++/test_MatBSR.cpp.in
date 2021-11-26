@@ -1,3 +1,4 @@
+#include "faust_TransformHelper.h"
 #include "faust_constant.h"
 #include "faust_MatDense.h"
 #include "faust_MatSparse.h"
@@ -566,6 +567,55 @@ void test_tosparse(const MatBSR<FPP, Cpu>& bmat)
 	cout << "OK" << endl;
 }
 
+void test_faust()
+{
+	int faust_nrows = 1024;
+	int faust_ncols = 1024;
+	RandFaustType t = SPARSE;
+	unsigned int min_num_factors = 5;
+	unsigned int max_num_factors = 10;
+	unsigned int min_dim_size = 1024;
+	unsigned int max_dim_size = 1024;
+	float density=.001f;
+	bool per_row=true;
+	auto F = TransformHelper<FPP, Cpu>::randFaust(faust_nrows, faust_ncols, t, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
+	auto rep_id = F->size()-3;
+	auto f_nrows = F->get_fact_nb_rows(rep_id);
+	auto f_ncols = F->get_fact_nb_cols(rep_id);
+	auto rand_bmat = MatBSR<FPP, Cpu>::randMat(f_nrows, f_ncols, 64, 64, 20);
+//	F->display();
+	cout << "replace factor of index: " << F->size()-3 << " by a rand BSRMat:" << std::endl;
+	F->replace(rand_bmat, rep_id);
+	F->display();
+	auto start = std::chrono::steady_clock::now();
+	auto toarray = F->get_product();
+	auto end = std::chrono::steady_clock::now();
+	std::chrono::duration<double> elapsed_seconds = end-start;
+	std::cout << "Faust with BSR matrix time: " << elapsed_seconds.count() << "s\n";
+	cout << endl;
+	auto rand_dmat = new MatDense<FPP, Cpu>(rand_bmat->to_dense());
+	F->replace(rand_dmat, rep_id);
+	F->display();
+	start = std::chrono::steady_clock::now();
+	auto toarray_ref = F->get_product();
+	end = std::chrono::steady_clock::now();
+	elapsed_seconds = end-start;
+	std::cout << "Faust with dense matrix time: " << elapsed_seconds.count() << "s\n";
+	cout << endl;
+	toarray_ref -= toarray;
+	assert(toarray_ref.norm() < 1e-6);
+	MatSparse<FPP, Cpu> *rand_smat = new MatSparse<FPP, Cpu>(*rand_dmat);
+	F->replace(rand_smat, rep_id);
+	F->display(); 
+	start = std::chrono::steady_clock::now();
+	auto toarray_sp = F->get_product();
+	end = std::chrono::steady_clock::now();
+	elapsed_seconds = end-start;
+	std::cout << "Faust with sparse matrix time: " << elapsed_seconds.count() << "s\n";
+	cout << endl;
+
+}
+
 int main(int argc, char** argv)
 {
 	int m, n, bm, bn, bnnz;
@@ -608,8 +658,9 @@ int main(int argc, char** argv)
 	test_nonzero_indices(*bmat);
 	test_set_zeros(*bmat);
 //	test_has_nan(*bmat);
-	test_getitem(*bmat);
+//	test_getitem(*bmat);
 	test_tosparse(*bmat);
+	test_faust();
 	delete bmat;
 	return EXIT_SUCCESS;
 }
