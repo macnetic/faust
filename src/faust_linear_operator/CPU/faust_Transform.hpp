@@ -506,11 +506,16 @@ void Faust::Transform<FPP,Cpu>::get_product(Faust::MatDense<FPP,Cpu> &mat, const
 	{
 		if(data.size() == 1)
 		{
+			auto end = this->size()-1;
 			// just one matrix in the Faust, return a copy as dense matrix
-			if(dynamic_cast<MatSparse<FPP,Cpu>*>(data[this->size()-1]))
-				mat = *dynamic_cast<MatSparse<FPP,Cpu>*>(data[this->size()-1]);
-			else if(dynamic_cast<MatDense<FPP,Cpu>*>(data[this->size()-1]))
-				mat = *dynamic_cast<MatDense<FPP,Cpu>*>(data[this->size()-1]);
+			if(dynamic_cast<MatSparse<FPP,Cpu>*>(data[end]))
+				mat = *dynamic_cast<MatSparse<FPP,Cpu>*>(data[end]);
+			else if(dynamic_cast<MatDense<FPP,Cpu>*>(data[end]))
+				mat = *dynamic_cast<MatDense<FPP,Cpu>*>(data[end]);
+			else if(dynamic_cast<MatBSR<FPP, Cpu>*>(data[end]))
+			{
+				mat = dynamic_cast<MatBSR<FPP, Cpu>*>(data[end])->to_dense();
+			}
 			if(isConj)
 				mat.conjugate();
 			return;
@@ -519,7 +524,7 @@ void Faust::Transform<FPP,Cpu>::get_product(Faust::MatDense<FPP,Cpu> &mat, const
 		{
 			// at least two factors, compute the first product (of the last two matrices)
 			// it avoids making a copy of the last factor
-			gemm_gen(*data[this->size()-2], *data[this->size()-1], mat);
+			gemm_gen(*data[this->size()-2], *data[this->size()-1], mat, FPP(1.0), FPP(0.0), 'N', 'N');
 		}
 		for (int i=this->size()-3; i >= 0; i--)
 		{
@@ -1063,12 +1068,11 @@ void Faust::Transform<FPP,Cpu>::get_fact(const faust_unsigned_int id,
 		s_outer_count_ptr = tmat.getRowPtr();
 		s_inner_ptr = tmat.getColInd();
 		s_elts = tmat.getValuePtr();
-		//do the copy here, otherwise we'll lose tmat and its buffers when out of scope
+		//do the copy here, otherwise we'll lose tmp mat and its buffers when out of scope
 		memcpy(d_outer_count_ptr, s_outer_count_ptr, sizeof(int)*(*num_cols+1));
 		memcpy(d_inner_ptr, s_inner_ptr, sizeof(int)**nnz);
 		memcpy(d_elts, s_elts, sizeof(FPP)**nnz);
 		// swap num_cols and num_rows
-		// (with only these 2 variables -- F2 arithmetic trick)
 		*num_cols = *num_cols^*num_rows;
 		*num_rows = *num_cols^*num_rows;
 		*num_cols = *num_cols^*num_rows;

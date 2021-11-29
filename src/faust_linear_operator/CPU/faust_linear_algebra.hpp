@@ -814,7 +814,7 @@ FPP Faust::power_iteration(const  Faust::LinearOperator<FPP,Cpu> & A, const faus
         handleError("linear_algebra "," power_iteration : Faust::Transform<FPP,Cpu> 1 must be a squared matrix");
 	}
 	Faust::Vect<FPP,Cpu> xk(nb_col);
-	xk.setOnes();
+	xk.setRand(); // most likely avoids to be orthogonal with the eigenvector // better than setOnes
 	Faust::Vect<FPP,Cpu> xk_norm(nb_col);
 	FPP lambda_old=1.0;
    	FPP lambda = 0.0;
@@ -825,6 +825,7 @@ FPP Faust::power_iteration(const  Faust::LinearOperator<FPP,Cpu> & A, const faus
 			i++;
       		lambda_old = lambda;
       		xk_norm = xk;
+			std::cout << "xk norm:" << xk.norm() << std::endl;
       		xk_norm.normalize();
       		xk = A.multiply(xk_norm);
       		lambda = xk_norm.dot(xk);
@@ -865,6 +866,10 @@ namespace Faust
 {
 	template<typename FPP> void gemm_gen(const MatGeneric<FPP, Cpu>& A, const MatGeneric<FPP, Cpu>& B, MatDense<FPP, Cpu>& out, const FPP alpha/*=FPP(1.0)*/, const FPP beta/*=(0.0)*/, const char opA/*='N'*/, const char opB/*='N'*/)
 	{
+		if(opA != 'N' && opA != 'T' && opA != 'H')
+			throw std::runtime_error("opA must be among 'N', 'T', 'H'");
+		if(opB != 'N' && opB != 'T' && opB != 'H')
+			throw std::runtime_error("opB must be among 'N', 'T', 'H'");
 		if(dynamic_cast<const MatDense<FPP, Cpu>*>(&A) != nullptr && dynamic_cast<const MatDense<FPP, Cpu>*>(&B) != nullptr)
 		{
 			gemm<FPP>(dynamic_cast<const MatDense<FPP, Cpu>&>(A), dynamic_cast<const MatDense<FPP, Cpu>&>(B), out, alpha, beta, opA, opB);
@@ -917,10 +922,124 @@ namespace Faust
 				out.mat = alpha*to_eigen_sp(dynamic_cast<const MatSparse<FPP, Cpu>&>(A).mat, opA)*to_eigen_sp(dynamic_cast<const MatSparse<FPP, Cpu>&>(B).mat, opB);
 #endif
 		}
+		else if(dynamic_cast<const MatBSR<FPP, Cpu>*>(&A))
+		{
+			//TODO: refactor
+			const MatDense<FPP, Cpu>* dsB = nullptr;
+			const MatSparse<FPP, Cpu>* spB = nullptr;
+			const MatBSR<FPP, Cpu>* bsrB = nullptr;
+			const MatBSR<FPP, Cpu>* bsrA = dynamic_cast<const MatBSR<FPP, Cpu>*>(&A);
+			if(opA == 'N')
+			{
+				Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic> dsm;
+				if(spB = dynamic_cast<const MatSparse<FPP, Cpu>*>(&B))
+				{
+					if(opB == 'N')
+						dsm = bsrA->bmat.mul(spB->mat);
+					else if (opB == 'T')
+						dsm = bsrA->bmat.mul(spB->mat).transpose();
+					else if (opB == 'H')
+						dsm = bsrA->bmat.mul(spB->mat).adjoint();
+				}
+				else if(dsB = dynamic_cast<const MatDense<FPP, Cpu>*>(&B))
+				{
+					if(opB == 'N')
+						dsm = bsrA->bmat.mul(dsB->mat);
+					else if (opB == 'T')
+						dsm = bsrA->bmat.mul(dsB->mat).transpose();
+					else if (opB == 'H')
+						dsm = bsrA->bmat.mul(dsB->mat).adjoint();
+				}
+				else if(bsrB = dynamic_cast<const MatBSR<FPP, Cpu>*>(&B))
+					if(opB == 'N')
+						dsm = alpha*bsrA->bmat.mul(bsrB->bmat);
+					else if (opB == 'T')
+						dsm = alpha*bsrA->bmat.mul(bsrB->bmat).transpose();
+					else // opB == H
+						dsm = alpha*bsrA->bmat.mul(bsrB->bmat).adjoint();
+
+				if(beta == FPP(0))
+				{
+					out.mat = alpha*dsm;
+				}
+				else
+				{
+					out.mat *= beta;
+					out.mat += alpha*dsm;
+				}
+			}
+			else if(opA == 'T')
+			{
+				MatBSR<FPP, Cpu> transpA(*bsrA);
+				transpA.transpose();
+				return gemm_gen(A, B, out, alpha, beta, 'N', opB);
+			}
+			else if(opA == 'H')
+			{
+				MatBSR<FPP, Cpu> adjA(*bsrA);
+				adjA.adjoint();
+				return gemm_gen(A, B, out, alpha, beta, 'N', opB);
+			}
+		}
+		else if(dynamic_cast<const MatBSR<FPP, Cpu>*>(&A))
+		{
+			//TODO: refactor
+			const MatBSR<FPP, Cpu>* bsrA = dynamic_cast<const MatBSR<FPP, Cpu>*>(&A);
+			if(opA == 'N' && opB == 'N')
+			{
+				gemm_gen(B, A, out, alpha, beta, 'T', 'T');
+				out.transpose();
+			}
+			else if(opA == 'N' && opB == 'T')
+			{
+				gemm_gen(B, A, out, alpha, beta, 'N', 'T');
+				out.transpose();
+			}
+			else if(opA == 'N' && opB == 'H')
+			{
+				gemm_gen(B, A, out, alpha, beta, 'N', 'H');
+				out.adjoint();
+			}
+			if(opA == 'T' && opB == 'N')
+			{
+				gemm_gen(B, A, out, alpha, beta, 'T', 'N');
+				out.transpose();
+			}
+			else if(opA == 'T' && opB == 'T')
+			{
+				gemm_gen(B, A, out, alpha, beta, 'N', 'N');
+				out.transpose();
+			}
+			else if(opA == 'T' && opB == 'H')
+			{
+				MatBSR<FPP, Cpu> A_conj(*bsrA);
+				A_conj.conjugate();
+				gemm_gen(B, A_conj, out, alpha, beta, 'N', 'N');
+				out.adjoint();
+			}
+			if(opA == 'H' && opB == 'N')
+			{
+				gemm_gen(B, A, out, alpha, beta, 'H', 'N');
+				out.adjoint();
+			}
+			else if(opA == 'H' && opB == 'T')
+			{
+				MatBSR<FPP, Cpu> A_conj(*bsrA);
+				A_conj.conjugate();
+				gemm_gen(B, A_conj, out, alpha, beta, 'N', 'N');
+				out.transpose();
+			}
+			else if(opA == 'H' && opB == 'H')
+			{
+				gemm_gen(B, A, out, alpha, beta, 'N', 'N');
+				out.adjoint();
+			}
+		}
 		else
 		{
-			throw std::runtime_error("faust_linear_algebra mul function doesn't handle other type of factors than MatDense or MatSparse");
+			throw std::runtime_error("faust_linear_algebra mul function doesn't handle other type of factors than MatDense, MatSparse or MatBSR.");
 		}
+		out.update_dims();
 	}
 }
 

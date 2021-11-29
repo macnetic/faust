@@ -67,7 +67,7 @@ namespace Faust
 
 	// Computes alpha*typeA(A)*typeB(B)+ beta*C into C.
 	template<typename FPP>
-		void gemm_gen(const Faust::MatGeneric<FPP,Cpu> & A,const Faust::MatGeneric<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C, const FPP alpha=FPP(1.0), const FPP beta=FPP(0.0), const char  typeA='N', const char  typeB='N');
+		void gemm_gen(const Faust::MatGeneric<FPP,Cpu> & A,const Faust::MatGeneric<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C, const FPP alpha/*=FPP(1.0)*/, const FPP beta/*=FPP(0.0)*/, const char  typeA/*='N'*/, const char  typeB/*='N'*/);
 
 	//! \fn spgemm
 	//! \brief performs Sparse matrices multiplication

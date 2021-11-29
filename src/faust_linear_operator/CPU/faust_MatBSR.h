@@ -30,9 +30,13 @@ template<typename T,int BlockStorageOrder=0> class BSRMat;
 
 namespace Faust
 {
+	// forward decl. (faust_linear_algebra.h) for friendship
+	template<typename FPP> void gemm_gen(const MatGeneric<FPP, Cpu>& A, const MatGeneric<FPP, Cpu>& B, MatDense<FPP, Cpu>& out, const FPP alpha/*=FPP(1.0)*/, const FPP beta/*=(0.0)*/, const char opA/*='N'*/, const char opB/*='N'*/);
+
 	template<typename FPP>
 		class MatBSR<FPP,Cpu> : public MatGeneric<FPP,Cpu>
 		{
+			friend void gemm_gen<>(const MatGeneric<FPP, Cpu>& A, const MatGeneric<FPP, Cpu>& B, MatDense<FPP, Cpu>& out, const FPP alpha/*=FPP(1.0)*/, const FPP beta/*=(0.0)*/, const char opA/*='N'*/, const char opB/*='N'*/);
 			BSRMat<FPP> bmat; // low-level BSRMat
 			MatBSR() : MatGeneric<FPP, Cpu>() {}
 			MatBSR(BSRMat<FPP>& mat);
