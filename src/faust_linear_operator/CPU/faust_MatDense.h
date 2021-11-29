@@ -528,6 +528,12 @@ namespace Faust
 
 
 			bool containsNaN() const;
+
+			/**
+			 * Ensures MatGeneric dims are the same as Eigen matrix.
+			 */
+			void update_dims() { this->dim1 = mat.rows(); this->dim2 = mat.cols();}
+
 			private:
 			Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic> mat;
 			bool isZeros;
