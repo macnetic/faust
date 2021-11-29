@@ -684,14 +684,7 @@ namespace Faust {
 			faust_unsigned_int nbytes = 0;
 			for(auto fac : this->transform->data)
 			{
-				if(dynamic_cast<Faust::MatDense<FPP, Cpu>*>(fac))
-					nbytes += fac->getNbCol() * fac->getNbRow() * sizeof(FPP);
-				else if (dynamic_cast<Faust::MatSparse<FPP, Cpu>*>(fac))
-					nbytes += fac->getNonZeros() * (sizeof(FPP) + sizeof(int)) + (fac->getNbRow() + 1) * sizeof(int); // by default storage index is int
-				else if (dynamic_cast<Faust::MatDiag<FPP>*>(fac))
-					nbytes += sizeof(FPP) * (fac->getNbCol()<fac->getNbRow()?fac->getNbCol():fac->getNbRow());
-				else
-					throw runtime_error("Unknown matrix type.");
+					nbytes += fac->getNBytes();
 			}
 			return nbytes;
 		}
@@ -772,11 +765,17 @@ template<typename FPP>
 	{
 		const MatDense<FPP,Cpu> * mat_dense;
 		const MatSparse<FPP,Cpu> * mat_sparse;
+		const MatBSR<FPP,Cpu> * mat_bsr;
 		for(int i=0;i<this->size();i++)
 		{
 			if(mat_dense = dynamic_cast<const MatDense<FPP,Cpu>*>(this->get_gen_fact(i)))
 			{
 				mat_sparse = new MatSparse<FPP,Cpu>(*mat_dense);
+				this->replace(mat_sparse, i);
+			}
+			else if(mat_bsr = dynamic_cast<const MatBSR<FPP,Cpu>*>(this->get_gen_fact(i)))
+			{
+				mat_sparse =  new MatSparse<FPP, Cpu>(mat_bsr->to_sparse()); // TODO: avoid the copy
 				this->replace(mat_sparse, i);
 			}
 		}
@@ -787,11 +786,17 @@ template<typename FPP>
 	{
 		const MatDense<FPP,Cpu> * mat_dense;
 		const MatSparse<FPP,Cpu> * mat_sparse;
+		const MatBSR<FPP,Cpu> * mat_bsr;
 		for(int i=0;i<this->size();i++)
 		{
 			if(mat_sparse = dynamic_cast<const MatSparse<FPP,Cpu>*>(this->get_gen_fact(i)))
 			{
 				mat_dense = new MatDense<FPP,Cpu>(*mat_sparse);
+				this->replace(mat_dense, i);
+			}
+			else if(mat_bsr = dynamic_cast<const MatBSR<FPP,Cpu>*>(this->get_gen_fact(i)))
+			{
+				mat_dense =  new MatDense<FPP, Cpu>(mat_bsr->to_sparse()); // TODO: avoid the copy
 				this->replace(mat_dense, i);
 			}
 		}
@@ -1147,6 +1152,31 @@ template<typename FPP>
 		return TransformHelper<FPP,Cpu>::randFaust(-1, -1, t, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
 	}
 
+template<typename FPP>
+	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::randBSRFaust(int faust_nrows, int faust_ncols, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int bnrows, unsigned int bncols, float density/*=.1f*/)
+	{
+		if(faust_nrows != faust_ncols)
+			throw std::runtime_error("randBSRFaust: currently only random square BSR Faust can be generated.");
+		if(faust_nrows%bnrows || faust_ncols%bncols)
+			throw std::runtime_error("randBSRFaust: the size of blocks must evenly divide the size of Faust matrices");
+		unsigned int bnnz = (unsigned int) std::round(faust_nrows*faust_ncols/bnrows/bncols*density);
+		if(bnnz == 0)
+			throw std::runtime_error("randBSRFaust: the nonzero blocks are too large for this Faust/matrix size.");
+		// pick randomly the number of factors into {min_num_factors, ..., max_num_factors}
+		std::uniform_int_distribution<int> num_fac_distr(min_num_factors, max_num_factors);
+		int num_factors = num_fac_distr(generator);
+		// create factors
+		std::vector<MatGeneric<FPP,Cpu>*> factors(num_factors);
+//		std::cout  << "num_factors:" << num_factors << std::endl;
+//		std::cout  << "bnnz :" << bnnz << std::endl;
+		for(int i=0;i<num_factors;i++)
+		{
+			factors[i] = MatBSR<FPP, Cpu>::randMat(faust_nrows, faust_ncols, bnrows, bncols, bnnz);
+//			std::cout  << "i=" << i << " num_factors: " << num_factors; factors[i]->Display();
+		}
+		TransformHelper<FPP,Cpu>* randFaust = new TransformHelper<FPP, Cpu>(factors,1.0,false,false);
+		return randFaust;
+	}
 
 template<typename FPP>
 	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::randFaust(int faust_nrows, int faust_ncols, RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density /* 1.f */, bool per_row /* true */)
