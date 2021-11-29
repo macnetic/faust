@@ -405,6 +405,7 @@ namespace Faust
 		{
 			MatSparse<FPP, Cpu> smat(this->dim1, this->dim2);
 			smat.mat = bmat.to_sparse();
+			smat.update_dim();
 			return smat;
 		}
 
