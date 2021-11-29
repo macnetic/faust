@@ -579,7 +579,7 @@ void test_faust()
 	float density=.001f;
 	bool per_row=true;
 	auto F = TransformHelper<FPP, Cpu>::randFaust(faust_nrows, faust_ncols, t, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
-	auto rep_id = F->size()-3;
+	auto rep_id = F->size()-2;
 	auto f_nrows = F->get_fact_nb_rows(rep_id);
 	auto f_ncols = F->get_fact_nb_cols(rep_id);
 	auto rand_bmat = MatBSR<FPP, Cpu>::randMat(f_nrows, f_ncols, 64, 64, 20);
@@ -613,6 +613,94 @@ void test_faust()
 	elapsed_seconds = end-start;
 	std::cout << "Faust with sparse matrix time: " << elapsed_seconds.count() << "s\n";
 	cout << endl;
+}
+
+void test_faust2()
+{
+	int faust_nrows = 1024;
+	int faust_ncols = 1024;
+	RandFaustType t = SPARSE;
+	unsigned int min_num_factors = 10;
+	unsigned int max_num_factors = 10;
+	unsigned int min_dim_size = 1024;
+	unsigned int max_dim_size = 1024;
+	float density=.078f;
+	auto nruns = 10;
+	auto bsrF = TransformHelper<FPP, Cpu>::randBSRFaust(faust_nrows, faust_ncols, min_num_factors, max_num_factors, 64, 64, density);
+	vector<MatGeneric<FPP, Cpu>*> data;
+	for(int i=0;i<bsrF->size();i++)
+	{
+		data.push_back((MatGeneric<FPP, Cpu>*)bsrF->get_fact_addr(i));
+	}
+	TransformHelper<FPP, Cpu> *spF = new TransformHelper<FPP, Cpu>(data, 1.0, false, true, false);
+	spF->convertToSparse();
+	auto dsF = new TransformHelper<FPP, Cpu>(data, 1.0, false, true, false);
+	dsF->convertToDense();
+	cout << "BSR Faust:" << endl;
+	bsrF->display();
+	cout << "Dense Faust:" << endl;
+	dsF->display();
+	cout << "Sparse Faust:" << endl;
+	spF->display();
+	auto mat_dense = MatDense<FPP, Cpu>::randMat(faust_nrows, faust_ncols);
+//	auto toarray = bsrF->get_product();
+	MatDense<FPP, Cpu> bsr_prod, sp_prod, ds_prod;
+	std::cout << "cumulative times for " << nruns << " runs." << std::endl;
+	auto start = std::chrono::steady_clock::now();
+	for(int i=0;i<nruns;i++)
+		bsr_prod = bsrF->multiply(*mat_dense);
+	auto end = std::chrono::steady_clock::now();
+	std::chrono::duration<double> elapsed_seconds = end-start;
+	std::cout << "BSR Faust-dense matrix mul time: " << elapsed_seconds.count() << "s\n";
+	start = std::chrono::steady_clock::now();
+//	auto toarray_ref = spF->get_product();
+	for(int i=0;i<nruns;i++)
+		sp_prod = spF->multiply(*mat_dense);
+	end = std::chrono::steady_clock::now();
+	elapsed_seconds = end-start;
+	std::cout << "Sparse Faust-dense matrix mul time: " << elapsed_seconds.count() << "s\n";
+	start = std::chrono::steady_clock::now();
+//	auto toarray_sp = dsF->get_product();
+	for(int i=0;i<nruns;i++)
+		ds_prod = dsF->multiply(*mat_dense);
+	end = std::chrono::steady_clock::now();
+	elapsed_seconds = end-start;
+	auto test = bsr_prod;
+	test -= ds_prod;
+	assert(test.norm()/bsr_prod.norm() < 1e-6);
+	std::cout << "Dense Faust-dense matrix mul time: " << elapsed_seconds.count() << "s\n";
+	/**************** test prod by mat_sparse */
+	auto mat_sparse = MatDense<FPP, Cpu>::randMat(faust_nrows, faust_ncols, .02);
+//	auto toarray = bsrF->get_product();
+	start = std::chrono::steady_clock::now();
+	for(int i=0;i<nruns;i++)
+		bsr_prod = bsrF->multiply(*mat_sparse);
+	end = std::chrono::steady_clock::now();
+	elapsed_seconds = end-start;
+	std::cout << "BSR Faust-sparse matrix mul time: " << elapsed_seconds.count() << "s\n";
+	start = std::chrono::steady_clock::now();
+//	auto toarray_ref = spF->get_product();
+	for(int i=0;i<nruns;i++)
+		sp_prod = spF->multiply(*mat_sparse);
+	end = std::chrono::steady_clock::now();
+	elapsed_seconds = end-start;
+	std::cout << "Sparse Faust-sparse matrix mul time: " << elapsed_seconds.count() << "s\n";
+	start = std::chrono::steady_clock::now();
+//	auto toarray_sp = dsF->get_product();
+	for(int i=0;i<nruns;i++)
+		ds_prod = dsF->multiply(*mat_sparse);
+	end = std::chrono::steady_clock::now();
+	elapsed_seconds = end-start;
+	test = bsr_prod;
+	test -= ds_prod;
+	assert(test.norm()/bsr_prod.norm() < 1e-6);
+	std::cout << "Dense Faust-sparse matrix mul time: " << elapsed_seconds.count() << "s\n";
+
+	delete mat_sparse;
+	delete mat_dense;
+	std::cout << "BSR Faust size (bytes): " << bsrF->getNBytes() << std::endl;
+	std::cout << "Dense Faust size (bytes): " << dsF->getNBytes() << std::endl;
+	std::cout << "Sparse Faust size (bytes): " << spF->getNBytes() << std::endl;
 
 }
 
@@ -660,8 +748,9 @@ int main(int argc, char** argv)
 //	test_has_nan(*bmat);
 //	test_getitem(*bmat);
 	test_tosparse(*bmat);
-	test_faust();
 	delete bmat;
+	test_faust();
+	test_faust2();
 	return EXIT_SUCCESS;
 }
 
