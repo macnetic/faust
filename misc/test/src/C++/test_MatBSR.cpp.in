@@ -522,15 +522,14 @@ void test_has_nan(const MatBSR<FPP, Cpu>& bmat)
 	}
 	auto nblocks = browptr[bmat.getNbBlocksPerDim(0)];
 	auto bcolinds = new int[nblocks];
-	auto data = new FPP[nblocks];
+	auto data = new FPP[nblocks*bmat.getNbBlockRow()*bmat.getNbBlockCol()];
 	for(int i=0;i<nblocks;i++)
 	{
 		bcolinds[i] = rand()*(bmat.getNbBlocksPerDim(1)-1)/RAND_MAX;
-		for(int bi=0;bi<bmat.getNbBlocksPerDim(0);bi++)
-			for(int bj=0;bj<bmat.getNbBlocksPerDim(1);bj++)
-			{
-				data[i*bmat.getNbBlockRow()*bmat.getNbBlockCol()+bj*bmat.getNbBlockRow()+bi] = FPP(rand());
-			}
+	}
+	for(int i=0;i<bmat.getNbBlockRow()*bmat.getNbBlockCol()*nblocks;i++)
+	{
+		data[i] = FPP(rand());
 	}
 	data[0] = FPP(NAN);
 	cout << data[0] << std::endl;
@@ -546,11 +545,13 @@ void test_getitem(const MatBSR<FPP, Cpu>& bmat)
 {
 	cout << "=== Testing MatBSR::operator(int,int)" << endl;
 	auto dmat = bmat.to_dense();
+	assert(abs(dmat.norm()-bmat.norm()) < 1e-6);
 	for(int i=0;i < bmat.getNbRow();i++)
 	{
 		for(int j=0;j < bmat.getNbCol();j++)
 		{
-			assert(dmat(i,j) == bmat(i,j));
+//			cout << dmat(i,j) << "==" << bmat(i,j) <<" ?" << endl;
+			assert(abs(dmat(i,j)-bmat(i,j)) < 1e-6);
 		}
 	}
 	cout << "OK" << endl;
@@ -745,8 +746,8 @@ int main(int argc, char** argv)
 	test_get_rows2(*bmat);
 	test_nonzero_indices(*bmat);
 	test_set_zeros(*bmat);
-//	test_has_nan(*bmat);
-//	test_getitem(*bmat);
+	test_has_nan(*bmat);
+	test_getitem(*bmat);
 	test_tosparse(*bmat);
 	delete bmat;
 	test_faust();
