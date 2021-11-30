@@ -45,9 +45,15 @@ void test_clone(const MatBSR<FPP, Cpu>& bmat)
 void test_mul_vec(const MatBSR<FPP, Cpu>& bmat)
 {
 	cout << "=== Testing MatBSR::multiply(Vect)" << endl;
-	auto md = MatDense<FPP, Cpu>::randMat(bmat.getNbCol(), 1);
-	Vect<FPP, Cpu> vec(bmat.getNbCol(), md->getData());
-	Vect<FPP, Cpu> vec_cpy(bmat.getNbCol(), md->getData());
+	Vect<FPP, Cpu> vec(bmat.getNbCol());
+	vec.setRand();
+	Vect<FPP, Cpu> vec_cpy(bmat.getNbCol(), vec.getData());
+	Vect<FPP, Cpu> vec_t(bmat.getNbRow());
+	vec_t.setRand();
+	Vect<FPP, Cpu> vec_t_cpy(bmat.getNbRow(), vec_t.getData());
+	Vect<FPP, Cpu> vec_h(bmat.getNbRow());
+	vec_h.setRand();
+	Vect<FPP, Cpu> vec_h_cpy(bmat.getNbRow(), vec_h.getData());
 	auto dmat = bmat.to_dense();
 	bmat.multiply(vec, 'N');
 	dmat.multiply(vec_cpy, 'N');
@@ -55,18 +61,18 @@ void test_mul_vec(const MatBSR<FPP, Cpu>& bmat)
 //	cout << "test vec:";vec.Display(); cout << "norm: " << vec.norm() << std::endl;
 	assert(std::abs(vec.norm()-vec_cpy.norm()) < 1e-6);
 	cout << "MatBSR::multiply(Vect, 'N') OK" << endl;
-	bmat.multiply(vec, 'T');
-	dmat.multiply(vec_cpy, 'T');
-//	cout << "ref vec:";vec_cpy.Display(); cout << "norm: " << vec_cpy.norm() << std::endl;
-//	cout << "test vec:";vec.Display(); cout << "norm: " << vec.norm() << std::endl;
-	assert(std::abs(vec.norm()-vec_cpy.norm()) < 1e-6);
+	bmat.multiply(vec_t, 'T');
+	dmat.multiply(vec_t_cpy, 'T');
+//	cout << "ref vec_t:";vec_t_cpy.Display(); cout << "norm: " << vec_t_cpy.norm() << std::endl;
+//	cout << "test vec_t:";vec_t.Display(); cout << "norm: " << vec_t.norm() << std::endl;
+	assert(std::abs(vec_t.norm()-vec_t_cpy.norm()) < 1e-6);
 	cout << "MatBSR::multiply(Vect, 'T') OK" << endl;
-	bmat.multiply(vec, 'H');
-	dmat.multiply(vec_cpy, 'H');
-//	cout << "ref vec:";vec_cpy.Display(); cout << "norm: " << vec_cpy.norm() << std::endl;
-//	cout << "test vec:";vec.Display(); cout << "norm: " << vec.norm() << std::endl;
-	assert(std::abs(vec.norm()-vec_cpy.norm()) < 1e-6);
-	delete md;
+	bmat.multiply(vec_h, 'H');
+	dmat.multiply(vec_h_cpy, 'H');
+//	cout << "ref vec:";vec_h_cpy.Display(); cout << "norm: " << vec_h_cpy.norm() << std::endl;
+//	cout << "test vec_h:";vec_h.Display(); cout << "norm: " << vec_h.norm() << std::endl;
+	assert(std::abs(vec_h.norm()-vec_h_cpy.norm()) < 1e-6);
+	cout << "MatBSR::multiply(Vect, 'H') OK" << endl;
 	cout << "OK" << endl;
 }
 
@@ -103,9 +109,13 @@ void test_mul_dense_transp(const MatBSR<FPP, Cpu>& bmat)
 	cout << "=== Testing MatBSR::multiply(MatDense, T)" << endl;
 	auto rmd = MatDense<FPP, Cpu>::randMat(bmat.getNbRow(), 32);
 	MatDense<FPP, Cpu> rmd_copy(*rmd);
+	rmd->Display();
+	rmd_copy.Display();
 	auto dmat = bmat.to_dense();
 	dmat.multiply(*rmd, 'T');
 	bmat.multiply(rmd_copy, 'T');
+	rmd->Display();
+	rmd_copy.Display();
 	assert((*rmd).getNbRow() == rmd_copy.getNbRow() && (*rmd).getNbCol() == rmd_copy.getNbCol());
 	rmd_copy -= *rmd;
 	assert(rmd_copy.norm() < 1e-6);
@@ -564,6 +574,7 @@ void test_tosparse(const MatBSR<FPP, Cpu>& bmat)
 	MatDense<FPP, Cpu> test(smat);
 	auto dmat = bmat.to_dense();
 	test -= dmat;
+	cout << test.norm() << endl;
 	assert(test.norm() < 1e-6);
 	cout << "OK" << endl;
 }
@@ -709,11 +720,11 @@ int main(int argc, char** argv)
 {
 	int m, n, bm, bn, bnnz;
 	srand(time(NULL));
-	m = 10;
-	n = 10;
-	bm = 2;
-	bn = 2;
-	bnnz = 8;
+	m = 1024;
+	n = 512;
+	bm = 64;
+	bn = 32;
+	bnnz = 22;
 	auto bmat = MatBSR<FPP, Cpu>::randMat(m, n, bm, bn, bnnz);
 	bmat->Display();
 	test_fro_norm(*bmat);

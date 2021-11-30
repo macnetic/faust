@@ -101,6 +101,7 @@ namespace Faust
 						throw std::runtime_error("Unknown op type.");
 					}
 			}
+			M.update_dims();
 		}
 
 	template <typename FPP>
@@ -133,6 +134,7 @@ namespace Faust
 						throw std::runtime_error("Unknown op type.");
 					}
 			}
+			M.update_dim();
 		}
 
 	template <typename FPP>
@@ -395,8 +397,7 @@ namespace Faust
 		{
 			MatDense<FPP, Cpu> dmat;
 			dmat.mat = bmat.to_dense();
-			dmat.dim1 = bmat.m;
-			dmat.dim2 = bmat.n;
+			dmat.update_dims();
 			return dmat;
 		}
 
@@ -447,8 +448,8 @@ BSRMat<T, BlockStorageOrder>::BSRMat(unsigned long int nrows, unsigned long int 
 		this->bm = bnrows;
 		this->bn = bncols;
 		this->bnnz = nblocks;
-		this->b_per_rowdim = this->n/this->bn;
-		this->b_per_coldim = this->m/this->bm;
+		this->b_per_rowdim = this->m/this->bm;
+		this->b_per_coldim = this->n/this->bn;
 		int data_size = bnnz*bm*bn;
 		// init data
 		this->data = new T[data_size];
@@ -520,8 +521,8 @@ BSRMat<T, BlockStorageOrder> BSRMat<T, BlockStorageOrder>::rand(int m, int n, in
 	bmat.bm = bm;
 	bmat.bn = bn;
 	bmat.bnnz = bnnz;
-	bmat.b_per_rowdim = n/bn;
-	bmat.b_per_coldim = m/bm;
+	bmat.b_per_rowdim = m/bm;
+	bmat.b_per_coldim = n/bn;
 	auto nblocks = bmat.b_per_coldim*bmat.b_per_rowdim;
 	// choose bnnz (i,j) indices to init bcolinds and browptr
 	std::random_device rd;
@@ -547,23 +548,23 @@ BSRMat<T, BlockStorageOrder> BSRMat<T, BlockStorageOrder>::rand(int m, int n, in
 		nnzBI[i] = bi;
 	}
 	std::sort(nnzBI.begin(), nnzBI.end());
-	bmat.browptr = new int[bmat.b_per_coldim+1];
+	bmat.browptr = new int[bmat.b_per_rowdim+1];
 	bmat.bcolinds = new int[bnnz];
 	bmat.browptr[0] = 0;
 	int browptr_ind = 1;
 	int brow_nblocks = 0;
 	int brow_ind = 0;
 	int bcolinds_ind = 0;
-	memset(bmat.browptr, 0, sizeof(int)*(bmat.b_per_coldim+1));
+	memset(bmat.browptr, 0, sizeof(int)*(bmat.b_per_rowdim+1));
 	for(auto bi: nnzBI)
 	{
-		while(bi/bmat.b_per_rowdim+1 > browptr_ind)
+		while(bi/bmat.b_per_coldim+1 > browptr_ind)
 			browptr_ind++;
 		// auto rowblock_ind = bi/bn;
-		bmat.bcolinds[bcolinds_ind++] = bi%bmat.b_per_rowdim;
+		bmat.bcolinds[bcolinds_ind++] = bi%bmat.b_per_coldim;
 		bmat.browptr[browptr_ind]++;
 	}
-	for(int i=1; i < bmat.b_per_coldim+1; i++)
+	for(int i=1; i < bmat.b_per_rowdim+1; i++)
 		bmat.browptr[i] += bmat.browptr[i-1];
 	return bmat;
 }
@@ -612,9 +613,9 @@ template<typename T, int BlockStorageOrder> SparseMat<T> BSRMat<T, BlockStorageO
 	triplets.reserve(bnnz*bm*bn);
 	iter_block([&smat, this, &triplets](int mat_row_id, int mat_col_id, int block_offset)
 			{
-			for(int i=0;i<bn;i++)
-				for(int j=0;j<bm;j++)
-						triplets.push_back(Eigen::Triplet<T>(mat_row_id+i, mat_col_id+j, (T)data[block_offset*bm*bn+j*bn+i]));
+			for(int i=0;i<bm;i++)
+				for(int j=0;j<bn;j++)
+						triplets.push_back(Eigen::Triplet<T>(mat_row_id+i, mat_col_id+j, (T)data[block_offset*bm*bn+j*bm+i]));
 			});
 	smat.setFromTriplets(triplets.begin(), triplets.end());
 	smat.makeCompressed();
@@ -675,20 +676,21 @@ void BSRMat<T, BlockStorageOrder>::iter_block(std::function<void(int /* mat_row_
 	int i = 1; // current line of blocks + 1
 	int j = browptr[i]; // the number of nonzero blocks at the current line of blocks
 	// iterate on each row of blocks and call op for each block
-	while(i < this->b_per_coldim+1)
+	while(i < this->b_per_rowdim+1 && block_offset < bnnz)
 	{
 		// find the next nonzero line of blocks
-		while(j == 0 && i < this->b_per_coldim+1)
+		while(j == 0 && i < this->b_per_rowdim+1)
 		{
 			i++;
-			if(i < this->b_per_coldim+1)
+			if(i < this->b_per_rowdim+1)
 				j = browptr[i]-browptr[i-1];
 		}
-		if(i < this->b_per_coldim+1)
+		if(i < this->b_per_rowdim+1)
 		{
 			mat_row_id = (i-1)*bm;
 			mat_col_id = bcolinds[block_offset]*bn;
 			op(mat_row_id, mat_col_id, block_offset);
+			assert(block_offset < bnnz);
 			block_offset++;
 			j--;
 		}
@@ -739,7 +741,7 @@ Real<T> BSRMat<T, BlockStorageOrder>::normInf() const
 //					std::cout << std::endl;
 				}
 			});
-	_max_sums((b_per_coldim-1)*bm);
+	_max_sums((b_per_rowdim-1)*bm);
 	delete[] sums;
 	return maxSum;
 }
@@ -758,7 +760,7 @@ BSRMat<T, BlockStorageOrder> BSRMat<T, BlockStorageOrder>::transpose(const bool 
 	if(inplace)
 	{
 		// init tbmat buffers and attributes
-		auto browptr = new int[b_per_rowdim+1];
+		auto browptr = new int[b_per_coldim+1];
 		browptr[0] = 0;
 		auto bcolinds = new int[bnnz];
 		auto data = new T[bnnz*bm*bn];
@@ -766,13 +768,13 @@ BSRMat<T, BlockStorageOrder> BSRMat<T, BlockStorageOrder>::transpose(const bool 
 		auto n = this->m;
 		auto bm = this->bn;
 		auto bn = this->bm;
-		auto b_per_rowdim = this->b_per_rowdim;
-		auto b_per_coldim = this->b_per_coldim;
+		auto b_per_rowdim = this->b_per_coldim;
+		auto b_per_coldim = this->b_per_rowdim;
 		auto bnnz = this->bnnz;
 		// copy-reorganize data in bmat.data
 		// by scanning column by column of this to find each one of its blocks to rearrange in tbmat.data
 		int t_block_offset = 0;
-		for(int j=0;j<b_per_rowdim;j++)
+		for(int j=0;j<this->b_per_coldim;j++)
 		{
 			int i = 0; // number of blocks found so far in this j-th block column
 			iter_block([this, &j, &i, &t_block_offset, &data, &bcolinds, &browptr](int mat_row_id, int mat_col_id, int block_offset)
@@ -790,6 +792,8 @@ BSRMat<T, BlockStorageOrder> BSRMat<T, BlockStorageOrder>::transpose(const bool 
 		for(int i=1;i<b_per_rowdim+1;i++)
 			browptr[i] += browptr[i-1];
 		free_bufs();
+		this->m = m;
+		this->n = n;
 		this->bm = bm;
 		this->bn = bn;
 		this->b_per_rowdim = b_per_rowdim;
@@ -880,7 +884,7 @@ std::list<std::pair<int,int>> BSRMat<T, BlockStorageOrder>::nonzeros_indices() c
 template<typename T, int BlockStorageOrder>
 size_t BSRMat<T, BlockStorageOrder>::nbytes() const
 {
-	return bm*bn*bnnz*sizeof(T) /* data byte size */ + sizeof(int) * (bnnz + b_per_coldim+1);
+	return bm*bn*bnnz*sizeof(T) /* data byte size */ + sizeof(int) * (bnnz + b_per_rowdim+1) /* indices byte size */;
 }
 
 template<typename T, int BlockStorageOrder>
