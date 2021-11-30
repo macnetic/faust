@@ -860,7 +860,7 @@ const T& BSRMat<T, BlockStorageOrder>::operator()(unsigned int i, unsigned int j
 				return data[k*bm*bn+j%bn*bm+i%bm];
 		}
 		// (i,j) is not in a nz block
-		return 0;
+		return zero;
 	}
 	throw std::runtime_error("BSRMat::operator() i or j is out of bounds.");
 }

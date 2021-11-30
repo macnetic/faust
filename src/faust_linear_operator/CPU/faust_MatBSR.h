@@ -123,8 +123,11 @@ class BSRMat
 	// \brief the number of blocks along the column dimension of the matrix (n/bn).
 	int b_per_coldim;// TODO: should be unsigned
 
+	// useful in operator()
+	T zero;
+
 	// private default constructor
-	BSRMat(): data(nullptr), bcolinds(nullptr), browptr(nullptr), bnnz(0), m(0), n(0), bm(0), bn(0), b_per_rowdim(0), b_per_coldim(0) {}
+	BSRMat(): data(nullptr), bcolinds(nullptr), browptr(nullptr), bnnz(0), m(0), n(0), bm(0), bn(0), b_per_rowdim(0), b_per_coldim(0), zero(T(0)) {}
 	public:
 	BSRMat(unsigned long int nrows, unsigned long int ncols, unsigned long int bnrows, unsigned long int bncols, unsigned long int nblocks, const T* data, const int *block_rowptr, const int *block_colinds);
 	/** Copy constructor */
