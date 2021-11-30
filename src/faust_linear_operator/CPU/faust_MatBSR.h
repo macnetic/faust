@@ -149,7 +149,7 @@ class BSRMat
 	/**
 	 * Returns the (i,j) entry of this.
 	 */
-	T operator()(unsigned int i, unsigned int j) const;
+	const T& operator()(unsigned int i, unsigned int j) const;
 	/**
 	 * Returns the indices on the nonzeros of this.
 	 */

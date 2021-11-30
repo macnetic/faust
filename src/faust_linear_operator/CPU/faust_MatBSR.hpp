@@ -837,17 +837,17 @@ bool BSRMat<T, BlockStorageOrder>::contains_nan() const
 }
 
 template<typename T, int BlockStorageOrder>
-T BSRMat<T, BlockStorageOrder>::operator()(unsigned int i, unsigned int j) const
+const T& BSRMat<T, BlockStorageOrder>::operator()(unsigned int i, unsigned int j) const
 {
 	if(i < m && j < n)
 	{
 		// determine if (i,j) is inside a nz block
-		unsigned int bi = i / bn; // the block row index of (i,j)
+		unsigned int bi = i / bm; // the block row index of (i,j)
 		// how many nz blocks in bi-th row 
 		unsigned int bc = browptr[bi+1] - browptr[bi];
 		if(!bc) return 0; // no nz blocks in the bi-th row
 		// is j located in a nz block of bi-th row?
-		unsigned int bj = j / bm; // block column index of (i,j)
+		unsigned int bj = j / bn; // block column index of (i,j)
 		for(int k=browptr[bi];k<browptr[bi+1]; k++)
 		{
 			if(bcolinds[k] == bj)
