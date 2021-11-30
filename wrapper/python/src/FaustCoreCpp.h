@@ -91,6 +91,7 @@ class FaustCoreCpp
     const char* to_string() const;
     void push_back(FPP* valueMat,unsigned int nbrow,unsigned int nbcol, bool optimizedCopy=false);
     void push_back(FPP* data, int* row_ptr, int* id_col, int nnz, int nrows, int ncols, bool optimizedCopy=false);
+    void push_back(FPP* bdata, int* brow_ptr, int* bcol_inds, int nrows, int ncols, int bnnz, int bnrows, int bncols, bool optimizedCopy=false);
     unsigned int getNBytes() const;
     unsigned int getNbRow() const;
     unsigned int getNbCol() const;

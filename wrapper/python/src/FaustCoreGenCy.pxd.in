@@ -9,6 +9,7 @@ cdef extern from "FaustCoreCpp.h":
         void push_back(FPP* valueMat,unsigned int nbrow,unsigned int nbcol, bool optimizedCopy)
         void push_back(FPP* data, int* row_ptr, int* id_col, int nnz, int nrows,
                        int ncols, bool optimizedCopy)
+        void push_back(FPP* bdata, int* brow_ptr, int* bcol_inds, int nrows, int ncols, int bnnz, int bnrows, int bncols, bool optimizedCopy);
         void get_product(FPP* data, int nbrow, int nbcol);
         FPP get_item(unsigned long int, unsigned long int);
         void multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,

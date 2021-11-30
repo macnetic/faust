@@ -8,7 +8,7 @@
 
 import numpy as np, scipy
 from scipy.io import loadmat
-from scipy.sparse import csr_matrix, csc_matrix, dia_matrix
+from scipy.sparse import csr_matrix, csc_matrix, dia_matrix, bsr_matrix
 import _FaustCorePy
 import pyfaust
 import pyfaust.factparams
@@ -157,20 +157,19 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             if(filepath and isinstance(filepath, str)):
                     contents = loadmat(filepath)
                     factors = contents['faust_factors'][0].tolist()
-            if((isinstance(factors, np.ndarray) and factors.ndim == 2)
-               or isinstance(factors,
-                             scipy.sparse.csc.csc_matrix)
-               or isinstance(factors, scipy.sparse.csr.csr_matrix)):
+            if isinstance(factors,
+                           (np.ndarray, csc_matrix, csr_matrix, bsr_matrix)) and factors.ndim == 2:
                 factors = [ factors ]
             if(not isinstance(factors, list)):
                 raise Exception("factors must be a non-empty list of/or a numpy.ndarray, "
-                                "scipy.sparse.csr.csr_matrix/csc.csc_matrix.")
+                                "scipy.sparse.csr_matrix/csc_matrix/bsr_matrix.")
             F._is_real = True
             # verify if all factors has the same dtype (mandatory)
             dtype = None
+            if len(factors) == 0:
+                raise ValueError("Empty list of matrices.")
             for f in factors:
-                if(isinstance(f[0,0], (np.complex, np.complex64))):
-                    F._is_real = False
+                F._is_real = f.dtype != np.complex
                 if dtype is None:
                     dtype = f.dtype
                 elif dtype != f.dtype:

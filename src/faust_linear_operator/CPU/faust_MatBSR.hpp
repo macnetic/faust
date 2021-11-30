@@ -453,8 +453,8 @@ BSRMat<T, BlockStorageOrder>::BSRMat(unsigned long int nrows, unsigned long int 
 		int data_size = bnnz*bm*bn;
 		// init data
 		this->data = new T[data_size];
-		memcpy(this->data, data, sizeof(T)*nblocks);
-		this->browptr = new int[this->b_per_coldim+1];
+		memcpy(this->data, data, sizeof(T)*nblocks*bm*bn);
+		this->browptr = new int[this->b_per_rowdim+1];
 		memcpy(this->browptr, block_rowptr, sizeof(int)*(this->b_per_rowdim+1));
 		this->bcolinds = new int[this->bnnz];
 		memcpy(this->bcolinds, block_colinds, sizeof(int)*this->bnnz);

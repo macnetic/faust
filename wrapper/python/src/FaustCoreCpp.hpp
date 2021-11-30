@@ -56,7 +56,7 @@ FaustCoreCpp<FPP, DEV>::FaustCoreCpp(Faust::TransformHelper<FPP,DEV> *th)
 }
 
     template<typename FPP, FDevice DEV>
-void FaustCoreCpp<FPP,DEV>::push_back(FPP* valueMat, unsigned int nbrow,unsigned int nbcol, bool optimizedCopy /* false by deft */)
+void FaustCoreCpp<FPP,DEV>::push_back(FPP* valueMat, unsigned int nbrow, unsigned int nbcol, bool optimizedCopy /* false by deft */)
 {
     Faust::MatDense<FPP,DEV> dense_mat(nbrow, nbcol, valueMat);
     // Faust::MatSparse<FPP,DEV> sparse_mat(dense_mat);
@@ -74,6 +74,13 @@ void FaustCoreCpp<FPP,DEV>::push_back(FPP* data, int* row_ptr, int* id_col, int 
       if(transform == nullptr) transform = new Faust::TransformHelper<FPP,DEV>();
 //      this->transform->push_back(&sparse_mat, optimizedCopy);
       this->transform->push_back(data, row_ptr, id_col, nnz, nrows, ncols, optimizedCopy);
+}
+
+template<typename FPP, FDevice DEV>
+    void FaustCoreCpp<FPP,DEV>::push_back(FPP* bdata, int* brow_ptr, int* bcol_inds, int nrows, int ncols, int bnnz, int bnrows, int bncols, bool optimizedCopy/*=false*/)
+{
+      if(transform == nullptr) transform = new Faust::TransformHelper<FPP,DEV>();
+      this->transform->push_back(bdata, brow_ptr, bcol_inds, nrows, ncols, bnnz, bnrows, bncols, optimizedCopy);
 }
 
 template<typename FPP, FDevice DEV>

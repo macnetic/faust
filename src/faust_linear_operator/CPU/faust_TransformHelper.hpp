@@ -625,11 +625,21 @@ namespace Faust {
         }
 
 	template<typename FPP>
+			void TransformHelper<FPP,Cpu>::push_back(const FPP* bdata, const int* brow_ptr, const int* bcol_inds, const int nrows, const int ncols, const int bnnz, const int bnrows, const int bncols, const bool optimizedCopy/*=false*/, const bool transpose/*=false*/, const bool conjugate/*=false*/)
+			{
+				auto bsr_mat = new MatBSR<FPP, Cpu>(nrows, ncols, bnrows, bncols, bnnz, bdata, brow_ptr, bcol_inds);
+				auto copying = optimizedCopy||transpose||conjugate;
+				this->push_back(bsr_mat, optimizedCopy, copying, transpose, conjugate);
+				if(copying) delete bsr_mat;
+			}
+
+	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::push_back(const FPP* data, const int* row_ptr, const int* id_col, const int nnz, const int nrows, const int ncols, const bool optimizedCopy /* false by deft */, const bool transpose/*=false*/, const bool conjugate/*=false*/)
 		{
 			auto sparse_mat = new MatSparse<FPP,Cpu>(nnz, nrows, ncols, data, row_ptr, id_col);
-			this->push_back(sparse_mat, optimizedCopy, false, transpose, conjugate);
-			if(optimizedCopy) delete sparse_mat;
+			auto copying = optimizedCopy||transpose||conjugate;
+			this->push_back(sparse_mat, optimizedCopy, copying, transpose, conjugate);
+			if(copying) delete sparse_mat;
 		}
 
 	template<typename FPP>

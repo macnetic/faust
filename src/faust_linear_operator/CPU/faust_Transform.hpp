@@ -1168,7 +1168,7 @@ void Faust::Transform<FPP,Cpu>::push_back(const Faust::MatGeneric<FPP,Cpu>* M, c
 	}
 	else
 	{
-		if(conjugate || optimizedCopy) throw std::runtime_error("copying argument mustn't be true if any of optimizedCopy or conjugate is true.");
+		if(conjugate || optimizedCopy) throw std::runtime_error("copying argument must be true if any of optimizedCopy or conjugate is true.");
 		M_ = const_cast<Faust::MatGeneric<FPP,Cpu>*>(M);
 	}
 	data.push_back(M_);
