@@ -7,7 +7,7 @@ import sys
 import numpy as np
 from scipy.io import savemat,loadmat
 from numpy.linalg import norm
-from scipy.sparse import spdiags
+from scipy.sparse import spdiags, bsr_matrix
 import math
 from os.path import dirname
 
@@ -1683,6 +1683,58 @@ class TestFaustFactory(unittest.TestCase):
         F = hierarchical(DFT, 'dft', backend=2016)
         err = norm(F.toarray()-DFT)/norm(DFT)
         self.assertLessEqual(err, 1e-6)
+
+    def test_bsr_Faust(self):
+        from random import randint
+        from scipy.sparse import random
+        from numpy.random import rand
+        def rand_bsr(m, n, bm, bn, bnnz):
+            nblocks_per_col = m//bm
+            nblocks_per_row = n//bn
+            nblocks = nblocks_per_col*nblocks_per_row
+            # 1D possible nz block indices
+            BI = list(range(nblocks))
+            # choose bnnz ones among them
+            nzBI = []
+            for i in range(bnnz):
+                ri = randint(0,len(BI)-1)
+                nzBI.append(BI[ri])
+                del BI[ri]
+            nzBI.sort()
+            indices = np.array(nzBI)%nblocks_per_row
+            bcolinds_ind = 0
+            bindptr_ind = 1
+            indptr = np.zeros((int(nblocks_per_col+1)))
+            for bi in nzBI:
+                while bi//nblocks_per_row+1 > bindptr_ind:
+                    bindptr_ind += 1
+                indices[bcolinds_ind] = bi%nblocks_per_row
+                bcolinds_ind += 1
+                indptr[bindptr_ind] += 1
+            for i in range(1, int(nblocks_per_col)+1):
+                indptr[i] += indptr[i-1]
+            data = rand(bnnz, bm, bn)
+            return data, indices, indptr
+
+        F_factors = []
+        F_sp_factors = []
+        for i in range(10):
+            nrows = ncols = 1024
+            bnnz = 20
+            bm = bn = 64
+            data, indices, indptr = rand_bsr(nrows,ncols, bm, bn, bnnz)
+            F_factors += [bsr_matrix((data, indices, indptr), shape=(nrows, ncols))]
+            F_sp_factors.append(F_factors[i].tocsr())
+        bsrF = Faust(F_factors)
+        spF = Faust(F_sp_factors)
+        print("toarray err:", np.linalg.norm(bsrF.toarray()-spF.toarray())/np.linalg.norm(spF.toarray()))
+        self.assertTrue(np.allclose(bsrF.toarray(), spF.toarray()))
+        M = rand(bsrF.shape[1], bsrF.shape[0])
+        print("err ds:", np.linalg.norm(bsrF@M-spF@M)/np.linalg.norm(spF@M))
+        self.assertTrue(np.allclose(bsrF@M, spF@M))
+        M = random(bsrF.shape[1], bsrF.shape[0], .02, format='csr')
+        print("err sp:", np.linalg.norm(bsrF@M-spF@M)/np.linalg.norm(spF@M))
+        self.assertTrue(np.allclose(bsrF@M, spF@M))
 
 
 if __name__ == "__main__":
