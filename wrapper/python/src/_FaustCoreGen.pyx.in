@@ -54,7 +54,13 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
                                                    nbcol, optimizedCopy)
                 elif(isinstance(factor, sparse.bsr_matrix)):
                     bnnz = int(factor.nnz/factor.blocksize[0]/factor.blocksize[1])
-                    data1d = factor.data.reshape(bnnz*factor.blocksize[0]*factor.blocksize[1]).astype(type2dtype('@TYPE@'), 'F')
+                    # reshape data with block transposition (because scipy is
+                    # in row-major order and FAµST col-major order)
+                    _data = np.empty((bnnz, factor.blocksize[0],
+                                      factor.blocksize[1]))
+                    for i in range(bnnz):
+                        _data[i] = factor.data[i].T
+                    data1d = _data.reshape(bnnz*factor.blocksize[0]*factor.blocksize[1]).astype(type2dtype('@TYPE@'))#, 'F')
                     indices=factor.indices.astype(np.int32, 'F')
                     indptr=factor.indptr.astype(np.int32, 'F')
                     self.@CORE_OBJ@.push_back(&data1d[0], &indptr[0],
