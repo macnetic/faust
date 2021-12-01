@@ -814,7 +814,7 @@ FPP Faust::power_iteration(const  Faust::LinearOperator<FPP,Cpu> & A, const faus
         handleError("linear_algebra "," power_iteration : Faust::Transform<FPP,Cpu> 1 must be a squared matrix");
 	}
 	Faust::Vect<FPP,Cpu> xk(nb_col);
-	xk.setRand(); // most likely avoids to be orthogonal with the eigenvector // better than setOnes
+	xk.setOnes();
 	Faust::Vect<FPP,Cpu> xk_norm(nb_col);
 	FPP lambda_old=1.0;
    	FPP lambda = 0.0;
@@ -825,7 +825,6 @@ FPP Faust::power_iteration(const  Faust::LinearOperator<FPP,Cpu> & A, const faus
 			i++;
       		lambda_old = lambda;
       		xk_norm = xk;
-			std::cout << "xk norm:" << xk.norm() << std::endl;
       		xk_norm.normalize();
       		xk = A.multiply(xk_norm);
       		lambda = xk_norm.dot(xk);
