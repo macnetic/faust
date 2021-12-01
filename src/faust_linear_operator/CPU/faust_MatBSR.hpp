@@ -205,9 +205,9 @@ namespace Faust
 	template <typename FPP>
 		void MatBSR<FPP,Cpu>::adjoint()
 		{
-			//TODO: it would be more efficient to transconjugate in one shot
-			transpose();
-			conjugate();
+			bmat.adjoint(/*inplace*/ true);
+			this->dim1 = bmat.m;
+			this->dim2 = bmat.n;
 		}
 
 	template <typename FPP>
@@ -757,6 +757,45 @@ Real<T> BSRMat<T, BlockStorageOrder>::normL1() const
 template<typename T, int BlockStorageOrder>
 BSRMat<T, BlockStorageOrder> BSRMat<T, BlockStorageOrder>::transpose(const bool inplace/*=false*/)
 {
+	return apply_op('T', inplace);
+}
+
+template<typename T, int BlockStorageOrder>
+BSRMat<T, BlockStorageOrder> BSRMat<T, BlockStorageOrder>::conjugate(const bool inplace/*="false"*/)
+{
+	if(inplace)
+	{
+		DenseMatMap<T> data_mat(data, bnnz*bm, bn);
+		data_mat = DenseMatMap<T>(data, bnnz*bm, bn).conjugate();
+		return *this;
+	}
+	else
+	{
+		BSRMat<T, BlockStorageOrder> cbmat(*this);
+		cbmat.conjugate(/*inplace=*/true);
+		return cbmat;
+	}
+}
+
+template<typename T, int BlockStorageOrder>
+BSRMat<T, BlockStorageOrder> BSRMat<T, BlockStorageOrder>::adjoint(const bool inplace/*="false"*/)
+{
+	return apply_op('H', inplace);
+}
+
+template<typename T, int BlockStorageOrder>
+BSRMat<T, BlockStorageOrder> BSRMat<T, BlockStorageOrder>::apply_op(const char op, const bool inplace/*="false"*/)
+{
+	if(op != 'C' && op != 'H' && op != 'T' && op != 'N')
+		throw std::runtime_error("BSRMat::apply_op: unknown op.");
+	if(op == 'N')
+		if(inplace)
+			return *this;
+		else
+			return BSRMat<T, BlockStorageOrder>(*this);
+	if(op == 'C')
+		return conjugate(inplace);
+	// op == 'T' or 'H'
 	if(inplace)
 	{
 		// init tbmat buffers and attributes
@@ -777,12 +816,15 @@ BSRMat<T, BlockStorageOrder> BSRMat<T, BlockStorageOrder>::transpose(const bool 
 		for(int j=0;j<this->b_per_coldim;j++)
 		{
 			int i = 0; // number of blocks found so far in this j-th block column
-			iter_block([this, &j, &i, &t_block_offset, &data, &bcolinds, &browptr](int mat_row_id, int mat_col_id, int block_offset)
+			iter_block([this, &op, &j, &i, &t_block_offset, &data, &bcolinds, &browptr](int mat_row_id, int mat_col_id, int block_offset)
 					{
 					if(mat_col_id/this->bn == j)
 					{
 					DenseMatMap<T> block(data+t_block_offset*this->bn*this->bm, this->bn, this->bm);
-					block = DenseMatMap<T>(this->data+block_offset*this->bm*this->bn, this->bm, this->bn).transpose().eval();
+					if(op == 'H')
+						block = DenseMatMap<T>(this->data+block_offset*this->bm*this->bn, this->bm, this->bn).adjoint().eval();
+					else if(op == 'T')
+						block = DenseMatMap<T>(this->data+block_offset*this->bm*this->bn, this->bm, this->bn).adjoint().eval();
 					bcolinds[t_block_offset++] = mat_row_id/this->bm;
 					i++;
 					}
@@ -807,28 +849,13 @@ BSRMat<T, BlockStorageOrder> BSRMat<T, BlockStorageOrder>::transpose(const bool 
 	else
 	{
 		BSRMat<T, BlockStorageOrder> tbmat(*this);
-		tbmat.transpose(/*inplace=*/true);
+		if(op == 'T')
+			tbmat.transpose(/*inplace=*/true);
+		else
+			tbmat.adjoint(/*inplace=*/true);
 		return tbmat;
 	}
 }
-
-template<typename T, int BlockStorageOrder>
-BSRMat<T, BlockStorageOrder> BSRMat<T, BlockStorageOrder>::conjugate(const bool inplace/*="false"*/)
-{
-	if(inplace)
-	{
-		DenseMatMap<T> data_mat(data, bnnz*bm, bn);
-		data_mat = DenseMatMap<T>(data, bnnz*bm, bn).conjugate();
-		return *this;
-	}
-	else
-	{
-		BSRMat<T, BlockStorageOrder> cbmat(*this);
-		cbmat.conjugate(/*inplace=*/true);
-		return cbmat;
-	}
-}
-
 
 template<typename T, int BlockStorageOrder>
 bool BSRMat<T, BlockStorageOrder>::contains_nan() const

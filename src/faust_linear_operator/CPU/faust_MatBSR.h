@@ -27,6 +27,8 @@ using Real = typename Eigen::NumTraits<T>::Real;
 #endif
 
 template<typename T,int BlockStorageOrder=0> class BSRMat;
+template<typename FPP, FDevice DEVICE> class Transform;
+
 
 namespace Faust
 {
@@ -37,6 +39,8 @@ namespace Faust
 		class MatBSR<FPP,Cpu> : public MatGeneric<FPP,Cpu>
 		{
 			friend void gemm_gen<>(const MatGeneric<FPP, Cpu>& A, const MatGeneric<FPP, Cpu>& B, MatDense<FPP, Cpu>& out, const FPP alpha/*=FPP(1.0)*/, const FPP beta/*=(0.0)*/, const char opA/*='N'*/, const char opB/*='N'*/);
+
+			friend Transform<FPP,Cpu>; // TODO: limit to needed member functions only
 			BSRMat<FPP> bmat; // low-level BSRMat
 			MatBSR() : MatGeneric<FPP, Cpu>() {}
 			MatBSR(BSRMat<FPP>& mat);
@@ -254,7 +258,16 @@ class BSRMat
 	 * Transpose
 	 */
 	BSRMat<T, BlockStorageOrder> transpose(const bool inplace=false);
+
 	BSRMat<T, BlockStorageOrder> conjugate(const bool inplace=false);
+	/**
+	 * Adjoint
+	 */
+	BSRMat<T, BlockStorageOrder> adjoint(const bool inplace=false);
+	/**
+	 * \param op: 'N' (no-op), 'T' (tranpose), 'H' (adjoint), 'C' (conjugate)
+	 */ 
+	BSRMat<T, BlockStorageOrder> apply_op(const char op, const bool inplace=false);
 	/**
 	 * \param m: matrix number of rows.
 	 * \param n: matrix number of columns.
