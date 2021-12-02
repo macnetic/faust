@@ -1152,7 +1152,7 @@ faust_unsigned_int Faust::Transform<FPP,Cpu>::get_fact_nnz(const faust_unsigned_
 }
 
 	template<typename FPP>
-void Faust::Transform<FPP,Cpu>::push_back(const Faust::MatGeneric<FPP,Cpu>* M, const bool optimizedCopy /*default value = false */, const bool conjugate /* default value = false*/, const bool copying /* default to true */, const bool verify_dims_agree/*= true*/)
+void Faust::Transform<FPP,Cpu>::push_back(const Faust::MatGeneric<FPP,Cpu>* M, const bool optimizedCopy /*=false */, const bool transpose/*=false*/,  const bool conjugate /*=false*/, const bool copying /*=true*/, const bool verify_dims_agree/*= true*/)
 {
 	if (size()>0 && verify_dims_agree)
 	{
@@ -1165,11 +1165,16 @@ void Faust::Transform<FPP,Cpu>::push_back(const Faust::MatGeneric<FPP,Cpu>* M, c
 	if(copying)
 	{
 		M_ = M->Clone(optimizedCopy);
-		if(conjugate) M_->conjugate();
+		if(transpose && conjugate)
+			M_->adjoint();
+		else if(transpose)
+			M_->transpose();
+		else if(conjugate)
+			M_->conjugate();
 	}
 	else
 	{
-		if(conjugate || optimizedCopy) throw std::runtime_error("copying argument must be true if any of optimizedCopy or conjugate is true.");
+		if(conjugate || transpose || optimizedCopy) throw std::runtime_error("copying argument must be true if any of optimizedCopy or conjugate is true.");
 		M_ = const_cast<Faust::MatGeneric<FPP,Cpu>*>(M);
 	}
 	data.push_back(M_);

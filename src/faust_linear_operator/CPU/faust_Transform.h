@@ -200,7 +200,7 @@ namespace Faust
 				 * \param conjugate (optional): to conjugate the factor before pushing (works only if copying==true).
 				 * \param copying (optional): true to duplicate the factor in memory and push the copy. Otherwise the same pointer is pushed.
 				 */
-				void push_back(const MatGeneric<FPP,Cpu>* M, const bool optimizedCopy=false, const bool conjugate=false, const bool copying=true, const bool verify_dims_agree=true);
+				void push_back(const MatGeneric<FPP,Cpu>* M, const bool optimizedCopy=false, const bool transpose=false, const bool conjugate=false, const bool copying=true, const bool verify_dims_agree=true);
 
 
 
