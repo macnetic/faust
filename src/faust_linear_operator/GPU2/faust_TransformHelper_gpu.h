@@ -24,6 +24,7 @@ namespace Faust
 				template<typename ...GList> TransformHelper(GList& ... t);
 #endif
 
+				void push_back(const FPP* data, int nrows, int ncols, const bool optimizedCopy=false, const bool transpose=false, const bool conjugate=false);
 				void push_back(const FPP* data, const int* row_ptr, const int* id_col, const int nnz, const int nrows, const int ncols, const bool optimizedCopy=false, const bool transpose=false, const bool conjugate=false);
 				void push_back(const FPP* bdata, const int* brow_ptr, const int* bcol_inds, const int nrows, const int ncols, const int bnnz, const int bnrows, const int bncols, const bool optimizedCopy=false, const bool transpose=false, const bool conjugate=false);
 				void push_back(const MatGeneric<FPP,GPU2>* M, const bool optimizedCopy=false, const bool copying=true, const bool transpose=false, const bool conjugate=false);

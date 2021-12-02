@@ -97,13 +97,22 @@ namespace Faust
 			this->transform->push_back(gpu_M, false);
 		}
 
+	template<typename FPP>
+		void TransformHelper<FPP,GPU2>::push_back(const FPP* data, const int nrows, const int ncols, const bool optimizedCopy/*=false*/, const bool transpose/*=false*/, const bool conjugate/*=false*/)
+		{
+			auto dense_mat = new MatDense<FPP,GPU2>(nrows, ncols, data, /* no_alloc */ false);
+			auto copying = transpose || conjugate || optimizedCopy;
+			this->push_back(dense_mat, optimizedCopy, copying, transpose, conjugate); // optimizedCopy not supported on GPU2
+			if(copying) delete dense_mat;
+		}
 
 	template<typename FPP>
 		void TransformHelper<FPP,GPU2>::push_back(const FPP* data, const int* row_ptr, const int* id_col, const int nnz, const int nrows, const int ncols, const bool optimizedCopy/*=false*/, const bool transpose/*=false*/, const bool conjugate/*=false*/)
 		{
 			auto sparse_mat = new MatSparse<FPP,GPU2>(nrows, ncols, nnz, data, row_ptr, id_col);
-			this->push_back(sparse_mat, optimizedCopy, false, transpose, conjugate);
-//			if(optimizedCopy) delete sparse_mat; // optimizedCopy not supported on GPU2
+			auto copying = transpose || conjugate || optimizedCopy;
+			this->push_back(sparse_mat, optimizedCopy, copying, transpose, conjugate); // optimizedCopy not supported on GPU2
+			if(copying) delete sparse_mat;
 		}
 
 	template<typename FPP>

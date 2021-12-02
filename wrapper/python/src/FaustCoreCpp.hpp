@@ -58,11 +58,8 @@ FaustCoreCpp<FPP, DEV>::FaustCoreCpp(Faust::TransformHelper<FPP,DEV> *th)
     template<typename FPP, FDevice DEV>
 void FaustCoreCpp<FPP,DEV>::push_back(FPP* valueMat, unsigned int nbrow, unsigned int nbcol, bool optimizedCopy /* false by deft */)
 {
-    Faust::MatDense<FPP,DEV> dense_mat(nbrow, nbcol, valueMat);
-    // Faust::MatSparse<FPP,DEV> sparse_mat(dense_mat);
-    // sparse_mat.Display();
     if(transform == nullptr) transform = new Faust::TransformHelper<FPP,DEV>();
-    this->transform->push_back(&dense_mat, optimizedCopy);
+    this->transform->push_back(valueMat, nbrow, nbcol, optimizedCopy);
 }
 
 template<typename FPP, FDevice DEV>

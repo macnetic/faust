@@ -634,6 +634,15 @@ namespace Faust {
 			}
 
 	template<typename FPP>
+		void TransformHelper<FPP,Cpu>::push_back(const FPP* data, int nrows, int ncols, const bool optimizedCopy/*=famse*/, const bool transpose/*=famse*/, const bool conjugate/*=famse*/)
+		{
+			auto copying = optimizedCopy||transpose||conjugate;
+			auto dense_mat = new MatDense<FPP, Cpu>(data, nrows, ncols);
+			this->push_back(dense_mat, optimizedCopy, copying, transpose, conjugate);
+			if(copying) delete dense_mat;
+		}
+
+	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::push_back(const FPP* data, const int* row_ptr, const int* id_col, const int nnz, const int nrows, const int ncols, const bool optimizedCopy /* false by deft */, const bool transpose/*=false*/, const bool conjugate/*=false*/)
 		{
 			auto sparse_mat = new MatSparse<FPP,Cpu>(nnz, nrows, ncols, data, row_ptr, id_col);
@@ -1174,13 +1183,9 @@ template<typename FPP>
 		int num_factors = num_fac_distr(generator);
 		// create factors
 		std::vector<MatGeneric<FPP,Cpu>*> factors(num_factors);
-//		std::cout  << "num_factors:" << num_factors << std::endl;
-//		std::cout  << "bnnz :" << bnnz << std::endl;
 		for(int i=0;i<num_factors;i++)
-		{
 			factors[i] = MatBSR<FPP, Cpu>::randMat(faust_nrows, faust_ncols, bnrows, bncols, bnnz);
-//			std::cout  << "i=" << i << " num_factors: " << num_factors; factors[i]->Display();
-		}
+		// create the Faust
 		TransformHelper<FPP,Cpu>* randFaust = new TransformHelper<FPP, Cpu>(factors,1.0,false,false);
 		return randFaust;
 	}
