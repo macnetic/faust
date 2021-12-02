@@ -281,7 +281,7 @@ Note that starting from pyfaust 3.11.1 the libomp library is embedded in the pyf
 ## 2.5 Why this no_normalization parameter for PALM4MSA and hierarchical factorization?
 
 Well, you must know that in PALM4MSA updating a factor consists to first applying the gradient on it and then passing the resulting matrix through a proximity operator to enforce the structure/sparsity. After this two stages, the prox output matrix is often normalized.  
-Experiments have shown that it is totally possible to fail the normalization stage when the norm of the matrix is too high to be a number (or at least to be encoded in a floating point data type), it is in fact infinite. So you might end up with a zero matrix after normalization. In other close cases it can give NaN as matrix elements.  
+Experiments have shown that it is totally possible to fail the normalization stage when the norm of the matrix is too high to be a number (or at least to be encoded in a floating point data type), it is in fact infinite. So you might end up with a zero matrix after normalization. In other close cases it can give NaN as matrix elements or 2-norms.  
 Hence disabling the normalization can help to avoid those overflows. That's why this option has been added to the parameters in both [pyfaust](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1factparams_1_1ParamsHierarchical.html#a663cfce79af6baa7006ee0af7006e18e) and [matfaust](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1factparams_1_1ParamsHierarchical.html#a0e596bab0beffb2d5892fadbe3e185aa).  
 For example, running the hierarchical factorization algorithm on a Hadamard matrix of numpy dtype float32 and size 512x512 is a case where this kind of error occurs.  
 Below I reproduce the code firstly with the normalization enabled and the error it produces, secondly without normalization to show that it fixes the issue.  
@@ -312,6 +312,8 @@ Error case:
 	terminate called after throwing an instance of 'std::runtime_error'
 	  what():  Error in update_lambda: S (the Faust) contains nan elements in at least one of its matrices, can't compute lambda.
 	Aborted
+
+\note This error case has been fixed (without disabling the normalization) by the [3.16.0 FAµST version](https://faust.inria.fr/fa%c2%b5st-3-16-0-fix-of-the-hadamard-512x512-factorization-in-float-single-precision/) (which exceptionally computes the 2-norm of matrices in double precision when the single precision failed). So don't be suprised if you're unable to reproduce this error. However the fix is only available on the 2020 backend of the hierarchical PALM4MSA algorithm. So you can reproduce it anyway if you set the 2016 backend instead in hierarchical function arguments.
 
 Fixed case:
 
