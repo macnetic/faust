@@ -8,7 +8,8 @@
 
 import numpy as np, scipy
 from scipy.io import loadmat
-from scipy.sparse import csr_matrix, csc_matrix, dia_matrix, bsr_matrix
+from scipy.sparse import (csr_matrix, csc_matrix, dia_matrix, bsr_matrix,
+                          coo_matrix)
 import _FaustCorePy
 import pyfaust
 import pyfaust.factparams
@@ -158,7 +159,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                     contents = loadmat(filepath)
                     factors = contents['faust_factors'][0].tolist()
             if isinstance(factors,
-                           (np.ndarray, csc_matrix, csr_matrix, bsr_matrix)) and factors.ndim == 2:
+                           (np.ndarray, csc_matrix, csr_matrix, coo_matrix, bsr_matrix)) and factors.ndim == 2:
                 factors = [ factors ]
             if(not isinstance(factors, list)):
                 raise Exception("factors must be a non-empty list of/or a numpy.ndarray, "

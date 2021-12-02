@@ -53,7 +53,7 @@ from libc.string cimport memcpy, strlen
 from libcpp cimport bool, complex
 from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 from scipy import sparse
-from scipy.sparse import csr_matrix, csc_matrix
+from scipy.sparse import csr_matrix, csc_matrix, coo_matrix, bsr_matrix
 from re import match
 import sys, os, pyfaust
 

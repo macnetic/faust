@@ -28,31 +28,29 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
                 # Faust uses row-major order for sparse matrices
                 # and col-major order for dense matrices
                 # but libmatio uses col-major order for sparse matrices
-                if(isinstance(factor, sparse.csc.csc_matrix)):
+                if isinstance(factor, (csc_matrix, coo_matrix)):
                     factor = list_factors[i] = factor.tocsr()
                     #print("FaustCorePy.pyx __cinit__(),toarray() factor:", factor)
-                if not isinstance(factor, (np.ndarray, sparse.csr.csr_matrix,
-                                           sparse.bsr_matrix)):
+                if not isinstance(factor, (np.ndarray, csr_matrix, bsr_matrix)):
                    #print("FaustCorePy.pyx __cinit__(), factor:",factor)
                    raise ValueError("Faust factors must be numpy.ndarray,"
-                                    " scipy.sparse.csr.csr_matrix or"
-                                    " scipy.sparse.bsr_matrix")
+                                    " scipy.sparse.csr_matrix/csc_matrix/coo_matrix/bsr_matrix")
             self.@CORE_OBJ@ = new FaustCoreCy.@CPP_CORE_CLASS@[@TYPE@]()
             for factor in list_factors:
                 nbrow=factor.shape[0];
                 nbcol=factor.shape[1];
-                if(isinstance(factor, sparse.csc.csc_matrix)):
+                if isinstance(factor, (csc_matrix, coo_matrix)):
                     #TODO: understand how is it possible to have a csc
                     # mat here and fix it (because it should have been
                     # converted above already)
                     factor = list_factors[i] = factor.tocsr()
                 #print('FaustCorePy.pyx type factor=',type(factor))
                 #print("FaustCorePy.pyx factor=",factor)
-                if(isinstance(factor, np.ndarray)):
+                if isinstance(factor, np.ndarray):
                     data=factor.astype(type2dtype('@TYPE@'),'F')
                     self.@CORE_OBJ@.push_back(&data[0,0], nbrow,
                                                    nbcol, optimizedCopy)
-                elif(isinstance(factor, sparse.bsr_matrix)):
+                elif isinstance(factor, sparse.bsr_matrix):
                     bnnz = int(factor.nnz/factor.blocksize[0]/factor.blocksize[1])
                     # reshape data with block transposition (because scipy is
                     # in row-major order and FAµST col-major order)
