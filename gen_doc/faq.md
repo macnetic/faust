@@ -280,12 +280,12 @@ Note that starting from pyfaust 3.11.1 the libomp library is embedded in the pyf
 
 ## 2.5 Why this no_normalization parameter for PALM4MSA and hierarchical factorization?
 
-Well, you must know that in PALM4MSA updating a factor consists to first applying the gradient on it and then passing the resulting matrix through a proximity operator to enforce the structure/sparsity. After this two stages, the prox output matrix is often normalized.
-Experiments have shown that it is totally possible to fail the normalization stage when the norm of the matrix is too high to be a number (or at least to be encoded in a floating point data type), it is in fact infinite. So you might end up with a zero matrix after normalization. In other close cases it can give NaN as matrix elements.
-Hence disabling the normalization can help to avoid those overflows. That's why this option has been added to the parameters in both [pyfaust](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1factparams_1_1ParamsHierarchical.html#a663cfce79af6baa7006ee0af7006e18e) and [matfaust](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1factparams_1_1ParamsHierarchical.html#a0e596bab0beffb2d5892fadbe3e185aa).
-For example, running the hierarchical factorization algorithm on a Hadamard matrix of numpy dtype float32 and size 512x512 is a case where this kind of error occur.
-Below I reproduce the code firstly with the normalization enabled and the error it produces, secondly without normalization to show that if fixes the issue.
-Note that this new parameter is limited to the 2020 implementations of PALM4MSA and the hierarchical algorithm.
+Well, you must know that in PALM4MSA updating a factor consists to first applying the gradient on it and then passing the resulting matrix through a proximity operator to enforce the structure/sparsity. After this two stages, the prox output matrix is often normalized.  
+Experiments have shown that it is totally possible to fail the normalization stage when the norm of the matrix is too high to be a number (or at least to be encoded in a floating point data type), it is in fact infinite. So you might end up with a zero matrix after normalization. In other close cases it can give NaN as matrix elements.  
+Hence disabling the normalization can help to avoid those overflows. That's why this option has been added to the parameters in both [pyfaust](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1factparams_1_1ParamsHierarchical.html#a663cfce79af6baa7006ee0af7006e18e) and [matfaust](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1factparams_1_1ParamsHierarchical.html#a0e596bab0beffb2d5892fadbe3e185aa).  
+For example, running the hierarchical factorization algorithm on a Hadamard matrix of numpy dtype float32 and size 512x512 is a case where this kind of error occurs.  
+Below I reproduce the code firstly with the normalization enabled and the error it produces, secondly without normalization to show that it fixes the issue.  
+Note that this new parameter is limited to the 2020 implementations of PALM4MSA and the hierarchical algorithm.  
 
 
 Error case:
