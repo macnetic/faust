@@ -37,14 +37,15 @@ The FAµST toolbox was initially released as a Matlab implementation ([versions 
 
 \section Credits
 
-FAµST is developed in the [PANAMA team](https://team.inria.fr/panama/) at [INRIA Rennes](https://www.inria.fr/en/centre/rennes). <br>
-For more information on the FAµST Project, please visit the website [faust.inria.fr](http://faust.inria.fr). <br>
+FAµST has been developed in the [PANAMA team](https://team.inria.fr/panama/) and [DANTE team](https://team.inria.fr/dante/). <br>
+For further information on the FAµST Project, please visit the website [faust.inria.fr](https://faust.inria.fr). <br>
 
-
+Researchers: Luc Le Magoarou, Rémi Gribonval, Le Quoc Tung, Amélie Barbe, Mathurin Massias  
+Software engineers: Adrien Leman, Nicolas Bellot, Thomas Gautrais, Hakim HADJ-DJILANI
 
 
 <HR>
-\authors Luc Le Magoarou, Rémi Gribonval, Adrien Leman, Nicolas Bellot, Thomas Gautrais, Hakim HADJ-DJILANI
+\authors  (Documentation) Rémi Gribonval, Hakim HADJ-DJILANI
 \date (of doc generation) @DOXYGEN_CURRENT_DATE@
 
 <HR>
