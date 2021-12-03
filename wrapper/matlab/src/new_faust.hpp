@@ -13,6 +13,8 @@ void new_faust(const mxArray **prhs, const int nrhs, mxArray **plhs, const int n
 	std::vector<Faust::MatGeneric<SCALAR, DEV>*> list_factor;
 	mwSize nb_element = mxGetNumberOfElements(prhs[1]);
 
+	Faust::TransformHelper<SCALAR, DEV> tmp_bsr_th;
+
 	if (nb_element != 0)
 	{
 		mxArray * mxMat, *mx_tmp;
@@ -47,8 +49,12 @@ void new_faust(const mxArray **prhs, const int nrhs, mxArray **plhs, const int n
 				browptr[0] = 0;
 				for(int i=1;i<bnrows+1;i++)
 					browptr[i] = browptr_[i-1] + browptr[i-1];
-				auto bsr_mat = new Faust::MatBSR<SCALAR, Cpu>(nrows, ncols, bnrows, bncols, bnnz, bdata, browptr, bcolinds);
-				list_factor.push_back(bsr_mat);
+//				auto bsr_mat = new Faust::MatBSR<SCALAR, DEV>(nrows, ncols, bnrows, bncols, bnnz, bdata, browptr, bcolinds);
+//				list_factor.push_back(bsr_mat);
+				// hack to use the same code for GPU2 which is not MatBSR compatible yet
+				tmp_bsr_th.push_back(bdata, browptr, bcolinds, nrows, ncols, bnnz, bnrows, bncols, /*optimizedCopy*/ false, false, false);
+				auto gen_fac = tmp_bsr_th.get_gen_fact_nonconst(tmp_bsr_th.size()-1);
+				list_factor.push_back(gen_fac);
 				delete[] bdata;
 				delete[] browptr_;
 				delete[] browptr;
@@ -81,7 +87,6 @@ void new_faust(const mxArray **prhs, const int nrhs, mxArray **plhs, const int n
 		optimizedCopy = (bool) optimizedCopy_inter;
 
 	}
-
 
 	Faust::TransformHelper<SCALAR,DEV>* F = new Faust::TransformHelper<SCALAR,DEV>(list_factor, lambda, optimizedCopy, /* cloning */ false);
 
