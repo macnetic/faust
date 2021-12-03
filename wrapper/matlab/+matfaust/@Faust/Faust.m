@@ -118,7 +118,8 @@ classdef Faust
 		%>
 		%> @param factors (1st arg.) the 1D cell array of factors to initialize the Faust with.
 		%> <br/> The factors must respect the dimensions needed for the product to be defined (for i=1 to size(factors,2), size(factors{i},2) == size(factors{i+1},1)).
-		%> <br/> The factors can be sparse or dense matrices.
+		%> <br/> The factors can be sparse, dense or BSR matrices.
+		%> <br/> To create a BSR matrix you must use the matfaust.create_bsr function.
 		%> <br/> Passing a single matrix to the constructor instead of
 		%> a cell array is equivalent to passing a singleton cell array.
 		%> @param filepath (1st arg.) the file from which a Faust is created. It must be a character array.<br/>
@@ -165,6 +166,11 @@ classdef Faust
 				% init a Faust from factor list
 				% check if the factors are real or complex, one complex factor implies a complex faust
 				factors=varargin{1};
+				if(isstr(factors{1}) && strcmp(lower(factors{1}), 'bsr'))
+					% a BSR matrix encoding was passed as first argument of the ctor
+					F = matfaust.Faust({factors});
+					return
+				end
 				if(length(factors) == 0)
 					error([ err_msg ' Cannot create an empty Faust.'])
 				end
@@ -175,19 +181,39 @@ classdef Faust
 				F.dtype = 'double';
 				optCopy = false;
 				for i=1:length(factors)
-					if (~isreal(factors{i}))
+					factor = factors{i};
+					warn_dtype = @(i, dtype) warning(['Faust constructor: first factor is ' dtype ' but the ' int2str(i) '-th factor is ' class(factor) '. It has been auto-converted to ' dtype ]);
+					% factors must be a matrix or a cell of a BSR encoding
+					if (iscell(factor) && strcmp(factor{1}, 'bsr'))
+						%  factor is supposed to be created using create_bsr (so it is well-formed)
+						F.isReal = isreal(factor{5});
+						if(i == 1 && strcmp(class(factor{5}), 'single'))
+							F.dtype = 'float';
+							continue
+						elseif(strcmp(class(factor{5}), 'single') && strcmp(F.dtype, 'double'))
+							warn_dtype(i, F.dtype)
+							factor{5} = double(factor{5});
+						elseif(strcmp(class(factor{5}), 'double') && strcmp(F.dtype, 'float'))
+							warn_dtype(i, F.dtype)
+							factor{5} = single(factor{5});
+						end
+						continue
+					end
+					if(~ isnumeric(factor) || ~ ismatrix(factor))
+						error('The cell Faust constructor 1st argument must contain only matrices or BSR matrix cell encodings.')
+					end
+					if (~isreal(factor))
 						F.isReal = false;
-						break
 					end
 					if(i == 1 && strcmp(class(factors{1}), 'single'))
 							F.dtype = 'float';
-					elseif(~ strcmp(class(factors{1}), class(factors{i})))
+					elseif(~ strcmp(class(factors{1}), class(factor)))
 						if(strcmp(F.dtype, 'float'))
-							factors{i} = single(factors{i});
+							factors{i} = single(factor);
 						else
-							factors{i} = double(factors{i});
+							factors{i} = double(factor);
 						end
-						warning(['Faust constructor: first factor is ' F.dtype ' but the ' int2str(i) '-th factor is ' class(factors{i}) '. It has been auto-converted to ' F.dtype ])
+						warn_dtype(i, F.dtype)
 					end
 				end
 				for i=2:nargin
@@ -237,7 +263,7 @@ classdef Faust
 				c{1} = varargin{1};
 				F = matfaust.Faust(c, varargin{2:end});
 			elseif(isa(varargin{1}, 'matfaust.Faust'))
-				% create a Faust from another one but not with the same
+				% create a Faust from another but not with the same
 				% handle to set inside the FaustCore object (matrix)
 				oF = varargin{1};
 				F.matrix = FaustCore(varargin{2}, oF.isReal, oF.dev, oF.dtype);

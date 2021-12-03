@@ -26,7 +26,7 @@ namespace Faust
 			MatBSR<FPP,Cpu> *clone = new MatBSR<FPP,Cpu>();
 			BSRMat<FPP> clone_bmat(bmat);
 			clone->bmat = clone_bmat;
-			clone->bmat.print_bufs();
+			// clone->bmat.print_bufs();
 			clone->dim1 = clone_bmat.m;
 			clone->dim2 = clone_bmat.n;
 			return clone;

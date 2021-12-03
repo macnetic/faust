@@ -42,6 +42,7 @@
 /*  <https://hal.archives-ouvertes.fr/hal-01167948v1>                       */
 #ifndef __MEX_NEW_FAUST__
 #define __MEX_NEW_FAUST__
+#include "faust_MatBSR.h"
 template <typename SCALAR, FDevice DEV>
 void new_faust(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs);
 #include "new_faust.hpp"

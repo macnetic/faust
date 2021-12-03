@@ -28,7 +28,7 @@ void faust_norm_2(const mxArray **prhs, const int nrhs, mxArray **plhs, const in
 		}
 	}
 
-	std::cout << "nbr_iter_max:" << nbr_iter_max << " threshold:" << precision << std::endl;
+//	std::cout << "nbr_iter_max:" << nbr_iter_max << " threshold:" << precision << std::endl;
 	norm_faust = (double) core_ptr->spectralNorm(nbr_iter_max,precision,flag);
 
 	plhs[0]=mxCreateDoubleScalar(norm_faust);
