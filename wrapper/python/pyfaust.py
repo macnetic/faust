@@ -94,9 +94,11 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                      The factors must respect the dimensions needed for
                      the product to be defined <code>(for i in range(0,len(factors)-1): factors[i].shape[1] == factors[i+1].shape[0])</code>.<br/>
                      The factors can be sparse or dense matrices
-                     (either scipy.sparse.csr.csr_matrix or
-                     numpy.ndarray).<br/>
-                     Passing only an array or or sparse matrix to the
+                     (either scipy.sparse.csr_matrix/bsr_matrix or
+                     numpy.ndarray with ndim == 2).
+                     scipy.sparse.csc_matrix/coo_matrix are supported but
+                     converted to csr_matrix on the fly.<br/>
+                     Passing only an array or a sparse matrix to the
                      constructor is equivalent to
                      passing a list of a single factor.
             filepath: the file from which a Faust is created.<br/>
@@ -132,6 +134,10 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                                              # factor
 
         <b>See also</b> Faust.save, pyfaust.rand
+        <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csr_matrix.html">csr_matrix, </a>
+        <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.bsr_matrix.html">bsr_matrix</a>
+        <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csc_matrix.html">csc_matrix, </a>
+        <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csc_matrix.html">coo_matrix </a>
 
         """
         is_on_gpu = False
