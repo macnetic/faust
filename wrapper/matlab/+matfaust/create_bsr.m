@@ -6,33 +6,39 @@
 %> @param M The number of rows of the BSR matrix.
 %> @param N The number of columns of the BSR matrix.
 %> @param bnnz The number of nonzero blocks of the BSR matrix.
-%> @param bdata The horizontal concatenation of the nonzero blocks contained in the matrix (all the nonzero blocks have the same size).
-%> @param bcolinds The block column indices corresponding (in the same order) to the blocks in bdata. A block column index is not a column index, for example if your matrix contains N columns and each nonzero block contains BN columns (note that mod(N, BN) must be zero), the block column indices must lay in {1, ..., N/BN}.
-%> @param brow_count The number of blocks in each block-row in the matrix. If each of your blocks contains BM rows (note that mod(BM, M) must be zero) then brow_count{i} is the number of nonzero blocks contained in the rows BM*i to BM*(i+1).
+%> @param bdata The horizontal concatenation of the matrix nonzero blocks taken in rowmajor order. Note that all the nonzero blocks have the same size.
+%> @param bcolinds The block column indices corresponding (in the same order) to the blocks in bdata. A block column index is not a column index, for example if your matrix contains N columns and each nonzero block contains BN columns, the block column indices must lay in {1, ..., N/BN}.
+%> @param brow_count The number of nonzero blocks in each block-row of the matrix (a vector of size M/BM, where brow_count(i) is the number of nonzero blocks in the i-th block-row).
 %>
 %> @b Examples
 %> @code
-%> >> bsr_mat = matfaust.create_bsr(10, 10, 3, rand(2, 2*3), [2, 4, 1], [2, 0, 1, 0, 0]);
+%> >> bnnz = 3;
+%> >> M = 10;
+%> >> N = 9;
+%> >> nonzero_blocks = [[ 0.6787, 0.7431 0.6555; 0.7577, 0.3922 0.1712] [ 0.7060 0.2769    0.0971; 0.0318    0.0462    0.8235] [0.6948    0.9502    0.4387; 0.3171    0.0344    0.3816]];
+%> >> bsr_mat = matfaust.create_bsr(M, N, bnnz, nonzero_blocks, [2, 3, 1], [2, 0, 1, 0, 0]);
 %> >> F = matfaust.Faust(bsr_mat)
 %>
 %> F =
 %>
-%> Faust size 10x10, density 0.12, nnz_sum 12, 1 factor(s): 
-%> - FACTOR 0 (double) BSR, size 10x10, density 0.12, nnz 12
+%> Faust size 10x10, density 0.2, nnz_sum 18, 1 factor(s):
+%> - FACTOR 0 (double) BSR, size 10x9, density 0.2, nnz 18
 %> >> full(F)
+%>
 %>
 %> ans =
 %>
-%>          0         0    0.1419    0.9157         0         0    0.9595    0.0357         0         0
-%>          0         0    0.4218    0.7922         0         0    0.6557    0.8491         0         0
-%>          0         0         0         0         0         0         0         0         0         0
-%>          0         0         0         0         0         0         0         0         0         0
-%>     0.9340    0.7577         0         0         0         0         0         0         0         0
-%>     0.6787    0.7431         0         0         0         0         0         0         0         0
-%>          0         0         0         0         0         0         0         0         0         0
-%>          0         0         0         0         0         0         0         0         0         0
-%>          0         0         0         0         0         0         0         0         0         0
-%>          0         0         0         0         0         0         0         0         0         0
+%>          0         0         0    0.6787    0.7431    0.6555    0.7060    0.2769    0.0971
+%>          0         0         0    0.7577    0.3922    0.1712    0.0318    0.0462    0.8235
+%>          0         0         0         0         0         0         0         0         0
+%>          0         0         0         0         0         0         0         0         0
+%>     0.6948    0.9502    0.4387         0         0         0         0         0         0
+%>     0.3171    0.0344    0.3816         0         0         0         0         0         0
+%>          0         0         0         0         0         0         0         0         0
+%>          0         0         0         0         0         0         0         0         0
+%>          0         0         0         0         0         0         0         0         0
+%>          0         0         0         0         0         0         0         0         0
+%>
 %> @endcode
 %======================================================================
 function bsr_enc = create_bsr(M, N, bnnz, bdata, bcolinds, brow_count)
@@ -41,6 +47,10 @@ function bsr_enc = create_bsr(M, N, bnnz, bdata, bcolinds, brow_count)
 	[ok, err] = verify_bnnz(bnnz);
 	if(~ ok) error(err); end
 	[ok, err] = verify_bdata(bdata, M, N, bnnz);
+	if(~ ok) error(err); end
+	[ok, err] = verify_bcolinds(bcolinds, bnnz);
+	if(~ ok) error(err); end
+	[ok, err] = verify_brow_count(brow_count, M, bdata);
 	if(~ ok) error(err); end
 	bsr_enc = {'bsr', M, N, bnnz, bdata, bcolinds, brow_count};
 	verify_bsr_format(bsr_enc);
