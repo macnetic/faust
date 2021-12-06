@@ -110,28 +110,52 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         use filepath you must explicitly set argument with the keyword.
 
         Examples:
-            >>> from pyfaust import Faust
-            >>> import numpy as np
-            >>> from scipy import sparse
-            >>> factors = []
-            >>> is_sparse = False
-            >>> for i in range(0,5):
-            >>>     if(is_sparse):
-            >>>         factors += [ sparse.random(100,100, dtype=np.float64, format='csr',
-            >>>                                   density=0.1)]
-            >>>     else:
-            >>>         factors += [ np.random.rand(100, 100).astype(np.float64) ]
-            >>>     is_sparse = not is_sparse
+            Example 1 -- Creating a Faust made of CSR matrices and numpy arrays:
+                >>> from pyfaust import Faust
+                >>> import numpy as np
+                >>> from scipy import sparse
+                >>> factors = []
+                >>> is_sparse = False
+                >>> for i in range(0,5):
+                >>>     if(is_sparse):
+                >>>         factors += [ sparse.random(100,100, dtype=np.float64, format='csr',
+                >>>                                   density=0.1)]
+                >>>     else:
+                >>>         factors += [ np.random.rand(100, 100).astype(np.float64) ]
+                >>>     is_sparse = not is_sparse
 
-            >>> # define a Faust with those factors
-            >>> F = Faust(factors)
+                >>> # define a Faust with those factors
+                >>> F = Faust(factors)
 
-            >>> F.save("F.mat")
-            >>> # define a Faust from file
-            >>> H = Faust(filepath="F.mat")
+                >>> F.save("F.mat")
+                >>> # define a Faust from file
+                >>> H = Faust(filepath="F.mat")
 
-            >>> Faust(np.random.rand(10,10)) # creating a Faust with only one
-                                             # factor
+                >>> Faust(np.random.rand(10,10)) # creating a Faust with only one
+                                                 # factor
+
+            Example 2 -- Creating a Faust containing one BSR matrix:
+                >>> from scipy.sparse import bsr_matrix
+                >>> from pyfaust import Faust
+                >>> from numpy import allclose
+                >>> from numpy.random import rand
+                >>> nzblocks = rand(3, 2, 3) # 3 blocks of size 2x3
+                >>> # create a scipy BSR matrix
+                >>> B = bsr_matrix((nzblocks, [0, 1, 2], [0, 1, 2, 3, 3, 3]), shape=(10,9))
+                >>> # create the single factor Faust
+                >>> F = Faust(B)
+                >>> F
+                Faust size 10x9, density 0.2, nnz_sum 18, 1 factor(s):<br/>
+                 FACTOR 0 (double) BSR, size 10x9, density 0.2, nnz 18
+                >>> allclose(F.toarray(), B.toarray())
+                True
+                >>> # of course it's ok to create a Faust with a BSR and another type of factors
+                >>> Faust([B, rand(9, 18)])
+                Faust size 10x18, density 1, nnz_sum 180, 2 factor(s): <br/>
+                  FACTOR 0 (double) BSR, size 10x9, density 0.2, nnz 18<br/>
+                  FACTOR 1 (double) DENSE, size 9x18, density 1, nnz 162
+                >>>
+
 
         <b>See also</b> Faust.save, pyfaust.rand
         <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csr_matrix.html">csr_matrix, </a>
