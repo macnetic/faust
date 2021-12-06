@@ -604,6 +604,18 @@ classdef FaustTest < matlab.unittest.TestCase
 			end
 		end
 
+		function testFaustBSR(this)
+			M = 10;
+			N = 9;
+			bnnz = 3;
+			nonzero_blocks = [[ 0.6787, 0.7431 0.6555; 0.7577, 0.3922 0.1712] [ 0.7060 0.2769    0.0971; 0.0318    0.0462    0.8235] [0.6948    0.9502    0.4387; 0.3171    0.0344    0.3816]];
+			bsr_mat = matfaust.create_bsr(M, N, bnnz, nonzero_blocks, [2, 3, 1], [2, 0, 1, 0, 0]);
+			F = matfaust.Faust(bsr_mat)
+			this.verifyEqual(nonzero_blocks(:,1:3), full(F(1:2, 4:6)), 'AbsTol', 1e-6)
+			this.verifyEqual(nonzero_blocks(:,4:6), full(F(1:2, 7:9)), 'AbsTol', 1e-6)
+			this.verifyEqual(nonzero_blocks(:,7:9), full(F(5:6, 1:3)), 'AbsTol', 1e-6)
+		end
+
         function testDelete(this)
             disp('Test Faust.delete()')
             tFaust = transpose(this.test_faust);
