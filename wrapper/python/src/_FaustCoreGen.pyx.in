@@ -54,8 +54,8 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
                     bnnz = int(factor.nnz/factor.blocksize[0]/factor.blocksize[1])
                     # reshape data with block transposition (because scipy is
                     # in row-major order and FAµST col-major order)
-                    _data = np.empty((bnnz, factor.blocksize[0],
-                                      factor.blocksize[1]))
+                    _data = np.empty((bnnz, factor.blocksize[1],
+                                      factor.blocksize[0]))
                     for i in range(bnnz):
                         _data[i] = factor.data[i].T
                     data1d = _data.reshape(bnnz*factor.blocksize[0]*factor.blocksize[1]).astype(type2dtype('@TYPE@'))#, 'F')
