@@ -68,7 +68,7 @@ end
 
 function [ok, err] = verify_bdata(bdata, M, N, bnnz)
 	ok = isnumeric(bdata) && ismatrix(bdata) && mod(M, size(bdata, 1)) == 0 && mod(N, size(bdata, 2)/bnnz) == 0;
-	err = 'bdata must be matrix which the number of rows (which is the nonzero block number of rows) must divide evenly the matrix number of rows. Its number of columns must be equal to the number of nonzero blocks times the nonzero block number of columns (bdata is the horizontal concatenation of the nonzero blocks).';
+	err = 'bdata must be a matrix whose the number of rows (which is the nonzero block number of rows) divides evenly the matrix number of rows. Its number of columns must be equal to the number of nonzero blocks times the nonzero block number of columns (bdata is the horizontal concatenation of the nonzero blocks).';
 end
 
 function [ok, err] = verify_bcolinds(bcolinds, bnnz)
