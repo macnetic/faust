@@ -207,7 +207,8 @@ classdef Faust
 					end
 					if(i == 1 && strcmp(class(factors{1}), 'single'))
 							F.dtype = 'float';
-					elseif(~ strcmp(class(factors{1}), class(factor)))
+					%elseif(~ strcmp(class(factors{1}), class(factor))) % factors{1} might be a bsr cell
+					elseif(strcmp(class(factor), 'single') && ~ strcmp(F.dtype, 'float') || strcmp(class(factor), 'double') && ~ strcmp(F.dtype, 'double'))
 						if(strcmp(F.dtype, 'float'))
 							factors{i} = single(factor);
 						else
@@ -251,12 +252,7 @@ classdef Faust
 				F.matrix = FaustCore(factors, scale, optCopy, F.isReal, F.dev, F.dtype);
 			elseif(ischar(varargin{1}))
 				% init a Faust from file
-				filename=varargin{1};
-				load(filename);
-				if (~exist('faust_factors','var') )
-					error('Faust : invalid file');
-				end
-				F = matfaust.Faust(faust_factors, varargin{2:end});
+				F = matfaust.Faust.load(varargin{:});
 			elseif(ismatrix(varargin{1}) && nargin == 1)
 				% create a Faust from a matrix (single factor)
 				c = cell(1, 1);
@@ -2253,6 +2249,54 @@ classdef Faust
 			bool = isa(obj, 'matfaust.Faust');
 		end
 
+		%================================================================
+		%> Loads a Faust from a .mat file.
+		%===
+		%>
+		%> @b Example
+		%> @code
+		%> import matfaust.*
+		%> F = rand(10,10)
+		%> F.save('my_faust.mat')
+		%> F2 = matfaust.Faust.load('my_faust.mat')
+		%> F3 = Faust('my_faust.mat')
+		%> % F == F2 == F3
+		%> @endcode
+		%>
+		%> <p> @b See @b also Faust.Faust
+		%================================================================
+		function F = load(filepath, varargin)
+			filename = filepath;
+			load(filename);
+			if (~exist('faust_factors','var') )
+				error('Faust : invalid file');
+			end
+			out_factors = {};
+			for i=1:length(faust_factors)
+				f = faust_factors{i};
+				if(iscell(f) && strcmp('bsr', f{1}))
+					% convert .mat encoded bsr to matfaust bsr (matfaust.create_bsr)
+					% it allows to ensure the data is correct
+					bcolinds = double(f{3})+1; % C++ is in 0-base index
+					browptr = f{4};
+					brow_count = zeros(1, size(browptr, 2)-1);
+					for i=2:numel(browptr)
+						brow_count(i-1) = browptr(i)-browptr(i-1);
+					end
+					M = double(f{2}(1));
+					N = double(f{2}(2));
+					bnnz = double(f{2}(3));
+					data = f{5};
+					bnrows = floor(M/(numel(browptr)-1));
+					bncols = floor(numel(data)/bnrows/bnnz);
+					bdata = reshape(data, bnrows, bncols*bnnz);
+					bsr = matfaust.create_bsr(double(f{2}(1)), double(f{2}(2)), double(f{2}(3)), bdata, bcolinds, brow_count);
+					f = bsr;
+				end
+				out_factors = [out_factors {f}];
+			end
+			F = matfaust.Faust(out_factors, varargin{1:end});
+		end
 	end
 end
 
