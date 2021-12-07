@@ -1030,7 +1030,7 @@ matvar_t* MatDense<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate) const
 	else
 	{
 		matio_type = MAT_T_DOUBLE;
-		matio_class = MAT_C_SINGLE;
+		matio_class = MAT_C_DOUBLE;
 	}
 	//
 	if(transpose)
