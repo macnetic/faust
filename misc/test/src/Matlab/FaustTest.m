@@ -610,10 +610,26 @@ classdef FaustTest < matlab.unittest.TestCase
 			bnnz = 3;
 			nonzero_blocks = [[ 0.6787, 0.7431 0.6555; 0.7577, 0.3922 0.1712] [ 0.7060 0.2769    0.0971; 0.0318    0.0462    0.8235] [0.6948    0.9502    0.4387; 0.3171    0.0344    0.3816]];
 			bsr_mat = matfaust.create_bsr(M, N, bnnz, nonzero_blocks, [2, 3, 1], [2, 0, 1, 0, 0]);
-			F = matfaust.Faust(bsr_mat)
+			F = matfaust.Faust(bsr_mat);
 			this.verifyEqual(nonzero_blocks(:,1:3), full(F(1:2, 4:6)), 'AbsTol', 1e-6)
 			this.verifyEqual(nonzero_blocks(:,4:6), full(F(1:2, 7:9)), 'AbsTol', 1e-6)
 			this.verifyEqual(nonzero_blocks(:,7:9), full(F(5:6, 1:3)), 'AbsTol', 1e-6)
+		end
+
+		function testSaveBSRFaust(this)
+			bnnz = 3;
+			M = 10;
+			N = 9;
+			nonzero_blocks = [[ 0.6787, 0.7431 0.6555; 0.7577, 0.3922 0.1712] [ 0.7060 0.2769    0.0971; 0.0318    0.0462    0.8235] [0.6948    0.9502    0.4387; 0.3171    0.0344    0.3816]];
+			bsr_mat = matfaust.create_bsr(M, N, bnnz, nonzero_blocks, [2, 3, 1], [2, 0, 1, 0, 0]);
+			nonzero_blocks2 = [ rand(3, 2) rand(3, 2) rand(3, 2) ];
+			bsr_mat2 = matfaust.create_bsr(N, M, bnnz, nonzero_blocks2, [2, 3, 1], [1, 2, 3]);
+			F = matfaust.Faust({bsr_mat, bsr_mat2, rand(M, 10), sprand(10, 20, .2)});
+			save(F, 'test_bsr_faust.mat');
+			G = matfaust.Faust('test_bsr_faust.mat');
+			this.verifyEqual(full(F), full(G), 'AbsTol', 1e-6)
+			G = matfaust.Faust.load('test_bsr_faust.mat');
+			this.verifyEqual(full(F), full(G), 'AbsTol', 1e-6)
 		end
 
         function testDelete(this)

@@ -716,6 +716,24 @@ void test_faust2()
 
 }
 
+void test_faust3()
+{
+	int faust_nrows = 1024;
+	int faust_ncols = 1024;
+	RandFaustType t = SPARSE;
+	unsigned int min_num_factors = 10;
+	unsigned int max_num_factors = 10;
+	unsigned int min_dim_size = 1024;
+	unsigned int max_dim_size = 1024;
+	float density=.078f;
+	auto bsrF = TransformHelper<FPP, Cpu>::randBSRFaust(faust_nrows, faust_ncols, min_num_factors, max_num_factors, 64, 64, density);
+	auto randDsMat = MatDense<FPP, Cpu>::randMat(faust_ncols, faust_nrows);
+	bsrF->push_back(randDsMat, false, false);
+	auto randSpMat = MatSparse<FPP, Cpu>::randMat(faust_ncols, faust_nrows, .2);
+	bsrF->push_back(randSpMat, false, false);
+	bsrF->save_mat_file("test_bsr_faust.mat");
+}
+
 int main(int argc, char** argv)
 {
 	int m, n, bm, bn, bnnz;
@@ -763,6 +781,7 @@ int main(int argc, char** argv)
 	delete bmat;
 	test_faust();
 	test_faust2();
+	test_faust3();
 	return EXIT_SUCCESS;
 }
 

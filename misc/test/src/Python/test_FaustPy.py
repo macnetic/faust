@@ -1696,6 +1696,22 @@ class TestFaustFactory(unittest.TestCase):
         F = Faust(B)
         self.assertTrue(allclose(F.toarray(), B.toarray()))
 
+    def test_save_bsr_Faust(self):
+        from scipy.sparse import bsr_matrix, random
+        from pyfaust import Faust
+        from numpy import allclose
+        from numpy.random import rand
+        nzblocks = rand(3, 2, 3) # 3 blocks of size 2x3
+        # create a scipy BSR matrix
+        B = bsr_matrix((nzblocks, [0, 1, 2], [0, 1, 2, 3, 3, 3]), shape=(10,9))
+        # create the single factor Faust
+        F = Faust([B, B.T, rand(10, 18), random(18, 18, .2)])
+        F.save('test_bsr_faust.mat')
+        G = Faust('test_bsr_faust.mat')
+        self.assertTrue(allclose(F.toarray(), G.toarray()))
+        G = Faust.load('test_bsr_faust.mat')
+        self.assertTrue(allclose(F.toarray(), G.toarray()))
+
     def test_bsr_Faust(self):
         from random import randint
         from scipy.sparse import random
