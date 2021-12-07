@@ -302,14 +302,16 @@ namespace Faust
 			//			smat.mat = bmat.to_sparse();
 			//			return smat.toMatIOVar(transpose, conjugate);
 			int opt = typeid(bmat.data[0])==typeid(std::complex<Real<FPP>>(1.0,1.0))?MAT_F_COMPLEX:0;
+			size_t bsr_name_dims[2] = {1, 3};
+			const char* bsr_name = "bsr";
 			size_t params_dims[2] = {1, 3}; // nrows, ncols, bnnz
 			int params[3] = {(int) this->getNbRow(), (int) this->getNbCol(), (int) this->getNBlocks()};
 			size_t nzb_dims[2] = {1, getNBlocks()}; // bcolinds size
 			size_t browptr_dims[2] = {1, getNbBlocksPerDim(0)+1};
 			size_t bcolinds_dims[2] = {1, getNBlocks()};
 			size_t bdata_dims[2] = {1, getNBlocks()*getNbBlockRow()*getNbBlockCol()};
-			size_t cell_dims[2] = { 1, 4};
-			matvar_t *matvars[5], *bsr_cell = nullptr;
+			size_t cell_dims[2] = { 1, 5};
+			matvar_t *matvars[6], *bsr_cell = nullptr;
 			mat_complex_split_t z = {nullptr,nullptr};
 			matio_types bdata_matio_type;
 			matio_classes bdata_matio_class;
@@ -324,15 +326,19 @@ namespace Faust
 				bdata_matio_type = MAT_T_DOUBLE;
 				bdata_matio_class = MAT_C_DOUBLE;
 			}
-			matvars[4] = nullptr;
-			matvars[0] = Mat_VarCreate(NULL, MAT_C_INT32, MAT_T_INT32, 2, params_dims, params, 0); // copy needed because params is in the stack
-			matvars[1] = Mat_VarCreate("bcolinds", MAT_C_INT32, MAT_T_INT32, 2, bcolinds_dims, bmat.bcolinds, MAT_F_DONT_COPY_DATA);
-			matvars[2] = Mat_VarCreate("browptr", MAT_C_INT32, MAT_T_INT32, 2, browptr_dims, bmat.browptr, MAT_F_DONT_COPY_DATA);
+			matvars[5] = nullptr;
+			matvars[0] = Mat_VarCreate("bsr_name", MAT_C_CHAR, MAT_T_UINT8, 2, bsr_name_dims, (void*) bsr_name, 0); // copy needed because bsr_name is in the stack
+//			auto mat_bsr_name = Mat_CreateVer("test_bsr_name.mat", NULL, MAT_FT_MAT5);
+//			Mat_VarWrite(mat_bsr_name, matvars[0], MAT_COMPRESSION_NONE);
+//			Mat_Close(mat_bsr_name);
+			matvars[1] = Mat_VarCreate("params", MAT_C_INT32, MAT_T_INT32, 2, params_dims, params, 0); // copy needed because params is in the stack
+			matvars[2] = Mat_VarCreate("bcolinds", MAT_C_INT32, MAT_T_INT32, 2, bcolinds_dims, bmat.bcolinds, MAT_F_DONT_COPY_DATA);
+			matvars[3] = Mat_VarCreate("browptr", MAT_C_INT32, MAT_T_INT32, 2, browptr_dims, bmat.browptr, MAT_F_DONT_COPY_DATA);
 //			auto mat_browptr = Mat_CreateVer("test_bsr_browptr.mat", NULL, MAT_FT_MAT5);
-//			Mat_VarWrite(mat_browptr, matvars[2], MAT_COMPRESSION_NONE);
+//			Mat_VarWrite(mat_browptr, matvars[3], MAT_COMPRESSION_NONE);
 //			Mat_Close(mat_browptr);
 //			auto mat_bcolinds = Mat_CreateVer("test_bsr_bcolinds.mat", NULL, MAT_FT_MAT5);
-//			Mat_VarWrite(mat_bcolinds, matvars[1], MAT_COMPRESSION_NONE);
+//			Mat_VarWrite(mat_bcolinds, matvars[2], MAT_COMPRESSION_NONE);
 //			Mat_Close(mat_bcolinds);
 			DenseMatMap _bmat(bmat.data, getNbBlockRow(), getNBlocks()*getNbBlockCol());
 			if(opt)
@@ -362,7 +368,7 @@ namespace Faust
 					dst_im *= Real<FPP>(-1);
 				z.Re = dst_re.data();
 				z.Im = dst_im.data();
-				matvars[3] = Mat_VarCreate(nullptr, bdata_matio_class, bdata_matio_type, 2, bdata_dims, &z /*mat.transpose().eval().data() //  doesn't work so we copy above */, opt);
+				matvars[4] = Mat_VarCreate(nullptr, bdata_matio_class, bdata_matio_type, 2, bdata_dims, &z /*mat.transpose().eval().data() //  doesn't work so we copy above */, opt);
 
 			}
 			else
@@ -372,13 +378,13 @@ namespace Faust
 				{
 					DenseMat<FPP> mat(getNbBlockRow(), getNBlocks()*getNbBlockCol());
 					mat = _bmat.transpose();
-					matvars[3] = Mat_VarCreate("bdata", bdata_matio_class, bdata_matio_type, 2, bdata_dims, mat.data(), MAT_F_DONT_COPY_DATA);
+					matvars[4] = Mat_VarCreate("bdata", bdata_matio_class, bdata_matio_type, 2, bdata_dims, mat.data(), MAT_F_DONT_COPY_DATA);
 				}
 				else
-					matvars[3] = Mat_VarCreate("bdata", bdata_matio_class, bdata_matio_type, 2, bdata_dims, bmat.data, MAT_F_DONT_COPY_DATA);
+					matvars[4] = Mat_VarCreate("bdata", bdata_matio_class, bdata_matio_type, 2, bdata_dims, bmat.data, MAT_F_DONT_COPY_DATA);
 			}
 //			auto mat = Mat_CreateVer("test_bsr_bdata.mat", NULL, MAT_FT_MAT5);
-//			Mat_VarWrite(mat, matvars[3], MAT_COMPRESSION_NONE);
+//			Mat_VarWrite(mat, matvars[4], MAT_COMPRESSION_NONE);
 //			Mat_Close(mat);
 			bsr_cell = Mat_VarCreate("bsr_cell", MAT_C_CELL, MAT_T_CELL, 2, cell_dims, matvars, 0);
 			return bsr_cell;

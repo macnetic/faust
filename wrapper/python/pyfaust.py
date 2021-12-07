@@ -186,8 +186,10 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             if(isinstance(factors, str) and not filepath):
                 filepath = factors
             if(filepath and isinstance(filepath, str)):
-                    contents = loadmat(filepath)
-                    factors = contents['faust_factors'][0].tolist()
+                G = Faust.load(filepath)
+                F.m_faust = G.m_faust
+                F._is_real = G._is_real
+                return
             if isinstance(factors,
                            (np.ndarray, csc_matrix, csr_matrix, coo_matrix, bsr_matrix)) and factors.ndim == 2:
                 factors = [ factors ]
@@ -1832,6 +1834,39 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             raise ValueError("Only Matlab or Matlab_core format is supported.")
         if(format == "Matlab"):
             F.m_faust.save_mat_file(filepath)
+
+    @staticmethod
+    def load(filepath):
+        """Loads a Faust from a MAT file.
+
+        The format is Matlab format version 5 and the filepath should end with
+        a .mat extension.
+
+        The Faust must have been saved before with Faust.save.
+
+        Args:
+            filepath: the filepath of the .mat file.
+        """
+        contents = loadmat(filepath)
+        factors = contents['faust_factors'][0].tolist()
+        # check if any BSR matrix exists here
+
+        for i in range(len(factors)):
+            if factors[i][0][0].dtype == '<U3' and factors[i][0][0][0] == 'bsr':
+                nrows, ncols, bnnz = factors[i][0][1][0]
+                bcolinds = factors[i][0][2][0]
+                browptr = factors[i][0][3][0]
+                bdata = factors[i][0][4][0]
+                bnrows = int(nrows/(browptr.shape[0]-1))
+                bncols = int(bdata.shape[0]/bnrows/bnnz)
+                bdata_ = np.empty((bnnz, bnrows, bncols))
+                for bi in range(bnnz): # .mat is in col-major order for blocks
+                    bdata_[bi] = bdata.reshape(bnnz, bncols, bnrows)[bi].T
+                # override the factor with the corresponding scipy bsr matrix
+                factors[i] = bsr_matrix((bdata_, bcolinds, browptr), shape=(nrows,
+                                                                            ncols))
+        return Faust(factors)
+
 
     def astype(F, dtype):
         """
