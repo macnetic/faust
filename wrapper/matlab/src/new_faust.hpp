@@ -47,7 +47,7 @@ void new_faust(const mxArray **prhs, const int nrhs, mxArray **plhs, const int n
 				mxArray2Ptr(mx_tmp, browptr_);
 				int* browptr = new int[nrows/bnrows+1];
 				browptr[0] = 0;
-				for(int i=1;i<bnrows+1;i++)
+				for(int i=1;i<nrows/bnrows+1;i++)
 					browptr[i] = browptr_[i-1] + browptr[i-1];
 //				auto bsr_mat = new Faust::MatBSR<SCALAR, DEV>(nrows, ncols, bnrows, bncols, bnnz, bdata, browptr, bcolinds);
 //				list_factor.push_back(bsr_mat);
