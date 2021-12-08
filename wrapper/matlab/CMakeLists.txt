@@ -101,7 +101,7 @@ if(USE_GPU_MOD)
 	include_directories(${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR} ${GPU_MOD_INCLUDE_DIR} ${GPU_MOD_INCLUDE_DIR}/../build-cu9.2)
 endif()
 add_library(${FAUST_MEXTOOLS_TARGET} OBJECT ${CPP_MEXTOOLS_FILES})
-target_compile_definitions(${FAUST_MEXTOOLS_TARGET} PRIVATE MATLAB_DEFAULT_RELEASE=R2017b) # for complex (deprecated) separate complex API
+target_compile_definitions(${FAUST_MEXTOOLS_TARGET} PRIVATE MATLAB_DEFAULT_RELEASE=R2018a) #R2017b) # for complex (deprecated) separate complex API
 
 set(MEX_TYPES_AND_SUFFIXES double:Real std::complex<double>:Cplx)
 if(BUILD_FLOAT_MEX)
@@ -179,12 +179,24 @@ endif()
 
 add_custom_target(${FAUST_MEX_TARGET} ALL DEPENDS ${MEXFILE_TARGET_LIST})
 
+if(MATLAB_2017_API)
+	set(MATLAB_API_VER "R2017b")
+else()
+	set(MATLAB_API_VER "R2018a")
+endif()
+
 #message(FATAL_ERROR "MEXFILE_TARGET_LIST=${MEXFILE_TARGET_LIST}")
 foreach(mex_target ${MEXFILE_TARGET_LIST})
-	matlab_add_mex(NAME ${mex_target} SHARED SRC "${FAUST_MATLAB_MEX_SRC_DIR}/${mex_target}.cpp" R2017b)
+	matlab_add_mex(NAME ${mex_target} SHARED SRC "${FAUST_MATLAB_MEX_SRC_DIR}/${mex_target}.cpp" ${MATLAB_API_VER})
 	set_target_properties(${mex_target} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${FAUST_MATLAB_MEX_BIN_DIR})
 	target_link_options(${mex_target} PRIVATE $<TARGET_PROPERTY:${FAUST_TARGET},LINK_OPTIONS>)
-	target_compile_definitions(${mex_target} PRIVATE MATLAB_DEFAULT_RELEASE=R2017b) # for complex (deprecated) separate complex API
+	target_compile_definitions(${mex_target} PRIVATE MATLAB_DEFAULT_RELEASE=${MATLAB_API_VER}) # R2017b for complex (deprecated) separate complex API
+	if(MATLAB_2017_API)
+		target_compile_definitions(${mex_target} PRIVATE __RELEASE_VERSION_DETECTOR__) # avoid mex.h to override the constants below
+		target_compile_definitions(${mex_target} PRIVATE TARGET_API_VERSION=700) # set target matlab version for compiling to R2017b
+		# to continue using mxGetImagData which is deprecated since R2018a # https://fr.mathworks.com/help/matlab/apiref/mxgetimagdata.html
+		target_compile_definitions(${mex_target} PRIVATE MATLAB_TARGET_API_VERSION=700) # consistency expected with the constant above
+	endif()
 	if(WIN32)
 
 		#target_compile_options(${mex_target} PRIVATE "${OMP_CXX_FLAGS}")
@@ -196,7 +208,7 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 		target_compile_definitions(${mex_target} PRIVATE NOMINMAX)
 	else()
 		target_link_options(${mex_target} PRIVATE ${OpenMP_CXX_LIBRARIES}) # do nothing if BUILD_MULTITHREAD is OFF
-		target_compile_definitions(${mex_target} PRIVATE MATLAB_DEFAULT_RELEASE=R2017b)
+		target_compile_definitions(${mex_target} PRIVATE MATLAB_DEFAULT_RELEASE=${MATLAB_API_VER})
 	endif()
 	if(BUILD_MULTITHREAD)
 		target_compile_definitions(${mex_target} PRIVATE _MUL_OMP_) # cf. ./src/faust_linear_operator/CPU/faust_prod_opt.hpp

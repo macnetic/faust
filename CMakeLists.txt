@@ -246,6 +246,7 @@ option(BUILD_FLOAT_PYX "Enabling the support of float matrices in the python wra
 option(BUILD_FLOAT_MEX "Enabling the support of float matrices in the matlab wrappers." OFF)
 option(DISABLE_ALGO_PYX "If OFF the algorithms (pyfaust.fact, pyfaust.poly etc.) python wrappers are built otherwise they're not (useful to avoid large compilation time when updating only the Faust class)." OFF)
 option(BUILD_EIGTJ_SVDTJ "if OFF the eigjt and svdtj C++ implementations are not built." ON)
+option(MATLAB_2017_API "if ON the deprecated Matlab API will be used to build -- including separate complex API instead of new interleaved complex (R2018a)" OFF)
 
 if (BUILD_USE_SINGLEPRECISION)
 	message(STATUS "**********SINGLEPRECISION ACTIF************")
