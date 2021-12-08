@@ -39,11 +39,13 @@
 
 #ifndef __FAUST_MX2FAUST_H__
 #define __FAUST_MX2FAUST_H__
-#define __RELEASE_VERSION_DETECTOR__ // avoid mex.h to override the constants below
-#define TARGET_API_VERSION 700 // set target matlab version for compiling to R2017b
+//#define __RELEASE_VERSION_DETECTOR__ // avoid mex.h to override the constants below
+//#define TARGET_API_VERSION 700 // set target matlab version for compiling to R2017b
 // to continue using mxGetImagData which is deprecated since R2018a # https://fr.mathworks.com/help/matlab/apiref/mxgetimagdata.html
-#define MATLAB_TARGET_API_VERSION 700 // consistency expected with the constant above
+//#define MATLAB_TARGET_API_VERSION 700 // consistency expected with the constant above
+
 #include "mex.h"
+#include "matrix.h"
 #include <vector>
 #include "faust_constant.h"
 #include "faust_Params.h"
@@ -51,6 +53,10 @@
 #include "faust_MHTP.h"
 #include <complex>
 #include <string>
+
+#if(TARGET_API_VERSION == 700)
+#undef MX_HAS_INTERLEAVED_COMPLEX
+#endif
 
 namespace Faust {
 	class ConstraintGeneric;
@@ -103,6 +109,10 @@ template<typename FPP, FDevice DEV>
 void mxArray2FaustspMat(const mxArray* spMat_array,Faust::MatSparse<FPP,DEV> & S);
 
 
+#ifdef MX_HAS_INTERLEAVED_COMPLEX
+template<typename FPP>
+void mxArray2PtrBase(const mxArray* mxMat,FPP* & ptr_data);
+#else
 /* !
   \brief convert the data (real part or imaginary part) of a mxArray* into the pointer ptr_data
   \param mxMat : pointer to the mxArray (MATLAB matrix)
@@ -111,10 +121,11 @@ void mxArray2FaustspMat(const mxArray* spMat_array,Faust::MatSparse<FPP,DEV> & S
 			  possible value : - mxGetData  (get the real scalar part of the data) 
 					                (cf https://fr.mathworks.com/help/matlab/apiref/mxgetdata.html)
 			                   - mxGetImagData (get the imaginary scalar part of the data)
-							(cf https://fr.mathworks.com/help/matlab/apiref/mxgetimagdata.html)  			  		
+							(cf https://fr.mathworks.com/help/matlab/apiref/mxgetimagdata.html)
 */
 template<typename FPP,class FUNCTOR>
 void mxArray2PtrBase(const mxArray* mxMat,FPP* & ptr_data,FUNCTOR & mxGetDataFunc);
+#endif
 
 /* \brief convert the real scalar data  of a mxArray* into the pointer ptr_data 
 */

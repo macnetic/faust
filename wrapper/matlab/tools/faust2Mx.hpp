@@ -85,7 +85,12 @@ mxArray*  FaustMat2mxArray(const Faust::MatDense<FPP,DEV>& M)
 		mexErrMsgTxt("FaustMat2mxArray : unsupported type of float");
 	}
 
-	FPP*    ptr_out = static_cast<FPP*> (mxGetData(mxMat));
+	FPP*    ptr_out;
+#ifdef MX_HAS_INTERLEAVED_COMPLEX
+	ptr_out	= static_cast<FPP*> (mxGetDoubles(mxMat));
+#else
+	ptr_out = static_cast<FPP*> (mxGetData(mxMat));
+#endif
 //	memcpy(ptr_out, M.getData(), row*col*sizeof(FPP));
 
 	M.copyBuf(ptr_out);
@@ -103,28 +108,35 @@ mxArray*  FaustMat2mxArray(const Faust::MatDense<std::complex<FPP>,Cpu>& M)
 	int row,col;
 	row = M.getNbRow();
         col = M.getNbCol();
-		
-  
+
+
 	const mwSize dims[2]={(mwSize)row,(mwSize)col};
 	if(typeid(FPP)==typeid(float))
 	{
 		mxMat = mxCreateNumericArray(2, dims, mxSINGLE_CLASS, mxCOMPLEX);
 	}else if(sizeof(FPP)==sizeof(double))
 	{
-		mxMat = mxCreateNumericArray(2, dims, mxDOUBLE_CLASS, mxCOMPLEX);		
+		mxMat = mxCreateNumericArray(2, dims, mxDOUBLE_CLASS, mxCOMPLEX);
 	}else
 	{
 		mexErrMsgTxt("FaustMat2mxArray (complex) : unsupported type of float");
 	}
-	
+
+#ifdef MX_HAS_INTERLEAVED_COMPLEX
+// TODO: refactor this code (it is used many times in this file)
+	complex<FPP>* ptr_data;
+	if(is_same<FPP, float>::value)
+		ptr_data = reinterpret_cast<complex<FPP>*>(mxGetComplexSingles(mxMat));
+	else
+		ptr_data = reinterpret_cast<complex<FPP>*>(mxGetComplexDoubles(mxMat));
+	memcpy(ptr_data, M.getData(), sizeof(complex<FPP>)*row*col);
+#else
 	FPP*    ptr_real_data = static_cast<FPP*> (mxGetData(mxMat));
 	FPP*    ptr_imag_data = static_cast<FPP*> (mxGetImagData(mxMat));
-			
-	splitComplexPtr(M.getData(),row*col,ptr_real_data,ptr_imag_data);	
-	
+
+	splitComplexPtr(M.getData(),row*col,ptr_real_data,ptr_imag_data);
+#endif
 	return mxMat;
-
-
 }
 
 
@@ -148,51 +160,68 @@ mxArray*  FaustVec2mxArray(const Faust::Vect<std::complex<FPP>,Cpu>& v)
 	{
 		mexErrMsgTxt("FaustMat2mxArray (complex) : unsupported type of float");
 	}
-	
+#ifdef MX_HAS_INTERLEAVED_COMPLEX
+	copyComplexDataToMxArray(v.getData(), sizeof(complex<FPP>)*row*col, mxMat);
+#else
+
 	FPP*    ptr_real_data = static_cast<FPP*> (mxGetData(mxMat));
 	FPP*    ptr_imag_data = static_cast<FPP*> (mxGetImagData(mxMat));
-			
-	splitComplexPtr(v.getData(),row*col,ptr_real_data,ptr_imag_data);	
-	
+	splitComplexPtr(v.getData(),row*col,ptr_real_data,ptr_imag_data);
+#endif
+
 	return mxMat;
 
 
 }
 
+#ifdef MX_HAS_INTERLEAVED_COMPLEX
+template<typename FPP>
+void copyComplexDataToMxArray(const complex<FPP> *data, size_t data_sz, mxArray* mxMat, bool conjugate/*=false*/)
+{
+	complex<FPP>* ptr_data;
+	if(is_same<FPP, float>::value)
+		ptr_data = reinterpret_cast<complex<FPP>*>(mxGetComplexSingles(mxMat));
+	else
+		ptr_data = reinterpret_cast<complex<FPP>*>(mxGetComplexDoubles(mxMat));
+	if(conjugate)
+	{
+		for(int i=0;i<data_sz;i++)
+
+			ptr_data[i]  = std::complex<FPP>(std::real(data[i]), - std::imag(data[i]));
+	}
+	else
+		memcpy(ptr_data, data, sizeof(complex<FPP>)*data_sz);
+}
+#endif
 
 
 
-
+#ifndef MX_HAS_INTERLEAVED_COMPLEX
 template<typename FPP>
 void splitComplexPtr(const std::complex<FPP>*  cpx_ptr, int nb_element, FPP* & real_ptr, FPP* & imag_ptr, const bool conjugate)
 {
-	std::complex<FPP> cpxValue;	
+	std::complex<FPP> cpxValue;
 	for (int i=0;i<nb_element;i++)
 	{
 		cpxValue=cpx_ptr[i];
 		real_ptr[i] = cpxValue.real();
 		imag_ptr[i] = conjugate?-cpxValue.imag():cpxValue.imag();
 	}
-	
-
-
 }
+#endif
 
 
 
 template<typename FPP>
-mxArray*  FaustVec2mxArray(const Faust::Vect<FPP,Cpu>& M)
+mxArray* FaustVec2mxArray(const Faust::Vect<FPP,Cpu>& M)
 {
 	if (!M.isReal())
 		mexErrMsgTxt("FaustMat2mxArray : Faust::MatDense must be real");
-	
+
 	mxArray * mxMat;
 	int row,col;
 	row = M.size();
-        col = 1;
-	
-		
-	
+	col = 1;
 
 	const mwSize dims[2]={(mwSize)row,(mwSize)col};
 	if(typeid(FPP)==typeid(float))
@@ -200,19 +229,21 @@ mxArray*  FaustVec2mxArray(const Faust::Vect<FPP,Cpu>& M)
 		mxMat = mxCreateNumericArray(2, dims, mxSINGLE_CLASS, mxREAL);
 	}else if(sizeof(FPP)==sizeof(double))
 	{
-		mxMat = mxCreateNumericArray(2, dims, mxDOUBLE_CLASS, mxREAL);		
+		mxMat = mxCreateNumericArray(2, dims, mxDOUBLE_CLASS, mxREAL);
 	}else
 	{
 		mexErrMsgTxt("FaustVec2mxArray : unsupported type of float");
 	}
-	
-	FPP*    ptr_out = static_cast<FPP*> (mxGetData(mxMat));
-		memcpy(ptr_out, M.getData(),row*col*sizeof(FPP));	
-		return mxMat;
-		
+
+	FPP* ptr_out;
+#ifdef MX_HAS_INTERLEAVED_COMPLEX
+	ptr_out = static_cast<FPP*> (mxGetDoubles(mxMat));
+#else
+	ptr_out = static_cast<FPP*> (mxGetData(mxMat));
+#endif
+	memcpy(ptr_out, M.getData(), row*col*sizeof(FPP));
+	return mxMat;
 }
-
-
 
 
 template<typename FPP>
@@ -265,7 +296,13 @@ mxArray*  FaustSpMat2mxArray(const Faust::MatSparse<FPP,Cpu>& M)
 			mxREAL);
 	mwIndex* ir = mxGetIr(sparseMat);
 	mwIndex* jc = mxGetJc(sparseMat);
-	FPP* pr = static_cast<FPP*>(mxGetPr(sparseMat));
+	FPP* pr;
+	//TODO: and complex case ?
+#ifdef MX_HAS_INTERLEAVED_COMPLEX
+	pr = static_cast<FPP*>(mxGetDoubles(sparseMat));
+#else
+	pr = static_cast<FPP*>(mxGetPr(sparseMat));
+#endif
 	// sadly we can't do a direct copy into ir and jc because MatSparse uses int type for indices
 	// (not mwIndex which is in fact a size_t)
 	// so we need to copy in intermediate buffers and then affect their elements
@@ -291,7 +328,12 @@ mxArray* transformFact2SparseMxArray(faust_unsigned_int id, Faust::TransformHelp
 	mwIndex* jc = mxGetJc(sparseMat);
 	//	std::cout << "transformFact2SparseMxArray()" << std::endl;
 	//	FPP* pr = static_cast<FPP*>(mxGetDoubles(sparseMat)); //given up because fails to compile with template FPP
-	double* pr = static_cast<double*>(mxGetPr(sparseMat));
+	double* pr;
+#ifdef MX_HAS_INTERLEAVED_COMPLEX
+	pr = static_cast<double*>(mxGetDoubles(sparseMat));
+#else
+	pr = static_cast<double*>(mxGetPr(sparseMat));
+#endif
 	faust_unsigned_int nnz, num_rows, num_cols;
 	// sadly we can't do a direct copy into ir and jc because MatSparse uses int type for indices
 	// (not mwIndex which is in fact a size_t)
@@ -341,7 +383,12 @@ mxArray* transformFact2SparseMxArray(faust_unsigned_int id, Faust::TransformHelp
 	mwIndex* jc = mxGetJc(sparseMat);
 	//	std::cout << "transformFact2SparseMxArray()" << std::endl;
 	//	FPP* pr = static_cast<FPP*>(mxGetDoubles(sparseMat)); //given up because fails to compile with template FPP
-	FPP* pr = static_cast<FPP*>(mxGetPr(sparseMat));
+	FPP* pr = nullptr;
+#if MX_HAS_INTERLEAVED_COMPLEX
+	pr = static_cast<FPP*>(mxGetDoubles(sparseMat));
+#else
+	pr = static_cast<FPP*>(mxGetPr(sparseMat));
+#endif
 	faust_unsigned_int nnz, num_rows, num_cols;
 	// sadly we can't do a direct copy into ir and jc because MatSparse uses int type for indices
 	// (not mwIndex which is in fact a size_t)
@@ -381,21 +428,25 @@ mxArray* transformFact2SparseMxArray(faust_unsigned_int id, Faust::TransformHelp
 template<typename FPP, FDevice DEV>
 mxArray* transformFact2SparseMxArray(faust_unsigned_int id, Faust::TransformHelper<complex<FPP>,DEV>* core_ptr)
 {
+	faust_unsigned_int nnz, num_rows, num_cols;
 	mxArray* sparseMat = mxCreateSparse(core_ptr->get_fact_nb_rows(id),
 			core_ptr->get_fact_nb_cols(id),
 			core_ptr->get_fact_nnz(id),
 			mxCOMPLEX);
 	mwIndex* ir = mxGetIr(sparseMat);
 	mwIndex* jc = mxGetJc(sparseMat);
-	FPP*    ptr_real_data = static_cast<FPP*> (mxGetPr(sparseMat));
-	FPP*    ptr_imag_data = static_cast<FPP*> (mxGetPi(sparseMat));
-	faust_unsigned_int nnz, num_rows, num_cols;
-	complex<FPP>* cplxData  = (complex<FPP>*) malloc(sizeof(complex<FPP>)*mxGetNzmax(sparseMat));
 	int * i_ir = (int*) malloc(sizeof(int)*mxGetNzmax(sparseMat)); //TODO: use new[]/delete[]
 	int * i_jc = (int*) malloc(sizeof(int)*mxGetN(sparseMat)+1);
+	complex<FPP>* cplxData  = (complex<FPP>*) malloc(sizeof(complex<FPP>)*mxGetNzmax(sparseMat));
 	core_ptr->get_fact(id, i_jc, i_ir, cplxData, &nnz, &num_rows, &num_cols, true);
 	assert(nnz == mxGetNzmax(sparseMat));
+#if MX_HAS_INTERLEAVED_COMPLEX
+	copyComplexDataToMxArray(cplxData, sizeof(complex<FPP>)*nnz, sparseMat);
+#else
+	FPP*    ptr_real_data = static_cast<FPP*> (mxGetPr(sparseMat));
+	FPP*    ptr_imag_data = static_cast<FPP*> (mxGetPi(sparseMat));
 	splitComplexPtr(cplxData, nnz, ptr_real_data, ptr_imag_data);
+#endif
 	for(int i=0;i<nnz;i++)
 		ir[i] = i_ir[i];
 	for(int i=0;i<mxGetN(sparseMat)+1;i++)
@@ -414,7 +465,12 @@ mxArray* transformFact2FullMxArray(faust_unsigned_int id, Faust::TransformHelper
 //	cout << "transformFact2FullMxArray() start" << endl;
 	mxClassID classId = typeid(FPP)==typeid(float)?mxSINGLE_CLASS:mxDOUBLE_CLASS;
 	mxArray* fullMat = mxCreateNumericArray(2, dim_sizes, classId, mxREAL);
-	FPP* data_ptr = static_cast<FPP*>(mxGetData(fullMat));
+	FPP* data_ptr;
+#ifdef MX_HAS_INTERLEAVED_COMPLEX
+	data_ptr = static_cast<FPP*>(mxGetDoubles(fullMat));
+#else
+	data_ptr = static_cast<FPP*>(mxGetData(fullMat));
+#endif
 	faust_unsigned_int num_rows, num_cols;
 	//transposition is handled internally
 	core_ptr->get_fact(id, data_ptr, &num_rows, &num_cols);
@@ -432,8 +488,10 @@ mxArray* transformFact2FullMxArray(faust_unsigned_int id, Faust::TransformHelper
 		core_ptr->get_fact_nb_cols(id)};
 	mxClassID classId = typeid(FPP)==typeid(float)?mxSINGLE_CLASS:mxDOUBLE_CLASS;
 	mxArray* fullMat = mxCreateNumericArray(2, dim_sizes, classId, mxCOMPLEX);
+#ifndef MX_HAS_INTERLEAVED_COMPLEX
 	FPP* data_ptr = static_cast<FPP*>(mxGetData(fullMat));
 	FPP* img_data_ptr = static_cast<FPP*>(mxGetImagData(fullMat));
+#endif
 	faust_unsigned_int num_rows, num_cols;
 	if(core_ptr->isTransposed())
 	{
@@ -441,19 +499,27 @@ mxArray* transformFact2FullMxArray(faust_unsigned_int id, Faust::TransformHelper
 		// cause it needs to be reordered
 		complex<FPP>* src_data_ptr = (complex<FPP>*) malloc(sizeof(complex<FPP>)*dim_sizes[0]*dim_sizes[1]); // TODO: alloc-free in c++ style (new/delete)
 		core_ptr->get_fact(id, src_data_ptr, &num_rows, &num_cols);
+#ifdef MX_HAS_INTERLEAVED_COMPLEX
+		copyComplexDataToMxArray(src_data_ptr, num_cols*num_rows, fullMat);
+#else
 		splitComplexPtr(src_data_ptr, num_cols*num_rows, data_ptr, img_data_ptr/*, core_ptr->isConjugate()*/); //let conjugate to false because it's handled internally by get_fact()
-		free(src_data_ptr);
 		// it's different to real transformFact2FullMxArray() case here
 		// because with complex we need to split im/real (until we stop to use separated complex API)
 		// when the split will be removed, we'll do as transformFact2SparseMxArray() for FPP==double/float
 		// (handling complex and real the same way)
+#endif
+		free(src_data_ptr);
 	}
 	else
 	{
 		complex<FPP>* src_data_ptr;
 		//not calling the same prototype of get_fact() called in transpose case (and real version of this function)
 		core_ptr->get_fact(id, src_data_ptr, &num_rows, &num_cols);
+#ifdef MX_HAS_INTERLEAVED_COMPLEX
+		copyComplexDataToMxArray(src_data_ptr, num_rows*num_cols, fullMat, core_ptr->isConjugate());
+#else
 		splitComplexPtr(src_data_ptr, num_rows*num_cols, data_ptr, img_data_ptr, core_ptr->isConjugate());//let conjugate to false because it's handled internally by get_fact()
+#endif
 
 	}
 	//TODO: matlab 2018 setComplexDoubles()/setComplexSingles() to avoid separating
@@ -472,13 +538,26 @@ template<typename FPP>
 void mxArray2Scalar(const mxArray* scalar, complex<FPP>* out)
 {
 	double real_part = mxGetScalar(scalar);
-	double* im_ptr;
 	complex<FPP> cplx;
 	if(mxIsComplex(scalar))
 	{
+#ifdef MX_HAS_INTERLEAVED_COMPLEX
+		if(is_same<FPP, float>::value)
+		{
+			mxComplexSingle *data = mxGetComplexSingles(scalar);
+			cplx = complex<FPP>(real_part, data->imag);
+		}
+		else
+		{
+			mxComplexDouble *data = mxGetComplexDoubles(scalar);
+			cplx = complex<FPP>(real_part, data->imag);
+		}
+#else
+		double* im_ptr;
 		im_ptr = (FPP*) mxGetPi(scalar);
 //		cout << "im_ptr[0]: " << im_ptr[0] << endl;
 		cplx = complex<FPP>(real_part, im_ptr[0]);
+#endif
 	}
 	else
 		cplx = complex<FPP>(real_part);

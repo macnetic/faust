@@ -45,6 +45,10 @@
 #include "faust_constant.h"
 #include <complex>
 
+#if(TARGET_API_VERSION == 700)
+#undef MX_HAS_INTERLEAVED_COMPLEX
+#endif
+
 
 namespace Faust {
 	class ConstraintGeneric;
@@ -89,13 +93,19 @@ mxArray*  FaustSpMat2mxArray(const Faust::MatSparse<FPP,Cpu>& M);
 
 
 
+#ifndef MX_HAS_INTERLEAVED_COMPLEX
 // split complex value ptr into real value ptr and imaginary value ptr,
 //real_ptr and imag_ptr must be allocated for nb_element
 template<typename FPP>
 void splitComplexPtr(const std::complex<FPP>*  cpx_ptr, int nb_element, FPP* & real_ptr, FPP* & imag_ptr, const bool conjugate = false);
+#endif
 template<typename FPP>
 void mxArray2Ptr(const mxArray* mxMat, std::complex<FPP>* & ptr_data);
 
+#ifdef MX_HAS_INTERLEAVED_COMPLEX
+template<typename FPP>
+void copyComplexDataToMxArray(const complex<FPP> *data, size_t data_sz, mxArray* mxMat, bool conjugate=false);
+#endif
 
 /*!
 *  \brief return a matlab mxArray** representing a cell-array of matlab matrix from a std::vector<Faust::MatDense<FPP,Cpu> >, no shared memory
