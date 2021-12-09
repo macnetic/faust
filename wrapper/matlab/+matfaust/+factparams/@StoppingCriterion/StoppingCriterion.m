@@ -33,12 +33,12 @@ classdef StoppingCriterion
 		% =========================================================
 		function display(self)
 			if(self.is_criterion_error)
-				printf('tol: %f ', self.tol)
-				printf('relerr: %d', self.relerr)
-				printf('maxiter: %d',self.maxiter)
+				fprintf('tol: %f\n', self.tol)
+				fprintf('relerr: %d\n', self.relerr)
+				fprintf('maxiter: %d\n',self.maxiter)
 			else
-				printf('num_its: %d', self.num_its)
-				printf('maxiter: %d', self.maxiter)
+				fprintf('num_its: %d\n', self.num_its)
+				fprintf('maxiter: %d\n', self.maxiter)
 			end
 		end
 		% =========================================================
