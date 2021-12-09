@@ -96,7 +96,8 @@ function  [F,lambda] = palm4msa(M, p, varargin)
 			dev = 'gpu';
 		end
 		if(isreal(M))
-			init_faust = matfaust.Faust(p.init_facts, 'dtype', dtype, 'dev', dev);
+			% do not use p.init_facts because if default init_facts is used it is created on the fly when palm4msa is called (in order to be type-class consistent with M)
+			init_faust = matfaust.Faust(mex_params.init_facts, 'dtype', dtype, 'dev', dev);
 			if(gpu)
 				if(is_float)
 					[lambda, core_obj] = mexPALM4MSA2020_gpu2RealFloat(mex_params, get_handle(init_faust));
@@ -111,7 +112,7 @@ function  [F,lambda] = palm4msa(M, p, varargin)
 				end
 			end
 		else
-			init_faust = complex(matfaust.Faust(p.init_facts, 'dev', dev));
+			init_faust = complex(matfaust.Faust(mex_params.init_facts, 'dev', dev));
 			if(gpu)
 				[lambda, core_obj] = mexPALM4MSA2020_gpu2Cplx(mex_params, get_handle(init_faust));
 			else
