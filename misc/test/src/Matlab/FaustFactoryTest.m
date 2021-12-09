@@ -82,16 +82,12 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			this.verifyEqual(norm(E,'fro')/norm(M,'fro'), 0.2710, 'AbsTol', 0.0001)
 		end
 
-		function test_palm4msaCplx(this)
+		function test_palm4msaCplxDeftInitFacts(this)
 			disp('Test matfaust.fact.palm4msaCplx()')
-			import matfaust.*
 			import matfaust.factparams.*
 			num_facts = 2;
 			is_update_way_R2L = false;
 			init_lambda = 1.0;
-			init_facts = cell(2,1);
-			init_facts{1} = zeros(500,32);
-			init_facts{2} = eye(32);
 			%M = rand(500, 32)
 			load([this.faust_paths{1},'../../../misc/data/mat/config_compared_palm2.mat']);
 			% data matrix is loaded from file
@@ -111,9 +107,88 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			this.verifyEqual(norm(E,'fro')/norm(M,'fro'), 0.272814, 'AbsTol', 0.0001)
 		end
 
+		function test_palm4msaCplx(this)
+			disp('Test matfaust.fact.palm4msaCplx()')
+			import matfaust.factparams.*
+			num_facts = 2;
+			is_update_way_R2L = false;
+			init_lambda = 1.0;
+			init_facts = cell(2,1);
+			init_facts{1} = complex(zeros(500,32)); % type consistency with M is verified by palm4msa
+			init_facts{2} = complex(eye(32));
+			%M = rand(500, 32)
+			load([this.faust_paths{1},'../../../misc/data/mat/config_compared_palm2.mat']);
+			% data matrix is loaded from file
+			M = data+j*data;
+			cons = cell(2,1);
+			cons{1} = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5);
+			cons{2} = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32, 32, 1.0);
+			stop_crit = StoppingCriterion(200);
+			params = ParamsPalm4MSA(cons, stop_crit, 'is_update_way_R2L', is_update_way_R2L, 'init_lambda', init_lambda, 'init_facts', init_facts);
+			F = matfaust.fact.palm4msa(M, params)
+			this.verifyEqual(size(F), size(M))
+			%disp('norm F: ')
+			%norm(F, 'fro')
+			E = full(F)-M;
+			disp('err: ')
+			norm(E,'fro')/norm(M,'fro')
+			this.verifyEqual(norm(E,'fro')/norm(M,'fro'), 0.272814, 'AbsTol', 0.0001)
+		end
+
+		function test_palm4msa2020Cplx(this)
+			disp('Test matfaust.fact.palm4msaCplx()')
+			import matfaust.factparams.*
+			num_facts = 2;
+			is_update_way_R2L = false;
+			init_lambda = 1.0;
+			init_facts = cell(2,1);
+			init_facts{1} = complex(zeros(500,32)); % type consistency with M is verified by palm4msa
+			init_facts{2} = complex(eye(32));
+			%M = rand(500, 32)
+			load([this.faust_paths{1},'../../../misc/data/mat/config_compared_palm2.mat']);
+			% data matrix is loaded from file
+			M = data+j*data;
+			cons = cell(2,1);
+			cons{1} = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5);
+			cons{2} = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32, 32, 1.0);
+			stop_crit = StoppingCriterion(200);
+			params = ParamsPalm4MSA(cons, stop_crit, 'is_update_way_R2L', is_update_way_R2L, 'init_lambda', init_lambda, 'init_facts', init_facts);
+			F = matfaust.fact.palm4msa(M, params, 'backend', 2020)
+			this.verifyEqual(size(F), size(M))
+			%disp('norm F: ')
+			%norm(F, 'fro')
+			E = full(F)-M;
+			disp('err: ')
+			norm(E,'fro')/norm(M,'fro')
+			this.verifyEqual(norm(E,'fro')/norm(M,'fro'), 0.272814, 'AbsTol', 0.0001)
+		end
+
+		function test_palm4msa2020CplxDeftInitFacts(this)
+			disp('Test matfaust.fact.palm4msaCplx()')
+			import matfaust.factparams.*
+			num_facts = 2;
+			is_update_way_R2L = false;
+			init_lambda = 1.0;
+			load([this.faust_paths{1},'../../../misc/data/mat/config_compared_palm2.mat']);
+			% data matrix is loaded from file
+			M = data+j*data;
+			cons = cell(2,1);
+			cons{1} = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5);
+			cons{2} = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32, 32, 1.0);
+			stop_crit = StoppingCriterion(200);
+			params = ParamsPalm4MSA(cons, stop_crit, 'is_update_way_R2L', is_update_way_R2L, 'init_lambda', init_lambda);
+			F = matfaust.fact.palm4msa(M, params, 'backend', 2020)
+			this.verifyEqual(size(F), size(M))
+			%disp('norm F: ')
+			%norm(F, 'fro')
+			E = full(F)-M;
+			disp('err: ')
+			norm(E,'fro')/norm(M,'fro')
+			this.verifyEqual(norm(E,'fro')/norm(M,'fro'), 0.272814, 'AbsTol', 0.0001)
+		end
+
 		function test_hierarchical(this)
 			disp('Test matfaust.fact.hierarchical()')
-			import matfaust.*
 			import matfaust.factparams.*
 			num_facts = 4;
 			is_update_way_R2L = false;
@@ -152,7 +227,6 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 
 		function test_hierarchical2020(this)
 			disp('Test matfaust.fact.hierarchical()')
-			import matfaust.*
 			import matfaust.factparams.*
 			num_facts = 4;
 			is_update_way_R2L = false;
@@ -191,7 +265,6 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 
 		function test_hierarchicalCplx(this)
 			disp('Test matfaust.fact.hierarchicalCplx()')
-			import matfaust.*
 			import matfaust.factparams.*
 			num_facts = 4;
 			is_update_way_R2L = false;
@@ -231,7 +304,6 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 
 		function test_fgft_givens(this)
 			disp('Test matfaust.fact.fgft_givens()')
-			import matfaust.*
 			load([this.faust_paths{1} '../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat'])
 			% Lap and J available
 			[F,D] = matfaust.fact.eigtj(Lap, 'nGivens', J, 'enable_large_Faust', true, 'nGivens_per_fac', 1);%, 0, 'verbosity', 1);
@@ -251,7 +323,6 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 
 		function test_fgft_givens_sparse(this)
 			disp('Test matfaust.fact.fgft_givens()')
-			import matfaust.*
 			load([this.faust_paths{1} '../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat'])
 			% Lap and J available
 			[F,D] = matfaust.fact.eigtj(sparse(Lap), 'nGivens', J, 'enable_large_Faust', true, 'nGivens_per_fac', 1);%, 0, 'verbosity', 1);
@@ -271,7 +342,6 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 
 		function test_fgft_givens_parallel(this)
 			disp('Test matfaust.fact.fgft_givens() -- parallel')
-			import matfaust.*
 			load([this.faust_paths{1} '../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat'])
 			% Lap and J available
 			t = size(Lap,1)/2;
@@ -292,7 +362,6 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 
 		function test_fgft_givens_parallel_sparse(this)
 			disp('Test matfaust.fact.fgft_givens_sparse() -- parallel')
-			import matfaust.*
 			load([this.faust_paths{1} '../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat'])
 			% Lap and J available
 			t = size(Lap,1)/2;
@@ -313,7 +382,6 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 
 		function test_fgft_palm(this)
 			disp('Test matfaust.fact.fgft_palm()')
-			import matfaust.*
 			import matfaust.factparams.*
 			num_facts = 4;
 			is_update_way_R2L = false;
