@@ -139,6 +139,15 @@ void mxArray2Scalar(const mxArray* scalar, typename std::enable_if<std::is_float
 template<typename FPP>
 void mxArray2Scalar(const mxArray* scalar, complex<FPP>* out);
 
+#ifdef MX_HAS_INTERLEAVED_COMPLEX
+/**
+ * Allow to access to mxMat data as double, float, complex<double>, complex<float> ptr.
+ * There is no copy (direct access) but the mxArray must match the type asked (otherwise a runtime error is raised).
+ */
+template<typename FPP>
+void newMxGetData(FPP* ptr_out, const mxArray* mxMat);
+#endif
+
 #include "faust2Mx.hpp"
 
 #endif
