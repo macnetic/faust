@@ -181,7 +181,6 @@ void mxArray2PtrBase(const mxArray* mxMat, FPP* & ptr_data)
 		{
 			if(! is_same<FPP, double>::value)
 			{
-				std::cout << "NB_ELEMENTS=" << NB_ELEMENTS << std::endl;
 				mexErrMsgTxt("mxMat is double, the output buffer must be double");
 			}
 			ptr_data = new FPP[NB_ELEMENTS];

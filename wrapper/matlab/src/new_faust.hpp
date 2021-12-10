@@ -21,6 +21,9 @@ void new_faust(const mxArray **prhs, const int nrhs, mxArray **plhs, const int n
 		for (int i=0; i < nb_element; i++)
 		{
 			mxMat=mxGetCell(prhs[1],i);
+			// test if the i-th element of the cell is a matrix or a cell (BSR encoding)
+			// if the element is a valid BSR encoding create the BSRMatrix here and add it to list_factor
+
 			if(mxIsCell(mxMat))
 			{
 				// adding at MatBSR matrix
@@ -63,8 +66,6 @@ void new_faust(const mxArray **prhs, const int nrhs, mxArray **plhs, const int n
 				continue;
 			}
 			// add a MatDense or MatSparse factor
-			//TODO: test if the i-th element of the cell is a matrix or a cell (BSR encoding)
-			//TODO: if the element is a valid BSR encoding create the BSRMatrix here and add it to list_factor
 			concatMatGeneric<SCALAR, DEV>(mxMat, list_factor);
 
 		}

@@ -145,7 +145,7 @@ void mxArray2Scalar(const mxArray* scalar, complex<FPP>* out);
  * There is no copy (direct access) but the mxArray must match the type asked (otherwise a runtime error is raised).
  */
 template<typename FPP>
-void newMxGetData(FPP* ptr_out, const mxArray* mxMat);
+void newMxGetData(FPP*& ptr_out, const mxArray* mxMat);
 #endif
 
 #include "faust2Mx.hpp"

@@ -65,8 +65,10 @@
 template<typename FPP, FDevice DEV>
 mxArray*  FaustMat2mxArray(const Faust::MatDense<FPP,DEV>& M)
 {
+#ifndef MX_HAS_INTERLEAVED_COMPLEX
 	if (!M.isReal())
 		mexErrMsgTxt("FaustMat2mxArray : Faust::MatDense must be real");
+#endif
 
 	mxArray * mxMat;
 	int row,col;
@@ -85,7 +87,7 @@ mxArray*  FaustMat2mxArray(const Faust::MatDense<FPP,DEV>& M)
 		mexErrMsgTxt("FaustMat2mxArray : unsupported type of float");
 	}
 
-	FPP*    ptr_out;
+	FPP*    ptr_out = nullptr;
 #ifdef MX_HAS_INTERLEAVED_COMPLEX
 	newMxGetData(ptr_out, mxMat);
 #else
@@ -101,7 +103,7 @@ mxArray*  FaustMat2mxArray(const Faust::MatDense<FPP,DEV>& M)
 
 #ifdef MX_HAS_INTERLEAVED_COMPLEX
 template<>
-void newMxGetData<float>(float* ptr_out, const mxArray* mxMat)
+void newMxGetData<float>(float*& ptr_out, const mxArray* mxMat)
 {
 	if(mxGetClassID(mxMat) != mxSINGLE_CLASS || mxIsComplex(mxMat))
 		mexErrMsgTxt("newMxGetData: the mex matrix must be double as the ptr is.");
@@ -109,7 +111,7 @@ void newMxGetData<float>(float* ptr_out, const mxArray* mxMat)
 }
 
 template<>
-void newMxGetData<double>(double* ptr_out, const mxArray* mxMat)
+void newMxGetData<double>(double*& ptr_out, const mxArray* mxMat)
 {
 	if(mxGetClassID(mxMat) != mxDOUBLE_CLASS && mxIsComplex(mxMat))
 		mexErrMsgTxt("newMxGetData: the mex matrix must be double as the ptr.");
@@ -117,7 +119,7 @@ void newMxGetData<double>(double* ptr_out, const mxArray* mxMat)
 }
 
 template<>
-void newMxGetData<std::complex<double>>(complex<double>* ptr_out, const mxArray* mxMat)
+void newMxGetData<std::complex<double>>(complex<double>*& ptr_out, const mxArray* mxMat)
 {
 	if(mxGetClassID(mxMat) != mxDOUBLE_CLASS || ! mxIsComplex(mxMat))
 		mexErrMsgTxt("newMxGetData: the mex matrix must be complex double as the ptr.");
@@ -125,7 +127,7 @@ void newMxGetData<std::complex<double>>(complex<double>* ptr_out, const mxArray*
 }
 
 template<>
-void newMxGetData<std::complex<float>>(complex<float>* ptr_out, const mxArray* mxMat)
+void newMxGetData<std::complex<float>>(complex<float>*& ptr_out, const mxArray* mxMat)
 {
 	if(mxGetClassID(mxMat) != mxSINGLE_CLASS || ! mxIsComplex(mxMat))
 		mexErrMsgTxt("newMxGetData: the mex matrix must be complex float as the ptr.");
@@ -269,7 +271,7 @@ mxArray* FaustVec2mxArray(const Faust::Vect<FPP,Cpu>& M)
 
 	FPP* ptr_out;
 #ifdef MX_HAS_INTERLEAVED_COMPLEX
-	ptr_out = static_cast<FPP*> (mxGetDoubles(mxMat));
+	newMxGetData(ptr_out, mxMat);
 #else
 	ptr_out = static_cast<FPP*> (mxGetData(mxMat));
 #endif
@@ -499,7 +501,7 @@ mxArray* transformFact2FullMxArray(faust_unsigned_int id, Faust::TransformHelper
 	mxArray* fullMat = mxCreateNumericArray(2, dim_sizes, classId, mxREAL);
 	FPP* data_ptr;
 #ifdef MX_HAS_INTERLEAVED_COMPLEX
-	data_ptr = static_cast<FPP*>(mxGetDoubles(fullMat));
+	newMxGetData(data_ptr, fullMat);
 #else
 	data_ptr = static_cast<FPP*>(mxGetData(fullMat));
 #endif
