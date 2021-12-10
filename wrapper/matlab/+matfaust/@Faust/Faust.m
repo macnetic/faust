@@ -164,7 +164,6 @@ classdef Faust
 				error([err_msg ' Number of arguments passed is zero or greater than ' int2str(max_nargin) '.'])
 			elseif(iscell(varargin{1}))
 				% init a Faust from factor list
-				% check if the factors are real or complex, one complex factor implies a complex faust
 				factors=varargin{1};
 				if(isstr(factors{1}) && strcmp(lower(factors{1}), 'bsr'))
 					% a BSR matrix encoding was passed as first argument of the ctor
@@ -178,44 +177,46 @@ classdef Faust
 				F.isReal = true;
 				scale = 1;
 				F.dev = 'cpu';
-				F.dtype = 'double';
+				F.dtype = 'float';
 				optCopy = false;
+				% loop on factors to determine is the Faust will be real/complex single/double precision
 				for i=1:length(factors)
 					factor = factors{i};
-					warn_dtype = @(i, dtype) warning(['Faust constructor: first factor is ' dtype ' but the ' int2str(i) '-th factor is ' class(factor) '. It has been auto-converted to ' dtype ]);
 					% factors must be a matrix or a cell of a BSR encoding
 					if (iscell(factor) && strcmp(factor{1}, 'bsr'))
+						% bsr factor
 						%  factor is supposed to be created using create_bsr (so it is well-formed)
-						F.isReal = isreal(factor{5});
-						if(i == 1 && strcmp(class(factor{5}), 'single'))
-							F.dtype = 'float';
-							continue
-						elseif(strcmp(class(factor{5}), 'single') && strcmp(F.dtype, 'double'))
-							warn_dtype(i, F.dtype)
-							factor{5} = double(factor{5});
-						elseif(strcmp(class(factor{5}), 'double') && strcmp(F.dtype, 'float'))
-							warn_dtype(i, F.dtype)
-							factor{5} = single(factor{5});
+						if (F.isReal)
+							F.isReal = isreal(factor{5});
 						end
-						continue
-					end
-					if(~ isnumeric(factor) || ~ ismatrix(factor))
-						error('The cell Faust constructor 1st argument must contain only matrices or BSR matrix cell encodings.')
-					end
-					if (~isreal(factor))
-						F.isReal = false;
-					end
-					if(i == 1 && strcmp(class(factors{1}), 'single'))
-							F.dtype = 'float';
-					%elseif(~ strcmp(class(factors{1}), class(factor))) % factors{1} might be a bsr cell
-					elseif(strcmp(class(factor), 'single') && ~ strcmp(F.dtype, 'float') || strcmp(class(factor), 'double') && ~ strcmp(F.dtype, 'double'))
 						if(strcmp(F.dtype, 'float'))
-							factors{i} = single(factor);
-						else
-							factors{i} = double(factor);
+							if(strcmp(class(factor{5}), 'double'))
+								F.dtype = 'double';
+							end
 						end
-						warn_dtype(i, F.dtype)
+					else
+						if(~ isnumeric(factor) || ~ ismatrix(factor))
+							error('The cell Faust constructor 1st argument must contain only matrices or BSR matrix cell encodings.')
+						end
+						% if any factor is complex then the Faust is complex
+						if (F.isReal)
+							F.isReal = isreal(factor);
+						end
+						if(strcmp(F.dtype, 'float'))
+							if(strcmp(class(factor), 'double'))
+								F.dtype = 'double';
+							end
+						end
 					end
+				end
+				% at least one factor is in double precision, convert all the others
+				% note: it might be overridden later if 'dtype' argument is passed to the constructor
+				if(strcmp(F.dtype, 'double'))
+					factors = F.convertFactorsToDouble(factors);
+				end
+				% at least one factor is complex, convert all the others
+				if(~ F.isReal)
+					factors = F.convertFactorsToComplex(factors);
 				end
 				for i=2:nargin
 					switch(varargin{i})
@@ -253,11 +254,6 @@ classdef Faust
 			elseif(ischar(varargin{1}))
 				% init a Faust from file
 				F = matfaust.Faust.load(varargin{:});
-			elseif(ismatrix(varargin{1}) && nargin == 1)
-				% create a Faust from a matrix (single factor)
-				c = cell(1, 1);
-				c{1} = varargin{1};
-				F = matfaust.Faust(c, varargin{2:end});
 			elseif(isa(varargin{1}, 'matfaust.Faust'))
 				% create a Faust from another but not with the same
 				% handle to set inside the FaustCore object (matrix)
@@ -286,6 +282,11 @@ classdef Faust
 				catch
 					error('The Faust handle passed as first argument is not valid or not consistent with the value of isReal (2nd argument).')
 				end
+			elseif(ismatrix(varargin{1}))
+				% create a Faust from a matrix (single factor)
+				c = cell(1, 1);
+				c{1} = varargin{1};
+				F = matfaust.Faust(c, varargin{2:end});
 			else
 				error(err_msg)
 			end
@@ -349,7 +350,7 @@ classdef Faust
 					end
 					C = [F,G];
 					if(~ C.isReal)
-						Fid = matfaust.eye(size(C,2)/2, 'complex', 'dtype', F.dtype, 'dev', F.dev)
+						Fid = matfaust.eye(size(C,2)/2, 'complex', 'dtype', F.dtype, 'dev', F.dev);
 					else
 						Fid = matfaust.eye(size(C,2)/2, 'dtype', F.dtype, 'dev', F.dev);
 					end
@@ -361,9 +362,9 @@ classdef Faust
 						G = complex(G);
 					end
 					if(size(F,1) <= size(F,2))
-						F = F+(Faust({speye(size(F,1),size(F,2)), ones(size(F,2), 1)*G, ones(1, size(F,2))}));
+						F = F + Faust({speye(size(F,1),size(F,2)), ones(size(F,2), 1)*G, ones(1, size(F,2))});
 					else
-						F = F+(Faust({speye(size(F,2),size(F,1)), ones(size(F,1), 1)*G, ones(1, size(F,1))})).';
+						F = F + Faust({speye(size(F,2),size(F,1)), ones(size(F,1), 1)*G, ones(1, size(F,1))}).';
 					end
 				elseif(ismatrix(G))
 					F = plus(F,Faust(G));
@@ -570,7 +571,7 @@ classdef Faust
 				else
 					C = matfaust.Faust(F, call_mex(F, 'mul_scalar', A));
 				end
-			elseif (F.isReal) % A is not a Faust (should be a matrix)
+			elseif (F.isReal) % A is not a Faust, not a scalar (should be a matrix)
 				if (isreal(A))
 					C = call_mex(F, 'multiply', A, trans);
 				else
@@ -578,8 +579,12 @@ classdef Faust
 					C_imag = call_mex(F, 'multiply', imag(A), trans);
 					C = C_real + 1i * C_imag;
 				end
-			else
-				C = call_mex(F, 'multiply', A, trans);
+			else % F is a complex and A most likely a matrix
+				if(isreal(A))
+					C = call_mex(F, 'multiply', F.convertFactorToComplex(A), trans);
+				else
+					C = call_mex(F, 'multiply', F.convertFactorToComplex(A), trans);
+				end
 			end
 		end
 
@@ -1317,7 +1322,7 @@ classdef Faust
 				error(' subsref invalid slicing must have 2 index since F is a 2D-array');
 			end
 
-			if(numel(S.subs{1}) == 1 && nume(S.subs{2}) == 1)
+			if(numel(S.subs{1}) == 1 && numel(S.subs{2}) == 1)
 				% accessing a single item
 				submatrix = call_mex(F, 'get_item', S.subs{1}, S.subs{2});
 				return
@@ -2227,6 +2232,55 @@ classdef Faust
 				end
 			else
 				error('The Faust F has an invalid dev attribute (must be cpu or gpu)')
+			end
+		end
+
+	end
+	methods(Static = true, Access = private)
+		function out_factors = convertFactorsToComplex(factors)
+			out_factors = cell(1, length(factors));
+			for i=1:length(factors)
+				out_factors{i} = matfaust.Faust.convertFactorToComplex(factors{i});
+			end
+		end
+
+		function out_factor = convertFactorToComplex(factor)
+			% this function replace complex in case of BSR cell or sparse matrices but it works for dense matrix too
+			if (iscell(factor) && strcmp(factor{1}, 'bsr'))
+				% bsr matrix cell
+				out_factor = factor;
+				if(isreal(factor{5}))
+					out_factor{5} = complex(factor{5});
+				end
+			else
+				if(isreal(factor))
+					if(issparse(factor))
+						out_factor = factor+j*1e-100; % complex() uninmplemented for sparse matrices
+					else
+						out_factor = complex(factor);
+					end
+				else
+					out_factor = factor;
+				end
+			end
+		end
+
+		function out_factors = convertFactorsToDouble(factors)
+			out_factors = cell(1, length(factors));
+			for i=1:length(factors)
+				if (iscell(factors{i}) && strcmp(factors{i}{1}, 'bsr'))
+					% bsr matrix cell
+					out_factors{i} = factors{i};
+					if(strcmp(class(factors{i}{5}), 'single'))
+						out_factors{i}{5} = double(factors{i}{5});
+					end
+				else
+					if(strcmp(class(factors{i}), 'single'))
+						out_factors{i} = double(factors{i});
+					else
+						out_factors{i} = factors{i};
+					end
+				end
 			end
 		end
 
