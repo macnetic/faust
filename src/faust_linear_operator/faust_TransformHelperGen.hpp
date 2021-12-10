@@ -486,13 +486,13 @@ namespace Faust
 			TransformHelper<FPP, DEV> *th;
 			if(this->getNbCol() < this->getNbRow())
 			{
-				th = this->slice(i, i+1, 0, this->getNbCol()-1);
+				th = this->slice(i, i+1, 0, this->getNbCol());
 				th->transpose();
 				out_id = j;
 			}
 			else
 			{
-				th = this->slice(0, this->getNbRow()-1, j, j+1);
+				th = this->slice(0, this->getNbRow(), j, j+1);
 				out_id = i;
 			}
 			out = th->get_product();

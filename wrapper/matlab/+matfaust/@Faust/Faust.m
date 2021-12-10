@@ -87,7 +87,7 @@
 %> - Faust.full(),
 %> - Faust.pinv(),
 %> - Faust.mldivide().
-%> - element indexing (F(i,j) / __getitem__, but note that slicing
+%> - element indexing (F(i,j), but note that slicing
 %>   is memory efficient through memory views).
 %>
 %>
@@ -1322,9 +1322,10 @@ classdef Faust
 				error(' subsref invalid slicing must have 2 index since F is a 2D-array');
 			end
 
-			if(numel(S.subs{1}) == 1 && numel(S.subs{2}) == 1)
+			if(numel(S.subs{1}) == 1 && numel(S.subs{2}) == 1 && ~ ischar(S.subs{1}) && ~ ischar(S.subs{2}))
 				% accessing a single item
-				submatrix = call_mex(F, 'get_item', S.subs{1}, S.subs{2});
+				% -1 is for converting to 0-base index used in C world
+				submatrix = call_mex(F, 'get_item', S.subs{1}-1, S.subs{2}-1);
 				return
 			end
 
