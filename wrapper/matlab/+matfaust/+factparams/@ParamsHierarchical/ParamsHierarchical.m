@@ -137,8 +137,10 @@ classdef ParamsHierarchical < matfaust.factparams.ParamsFact
 		%>
 		%> @retval The mex structure instance as expected by the mex wrapper used by matfaust.fact.hierarchical.
 		% =========================================================
-		function mex_params = to_mex_struct(this)
+		function mex_params = to_mex_struct(this, M)
 			mex_constraints = cell(2, this.num_facts-1);
+			M_is_single = strcmp('single', class(M));
+			is_single = @(mat) strcmp('single', class(mat));
 			%mex_fact_constraints = cell(1, this.num_facts-1)
 			for i=1:this.num_facts-1
 				cur_cell = cell(1, 4);
@@ -158,6 +160,26 @@ classdef ParamsHierarchical < matfaust.factparams.ParamsFact
 				cur_cell{4} = this.constraints{i+this.num_facts-1}.num_cols;
 				%mex_residuum_constraints{i} = cur_cell;
 				mex_constraints{2,i} = cur_cell;
+			end
+			% verify ConstraintMat type consistency with the factorized matrix
+			for i=0:1
+				if(i == 0)
+					cons_factor = 'main factor';
+				else
+					cons_factor = 'residual factor';
+				end
+				for j=1:this.num_facts-1
+					ci = (this.num_facts-1)*i+j;
+					if(isa(this.constraints{ci}, 'matfaust.factparams.ConstraintMat'))
+						if(~ M_is_single == is_single(this.constraints{ci}.param))
+							error(['ParamsHierarchical.constraints, ' cons_factor ' constraint #' int2str(j) ' must be in single precision (resp. double) if the matrix to factorize is in single precision (resp. double).'])
+						end
+						if(~ isreal(M) == isreal(this.constraints{ci}.param))
+							error(['ParamsHierarchical.constraints, ' cons_factor ' constraint #' int2str(j) ' must be real (resp. complex) if the matrix to factorize is real (resp. complex).'])
+						end
+					end
+
+				end
 			end
 			mex_params = struct('nfacts', this.num_facts, 'cons', {mex_constraints}, 'niter1', this.stop_crits{1}.num_its,'niter2', this.stop_crits{2}.num_its, 'sc_is_criterion_error', this.stop_crits{1}.is_criterion_error, 'sc_error_treshold', this.stop_crits{1}.tol, 'sc_max_num_its', this.stop_crits{1}.maxiter, 'sc_is_criterion_error2', this.stop_crits{2}.is_criterion_error, 'sc_error_treshold2', this.stop_crits{2}.tol, 'sc_max_num_its2', this.stop_crits{2}.maxiter, 'nrow', this.data_num_rows, 'ncol', this.data_num_cols, 'fact_side', this.is_fact_side_left, 'update_way', this.is_update_way_R2L, 'verbose', this.is_verbose, 'init_lambda', this.init_lambda, 'factor_format', matfaust.factparams.ParamsFact.factor_format_str2int(this.factor_format), 'packing_RL', this.packing_RL, 'no_normalization', this.no_normalization, 'no_lambda', this.no_lambda, 'norm2_threshold', this.norm2_threshold, 'norm2_max_iter', this.norm2_max_iter, 'step_size', this.step_size, 'constant_step_size', this.constant_step_size);
 			if(~ (islogical(this.use_MHTP) &&  this.use_MHTP == false))

@@ -176,7 +176,7 @@ function varargout = hierarchical(M, p, varargin)
 	if(~ p.is_mat_consistent(M))
 		error('M''s number of columns must be consistent with the last residuum constraint defined in p. Likewise its number of rows must be consistent with the first factor constraint defined in p.')
 	end
-	mex_params = p.to_mex_struct();
+	mex_params = p.to_mex_struct(M);
 	backend = 2016;
 	nargin = length(varargin);
 	gpu = false;
