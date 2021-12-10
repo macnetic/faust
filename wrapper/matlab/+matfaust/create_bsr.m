@@ -52,7 +52,7 @@ function bsr_enc = create_bsr(M, N, bnnz, bdata, bcolinds, brow_count)
 	if(~ ok) error(err); end
 	[ok, err] = verify_brow_count(brow_count, M, bdata);
 	if(~ ok) error(err); end
-	bsr_enc = {'bsr', M, N, bnnz, bdata, bcolinds, brow_count};
+	bsr_enc = {'bsr', M, N, bnnz, bdata, int32(bcolinds), int32(brow_count)};
 	verify_bsr_format(bsr_enc);
 end
 
