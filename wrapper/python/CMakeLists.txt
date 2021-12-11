@@ -134,6 +134,9 @@ endif(BUILD_OPENBLAS)
 
 # read the license header to insert in top of each pyfaust python file
 file(READ ${FAUST_PYTHON_SRC_DIR}/PYFAUST_LICENSE_HEADER.txt PYFAUST_LICENSE_HEADER)
+if(PYTORCH_EXP)
+	file(READ ${FAUST_PYTHON_SRC_DIR}/pytorch_faust_exp.py PYTORCH_EXP_CODE)
+endif()
 
 
 if(WIN32)
