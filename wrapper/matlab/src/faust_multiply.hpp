@@ -47,29 +47,52 @@ void faust_multiply(const mxArray **prhs, const int nrhs, mxArray **plhs, const 
 		if (typeid(Faust::TransformHelper<double,DEV>) == typeid(Faust::TransformHelper<SCALAR,DEV>) && mxIsComplex(inMatlabMatrix) )
 			mexErrMsgTxt("impossibile to multiply a real Faust with complex matrix");
 
+
+#ifdef MX_HAS_INTERLEAVED_COMPLEX
+		newMxGetData(ptr_data, inMatlabMatrix);
+#else
 		mxArray2Ptr(inMatlabMatrix, ptr_data);
+#endif
 
 		if(nbColA == 1)
 		{
 			// applying the Faust to a vector
+#ifdef MX_HAS_INTERLEAVED_COMPLEX
+			SCALAR* ptr_out;
+			mwSize out_dims[2] = {nbRowB, 1};
+			plhs[0] = helperCreateNumMxArray<SCALAR>(out_dims);
+			core_ptr->multiply(ptr_data, ptr_out, transpose_flag);
+#else
 			Faust::Vect<SCALAR,Cpu> A(nbRowA, ptr_data);
 			Faust::Vect<SCALAR,Cpu> B(nbRowB);
 			B = (*core_ptr).multiply(A, transpose_flag);
-
-
 			plhs[0]=FaustVec2mxArray(B);
+#endif
+
+
 		}
 		else
 		{ // applying the Faust to a matrix
+#ifdef MX_HAS_INTERLEAVED_COMPLEX
+			SCALAR* ptr_out;
+			mwSize out_dims[2] = {nbRowB, nbColA};
+			plhs[0] = helperCreateNumMxArray<SCALAR>(out_dims);
+			newMxGetData(ptr_out, plhs[0]);
+			core_ptr->multiply(ptr_data, nbColA, ptr_out);
+
+#else
 			Faust::MatDense<SCALAR,Cpu> A(ptr_data, nbRowA, nbColA);
 			Faust::MatDense<SCALAR,Cpu> B(nbRowB, nbColA);
 			B = (*core_ptr).multiply(A, transpose_flag);
-
 			plhs[0]=FaustMat2mxArray(B);
+#endif
+
 
 		}
 
+#ifndef MX_HAS_INTERLEAVED_COMPLEX
 		if(ptr_data) {delete [] ptr_data ; ptr_data = NULL;}
+#endif
 	}
 
 }
