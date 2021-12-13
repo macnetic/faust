@@ -148,6 +148,13 @@ template<typename FPP>
 void newMxGetData(FPP*& ptr_out, const mxArray* mxMat);
 #endif
 
+/**
+ * Creates a numeric mxArray that matches the FPP type (complex<float>/<double> or float/double).
+ */
+template<typename FPP>
+mxArray* helperCreateNumMxArray(const mwSize dims[2]);
+
+
 #include "faust2Mx.hpp"
 
 #endif

@@ -136,6 +136,23 @@ void newMxGetData<std::complex<float>>(complex<float>*& ptr_out, const mxArray* 
 #endif
 
 template<typename FPP>
+mxArray* helperCreateNumMxArray(const mwSize dims[2])
+{
+	mxArray *mxMat;
+	if(std::is_same<FPP, complex<float>>::value)
+		mxMat = mxCreateNumericArray(2, dims, mxSINGLE_CLASS, mxCOMPLEX);
+	else if(std::is_same<FPP, complex<double>>::value)
+		mxMat = mxCreateNumericArray(2, dims, mxDOUBLE_CLASS, mxCOMPLEX);
+	else if(std::is_same<FPP, float>::value)
+		mxMat = mxCreateNumericArray(2, dims, mxSINGLE_CLASS, mxREAL);
+	else if(std::is_same<FPP, double>::value)
+		mxMat = mxCreateNumericArray(2, dims, mxDOUBLE_CLASS, mxREAL);
+	else
+		mexErrMsgTxt("helperCreateNumMxArray: unsupported scalar type of matrix");
+	return mxMat;
+}
+
+template<typename FPP>
 mxArray*  FaustMat2mxArray(const Faust::MatDense<std::complex<FPP>,Cpu>& M)
 {
 	mxArray * mxMat;
@@ -145,16 +162,7 @@ mxArray*  FaustMat2mxArray(const Faust::MatDense<std::complex<FPP>,Cpu>& M)
 
 
 	const mwSize dims[2]={(mwSize)row,(mwSize)col};
-	if(typeid(FPP)==typeid(float))
-	{
-		mxMat = mxCreateNumericArray(2, dims, mxSINGLE_CLASS, mxCOMPLEX);
-	}else if(sizeof(FPP)==sizeof(double))
-	{
-		mxMat = mxCreateNumericArray(2, dims, mxDOUBLE_CLASS, mxCOMPLEX);
-	}else
-	{
-		mexErrMsgTxt("FaustMat2mxArray (complex) : unsupported type of float");
-	}
+	mxMat = helperCreateNumMxArray<complex<FPP>>(dims);
 
 #ifdef MX_HAS_INTERLEAVED_COMPLEX
 // TODO: refactor this code (it is used many times in this file)
@@ -184,16 +192,7 @@ mxArray*  FaustVec2mxArray(const Faust::Vect<std::complex<FPP>,Cpu>& v)
 		
   
 	const mwSize dims[2]={(mwSize)row,(mwSize)col};
-	if(typeid(FPP)==typeid(float))
-	{
-		mxMat = mxCreateNumericArray(2, dims, mxSINGLE_CLASS, mxCOMPLEX);
-	}else if(sizeof(FPP)==sizeof(double))
-	{
-		mxMat = mxCreateNumericArray(2, dims, mxDOUBLE_CLASS, mxCOMPLEX);		
-	}else
-	{
-		mexErrMsgTxt("FaustMat2mxArray (complex) : unsupported type of float");
-	}
+	mxMat = helperCreateNumMxArray<FPP>(dims);
 #ifdef MX_HAS_INTERLEAVED_COMPLEX
 	copyComplexDataToMxArray(v.getData(), sizeof(complex<FPP>)*row*col, mxMat);
 #else
