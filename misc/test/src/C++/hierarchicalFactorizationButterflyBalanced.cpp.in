@@ -96,9 +96,7 @@ int main(int argc, char** argv)
 	//	Faust::kron(ones, id, out);
 	//	std::cout << out.norm() << std::endl;
 
-	ButterflyFactDir dir = (argc > 1 && !strcmp(argv[1], "1"))?LEFT:RIGHT;
-	std::cout << "Factorization dir: " << dir << std::endl;
-	auto th = butterfly_hierarchical(A, dir);
+	auto th = butterfly_hierarchical(A, BALANCED);
 	th->display();
 //	auto support = support_DFT<FPP>((int) log2dim);
 //	for(int i=0;i<support.size();i++)
@@ -115,4 +113,3 @@ int main(int argc, char** argv)
 	if(err > 1e-6)
 		exit(1);
 }
-

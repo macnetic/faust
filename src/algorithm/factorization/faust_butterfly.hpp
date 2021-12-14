@@ -290,6 +290,89 @@ namespace Faust
 		}
 
 	template<typename FPP>
+		Faust::TransformHelper<FPP, Cpu>* butterfly_hierarchical_balanced(const Faust::MatDense<FPP, Cpu>& A, const std::vector<Faust::MatSparse<FPP, Cpu>*> &supports)
+		{
+			auto th = new TransformHelper<FPP, Cpu>();
+			double l2_nfacts = std::log2((double)supports.size());
+			size_t d = ceil(l2_nfacts); // depth of factorization tree
+			/** initialize the support tree structure (the size of each vector -- one per level of tree) **/
+			std::vector<std::vector<MatDense<FPP, Cpu>>> tree_supports(d);
+			// set supports for each tree level
+			size_t i=0;
+			while(i<d-1)
+			{
+				tree_supports[i] = std::vector<MatDense<FPP, Cpu>>(1 << (i+1));
+//				std::cout << "tree_supports["<<i<<"].size():" << tree_supports[i].size() << std::endl;
+				i++;
+			}
+			// the number of leafs of tree is not necessarily a power of two (remaining factorization(s))
+			size_t n = supports.size();
+			if(d > 1)
+				tree_supports[d-1] = std::vector<MatDense<FPP, Cpu>>(2*(n - tree_supports[d-2].size()));
+			else // factorization in two factors only
+				tree_supports[d-1] = std::vector<MatDense<FPP, Cpu>>(2);
+//			std::cout << "tree_supports[" << d-1 << "].size():" << tree_supports[d-1].size() << std::endl;
+			/** initialize the supports in the tree starting from the leafs -- that are the supports arguments **/
+			for(int i=d-1;i>=0;i--)
+			{
+				#pragma omp parallel for schedule(dynamic)
+				for(int j = 0;j < tree_supports[i].size(); j++)
+				{
+					if(i == d - 1)
+					{
+						// tree_supports[i][j] is a leaf on the last level
+//						std::cout << "tree_supports[" << i << "," << j << "] received support[" << j << "]" << std::endl;
+						tree_supports[i][j] = *supports[j];
+					}
+					else if (2*(j+1) > tree_supports[i+1].size())
+					{
+						// tree_supports[i][j] is a leaf
+//						std::cout << "tree_supports[" << i << "," << j << "] received support[" << j+tree_supports[i+1].size()/2 << "]" << std::endl;
+						tree_supports[i][j] = *supports[j+tree_supports[i+1].size()/2];
+					}
+					else
+					{
+						// tree_supports[i][j] is not a leaf so it's calculated using child nodes
+						// tree_supports[i][j] = tree_supports[i+1][2*j] * tree_supports[i+1][2*j+]
+//						std::cout << "tree_supports[" << i << "," << j << "] received tree_supports[" << i+1 << "," << 2*j << "]*tree_supports[" << i+1 << "," << 2*j+1 << "]" << std::endl;
+						gemm(tree_supports[i+1][2*j], tree_supports[i+1][2*j+1], tree_supports[i][j], FPP(1.0), FPP(0), 'N', 'N');
+					}
+				}
+			}
+			// the supports are now set for all factorization tree nodes
+			// factorize according to the tree of supports, level by level
+			std::vector<MatDense<FPP, Cpu>> next_lvl_facs;
+			std::vector<MatDense<FPP, Cpu>> input_facs;
+			// first factorization
+			next_lvl_facs.resize(2);
+			solveDTO(A, tree_supports[0][0], tree_supports[0][1], next_lvl_facs[0], next_lvl_facs[1]);
+			input_facs = next_lvl_facs;
+			for(size_t i=0;i<d-1;i++)
+			{
+				next_lvl_facs.resize(tree_supports[i+1].size());
+				auto j_bound = std::min(tree_supports[i].size(), tree_supports[i+1].size()/2);
+				#pragma omp parallel for schedule(static)
+				for(size_t j=0;j < j_bound;j++)
+					solveDTO(input_facs[j], tree_supports[i+1][2*j], tree_supports[i+1][2*j+1], next_lvl_facs[j*2], next_lvl_facs[j*2+1]);
+				if(i < d - 2)
+				{
+					input_facs = next_lvl_facs;
+				}
+			}
+			// build the resulting Faust
+			for(auto f: next_lvl_facs)
+			{
+				th->push_back(new MatSparse<FPP, Cpu>(f), false, false);
+			}
+			if(next_lvl_facs.size() < supports.size())
+				for(int i=next_lvl_facs.size()/2;i<input_facs.size();i++)
+				{
+					th->push_back(new MatSparse<FPP, Cpu>(input_facs[i]), false, false);
+				}
+			return th;
+		}
+
+	template<typename FPP>
 		Faust::TransformHelper<FPP, Cpu>* butterfly_hierarchical(const Faust::MatDense<FPP, Cpu>& A, const ButterflyFactDir &dir/*=RIGHT*/)
 		{
 			double log2_size = log2((double)A.getNbRow());
@@ -301,7 +384,11 @@ namespace Faust
 			//	std::cout << "support norms" << std::endl;
 			//	for(auto s: support)
 			//		std::cout << s->norm() << std::endl;
-			auto th = butterfly_hierarchical(A, support, dir);
+			TransformHelper<FPP, Cpu>* th = nullptr;
+			if(dir == BALANCED)
+				th = butterfly_hierarchical_balanced(A, support);
+			else
+				th = butterfly_hierarchical(A, support, dir);
 			return th;
 		}
 

@@ -6,6 +6,7 @@ namespace Faust
 	{
 		LEFT,
 		RIGHT,
+		BALANCED
 	};
 
 	template<typename FPP>
@@ -25,6 +26,9 @@ namespace Faust
 
 	template<typename FPP>
 		Faust::TransformHelper<FPP, Cpu>* butterfly_hierarchical(const Faust::MatDense<FPP, Cpu>& A, const std::vector<Faust::MatSparse<FPP, Cpu>*> &supports, const ButterflyFactDir& dir=RIGHT);
+
+	template<typename FPP>
+		Faust::TransformHelper<FPP, Cpu>* butterfly_hierarchical_balanced(const Faust::MatDense<FPP, Cpu>& A, const std::vector<Faust::MatSparse<FPP, Cpu>*> &supports);
 
 	template<typename FPP>
 		Faust::TransformHelper<FPP, Cpu>* butterfly_hierarchical(const Faust::MatDense<FPP, Cpu>& A, const ButterflyFactDir &dir=RIGHT);
