@@ -351,7 +351,7 @@ def hierarchical_py(A, J, N, res_proxs, fac_proxs, is_update_way_R2L=False,
         J: number of factors.
         N: number of iterations.
     """
-    S = Faust([A], dev=dev)
+    S = Faust([A], dev=dev, dtype=A.dtype)
     l2_ = 1
     compute_2norm_on_arrays_ = compute_2norm_on_arrays
     for i in range(J-1):
@@ -400,17 +400,18 @@ def palm4msa_py(A, J, N, proxs, is_update_way_R2L=False, S=None, _lambda=1,
     if(S == 'zero_and_ids'):
         # start Faust, identity factors and one zero
         if(is_update_way_R2L):
-            S = Faust([np.eye(dims[i][0],dims[i][1]) for i in
-                       range(J-1)]+[np.zeros((dims[J-1][0], dims[J-1][1]))],
+            S = Faust([np.eye(dims[i][0],dims[i][1], dtype=A.dtype) for i in
+                       range(J-1)]+[np.zeros((dims[J-1][0], dims[J-1][1]), dtype=A.dtype)],
                       dev=dev)
         else:
-            S = Faust([np.zeros((dims[0][0],dims[0][1]))]+[np.eye(dims[i+1][0],
-                                                                  dims[i+1][1])
+            S = Faust([np.zeros((dims[0][0],dims[0][1]), dtype=A.dtype)]+[np.eye(dims[i+1][0],
+                                                                  dims[i+1][1], dtype=A.dtype)
                                                            for i in
-                                                           range(J-1)], dev=dev)
+                                                           range(J-1)],
+                      dev=dev)
     elif(S == None):
         # start Faust, identity factors
-        S = Faust([np.eye(dims[i][0], dims[i][1]) for i in range(J)], dev=dev)
+        S = Faust([np.eye(dims[i][0], dims[i][1], dtype=A.dtype) for i in range(J)], dev=dev)
     lipschitz_multiplicator=1.001
     for i in range(N):
         if(is_update_way_R2L):
@@ -421,19 +422,19 @@ def palm4msa_py(A, J, N, proxs, is_update_way_R2L=False, S=None, _lambda=1,
             #print("S=", S)
             #if(2 == S.numfactors()):
             if(j == 0):
-                L = np.eye(dims[0][0],dims[0][0])
+                L = np.eye(dims[0][0],dims[0][0], dtype=A.dtype)
                 S_j = S.factors(j)
                 R = S.right(j+1)
             elif(j == S.numfactors()-1):
                 L = S.left(j-1)
                 S_j = S.factors(j)
-                R = np.eye(dims[j][1], dims[j][1])
+                R = np.eye(dims[j][1], dims[j][1], dtype=A.dtype)
             else:
                 L = S.left(j-1)
                 R = S.right(j+1)
                 S_j = S.factors(j)
-            if(not pyfaust.isFaust(L)): L = Faust(L, dev=dev)
-            if(not pyfaust.isFaust(R)): R = Faust(R, dev=dev)
+            if(not pyfaust.isFaust(L)): L = Faust(L, dev=dev, dtype=A.dtype)
+            if(not pyfaust.isFaust(R)): R = Faust(R, dev=dev, dtype=A.dtype)
             if(compute_2norm_on_arrays):
                 c = \
                         lipschitz_multiplicator*_lambda**2*norm(R.toarray(),2)**2 * \
@@ -458,11 +459,11 @@ def palm4msa_py(A, J, N, proxs, is_update_way_R2L=False, S=None, _lambda=1,
             if(use_csr):
                 S_j = csr_matrix(S_j)
             if(S.numfactors() > 2 and j > 0 and j < S.numfactors()-1):
-                S = L@Faust(S_j, dev=dev)@R
+                S = L@Faust(S_j, dev=dev, dtype=A.dtype)@R
             elif(j == 0):
-                S = Faust(S_j, dev=dev)@R
+                S = Faust(S_j, dev=dev, dtype=A.dtype)@R
             else:
-                S = L@Faust(S_j, dev=dev)
+                S = L@Faust(S_j, dev=dev, dtype=A.dtype)
         _lambda = np.trace(A_H@S).real/S.norm()**2
         #print("lambda:", _lambda)
     S = _lambda*S
@@ -1186,27 +1187,38 @@ def fgft_palm(U, Lap, p, init_D=None, ret_lambda=False, ret_params=False):
 # experimental block end
 
 
-def butterfly(M, dir="right"):
+def butterfly(M, type="right"):
     """
     Factorizes M according to a butterfly support.
 
     Args:
         M: the numpy ndarray. The dtype must be float32, float64
         or complex128 (the dtype might have a large impact on performance).
-        dir: (str) the direction of factorization 'right'ward or 'left'ward
-        (more precisely: at each stage of the factorization the most right factor or
-        the most left factor is split in two).
+        type: (str) the type of factorization 'right'ward, 'left'ward or
+        'bbtree'. More precisely: if 'left' (resp. 'right') is used then at each stage of the
+        factorization the most left factor (resp. the most left factor) is split in two.
+        If 'bbtree' is used then the matrix is factorized according to a Balanced
+        Binary Tree (which is faster as it allows parallelization).
 
     Returns:
         The Faust which is an approximate of M according to a butterfly support.
+
+    Example:
+        >>> from pyfaust import Faust, wht, dft
+        >>> from pyfaust.fact import butterfly
+        >>> H = wht(32).toarray() # it works with dft too!
+        >>> F = butterfly(H, dir='bbtree')
+        >>> (F-M).norm()/Faust(M).norm()
+        1.0272844187006565e-15
+
     """
     is_real = np.empty((1,))
     M = _check_fact_mat('butterfly()', M, is_real)
     if is_real:
         is_float = M.dtype == 'float32'
         if is_float:
-            return Faust(core_obj=_FaustCorePy.FaustAlgoGenFlt.butterfly_hierarchical(M, dir))
+            return Faust(core_obj=_FaustCorePy.FaustAlgoGenFlt.butterfly_hierarchical(M, type))
         else:
-            return Faust(core_obj=_FaustCorePy.FaustAlgoGenDbl.butterfly_hierarchical(M, dir))
+            return Faust(core_obj=_FaustCorePy.FaustAlgoGenDbl.butterfly_hierarchical(M, type))
     else:
-        return Faust(core_obj=_FaustCorePy.FaustAlgoGenCplxDbl.butterfly_hierarchical(M, dir))
+        return Faust(core_obj=_FaustCorePy.FaustAlgoGenCplxDbl.butterfly_hierarchical(M, type))

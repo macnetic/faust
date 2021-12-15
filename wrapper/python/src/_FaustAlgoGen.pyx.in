@@ -567,6 +567,8 @@ cdef class FaustAlgoGen@TYPE_NAME@:
             dir = 1
         elif dir == "left":
             dir = 0
+        elif dir == "bbtree":
+            dir = 2
         else:
             raise ValueError("dir argument must be 'right' or 'left'.")
 
