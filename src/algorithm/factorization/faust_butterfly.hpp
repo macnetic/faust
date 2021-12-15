@@ -350,7 +350,7 @@ namespace Faust
 			for(size_t i=0;i<d-1;i++)
 			{
 				next_lvl_facs.resize(tree_supports[i+1].size());
-				auto j_bound = std::min(tree_supports[i].size(), tree_supports[i+1].size()/2);
+				size_t j_bound = std::min(tree_supports[i].size(), tree_supports[i+1].size()/2);
 				#pragma omp parallel for schedule(static)
 				for(size_t j=0;j < j_bound;j++)
 					solveDTO(input_facs[j], tree_supports[i+1][2*j], tree_supports[i+1][2*j+1], next_lvl_facs[j*2], next_lvl_facs[j*2+1]);
