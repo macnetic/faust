@@ -504,6 +504,10 @@ namespace Faust
 			 */
 			void best_low_rank(const int &r, MatDense<FPP,Cpu> &bestX, MatDense<FPP, Cpu> &bestY) const;
 			/**
+			 * \brief Returns the best rank-1 approximate this = bestX * bestY using the svd/eigensolver/power iteration.
+			 */
+			void approx_rank1(MatDense<FPP,Cpu> &bestX, MatDense<FPP, Cpu> &bestY) const;
+			/**
 			 * Returns the vector of the indices of the nonzeros of the row of index row_id.
 			 */
 			std::vector<int> row_nonzero_inds(faust_unsigned_int row_id) const;
