@@ -3,7 +3,7 @@
 
 %>        @param 'type', str: the type of factorization 'right'ward, 'left'ward or 'bbtree'.
 %>        More precisely: if 'left' (resp. 'right') is used then at each stage of the
-%>        factorization the most left factor (resp. the most left factor) is split in two.
+%>        factorization the most left factor (resp. the most right factor) is split in two.
 %>        If 'bbtree' is used then the matrix is factorized according to a Balanced
 %>        Binary Tree (which is faster as it allows parallelization).
 %>
@@ -21,6 +21,8 @@
 %>
 %>    1.4311e-15
 %> @endcode
+%>
+%> <b>Reference:</b> Leon Zheng, Elisa Riccietti, and Remi Gribonval, <a href="https://arxiv.org/pdf/2110.01230.pdf">Hierarchical Identifiability in Multi-layer Sparse Matrix Factorization</a>
 %==========================================================================
 function F = butterfly(M, varargin)
         import matfaust.Faust
