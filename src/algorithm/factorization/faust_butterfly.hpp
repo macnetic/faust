@@ -105,6 +105,7 @@ namespace Faust
 			retrieveCEC(s1, s2, cec, noncec);
 			for(auto ce: cec)
 			{
+//				Faust::MatDense<FPP, Cpu> submat;
 				auto r = (*ce)[0];
 				auto RP = s1.col_nonzero_inds(r);
 				auto CP = s2.row_nonzero_inds(r);
@@ -150,14 +151,22 @@ namespace Faust
 
 				}
 			}
+//			#pragma omp parallel for // Tested but non-efficient because of solveDTO already parallelized
+//			for(int i=0;i<noncec.size();i++)
+//			{
+//				Faust::MatDense<FPP, Cpu> submat, bestx, besty;
+//				auto ce = noncec[i];
 			for(auto ce: noncec)
 			{
 				auto r = (*ce)[0];
 				auto RP = s1.col_nonzero_inds(r);
 				auto CP = s2.row_nonzero_inds(r);
 				A.submatrix(RP, CP, submat);
+#ifdef BUTTERFLY_TUNCATED_SVD
 				submat.best_low_rank(ce->size(), bestx, besty);
-				//TODO: OpenMP ?
+#else
+				submat.approx_rank1(bestx, besty);
+#endif
 				for(int i=0;i< ce->size();i++)
 				{
 
@@ -350,9 +359,9 @@ namespace Faust
 			for(size_t i=0;i<d-1;i++)
 			{
 				next_lvl_facs.resize(tree_supports[i+1].size());
-				size_t j_bound = std::min(tree_supports[i].size(), tree_supports[i+1].size()/2);
+				int j_bound = std::min(tree_supports[i].size(), tree_supports[i+1].size()/2);
 				#pragma omp parallel for schedule(static)
-				for(size_t j=0;j < j_bound;j++)
+				for(int j=0;j < j_bound;j++)
 					solveDTO(input_facs[j], tree_supports[i+1][2*j], tree_supports[i+1][2*j+1], next_lvl_facs[j*2], next_lvl_facs[j*2+1]);
 				if(i < d - 2)
 				{
