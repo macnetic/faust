@@ -786,9 +786,9 @@ A.t_add_ext.stop();
 
 
 
-// compute the biggest eigenvalue of A, A must be semi-definite positive
+// compute the largest eigenvalue of A, A must be semi-definite positive
 template<typename FPP, typename FPP2>
-FPP Faust::power_iteration(const  Faust::LinearOperator<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max, FPP2 threshold, int & flag)
+FPP Faust::power_iteration(const  Faust::LinearOperator<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max, FPP2 threshold, int & flag, FPP* out_vec/*=nullptr*/, const bool rand_init/*=false*/)
 {
 	#ifdef __COMPILE_TIMERS__
 		A.t_power_iteration.start();
@@ -814,7 +814,10 @@ FPP Faust::power_iteration(const  Faust::LinearOperator<FPP,Cpu> & A, const faus
         handleError("linear_algebra "," power_iteration : Faust::Transform<FPP,Cpu> 1 must be a squared matrix");
 	}
 	Faust::Vect<FPP,Cpu> xk(nb_col);
-	xk.setOnes();
+	if(rand_init)
+		xk.setRand();
+	else
+		xk.setOnes();
 	Faust::Vect<FPP,Cpu> xk_norm(nb_col);
 	FPP lambda_old=1.0;
    	FPP lambda = 0.0;
@@ -836,10 +839,10 @@ FPP Faust::power_iteration(const  Faust::LinearOperator<FPP,Cpu> & A, const faus
         A.t_power_iteration.stop();
 	#endif
 
+	if(out_vec)
+		memcpy(out_vec, xk_norm.getData(), sizeof(FPP)*xk_norm.size());
+
    	return lambda;
-
-
-
 }
 
 

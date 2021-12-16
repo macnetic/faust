@@ -156,8 +156,12 @@ namespace Faust
 	template<typename FPP, typename FPP2 = double>
 		FPP power_iteration(const MatDense<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max,FPP2 threshold,faust_int & flag,BlasHandle<Cpu> & handle)
 		{power_iteration(A,nbr_iter_max,threshold,flag);}
-	    template<typename FPP, typename FPP2 = double>
-		FPP power_iteration(const LinearOperator<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max,FPP2 threshold,int & flag);
+	/**
+	 * \param out_vec_data: output buffer for the eigenvector approximate.
+	 * \param rand_init: true for random initialization (else the vector is full of ones).
+	 */
+	template<typename FPP, typename FPP2 = double>
+		FPP power_iteration(const LinearOperator<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max,FPP2 threshold,int & flag, FPP* out_vec_data=nullptr, bool rand_init=false);
 
 
 	//! surcharge d'operateur * pour multiplier des matrices et des vecteurs
