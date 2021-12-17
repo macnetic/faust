@@ -1347,7 +1347,6 @@ template<typename FPP>
 void MatDense<FPP, Cpu>::approx_rank1(MatDense<FPP,Cpu> &bestX, MatDense<FPP, Cpu> &bestY) const
 {
 	MatDense<FPP, Cpu> AtA, tAA;
-	Vect<FPP, Cpu> u, v;
 	int flag;
 	gemm(*this, *this, AtA, FPP(1.0), FPP(0.0), 'N', 'T');
 	gemm(*this, *this, tAA, FPP(1.0), FPP(0.0), 'T', 'N');
@@ -1355,15 +1354,21 @@ void MatDense<FPP, Cpu>::approx_rank1(MatDense<FPP,Cpu> &bestX, MatDense<FPP, Cp
 	bestY.resize(this->getNbCol(), 1);
 	FPP sigma1 = std::sqrt(std::abs(power_iteration(AtA, 100, 1e-6, flag, bestX.getData(), /*rand_init*/ true)));
 	FPP sigma2 = std::sqrt(std::abs(power_iteration(tAA, 100, 1e-6, flag, bestY.getData(), true)));
-	bestY.adjoint();
+	MatDense<FPP,Cpu> tuav;
+	gemm(*this, bestY, tuav, FPP(1.0), FPP(0.0), 'N', 'N');
+	gemm(bestX, tuav, tuav, FPP(1.0), FPP(0.0), 'H', 'N');
+	if(sigma2 < 0 && tuav(0,0) > 0 || sigma2 > 0 && tuav(0,0) < 0)
+		sigma2 *= -1;
 	bestY *= sigma2;
-	// test the error to determine if the sigma sign is correct (TODO: find a more efficient way to test)
-	auto err = bestY;
-	bestX.multiply(err, 'N');
-	err -= *this;
-	//				std::cout << "err:" << err.norm() << std::endl;
-	if(err.norm() > 1e-6)
-		bestY *= -1;
+	bestY.adjoint();
+	// test the error to determine if the sigma sign is correct (the way to do it above is slightly better)
+	//	auto err = bestY;
+	//	bestX.multiply(err, 'N');
+	//	err -= *this;
+	//	//				std::cout << "err:" << err.norm() << std::endl;
+	//	if(err.norm() > 1e-6)
+	//		bestY *= -1;
+
 }
 
 	template<typename FPP>
