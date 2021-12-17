@@ -102,6 +102,13 @@ cdef extern from "FaustCoreCpp.h":
                                              unsigned int min_dim_size,
                                              unsigned int max_dim_size,
                                              float density, bool per_row)
+
+        @staticmethod
+        @CPP_CORE_CLASS@[FPP]* randBSRFaust(unsigned int faust_nrows, unsigned int faust_ncols,
+                                            unsigned int min_num_factors, unsigned int max_num_factors,
+                                            unsigned int bnrows, unsigned int bncols,
+                                            float density)
+
         @staticmethod
         @CPP_CORE_CLASS@[FPP]* hadamardFaust(unsigned int n, const bool norma)
         @staticmethod

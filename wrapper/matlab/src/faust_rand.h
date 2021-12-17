@@ -45,6 +45,10 @@
 #define __MEX_FAUST_RAND__
 template <typename SCALAR, FDevice DEV>
 void faust_rand(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs);
+
+template <typename SCALAR, FDevice DEV>
+void faust_rand_bsr(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs);
+
 #include "faust_rand.hpp"
 #endif
 

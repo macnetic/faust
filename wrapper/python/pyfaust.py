@@ -104,10 +104,12 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             filepath: the file from which a Faust is created.<br/>
                       The format is Matlab version 5 (.mat extension).<br/>
                       The file must have been saved before with Faust.save().
-            *kwargs: internal purpose arguments.
+            kwargs: internal purpose arguments.
 
-        WARNING: filepath and factors arguments are mutually exclusive. If you
-        use filepath you must explicitly set argument with the keyword.
+        NOTE: filepath and factors arguments are mutually exclusive. Either
+        you specify one of them explicitly with the keyword or the first (positional) argument type
+        will determine if it's a filepath (a str) or a factor list. If both of
+        the keyword arguments are set then filepath will be prioritary.
 
         Examples:
             Example 1 -- Creating a Faust made of CSR matrices and numpy arrays:
@@ -129,7 +131,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
                 >>> F.save("F.mat")
                 >>> # define a Faust from file
-                >>> H = Faust(filepath="F.mat")
+                >>> H = Faust(filepath="F.mat") # F = Faust("F.mat") does the same
 
                 >>> Faust(np.random.rand(10,10)) # creating a Faust with only one
                                                  # factor
@@ -582,7 +584,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
     def __add__(F, *args, **kwargs):
         """
-        Sums F to one or a sequence of variables. Faust objects, arrays or scalars.
+        Sums F to one or a sequence of variables (Faust objects, arrays or scalars).
 
 
         NOTE: This method overloads the Python function/operator +.
@@ -2733,6 +2735,80 @@ def eye(m, n=None, t='real', dev="cpu"):
 #        raise ValueError("t must be 'real' or 'complex'")
 #    return Faust(e)
 
+def rand_bsr(num_rows, num_cols, bnrows, bncols, num_factors=None, density=.1,
+            dev='cpu', dtype='double'):
+    """
+    Generates a random Faust composed only of BSR matrices.
+
+    Args:
+        num_rows: the Faust number of rows.
+        num_cols: the Faust number of columns.
+        bnrows: the nonzero block number of rows (must divide num_rows).
+        bncols: the nonzero block number of columns (must divide num_cols).
+        num_factors: If it's an integer it will be the number of random factors to set in the Faust.
+                    If num_factors is a list or tuple of 2 integers then the
+                    number of factors will be set randomly between
+                    num_factors[0] and num_factors[1] (inclusively).
+                    If num_factors is None then 5 factors are generated.
+        density: the Faust factor density (it determines the number of nonzero blocks).
+        dev: the device on which the Faust is created.
+        dtype: the numpy dtype of the Faust.
+
+    Example:
+        >>> from pyfaust import rand_bsr
+        >>> rand_bsr(100,100, 20, 10, num_factors=6) 
+        Faust size 100x100, density 0.6, nnz_sum 6000, 6 factor(s): 
+            - FACTOR 0 (double) BSR, size 100x100, density 0.1, nnz 1000
+            - FACTOR 1 (double) BSR, size 100x100, density 0.1, nnz 1000
+            - FACTOR 2 (double) BSR, size 100x100, density 0.1, nnz 1000
+            - FACTOR 3 (double) BSR, size 100x100, density 0.1, nnz 1000
+            - FACTOR 4 (double) BSR, size 100x100, density 0.1, nnz 1000
+            - FACTOR 5 (double) BSR, size 100x100, density 0.1, nnz 1000
+
+    <b> See also:</b> <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.bsr_matrix.html">bsr_matrix</a>
+
+    """
+    if num_factors is None:
+        min_num_factors = max_num_factors = 5
+    elif isinstance(num_factors, int):
+        min_num_factors = max_num_factors = num_factors
+    elif isinstance(num_factors, tuple) and len(num_factors) == 2 and isinstance(num_factors[0], int) and isinstance(num_factors[1], int):
+        min_num_factors = num_factors[0]
+        max_num_factors = num_factors[1]
+    else:
+        raise ValueError('num_factors must be None, a int or a tuple of int')
+    if dev == "cpu":
+        if dtype in ['float64', 'double']:
+            rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUDbl.randBSRFaust(num_rows,
+                                                                             num_cols,
+                                                                             min_num_factors,
+                                                                             max_num_factors,
+                                                                             bnrows,
+                                                                             bncols,
+                                                                             density))
+        elif dtype in ['float32', 'float']: # type == 'float'
+            rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUFlt.randBSRFaust(num_rows,
+                                                                             num_cols,
+                                                                             min_num_factors,
+                                                                             max_num_factors,
+                                                                             bnrows,
+                                                                             bncols,
+                                                                             density))
+        elif dtype in ['complex', 'complex128']:
+            rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUCplxDbl.randBSRFaust(num_rows,
+                                                                                 num_cols,
+                                                                                 min_num_factors,
+                                                                                 max_num_factors,
+                                                                                 bnrows,
+                                                                                 bncols,
+                                                                                 density))
+    elif dev.startswith("gpu"):
+        raise ValueError('BSR matrices are not yet supported on GPU.')
+    else:
+        raise ValueError('Invalid device')
+    return rF
+
+
 def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
          density=None, fac_type="sparse",
          field='real', per_row=True, dev="cpu", dtype='double'):
@@ -2891,7 +2967,7 @@ def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
 
 def enable_gpu_mod(libpaths=None, backend='cuda', silent=False, fatal=False):
     """
-    This function loads explicitely the gpu_mod library in memory.
+    This function loads explicitly the gpu_mod library in memory.
 
     Normally it's not required to load the library manually, but it could be
     useful to set a non-default path or to diagnose a loading issue.

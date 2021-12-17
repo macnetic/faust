@@ -32,3 +32,17 @@ cdef class FaustAlgoGen@PROC@@TYPE_NAME@:
         if(core.@CORE_OBJ@ == NULL): raise MemoryError()
         return core
 
+    @staticmethod
+    def randBSRFaust(faust_nrows, faust_ncols, min_num_factors, max_num_factors,
+                  bnrows, bncols, density=0.1):
+        core = @CORE_CLASS@(core=True)
+        core.@CORE_OBJ@ = \
+                FaustCoreCy.@CPP_CORE_CLASS@[@TYPE@].randBSRFaust(faust_nrows,
+                                                               faust_ncols,
+                                                               min_num_factors,
+                                                               max_num_factors,
+                                                               bnrows,
+                                                               bncols, density)
+        if(core.@CORE_OBJ@ == NULL): raise MemoryError()
+        return core
+

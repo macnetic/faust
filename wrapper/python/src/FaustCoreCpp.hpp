@@ -493,6 +493,19 @@ template<typename FPP, FDevice DEV>
       return core;
   }
 
+template<typename FPP, FDevice DEV>
+  FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::randBSRFaust(
+          unsigned int faust_nrows,
+          unsigned int faust_ncols,
+          unsigned int min_num_factors, unsigned int max_num_factors,
+          unsigned int bnrows, unsigned int bncols, float density)
+{
+    Faust::TransformHelper<FPP,DEV>* th = Faust::TransformHelper<FPP,DEV>::randBSRFaust(faust_nrows, faust_ncols, min_num_factors, max_num_factors, bnrows, bncols, density);
+    if(!th) return NULL;
+    FaustCoreCpp<FPP,DEV>* core = new FaustCoreCpp<FPP,DEV>(th);
+    return core;
+}
+
 //TODO: hadamardFaust and fourierFaust shouldn't be here... or at least it
 //should be reconsidered
 template<typename FPP, FDevice DEV>

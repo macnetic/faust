@@ -144,6 +144,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			new_faust<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
 		else if(!strcmp("rand", cmd))
 			faust_rand<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("rand_bsr", cmd))
+			faust_rand_bsr<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
 		else if (! strcmp("disp",cmd))
 			faust_disp<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
 		else if (!strcmp("delete", cmd))

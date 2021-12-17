@@ -268,6 +268,7 @@ class BSRMat
 	 * \param op: 'N' (no-op), 'T' (tranpose), 'H' (adjoint), 'C' (conjugate)
 	 */ 
 	BSRMat<T, BlockStorageOrder> apply_op(const char op, const bool inplace=false);
+
 	/**
 	 * \param m: matrix number of rows.
 	 * \param n: matrix number of columns.
@@ -278,6 +279,7 @@ class BSRMat
 	 * \param max_bdensity: the inner maximal density of each block.
 	 */
 	static BSRMat<T, BlockStorageOrder> rand(int m, int n, int bm, int bn, int bnnz);
+
 
 	void free_bufs();
 	~BSRMat();

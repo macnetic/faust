@@ -169,6 +169,10 @@ class FaustCoreCpp
             unsigned int min_num_factors, unsigned int max_num_factors,
             unsigned int min_dim_size,
             unsigned int max_dim_size, float density, bool per_row);
+    static FaustCoreCpp<FPP,DEV>* randBSRFaust(unsigned int faust_nrows, unsigned int faust_ncols,
+            unsigned int min_num_factors, unsigned int max_num_factors,
+            unsigned int bnrows, unsigned int bncols, float density);
+
     static FaustCoreCpp<FPP,DEV>* hadamardFaust(unsigned int n, const bool norma);
     static FaustCoreCpp<FPP,DEV>* fourierFaust(unsigned int n, const bool norma);
     static FaustCoreCpp<FPP,DEV>* eyeFaust(unsigned int n, unsigned int m);

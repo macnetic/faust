@@ -245,6 +245,7 @@ namespace Faust {
 		void TransformHelper<FPP,Cpu>::multiply(const FPP *x, FPP* y, const bool transpose, const bool conjugate)
 		{
 			//TODO: move to Faust::Transform ?
+			// TODO: don't create vx, directly compute into y (as it's made for Faust-matrix product)
 			// x is a vector, it doesn't matter it's transpose or not, just keep the valid size to multiply against this Transform
 			int x_size = this->getNbCol();
 			// however x and y are supposed to be allocated to the good sizes
@@ -1169,7 +1170,7 @@ template<typename FPP>
 	}
 
 template<typename FPP>
-	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::randBSRFaust(int faust_nrows, int faust_ncols, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int bnrows, unsigned int bncols, float density/*=.1f*/)
+	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::randBSRFaust(unsigned int faust_nrows, unsigned int faust_ncols, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int bnrows, unsigned int bncols, float density/*=.1f*/)
 	{
 		if(faust_nrows != faust_ncols)
 			throw std::runtime_error("randBSRFaust: currently only random square BSR Faust can be generated.");
@@ -1186,7 +1187,7 @@ template<typename FPP>
 		for(int i=0;i<num_factors;i++)
 			factors[i] = MatBSR<FPP, Cpu>::randMat(faust_nrows, faust_ncols, bnrows, bncols, bnnz);
 		// create the Faust
-		TransformHelper<FPP,Cpu>* randFaust = new TransformHelper<FPP, Cpu>(factors,1.0,false,false);
+		TransformHelper<FPP,Cpu>* randFaust = new TransformHelper<FPP, Cpu>(factors, 1.0, false, false);
 		return randFaust;
 	}
 
