@@ -151,7 +151,7 @@ namespace Faust
 
 				}
 			}
-//			#pragma omp parallel for // Tested but non-efficient because of solveDTO already parallelized
+//			#pragma omp parallel for // Tested but non-efficient because of solveDTO calls are already parallelized
 //			for(int i=0;i<noncec.size();i++)
 //			{
 //				Faust::MatDense<FPP, Cpu> submat, bestx, besty;
@@ -162,10 +162,10 @@ namespace Faust
 				auto RP = s1.col_nonzero_inds(r);
 				auto CP = s2.row_nonzero_inds(r);
 				A.submatrix(RP, CP, submat);
-#ifdef BUTTERFLY_TUNCATED_SVD
-				submat.best_low_rank(ce->size(), bestx, besty);
-#else
+#ifdef BUTTERFLY_APPROX_RANK1
 				submat.approx_rank1(bestx, besty);
+#else
+				submat.best_low_rank(ce->size(), bestx, besty);
 #endif
 				for(int i=0;i< ce->size();i++)
 				{
