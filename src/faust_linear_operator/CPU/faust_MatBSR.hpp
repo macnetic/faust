@@ -3,6 +3,8 @@
 #include <random>
 #include <vector>
 #include <iostream>
+#include <numeric>
+
 
 namespace Faust
 {
