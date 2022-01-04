@@ -777,11 +777,22 @@ namespace Faust
 				factors.push_back(const_cast<MatGeneric<FPP, Cpu>*>(A)); // A won't be touched
 				last_op = 'N';
 			}
+			// this function initializes a triplet of boolean depending on fac concrete type (MatDense, MatSparse or MatBSR)
+			auto init_fac_type_bools = [](const MatGeneric<FPP, Cpu>* fac, bool& fac_dense, bool &fac_sparse, bool &fac_bsr)
+			{
+				fac_dense = fac_sparse = fac_bsr = false;
+				std::runtime_error et("dynprog_multiply error: non-supported matrix type (only MatDense, MatSparse, MatBSR are)");
+				if(! (fac_dense = dynamic_cast<const MatDense<FPP, Cpu>*>(fac)))
+					if(! (fac_sparse = dynamic_cast<const MatSparse<FPP, Cpu>*>(fac)))
+						if(! (fac_bsr = dynamic_cast<const MatBSR<FPP, Cpu>*>(fac)))
+							throw et;
+			};
 			const int n = factors.size();
 			int** c = new int*[n]; // TODO: reduce the memory used because only the upper triangle of the array is used
 			int** inds = new int*[n]; // TODO: idem
 			int j, k, cost;
 			int c_i, c_j;
+			MatBSR<FPP, Cpu> *lf_bsr_mat, *rf_bsr_mat;
 			for(int i=0;i<n;i++)
 			{
 				c[i] = new int[n];
@@ -792,49 +803,54 @@ namespace Faust
 				for(int i=0;i<n-p;i++)
 				{
 					j = p + i;
+					// left factor is dense, sparse or bsr
+					bool lf_dense, lf_sparse, lf_bsr;
+					// right factor is dense, sparse or bsr
+					bool rf_dense, rf_sparse, rf_bsr;
+					init_fac_type_bools(factors[i], lf_dense, lf_sparse, lf_bsr);
+					init_fac_type_bools(factors[j], rf_dense, rf_sparse, rf_bsr);
+
 					k = i;
 					c[i][j] = std::numeric_limits<int>::max();
-					auto i_nrows = factors[i]->getNbRow();
-					auto i_ncols = factors[i]->getNbCol();
-					auto j_nrows = factors[j]->getNbRow();
-					auto j_ncols = factors[j]->getNbCol();
+					auto lf_nrows = factors[i]->getNbRow();
+					auto lf_ncols = factors[i]->getNbCol();
+					auto rf_nrows = factors[j]->getNbRow();
+					auto rf_ncols = factors[j]->getNbCol();
 					while(k < j)
 					{
+						auto lf_init = k == i; // if true : left factor and middle factor are the same matrix which is an initial matrix (it doesn't result from intermediate product)
+						auto rf_init = k + 1 == j; // true means that the right factor is composed of only one initial matrix (it doesn't result from intermediate product)
 						cost = c[i][k] + c[k+1][j];
-						// sparse matrices can exist only in the starting sequence of factors because any product of two matrices gives a dense matrix here
-						auto fac_i_sparse = k == i && dynamic_cast<MatSparse<FPP, Cpu>*>(factors[i]);
-						auto fac_kp1_sparse = k + 1 == j && dynamic_cast<MatSparse<FPP, Cpu>*>(factors[j]);
-						auto k_nrows = factors[k]->getNbRow();
-						auto k_ncols = factors[k]->getNbCol();
-						if(! fac_i_sparse && ! fac_kp1_sparse)
-						{
-							// i-th and k-th factors are dense matrices
-							if(op == 'N')
-								cost += i_nrows*k_ncols*j_ncols;
-							else
-								cost += i_ncols*k_nrows*j_nrows;
-						}
-						else if(fac_i_sparse && fac_kp1_sparse)
-						{
-							if(op == 'N')
-								cost += factors[i]->getNonZeros()*factors[j]->getNonZeros()/i_nrows;
-							else
-								cost += factors[i]->getNonZeros()*factors[j]->getNonZeros()/i_ncols;
-						}
-						else if(fac_i_sparse && ! fac_kp1_sparse)
-						{
-							if(op == 'N')
-								cost += factors[i]->getNonZeros()*j_ncols;
-							else
-								cost += factors[i]->getNonZeros()*j_nrows;
-						}
-						else // ! fac_i_sparse && fac_kp1_sparse
-						{
-							if(op == 'N')
-								cost += factors[j]->getNonZeros()*i_nrows;
-							else
-								cost += factors[j]->getNonZeros()*i_ncols;
-						}
+						// middle factor nrows/ncols
+						auto mf_nrows = factors[k]->getNbRow();
+						auto mf_ncols = factors[k]->getNbCol();
+
+						if(lf_bsr) lf_bsr_mat = dynamic_cast<MatBSR<FPP,Cpu>*>(factors[i]);
+						if(rf_bsr) rf_bsr_mat = dynamic_cast<MatBSR<FPP,Cpu>*>(factors[j]);
+						if(lf_dense && rf_dense)
+							// left and right factors are dense matrices
+							cost += cost_dense_dense(lf_nrows, mf_ncols, rf_nrows, rf_ncols, op != 'N' && rf_init); // no need to consider op for product resulting dense matrices
+						else if(lf_dense && rf_sparse)
+							cost += cost_dense_sparse(lf_nrows, mf_ncols, op != 'N' && lf_init, factors[j]->getNonZeros());
+						else if(lf_dense && rf_bsr)
+							cost += cost_dense_bsr(lf_nrows, mf_ncols, op != 'N' && lf_init, rf_bsr_mat->getNbBlockRow(), rf_bsr_mat->getNbBlockCol(), rf_bsr_mat->getNBlocks());
+						else if(lf_sparse && rf_sparse)
+							// lf_sparse => lf_init
+							cost += cost_sparse_sparse(lf_nrows, lf_ncols, factors[i]->getNonZeros(), op != 'N', factors[j]->getNonZeros());
+						else if(lf_sparse && rf_dense /*! rf_sparse*/)
+							cost += cost_sparse_dense(factors[i]->getNonZeros(), rf_nrows, rf_ncols, op != 'N' && rf_init);
+						else if(lf_sparse && rf_bsr)
+							// rf_bsr => rf_fac_initial
+							cost += cost_sparse_bsr(factors[i]->getNonZeros(), rf_bsr_mat->getNBlocks(), rf_bsr_mat->getNbBlockRow(), rf_bsr_mat->getNbBlockCol(), op != 'N');
+						else if(lf_bsr && rf_dense)
+							// lf_bsr => lf_init
+							cost += cost_bsr_dense(lf_bsr_mat->getNBlocks(), lf_bsr_mat->getNbBlockRow(), lf_bsr_mat->getNbBlockCol(), rf_nrows, rf_ncols, op != 'N');
+						else if(lf_bsr && rf_sparse)
+							// lf_bsr => lf_init
+							cost += cost_bsr_sparse(lf_bsr_mat->getNBlocks(), lf_bsr_mat->getNbBlockRow(), lf_bsr_mat->getNbBlockCol(), op != 'N', factors[j]->getNonZeros());
+						else if(lf_bsr && rf_bsr)
+							// lf_bsr => lf_init
+							cost += cost_bsr_bsr(lf_bsr_mat->getNBlocks(), lf_bsr_mat->getNbBlockRow(), lf_bsr_mat->getNbBlockCol(), op != 'N', factors[j]->getNonZeros());
 						if(cost < c[i][j])
 						{
 							c[i][j] = cost;
@@ -857,4 +873,7 @@ namespace Faust
 				factors.erase(factors.end()-1);
 			return std::move(M);
 		}
+
 }
+
+
