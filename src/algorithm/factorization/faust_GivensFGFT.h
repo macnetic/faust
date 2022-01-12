@@ -1,4 +1,3 @@
-
 #ifndef __GIVENS_FGFT__
 #define __GIVENS_FGFT__
 
@@ -9,6 +8,10 @@
 #include "faust_GivensFGFTGen.h"
 #include <cfloat>
 #include <vector>
+#include <cmath>
+#ifndef M_PI
+#define M_PI acos(-1)
+#endif
 
 namespace Faust
 {
