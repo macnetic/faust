@@ -59,7 +59,7 @@ elseif(WIN32)
 		message(STATUS "------------------------------------------------")
 		message(STATUS "------------------------------------------------")
 
-		set(EIGEN_LINK https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.zip)
+		set(EIGEN_LINK https://gitlab.com/libeigen/eigen/-/archive/3.2.8/eigen-3.2.8.zip)
 		string(REGEX REPLACE "https://.*/(.*).zip" "\\1" EIGEN_LIB_NAME ${EIGEN_LINK})
 		if(NOT EXISTS ${CMAKE_SOURCE_DIR}/externals/win/zipLibs/${EIGEN_LIB_NAME}.zip)
 			file(DOWNLOAD ${EIGEN_LINK} ${CMAKE_SOURCE_DIR}/externals/win/zipLibs/${EIGEN_LIB_NAME}.zip SHOW_PROGRESS)
