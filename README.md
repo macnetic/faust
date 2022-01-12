@@ -28,6 +28,10 @@ The FAUST toolbox has been tested on the following environments:
 - MACOS X
 - WINDOWS (windows 10)
 
+Dependencies
+============
+- libxml2 (Optional, needed with CMake BUILD_READ_XML_FILE).
+- TODO
 
 
 ---
