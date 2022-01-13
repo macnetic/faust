@@ -12,8 +12,7 @@
 %
 % - expectedLambdaPrecision : to succeed |expectedLambda - lambda|< expectedLambdaPrecision must be true
 %
-% - opt : if opt = 'MEX' => mexHierarchical_fact is called (mexfunction)
-%            opt = 'MATLAB' => old_hierarchical_fact is called (pure matlab version) 
+% - opt : opt must be 'MEX' => mexHierarchical_fact is called (mexfunction) % TODO: this argument should be deleted
 %
 %  
 %
@@ -74,27 +73,17 @@ disp(' ');
 load(paramsFile);
 
 
-
+if(~ strcmp(opt, 'MEX'))
+	error('hier_fact_test : invalid opt parameter , must be equal to ''MEX''');
+end
 
 %% factorization of the matrix 
-switch(opt)
-	case 'MEX' %% factorisation (mexfile)
-		disp('*** MEX FACTORISATION ***');  
-		tic
-			%[lambda,fact]=mexHierarchical_fact(matrix,params);
-			[lambda, core_obj] = mexHierarchical_factReal(matrix, params);
-			F = Faust(core_obj, isreal(matrix));
-		t=toc;
-	case 'MATLAB' %% factorisation (matlab)
-		disp(['*** MATLAB FACTORISATION ***']); 
-		tic
-			[lambda,fact]=old_hierarchical_fact(matrix,params);
-			F=Faust(fact,lambda);
-		t=toc;
-     
-	otherwise
-		error('hier_fact_test : invalid opt parameter , must be equal to ''MEX'' or ''MATLAB''');
-end
+disp('*** MEX FACTORISATION ***');  
+tic
+%[lambda,fact]=mexHierarchical_fact(matrix,params);
+[lambda, core_obj] = mexHierarchical_factReal(matrix, params);
+F = Faust(core_obj, isreal(matrix));
+t=toc;
 
 
 % conversion seconds into [hour,min,seconds])

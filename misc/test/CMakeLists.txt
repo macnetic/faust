@@ -36,15 +36,12 @@ if(BUILD_WRAPPER_MATLAB)
 		#   2nd arg : the ouputfile that stores all the things that will be display in the matlab command window
 		
 		add_test(NAME MATLAB_FACT_HIER_MEX COMMAND ${FAUST_SRC_TEST_TOOL_DIR}/windows_test_matlab.bat "addpath('${FAUST_BIN_TEST_BIN_DIR}'@'${FAUST_BIN_TEST_TOOLS_DIR}')$set_path$hier_fact_test('matrix_hierarchical_fact'@'config_hierarchical_fact'@9407@1@'MEX')$" "${FAUST_BIN_TEST_OUTPUT_DIR}/MATLAB_FACT_HIER_MEX") 
-		add_test(NAME MATLAB_FACT_HIER_MATLAB COMMAND ${FAUST_SRC_TEST_TOOL_DIR}/windows_test_matlab.bat "addpath('${FAUST_BIN_TEST_BIN_DIR}'@'${FAUST_BIN_TEST_TOOLS_DIR}')$set_path$hier_fact_test('matrix_hierarchical_fact'@'config_hierarchical_fact'@9401@1@'MATLAB')$" "${FAUST_BIN_TEST_BIN_DIR}/MATLAB_FACT_HIER_MATLAB")
-		
-		
+
+
 		if(${SLOW_TESTS}) 
 			add_test(NAME MATLAB_FACT_MEG_MEX COMMAND ${FAUST_SRC_TEST_TOOL_DIR}/windows_test_matlab.bat "addpath('${FAUST_BIN_TEST_BIN_DIR}'@'${FAUST_BIN_TEST_TOOLS_DIR}')$set_path$hier_fact_test('matrix_MEG'@'config_MEG'@22480@1@'MEX')$" "${FAUST_BIN_TEST_BIN_DIR}/MATLAB_FACT_MEG_MEX")
-			add_test(NAME MATLAB_FACT_MEG_MATLAB COMMAND ${FAUST_SRC_TEST_TOOL_DIR}/windows_test_matlab.bat "addpath('${FAUST_BIN_TEST_BIN_DIR}'@'${FAUST_BIN_TEST_TOOLS_DIR}')$set_path$hier_fact_test('matrix_MEG'@'config_MEG'@22480@1@'MATLAB')$" "${FAUST_BIN_TEST_BIN_DIR}/MATLAB_FACT_MEG_MATLAB")
 		endif()
 		add_test(NAME MATLAB_FACT_HADAMARD_MEX COMMAND ${FAUST_SRC_TEST_TOOL_DIR}/windows_test_matlab.bat "addpath('${FAUST_BIN_TEST_BIN_DIR}'@'${FAUST_BIN_TEST_TOOLS_DIR}')$set_path$hier_fact_test('matrix_HADAMARD_32'@'config_HADAMARD_32'@5941@30@'MEX')$" "${FAUST_BIN_TEST_BIN_DIR}/MATLAB_FACT_HADAMARD_MEX")
-		add_test(NAME MATLAB_FACT_HADAMARD_MATLAB COMMAND ${FAUST_SRC_TEST_TOOL_DIR}/windows_test_matlab.bat "addpath('${FAUST_BIN_TEST_BIN_DIR}'@'${FAUST_BIN_TEST_TOOLS_DIR}')$set_path$hier_fact_test('matrix_HADAMARD_32'@'config_HADAMARD_32'@5941@30@'MATLAB')$" "${FAUST_BIN_TEST_BIN_DIR}/MATLAB_FACT_HADAMARD_MATLAB")
 
 		if(${SLOW_TESTS})
 			add_test(NAME MATLAB_DEMO_INSTALL COMMAND ${FAUST_SRC_TEST_TOOL_DIR}/windows_test_matlab.bat "addpath('${CMAKE_INSTALL_MATLAB_PREFIX}')$setup_FAUST$import matfaust.demo.runall$runall$" "${FAUST_BIN_TEST_BIN_DIR}/MATLAB_DEMO_INSTALL")
@@ -55,34 +52,31 @@ if(BUILD_WRAPPER_MATLAB)
 		# test the matlab Faust class methods with incorrect parameter
 		add_test(NAME MATLAB_FAUST_2 COMMAND ${FAUST_SRC_TEST_TOOL_DIR}/windows_test_matlab.bat "addpath('${FAUST_BIN_TEST_BIN_DIR}'@'${FAUST_BIN_TEST_TOOLS_DIR}')$set_path$test_matlab_faust2$" "${FAUST_BIN_TEST_BIN_DIR}/MATLAB_FAUST_2")
 		add_test(NAME MATLAB_FAUST_SPEED COMMAND ${FAUST_SRC_TEST_TOOL_DIR}/windows_test_matlab.bat "addpath('${FAUST_BIN_TEST_BIN_DIR}'@'${FAUST_BIN_TEST_TOOLS_DIR}')$set_path$test_matlab_faust_time$" "${FAUST_BIN_TEST_BIN_DIR}/MATLAB_FAUST_SPEED")
-		
-	
-	
-	
+
+
+
+
 	else(WIN32 AND NOT UNIX)	
 		add_test(NAME MATLAB_FACT_HIER_MEX COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('matrix_hierarchical_fact','config_hierarchical_fact',9407,1,'MEX'); catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)" )
-	
-		
-		add_test(NAME MATLAB_FACT_HIER_MATLAB COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('matrix_hierarchical_fact','config_hierarchical_fact',9401,1,'MATLAB'); catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)" )
-	
+
+
+
 		if(${SLOW_TESTS})
 			add_test(NAME MATLAB_FACT_MEG_MEX COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('matrix_MEG','config_MEG',22594,1,'MEX');catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
-			add_test(NAME MATLAB_FACT_MEG_MATLAB COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('matrix_MEG','config_MEG',22480,1,'MATLAB');catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 		endif()
 
 		add_test(NAME MATLAB_FACT_HADAMARD_MEX COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('matrix_HADAMARD_32','config_HADAMARD_32',5941,30,'MEX');catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
-		add_test(NAME MATLAB_FACT_HADAMARD_MATLAB COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('matrix_HADAMARD_32','config_HADAMARD_32',5941,30,'MATLAB');catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
-		
+
 		if(${SLOW_TESTS})
 			add_test(NAME MATLAB_DEMO_INSTALL COMMAND matlab -nodesktop -r "try;testpass=0;addpath('${CMAKE_INSTALL_MATLAB_PREFIX}');setup_FAUST;import matfaust.demo.runall;runall;catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 			add_test(NAME MATLAB_DEMO_BUILD COMMAND matlab -nodesktop -r "try;testpass=0;addpath('${FAUST_MATLAB_BIN_DIR}');setup_FAUST;import matfaust.demo.runall;runall;catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 		endif(${SLOW_TESTS})
-		
-		#test Faust with 3 real factors : 
-		# 1st factor sparse size 10x3, 
-		# 2nd factor dense size 3x2, 
-		# 3rd factor sparse size 2x5		
-		add_test(NAME MATLAB_FAUST_CONFIG_REAL1 COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([10,3,2,5],{'real.sparse','real.dense','real.sparse'},0.5);test_matlab_faust(factors,prod,30,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")	
+
+		#test Faust with 3 real factors :
+		# 1st factor sparse size 10x3,
+		# 2nd factor dense size 3x2,
+		# 3rd factor sparse size 2x5
+		add_test(NAME MATLAB_FAUST_CONFIG_REAL1 COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([10,3,2,5],{'real.sparse','real.dense','real.sparse'},0.5);test_matlab_faust(factors,prod,30,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 		
 		#test Faust with 3 real factors : 
 		# 1st factor sparse size 5x2, 
@@ -237,7 +231,7 @@ if(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE AND NOT NOCPPTESTS) 
 			endif()
 			configure_file(${FAUST_SRC_TEST_SRC_CPP_DIR}/${testin}.cpp.in ${FAUST_BIN_TEST_SRC_DIR}/${TEST_FILE_CPP} @ONLY)
 			# Generation of the binary files in double and float precision
-			add_executable(${TEST_CPP_NAME} ${FAUST_BIN_TEST_SRC_DIR}/${TEST_FILE_CPP} ${FAUST_BIN_TEST_SRC_DIR}/ ${FAUST_CMDLINE_TYPE_FORMAT_MAT_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_CMDLINE_TYPE_FORMAT_MAT_SRC_DIR}/faust_init_from_matio_mat.cpp)
+			add_executable(${TEST_CPP_NAME} ${FAUST_BIN_TEST_SRC_DIR}/${TEST_FILE_CPP} ${FAUST_BIN_TEST_SRC_DIR}/) #${FAUST_CMDLINE_TYPE_FORMAT_MAT_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_CMDLINE_TYPE_FORMAT_MAT_SRC_DIR}/faust_init_from_matio_mat.cpp)
 
 			set(TEST_LIBS ${FAUST_TARGET};${MATIO_LIB_FILE};${HDF5_LIB_FILE})
 			if(FAUST_TORCH)
@@ -259,7 +253,7 @@ if(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE AND NOT NOCPPTESTS) 
 
 
 ###### IN CASE MATIO IS NOT AVAILABLE YOU CAN RUN THE TEST ######
-else(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE AND NOT NOCPPTESTS)	
+else(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE AND NOT NOCPPTESTS)
 	#message(STATUS "Library matio is not available. Please used .xml input files.")
 endif(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE AND NOT NOCPPTESTS)
 
@@ -267,8 +261,8 @@ endif(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE AND NOT NOCPPTEST
 
 if (BUILD_WRAPPER_MATLAB)
 	configure_file(${FAUST_SRC_TEST_TOOL_DIR}/set_path.m.in ${FAUST_BIN_TEST_TOOLS_DIR}/set_path.m @ONLY)
-	
-	
+
+
 	foreach(matlabtest hier_fact_test.m generate_Faust_config.m test_matlab_faust.m test_matlab_faust2.m test_matlab_faust_mult.m test_matlab_faust_time.m)
 		configure_file(${FAUST_SRC_TEST_SRC_MATLAB_DIR}/${matlabtest} ${FAUST_BIN_TEST_BIN_DIR}/${matlabtest} @ONLY)
 	endforeach()
