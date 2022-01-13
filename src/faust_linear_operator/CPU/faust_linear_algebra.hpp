@@ -44,6 +44,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <complex>
+#include <cstdlib>
 #include "faust_LinearOperator.h"
 #include "faust_MatGeneric.h"
 #include "faust_MatDense.h"
@@ -788,7 +789,7 @@ A.t_add_ext.stop();
 
 // compute the largest eigenvalue of A, A must be semi-definite positive
 template<typename FPP, typename FPP2>
-FPP Faust::power_iteration(const  Faust::LinearOperator<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max, FPP2 threshold, int & flag, FPP* out_vec/*=nullptr*/, const bool rand_init/*=false*/)
+FPP Faust::power_iteration(const  Faust::LinearOperator<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max, FPP2 threshold, int & flag, FPP* out_vec/*=nullptr*/, const bool rand_init/*=true*/)
 {
 	#ifdef __COMPILE_TIMERS__
 		A.t_power_iteration.start();
@@ -815,7 +816,10 @@ FPP Faust::power_iteration(const  Faust::LinearOperator<FPP,Cpu> & A, const faus
 	}
 	Faust::Vect<FPP,Cpu> xk(nb_col);
 	if(rand_init)
-		xk.setRand();
+	{
+		srand(0xF4+'u'+57); // always the same seed, not standard but allows reproducibility
+		xk.setRand(); // the main objective is to make very unlikely to be orthogonal to the main eigenvector
+	}
 	else
 		xk.setOnes();
 	Faust::Vect<FPP,Cpu> xk_norm(nb_col);

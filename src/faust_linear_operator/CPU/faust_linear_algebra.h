@@ -161,7 +161,7 @@ namespace Faust
 	 * \param rand_init: true for random initialization (else the vector is full of ones).
 	 */
 	template<typename FPP, typename FPP2 = double>
-		FPP power_iteration(const LinearOperator<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max,FPP2 threshold,int & flag, FPP* out_vec_data=nullptr, bool rand_init=false);
+		FPP power_iteration(const LinearOperator<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max,FPP2 threshold,int & flag, FPP* out_vec_data=nullptr, bool rand_init=true);
 
 
 	//! surcharge d'operateur * pour multiplier des matrices et des vecteurs
