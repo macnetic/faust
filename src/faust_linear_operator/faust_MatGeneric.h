@@ -166,7 +166,7 @@ namespace Faust
 			//! \brief Returns the features of the matrix (type Dense/Sparse, size, nnz, density of nnz ... )
 			virtual std::string to_string(const bool transpose=false, const bool displaying_small_mat_elts=false) const;
 
-			static std::string to_string(int32_t nrows, int32_t ncols, bool transpose, Real<FPP> density, int32_t nnz, bool is_identity, MatType type);
+			std::string to_string(int32_t nrows, int32_t ncols, bool transpose, Real<FPP> density, int32_t nnz, bool is_identity, MatType type) const;
 
 			static std::string get_scalar_type_str();
 

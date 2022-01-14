@@ -174,7 +174,7 @@ std::string Faust::MatGeneric<FPP,DEVICE>::get_scalar_type_str()
 
 
 template<typename FPP,FDevice DEVICE>
-std::string Faust::MatGeneric<FPP,DEVICE>::to_string(int32_t nrows, int32_t ncols, bool transpose, Real<FPP> density, int32_t nnz, bool is_identity, MatType type)
+std::string Faust::MatGeneric<FPP,DEVICE>::to_string(int32_t nrows, int32_t ncols, bool transpose, Real<FPP> density, int32_t nnz, bool is_identity, MatType type) const
 {
 	std::ostringstream str;
 	str << " (" << MatGeneric<FPP,DEVICE>::get_scalar_type_str() << ") ";
@@ -195,7 +195,12 @@ std::string Faust::MatGeneric<FPP,DEVICE>::to_string(int32_t nrows, int32_t ncol
 		str << ncols << "x" << nrows;
 	else
 		str << nrows << "x" << ncols;
-	str << ", density "<< density <<", nnz "<< nnz <<std::endl;
+	if(type == BSR) //TODO: refactor with above almost same code into a new MatBSR member function
+		str << dynamic_cast<const MatBSR<FPP, Cpu>*>(this)->to_string_blocks(transpose);
+	str << ", density "<< density <<", nnz "<< nnz; 
+	if(type == BSR)
+		str <<  " (nnz blocks: " << dynamic_cast<const MatBSR<FPP, Cpu>*>(this)->getNBlocks() << ")";
+	str <<std::endl;
 	if (is_identity)
 		str <<" identity matrix flag" << std::endl;
 	return str.str();

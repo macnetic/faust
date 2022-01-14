@@ -62,6 +62,10 @@ namespace Faust
 			void operator*=(const FPP alpha);
 			std::string to_string(MatType type, const bool transpose=false, const bool displaying_small_mat_elts=false) const;
 			std::string to_string(const bool transpose=false, const bool displaying_small_mat_elts=false) const;
+			/**
+			 * Returns a string representing size of nz blocks.
+			 */
+			std::string to_string_blocks(bool transpose=false) const;
 			matvar_t* toMatIOVar(bool transpose, bool conjugate) const;
 			Real<FPP> normL1(const bool transpose=false) const;
 			Real<FPP> norm() const;

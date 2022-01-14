@@ -1088,7 +1088,20 @@ namespace Faust
 					str << "GPU ";
 				str << "FACTOR " << i;
 				density = (double) this->get_fact_nnz(i) / this->get_fact_nb_rows(i) / this->get_fact_nb_cols(i);
-				str << Faust::MatGeneric<FPP,Cpu>::to_string(this->get_fact_nb_rows(i), this->get_fact_nb_cols(i), this->is_transposed, density, this->get_fact_nnz(i), /* is_identity */ i == this->size()-1 && (! T0_is_arbitrary || is_fact_created[this->size()-1] && this->get_gen_fact_nonconst(this->size()-1)->is_id()), Sparse);
+				auto nrows = this->get_fact_nb_rows(i);
+				auto ncols = this->get_fact_nb_cols(i);
+				// respect the MatGeneric::to_string() format
+				str << " (" << MatGeneric<FPP,Cpu>::get_scalar_type_str() << ") ";
+				str << "SPARSE,";
+				str << " size ";
+				if(this->is_transposed)
+					str << ncols << "x" << nrows;
+				else
+					str << nrows << "x" << ncols;
+				str << ", density "<< density <<", nnz "<< this->get_fact_nnz(i);
+				str <<std::endl;
+				if (! T0_is_arbitrary || is_fact_created[this->size()-1] && this->get_gen_fact_nonconst(this->size()-1)->is_id())
+					str <<" identity matrix flag" << std::endl;
 			}
 			return str.str();
 		}

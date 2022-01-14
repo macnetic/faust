@@ -269,6 +269,26 @@ namespace Faust
 		}
 
 	template <typename FPP>
+	std::string MatBSR<FPP,Cpu>::to_string_blocks(bool transpose) const
+	{
+		std::ostringstream str;
+		auto bsr_mat = dynamic_cast<const MatBSR<FPP, Cpu>*>(this);
+		faust_unsigned_int nbr, nbc;
+		if(transpose)
+		{
+			nbr = bsr_mat->getNbBlockCol();
+			nbc = bsr_mat->getNbBlockRow();
+		}
+		else
+		{
+			nbr = bsr_mat->getNbBlockRow();
+			nbc = bsr_mat->getNbBlockCol();
+		}
+		str << " (blocksize = " <<  nbr << "x" << nbc << ")";
+		return str.str();
+	}
+
+	template <typename FPP>
 		std::string MatBSR<FPP,Cpu>::to_string(MatType type, const bool transpose/*=false*/, const bool displaying_small_mat_elts/*=false*/) const
 		{
 			std::ostringstream  str;
