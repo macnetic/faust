@@ -37,27 +37,6 @@
 namespace Faust
 {
 
-	template <typename FPP, FDevice DEVICE>
-		void palm4msa(
-				/** input matrix */
-				const MatDense<FPP,DEVICE>& A,
-				/* input constraints */
-				std::vector<ConstraintGeneric*> & constraints,
-				/** output factors (if not initialized to size nfacts, set to nfacts identities (with constraints dims) */
-				TransformHelper<FPP,DEVICE>& S,
-				/** lambda output, intialized from outside */
-				FPP& lambda,
-				//const unsigned int nites,
-				const StoppingCriterion<Real<FPP>>& sc,
-				const bool is_update_way_R2L=false,
-				const FactorsFormat factors_format=AllDynamic,
-				const bool compute_2norm_on_array=false,
-				const Real<FPP> norm2_threshold=FAUST_PRECISION,
-				const unsigned int norm2_max_iter=FAUST_NORM2_MAX_ITER,
-				const bool constant_step_size=false, const Real<FPP> step_size=FAUST_PRECISION,
-				const bool on_gpu=false,
-				const bool is_verbose=false); //TODO: the def of this decl must be updated in faust_palm4msa2020.hpp
-
 
 	template <typename FPP, FDevice DEVICE>
 		void palm4msa2(
@@ -162,5 +141,4 @@ namespace Faust
 
 }
 #include "faust_palm4msa2020.hpp"
-#include "faust_palm4msa2020_2.hpp"
 #endif

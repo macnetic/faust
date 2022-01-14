@@ -115,12 +115,7 @@ int main(int argc, char* argv[])
 	vector<ConstraintGeneric*> gpu_constraints{&gpu_c1, &gpu_c2};
 #endif
 
-	if(meth == 1)
-	{
-		cout << "use impl1" << endl;
-		Faust::palm4msa<FPP,Cpu>(data, constraints, facts, lambda, sc, is_update_way_R2L, factors_format, compute_2norm_on_array, norm2_threshold, norm2_max_iter, false, FAUST_PRECISION, on_gpu, true);
-	}
-	else if(meth == 2)
+	if(meth == 2)
 	{
 		cout << "use impl2" << endl;
 		Faust::palm4msa2<FPP,Cpu>(data, constraints, facts, lambda, sc, is_update_way_R2L, factors_format, packing_RL, no_normalization, no_lambda, MHTPParams<FPP>(), compute_2norm_on_array, norm2_threshold, norm2_max_iter, false, FAUST_PRECISION, on_gpu);
@@ -138,7 +133,7 @@ int main(int argc, char* argv[])
 #endif
 	else
 	{
-		std::cerr << "meth (arg 1) must be 1 or 2." << endl;
+		std::cerr << "meth (arg 1) must be 2 or 3." << endl;
 	}
 	//	auto left_th_2 = th->left(2);
 	//	left_th_2->display();
