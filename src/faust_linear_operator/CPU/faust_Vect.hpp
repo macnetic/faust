@@ -378,4 +378,13 @@ FPP Faust::Vect<FPP, Cpu>::max_coeff(int *index) const
 	return max;
 }
 
+template<typename FPP>
+void Faust::Vect<FPP, Cpu>::normalize()
+{
+	auto n = norm();
+	if(n == Real<FPP>(0))
+		throw std::domain_error("Can't normalize a zero-norm vector.");
+	scalarMultiply(1/norm());
+}
+
 #endif

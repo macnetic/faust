@@ -439,6 +439,16 @@ namespace Faust
 		}
 
 	template<typename FPP>
+		template<typename FPP2>
+		MatDense<FPP2, Cpu> MatDense<FPP, Cpu>::to_real() const
+		{
+			Faust::MatDense<FPP2, Cpu> ddmat;
+			ddmat.resize(this->getNbRow(), this->getNbCol());
+			ddmat.mat = mat.real().eval().template cast<Real<FPP2>>();
+			return ddmat;
+		}
+
+	template<typename FPP>
 		void MatDense<FPP,Cpu>::multiply(MatSparse<FPP,Cpu> & M, char opThis) const
 		{
 			//TODO: this function should not rely on spgemm which forces us to transconjugate
@@ -1131,7 +1141,7 @@ void MatDense<FPP,Cpu>::normalize(int norm_type/*=-2*/)
 		default:
 			throw std::runtime_error("Unknown kind of norm asked for normalization.");
 	}
-	if(n != FPP(0))
+	if(n != Real<FPP>(0))
 		scalarMultiply(FPP(1.0/n));
 	else
 		throw std::domain_error("the norm is zero, can't normalize.");

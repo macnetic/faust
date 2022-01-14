@@ -147,7 +147,7 @@ namespace Faust
 	void scalarMultiply(FPP1 const scalar){vec *= scalar;}
 		void conjugate();
 		FPP normL1() const;
-		void normalize(){scalarMultiply(1/norm());}
+		void normalize();
 
 
         // multiply (*this) =  A * (*this)

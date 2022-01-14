@@ -832,7 +832,35 @@ FPP Faust::power_iteration(const  Faust::LinearOperator<FPP,Cpu> & A, const faus
 			i++;
       		lambda_old = lambda;
       		xk_norm = xk;
-      		xk_norm.normalize();
+			try
+			{
+				xk_norm.normalize();
+			}
+			catch(std::domain_error de)
+			{
+				// this block catches division by zero error that might occur in xk_norm normalization
+				// known cases of PALM4MSA 2020 running 2-norm computation (through power_iteration) on float precision produces sometimes this error while in double precision the power iteration goes well
+				// so here we process these known cases that occur on Transform<float> 2-norm computations
+				// other cases where A is a MatDense might occur but are not handled until it makes sense (see the 2nd message below)
+				const Faust::Transform<FPP, Cpu>* t = nullptr;
+				if(std::is_same<FPP, float>::value)
+				{
+					if(t = dynamic_cast<const Faust::Transform<FPP, Cpu>*>(&A))
+					{
+						// TODO: ideally each factor should be converted in double precision
+						// here we compute the product and then convert it to float precision, it's simpler
+						auto dmat = t->get_product();
+						auto ddmat = dmat.template to_real<double>();
+						std::cerr << "WARNING: power_iteration detected a zero norm vector, trying to recompute the Transform power_iteration using double precision instead of float precision to contravene this error." << std::endl;
+						auto res = FPP(power_iteration(ddmat, nbr_iter_max, threshold, flag, (double*) nullptr, rand_init));
+						std::cerr << "The error was fixed with double precision!" << std::endl;
+						return res;
+					}
+					else
+						std::cerr << "power_iteration error: vector normalization failed (because of zero norm) in float precision context but A is a: " << typeid(A).name() << ". The workaround of recomputation in double precision is only enabled for Transform<float, Cpu> so far (this error might suggest a new need in the workaround, please contact the developers)." << std::endl;
+				}
+				throw de;
+			}
       		xk = A.multiply(xk_norm);
       		lambda = xk_norm.dot(xk);
      		//std::cout << "i = " << i << " ; lambda=" << lambda << std::endl;
