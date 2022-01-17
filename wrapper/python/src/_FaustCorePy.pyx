@@ -109,7 +109,7 @@ def enable_gpu_mod(libpaths=None, backend='cuda', silent=False, fatal=False):
         else:
             if fatal and libpaths[-1] == libpath:
                 raise Exception("Can't load gpu_mod library, tried all the candidate paths ("
-                                +libpaths+"). Maybe they are not"
+                                +str(libpaths)+"). Maybe they are not"
                                 " correct or the backends (CUDA) are not installed or"
                                 " configured properly so"
                                 " the libraries are not found.")

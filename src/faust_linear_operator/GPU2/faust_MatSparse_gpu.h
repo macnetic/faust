@@ -84,6 +84,8 @@ namespace Faust
 				MatSparse<FPP, GPU2>* clone(const int32_t dev_id=-1, const void* stream=nullptr) const;
 				MatGeneric<FPP,GPU2>* Clone(const bool isOptimize=false) const;
 				void real(MatSparse<Real<FPP>, GPU2>& real_mat) const;
+				template<typename FPP2>
+					MatSparse<Real<FPP2>, GPU2> to_real() const;
 				void move(const int32_t dev_id=-1, const void* stream=nullptr);
 				int32_t getNbRow() const;
 				int32_t getNbCol() const;
@@ -112,5 +114,6 @@ namespace Faust
 
 };
 
+#include "faust_MatSparse_gpu.hpp"
 #endif
 #endif
