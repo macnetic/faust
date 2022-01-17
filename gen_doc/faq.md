@@ -10,7 +10,8 @@
 [1.3. How to launch the demos with matfaust?](#mat_three)  
 [1.4. How can I launch the integrated unit tests of matfaust?](#mat_four)  
 [1.5. How to run the PALM4MSA algorithm in a step-by-step fashion?](#mat_five)  
-[2.6. Why this no_normalization parameter for PALM4MSA and hierarchical factorization?](#mat_six)
+[1.6. Why this no_normalization parameter for PALM4MSA and hierarchical factorization?](#mat_six)  
+[1.7. How to deal with single precision sparse matrices in Matlab?](#mat_seven)  
 
 **2. About pyfaust:**  
 [2.1. How can I launch the integrated unit tests of pyfaust?](#py_one)  
@@ -183,9 +184,52 @@ TODO (in the meanwhile you can read the [pyfaust entry](#py_three))
 
 \anchor mat_six
 
-## 1.5  Why this no_normalization parameter for PALM4MSA and hierarchical factorization?
+## 1.6  Why this no_normalization parameter for PALM4MSA and hierarchical factorization?
 
 TODO (in the meanwhile you can read the [pyfaust entry](#py_five))
+
+\anchor mat_seven
+
+## 1.7. How to deal with single precision sparse matrices in Matlab?
+
+As you maybe know, Matlab doesn't support single (precision) sparse matrices, it does only support double sparse matrices.
+If you create a double sparse matrix and try to convert it to single class, here is the result:
+
+	>> M = sprand(10, 10, .2);
+	>> sM = single(M)
+	Error using single
+	Attempt to convert to unimplemented sparse type
+
+However since matfaust supports single/float sparse matrices, you might wonder how to use such a class of matrices in matlab.
+The solution is straightforward, you encapsulate it in a Faust as follows:
+
+	>> F = matfaust.Faust(M)
+
+	F =
+
+	Faust size 10x10, density 0.19, nnz_sum 19, 1 factor(s):
+	- FACTOR 0 (double) SPARSE, size 10x10, density 0.19, nnz 19
+	>> class(F)
+
+	ans =
+
+	    'double'
+
+	>> sF = single(F)
+
+	sF =
+
+	Faust size 10x10, density 0.19, nnz_sum 19, 1 factor(s):
+	- FACTOR 0 (float) SPARSE, size 10x10, density 0.19, nnz 19
+	>> class(sF)   
+
+	ans =
+
+	    'single'
+
+
+sF is now your single sparse matrix encapsulated in a Faust. You can easily proceed to any operation on it as for any Faust. They all be computed as respect to the single/float precision (which is of course less expensive than double precision).
+
 
 # 2. About pyfaust
 \anchor py_one
