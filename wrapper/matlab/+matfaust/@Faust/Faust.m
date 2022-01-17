@@ -649,6 +649,22 @@ classdef Faust
 
 		end
 
+
+		%======================================================================
+		%> @brief Returns a new Faust whose class is single. It allows to convert all the factors to single precision.
+		%> @b Usage
+		%>
+		%> &nbsp;&nbsp;&nbsp; @b sF = single(F)
+		%>
+		%> @retval sF the single class/precision Faust.
+		%>
+		%> <p/>@b See @b also Faust.class
+		%======================================================================
+		function sF = single(F)
+			sF = matfaust.Faust(call_mex(F, 'single'), true, F.dev, 'float');
+			% 2nd argument (true) is for isReal attribute
+		end
+
 		%======================================================================
 		%> @brief The transpose of F.
 		%>

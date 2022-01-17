@@ -216,7 +216,8 @@ namespace Faust
 			void convertToSparse();
 			void convertToDense();
 			FPP get_item(faust_unsigned_int i, faust_unsigned_int j);
-			TransformHelper<Real<FPP>, Cpu>* real();
+			template<typename FPP2>
+			TransformHelper<Real<FPP2>, Cpu>* real();
 		};
 
 

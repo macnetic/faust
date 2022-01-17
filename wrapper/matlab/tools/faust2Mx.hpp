@@ -76,12 +76,12 @@ mxArray*  FaustMat2mxArray(const Faust::MatDense<FPP,DEV>& M)
 	col = M.getNbCol();
 
 	const mwSize dims[3]={(mwSize)row,(mwSize)col};
-	if(typeid(FPP)==typeid(float))
+	if(std::is_same<float, FPP>::value)
 	{
 		mxMat = mxCreateNumericArray(2, dims, mxSINGLE_CLASS, mxREAL);
-	}else if(sizeof(FPP)==sizeof(double))
+	}else if(std::is_same<double, FPP>::value)
 	{
-		mxMat = mxCreateNumericArray(2, dims, mxDOUBLE_CLASS, mxREAL);		
+		mxMat = mxCreateNumericArray(2, dims, mxDOUBLE_CLASS, mxREAL);
 	}else
 	{
 		mexErrMsgTxt("FaustMat2mxArray : unsupported type of float");

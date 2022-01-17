@@ -405,6 +405,9 @@ namespace Faust
 
 			void real(MatSparse<Real<FPP>, Cpu> & real_mat) const;
 
+			template<typename FPP2>
+				MatSparse<FPP2, Cpu> to_real() const;
+
 
 			bool containsNaN() const;
 			void print_bufs(const std::string name="");

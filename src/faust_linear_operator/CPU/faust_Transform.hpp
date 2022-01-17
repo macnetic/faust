@@ -418,7 +418,8 @@ void Faust::Transform<FPP, Cpu>::save_mat_file(const char* filename, bool transp
 	mat_t *matfp;
 	if(!size()) handleError("Faust::Transform", "save_mat_file(): can't save an empty Faust.");
 	matvar_t **faust_factor_matvars = new matvar_t*[size()];
-	for(i=0; i < size(); i++){
+	for(i=0; i < size(); i++)
+	{
 		// revert factors order if we are in transpose case
 		i2 = transpose?size()-i-1:i;
 		faust_factor_matvars[i] = data[i2]->toMatIOVar(transpose, conjugate);

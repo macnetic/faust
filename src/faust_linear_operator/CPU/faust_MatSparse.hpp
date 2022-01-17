@@ -1454,6 +1454,16 @@ void Faust::MatSparse<FPP,Cpu>::real(MatSparse<Real<FPP>, Cpu> &real_mat) const
 }
 
 template<typename FPP>
+template<typename FPP2>
+Faust::MatSparse<FPP2, Cpu> Faust::MatSparse<FPP, Cpu>::to_real() const
+{
+	Faust::MatSparse<FPP2, Cpu> smat;
+	smat.resize(this->getNonZeros(), this->getNbRow(), this->getNbCol());
+	smat.mat = mat.real().eval().template cast<Real<FPP2>>();
+	return smat;
+}
+
+template<typename FPP>
 bool Faust::MatSparse<FPP,Cpu>::containsNaN() const
 {
 	return Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>>(const_cast<FPP*>(getValuePtr()) /* no worry, just a read access */, getNonZeros(), 1).hasNaN();

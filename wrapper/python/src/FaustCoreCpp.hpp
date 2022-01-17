@@ -666,7 +666,7 @@ template<typename FPP, FDevice DEV>
 FaustCoreCpp<Real<FPP>,DEV>* FaustCoreCpp<FPP,DEV>::real()
 {
 //    auto th = this->transform->template real<Real<FPP>>();
-    auto th = this->transform->real();
+    auto th = this->transform->template real<Real<FPP>>();
     auto core = new FaustCoreCpp<Real<FPP>,DEV>(th);
     return core;
 }
