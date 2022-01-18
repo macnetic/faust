@@ -59,6 +59,10 @@ namespace Faust
 			faust_unsigned_int getNonZeros()const;
 			size_t getNBytes() const;
 			MatType getType() const;
+			void copy_bdata(FPP*& bdata_out) const;
+			void copy_browptr(int*& browptr_out) const;
+			void copy_bcolinds(int*& bcolinds) const;
+			void get_buf_sizes(size_t &bdata_size, size_t &browptr_size, size_t &bcolinds_size);
 			void operator*=(const FPP alpha);
 			std::string to_string(MatType type, const bool transpose=false, const bool displaying_small_mat_elts=false) const;
 			std::string to_string(const bool transpose=false, const bool displaying_small_mat_elts=false) const;

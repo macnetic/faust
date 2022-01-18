@@ -151,6 +151,17 @@ namespace Faust
 					faust_unsigned_int* num_rows,
 					faust_unsigned_int* num_cols,
 					const bool transpose = false) const;
+			void get_fact_bsr_info(const faust_unsigned_int id,
+					size_t& bdata_sz,
+					size_t& browptr_sz,
+					size_t& bcolinds_sz,
+					size_t& bnnz,
+					size_t& bnrows,
+					size_t& bncols) const;
+			void get_fact(const faust_unsigned_int id,
+					FPP* bdata,
+					int* brow_ptr,
+					int* bcol_inds) const;
 			virtual MatDense<FPP,Cpu> get_product(const int mul_order_opt_mode=-1);// const;
 			virtual void get_product(MatDense<FPP,Cpu>& prod, const int mul_order_opt_mode=-1); //const;
 			virtual void save_mat_file(const char* filename) const;

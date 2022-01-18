@@ -833,6 +833,43 @@ template<typename FPP>
 
 template<typename FPP>
 	void TransformHelper<FPP,Cpu>::get_fact(const faust_unsigned_int id,
+			FPP* bdata,
+			int* brow_ptr,
+			int* bcol_inds) const
+	{
+		if(id < 0 || id > this->size())
+			throw std::domain_error("get_fact(BSR): index out of bounds.");
+		if(this->get_fact_type(id) != BSR)
+			throw std::runtime_error("get_fact(BSR): matrix requested is not a MatBSR.");
+		MatBSR<FPP, Cpu> *bmat = dynamic_cast<MatBSR<FPP, Cpu>*>(this->transform->data[id]);
+		bmat->copy_bdata(bdata);
+		bmat->copy_browptr(brow_ptr);
+		bmat->copy_bcolinds(bcol_inds);
+	}
+
+template<typename FPP>
+	void TransformHelper<FPP,Cpu>::get_fact_bsr_info(const faust_unsigned_int id,
+			size_t& bdata_sz,
+			size_t& browptr_sz,
+			size_t& bcolinds_sz, 
+			size_t& bnnz,
+			size_t& bnrows,
+			size_t& bncols) const
+	{
+		if(id < 0 || id > this->size())
+			throw std::domain_error("get_fact_bsr_info(BSR): index out of bounds.");
+		if(this->get_fact_type(id) != BSR)
+			throw std::runtime_error("get_fact_bsr_info(BSR): matrix requested is not a MatBSR.");
+		MatBSR<FPP, Cpu> *bmat = dynamic_cast<MatBSR<FPP, Cpu>*>(this->transform->data[id]);
+		bmat->get_buf_sizes(bdata_sz, browptr_sz, bcolinds_sz);
+		bnnz = bmat->getNBlocks();
+		bnrows = bmat->getNbBlockRow();
+		bncols = bmat->getNbBlockCol();
+	}
+
+
+template<typename FPP>
+	void TransformHelper<FPP,Cpu>::get_fact(const faust_unsigned_int id,
 			const int** rowptr,
 			const int** col_ids,
 			const FPP** elts,

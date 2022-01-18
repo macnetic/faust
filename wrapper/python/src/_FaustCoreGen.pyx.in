@@ -411,9 +411,16 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
         cdef @TYPE@[:,:] fact_view
         cdef rowptr, col_ids, elts, nnz
         cdef int[:] rowptr_view, col_ids_view
-        is_fact_sparse = self.@CORE_OBJ@.is_fact_sparse(i)
+        ### for bsr matrix buffer
+        cdef size_t[:] bsr_sz_view
+        cdef @TYPE@[:] bsr_data1d_view
+        ###
+        #is_fact_sparse = self.@CORE_OBJ@.is_fact_sparse(i)
+        fac_type = self.@CORE_OBJ@.get_fact_type(i) # 0 == Dense, 1 == Sparse,
+                                                    # 2 == Diag, 3 == BSR
         is_transposed = self.@CORE_OBJ@.isTransposed()
-        if(is_fact_sparse):
+        #print("fac_type:", fac_type)
+        if fac_type == 1: # Sparse matrix
             # is_transposed = False # uncomment to disable the trick which
             # uses csc representation instead of csr transpose
             # to optimize copy
@@ -442,7 +449,7 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
                 fact = csc_matrix((elts[0,:], col_ids, rowptr), shape=shape)
             else:
                 fact = csr_matrix((elts[0,:], col_ids, rowptr), shape=shape)
-        else: # dense matrix
+        elif fac_type == 0: # dense matrix
             if(is_transposed):
                 order = 'C'
                 # C contiguous repr. (row-major order ) is used to optimized the
@@ -457,6 +464,41 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
                                                <unsigned int*>NULL,
                                                <unsigned int*>NULL,
                                                is_transposed)
+        elif fac_type == 3: # BSR matrix
+            #            print("factor to retrieve is a BSR matrix.")
+            nrows = self.@CORE_OBJ@.get_fact_nb_rows(i)
+            ncols = self.@CORE_OBJ@.get_fact_nb_cols(i)
+            #            print("nrows, ncols:", nrows, ncols)
+            nnz = self.@CORE_OBJ@.get_fact_nnz(i)
+            buf_sizes = np.empty((6), dtype='uint64') # sizes of bdata, browptr
+            # and bcolinds, bnnz, bnrows, bncols
+            bsr_sz_view = buf_sizes
+            self.@CORE_OBJ@.get_fact_bsr_info(i, bsr_sz_view[0],
+                                              bsr_sz_view[1],
+                                              bsr_sz_view[2],
+                                              bsr_sz_view[3],
+                                              bsr_sz_view[4],
+                                              bsr_sz_view[5])
+            #            print("bsr buf sizes:", buf_sizes, "nnz: ", nnz)
+            bsr_data1d = np.empty(buf_sizes[3] * buf_sizes[5] * buf_sizes[4], dtype=type2dtype('@TYPE@'))
+            bsr_data1d_view = bsr_data1d
+            bsr_data_3d = bsr_data1d.reshape((buf_sizes[3], buf_sizes[5],
+                                                buf_sizes[4]))
+            browptr = np.empty((buf_sizes[1]), dtype='int32')
+            bcolinds = np.empty((buf_sizes[2]), dtype='int32')
+            rowptr_view = browptr
+            col_ids_view = bcolinds
+            self.@CORE_OBJ@.get_fact_bsr(i, &bsr_data1d_view[0], &rowptr_view[0],
+                                         &col_ids_view[0])
+            bsr_data_3d_T = np.empty((buf_sizes[3], buf_sizes[4],
+                                      buf_sizes[5]), dtype=type2dtype('@TYPE@'))
+            for i in range(buf_sizes[3]):
+                bsr_data_3d_T[i] = bsr_data_3d[i].T
+            #            print("bsr_data_3d:", bsr_data_3d)
+            #            print("browptr:", browptr)
+            #            print("bcolinds:", bcolinds)
+            return bsr_matrix((bsr_data_3d_T, bcolinds, browptr), shape=(nrows,
+                                                                        ncols))
         return fact
 
     def slice(self, indices):

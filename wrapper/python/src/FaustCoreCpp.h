@@ -126,10 +126,22 @@ class FaustCoreCpp
     void get_fact_dense(const unsigned int& i, FPP* elts,
             unsigned int* num_rows, unsigned int* num_cols,
             const bool transpose) const;
+    void get_fact_bsr_info(const faust_unsigned_int id,
+            size_t& bdata_sz,
+            size_t& browptr_sz,
+            size_t& bcolinds_sz,
+            size_t& bnnz,
+            size_t& bnrows,
+            size_t& bncols ) const;
+    void get_fact_bsr(const faust_unsigned_int id,
+            FPP* bdata,
+            int* brow_ptr,
+            int* bcol_inds) const;
     FaustCoreCpp<FPP,DEV>* left(const faust_unsigned_int) const;
     FaustCoreCpp<FPP,DEV>* right(const faust_unsigned_int) const;
     faust_unsigned_int get_fact_nnz(const faust_unsigned_int) const;
     bool is_fact_sparse(const faust_unsigned_int id) const;
+    int get_fact_type(const faust_unsigned_int id) const;
     FaustCoreCpp<FPP,DEV>* slice(unsigned int, unsigned int, unsigned int, unsigned int) const;
     FaustCoreCpp<FPP,DEV>* fancy_idx(unsigned long int* row_ids, unsigned long int
                                   num_rows, unsigned long int* col_ids,

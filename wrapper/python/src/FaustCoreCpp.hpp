@@ -304,6 +304,34 @@ bool FaustCoreCpp<FPP,DEV>::is_fact_sparse(const faust_unsigned_int id) const
 }
 
 template<typename FPP, FDevice DEV>
+int FaustCoreCpp<FPP,DEV>::get_fact_type(const faust_unsigned_int id) const
+{
+    return (int) transform->get_fact_type(id);
+}
+
+template<typename FPP, FDevice DEV>
+void FaustCoreCpp<FPP,DEV>::get_fact_bsr_info(const faust_unsigned_int id,
+        size_t& bdata_sz,
+        size_t& browptr_sz,
+        size_t& bcolinds_sz,
+        size_t& bnnz,
+        size_t& bnrows,
+        size_t& bncols) const
+{
+    transform->get_fact_bsr_info(id, bdata_sz, browptr_sz, bcolinds_sz, bnnz, bnrows, bncols);
+}
+
+template<typename FPP, FDevice DEV>
+void FaustCoreCpp<FPP,DEV>::get_fact_bsr(const faust_unsigned_int id,
+        FPP* bdata,
+        int* brow_ptr,
+        int* bcol_inds) const
+{
+    transform->get_fact(id, bdata, brow_ptr, bcol_inds);
+}
+
+
+template<typename FPP, FDevice DEV>
 FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::slice(unsigned int start_row_id, unsigned int end_row_id, unsigned int start_col_id, unsigned int end_col_id) const
 {
     Faust::TransformHelper<FPP,DEV>* th = this->transform->slice(start_row_id, end_row_id, start_col_id, end_col_id);

@@ -263,6 +263,33 @@ namespace Faust
 		}
 
 	template <typename FPP>
+		void MatBSR<FPP,Cpu>::copy_bdata(FPP*& bdata_out) const
+		{
+			memcpy(bdata_out, bmat.data, this->getNBlocks()*this->getNbBlockRow()*this->getNbBlockRow()*sizeof(FPP));
+		}
+
+	template <typename FPP>
+		void MatBSR<FPP,Cpu>::copy_browptr(int*& browptr_out) const
+		{
+			memcpy(browptr_out, bmat.browptr, (getNbBlocksPerDim(0)+1)*sizeof(int));
+		}
+
+	template <typename FPP>
+		void MatBSR<FPP,Cpu>::copy_bcolinds(int*& bcolinds_out) const
+		{
+			memcpy(bcolinds_out, bmat.bcolinds, bmat.bnnz*sizeof(int));
+		}
+
+	template<typename FPP>
+		void MatBSR<FPP,Cpu>::get_buf_sizes(size_t &bdata_size, size_t &browptr_size, size_t &bcolinds_size)
+		{
+			bdata_size = this->getNBlocks()*this->getNbBlockRow()*this->getNbBlockCol();
+			browptr_size = (this->getNbBlocksPerDim(0)+1);
+			bcolinds_size = this->getNBlocks();
+		}
+
+
+	template <typename FPP>
 		void MatBSR<FPP,Cpu>::operator*=(const FPP alpha)
 		{
 			bmat.mul(alpha);

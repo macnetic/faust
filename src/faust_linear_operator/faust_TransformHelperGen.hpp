@@ -130,6 +130,12 @@ namespace Faust
 			return this->transform->is_fact_sparse(this->is_transposed?size()-id-1:id);
 		}
 
+	template<typename FPP, FDevice DEV>
+		MatType TransformHelperGen<FPP,DEV>::get_fact_type(const faust_unsigned_int id) const
+		{
+			return this->transform->get_fact(id, false)->getType();
+		}
+
 
 	template<typename FPP, FDevice DEV>
 		bool TransformHelperGen<FPP,DEV>::is_fact_dense(const faust_unsigned_int id) const
