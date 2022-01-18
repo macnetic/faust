@@ -808,6 +808,29 @@ template<typename FPP>
 			TransformHelperGen<FPP,GPU2>::get_item(i, j, M, out_id);
 			return M.tocpu().getData()[out_id];
 		}
-}
+
+	template<typename FPP>
+		void TransformHelper<FPP,GPU2>::get_fact_bsr_info(const faust_unsigned_int id,
+				size_t& bdata_sz,
+				size_t& browptr_sz,
+				size_t& bcolinds_sz, 
+				size_t& bnnz,
+				size_t& bnrows,
+				size_t& bncols) const
+		{
+			throw std::runtime_error("TransformHelper<FPP,GPU2>::get_fact_bsr_info error: GPU2 doesn't support the BSR matrix yet.");
+		}
+
+	template<typename FPP>
+		void TransformHelper<FPP,GPU2>::get_fact(const faust_unsigned_int id,
+				FPP* bdata,
+				int* brow_ptr,
+				int* bcol_inds) const
+		{
+
+			throw std::runtime_error("TransformHelper<FPP,GPU2>::get_fact error: GPU2 doesn't support the BSR matrix yet.");
+		}
+
+	}
 
 #include "faust_TransformHelper_cat_gpu.hpp"

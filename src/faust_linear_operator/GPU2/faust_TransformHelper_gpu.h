@@ -111,6 +111,21 @@ namespace Faust
 						faust_unsigned_int* num_cols,
 						const bool transpose  = false) const;
 
+				void get_fact_bsr_info(const faust_unsigned_int id,
+						size_t& bdata_sz,
+						size_t& browptr_sz,
+						size_t& bcolinds_sz,
+						size_t& bnnz,
+						size_t& bnrows,
+						size_t& bncols) const;
+
+				void get_fact(const faust_unsigned_int id,
+						FPP* bdata,
+						int* brow_ptr,
+						int* bcol_inds) const;
+
+
+
 				void save_mat_file(const char* filepath) const;
 				FPP get_item(faust_unsigned_int i, faust_unsigned_int j);
 				virtual ~TransformHelper() {};
