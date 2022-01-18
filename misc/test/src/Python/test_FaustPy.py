@@ -811,6 +811,18 @@ class TestFaustPy(unittest.TestCase):
                     b = b.toarray()
                 np.allclose(a,b)
 
+    def test_bsr_get_fact(self):
+        print("test_bsr_get_fact")
+        from pyfaust import rand_bsr, Faust
+        from numpy import allclose
+        nfacs = 5
+        F = rand_bsr(15, 15, 3, 5, nfacs)
+        for i in range(nfacs):
+            bf = F.factors(i)
+            G = Faust(bf)
+            bf2  = G.factors(0)
+            self.assertTrue(allclose(bf.toarray(), bf2.toarray()))
+
 class TestFaustPyCplx(TestFaustPy):
 
         def setUp(self):
