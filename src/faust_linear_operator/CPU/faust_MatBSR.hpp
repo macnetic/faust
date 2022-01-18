@@ -265,7 +265,7 @@ namespace Faust
 	template <typename FPP>
 		void MatBSR<FPP,Cpu>::copy_bdata(FPP*& bdata_out) const
 		{
-			memcpy(bdata_out, bmat.data, this->getNBlocks()*this->getNbBlockRow()*this->getNbBlockRow()*sizeof(FPP));
+			memcpy(bdata_out, bmat.data, this->getNBlocks()*this->getNbBlockCol()*this->getNbBlockRow()*sizeof(FPP));
 		}
 
 	template <typename FPP>
@@ -633,10 +633,10 @@ BSRMat<T, BlockStorageOrder>& BSRMat<T, BlockStorageOrder>::operator=(const BSRM
 	free_bufs();
 	data = new T[bnnz*bm*bn];
 	bcolinds = new int[bnnz];
-	browptr = new int[b_per_coldim+1];
+	browptr = new int[b_per_rowdim+1];
 	memcpy(data, src_bmat.data, sizeof(T)*bnnz*bm*bn);
 	memcpy(bcolinds, src_bmat.bcolinds, sizeof(int)*bnnz);
-	memcpy(browptr, src_bmat.browptr, sizeof(int)*(b_per_coldim+1));
+	memcpy(browptr, src_bmat.browptr, sizeof(int)*(b_per_rowdim+1));
 	return *this;
 }
 
