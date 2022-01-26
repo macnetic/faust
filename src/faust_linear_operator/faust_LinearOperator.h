@@ -61,7 +61,6 @@
 //! \brief Faust namespace contains the principal class of the project.
 namespace Faust
 {
-    // modif AL AL
     template<typename FPP,FDevice DEVICE>
     class MatDense;
 	template<typename FPP, FDevice DEVICE>

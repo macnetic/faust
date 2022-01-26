@@ -1547,4 +1547,11 @@ Faust::TransformHelper<Real<FPP2>, Cpu>* Faust::TransformHelper<FPP, Cpu>::real(
 	auto th = new TransformHelper<Real<FPP2>, Cpu>(real_data, 1.0, false, false, true);
 	return th;
 }
+
+template<typename FPP>
+bool Faust::TransformHelper<FPP,Cpu>::is_zero() const
+{
+	return this->transform.is_zero;
+}
+
 #include "faust_TransformHelper_cat.hpp"

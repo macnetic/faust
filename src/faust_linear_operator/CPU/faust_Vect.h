@@ -159,6 +159,7 @@ namespace Faust
         void  multiplyLeft(MatDense<FPP,Cpu> const& A); //{gemv(A, *this, *this, 1.0, 0.0, 'N');}
         void  multiplyLeft(MatSparse<FPP,Cpu> const& S,const char TransS='N');
 
+		bool isZero() const {return vec.isZero(0);};
         FPP sum()const{return vec.sum();}
         FPP mean()const{return vec.mean();}
         FPP dot(const Vect<FPP,Cpu> & v)const;

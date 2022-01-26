@@ -158,7 +158,7 @@ const char * Faust::Transform<FPP,Cpu>::m_className="Faust::Transform<FPP,Cpu>";
 
 template<typename FPP>
 Faust::Transform<FPP,Cpu>::Transform() :
-	totalNonZeros(0), data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()),
+	totalNonZeros(0), is_zero(false), data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()),
 	dtor_delete_data(false), dtor_disabled(false)
 {
 
@@ -171,7 +171,7 @@ Faust::Transform<FPP,Cpu>::Transform() :
 
 template<typename FPP>
 Faust::Transform<FPP,Cpu>::Transform(const Faust::Transform<FPP,Cpu> & A) :
-	totalNonZeros(A.totalNonZeros), data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()),
+	totalNonZeros(A.totalNonZeros), is_zero(A.is_zero), data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()),
 	dtor_delete_data(false), dtor_disabled(false)
 {
 	data.resize(0); // to be sure
@@ -184,7 +184,7 @@ Faust::Transform<FPP,Cpu>::Transform(const Faust::Transform<FPP,Cpu> & A) :
 
 template<typename FPP>
 Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatGeneric<FPP,Cpu> *> & facts, const FPP lambda_ /*default value = 1.0 */,const bool optimizedCopy /*default value = false*/, const bool cloning_fact /* default to true */) :
-	totalNonZeros(0), data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()),
+	totalNonZeros(0), is_zero(false), data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()),
 	dtor_delete_data(false), dtor_disabled(false)
 {
 	data.resize(facts.size());
@@ -207,7 +207,9 @@ Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatGeneric<FPP,Cpu
 		}
 		else
 			data[min_size_id] = facts[min_size_id];
-		totalNonZeros += data[min_size_id]->getNonZeros();
+		auto fac_nnz = data[min_size_id]->getNonZeros();
+		totalNonZeros += fac_nnz;
+		is_zero = ! fac_nnz;
 		for (int i=0 ; i<data.size() ; i++)
 		{
 			if(i == min_size_id)
@@ -216,7 +218,9 @@ Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatGeneric<FPP,Cpu
 				data[i]=facts[i]->Clone(optimizedCopy);
 			else
 				data[i] = facts[i];
-			totalNonZeros += data[i]->getNonZeros();
+			fac_nnz = data[i]->getNonZeros();
+			if(! is_zero) is_zero = ! fac_nnz;
+			totalNonZeros += fac_nnz;
 			if(!dtor_delete_data) ref_man.acquire(data[i]);
 		}
 
@@ -234,7 +238,7 @@ Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatGeneric<FPP,Cpu
 
 
 template<typename FPP>
-Faust::Transform<FPP,Cpu>::Transform(Faust::Transform<FPP,Cpu>&& T) : totalNonZeros(T.totalNonZeros), dtor_delete_data(T.dtor_delete_data), dtor_disabled(T.dtor_disabled)
+Faust::Transform<FPP,Cpu>::Transform(Faust::Transform<FPP,Cpu>&& T) : totalNonZeros(T.totalNonZeros), is_zero(T.is_zero), dtor_delete_data(T.dtor_delete_data), dtor_disabled(T.dtor_disabled)
 {
 	data = std::move(T.data);
 	totalNonZeros = T.totalNonZeros;
@@ -246,34 +250,40 @@ Faust::Transform<FPP,Cpu>::Transform(Faust::Transform<FPP,Cpu>&& T) : totalNonZe
 
 template<typename FPP>
 Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatDense<FPP,Cpu> >&facts, const bool optimizedCopy /*default value = false*/ ):	data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()),
-	totalNonZeros(0), dtor_delete_data(false), dtor_disabled(false)
+	totalNonZeros(0), is_zero(false), dtor_delete_data(false), dtor_disabled(false)
 {
 	data.resize(facts.size());
+	faust_unsigned_int fac_nnz;
 	for (int i=0 ; i<data.size() ; i++)
 	{
 		data[i]=facts[i].Clone(optimizedCopy);
 		if(!dtor_delete_data) ref_man.acquire(data[i]);
-		totalNonZeros += data[i]->getNonZeros();
+		fac_nnz = data[i]->getNonZeros();
+		if(! is_zero) is_zero = ! fac_nnz;
+		totalNonZeros += fac_nnz;
 	}
 
 }
 
 template<typename FPP>
-Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatSparse<FPP,Cpu> >& facts, const bool optimizedCopy /*default value = false*/ ):	totalNonZeros(0), data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()),
+Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatSparse<FPP,Cpu> >& facts, const bool optimizedCopy /*default value = false*/ ):	totalNonZeros(0), is_zero(false), data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()),
 	dtor_delete_data(false), dtor_disabled(false)
 {
 	data.resize(facts.size());
+	faust_unsigned_int fac_nnz;
 	for (int i=0 ; i<data.size() ; i++)
 	{
 		data[i]=facts[i].Clone(optimizedCopy);
-		totalNonZeros += data[i]->getNonZeros();
+		fac_nnz = data[i]->getNonZeros();
+		if(! is_zero) is_zero = ! fac_nnz;
+		totalNonZeros += fac_nnz;
 		if(!dtor_delete_data) ref_man.acquire(data[i]);
 	}
 }
 
 template<typename FPP>
 Faust::Transform<FPP,Cpu>::Transform(const Transform<FPP, Cpu>* A, const bool transpose_A, const bool conj_A, const Transform<FPP, Cpu>* B, const bool transpose_B, const bool conj_B):
-	totalNonZeros(0), data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()), dtor_delete_data(false), dtor_disabled(false)
+	totalNonZeros(0), is_zero(false), data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()), dtor_delete_data(false), dtor_disabled(false)
 {
 	data.resize(A->size()+B->size());
 	int i = transpose_A?A->size()-1:0;
@@ -281,6 +291,7 @@ Faust::Transform<FPP,Cpu>::Transform(const Transform<FPP, Cpu>* A, const bool tr
 	// verification that mul. is defined between A and B is done afterward by check_factors_validity()
 	bool copying = A->size()>0;
 	//TODO: factorize the two loops
+	faust_unsigned_int fac_nnz;
 	while(copying)
 	{
 		if(transpose_A)
@@ -303,7 +314,9 @@ Faust::Transform<FPP,Cpu>::Transform(const Transform<FPP, Cpu>* A, const bool tr
 			// else: already cloned
 			data[j]->conjugate();
 		}
-		totalNonZeros += data[j]->getNonZeros();
+		fac_nnz = data[j]->getNonZeros();
+		if(! is_zero) is_zero = ! fac_nnz;
+		totalNonZeros += fac_nnz;
 		if(!dtor_delete_data) ref_man.acquire(data[j]);
 		j++;
 	}
@@ -331,7 +344,9 @@ Faust::Transform<FPP,Cpu>::Transform(const Transform<FPP, Cpu>* A, const bool tr
 			// else: already cloned
 			data[j]->conjugate();
 		}
-		totalNonZeros += data[j]->getNonZeros();
+		fac_nnz = data[j]->getNonZeros();
+		if(! is_zero) is_zero = ! fac_nnz;
+		totalNonZeros += fac_nnz;
 		if(!dtor_delete_data) ref_man.acquire(data[j]);
 		j++;
 	}
@@ -362,9 +377,12 @@ template<typename FPP>
 void Faust::Transform<FPP,Cpu>::update_total_nnz()
 {
 	this->totalNonZeros = 0;
+	is_zero = false;
 	for(auto fac : data)
 	{
-		totalNonZeros += fac->getNonZeros();
+		auto fac_nnz = fac->getNonZeros();
+		if(! is_zero) is_zero = ! fac_nnz;
+		totalNonZeros += fac_nnz;
 	}
 }
 
@@ -603,9 +621,11 @@ double Faust::Transform<FPP,Cpu>::spectralNorm(const int nbr_iter_max, double th
 {
 	if (size() == 0)
 	{
-		return 1;
+		return 1; // TODO: why?
 	}else
 	{
+		if(this->is_zero)
+			return 0;
 		//std::cout<<"Faust debut spectralNorm"<<std::endl;
 		//std::cout<<"copy constructor"<<std::endl;
 		Faust::Transform<FPP,Cpu> AtA((*this)); // modif AL <FPP,Cpu>
@@ -913,6 +933,7 @@ void Faust::Transform<FPP,Cpu>::clear()
 
 	data.resize(0);
 	totalNonZeros = 0;
+	is_zero = true;
 }
 	template<typename FPP>
 void Faust::Transform<FPP,Cpu>::operator=(const Transform<FPP,Cpu>&  f)
@@ -927,7 +948,8 @@ void Faust::Transform<FPP,Cpu>::operator=(const Transform<FPP,Cpu>&  f)
 		if(!dtor_delete_data) ref_man.acquire(data[i]);
 	}
 
-	this->totalNonZeros=f.totalNonZeros;
+	this->totalNonZeros = f.totalNonZeros;
+	this->is_zero = f.is_zero;
 
 }
 
@@ -939,6 +961,7 @@ Faust::Transform<FPP,Cpu>& Faust::Transform<FPP,Cpu>::operator=(Faust::Transform
 {
 	data = std::move(T.data);
 	totalNonZeros = T.totalNonZeros;
+	is_zero = T.is_zero;
 	dtor_disabled = T.dtor_disabled;
 	dtor_delete_data = T.dtor_delete_data;
 	T.data.resize(0);
@@ -1180,8 +1203,9 @@ void Faust::Transform<FPP,Cpu>::push_back(const Faust::MatGeneric<FPP,Cpu>* M, c
 	}
 	data.push_back(M_);
 	if(!dtor_delete_data) ref_man.acquire(M_);
-	totalNonZeros += M_->getNonZeros();
-
+	auto fac_nnz = M_->getNonZeros();
+	totalNonZeros += fac_nnz;
+	if(! is_zero) is_zero = ! fac_nnz;
 #ifdef __COMPILE_TIMERS__
 	this->t_multiply_vector.push_back(Faust::Timer());
 #endif
@@ -1211,7 +1235,9 @@ void Faust::Transform<FPP,Cpu>::push_first(const Faust::MatGeneric<FPP,Cpu>* M, 
 	}
 	data.insert(data.begin(),M_);
 	if(!dtor_delete_data) ref_man.acquire(M_);
-	totalNonZeros += M_->getNonZeros();
+	auto fac_nnz = M_->getNonZeros();
+	totalNonZeros += fac_nnz;
+	if(! is_zero) is_zero = ! fac_nnz;
 
 #ifdef __COMPILE_TIMERS__
 	this->t_multiply_vector.insert(this->t_multiply_vector().begin(),Faust::Timer());
@@ -1224,7 +1250,10 @@ void Faust::Transform<FPP,Cpu>::insert(faust_unsigned_int i, Faust::MatGeneric<F
     if(i > size()) throw std::out_of_range("Faust::Transform<FPP,Cpu>::insert");
 	data.insert(data.begin()+i,M);
 	if(!dtor_delete_data) ref_man.acquire(M);
-	totalNonZeros += M->getNonZeros();
+	auto fac_nnz = M->getNonZeros();
+	totalNonZeros += fac_nnz;
+	if(! is_zero) is_zero = ! fac_nnz;
+
 }
 
 template<typename FPP>
@@ -1243,9 +1272,24 @@ template<typename FPP>
 void Faust::Transform<FPP,Cpu>::erase(faust_unsigned_int i)
 {
     if(i >= size()) throw std::out_of_range("Faust::Transform<FPP,Cpu>::erase");
-    totalNonZeros -= (*(begin()+i))->getNonZeros();
+	auto fac_nnz = (*(begin()+i))->getNonZeros();
+    totalNonZeros -= fac_nnz;
     if(!dtor_delete_data) ref_man.release(*(begin()+i));
     data.erase(begin()+i);
+	if(is_zero && fac_nnz == 0)
+	{
+		// forced to check if the Transform stays nul after zero factor deletion
+		is_zero = false;
+		for(auto M: data)
+		{
+			fac_nnz = M->getNonZeros();
+			if(! fac_nnz)
+			{
+				is_zero = true;
+				break;
+			}
+		}
+	}
 }
 
 template<typename FPP>
@@ -1687,7 +1731,6 @@ void Faust::Transform<FPP,Cpu>::print_timers() const
 
 }
 #endif
-
 
 
 

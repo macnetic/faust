@@ -862,6 +862,11 @@ FPP Faust::power_iteration(const  Faust::LinearOperator<FPP,Cpu> & A, const faus
 				throw de;
 			}
       		xk = A.multiply(xk_norm);
+			if(xk.isZero()) // A is most likely zero, lambda is zero
+			{
+				std::cerr << "WARNING: power_iteration product Ax leads to zero vector, A is most likely zero, lambda should be zero too." << std::endl;
+				return FPP(0);
+			}
       		lambda = xk_norm.dot(xk);
      		//std::cout << "i = " << i << " ; lambda=" << lambda << std::endl;
    	}

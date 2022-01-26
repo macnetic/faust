@@ -122,6 +122,7 @@ namespace Faust
 			void push_first(const MatGeneric<FPP,Cpu>* M, const bool optimizedCopy=false, const bool copying=true);
 			virtual faust_unsigned_int getNBytes() const;
 			virtual faust_unsigned_int get_total_nnz() const;
+			bool is_zero() const;
 			faust_unsigned_int size() const;
 			virtual void resize(faust_unsigned_int);
 			void display() const;

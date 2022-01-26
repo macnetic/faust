@@ -334,6 +334,7 @@ namespace Faust
 
 			private:
 		long long int totalNonZeros;
+		bool is_zero;
 		static const char * m_className;
 		std::vector<MatGeneric<FPP,Cpu>*> data;
 		bool dtor_delete_data;
