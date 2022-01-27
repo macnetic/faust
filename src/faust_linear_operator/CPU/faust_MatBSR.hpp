@@ -668,8 +668,14 @@ BSRMat<T, BlockStorageOrder> BSRMat<T, BlockStorageOrder>::rand(int m, int n, in
 	// init data
 	bmat.data = new T[data_size];
 	std::uniform_real_distribution<Real<T>> dis(0.0, 1.0);
+	int size_mul = sizeof(T)/sizeof(Real<T>);
+	Real<T> r; // random element
 	for(int i=0;i<data_size;i++)
-		bmat.data[i] = dis(gen);
+		for(int j=0; j < size_mul; j++)
+		{
+			r = dis(gen);
+			memcpy(((char*) (bmat.data))+i*sizeof(T)+j*sizeof(Real<T>), &r, sizeof(Real<T>));
+		}
 	// generate the vector of possible block indices (in 1D first to ease the selection of bnnz random blocks)
 	std::vector<int> BI(nblocks);
 	std::vector<int> nnzBI(bnnz);
