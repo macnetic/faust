@@ -123,6 +123,7 @@ namespace Faust
 			friend class MatDense<FPP,Cpu>;
 			friend class MatSparse<std::complex<double>, Cpu>;
 			friend class MatSparse<double, Cpu>;
+			friend class MatSparse<float, Cpu>;
 			//friend void MatDense<FPP,Cpu>::operator+=(const MatSparse<FPP,Cpu>& S);
 
 			public:

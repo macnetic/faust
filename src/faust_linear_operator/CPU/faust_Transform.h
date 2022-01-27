@@ -142,6 +142,7 @@ namespace Faust
 				MatGeneric<FPP,Cpu>* get_fact(faust_unsigned_int id, const bool cloning_fact = true) const;
 				bool is_fact_sparse(const faust_unsigned_int id) const;
 				bool is_fact_dense(const faust_unsigned_int id) const;
+				bool is_fact_bsr(const faust_unsigned_int id) const;
 				faust_unsigned_int get_fact_nnz(const faust_unsigned_int id) const;
 				void get_fact(const faust_unsigned_int id,
 						const int** row_ids,

@@ -51,6 +51,7 @@ namespace Faust
 			void get_facts(std::vector<MatGeneric<FPP,GPU2>*> &factors, bool cloning_facts=true) const;
 			bool is_fact_sparse(int id) const;
 			bool is_fact_dense(int id) const;
+			bool is_fact_bsr(int id) const;
 			void transpose();
 			int32_t getNbRow()const;
 			int32_t getNbCol()const;

@@ -106,7 +106,7 @@ template<>
 void newMxGetData<float>(float*& ptr_out, const mxArray* mxMat)
 {
 	if(mxGetClassID(mxMat) != mxSINGLE_CLASS || mxIsComplex(mxMat))
-		mexErrMsgTxt("newMxGetData: the mex matrix must be double as the ptr is.");
+		mexErrMsgTxt("newMxGetData: the mex matrix must be float as the ptr is.");
 	ptr_out	= static_cast<float*> (mxGetSingles(mxMat));
 }
 
@@ -329,10 +329,15 @@ mxArray*  FaustSpMat2mxArray(const Faust::MatSparse<FPP,Cpu>& M)
 			mxREAL);
 	mwIndex* ir = mxGetIr(sparseMat);
 	mwIndex* jc = mxGetJc(sparseMat);
-	FPP* pr;
+	const Faust::MatSparse<double, Cpu>* dM = nullptr;
+	Faust::MatSparse<double, Cpu> dmat;
+	// matlab sparse matrix cannot be in single/float precision, convert it to double before processing
+	if(std::is_same<FPP, float>::value) return FaustSpMat2mxArray(M.template to_real<double>());
+	dM = (const Faust::MatSparse<double, Cpu>*)(&M);
+	double* pr;
 	//TODO: and complex case ?
 #ifdef MX_HAS_INTERLEAVED_COMPLEX
-	pr = static_cast<FPP*>(mxGetDoubles(sparseMat));
+	pr = static_cast<double*>(mxGetDoubles(sparseMat));
 #else
 	pr = static_cast<FPP*>(mxGetPr(sparseMat));
 #endif
@@ -340,15 +345,43 @@ mxArray*  FaustSpMat2mxArray(const Faust::MatSparse<FPP,Cpu>& M)
 	// (not mwIndex which is in fact a size_t)
 	// so we need to copy in intermediate buffers and then affect their elements
 	// into jc, ir
-	auto tM = M;
+	auto tM = *dM;
 	// transpose M because matlab is in CSC format while Faust is in CSR
 	tM.transpose();
-//	tM.copyRowPtr(jc);
-//	tM.copyColInd(ir);
-//	tM.copyValuePtr(pr);
+	//	tM.copyRowPtr(jc);
+	//	tM.copyColInd(ir);
+	//	tM.copyValuePtr(pr);
 	tM.copyBufs(jc, ir, pr);
 	return sparseMat;
 }
+
+#ifdef MX_HAS_INTERLEAVED_COMPLEX
+template<>
+mxArray*  FaustSpMat2mxArray(const Faust::MatSparse<std::complex<double>,Cpu>& M)
+{
+	faust_unsigned_int nnz = M.getNonZeros();
+	mxArray* sparseMat = mxCreateSparse(M.getNbRow(),
+			M.getNbCol(),
+			nnz,
+			mxCOMPLEX);
+	mwIndex* ir = mxGetIr(sparseMat);
+	mwIndex* jc = mxGetJc(sparseMat);
+	std::complex<double>* pr;
+	pr = reinterpret_cast<std::complex<double>*>(mxGetComplexDoubles(sparseMat));
+	// sadly we can't do a direct copy into ir and jc because MatSparse uses int type for indices
+	// (not mwIndex which is in fact a size_t)
+	// so we need to copy in intermediate buffers and then affect their elements
+	// into jc, ir
+	auto tM = M;
+	// transpose M because matlab is in CSC format while Faust is in CSR
+	tM.transpose();
+	//	tM.copyRowPtr(jc);
+	//	tM.copyColInd(ir);
+	//	tM.copyValuePtr(pr);
+	tM.copyBufs(jc, ir, pr);
+	return sparseMat;
+}
+#endif
 
 	template<FDevice DEV>
 mxArray* transformFact2SparseMxArray(faust_unsigned_int id, Faust::TransformHelper<float, DEV>* core_ptr)
@@ -361,9 +394,9 @@ mxArray* transformFact2SparseMxArray(faust_unsigned_int id, Faust::TransformHelp
 	mwIndex* jc = mxGetJc(sparseMat);
 	//	std::cout << "transformFact2SparseMxArray()" << std::endl;
 	//	FPP* pr = static_cast<FPP*>(mxGetDoubles(sparseMat)); //given up because fails to compile with template FPP
-	double* pr;
+	float* pr;
 #ifdef MX_HAS_INTERLEAVED_COMPLEX
-	pr = static_cast<double*>(mxGetDoubles(sparseMat));
+	newMxGetData(pr, sparseMat);
 #else
 	pr = static_cast<double*>(mxGetPr(sparseMat));
 #endif

@@ -63,6 +63,7 @@ namespace Faust
 			virtual faust_unsigned_int get_fact_nnz(const faust_unsigned_int id) const;
 			virtual bool is_fact_sparse(const faust_unsigned_int id) const;
 			virtual bool is_fact_dense(const faust_unsigned_int id) const;
+			virtual bool is_fact_bsr(const faust_unsigned_int id) const;
 			virtual MatType get_fact_type(const faust_unsigned_int id) const;
 			virtual void pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id, const int mul_order_opt_mode=DEFAULT_L2R)=0;
 

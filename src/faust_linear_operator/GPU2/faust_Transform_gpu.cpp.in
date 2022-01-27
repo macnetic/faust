@@ -426,6 +426,12 @@ namespace Faust
 		}
 
 	template<>
+		bool Faust::Transform<@FAUST_SCALAR_FOR_GM@, GPU2>::is_fact_bsr(int id) const
+		{
+			return get_fact(id, /*cloning*/ false)->getType() == BSR;
+		}
+
+	template<>
 		void Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::get_fact(const faust_unsigned_int &id,
 				@FAUST_SCALAR_FOR_GM@* elts,
 				faust_unsigned_int* num_rows,

@@ -624,8 +624,10 @@ double Faust::Transform<FPP,Cpu>::spectralNorm(const int nbr_iter_max, double th
 		return 1; // TODO: why?
 	}else
 	{
-		if(this->is_zero)
+		if(this->is_zero) // The Faust is zero by at least one of its factors
 			return 0;
+		// The Faust can still by zero (without any of its factor being)
+		// this case will be detected in power_iteration
 		//std::cout<<"Faust debut spectralNorm"<<std::endl;
 		//std::cout<<"copy constructor"<<std::endl;
 		Faust::Transform<FPP,Cpu> AtA((*this)); // modif AL <FPP,Cpu>
@@ -1167,6 +1169,12 @@ template<typename FPP>
 bool Faust::Transform<FPP,Cpu>::is_fact_dense(const faust_unsigned_int id) const
 {
 	return get_fact(id, false)->getType() == MatType::Dense;
+}
+
+template<typename FPP>
+bool Faust::Transform<FPP,Cpu>::is_fact_bsr(const faust_unsigned_int id) const
+{
+	return get_fact(id, false)->getType() == MatType::BSR;
 }
 
 template<typename FPP>

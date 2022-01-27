@@ -163,7 +163,7 @@ void mxArray2PtrBase(const mxArray* mxMat, FPP* & ptr_data)
 	else
 		nb_element_tmp = mxGetNumberOfElements(mxMat);
 
-	const size_t NB_ELEMENTS = nb_element_tmp;
+	const size_t nb_elts = nb_element_tmp;
 
 
 	if(V_CLASS_ID == mxDOUBLE_CLASS)
@@ -173,9 +173,9 @@ void mxArray2PtrBase(const mxArray* mxMat, FPP* & ptr_data)
 		{
 			if(! is_same<FPP, complex<double>>::value)
 				mexErrMsgTxt("mxMat is complex double, the output buffer must be complex<double>");
-			ptr_data = new FPP[NB_ELEMENTS];
+			ptr_data = new FPP[nb_elts];
 			mxComplexDouble* mx_cplx_doubles = mxGetComplexDoubles(mxMat);
-			memcpy(ptr_data, mx_cplx_doubles, sizeof(FPP)*NB_ELEMENTS);
+			memcpy(ptr_data, mx_cplx_doubles, sizeof(FPP)*nb_elts);
 		}
 		else
 		{
@@ -183,9 +183,9 @@ void mxArray2PtrBase(const mxArray* mxMat, FPP* & ptr_data)
 			{
 				mexErrMsgTxt("mxMat is double, the output buffer must be double");
 			}
-			ptr_data = new FPP[NB_ELEMENTS];
+			ptr_data = new FPP[nb_elts];
 			mxDouble* mx_doubles = mxGetDoubles(mxMat);
-			memcpy(ptr_data, mx_doubles, sizeof(FPP)*NB_ELEMENTS);
+			memcpy(ptr_data, mx_doubles, sizeof(FPP)*nb_elts);
 		}
 
 	}
@@ -198,17 +198,17 @@ void mxArray2PtrBase(const mxArray* mxMat, FPP* & ptr_data)
 		{
 			if(! is_same<FPP, complex<float>>::value)
 				mexErrMsgTxt("mxMat is complex float, the output buffer must be complex<float>");
-			ptr_data = new FPP[NB_ELEMENTS];
+			ptr_data = new FPP[nb_elts];
 			mxComplexSingle* mx_cplx_floats = mxGetComplexSingles(mxMat);
-			memcpy(ptr_data, mx_cplx_floats, sizeof(FPP)*NB_ELEMENTS);
+			memcpy(ptr_data, mx_cplx_floats, sizeof(FPP)*nb_elts);
 		}
 		else
 		{
 			if(! is_same<FPP, float>::value)
 				mexErrMsgTxt("mxMat is float, the output buffer must be float");
-			ptr_data = new FPP[NB_ELEMENTS];
+			ptr_data = new FPP[nb_elts];
 			mxSingle* mx_floats = mxGetSingles(mxMat);
-			memcpy(ptr_data, mx_floats, sizeof(FPP)*NB_ELEMENTS);
+			memcpy(ptr_data, mx_floats, sizeof(FPP)*nb_elts);
 		}
 	}
 
@@ -224,9 +224,9 @@ void mxArray2PtrBase(const mxArray* mxMat, FPP* & ptr_data)
 
 		if(! is_same<FPP, char>::value)
 			mexErrMsgTxt("mxMat is int8s, the output buffer must be char");
-		ptr_data = new FPP[NB_ELEMENTS];
+		ptr_data = new FPP[nb_elts];
 		mxInt8* mx_chars = mxGetInt8s(mxMat);
-		memcpy(ptr_data, mx_chars, sizeof(FPP)*NB_ELEMENTS);
+		memcpy(ptr_data, mx_chars, sizeof(FPP)*nb_elts);
 
 	}
 
@@ -235,9 +235,9 @@ void mxArray2PtrBase(const mxArray* mxMat, FPP* & ptr_data)
 	{
 		if(! is_same<FPP, unsigned char>::value)
 			mexErrMsgTxt("mxMat is uint8, the output buffer must be unsigned char");
-		ptr_data = new FPP[NB_ELEMENTS];
+		ptr_data = new FPP[nb_elts];
 		mxUint8* mx_chars = mxGetUint8s(mxMat);
-		memcpy(ptr_data, mx_chars, sizeof(FPP)*NB_ELEMENTS);
+		memcpy(ptr_data, mx_chars, sizeof(FPP)*nb_elts);
 	}
 
 	else if(V_CLASS_ID == mxINT16_CLASS)
@@ -245,9 +245,9 @@ void mxArray2PtrBase(const mxArray* mxMat, FPP* & ptr_data)
 	{
 		if(! is_same<FPP, short>::value)
 			mexErrMsgTxt("mxMat is int16s, the output buffer must be short");
-		ptr_data = new FPP[NB_ELEMENTS];
+		ptr_data = new FPP[nb_elts];
 		mxInt16* mx_chars = mxGetInt16s(mxMat);
-		memcpy(ptr_data, mx_chars, sizeof(FPP)*NB_ELEMENTS);
+		memcpy(ptr_data, mx_chars, sizeof(FPP)*nb_elts);
 	}
 
 	else if (V_CLASS_ID == mxUINT16_CLASS)
@@ -255,41 +255,41 @@ void mxArray2PtrBase(const mxArray* mxMat, FPP* & ptr_data)
 	{
 		if(! is_same<FPP, unsigned short>::value)
 			mexErrMsgTxt("mxMat is uint16, the output buffer must be unsigned short");
-		ptr_data = new FPP[NB_ELEMENTS];
+		ptr_data = new FPP[nb_elts];
 		mxUint16* mx_ints = mxGetUint16s(mxMat);
-		memcpy(ptr_data, mx_ints, sizeof(FPP)*NB_ELEMENTS);
+		memcpy(ptr_data, mx_ints, sizeof(FPP)*nb_elts);
 	}
 	else if (V_CLASS_ID == mxINT32_CLASS)
 	{
 		if(! is_same<FPP, int>::value)
 			mexErrMsgTxt("mxMat is int32s, the output buffer must be int");
-		ptr_data = new FPP[NB_ELEMENTS];
+		ptr_data = new FPP[nb_elts];
 		mxInt32* mx_ints = mxGetInt32s(mxMat);
-		memcpy(ptr_data, mx_ints, sizeof(FPP)*NB_ELEMENTS);
+		memcpy(ptr_data, mx_ints, sizeof(FPP)*nb_elts);
 	}
 	else if (V_CLASS_ID == mxUINT32_CLASS)
 	{
 		if(! is_same<FPP, unsigned int>::value)
 			mexErrMsgTxt("mxMat is uint32, the output buffer must be unsigned int");
-		ptr_data = new FPP[NB_ELEMENTS];
+		ptr_data = new FPP[nb_elts];
 		mxUint32* mx_ints = mxGetUint32s(mxMat);
-		memcpy(ptr_data, mx_ints, sizeof(FPP)*NB_ELEMENTS);
+		memcpy(ptr_data, mx_ints, sizeof(FPP)*nb_elts);
 	}
 	else if (V_CLASS_ID == mxINT64_CLASS)
 	{
 		if(! is_same<FPP, long int>::value)
 			mexErrMsgTxt("mxMat is int64s, the output buffer must be long int");
-		ptr_data = new FPP[NB_ELEMENTS];
+		ptr_data = new FPP[nb_elts];
 		mxInt64* mx_ints = mxGetInt64s(mxMat);
-		memcpy(ptr_data, mx_ints, sizeof(FPP)*NB_ELEMENTS);
+		memcpy(ptr_data, mx_ints, sizeof(FPP)*nb_elts);
 	}
 	else if (V_CLASS_ID == mxUINT64_CLASS)
 	{
 		if(! is_same<FPP, unsigned long int>::value)
 			mexErrMsgTxt("mxMat is uint64, the output buffer must be unsigned long int");
-		ptr_data = new FPP[NB_ELEMENTS];
+		ptr_data = new FPP[nb_elts];
 		mxUint64* mx_ints = mxGetUint64s(mxMat);
-		memcpy(ptr_data, mx_ints, sizeof(FPP)*NB_ELEMENTS);
+		memcpy(ptr_data, mx_ints, sizeof(FPP)*nb_elts);
 	}
 	else
 		mexErrMsgTxt("Unknown matlab type.");
@@ -316,15 +316,15 @@ void mxArray2PtrBase(const mxArray* mxMat, FPP* & ptr_data,FUNCTOR & mxGetDataFu
 	else
 		nb_element_tmp = mxGetNumberOfElements(mxMat);
 
-	const size_t NB_ELEMENTS = nb_element_tmp;
+	const size_t nb_elts = nb_element_tmp;
 
 
 	if(V_CLASS_ID == mxDOUBLE_CLASS)
 
 	{
 		double* ptr_data_tmp = static_cast<double*> (mxGetDataFunc(mxMat));
-		ptr_data = new FPP[NB_ELEMENTS];
-		for (size_t i =0 ; i<NB_ELEMENTS ; i++)
+		ptr_data = new FPP[nb_elts];
+		for (size_t i =0 ; i<nb_elts ; i++)
 			ptr_data[i] = static_cast<FPP> (ptr_data_tmp[i]);
 
 	}
@@ -335,8 +335,8 @@ void mxArray2PtrBase(const mxArray* mxMat, FPP* & ptr_data,FUNCTOR & mxGetDataFu
 
 
 		float* ptr_data_tmp = static_cast<float*> (mxGetDataFunc(mxMat));
-		ptr_data = new FPP[NB_ELEMENTS];
-		for (size_t i =0 ; i<NB_ELEMENTS ; i++)
+		ptr_data = new FPP[nb_elts];
+		for (size_t i =0 ; i<nb_elts ; i++)
 			ptr_data[i] = static_cast<FPP> (ptr_data_tmp[i]);
 
 	}
@@ -348,8 +348,8 @@ void mxArray2PtrBase(const mxArray* mxMat, FPP* & ptr_data,FUNCTOR & mxGetDataFu
 
 
 		char* ptr_data_tmp = static_cast<char*> (mxGetDataFunc(mxMat));
-		ptr_data = new FPP[NB_ELEMENTS];
-		for (size_t i =0 ; i<NB_ELEMENTS ; i++)
+		ptr_data = new FPP[nb_elts];
+		for (size_t i =0 ; i<nb_elts ; i++)
 			ptr_data[i] = static_cast<FPP> (ptr_data_tmp[i]);
 
 	}
@@ -358,8 +358,8 @@ void mxArray2PtrBase(const mxArray* mxMat, FPP* & ptr_data,FUNCTOR & mxGetDataFu
 
 	{
 		unsigned char* ptr_data_tmp = static_cast<unsigned char*> (mxGetDataFunc(mxMat));
-		ptr_data = new FPP[NB_ELEMENTS];
-		for (size_t i =0 ; i<NB_ELEMENTS ; i++)
+		ptr_data = new FPP[nb_elts];
+		for (size_t i =0 ; i<nb_elts ; i++)
 			ptr_data[i] = static_cast<FPP> (ptr_data_tmp[i]);
 
 	}
@@ -370,8 +370,8 @@ void mxArray2PtrBase(const mxArray* mxMat, FPP* & ptr_data,FUNCTOR & mxGetDataFu
 
 
 		short* ptr_data_tmp = static_cast<short*> (mxGetDataFunc(mxMat));
-		ptr_data = new FPP[NB_ELEMENTS];
-		for (size_t i =0 ; i<NB_ELEMENTS ; i++)
+		ptr_data = new FPP[nb_elts];
+		for (size_t i =0 ; i<nb_elts ; i++)
 			ptr_data[i] = static_cast<FPP> (ptr_data_tmp[i]);
 	}
 
@@ -379,40 +379,40 @@ void mxArray2PtrBase(const mxArray* mxMat, FPP* & ptr_data,FUNCTOR & mxGetDataFu
 
 	{
 		unsigned short* ptr_data_tmp = static_cast<unsigned short*> (mxGetDataFunc(mxMat));
-		ptr_data = new FPP[NB_ELEMENTS];
-		for (size_t i =0 ; i<NB_ELEMENTS ; i++)
+		ptr_data = new FPP[nb_elts];
+		for (size_t i =0 ; i<nb_elts ; i++)
 			ptr_data[i] = static_cast<FPP> (ptr_data_tmp[i]);
 	}
 	else if (V_CLASS_ID == mxINT32_CLASS)
 	{
 
 		int* ptr_data_tmp = static_cast<int*> (mxGetDataFunc(mxMat));
-		ptr_data = new FPP[NB_ELEMENTS];
-		for (size_t i =0 ; i<NB_ELEMENTS ; i++)
+		ptr_data = new FPP[nb_elts];
+		for (size_t i =0 ; i<nb_elts ; i++)
 			ptr_data[i] = static_cast<FPP> (ptr_data_tmp[i]);
 	}
 	else if (V_CLASS_ID == mxUINT32_CLASS)
 	{
 
 		unsigned int* ptr_data_tmp = static_cast<unsigned int*> (mxGetDataFunc(mxMat));
-		ptr_data = new FPP[NB_ELEMENTS];
-		for (size_t i =0 ; i<NB_ELEMENTS ; i++)
+		ptr_data = new FPP[nb_elts];
+		for (size_t i =0 ; i<nb_elts ; i++)
 			ptr_data[i] = static_cast<FPP> (ptr_data_tmp[i]);
 	}
 	else if (V_CLASS_ID == mxINT64_CLASS)
 	{
 
 		long long* ptr_data_tmp = static_cast<long long*> (mxGetDataFunc(mxMat));
-		ptr_data = new FPP[NB_ELEMENTS];
-		for (size_t i =0 ; i<NB_ELEMENTS ; i++)
+		ptr_data = new FPP[nb_elts];
+		for (size_t i =0 ; i<nb_elts ; i++)
 			ptr_data[i] = static_cast<FPP> (ptr_data_tmp[i]);
 	}
 	else if (V_CLASS_ID == mxUINT64_CLASS)
 	{
 
 		unsigned long long* ptr_data_tmp = static_cast<unsigned long long*> (mxGetDataFunc(mxMat));
-		ptr_data = new FPP[NB_ELEMENTS];
-		for (size_t i =0 ; i<NB_ELEMENTS ; i++)
+		ptr_data = new FPP[nb_elts];
+		for (size_t i =0 ; i<nb_elts ; i++)
 			ptr_data[i] = static_cast<FPP> (ptr_data_tmp[i]);
 	}
 	else
@@ -456,13 +456,13 @@ void mxArray2Ptr(const mxArray* mxMat, std::complex<FPP>* & ptr_data)
 	else
 		nb_element_tmp = mxGetNumberOfElements(mxMat);
 
-	const size_t NB_ELEMENTS = nb_element_tmp;
+	const size_t nb_elts = nb_element_tmp;
 
 	// get the real part of the Matlab Matrix
 	FPP* ptr_real_part_data;
 	mxArray2Ptr(mxMat,ptr_real_part_data);
 
-	ptr_data = new std::complex<FPP>[NB_ELEMENTS];
+	ptr_data = new std::complex<FPP>[nb_elts];
 
 	if (mxIsComplex(mxMat))
 	{
@@ -473,7 +473,7 @@ void mxArray2Ptr(const mxArray* mxMat, std::complex<FPP>* & ptr_data)
 		mxArray2PtrBase(mxMat,ptr_imag_part_data,mxGetImagData);
 
 		// copy the values in the output vector
-		for (int i=0;i < NB_ELEMENTS;i++)
+		for (int i=0;i < nb_elts;i++)
 			ptr_data[i]=std::complex<FPP>(ptr_real_part_data[i],ptr_imag_part_data[i]);
 
 
@@ -484,7 +484,7 @@ void mxArray2Ptr(const mxArray* mxMat, std::complex<FPP>* & ptr_data)
 	{
 		// Real Matlab Matrix
 		// copy only the real part of the matrix (the imaginary part is set to zero
-		for (int i=0;i < NB_ELEMENTS;i++)
+		for (int i=0;i < nb_elts;i++)
 			ptr_data[i]=std::complex<FPP>(ptr_real_part_data[i],(FPP) 0.0);
 
 
