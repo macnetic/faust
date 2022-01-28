@@ -12,8 +12,8 @@ class proj_gen(ABC):
     The parent abstract class to represent projectors (as functors).
     """
     @abstractmethod
-    def __init__(self):
-        pass
+    def __init__(self, shape):
+        self.shape = shape
 
     def __call__(self, M):
         return self.constraint.project(M)
@@ -42,7 +42,7 @@ class toeplitz(proj_gen):
             normalized: True to normalize the projection image according to its Frobenius norm.
             pos: True to skip negative values (replaced by zero) of the matrix to project.
         """
-
+        super(toeplitz, self).__init__(shape)
         self.constraint = ConstraintMat('toeplitz', np.empty(shape), normalized, pos)
 
 class circ(proj_gen):
@@ -73,6 +73,7 @@ class circ(proj_gen):
 
 
         """
+        super(circ, self).__init__(shape)
         self.constraint = ConstraintMat('circ', np.empty(shape), normalized, pos)
 
 class hankel(proj_gen):
@@ -99,7 +100,7 @@ class hankel(proj_gen):
             normalized: True to normalize the projection image according to its Frobenius norm.
             pos: True to skip negative values (replaced by zero) of the matrix to project.
         """
-
+        super(hankel, self).__init__(shape)
         self.constraint = ConstraintMat('hankel', np.empty(shape), normalized, pos)
 
 
@@ -137,6 +138,7 @@ class sp(proj_gen):
             pos: True to skip negative values (replaced by zero) of the matrix to project.
 
         """
+        super(sp, self).__init__(shape)
         self.constraint = ConstraintInt('sp', shape[0], shape[1], k, normalized, pos)
 
 class splin(proj_gen):
@@ -169,6 +171,7 @@ class splin(proj_gen):
             pos: True to skip negative values (replaced by zero) of the matrix to project.
 
         """
+        super(splin, self).__init__(shape)
         self.constraint = ConstraintInt('splin', shape[0], shape[1], k, normalized, pos)
 
 class spcol(proj_gen):
@@ -198,6 +201,7 @@ class spcol(proj_gen):
             pos: True to skip negative values (replaced by zero) of the matrix to project.
 
         """
+        super(spcol, self).__init__(shape)
         self.constraint = ConstraintInt('spcol', shape[0], shape[1], k, normalized, pos)
 
 class splincol(proj_gen):
@@ -255,6 +259,7 @@ class splincol(proj_gen):
             pos: True to skip negative values (replaced by zero) of the matrix to project.
 
         """
+        super(splincol, self).__init__(shape)
         self.constraint = ConstraintInt('splincol', shape[0], shape[1], k, normalized, pos)
 
 class supp(proj_gen):
@@ -296,6 +301,7 @@ class supp(proj_gen):
             normalized: True to normalize the projection image according to its Frobenius norm.
             pos: True to skip negative values (replaced by zero) of the matrix to project.
         """
+        super(supp, self).__init__(shape)
         self.constraint = ConstraintMat('supp', S, normalized, pos)
 
 class const(proj_gen):
@@ -352,6 +358,7 @@ class const(proj_gen):
             pos: True to skip negative values (replaced by zero) of the matrix to project.
 
         """
+        super(const, self).__init__(C.shape)
         self.constraint = ConstraintMat('const', C, normalized, pos=False)
 
 class normcol(proj_gen):
@@ -374,6 +381,7 @@ class normcol(proj_gen):
             >>> norm(p(M)[:,0], 2)
             0.01
         """
+        super(normcol, self).__init__(shape)
         if(s < 0):
             raise ValueError('A norm can\'t be negative')
         normalized=False
@@ -407,6 +415,7 @@ class normlin(proj_gen):
             s: the row 2-norm (default to 1).
 
         """
+        super(normlin, self).__init__(shape)
         if(s < 0):
             raise ValueError('A norm can\'t be negative')
         normalized=False
@@ -457,6 +466,7 @@ class blockdiag(proj_gen):
             normalized: True to normalize the projection image matrix.
             pos: True to ignore negative values (replaced by 0).
         """
+        super(blockdiag, self).__init__(shape)
         self._m_vec = [ sh[0] for sh in block_shapes ]
         self._n_vec = [ sh[1] for sh in block_shapes ]
         self._shape = shape
@@ -545,5 +555,6 @@ class skperm(proj_gen):
             pos: True to skip negative values (replaced by zero) of the matrix to project.
 
         """
+        super(skperm, self).__init__(shape)
         self.constraint = ConstraintInt('skperm', shape[0], shape[1], k, normalized, pos)
 

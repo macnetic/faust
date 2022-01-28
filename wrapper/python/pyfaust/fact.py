@@ -524,11 +524,7 @@ def palm4msa(M, p, ret_lambda=False, backend=2016, on_gpu=False):
         raise TypeError("p must be a ParamsPalm4MSA object.")
     is_real = np.empty((1,))
     M = _check_fact_mat('palm4msa()', M, is_real)
-    if(not p.is_mat_consistent(M)):
-        raise ValueError("M's number of columns must be consistent with "
-                         "the last residuum constraint defined in p. "
-                         "Likewise its number of rows must be consistent "
-                         "with the first factor constraint defined in p.")
+    p.are_constraints_consistent(M)
     if(backend == 2016):
         if on_gpu: raise ValueError("on_gpu applies only on 2020 backend.")
         if is_real:

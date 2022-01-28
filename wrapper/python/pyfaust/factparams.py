@@ -216,6 +216,9 @@ class ConstraintGeneric(ABC):
                 str(self._num_cols) + (", "+str(self._cons_value) + ")" if not
                                            self.is_mat_constraint()
                                            else ")")
+    @property
+    def shape(self):
+        return (self._num_rows, self._num_cols)
 
 class ConstraintInt(ConstraintGeneric):
     """
@@ -1440,6 +1443,42 @@ class ParamsPalm4MSA(ParamsFact):
 
     def is_mat_consistent(self, M):
         return super(ParamsPalm4MSA, self).is_mat_consistent(M)
+
+    def are_constraints_consistent(self, M):
+        """
+        This method verifies that the constraints are shape-consistent to the
+        matrix/array M to factorize and with each other.
+
+        Returns: True if the constraint are consistent, raises a ValueError otherwise.
+        """
+        if not hasattr(M, 'shape'):
+            raise TypeError('M must be an array-like object, with at least the'
+                            ' shape attribute')
+        # check matrix against constraints consistency
+        cons_ok = False
+        # either constraints[i] is a ConstraintGen or a proj_gen object, it has
+        # the shape attribute/property
+        if not (cons_ok := M.shape[0] == self.constraints[0].shape[0]):
+            raise ValueError('ParamsPalm4MSA error: the matrix M to factorize must have the same'
+                             ' number of rows as the first constraint.'
+                             ' They are respectively: '+str(M.shape[0])+' and '
+                             +str(self.constraints[0].shape[0])+'.')
+        if not (cons_ok := M.shape[1] == self.constraints[-1].shape[1]):
+            raise ValueError('ParamsPalm4MSA error: the matrix M to factorize must have the same'
+                             ' number of columns as the last constraint.'
+                             ' They are respectively: '+str(M.shape[1])+' and '
+                             +str(self.constraints[-1].shape[1])+'.')
+        # check constraints sizes consistency
+        for i,c in enumerate(self.constraints[1:]):
+            # i the previous constraint
+            j = i+1 # curr constraint
+            if not (cons_ok := self.constraints[i].shape[1] == c.shape[0]):
+                raise ValueError('The '+str(j)+'-index constraint number of rows '
+                                 '(which is '+str(c.shape[0])+')'
+                                 ' must be equal to the '+str(i)+'-index constraint'
+                                 ' number of columns '
+                                 '(which is '+str(self.constraints[i].shape[1])+').')
+        return cons_ok
 
     def __repr__(self):
         return super(ParamsPalm4MSA, self).__repr__()+ \
