@@ -276,7 +276,11 @@ function (Generate_pyx TYPE_NAME TYPE REAL_TYPE_NAME REAL_TYPE PROC CORE_OBJ_SUF
 	if(NOT DISABLE_ALGO_PYX)
 		list(APPEND PYX_LIST _FaustAlgoGenProc)
 		if(${PROC} MATCHES CPU)
-			list(APPEND PYX_LIST _FaustAlgoGen) # this pyx is only on CPU
+			# these pyx are only on CPU
+			list(APPEND PYX_LIST _FaustAlgoGen)
+			if(BUILD_EIGTJ_SVDTJ)
+				list(APPEND PYX_LIST _FaustAlgoGenGivens)
+			endif()
 		endif()
 		if(USE_GPU_MOD)
 			list(APPEND PYX_LIST _FaustCoreGenNonMemberFuncs)

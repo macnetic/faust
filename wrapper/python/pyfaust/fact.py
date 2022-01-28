@@ -170,22 +170,22 @@ def svdtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
         is_float = M.dtype == 'float32'
         if(isinstance(M, np.ndarray)):
             if is_float:
-                Ucore, S, Vcore =  _FaustCorePy.FaustAlgoGenFlt.svdtj(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
+                Ucore, S, Vcore =  _FaustCorePy.FaustAlgoGenGivensFlt.svdtj(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
             else:
-                Ucore, S, Vcore =  _FaustCorePy.FaustAlgoGenDbl.svdtj(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
+                Ucore, S, Vcore =  _FaustCorePy.FaustAlgoGenGivensDbl.svdtj(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
         elif(isinstance(M, csr_matrix)):
             if is_float:
-                Ucore, S, Vcore =  _FaustCorePy.FaustAlgoGenFlt.svdtj_sparse(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
+                Ucore, S, Vcore =  _FaustCorePy.FaustAlgoGenGivensFlt.svdtj_sparse(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
             else:
-                Ucore, S, Vcore =  _FaustCorePy.FaustAlgoGenDbl.svdtj_sparse(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
+                Ucore, S, Vcore =  _FaustCorePy.FaustAlgoGenGivensDbl.svdtj_sparse(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
         else:
             raise ValueError("invalid type for M (first argument): only np.ndarray "
                              "or scipy.sparse.csr_matrix are supported.")
     else:
         if(isinstance(M, np.ndarray)):
-            Ucore, S, Vcore =  _FaustCorePy.FaustAlgoGenCplxDbl.svdtj(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
+            Ucore, S, Vcore =  _FaustCorePy.FaustAlgoGenGivensCplxDbl.svdtj(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
         elif(isinstance(M, csr_matrix)):
-            Ucore, S, Vcore =  _FaustCorePy.FaustAlgoGenCplxDbl.svdtj_sparse(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
+            Ucore, S, Vcore =  _FaustCorePy.FaustAlgoGenGivensCplxDbl.svdtj_sparse(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
         else:
             raise ValueError("invalid type for M (first argument): only np.ndarray "
                              "or scipy.sparse.csr_matrix are supported.")
@@ -300,16 +300,16 @@ def eigtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
 
     if is_real:
         if M.dtype == 'float32':
-            D, core_obj = _FaustCorePy.FaustAlgoGenFlt.eigtj(M, nGivens, tol, relerr,
+            D, core_obj = _FaustCorePy.FaustAlgoGenGivensFlt.eigtj(M, nGivens, tol, relerr,
                                                              nGivens_per_fac, verbosity, order,
                                                              enable_large_Faust)
 
         else:
-            D, core_obj = _FaustCorePy.FaustAlgoGenDbl.eigtj(M, nGivens, tol, relerr,
+            D, core_obj = _FaustCorePy.FaustAlgoGenGivensDbl.eigtj(M, nGivens, tol, relerr,
                                                              nGivens_per_fac, verbosity, order,
                                                              enable_large_Faust)
     else:
-        D, core_obj = _FaustCorePy.FaustAlgoGenCplxDbl.eigtj(M, nGivens, tol, relerr,
+        D, core_obj = _FaustCorePy.FaustAlgoGenGivensCplxDbl.eigtj(M, nGivens, tol, relerr,
                                                    nGivens_per_fac, verbosity, order,
                                                    enable_large_Faust)
     return D, Faust(core_obj=core_obj)
