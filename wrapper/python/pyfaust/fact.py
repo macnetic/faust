@@ -899,11 +899,7 @@ def _prepare_hierarchical_fact(M, p, callee_name, ret_lambda, ret_params,
         raise TypeError("ret_lambda must be a bool.")
     if(not isinstance(ret_params, bool)):
         raise TypeError("ret_params must be a bool.")
-    if(not p.is_mat_consistent(M)):
-        raise ValueError("M's number of columns must be consistent with "
-                         "the last residuum constraint defined in p. "
-                         "Likewise its number of rows must be consistent "
-                         "with the first factor constraint defined in p.")
+    p.are_constraints_consistent(M)
     return p, M
 
 # experimental block start

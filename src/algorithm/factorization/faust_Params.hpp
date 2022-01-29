@@ -83,7 +83,7 @@ void Faust::Params<FPP,DEVICE,FPP2>::check_constraint_validity()
 {
 	if (cons.size() != 2)
 		//handleError("Faust::Params<FPP,DEVICE,FPP2>::check_constraint_validity :\n cons must have 2 rows instead of %d",cons.size());
-		handleError(m_className,"check_constraint_validity :\n cons must have 2 rows");
+		handleError(m_className,"check_constraint_validity :\n constraints must have 2 rows");
 
 	for (unsigned int i=0 ; i<cons.size() ; i++)
 		if (cons[i].size() != m_nbFact-1)
@@ -91,7 +91,12 @@ void Faust::Params<FPP,DEVICE,FPP2>::check_constraint_validity()
 			//handleError("Faust::Params<FPP,DEVICE,FPP2>::check_constraint_validity :\n The number of constraints equal to %d is in conflict with the number of factors which is %d\n, number of columns of constraints must be equal to m_nbFact - 1",cons[i].size(),m_nbFact);
 			handleError(m_className,"check_constraint_validity :\n The number of constraints equal is in conflict with the number of factors,\n number of columns of constraints must be equal to m_nbFact - 1");
 		}
-
+	// isFactSideLeft == true =>
+	// cons[0] are residual constraints
+	// cons[1] are factor constraints
+	// isFactSideLeft == false =>
+	// cons[0] are factor constraints
+	// cons[1] are residual constraints
 	bool verifSize  =    m_nbRow     == cons[0][0]->get_rows()
 		&& cons[0][0]->get_cols() == cons[1][0]->get_rows()
 		&&   m_nbCol     == cons[1][0]->get_cols();

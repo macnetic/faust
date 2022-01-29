@@ -1074,6 +1074,98 @@ class ParamsHierarchical(ParamsFact):
         return M.shape[0] == self.data_num_rows and \
                 M.shape[1] == self.data_num_cols
 
+    def are_constraints_consistent(self, M):
+        """
+        This method verifies that the constraints are shape-consistent to the
+        matrix/array M to factorize and with each other.
+
+        Returns: True if the constraints are consistent, raises a ValueError otherwise.
+        """
+        cons_not_ok = False
+        cs = self.constraints
+        if cons_not_ok := self.num_facts-1 != len(cs)//2:
+            raise ValueError('The number of constraints must agree with'
+                             ' self.num_facts='+str(self.num_facts))
+        if not hasattr(M, 'shape'):
+            raise TypeError('M must be an array-like object, with at least the'
+                            ' shape attribute')
+        if self.is_fact_side_left:
+            # cs == res_constraints + fact_constraints
+            # self.num_facts-1 is the index of the first factor constraint
+            i = self.num_facts-1
+            if cons_not_ok := cs[i].shape[1] != M.shape[1]:
+                raise ValueError('The number of columns of the'
+                                 ' 0-index factor constraint'
+                                 ' ('+str(cs[i].shape[1])+')'
+                                 ' must be equal to the number of columns'
+                                 ' of the matrix to factorize ('
+                                 +str(M.shape[1])+')'
+                                 ' (is_fact_side_left='+str(self.is_fact_side_left)+').')
+            last_fact = cs[i]
+            for i in range(self.num_facts-1):
+                res_cons = cs[i]
+                fact_cons = cs[i+self.num_facts-1]
+                if cons_not_ok := res_cons.shape[0] != M.shape[0]:
+                    raise ValueError('The number of rows ('+str(res_cons.shape[0])+') of the'
+                                     ' '+str(i)+'-index residual constraint'
+                                     ' must be equal to the number of rows'
+                                     ' ('+str(M.shape[0])+') of the matrix to factorize '
+                                     '(is_fact_side_left='+str(self.is_fact_side_left)+').')
+                if cons_not_ok := i > 0 and fact_cons.shape[1] != last_fact.shape[0]:
+                    raise ValueError('The number of columns ('+str(fact_cons.shape[1])+') of the'
+                                     ' '+str(i)+'-index factor constraint'
+                                     ' must be equal to the number of rows'
+                                     ' ('+str(last_fact.shape[0])+') of the '+
+                                     str(i-1)+'-index factor constraint.'
+                                     ' (is_fact_side_left='+str(self.is_fact_side_left)+').')
+                if cons_not_ok := fact_cons.shape[0] != res_cons.shape[1]:
+                    raise ValueError('The number of rows of ('+str(fact_cons.shape[0])+') the '
+                                     +str(i)+'-index factor constraint must be'
+                                     ' equal to the number of columns'
+                                     ' ('+str(res_cons.shape[1])+') of the '
+                                     +str(i)+'-index residual constraint '
+                                     '(is_fact_side_left='+str(self.is_fact_side_left)+').')
+                last_fact = fact_cons
+        else: # is_fact_side_left == False
+            # cs == fact_constraints + res_constraints
+            # cs[0] is the first factor constraint
+            if cons_not_ok := cs[0].shape[0] != M.shape[0]:
+                raise ValueError('The number of rows of the'
+                                 ' 0-index factor constraint'
+                                 ' ('+str(cs[0].shape[0])+')'
+                                 ' must be equal to the number of rows'
+                                 ' of the matrix to factorize ('
+                                 +str(M.shape[0])+')'
+                                 ' (is_fact_side_left='+str(self.is_fact_side_left)+').')
+            last_fact = cs[0]
+            for i in range(self.num_facts-1):
+                fact_cons = cs[i]
+                res_cons = cs[i+self.num_facts-1]
+                if cons_not_ok := res_cons.shape[1] != M.shape[1]:
+                    raise ValueError('The number of columns '
+                                     '('+str(res_cons.shape[1])+') of the'
+                                     ' '+str(i)+'-index residual constraint'
+                                     ' must be equal to the number of columns'
+                                     ' ('+str(M.shape[1])+') of the matrix to factorize '
+                                     '(is_fact_side_left='+str(self.is_fact_side_left)+').')
+                if cons_not_ok := i > 0 and fact_cons.shape[0] != last_fact.shape[1]:
+                    raise ValueError('The number of rows '
+                                     '('+str(fact_cons.shape[0])+') of the'
+                                     ' '+str(i)+'-index factor constraint'
+                                     ' must be equal to the number of columns'
+                                     ' ('+str(last_fact.shape[1])+') of the '+str(i-1)+'-index'
+                                     ' factor constraint'
+                                     ' (is_fact_side_left='+str(self.is_fact_side_left)+').')
+                if cons_not_ok := fact_cons.shape[1] != res_cons.shape[0]:
+                    raise ValueError('The number of columns'
+                                     ' ('+str(fact_cons.shape[1])+') of the '
+                                     +str(i)+'-index factor constraint must be'
+                                     ' equal to the number of rows ('+str(res_cons.shape[0])+') of the '
+                                     +str(i)+'-index residual constraint '
+                                     '(is_fact_side_left='+str(self.is_fact_side_left)+').')
+                last_fact = fact_cons
+        return not cons_not_ok
+
     def __repr__(self):
         """
             Returns object representation.
@@ -1439,7 +1531,6 @@ class ParamsPalm4MSA(ParamsFact):
            raise TypeError('ParamsPalm4MSA stop_crit argument must be a StoppingCriterion '
                            'object')
         self.stop_crit = stop_crit
-        #TODO: verify number of constraints is consistent with num_facts
 
     def is_mat_consistent(self, M):
         return super(ParamsPalm4MSA, self).is_mat_consistent(M)
@@ -1449,7 +1540,7 @@ class ParamsPalm4MSA(ParamsFact):
         This method verifies that the constraints are shape-consistent to the
         matrix/array M to factorize and with each other.
 
-        Returns: True if the constraint are consistent, raises a ValueError otherwise.
+        Returns: True if the constraints are consistent, raises a ValueError otherwise.
         """
         if not hasattr(M, 'shape'):
             raise TypeError('M must be an array-like object, with at least the'
@@ -1478,6 +1569,10 @@ class ParamsPalm4MSA(ParamsFact):
                                  ' must be equal to the '+str(i)+'-index constraint'
                                  ' number of columns '
                                  '(which is '+str(self.constraints[i].shape[1])+').')
+        # finally, verify that the number of constraints is consistent with num_facts
+        if not (cons_ok := self.num_facts):
+            raise ValueError('The number of constraints must be equal to the'
+                             ' number of factors asked to PALM4MSA.')
         return cons_ok
 
     def __repr__(self):
