@@ -823,6 +823,54 @@ class TestFaustPy(unittest.TestCase):
             bf2  = G.factors(0)
             self.assertTrue(allclose(bf.toarray(), bf2.toarray()))
 
+    def test_palm4msa_constraints_consistency_checking(self):
+        print("Test ParamsPalm4MSA.are_constraints_consistent")
+        from pyfaust.factparams import ParamsPalm4MSA, ConstraintList, StoppingCriterion
+        from pyfaust.proj import splin, normcol
+        import numpy as np
+        ##### error test 1: last constraint number of columns vs matrix number of columns
+        M = np.random.rand(500, 32).astype(self.F.dtype)
+        cons = ConstraintList('splin', 5, 500, 32, 'normcol', 1.0, 32, 33)
+        projs = [splin((500,32), 5), normcol((32,33), 1.0)] # the same with projs
+        stop_crit = StoppingCriterion(num_its=200)
+        # WARNING: for assertRaisesRegex it must be on one line or only the first line
+        # is tested as regex (is that a bug?)
+        err_msg = "ParamsPalm4MSA error: the matrix M to factorize must have the same number of columns as the last constraint. They are respectively: 32 and 33."
+        param = ParamsPalm4MSA(cons, stop_crit)
+        self.assertRaisesRegex(ValueError, err_msg, param.are_constraints_consistent, M)
+        param = ParamsPalm4MSA(projs, stop_crit)
+        self.assertRaisesRegex(ValueError, err_msg, param.are_constraints_consistent, M)
+        ##### error test 2: first constraint number of rows vs matrix number of rows
+        cons = ConstraintList('splin', 5, 501, 32, 'normcol', 1.0, 32, 32)
+        projs = [splin((501, 32), 5), normcol((32, 32), 1.0)] # the same with projs
+        stop_crit = StoppingCriterion(num_its=200)
+        # cf. WARNING above
+        err_msg = "ParamsPalm4MSA error: the matrix M to factorize must have the same number of rows as the first constraint. They are respectively: 500 and 501."
+        param = ParamsPalm4MSA(cons, stop_crit)
+        self.assertRaisesRegex(ValueError, err_msg, param.are_constraints_consistent, M)
+        param = ParamsPalm4MSA(projs, stop_crit)
+        self.assertRaisesRegex(ValueError, err_msg, param.are_constraints_consistent, M)
+        ##### error test 3: the constraints dimensions must follow a well-defined matrix product
+        cons = ConstraintList('splin', 5, 500, 33, 'normcol', 1.0, 32, 32)
+        projs = [splin((500, 33), 5), normcol((32, 32), 1.0)] # the same with projs
+        stop_crit = StoppingCriterion(num_its=200)
+        # cf. WARNING above
+        err_msg = "The 1-index constraint number of rows \(which is 32\) must be equal to the 0-index constraint number of columns \(which is 33\)."
+        param = ParamsPalm4MSA(cons, stop_crit)
+        self.assertRaisesRegex(ValueError, err_msg, param.are_constraints_consistent, M)
+        param = ParamsPalm4MSA(projs, stop_crit)
+        self.assertRaisesRegex(ValueError, err_msg, param.are_constraints_consistent, M)
+        ##### sucess test: the constraints dimensions must follow a well-defined matrix product
+        cons = ConstraintList('splin', 5, 500, 32, 'normcol', 1.0, 32, 32)
+        projs = [splin((500, 32), 5), normcol((32, 32), 1.0)] # the same with projs
+        stop_crit = StoppingCriterion(num_its=200)
+        # cf. WARNING above
+        param = ParamsPalm4MSA(cons, stop_crit)
+        self.assertTrue(param.are_constraints_consistent(M))
+        param = ParamsPalm4MSA(projs, stop_crit)
+        self.assertTrue(param.are_constraints_consistent(M))
+
+
 class TestFaustPyCplx(TestFaustPy):
 
         def setUp(self):
