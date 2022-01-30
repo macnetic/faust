@@ -827,7 +827,6 @@ class TestFaustPy(unittest.TestCase):
         print("Test ParamsPalm4MSA.are_constraints_consistent")
         from pyfaust.factparams import ParamsPalm4MSA, ConstraintList, StoppingCriterion
         from pyfaust.proj import splin, normcol
-        import numpy as np
         ##### error test 1: last constraint number of columns vs matrix number of columns
         M = np.random.rand(500, 32).astype(self.F.dtype)
         cons = ConstraintList('splin', 5, 500, 32, 'normcol', 1.0, 32, 33)
@@ -870,6 +869,77 @@ class TestFaustPy(unittest.TestCase):
         param = ParamsPalm4MSA(projs, stop_crit)
         self.assertTrue(param.are_constraints_consistent(M))
 
+    def test_hierarchical_constraints_consistency_checking(self):
+        print("ParamsHierarchical.are_constraints_consistent")
+        from pyfaust.factparams import (ParamsHierarchical, ConstraintList,
+                                        StoppingCriterion)
+        from pyfaust.proj import splin, sp, normcol
+        M = np.random.rand(500, 32)
+        stop_crit1 = StoppingCriterion(num_its=200)
+        stop_crit2 = StoppingCriterion(num_its=200)
+        ### 1st test: it must work, constraints/projs are valid
+        fact_cons = ConstraintList('splin', 5, 500, 32, 'sp', 96, 32, 32,
+                                       'sp', 96, 32, 32)
+        res_cons = ConstraintList('normcol', 1, 32, 32, 'sp', 666, 32, 32,
+                                      'sp', 333, 32, 32)
+        param = ParamsHierarchical(fact_cons, res_cons, stop_crit1,
+                                       stop_crit2)
+        self.assertTrue(param.are_constraints_consistent(M))
+        # test the same with projectors
+        fact_projs = [splin((500, 32), 5), sp((32,32), 96), sp((32,32), 96)]
+        res_projs = [normcol((32,32), 1), sp((32,32), 666), sp((32,32), 333)]
+        param = ParamsHierarchical(fact_projs, res_projs, stop_crit1,
+                                       stop_crit2)
+        self.assertTrue(param.are_constraints_consistent(M))
+        ### 2nd test: erroneous end constraint sizes (which must be equal to M size)
+        fact_cons = ConstraintList('splin', 5, 501, 32, 'sp', 96, 32, 32,
+                                   'sp', 96, 32, 32)
+        res_cons = ConstraintList('normcol', 1, 32, 32, 'sp', 666, 32, 32,
+                                  'sp', 333, 32, 32)
+
+        param = ParamsHierarchical(fact_cons, res_cons, stop_crit1,
+                                   stop_crit2)
+        err_msg = "The number of rows of the 0-index factor constraint \(501\) must be equal to the number of rows of the matrix to factorize \(500\) \(is_fact_side_left=False\)."
+        self.assertRaisesRegex(ValueError, err_msg, param.are_constraints_consistent, M)
+        fact_projs = [splin((501, 32), 5), sp((32,32), 96), sp((32,32), 96)]
+        res_projs = [normcol((32,32), 1), sp((32,32), 666), sp((32,32), 333)]
+        param = ParamsHierarchical(fact_cons, res_cons, stop_crit1,
+                                   stop_crit2)
+        self.assertRaisesRegex(ValueError, err_msg, param.are_constraints_consistent, M)
+        ### 3rd test: constraint intermediary inconsistent sizes
+        fact_cons = ConstraintList('splin', 5, 500, 31, 'sp', 96, 32, 32,
+                                   'sp', 96, 32, 32)
+        res_cons = ConstraintList('normcol', 1, 32, 32, 'sp', 666, 32, 32,
+                                  'sp', 333, 32, 32)
+
+        param = ParamsHierarchical(fact_cons, res_cons, stop_crit1,
+                                   stop_crit2)
+        err_msg = "The number of columns \(31\) of the 0-index factor constraint must be equal to the number of rows \(32\) of the 0-index residual constraint \(is_fact_side_left=False\)."
+        param = ParamsHierarchical(fact_cons, res_cons, stop_crit1,
+                                   stop_crit2)
+        self.assertRaisesRegex(ValueError, err_msg, param.are_constraints_consistent, M)
+        fact_cons = ConstraintList('splin', 5, 500, 31, 'sp', 96, 32, 32,
+                                   'sp', 96, 32, 32)
+        res_cons = ConstraintList('normcol', 1, 31, 32, 'sp', 666, 32, 32,
+                                  'sp', 333, 32, 32)
+
+        param = ParamsHierarchical(fact_cons, res_cons, stop_crit1,
+                                   stop_crit2)
+        err_msg = "The number of rows \(32\) of the 1-index factor constraint must be equal to the number of columns \(31\) of the 0-index factor constraint \(is_fact_side_left=False\)."
+        param = ParamsHierarchical(fact_cons, res_cons, stop_crit1,
+                                   stop_crit2)
+        self.assertRaisesRegex(ValueError, err_msg, param.are_constraints_consistent, M)
+        fact_cons = ConstraintList('splin', 5, 500, 32, 'sp', 96, 32, 32,
+                                   'sp', 96, 32, 32)
+        res_cons = ConstraintList('normcol', 1, 32, 32, 'sp', 666, 64, 32,
+                                  'sp', 333, 32, 32)
+
+        param = ParamsHierarchical(fact_cons, res_cons, stop_crit1,
+                                   stop_crit2)
+        err_msg = "The number of columns \(32\) of the 1-index factor constraint must be equal to the number of rows \(64\) of the 1-index residual constraint \(is_fact_side_left=False\)."
+        param = ParamsHierarchical(fact_cons, res_cons, stop_crit1,
+                                   stop_crit2)
+        self.assertRaisesRegex(ValueError, err_msg, param.are_constraints_consistent, M)
 
 class TestFaustPyCplx(TestFaustPy):
 
