@@ -117,11 +117,19 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		void prox_const(MatDense<FPP,GPU2> & M, const MatDense<FPP,GPU2> & supp, const bool normalized/*=true*/, const bool pos/*=false*/)
+		void prox_const(MatDense<FPP,GPU2> & M, const MatDense<FPP,GPU2> & supp, const bool normalized/*=false*/, const bool pos/*=false*/)
 		{
 			MatDense<FPP,Cpu> cpuM = M.tocpu();
 			MatDense<FPP,Cpu> cpu_supp = supp.tocpu();
 			prox_const(cpuM, cpu_supp, normalized, pos);
+			M = cpuM;
+		}
+
+	template<typename FPP>
+		void prox_id(MatDense<FPP,GPU2> & M, const bool normalized/*=false*/, const bool pos/*=false*/)
+		{
+			MatDense<FPP,Cpu> cpuM = M.tocpu();
+			prox_id(cpuM, normalized, pos);
 			M = cpuM;
 		}
 

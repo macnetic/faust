@@ -309,6 +309,7 @@ bool Faust::ConstraintGeneric::is_constraint_parameter_mat()const
 		case CONSTRAINT_NAME_TOEPLITZ:
 		case CONSTRAINT_NAME_HANKEL:
 		case CONSTRAINT_NAME_CIRC:
+		case CONSTRAINT_NAME_ID:
 			return true;
 		default:
 			handleError(m_className,"is_constraint_parameter_mat : Unknown type of constraint");

@@ -688,4 +688,11 @@ void Faust::prox_skperm(Faust::MatDense<FPP, Cpu> & M_, const unsigned int k, co
 	M = (matching.array() > 0).select(M, 0);
 	if(normalized) M_.normalize();
 }
+
+template<typename FPP>
+void Faust::prox_id(Faust::MatDense<FPP,Cpu> & M, const bool normalized /* deft to false */, const bool pos /* false */)
+{
+	if(pos) pre_prox_pos(M);
+	if(normalized) M.normalize();
+}
 #endif

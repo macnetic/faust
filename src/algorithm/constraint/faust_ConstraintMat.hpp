@@ -105,16 +105,12 @@ void Faust::ConstraintMat<FPP,DEVICE>::check_constraint_name()const
    switch (this->m_constraintName)
    {
       case CONSTRAINT_NAME_CONST:
-         break;
       case CONSTRAINT_NAME_SUPP:
-         break;
 	  case CONSTRAINT_NAME_CIRC:
-			 break;
 	  case CONSTRAINT_NAME_TOEPLITZ:
-			 break;
 	  case CONSTRAINT_NAME_HANKEL:
-			 break;
 	  case CONSTRAINT_NAME_BLKDIAG:
+	  case CONSTRAINT_NAME_ID:
 			 break;
       default:
          handleError(m_className," cannot create Faust::ConstraintMat objet from an faust_constraint object with this constraint_name");
@@ -133,6 +129,9 @@ void Faust::ConstraintMat<FPP,DEVICE>::set_default_parameter()
       case CONSTRAINT_NAME_SUPP:
          m_parameter.setZeros();
          break;
+	  case CONSTRAINT_NAME_ID:
+		 // nothing to do
+		 break;
       default:
          handleError(m_className,"set_default_parameter : cannot create Faust::ConstraintMat objet from an faust_constraint object with this constraint_name");
          break;
@@ -164,6 +163,8 @@ void Faust::ConstraintMat<FPP,DEVICE>::project(Faust::MatDense<FPP,DEVICE> & mat
 	  case CONSTRAINT_NAME_BLKDIAG:
 		 Faust::prox_blockdiag(mat, m_parameter, normalizing);
 		 break;
+	  case CONSTRAINT_NAME_ID:
+		 Faust::prox_id(mat, false); // normalizing is ignored for the CONST prox
       default:
          handleError(m_className,"project : invalid constraint_name");
          break;
@@ -178,6 +179,8 @@ Faust::MatGeneric<FPP,DEVICE>* Faust::ConstraintMat<FPP,DEVICE>::project_gen(Fau
       case CONSTRAINT_NAME_CONST:
          //mat=m_parameter;
 		return  Faust::prox_const_gen(mat, m_parameter, false); // normalizing is ignored for the CONST prox
+      case CONSTRAINT_NAME_ID:
+		return  Faust::prox_id_gen(mat, false); // normalizing is ignored for the ID prox
       case CONSTRAINT_NAME_SUPP:
          return Faust::prox_supp_gen(mat,m_parameter, normalizing);
 	  case CONSTRAINT_NAME_TOEPLITZ:

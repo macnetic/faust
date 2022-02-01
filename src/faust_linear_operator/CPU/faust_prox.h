@@ -103,6 +103,8 @@ namespace Faust
 
 	template<typename FPP> faust_unsigned_int sparse_size(faust_unsigned_int nnz, faust_unsigned_int nrows);
 	template<typename FPP> faust_unsigned_int dense_size(faust_unsigned_int nrows, faust_unsigned_int ncols);
+	template<typename FPP>
+		void prox_id(MatDense<FPP,Cpu> & M, const bool normalized=false, const bool pos=false);
 
 }
 

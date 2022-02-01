@@ -106,6 +106,8 @@ namespace Faust
 		MatGeneric<FPP,DEV>* prox_supp_gen(MatDense<FPP,DEV> & M, const MatDense<FPP,DEV> & supp, const bool normalized=true, const bool pos=false,  const MatType forcedType=None);
 	template<typename FPP, FDevice DEV>
 		MatGeneric<FPP,DEV>* prox_const_gen(MatDense<FPP,DEV> & M, const MatDense<FPP,DEV> & supp, const bool normalized=true, const bool pos=false,  const MatType forcedType=None);
+	template<typename FPP, FDevice DEV>
+		Faust::MatGeneric<FPP,DEV>* prox_id_gen(Faust::MatDense<FPP,DEV> & M, const bool normalized=false, const bool pos=false,  const MatType forcedType=None);
 
 }
 
