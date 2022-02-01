@@ -813,22 +813,22 @@ cdef class ConstraintMatCore@TYPE_NAME@:
     @staticmethod
     def project(M, name, num_rows, num_cols, parameter, parameter_sz, normalized=False,
                 pos=False):
-        cdef @TYPE@[:,:] M_view_cplx
-        cdef @TYPE@[:,:] M_out_view_cplx
-        cdef @TYPE@[:,:] param_view_cplx
+        cdef @TYPE@[:,:] M_view
+        cdef @TYPE@[:,:] M_out_view
+        cdef @TYPE@[:,:] param_view
 
         M_out = np.empty(M.shape, dtype=M.dtype, order='F')
 
 
         parameter = parameter.astype(M.dtype)
 
-        M_view_cplx = M
-        M_out_view_cplx = M_out
-        param_view_cplx = parameter
-        ret = FaustCoreCy.prox_mat[@TYPE@](name, &param_view_cplx[0,0],
-                                      parameter_sz, &M_view_cplx[0,0],
+        M_view = M
+        M_out_view = M_out
+        param_view = parameter
+        ret = FaustCoreCy.prox_mat[@TYPE@](name, &param_view[0,0],
+                                      parameter_sz, &M_view[0,0],
                                       num_rows, num_cols,
-                                      &M_out_view_cplx[0,0], normalized,
+                                      &M_out_view[0,0], normalized,
                                       pos)
 
         if ret == -1:
@@ -837,8 +837,8 @@ cdef class ConstraintMatCore@TYPE_NAME@:
 
     @staticmethod
     def prox_blockdiag(M, block_shapes, normalized, pos):
-        cdef @TYPE@[:,:] M_view_cplx
-        cdef @TYPE@[:,:] M_out_view_cplx
+        cdef @TYPE@[:,:] M_view
+        cdef @TYPE@[:,:] M_out_view
         cdef unsigned long int* m_ptr
         cdef unsigned long int* n_ptr
 
@@ -856,12 +856,12 @@ cdef class ConstraintMatCore@TYPE_NAME@:
         if(m_ptr[len(block_shapes)-1] != M.shape[0] or n_ptr[len(block_shapes)-1] != M.shape[1]):
             raise ValueError("The sum of block shapes is not equal to the matrix shapes.")
 
-        M_view_cplx = M
-        M_out_view_cplx = M_out
-        ret = FaustCoreCy.prox_blockdiag[@TYPE@](&M_view_cplx[0,0], M.shape[0],
+        M_view = M
+        M_out_view = M_out
+        ret = FaustCoreCy.prox_blockdiag[@TYPE@](&M_view[0,0], M.shape[0],
                                            M.shape[1], &m_ptr[0], &n_ptr[0],
                                           len(block_shapes),normalized, pos,
-                                           &M_out_view_cplx[0,0])
+                                           &M_out_view[0,0])
         PyMem_Free(m_ptr)
         PyMem_Free(n_ptr)
 
