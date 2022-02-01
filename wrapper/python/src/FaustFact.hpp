@@ -61,6 +61,7 @@ bool PyxConstraintGeneric::is_mat_constraint()
         case CONSTRAINT_NAME_TOEPLITZ:
         case CONSTRAINT_NAME_CIRC:
         case CONSTRAINT_NAME_HANKEL:
+        case CONSTRAINT_NAME_ID:
             return true;
         default:
             return false;
@@ -134,6 +135,10 @@ int prox_mat(unsigned int cons_type, FPP* cons_param, unsigned long cons_param_s
                 return ret;
             case CONSTRAINT_NAME_HANKEL:
                 Faust::prox_hankel(fmat, normalized, pos);//, Faust::MatDense<FPP,Cpu>(cons_param, num_rows, num_cols), normalized, pos);
+                memcpy(mat_out, fmat.getData(), sizeof(FPP)*num_rows*num_cols);
+                return ret;
+            case CONSTRAINT_NAME_ID:
+                Faust::prox_id(fmat);
                 memcpy(mat_out, fmat.getData(), sizeof(FPP)*num_rows*num_cols);
                 return ret;
             default:
@@ -282,12 +287,19 @@ void prepare_fact(const FPP* mat, const unsigned int num_rows, const unsigned in
             cons_mat = static_cast<PyxConstraintMat<FPP>*>(p->constraints[i]);
 //            if(p->is_verbose)
 //                cout << "constraint[" << i << "]->parameter: " << cons_mat->parameter[0] << endl;
-            Faust::MatDense<FPP, Cpu> P;
-            if(p->constraints[i]->num_rows * p->constraints[i]->num_cols == cons_mat->parameter_sz)
-                P = Faust::MatDense<FPP, Cpu>(cons_mat->parameter, p->constraints[i]->num_rows, p->constraints[i]->num_cols);
+            if(p->constraints[i]->name == CONSTRAINT_NAME_ID)
+            {
+                tmp_cons = new Faust::ConstraintMat<FPP, Cpu>(CONSTRAINT_NAME_ID, p->constraints[i]->num_rows, p->constraints[i]->num_cols);
+            }
             else
-                P = Faust::MatDense<FPP, Cpu>(cons_mat->parameter, cons_mat->parameter_sz/2, 2);
-            tmp_cons = new Faust::ConstraintMat<FPP,Cpu>(static_cast<faust_constraint_name>(p->constraints[i]->name), P, p->constraints[i]->num_rows, p->constraints[i]->num_cols);
+            {
+                Faust::MatDense<FPP, Cpu> P;
+                if(p->constraints[i]->num_rows * p->constraints[i]->num_cols == cons_mat->parameter_sz)
+                    P = Faust::MatDense<FPP, Cpu>(cons_mat->parameter, p->constraints[i]->num_rows, p->constraints[i]->num_cols);
+                else
+                    P = Faust::MatDense<FPP, Cpu>(cons_mat->parameter, cons_mat->parameter_sz/2, 2);
+                tmp_cons = new Faust::ConstraintMat<FPP,Cpu>(static_cast<faust_constraint_name>(p->constraints[i]->name), P, p->constraints[i]->num_rows, p->constraints[i]->num_cols);
+            }
             cons.push_back(tmp_cons);
         }
         else
@@ -756,19 +768,26 @@ Faust::TransformHelper<FPP,DEV>* hierarchical2020_gen(FPP* mat, unsigned int num
 			faust_unsigned_int nrows, ncols;
             //            if(is_verbose)
             //                cout << "constraint[" << i << "]->parameter: " << cons_mat->parameter[0] << endl;
-            Faust::MatDense<FPP, DEV> P;
-            if(constraints[i]->num_rows * constraints[i]->num_cols == cons_mat->parameter_sz)
-			{
-				nrows = constraints[i]->num_rows;
-				ncols = constraints[i]->num_cols;
-			}
+            if(constraints[i]->name == CONSTRAINT_NAME_ID)
+            {
+                tmp_cons = new Faust::ConstraintMat<FPP, Cpu>(CONSTRAINT_NAME_ID, constraints[i]->num_rows, constraints[i]->num_cols);
+            }
             else
-			{
-				nrows = cons_mat->parameter_sz/2;
-				ncols = 2;
-			}
-			P = Faust::MatDense<FPP, DEV>(nrows, ncols, cons_mat->parameter);
-            tmp_cons = new Faust::ConstraintMat<FPP, DEV>(static_cast<faust_constraint_name>(constraints[i]->name), P, constraints[i]->num_rows, constraints[i]->num_cols);
+            {
+                Faust::MatDense<FPP, DEV> P;
+                if(constraints[i]->num_rows * constraints[i]->num_cols == cons_mat->parameter_sz)
+                {
+                    nrows = constraints[i]->num_rows;
+                    ncols = constraints[i]->num_cols;
+                }
+                else
+                {
+                    nrows = cons_mat->parameter_sz/2;
+                    ncols = 2;
+                }
+                P = Faust::MatDense<FPP, DEV>(nrows, ncols, cons_mat->parameter);
+                tmp_cons = new Faust::ConstraintMat<FPP, DEV>(static_cast<faust_constraint_name>(constraints[i]->name), P, constraints[i]->num_rows, constraints[i]->num_cols);
+            }
             cons.push_back(tmp_cons);
         }
         else

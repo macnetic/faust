@@ -18,6 +18,32 @@ class proj_gen(ABC):
     def __call__(self, M):
         return self.constraint.project(M)
 
+class proj_id(proj_gen):
+    """
+    Functor for the identity projector.
+
+    This projector simply returns the same array as the one passed as argument.
+
+    It's not useless for example in PALM4MSA (pyfaust.fact.palm4msa,
+    pyfaust.fact.hierarchical) it might serve to avoid any
+    constraint on a factor.
+
+    Example:
+    >>> from pyfaust.proj import proj_id
+    >>> from numpy import allclose
+    >>> from numpy.random import rand
+    >>> M = rand(5,5)
+    >>> p = proj_id(M.shape)
+    >>> allclose(p(M), M)
+    True
+    """
+
+    def __init__(self, shape):
+        super(proj_id, self).__init__(shape)
+        self.constraint = ConstraintMat('id', np.empty(shape))
+        self.constraint._num_rows = shape[0]
+        self.constraint._num_cols = shape[1]
+
 class toeplitz(proj_gen):
     """
     Functor for the TOEPLITZ projector.
