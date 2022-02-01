@@ -296,17 +296,17 @@ class ConstraintMat(ConstraintGeneric):
         This class represents a matrix-based constraint to apply on a matrix.
 
     """
-    def __init__(self, name, cons_value, normalized=None, pos=False, cons_value_sz=None):
+    def __init__(self, name, cons_value=None, shape=None, normalized=None, pos=False, cons_value_sz=None):
         """
         Constructs a matrix type constraint.
 
         Args:
             name: must be a ConstraintName instance set with a value among
-            SUPP, CONST, TOEPLITZ or CIRC(ULANT) (cf. ConstraintName) or it can also be one of the
+            ID, SUPP, CONST, TOEPLITZ or CIRC(ULANT) (cf. ConstraintName) or it can also be one of the
             more handy str aliases which are respectively: 'supp' and 'const'.
-            num_rows: the number of rows of the constrainted matrix.
-            num_cols: the number of columns of the constrained matrix.
             cons_value: the value of the constraint, it must be a numpy.array
+            shape: the shape of the matrix (only useful for identity prox,
+            ConstraintName.ID. In this case the cons_value argument is None).
             that defines the constraint (the matrix support for SUPP and the
             constant matrix for CONST).
 
@@ -333,8 +333,13 @@ class ConstraintMat(ConstraintGeneric):
             0.99999999999999989
 
         """
-        super(ConstraintMat, self).__init__(name, cons_value.shape[0],
-                                            cons_value.shape[1],
+        if not shape is None:
+            _shape = shape
+        elif not cons_value is None:
+            _shape = cons_value.shape
+        else:
+            raise ValueError('either shape or cons_value must be defined')
+        super(ConstraintMat, self).__init__(name, _shape[0], _shape[1],
                                             cons_value, normalized, pos)
         if(not isinstance(cons_value, np.ndarray)):
             raise TypeError('ConstraintMat must receive a numpy.ndarray as cons_value '
@@ -351,6 +356,13 @@ class ConstraintMat(ConstraintGeneric):
             raise TypeError('ConstraintMat first argument must be a '
                             'ConstraintName with a matrix type name '
                             '(name.is_mat_constraint() must return True)')
+        if self._name.name != ConstraintName.ID and cons_value is None:
+            raise ValueError('you must specify a matrix as cons_value except if'
+                             ' the ConstraintName is ID.')
+        if not shape is None and not cons_value is None \
+           and shape != cons_value.shape:
+            raise ValueError('cons_value shape must be equal to shape argument'
+                             ' if not None.')
         if(self._name.name == ConstraintName.BLKDIAG):
             self._num_rows = int(cons_value[-1][0])
             self._num_cols = int(cons_value[-1][1])
@@ -477,6 +489,8 @@ class ConstraintName:
         NORMLIN: Designates a 2-norm constraint on each row of a matrix.
         CONST: Designates a constraint imposing to a matrix to be constant.
         SUPP: Designates a constraint by a support matrix S (element-wisely multiplying the matrix to constrain to obtain a matrix for which the 2-norm equals 1, see: ConstraintMat.project()).
+        SKPERM: SKPERM prox/constraint.
+        ID: Identity prox/constraint.
         name: The name of the constraint (actually an integer among the valid constants).
 
     Example:
@@ -523,6 +537,7 @@ class ConstraintName:
     CIRC = 11 # Mat constraint
     HANKEL = 12 # Mat cons.
     SKPERM = 13 # Int constraint
+    ID = 14 # Mat cons.
 
     def __init__(self, name):
         """
@@ -560,7 +575,8 @@ class ConstraintName:
     def _arg_is_mat_const(name):
         return name in [ConstraintName.SUPP, ConstraintName.CONST,
                         ConstraintName.CIRC, ConstraintName.TOEPLITZ,
-                        ConstraintName.HANKEL, ConstraintName.BLKDIAG]
+                        ConstraintName.HANKEL, ConstraintName.BLKDIAG,
+                        ConstraintName.ID]
 
     def is_int_constraint(self):
         """
@@ -621,6 +637,8 @@ class ConstraintName:
             _str =  'hankel'
         elif(_id == ConstraintName.BLKDIAG):
             _str =  'blockdiag'
+        elif _id == ConstraintName.ID:
+            _str =  'id'
         else:
             raise ValueError(err_msg)
         return _str
@@ -663,6 +681,8 @@ class ConstraintName:
             id = ConstraintName.HANKEL
         elif(_str == 'blockdiag'):
             id = ConstraintName.BLKDIAG
+        elif(_str == 'id'):
+            id = ConstraintName.ID
         else:
             raise ValueError(err_msg)
         return id
@@ -1175,6 +1195,153 @@ class ParamsHierarchical(ParamsFact):
                 "global stopping criterion"+str(self.stop_crits[1])+"\r\n" \
                 "is_fact_side_left:"+str(self.is_fact_side_left)
 
+class ParamsHierarchicalSimpleCons(ParamsHierarchical):
+    """
+    This class is a simplified ParamsHierarchical in which you define only the pyfaust.fact.hierarchical resulting Faust factors constraints.
+
+    You don't have to define the intermediate residual factors as you normally do with a
+    ParamsHierarchical. With a ParamsHierachicalSimpleCons they are defined
+    automatically/internally using pyfaust.proj.proj_id. It means that only the
+    gradient descent of PALM4MSA modify the residual factors. The only residual
+    factor you have to define the constraint for, is the last one (because it is
+    present in the resulting Faust of pyfaust.fact.hierarchical).
+
+    The example below shows (for a Hadamard matrix factorization) the definition
+    of a ParamsHierarchical instance and its simpler equivalent (with the same set
+    of internal defaultly defined residual constraints) as a ParamsHierachicalSimpleCons.
+    It allows to get exactly what is exactly a ParamsHierarchicalSimpleCons internally.
+    This example is a detailed way to the same thing as ParamsHierarchicalWHTSimpleCons.
+
+    <b/> See also ParamsHierarchical, pyfaust.fact.hierarchical
+
+    Example:
+        >>> from pyfaust import wht
+        >>> from pyfaust.proj import skperm, proj_id
+        >>> from pyfaust.factparams import ParamsHierarchical, ParamsHierarchicalSimpleCons, StoppingCriterion
+        >>> from pyfaust.fact import hierarchical
+        >>> from numpy import log2
+        >>> from numpy.linalg import norm
+        >>> # create a Hadamard matrix
+        >>> H = wht(32).toarray()
+        >>> d = H.shape[0]
+        >>> n = int(log2(d))
+        >>> res_projs = [];
+        >>> fac_projs = [];
+        >>> for i in range(n-1):
+        >>>     if i == n-2:
+        >>>         res_projs += [ skperm((d,d), int(d/2**(i+1)), normalized=True) ]
+        >>>     else:
+        >>>         res_projs += [ proj_id((d,d)) ]
+        >>>     fac_projs += [ skperm((d,d), 2, normalized=True) ]
+        >>> stop_crit = StoppingCriterion(num_its=30)
+        >>> p1 = ParamsHierarchical(fac_projs, res_projs, stop_crit, stop_crit, is_update_way_R2L=True, packing_RL=False)
+        >>> simple_projs = fac_projs+[res_projs[-1]]
+        >>> p2 = ParamsHierarchicalSimpleCons(simple_projs, stop_crit, stop_crit, is_update_way_R2L=True, packing_RL=False)
+        >>> # p1 and p2 are exactly the same set of parameters for hierarchical
+        >>> # let's verify the results
+        >>> print("factorizing with p1 (ParamsHierarchical) into Faust F1")
+        >>> F1 = hierarchical(H, p1, backend=2020)
+        >>> # factorizing with p2 (ParamsHierarchicalSimpleCons)
+        >>> print("F1=", F1)
+        >>> print("F1 error =", (F1-H).norm()/norm(H))
+        >>> print("factorizing with p2 (ParamsHierarchicalSimpleCons) into Faust F2")
+        >>> F2 = hierarchical(H, p2, backend=2020)
+        >>> print("F2=", F2)
+        >>> print("F2 error =", (F2-H).norm()/norm(H))
+
+        Output:
+            factorizing with p1 (ParamsHierarchical) into Faust F1<br/>
+            hierarchical: 1/4<br/>
+            hierarchical: 2/4<br/>
+            hierarchical: 3/4<br/>
+            hierarchical: 4/4<br/>
+            F1= Faust size 32x32, density 0.3125, nnz_sum 320, 5 factor(s): <br/>
+            FACTOR 0 (double) SPARSE, size 32x32, density 0.0625, nnz 64<br/>
+            FACTOR 1 (double) SPARSE, size 32x32, density 0.0625, nnz 64<br/>
+            FACTOR 2 (double) SPARSE, size 32x32, density 0.0625, nnz 64<br/>
+            FACTOR 3 (double) SPARSE, size 32x32, density 0.0625, nnz 64<br/>
+            FACTOR 4 (double) SPARSE, size 32x32, density 0.0625, nnz 64<br/>
+            F1 error = 7.850462159063938e-16<br/>
+            factorizing with p2 (ParamsHierarchicalSimpleCons) into Faust F2<br/>
+            hierarchical: 1/4<br/>
+            hierarchical: 2/4<br/>
+            hierarchical: 3/4<br/>
+            hierarchical: 4/4<br/>
+            F2= Faust size 32x32, density 0.3125, nnz_sum 320, 5 factor(s): <br/>
+            FACTOR 0 (double) SPARSE, size 32x32, density 0.0625, nnz 64<br/>
+            FACTOR 1 (double) SPARSE, size 32x32, density 0.0625, nnz 64<br/>
+            FACTOR 2 (double) SPARSE, size 32x32, density 0.0625, nnz 64<br/>
+            FACTOR 3 (double) SPARSE, size 32x32, density 0.0625, nnz 64<br/>
+            FACTOR 4 (double) SPARSE, size 32x32, density 0.0625, nnz 64<br/>
+            F2 error = 7.850462159063938e-16<br/>
+
+    """
+    def __init__(self, fact_constraints, stop_crit1,
+                 stop_crit2, is_update_way_R2L=False, init_lambda=1.0,
+                 step_size=10.0**-16, constant_step_size=False,
+                 is_fact_side_left=False,
+                 is_verbose=False,
+                 factor_format='dynamic',
+                 packing_RL=True,
+                 no_normalization=False,
+                 no_lambda=False,
+                 norm2_max_iter=100,
+                 norm2_threshold=1e-6,
+                 grad_calc_opt_mode=ParamsFact.EXTERNAL_OPT,
+                 **kwargs):
+        """
+        Constructor.
+
+        Args:
+            fact_constraints: the list of pyfaust.proj.proj_gen or pyfaust.factparams.ConstraintGen that define the structure of the pyfaust.fact.hierarchical resulting Faust factors in the same order if is_fact_side_left==False in the reverse order otherwise.
+            stop_crit1: cf. pyfaust.fact.ParamsHierarchical.__init__
+            stop_crit2: cf. pyfaust.fact.ParamsHierarchical.__init__
+            is_update_way_R2L: cf. pyfaust.fact.ParamsHierarchical.__init__
+            init_lambda: cf. pyfaust.fact.ParamsHierarchical.__init__
+            step_size: cf. pyfaust.fact.ParamsHierarchical.__init__
+            constant_step_size: cf. pyfaust.fact.ParamsHierarchical.__init__
+            is_fact_side_left: cf. pyfaust.fact.ParamsHierarchical.__init__
+            is_verbose: cf. pyfaust.fact.ParamsHierarchical.__init__
+            factor_format: cf. pyfaust.fact.ParamsHierarchical.__init__
+            packing_RL: cf. pyfaust.fact.ParamsHierarchical.__init__
+            no_normalization: cf. pyfaust.fact.ParamsHierarchical.__init__
+            no_lambda: cf. pyfaust.fact.ParamsHierarchical.__init__
+            norm2_max_iter: cf. pyfaust.fact.ParamsHierarchical.__init__
+            grad_calc_opt_mode: cf. pyfaust.fact.ParamsHierarchical.__init__
+        """
+        from pyfaust.proj import proj_id
+        fact_constraints = list(fact_constraints) # copy it because it'll be modified
+        res_constraints = []
+        for i in range(len(fact_constraints)-2): # there is as many residuals than factors
+            if is_fact_side_left:
+                res_constraints += [proj_id((fact_constraints[-1].shape[0],
+                                             fact_constraints[i].shape[0])).constraint]
+            else:
+                res_constraints += [proj_id((fact_constraints[i].shape[1],
+                                            fact_constraints[-1].shape[1])).constraint]
+        # the last fact_constraints is the last residual factor
+        res_constraints += fact_constraints[-1:]
+        del fact_constraints[-1]
+        super(ParamsHierarchicalSimpleCons, self).__init__(fact_constraints,
+                                                          res_constraints,
+                                                          stop_crit1,
+                                                          stop_crit2,
+                                                          is_update_way_R2L,
+                                                          init_lambda,
+                                                          step_size,
+                                                          constant_step_size,
+                                                          is_fact_side_left,
+                                                          is_verbose,
+                                                          factor_format,
+                                                          packing_RL,
+                                                          no_normalization,
+                                                          no_lambda,
+                                                          norm2_max_iter,
+                                                          norm2_threshold,
+                                                          grad_calc_opt_mode,
+                                                          **kwargs)
+
+
 class ParamsHierarchicalDFT(ParamsHierarchical):
     """
     The simplified parameterization class for factorizing a DFT matrix using the hierarchical factorization algorithm.
@@ -1274,7 +1441,7 @@ class ParamsHierarchicalDFT(ParamsHierarchical):
 
 class ParamsHierarchicalWHT(ParamsHierarchical):
     """
-    The simplified parameterization class for factorizing a square matrix (of order a power of two) with the hierarchical factorization algorithm.
+    The simplified parameterization class for factorizing a Hadamard matrix with the hierarchical factorization algorithm.
 
     This type of parameters is typically used for a Hadamard matrix
     factorization.
@@ -1314,8 +1481,48 @@ class ParamsHierarchicalWHT(ParamsHierarchical):
         pot = int(pot)
         return ParamsHierarchicalWHT(pot)
 
-    def __repr__(self):
-        return super(ParamsHierarchicalWHT, self).__repr__()
+class ParamsHierarchicalWHTSimpleCons(ParamsHierarchicalSimpleCons):
+    """
+    The simplified parameterization class for factorizing a Hadamard matrix with the hierarchical factorization algorithm.
+
+    This type of parameters is typically used for a Hadamard matrix factorization.
+    This is a variant of ParamsHierarchicalWHT. Here the intermediate residual
+    factors are not constrained at all, the other factors are constrained with
+    pyfaust.proj.skperm.
+
+    <b/> See also pyfaust.fact.hierarchical, pyfaust.demo.hadamard
+    """
+    def __init__(self, n):
+        """
+        args:
+            n: the number of output factors (the input matrix to factorize must
+            be of shape (2**n, 2**n)) .
+            proj_name: the type of projector used, must be either
+            'splincol' (default value) or 'skperm'.
+        """
+        proj_name = 'skperm' # when proj_id is used to constraint intermediate
+        # residual factors the splincol prox doesn't work well (bad
+        # approximate)
+        cons_name = ConstraintName.str2name_int(proj_name)
+        d = 2**int(n)
+        stop_crit = StoppingCriterion(num_its=30)
+        super(ParamsHierarchicalWHTSimpleCons,
+              self).__init__([ConstraintInt(ConstraintName(cons_name),d,d,2)
+                              for i in range(0,n-1)]+
+                             [ConstraintInt(ConstraintName(cons_name),d,d,int(d/2.**(n-1)))],
+                             stop_crit, stop_crit,
+                             is_update_way_R2L=True,
+                             packing_RL=False)
+
+    @staticmethod
+    def createParams(M, p):
+        pot = np.log2(M.shape[0])
+        if(pot > int(pot) or M.shape[0] != M.shape[1]):
+            raise ValueError('M must be a '
+                             'square matrix of order a power of '
+                             'two.')
+        pot = int(pot)
+        return ParamsHierarchicalWHTSimpleCons(pot)
 
 
 # this is left here for descendant compatibility but it will be removed in a
@@ -1367,7 +1574,7 @@ class ParamsHierarchicalRectMat(ParamsHierarchical):
             j: the total number of factors.
             k: the integer sparsity per column (SPCOL, pyfaust.proj.spcol) applied to the
             rightmost factor (index j-1) of shape (m, n).
-            s: the integer sparsity targeted (SP, pyfaust.proj.sp) for all the factors from the
+            s: s*m is the integer sparsity targeted (SP, pyfaust.proj.sp) for all the factors from the
             second (index 1) to index j-2. These factors are square of order n.
             rho: defines the integer sparsity (SP, pyfaust.proj.sp) of the i-th residual (i=0:j-2): ceil(P*rho**i).
             P: (default value is ParamsHierarchicalRectMat.DEFAULT_P_CONST_FACT) defines the integer sparsity of the i-th residual (i=0:j-2): ceil(P*rho**i).
@@ -1446,8 +1653,119 @@ class ParamsHierarchicalRectMat(ParamsHierarchical):
         p = ParamsHierarchicalRectMat(M.shape[0], M.shape[1], *p[1:])
         return p
 
-    def __repr__(self):
-        return super(ParamsHierarchicalRectMat, self).__repr__()
+class ParamsHierarchicalRectMatSimpleCons(ParamsHierarchical):
+    """
+    This parameter class is the same as ParamsHierarchicalRectMat except that there is no residual factor constraints (see ParamsHierachicalSimpleCons).
+
+    <b/> See also pyfaust.fact.hierarchical, pyfaust.demo.bsl, pyfaust.factparams.ParamsHierarchicalRectMat, pyfaust.factparams.ParamsHierarchicalSimpleCons
+    """
+
+    DEFAULT_P_CONST_FACT = 1.4
+
+    def __init__(self, m, n, j, k, s, rho=0.8, P=None):
+        """
+        Constructor for the specialized parametrization used for example in the pyfaust.demo.bsl (brain souce localization).
+
+        For a better understanding you might refer to [1].
+
+        [1] Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse
+        approximations of matrices and applications", Journal of Selected
+        Topics in Signal Processing, 2016. [https://hal.archives-ouvertes.fr/hal-01167948v1]
+
+        Args:
+            m: the number of rows of the input matrix.
+            n: the number of columns of the input matrix.
+            j: the total number of factors.
+            k: the integer sparsity per column (SPCOL, pyfaust.proj.spcol) applied to the
+            rightmost factor (index j-1) of shape (m, n).
+            s: the integer sparsity targeted (SP, pyfaust.proj.sp) for all the factors from the
+            second (index 1) to index j-2. These factors are square of order n.
+            rho: defines the integer sparsity (SP, pyfaust.proj.sp) of the i-th residual (i=0:j-2): ceil(P*rho**i).
+            P: (default value is ParamsHierarchicalRectMat.DEFAULT_P_CONST_FACT) defines the integer sparsity of the i-th residual (i=0:j-2): ceil(P*rho**i).
+        """
+        from math import ceil
+        from pyfaust.proj import spcol, sp, proj_id
+        #test args
+        for arg,aname in zip([m, n, j, k, s],["m","n","j","k","s"]):
+            if(not isinstance(m, int) and not isinstance(m, np.integer)):
+                raise TypeError(aname+" must be an integer.")
+        if(not isinstance(rho, float)):
+            raise TypeError('rho must be a float')
+        if(not P):
+            P=ParamsHierarchicalRectMat.DEFAULT_P_CONST_FACT*m**2
+        elif(not isinstance(P, float)):
+            raise TypeError('P must be a float')
+        #S1_cons = ConstraintInt('spcol', m, n, k)
+        S1_cons = spcol((m,n), k)
+        S_cons = [S1_cons]
+        for i in range(j-2):
+#            S_cons += [ ConstraintInt('sp', m, m, s*m) ]
+            S_cons += [ sp((m, m), s*m) ]
+
+        R_cons = []
+        for i in range(j-1):
+            #R_cons += [ConstraintInt('sp', m, m, int(ceil(P*rho**i)))]
+            if i < j-2:
+                R_cons += [proj_id((m,m))]
+            else:
+                R_cons += [sp((m,m), int(ceil(P*rho**i)))]
+
+        stop_crit = StoppingCriterion(num_its=30)
+
+        super(ParamsHierarchicalRectMatSimpleCons,
+              self).__init__([prox.constraint for prox in S_cons], [prox.constraint for prox in R_cons],
+                                                            stop_crit,
+                                                            stop_crit,
+                                                            is_update_way_R2L=True,
+                                                            is_fact_side_left=True)
+        self.S_cons = S_cons
+        self.R_cons = R_cons
+
+    @staticmethod
+    def createParams(M, p):
+        """
+        Static member function to create a ParamsHierarchicalRectMat instance by a simplified parametrization expression.
+
+        Args:
+            p: a list of the form ['rectmat', j, k, s] to create a parameter
+            instance with the parameters j, k, s (see the class
+            ParamsHierarchicalRectMat.__init__ for
+            their definitions).
+
+        Example:
+            >>> from pyfaust.factparams import ParamsHierarchicalRectMat
+            >>> num_facts = 9
+            >>> k = 10
+            >>> s = 8
+            >>> p = ParamsHierarchicalRectMat.createParams(rand(256, 1024), ['rectmat', num_facts, k, s])
+        """
+        # caller is responsible to check if name in p is really 'rectmat'
+        def parse_p(p):
+            # p = ('rectmat', j, k, s)
+            # or p is (['rectmat', j, k, s ],{'rho':rho, P: P})
+            if(isinstance(p, tuple) or isinstance(p, list)):
+                if(len(p) == 2 and (isinstance(p[0], list) or isinstance(p[0],
+                                                                        tuple))
+                  and len(p[0]) == 4 and isinstance(p[1], dict) and 'rho' in
+                   p[1].keys() and 'P' in p[1].keys()):
+                    # ENOTE: concatenation instead of unpacking into list
+                    # because of py2 (it would be ok for py3)
+                    p = list(p[0][:])+[p[1]['rho'], p[1]['P']]
+                elif(len(p) == 4 and (isinstance(p, list) or isinstance(p,
+                                                                        tuple))):
+                    pass #nothing to do
+                else:
+                    raise ValueError('The valid formats for p are: '
+                                     '("rectmat",j,k,s) or '
+                                     '[("rectmat",j,k,s),{"rho": rho, "P": P}]'
+                                     ' with j, k, s being integers and rho and'
+                                     ' P being floats')
+            return p
+        p = parse_p(p)
+        if(not isinstance(M, np.ndarray)):
+            raise TypeError('M must be a numpy.ndarray.')
+        p = ParamsHierarchicalRectMatSimpleCons(M.shape[0], M.shape[1], *p[1:])
+        return p
 
 class ParamsPalm4MSA(ParamsFact):
     """
@@ -1625,13 +1943,17 @@ class ParamsFactFactory:
         ParamsHierarchicalWHT, pyfaust.fact.hierarchical()
     """
     SIMPLIFIED_PARAM_NAMES = [
-        [ "squaremat", "hadamard"],
+        [ "squaremat", "hadamard"], #TODO: delete squaremat
         ["rectmat", "meg"],
         ["dft"],
+        ["hadamard_simple", "hadamard_no_rescons"],
+        ["rectmat_simple", "meg_simple"]
     ]
     SQRMAT_ID = 0
     RECTMAT_ID = 1
     DFTMAT_ID = 2
+    WHT_SIMPLE_ID = 3
+    RECTMAT_SIMPLE_ID = 4
 
     @staticmethod
     def createParams(M, p):
@@ -1651,8 +1973,12 @@ class ParamsFactFactory:
         param_id = c.get_simplification_name(p)
         if(param_id.lower() in c.SIMPLIFIED_PARAM_NAMES[c.SQRMAT_ID]):
             return ParamsHierarchicalWHT.createParams(M, p)
+        if(param_id.lower() in c.SIMPLIFIED_PARAM_NAMES[c.WHT_SIMPLE_ID]):
+            return ParamsHierarchicalWHTSimpleCons.createParams(M, p)
         elif(param_id.lower() in c.SIMPLIFIED_PARAM_NAMES[c.RECTMAT_ID]):
             return ParamsHierarchicalRectMat.createParams(M, p)
+        elif(param_id.lower() in c.SIMPLIFIED_PARAM_NAMES[c.RECTMAT_SIMPLE_ID]):
+            return ParamsHierarchicalRectMatSimpleCons.createParams(M, p)
         elif(param_id.lower() in c.SIMPLIFIED_PARAM_NAMES[c.DFTMAT_ID]):
             return ParamsHierarchicalDFT.createParams(M, p)
         else:

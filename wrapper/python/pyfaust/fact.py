@@ -674,7 +674,7 @@ def _palm4msa_fgft(Lap, p, ret_lambda=False):
         raise ValueError("Laplacian matrix must be square and symmetric.")
     if(not p.is_mat_consistent(Lap)):
         raise ValueError("M's number of columns must be consistent with "
-                         "the last residuum constraint defined in p. "
+                         "the last residual constraint defined in p. "
                          "Likewise its number of rows must be consistent "
                          "with the first factor constraint defined in p.")
     if is_real:
@@ -693,7 +693,8 @@ def _palm4msa_fgft(Lap, p, ret_lambda=False):
 def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
                  on_gpu=False):
     """
-    Factorizes the matrix M with Hierarchical Factorization using the parameters set in p.
+    Factorizes the matrix M using the hierarchical PALM4MSA algorithm according to the parameters set in p.
+
     @note This function has its shorthand pyfaust.faust_fact(). For
     convenience you might use it like this:<br/>
             <code>
@@ -701,20 +702,35 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
             F = faust_fact(M, p) # equiv. to hierarchical(M, p)
             </code>
 
+    Basically, the hierarchical factorization works in a sequence of splits in two of the
+    last factor.
+    The first split consists to split the matrix M in two, when
+    p.is_fact_side_left is False (which is the case by default), the
+    factorization works toward right, so M is factorized as follows:
+        \f[M \approx S_1 R_1\f]
+    We call \f$S_1\f$ the main factor and \f$R_1\f$ the residual factor.
+    On step 2, \f$R_1\f$ is split in two such as \f$R_1 \approx S_2 R_2\f$, which gives:
+        \f[M \approx S_1 S_2 R_2 \f]
+    And so on until the algorithm reaches the targeted number of factors:
+        \f[M \approx S_1 S_2 ... S_{N-1} R_N \f]
+    If p.is_fact_side_left is False, the residual is factorized toward left, so
+    it gives rather :
+        \f[M \approx R_1 S_1 \\ \vdots \\ M \approx R_2 S_2 S_1 \\ \vdots \\ M \approx R_N S_{N-1}  S_2 S_1 ... \f]
+
     Args:
         M: the numpy array to factorize. The dtype must be float32, float64
         or complex128 (the dtype might have a large impact on performance).
         p: is a set of hierarchical factorization parameters. It might be a fully defined instance of parameters (pyfaust.factparams.ParamsHierarchical) or a simplified expression which designates a pre-defined parametrization:
-            - 'squaremat' to use pre-defined parameters typically used to factorize a Hadamard square matrix of order a power of two (see pyfaust.demo.hadamard).
+            - 'hadamard' to use pre-defined parameters typically used to factorize a Hadamard matrix of order a power of two (see pyfaust.demo.hadamard).
             - ['rectmat', j, k, s] to use pre-defined parameters used for
             instance in factorization of the MEG matrix which is a rectangular
             matrix of size m*n such that m < n (see pyfaust.demo.bsl); j is the
             number of factors, k the sparsity of the main factor's columns, and
-            s the sparsity of rows for all other factors except the residuum
+            s the sparsity of rows for all other factors except the residual factor
             (that is the first factor here because the factorization is made
             toward the left -- is_side_fact_left == true, cf.
             pyfaust.factparams.ParamsHierarchical and pyfaust.factparams.ParamsHierarchicalRectMat).
-            <br/>The residuum has a sparsity of P*rho^(num_facts-1). <br/> By default, rho == .8 and P = 1.4. It's possible to set custom values with for example p == ( ['rectmat', j, k, s], {'rho':.4, 'P':.7 }). <br/>The sparsity is here the number of non-zero elements.
+            <br/>The residual factor has a sparsity of P*rho^(num_facts-1). <br/> By default, rho == .8 and P = 1.4. It's possible to set custom values with for example p == ( ['rectmat', j, k, s], {'rho':.4, 'P':.7 }). <br/>The sparsity is here the number of non-zero elements.
         backend: the C++ implementation to use (default to 2016, 2020 backend
         should be faster for most of the factorizations).
         on_gpu: if True the GPU implementation is executed (this option applies only to 2020 backend).
@@ -728,7 +744,11 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
 
 
     Returns:
-        F the Faust object result of the factorization.<br/>
+        F the Faust object result of the factorization: Faust\f$([S_1, S_2, ...
+        ,S_{N-1}, R_N]])\f$
+        if p.is_fact_side_left == False, Faust\f$([R_N, S_{N-1}, ... , S_2,
+        S_1])\f$
+        otherwise.<br/>
         if ret_lambda == True (and ret_params == False), then the function
         returns the tuple (F,_lambda) (_lambda is the scale factor at the
         end of factorization).<br/>
@@ -772,7 +792,7 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
         >>> FH = wht(32)
         >>> H = FH.toarray() # the full matrix version
         >>> # factorize it
-        >>> FH2 = hierarchical(H, 'squaremat');
+        >>> FH2 = hierarchical(H, 'hadamard');
         >>> # test the relative error
         >>> (FH-FH2).norm('fro')/FH.norm('fro') # the result is about 1e-16, the factorization is accurate
         >>> FH
@@ -851,7 +871,64 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
            - FACTOR 4 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
            - FACTOR 5 (complex) SPARSE, size 32x32, density 0.03125, nnz 32
 
-       <b/> See also pyfaust.factparams.ParamsHierarchicalRectMat, pyfaust.factparams.ParamsHierarchicalSquareMat, pyfaust.factparams.ParamsHierarchicalDFT
+        <b>5. Simplified Parameters for Hadamard Factorization without residual
+        constraints</b>
+
+        This factorization parameterization is the same as the one shown in 2.
+        except that there is no constraints at all on residual factors. See
+        pyfaust.factparams.ParamsHierarchicalSimpleCons and
+        pyfaust.factparams.ParamsHierarchicalWHTSimpleCons for more details.
+
+        >>> from pyfaust import wht
+        >>> from pyfaust.fact import hierarchical
+        >>> from numpy.linalg import norm
+        >>> # generate a Hadamard Faust of size 32x32
+        >>> FH = wht(32)
+        >>> H = FH.toarray() # the full matrix version
+        >>> # factorize it
+        >>> FH2 = hierarchical(H, 'hadamard_simple', backend=2020);
+        >>> # test the relative error
+        >>> (FH-FH2).norm('fro')/FH.norm('fro') # the result is about 1e-16, the factorization is accurate
+        >>> FH
+        Faust size 32x32, density 0.3125, nnz_sum 320, 5 factor(s):
+        - FACTOR 0 (real) SPARSE, size 32x32, density 0.0625, nnz 64
+        - FACTOR 1 (real) SPARSE, size 32x32, density 0.0625, nnz 64
+        - FACTOR 2 (real) SPARSE, size 32x32, density 0.0625, nnz 64
+        - FACTOR 3 (real) SPARSE, size 32x32, density 0.0625, nnz 64
+        - FACTOR 4 (real) SPARSE, size 32x32, density 0.0625, nnz 64
+
+       <b> 6. Simplified Parameters for a Rectangular Matrix Factorization (the
+       BSL demo MEG matrix) without residual constraints</b>
+
+       The factorization parameterization shown here is the same as in 3.
+       except that there is no constraint at all on residual factors. See
+       pyfaust.factparams.ParamsHierarchicalSimpleCons and
+       pyfaust.factparams.ParamsHierarchicalRectMatSimpleCons for more details.
+       In the example below the MEG matrix is factorized according to the
+       parameterization shown in 3. (aka "MEG") and on the other hand with
+       the parameterization of interest here (aka "MEG_SIMPLE", with no
+       residual constraints), the approximate accuracy is quite the same so we
+       can conclude that on this case (as in 5.) removing residual constraints can
+       not only simplify the parameterization of hierarchical PALM4MSA but also
+       be as efficient.
+
+        >>> from scipy.io import loadmat
+        >>> from pyfaust.fact import hierarchical
+        >>> from pyfaust.demo import get_data_dirpath
+        >>> MEG = loadmat(get_data_dirpath()+'/matrix_MEG.mat')['matrix'].T
+        >>> F1 = hierarchical(MEG, ['MEG', 5, 10, 8], backend=2020)
+        >>> F2 = hierarchical(MEG, ['MEG_SIMPLE', 5, 10, 8], backend=2020)
+        # compare the error:
+        >>> F2 - MEG).norm() / Faust(MEG).norm()
+        0.13033595653237676
+        >>> (F1 - MEG).norm() / Faust(MEG).norm()
+        0.12601709513741005
+
+    <b/> See also pyfaust.factparams.ParamsHierarchicalRectMat, pyfaust.factparams.ParamsHierarchicalSquareMat, pyfaust.factparams.ParamsHierarchicalDFT
+
+    [1] <a href="https://hal.archives-ouvertes.fr/hal-01167948">Le Magoarou L. and Gribonval R., “Flexible multi-layer
+    sparse approximations of matrices and applications”, Journal of Selected
+    Topics in Signal Processing, 2016.</a>
 
     """
     is_real = np.empty((1,))
@@ -920,7 +997,7 @@ def hierarchical_constends(M, p, A, B, ret_lambda=False, ret_params=False):
     """
     Tries to approximate M by \f$ A \prod_j S_j B \f$ using the hierarchical.
 
-    It needs to add one additional residuum constraint and also one factor
+    It needs to add one additional residual constraint and also one factor
     constraint into p relatively to the number of constraints you would
     have defined if you just factorized M into prod \f$ \prod_j S_j \f$.
 
@@ -957,7 +1034,7 @@ def hierarchical_constends(M, p, A, B, ret_lambda=False, ret_params=False):
     consB = ConstraintList('const', B, *B.shape)
     consts = p.constraints
     nconsts = len(consts)
-    # consts : factor constraints + residuum constraints
+    # consts : factor constraints + residual constraints
     fac_cons = [ consts[i] for i in range(0, p.num_facts-1) ]
     res_cons = [ consts[i] for i in range(p.num_facts-1, len(consts))]
     assert(nconsts == len(fac_cons) + len(res_cons))
