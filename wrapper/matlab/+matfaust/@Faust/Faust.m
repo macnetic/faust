@@ -652,6 +652,8 @@ classdef Faust
 
 		%======================================================================
 		%> @brief Returns a new Faust whose class is single. It allows to convert all the factors to single precision.
+		%>
+		%>
 		%> @b Usage
 		%>
 		%> &nbsp;&nbsp;&nbsp; @b sF = single(F)

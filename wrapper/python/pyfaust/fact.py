@@ -1289,7 +1289,7 @@ def butterfly(M, type="right"):
         >>> from pyfaust import Faust, wht, dft
         >>> from pyfaust.fact import butterfly
         >>> H = wht(32).toarray() # it works with dft too!
-        >>> F = butterfly(H, dir='bbtree')
+        >>> F = butterfly(H, type='bbtree')
         >>> (F-H).norm()/Faust(H).norm()
         1.0272844187006565e-15
 

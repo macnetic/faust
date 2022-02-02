@@ -3019,9 +3019,9 @@ class FaustMulMode:
     """
     ## \brief The default method, it computes the product from the right to the left.
     DEFAULT_L2R=0
-    ## \brief This method implements the classic dynamic programming solution
+    ## \brief This method implements the classic dynamic programming solution to the chain matrix problem.
     ##
-    ## to the chain matrix problem (see https://en.wikipedia.org/wiki/Matrix_chain_multiplication#A_dynamic_programming_algorithm).
+    ## See https://en.wikipedia.org/wiki/Matrix_chain_multiplication#A_dynamic_programming_algorithm.
     ## Note that the standard method is extended in order to take into account the complexity of multiplications including a sparse matrix (because that's not the same cost than multiplying dense matrices).
     DYNPROG=5
     ## \brief This method computes the product of the matrix chain from the left to the right using the Torch C++ library (CPU backend).
