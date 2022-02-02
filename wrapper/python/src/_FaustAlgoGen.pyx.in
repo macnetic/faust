@@ -111,7 +111,7 @@ cdef class FaustAlgoGen@TYPE_NAME@:
             elif(cons.is_mat_constraint()):
                 cpp_constraints[i] = <PyxConstraintMat[@TYPE@]*> \
                         PyMem_Malloc(sizeof(PyxConstraintMat[@TYPE@]))
-                tmp_mat = cons._cons_value
+                tmp_mat = (cons._cons_value).astype(type2dtype('@TYPE@'))
                 (<PyxConstraintMat[@TYPE@]*>cpp_constraints[i]).parameter =\
                         &tmp_mat[0,0]
                 (<PyxConstraintMat[@TYPE@]*>cpp_constraints[i]).parameter_sz =\
@@ -127,7 +127,7 @@ cdef class FaustAlgoGen@TYPE_NAME@:
         cpp_params.num_constraints = len(p.constraints)
 
         for i in range(0,p.num_facts):
-            check_matrix('@TYPE@' == 'double', p.init_facts[i], message="while checking"
+            check_matrix('@TYPE@' == '@REAL_TYPE@', p.init_facts[i], message="while checking"
                          " palm4msa init facts: ")
             tmp_mat = p.init_facts[i]
             cpp_params.init_facts[i] = &tmp_mat[0,0]
@@ -258,7 +258,7 @@ cdef class FaustAlgoGen@TYPE_NAME@:
             elif(cons.is_mat_constraint()):
                 cpp_constraints[i] = <PyxConstraintMat[@TYPE@]*> \
                         PyMem_Malloc(sizeof(PyxConstraintMat[@TYPE@]))
-                tmp_mat = cons._cons_value
+                tmp_mat = cons._cons_value.astype(type2dtype('@TYPE@'))
                 (<PyxConstraintMat[@TYPE@]*>cpp_constraints[i]).parameter =\
                         &tmp_mat[0,0]
                 (<PyxConstraintMat[@TYPE@]*>cpp_constraints[i]).parameter_sz =\
@@ -365,7 +365,7 @@ cdef class FaustAlgoGen@TYPE_NAME@:
             elif cons.is_mat_constraint():
                 cpp_constraints[i] = <PyxConstraintMat[@TYPE@]*> \
                         PyMem_Malloc(sizeof(PyxConstraintMat[@TYPE@]))
-                tmp_mat = cons._cons_value
+                tmp_mat = (cons._cons_value).astype(type2dtype('@TYPE@'))
                 (<PyxConstraintMat[@TYPE@]*>cpp_constraints[i]).parameter =\
                         &tmp_mat[0,0]
                 (<PyxConstraintMat[@TYPE@]*>cpp_constraints[i]).parameter_sz =\
@@ -507,7 +507,7 @@ cdef class FaustAlgoGen@TYPE_NAME@:
             elif(cons.is_mat_constraint()):
                 cpp_constraints[i] = <PyxConstraintMat[@TYPE@]*> \
                         PyMem_Malloc(sizeof(PyxConstraintMat[@TYPE@]))
-                tmp_mat = cons._cons_value
+                tmp_mat = (cons._cons_value).astype(type2dtype('@TYPE@'))
                 (<PyxConstraintMat[@TYPE@]*>cpp_constraints[i]).parameter =\
                         &tmp_mat[0,0]
                 (<PyxConstraintMat[@TYPE@]*>cpp_constraints[i]).parameter_sz =\
