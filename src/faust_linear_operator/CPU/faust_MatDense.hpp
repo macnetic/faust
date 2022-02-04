@@ -1362,12 +1362,12 @@ void MatDense<FPP, Cpu>::approx_rank1(MatDense<FPP,Cpu> &bestX, MatDense<FPP, Cp
 	gemm(*this, *this, tAA, FPP(1.0), FPP(0.0), 'T', 'N');
 	bestX.resize(this->getNbRow(), 1);
 	bestY.resize(this->getNbCol(), 1);
-	FPP sigma1 = std::sqrt(std::abs(power_iteration(AtA, 100, 1e-6, flag, bestX.getData(), /*rand_init*/ true)));
-	FPP sigma2 = std::sqrt(std::abs(power_iteration(tAA, 100, 1e-6, flag, bestY.getData(), true)));
+	FPP sigma1 = std::sqrt(std::abs(power_iteration(AtA, 2, 1e-2, flag, bestX.getData(), /*rand_init*/ true)));
+	FPP sigma2 = std::sqrt(std::abs(power_iteration(tAA, 2, 1e-2, flag, bestY.getData(), true)));
 	MatDense<FPP,Cpu> tuav;
 	gemm(*this, bestY, tuav, FPP(1.0), FPP(0.0), 'N', 'N');
 	gemm(bestX, tuav, tuav, FPP(1.0), FPP(0.0), 'H', 'N');
-	if(sigma2 < 0 && tuav(0,0) > 0 || sigma2 > 0 && tuav(0,0) < 0)
+	if(std::abs(sigma2) < 0 && tuav(0,0) > 0 || std::abs(sigma2) > 0 && tuav(0,0) < 0)
 		sigma2 *= -1;
 	bestY *= sigma2;
 	bestY.adjoint();
@@ -1427,7 +1427,8 @@ void MatDense<FPP, Cpu>::set_col_coeffs(faust_unsigned_int col_id, const std::ve
 		auto row_id = row_ids[i];
 		mat(row_id, col_id) = values(i, val_col_id);
 	}
-	this->isZeros = this->getNonZeros() == 0;
+//	this->isZeros = this->getNonZeros() == 0;
+	this->isZeros = false; // too costly to verify exhaustively, in doubt say it is not 0
 }
 
 template<typename FPP>
@@ -1438,7 +1439,8 @@ void MatDense<FPP, Cpu>::set_row_coeffs(faust_unsigned_int row_id, const std::ve
 		auto col_id = col_ids[i];
 		mat(row_id, col_id) = values(val_row_id, i);
 	}
-	this->isZeros = this->getNonZeros() == 0;
+//	this->isZeros = this->getNonZeros() == 0;
+	this->isZeros = false; // too costly to verify exhaustively, in doubt say it is not 0
 }
 
 template<typename FPP>
