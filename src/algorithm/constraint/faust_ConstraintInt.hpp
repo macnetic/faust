@@ -209,4 +209,9 @@ void Faust::ConstraintInt<FPP,DEVICE>::Display() const
 	std::cout<<" parameter :"<< get_parameter() << std::endl;
 }
 
+template<typename FPP,FDevice DEVICE>
+const char* Faust::ConstraintInt<FPP,DEVICE>::get_type() const
+{
+	return "FAUST_INT";
+}
 

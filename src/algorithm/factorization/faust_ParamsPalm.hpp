@@ -186,7 +186,7 @@ void Faust::ParamsPalm<FPP,DEVICE,FPP2>::Display() const
 		//std::string type_cons;
 		//type_cons.resize(0);
 		//type_cons=getConstraintType((*cons[jl][L]).getConstraintType());
-		std::cout<<"type_cont : "<<cons[L]->template get_type<FPP,DEVICE,FPP2>()<<" ";
+		std::cout<<"type_cont : "<<cons[L]->get_type()<<" ";
 		std::cout<<(*cons[L]).get_constraint_name();
 		std::cout<<" nb_row :"<<(*cons[L]).get_rows();
 		std::cout<<" nb_col :"<<(*cons[L]).get_cols();

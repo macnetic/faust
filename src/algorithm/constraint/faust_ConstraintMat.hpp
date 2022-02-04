@@ -204,7 +204,11 @@ void Faust::ConstraintMat<FPP,DEVICE>::Display() const
 	get_parameter().Display();
 }
 
-
+template<typename FPP,FDevice DEVICE>
+const char* Faust::ConstraintMat<FPP,DEVICE>::get_type() const
+{
+	return "FAUST_MAT";
+}
 
 #endif
 

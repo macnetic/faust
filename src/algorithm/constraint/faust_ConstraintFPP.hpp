@@ -166,6 +166,13 @@ Faust::MatGeneric<FPP,DEVICE>* Faust::ConstraintFPP<FPP,DEVICE, FPP2>::project_g
    }
 }
 
+
+template<typename FPP,FDevice DEVICE, typename FPP2>
+const char* Faust::ConstraintFPP<FPP,DEVICE, FPP2>::get_type() const
+{
+	return "FAUST_REAL";
+}
+
 template<typename FPP,FDevice DEVICE, typename FPP2>
 void Faust::ConstraintFPP<FPP,DEVICE,FPP2>::Display() const
 {

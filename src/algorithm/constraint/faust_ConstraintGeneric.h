@@ -101,8 +101,7 @@ namespace Faust
 
 
 
-	    template<typename FPP,FDevice DEVICE, typename FPP2=double>
-		const char* get_type() const;
+		virtual const char* get_type() const=0;
 	    const char* get_constraint_name()const;
 	    const faust_constraint_name get_constraint_type() const;
 	    template<typename FPP,FDevice DEVICE, typename FPP2=double>
