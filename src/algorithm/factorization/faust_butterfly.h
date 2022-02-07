@@ -22,6 +22,12 @@ namespace Faust
 		void solveDTO(const Faust::MatDense<FPP, Cpu>& A, const Faust::MatDense<FPP, Cpu>& s1, const Faust::MatDense<FPP, Cpu>& s2, Faust::MatDense<FPP, Cpu>& X, Faust::MatDense<FPP, Cpu>& Y);
 
 	template<typename FPP>
+		void lifting_two_layers_factorization(const Faust::MatDense<FPP, Cpu>& A, const Faust::MatSparse<FPP, Cpu>& s1, const Faust::MatSparse<FPP, Cpu>& s2, Faust::MatDense<FPP, Cpu>& X, Faust::MatDense<FPP, Cpu>& Y);
+
+	template<typename FPP>
+		void lifting_two_layers_factorization(const Faust::MatDense<FPP, Cpu>& A, const Faust::MatDense<FPP, Cpu>& s1, const Faust::MatDense<FPP, Cpu>& s2, Faust::MatDense<FPP, Cpu>& X, Faust::MatDense<FPP, Cpu>& Y);
+
+	template<typename FPP>
 		void butterfly_support(int nfactors, std::vector<Faust::MatSparse<FPP, Cpu>*> out);
 
 	template<typename FPP>
