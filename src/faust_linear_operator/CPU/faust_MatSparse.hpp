@@ -1056,6 +1056,26 @@ Faust::MatSparse<FPP,Cpu>* Faust::MatSparse<FPP,Cpu>::get_rows(const faust_unsig
 	return subMatrix;
 }
 
+template<typename FPP>
+std::vector<int> Faust::MatSparse<FPP, Cpu>::col_nonzero_inds(faust_unsigned_int col_id) const
+{
+	std::vector<int> ids;
+	for (int i=0; i < mat.outerSize(); i++)
+		for (typename Eigen::SparseMatrix<FPP,Eigen::RowMajor>::InnerIterator it(mat,i); it; ++it)
+			if(it.col() == col_id)
+				ids.push_back(it.row());
+	return ids;
+}
+
+template<typename FPP>
+std::vector<int> Faust::MatSparse<FPP, Cpu>::row_nonzero_inds(faust_unsigned_int row_id) const
+{
+	std::vector<int> ids;
+	for (typename Eigen::SparseMatrix<FPP,Eigen::RowMajor>::InnerIterator it(mat,row_id); it; ++it)
+		ids.push_back(it.col());
+	return ids;
+}
+
 	template<typename FPP>
 Faust::MatSparse<FPP, Cpu>* Faust::MatSparse<FPP, Cpu>::randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, Real<FPP> density)
 {

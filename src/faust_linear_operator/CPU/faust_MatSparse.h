@@ -392,6 +392,9 @@ namespace Faust
 			void swap_rows(faust_unsigned_int id1, faust_unsigned_int id2);
 			void swap_cols(faust_unsigned_int id1, faust_unsigned_int id2);
 
+			std::vector<int> col_nonzero_inds(faust_unsigned_int col_id) const;
+			std::vector<int> row_nonzero_inds(faust_unsigned_int row_id) const;
+
 			std::list<std::pair<int,int>> nonzeros_indices() const;
 
 			/**
