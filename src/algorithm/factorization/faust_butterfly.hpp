@@ -156,6 +156,53 @@ namespace Faust
 			}
 		}
 
+	template<typename FPP>
+		void lifting_two_layers_factorization(const Faust::MatGeneric<FPP, Cpu>& A, const Faust::MatSparse<FPP, Cpu>& s1, const Faust::MatSparse<FPP, Cpu>& s2, Faust::MatSparse<FPP, Cpu>& X, Faust::MatSparse<FPP, Cpu>& Y)
+		{
+			const Faust::MatDense<FPP, Cpu>* dsA = dynamic_cast<const Faust::MatDense<FPP, Cpu>*>(&A);
+			const Faust::MatSparse<FPP, Cpu>* spA;
+			if(dsA == nullptr)
+			{
+				spA = dynamic_cast<const Faust::MatSparse<FPP, Cpu>*>(&A);
+				if(spA == nullptr)
+					throw std::runtime_error("lifting_two_layers_factorization A must be MatDense or MatSparse.");
+			}
+			int r = s1.getNbCol();
+			Faust::MatDense<FPP, Cpu> subA, u, v;
+			X.resize(s1.getNbRow(), s1.getNbCol());
+			Y.resize(s2.getNbRow(), s2.getNbCol());
+			X.setZeros();
+			Y.setZeros();
+			std::vector<MatDense<FPP, Cpu>> U(r), V(r);
+			std::vector<std::vector<int>> rows(r), cols(r);
+			#pragma omp parallel for schedule(dynamic) private(subA)
+			for(int t=0;t<r;t++)
+			{
+				rows[t] = s1.col_nonzero_inds(t);
+				cols[t] = s2.row_nonzero_inds(t);
+				if(dsA)
+					dsA->submatrix(rows[t], cols[t], subA);
+				else
+					spA->submatrix(rows[t], cols[t], subA);
+				//#define BUTTERFLY_APPROX_RANK1
+#ifdef BUTTERFLY_APPROX_RANK1
+				subA.approx_rank1(U[t], V[t]);
+#else
+				subA.best_low_rank(1, U[t], V[t]);
+#endif
+			}
+			std::vector<Eigen::Triplet<FPP>> XtripletList;
+			std::vector<Eigen::Triplet<FPP>> YtripletList;
+			for(int t=0;t<r;t++)
+			{
+				for(int i=0;i<rows[t].size();i++)
+						XtripletList.push_back(Eigen::Triplet<FPP>(rows[t][i], t, U[t].getData()[i]));
+				for(int i=0;i<cols[t].size();i++)
+						YtripletList.push_back(Eigen::Triplet<FPP>(t, cols[t][i], V[t](0,i)));
+			}
+			X = MatSparse<FPP, Cpu>(XtripletList, s1.getNbRow(), s1.getNbCol());
+			Y = MatSparse<FPP, Cpu>(YtripletList, s2.getNbRow(), s2.getNbCol());
+		}
 
 	template<typename FPP>
 		void solveDTO(const Faust::MatDense<FPP, Cpu>& A, const Faust::MatDense<FPP, Cpu>& s1, const Faust::MatDense<FPP, Cpu>& s2, Faust::MatDense<FPP, Cpu>& X, Faust::MatDense<FPP, Cpu>& Y)
@@ -365,6 +412,9 @@ namespace Faust
 	template<typename FPP>
 		Faust::TransformHelper<FPP, Cpu>* butterfly_hierarchical_balanced(const Faust::MatDense<FPP, Cpu>& A, const std::vector<Faust::MatSparse<FPP, Cpu>*> &supports, const FactMeth meth/*=LIFTING*/)
 		{
+			//TODO: refactor with other prototypes
+			if(meth != LIFTING)
+				throw std::runtime_error("Only FactMeth::LIFTING is supported here, use the other prototype for DTO.");
 			auto th = new TransformHelper<FPP, Cpu>();
 			double l2_nfacts = std::log2((double)supports.size());
 			size_t d = ceil(l2_nfacts); // depth of factorization tree
@@ -417,14 +467,11 @@ namespace Faust
 			}
 			// the supports are now set for all factorization tree nodes
 			// factorize according to the tree of supports, level by level
-			std::vector<MatDense<FPP, Cpu>> next_lvl_facs;
-			std::vector<MatDense<FPP, Cpu>> input_facs;
+			std::vector<MatSparse<FPP, Cpu>> next_lvl_facs;
+			std::vector<MatSparse<FPP, Cpu>> input_facs;
 			// first factorization
 			next_lvl_facs.resize(2);
-//			if(meth == DTO)
-//				solveDTO(A, tree_supports[0][0], tree_supports[0][1], next_lvl_facs[0], next_lvl_facs[1]);
-//			else // meth == ButterflyFactDir
-				lifting_two_layers_factorization(A, tree_supports[0][0], tree_supports[0][1], next_lvl_facs[0], next_lvl_facs[1]);
+			lifting_two_layers_factorization(A, tree_supports[0][0], tree_supports[0][1], next_lvl_facs[0], next_lvl_facs[1]);
 			input_facs = next_lvl_facs;
 
 			for(size_t i=0;i<d-1;i++)
@@ -433,12 +480,7 @@ namespace Faust
 				int j_bound = std::min(tree_supports[i].size(), tree_supports[i+1].size()/2);
 				#pragma omp parallel for schedule(static)
 				for(int j=0;j < j_bound;j++)
-				{
-//					if(meth == DTO)
-//						solveDTO(input_facs[j], tree_supports[i+1][2*j], tree_supports[i+1][2*j+1], next_lvl_facs[j*2], next_lvl_facs[j*2+1]);
-//					else // meth == LIFTING
-						lifting_two_layers_factorization(input_facs[j], tree_supports[i+1][2*j], tree_supports[i+1][2*j+1], next_lvl_facs[j*2], next_lvl_facs[j*2+1]);
-				}
+					lifting_two_layers_factorization(input_facs[j], tree_supports[i+1][2*j], tree_supports[i+1][2*j+1], next_lvl_facs[j*2], next_lvl_facs[j*2+1]);
 				if(i < d - 2)
 				{
 					input_facs = next_lvl_facs;
