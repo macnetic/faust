@@ -905,6 +905,16 @@ Real<FPP> Faust::MatSparse<FPP, Cpu>::normInf(faust_unsigned_int& row_id, const 
 }
 
 template<typename FPP>
+void Faust::MatSparse<FPP, Cpu>::submatrix(const std::vector<int> &row_ids, const std::vector<int> &col_ids, MatDense<FPP, Cpu> & submat) const
+{
+	if(this->dim1 != row_ids.size() || this->dim2 != col_ids.size())
+		submat.resize(row_ids.size(), col_ids.size());
+	for(int i=0;i<row_ids.size();i++)
+		for(int j=0;j<col_ids.size();j++)
+			submat.mat(i,j) = mat.coeff(row_ids[i], col_ids[j]);
+}
+
+template<typename FPP>
 Faust::Vect<FPP,Cpu> Faust::MatSparse<FPP,Cpu>::get_col(faust_unsigned_int id) const
 {
 	Vect<FPP, Cpu> out_vec;

@@ -352,6 +352,9 @@ namespace Faust
 
 			const FPP& operator()(faust_unsigned_int i, faust_unsigned_int j)const{return const_cast<Eigen::SparseMatrix<FPP,Eigen::RowMajor>*>(&mat)->coeffRef(i,j);}
 
+
+
+			void submatrix(const std::vector<int> &row_ids, const std::vector<int> &col_ids, MatDense<FPP, Cpu> & submat) const;
 			Vect<FPP,Cpu> get_col(faust_unsigned_int id) const;
 			void get_col(faust_unsigned_int id, Vect<FPP, Cpu> &out_vec) const;
 			/*
