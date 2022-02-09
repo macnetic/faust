@@ -1334,16 +1334,9 @@ bool MatDense<FPP,Cpu>::eq_rows(const MatDense<FPP, Cpu> & other, faust_unsigned
 }
 
 template<typename FPP>
-void MatDense<FPP, Cpu>::best_low_rank(const int &r, MatDense<FPP,Cpu> &bestX, MatDense<FPP, Cpu> &bestY) const
+template<typename SVDImpl>
+void MatDense<FPP, Cpu>::best_low_rank(const int &r, MatDense<FPP,Cpu> &bestX, MatDense<FPP, Cpu> &bestY, SVDImpl svd) const
 {
-#if(EIGEN_WORLD_VERSION > 3 || EIGEN_WORLD_VERSION >= 3 && EIGEN_MAJOR_VERSION >= 3)
-	Eigen::BDCSVD<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>> svd(this->mat, Eigen::ComputeThinU | Eigen::ComputeThinV);
-#else
-//#ifdef _MSC_VER
-	// as far as I tested eigen3.4rc1 doesn't compile with VS 14
-	// so use JacobiSVD
-	Eigen::JacobiSVD<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>> svd(this->mat, Eigen::ComputeThinU | Eigen::ComputeThinV);
-#endif
 	if(bestX.getNbRow() != this->getNbRow() || r != bestX.getNbCol())
 		bestX.resize(this->getNbRow(), r);
 	if(bestY.getNbRow() != this->getNbRow() || r != bestY.getNbCol())
@@ -1351,6 +1344,20 @@ void MatDense<FPP, Cpu>::best_low_rank(const int &r, MatDense<FPP,Cpu> &bestX, M
 	auto s = Eigen::sqrt(svd.singularValues().block(0, 0, r, r).array()).matrix().asDiagonal();
 	bestX.mat = svd.matrixU().block(0, 0, this->getNbRow(), r) * s;
 	bestY.mat = s * svd.matrixV().block(0, 0, this->getNbCol(), r).adjoint();
+}
+
+template<typename FPP>
+void MatDense<FPP, Cpu>::best_low_rank(const int &r, MatDense<FPP,Cpu> &bestX, MatDense<FPP, Cpu> &bestY) const
+{
+#if(EIGEN_WORLD_VERSION > 3 || EIGEN_WORLD_VERSION >= 3 && EIGEN_MAJOR_VERSION >= 3)
+	Eigen::JacobiSVD<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>> svd(this->mat, Eigen::ComputeThinU | Eigen::ComputeThinV);
+#else
+	//#ifdef _MSC_VER
+	// as far as I tested eigen3.4rc1 doesn't compile with VS 14
+	// so use JacobiSVD
+	Eigen::JacobiSVD<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>> svd(this->mat, Eigen::ComputeThinU | Eigen::ComputeThinV);
+#endif
+	best_low_rank(r, bestX, bestY, svd);
 }
 
 template<typename FPP>
@@ -1379,6 +1386,12 @@ void MatDense<FPP, Cpu>::approx_rank1(MatDense<FPP,Cpu> &bestX, MatDense<FPP, Cp
 	//	if(err.norm() > 1e-6)
 	//		bestY *= -1;
 
+}
+
+template<typename FPP>
+void MatDense<FPP, Cpu>::initJacobiSVD(Eigen::JacobiSVD<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>>& svd)
+{
+	svd.compute(this->mat, Eigen::ComputeThinU | Eigen::ComputeThinV);
 }
 
 	template<typename FPP>

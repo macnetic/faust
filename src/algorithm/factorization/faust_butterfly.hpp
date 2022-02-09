@@ -1,3 +1,4 @@
+#include <Eigen/SVD>
 #include "faust_MatDense.h"
 #include "faust_TransformHelper.h"
 #include <vector>
@@ -93,6 +94,7 @@ namespace Faust
 			}
 			delete[] th_class;
 		}
+
 	template<typename FPP>
 		void lifting_two_layers_factorization(const Faust::MatDense<FPP, Cpu>& A, const Faust::MatSparse<FPP, Cpu>& s1, const Faust::MatSparse<FPP, Cpu>& s2, Faust::MatDense<FPP, Cpu>& X, Faust::MatDense<FPP, Cpu>& Y)
 		{
@@ -115,7 +117,16 @@ namespace Faust
 #ifdef BUTTERFLY_APPROX_RANK1
 				subA.approx_rank1(U[t], V[t]);
 #else
-				subA.best_low_rank(1, U[t], V[t]);
+				if(A.getNbRow() >= (1 << 14) && (std::is_same<FPP, double>::value || std::is_same<FPP, std::complex<double>>::value))
+				{
+					// use jacobi svd as a workaround to this bug https://gitlab.com/libeigen/eigen/-/issues/1723
+					// TODO: remove when it'll be fixed
+					Eigen::JacobiSVD<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>> svd;
+					subA.initJacobiSVD(svd);
+					subA.best_low_rank(1, U[t], V[t], svd);
+				}
+				else
+					subA.best_low_rank(1, U[t], V[t]);
 #endif
 			}
 			#pragma omp parallel for schedule(dynamic)
@@ -192,7 +203,16 @@ namespace Faust
 #ifdef BUTTERFLY_APPROX_RANK1
 				subA.approx_rank1(U[t], V[t]);
 #else
-				subA.best_low_rank(1, U[t], V[t]);
+				if(A.getNbRow() >= (1 << 14) && (std::is_same<FPP, double>::value || std::is_same<FPP, std::complex<double>>::value))
+				{
+					// use jacobi svd as a workaround to this bug https://gitlab.com/libeigen/eigen/-/issues/1723
+					// TODO: remove when it'll be fixed
+					Eigen::JacobiSVD<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>> svd;
+					subA.initJacobiSVD(svd);
+					subA.best_low_rank(1, U[t], V[t], svd);
+				}
+				else
+					subA.best_low_rank(1, U[t], V[t]);
 #endif
 			}
 			std::vector<Eigen::Triplet<FPP>> XtripletList;

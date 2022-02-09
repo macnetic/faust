@@ -506,8 +506,14 @@ namespace Faust
 
 			/**
 			 * \brief Returns the best low rank approximation this = bestX * bestY using the svd.
+			 * \param svd_impl 0 for BDCSVD, 1 for JacobiSVD.
 			 */
+			template<typename SVDImpl>
+				void best_low_rank(const int &r, MatDense<FPP,Cpu> &bestX, MatDense<FPP, Cpu> &bestY, SVDImpl svd) const;
+
 			void best_low_rank(const int &r, MatDense<FPP,Cpu> &bestX, MatDense<FPP, Cpu> &bestY) const;
+
+			void initJacobiSVD(Eigen::JacobiSVD<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>>& svd);
 			/**
 			 * \brief Returns the best rank-1 approximate this = bestX * bestY using the svd/eigensolver/power iteration.
 			 */
