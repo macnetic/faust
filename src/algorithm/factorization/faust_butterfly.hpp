@@ -39,6 +39,7 @@ namespace Faust
 	template<typename FPP>
 		void retrieveCEC(const Faust::MatDense<FPP, Cpu>& s1, const Faust::MatDense<FPP, Cpu>& s2, vector<vector<faust_unsigned_int>*> &cec, vector<vector<faust_unsigned_int>*> &noncec)
 		{
+			//TODO: this function should be deleted because lifting_two_layers_factorization is faster
 			faust_unsigned_int r = s1.getNbCol(); // == s2.getNbCol()
 			//	Vect<FPP, Cpu> c1(r), c2(r), r1(r), r2(r);
 			vector<bool> processed_ids(r, false);
@@ -95,6 +96,7 @@ namespace Faust
 	template<typename FPP>
 		void lifting_two_layers_factorization(const Faust::MatDense<FPP, Cpu>& A, const Faust::MatSparse<FPP, Cpu>& s1, const Faust::MatSparse<FPP, Cpu>& s2, Faust::MatDense<FPP, Cpu>& X, Faust::MatDense<FPP, Cpu>& Y)
 		{
+			// TODO: this function should be deleted because lifting_two_layers_factorization(MatGeneric, ...) def is faster
 			int r = s1.getNbCol();
 			Faust::MatDense<FPP, Cpu> subA, u, v;
 			X.resize(s1.getNbRow(), s1.getNbCol());
@@ -127,6 +129,7 @@ namespace Faust
 	template<typename FPP>
 		void lifting_two_layers_factorization(const Faust::MatDense<FPP, Cpu>& A, const Faust::MatDense<FPP, Cpu>& s1, const Faust::MatDense<FPP, Cpu>& s2, Faust::MatDense<FPP, Cpu>& X, Faust::MatDense<FPP, Cpu>& Y)
 		{
+			// TODO: this function should be deleted because lifting_two_layers_factorization(MatGeneric, ...) def is faster
 			int r = s1.getNbCol();
 			Faust::MatDense<FPP, Cpu> subA, u, v;
 			X.resize(s1.getNbRow(), s1.getNbCol());
@@ -168,11 +171,12 @@ namespace Faust
 					throw std::runtime_error("lifting_two_layers_factorization A must be MatDense or MatSparse.");
 			}
 			int r = s1.getNbCol();
-			Faust::MatDense<FPP, Cpu> subA, u, v;
+			MatDense<FPP, Cpu> subA;
 			X.resize(s1.getNbRow(), s1.getNbCol());
 			Y.resize(s2.getNbRow(), s2.getNbCol());
 			X.setZeros();
 			Y.setZeros();
+
 			std::vector<MatDense<FPP, Cpu>> U(r), V(r);
 			std::vector<std::vector<int>> rows(r), cols(r);
 			#pragma omp parallel for schedule(dynamic) private(subA)
@@ -304,6 +308,7 @@ namespace Faust
 	template<typename FPP>
 		std::vector<Faust::MatSparse<FPP, Cpu>*> support_DFT(int nfactors)
 		{
+			// WARNING: free the MatSparse of out after calling this function
 			std::vector<Faust::MatSparse<FPP, Cpu>*> out;
 			auto size = 1 << nfactors;
 			Faust::MatDense<FPP, Cpu> kernel, id;
@@ -472,6 +477,14 @@ namespace Faust
 			// first factorization
 			next_lvl_facs.resize(2);
 			lifting_two_layers_factorization(A, tree_supports[0][0], tree_supports[0][1], next_lvl_facs[0], next_lvl_facs[1]);
+#ifdef BUTTERFLY_BALANCED_CHECK_ERRORS
+			std::cout << "computing error... lvl1" << std::endl;
+			MatDense<FPP, Cpu> L = next_lvl_facs[0];
+			MatDense<FPP, Cpu> R = next_lvl_facs[1];
+			L.multiplyRight(R);
+			L -= A;
+			std::cout << "err:" << L.norm()/A.norm() << std::endl;
+#endif
 			input_facs = next_lvl_facs;
 
 			for(size_t i=0;i<d-1;i++)
@@ -481,6 +494,19 @@ namespace Faust
 				#pragma omp parallel for schedule(static)
 				for(int j=0;j < j_bound;j++)
 					lifting_two_layers_factorization(input_facs[j], tree_supports[i+1][2*j], tree_supports[i+1][2*j+1], next_lvl_facs[j*2], next_lvl_facs[j*2+1]);
+#ifdef BUTTERFLY_BALANCED_CHECK_ERRORS
+				for(int j=0;j < j_bound;j++)
+				{
+					std::cout << "computing error... lvl" << (i+2) << " factorization of index" << j << " factor" << std::endl;
+					MatDense<FPP, Cpu> A = input_facs[j];
+					MatDense<FPP, Cpu> L = next_lvl_facs[j*2];
+					MatDense<FPP, Cpu> R = next_lvl_facs[j*2+1];
+					L.multiplyRight(R);
+					L -= A;
+					std::cout << "err:" << L.norm()/A.norm() << std::endl;
+				}
+#endif
+
 				if(i < d - 2)
 				{
 					input_facs = next_lvl_facs;
@@ -503,6 +529,7 @@ namespace Faust
 	template<typename FPP>
 		Faust::TransformHelper<FPP, Cpu>* butterfly_hierarchical_balanced_dense(const Faust::MatDense<FPP, Cpu>& A, const std::vector<Faust::MatSparse<FPP, Cpu>*> &supports, const FactMeth meth/*=LIFTING*/)
 		{
+			//TODO: this function should be deleted because it has shown to be very inefficient relatively to its MatSparse counterpart
 			auto th = new TransformHelper<FPP, Cpu>();
 			double l2_nfacts = std::log2((double)supports.size());
 			size_t d = ceil(l2_nfacts); // depth of factorization tree
@@ -610,6 +637,8 @@ namespace Faust
 				th = butterfly_hierarchical_balanced(A, support);
 			else
 				th = butterfly_hierarchical(A, support, dir);
+			for(auto s: support)
+				delete s;
 			return th;
 		}
 
