@@ -17,6 +17,11 @@ namespace Faust {
 
 		void set_free_cb(void (*cb)(void*));
 
+		/**
+		 * Prints all managed addresses with their references count.
+		 */
+		void print_refs();
+
 		RefManager();
 		RefManager(void(*cb)(void*));
 	};

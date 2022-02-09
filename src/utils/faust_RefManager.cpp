@@ -62,3 +62,13 @@ Faust::RefManager::RefManager(void(*cb)(void*))
 {
 	set_free_cb(cb);
 }
+
+void Faust::RefManager::print_refs()
+{
+	std::cout << "number of refs managed: " << refCounts.size() << std::endl;
+	for(map<void*, unsigned int>::const_iterator it = refCounts.begin();
+			it != refCounts.end(); ++it)
+	{
+		std::cout << "address: " << it->first << " ref counts:" << it->second << std::endl;
+	}
+}
