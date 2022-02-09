@@ -112,6 +112,8 @@ int main(int argc, char** argv)
 	M -= A;
 	auto err = M.norm()/A.norm();
 	std::cout << "err=" << err << std::endl;
+	delete wht;
+	delete th;
 	if(err > 1e-6)
 		exit(1);
 }

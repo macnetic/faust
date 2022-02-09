@@ -17,8 +17,9 @@ int main(int argc, char** argv)
 		log2dim = std::atoi(argv[1]);
 	else
 		log2dim = 10;
-	auto wht = TransformHelper<FPP,Cpu>::hadamardFaust(log2dim, false);
+
 	Faust::MatDense<FPP,Cpu> A;
+	auto wht = TransformHelper<FPP,Cpu>::hadamardFaust(log2dim, false);
 	/********** NOTE: a lot of garbage is left here, it was useful during the first writing of butterfly module (it could be again) */
 	//	Faust::MatDense<FPP,Cpu> support1, support2, A;
 	//	Faust::MatDense<FPP,Cpu> submatrixA, bestx, besty, X, Y, refX, refY;
@@ -33,8 +34,8 @@ int main(int argc, char** argv)
 
 	//	support1.Display();
 	//	support2.Display();
-	cout << "matrix to factorize:" << std::endl;
 	A = wht->get_product();
+	cout << "matrix to factorize:" << std::endl;
 	A.Display();
 
 
@@ -110,6 +111,8 @@ int main(int argc, char** argv)
 	M -= A;
 	auto err = M.norm()/A.norm();
 	std::cout << "err=" << err << std::endl;
+	delete wht;
+	delete th;
 	if(err > 1e-6)
 		exit(1);
 }
