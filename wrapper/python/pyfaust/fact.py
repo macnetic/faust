@@ -1304,7 +1304,7 @@ def fgft_palm(U, Lap, p, init_D=None, ret_lambda=False, ret_params=False):
 # experimental block end
 
 
-def butterfly(M, type="right"):
+def butterfly(M, type="bbtree"):
     """
     Factorizes M according to a butterfly support.
 
@@ -1329,8 +1329,10 @@ def butterfly(M, type="right"):
         1.0272844187006565e-15
 
     Reference:
-        Leon Zheng, Elisa Riccietti, and Remi Gribonval, <a href="https://arxiv.org/pdf/2110.01230.pdf">Hierarchical Identifiability in Multi-layer Sparse Matrix Factorization</a>
-
+        [1] Quoc-Tung Le, Léon Zheng, Elisa Riccietti, Rémi Gribonval. Fast
+        learning of fast transforms, with guarantees. ICASSP, IEEE
+        International Conference on Acoustics, Speech and Signal Processing,
+        May 2022, Singapore, Singapore. ⟨<a href="https://hal.inria.fr/hal-03438881">hal-03438881</a>⟩
     """
     is_real = np.empty((1,))
     M = _check_fact_mat('butterfly()', M, is_real)
