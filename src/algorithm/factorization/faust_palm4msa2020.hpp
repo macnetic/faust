@@ -1,15 +1,17 @@
 template <typename FPP, FDevice DEVICE>
 void Faust::fill_of_eyes(
 		Faust::TransformHelper<FPP,DEVICE>& S,
+		const unsigned int offset,
 		const unsigned int nfacts,
 		const bool sparse,
 		const std::vector<std::pair<faust_unsigned_int,faust_unsigned_int>> dims,
-		const bool on_gpu)
+		const bool on_gpu/*=false*/)
 {
 	if(S.size() > 0)
 		throw std::runtime_error("The Faust must be empty for intializing it to eyes factors.");
-	for(auto fdims : dims)
+	for(int i=offset; i < nfacts; i++)
 	{
+		auto fdims = dims[i];
 //		std::cout << "fill_of_eyes() fdims: " << fdims.first << " " << fdims.second << std::endl;
 		// init all facts as identity matrices
 		// with proper dimensions
@@ -26,7 +28,7 @@ void Faust::fill_of_eyes(
 			dfact->setEyes();
 			fact = dfact;
 		}
-		S.push_back(fact); //TODO: copying=false
+		S.push_back(fact, false, false);
 	}
 }
 
@@ -111,7 +113,40 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 	Faust::MatDense<FPP,DEVICE> A_H = A;
 	A_H.adjoint();
 	if(S.size() != nfacts)
-		fill_of_eyes(S, nfacts, factors_format != AllDense, dims, on_gpu);
+	{
+		// the first factor updated is initialized to zero, the others to eye
+		MatGeneric<FPP,DEVICE> *zero;
+		unsigned int zero_nrows, zero_ncols;
+		if(is_update_way_R2L)
+		{
+			zero_nrows = dims[dims.size()-1].first;
+			zero_ncols = dims[dims.size()-1].second;
+		}
+		else
+		{
+			zero_nrows = dims[0].first;
+			zero_ncols = dims[0].second;
+		}
+		if(factors_format != AllDense)
+		{
+			auto sp_zero = new MatSparse<FPP, DEVICE>();
+			sp_zero->resize(0, zero_nrows, zero_ncols);
+			zero = sp_zero;
+		}
+		else
+			zero = new MatDense<FPP, DEVICE>(zero_nrows, zero_ncols);
+		zero->setZeros();
+		if(is_update_way_R2L)
+		{
+			fill_of_eyes(S, 0, nfacts-1, factors_format != AllDense, dims, on_gpu);
+			S.push_back(zero, false, false);
+		}
+		else
+		{
+			fill_of_eyes(S, 1, nfacts, factors_format != AllDense, dims, on_gpu);
+			S.push_first(zero, false, false);
+		}
+	}
 	else if(factors_format == AllSparse)
 	{
 		S.convertToSparse();
@@ -558,8 +593,12 @@ void Faust::update_fact(
 		}
 		if(nR == 0 || nL == 0)
 		{
-			pR[f_id]->save_mat_file("R.mat");
-			pL[f_id]->save_mat_file("L.mat");
+			if(pR[f_id]->size() > 0)
+				pR[f_id]->save_mat_file("R.mat");
+			if(pL[f_id]->size() > 0)
+				pL[f_id]->save_mat_file("L.mat");
+			std::cerr << "norm(R): " << nR << std::endl;
+			std::cerr << "norm(L): " << nL << std::endl;
 			throw std::runtime_error("2-norm computation error in computation of descent step inverse: R or L 2-norm is zero. R and L were saved in R.mat and L.mat files.");
 		}
 		if(is_verbose)

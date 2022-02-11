@@ -77,6 +77,7 @@ namespace Faust
 	 */
 	template <typename FPP, FDevice DEVICE>
 		void fill_of_eyes(TransformHelper<FPP,DEVICE>& S,
+				const unsigned int offset,
 				const unsigned int nfacts,
 				const bool sparse,
 				const std::vector<std::pair<faust_unsigned_int,faust_unsigned_int>> dims,
