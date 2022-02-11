@@ -556,6 +556,12 @@ void Faust::update_fact(
 			std::cout << "S id:" << f_id << std::endl;
 			throw std::runtime_error("2-norm computation error: R or L 2-norm is NaN.");
 		}
+		if(nR == 0 || nL == 0)
+		{
+			pR[f_id]->save_mat_file("R.mat");
+			pL[f_id]->save_mat_file("L.mat");
+			throw std::runtime_error("2-norm computation error in computation of descent step inverse: R or L 2-norm is zero. R and L were saved in R.mat and L.mat files.");
+		}
 		if(is_verbose)
 		{
 			spectral_stop = std::chrono::high_resolution_clock::now();
