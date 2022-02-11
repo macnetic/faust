@@ -516,7 +516,8 @@ def palm4msa_py(A, J, N, proxs, is_update_way_R2L=False, S=None, _lambda=1,
                 S = L@Faust(S_j, dev=dev, dtype=A.dtype)
         _lambda = np.trace(A_H@S).real/S.norm()**2
     S = _lambda*S
-    return S, _lambda# experimental block end
+    return S, _lambda
+# experimental block end
 
 # experimental block start
 def hierarchical2020(M, nites, constraints, is_update_way_R2L,
@@ -1332,7 +1333,7 @@ def butterfly(M, type="bbtree"):
         [1] Quoc-Tung Le, Léon Zheng, Elisa Riccietti, Rémi Gribonval. Fast
         learning of fast transforms, with guarantees. ICASSP, IEEE
         International Conference on Acoustics, Speech and Signal Processing,
-        May 2022, Singapore, Singapore. ⟨<a href="https://hal.inria.fr/hal-03438881">hal-03438881</a>⟩
+        May 2022, Singapore, Singapore. (<a href="https://hal.inria.fr/hal-03438881">hal-03438881</a>)
     """
     is_real = np.empty((1,))
     M = _check_fact_mat('butterfly()', M, is_real)
