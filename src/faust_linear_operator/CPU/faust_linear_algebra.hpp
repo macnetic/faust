@@ -851,7 +851,7 @@ FPP Faust::power_iteration(const  Faust::LinearOperator<FPP,Cpu> & A, const faus
 						// here we compute the product and then convert it to float precision, it's simpler
 						auto dmat = t->get_product();
 						auto ddmat = dmat.template to_real<double>();
-						std::cerr << "WARNING: power_iteration detected a zero norm vector, trying to recompute the Transform power_iteration using double precision instead of float precision to contravene this error." << std::endl;
+						std::cerr << "WARNING: power_iteration detected a zero norm vector, trying to recompute the Transform power_iteration using double precision instead of float precision to fix this error." << std::endl;
 						auto res = FPP(power_iteration(ddmat, nbr_iter_max, threshold, flag, (double*) nullptr, rand_init));
 						std::cerr << "The error was fixed with double precision!" << std::endl;
 						return res;
