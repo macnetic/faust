@@ -111,7 +111,8 @@ cdef class FaustAlgoGen@TYPE_NAME@:
             elif(cons.is_mat_constraint()):
                 cpp_constraints[i] = <PyxConstraintMat[@TYPE@]*> \
                         PyMem_Malloc(sizeof(PyxConstraintMat[@TYPE@]))
-                tmp_mat = (cons._cons_value).astype(type2dtype('@TYPE@'))
+                cons._cons_value = cons._cons_value.astype(type2dtype('@TYPE@'))
+                tmp_mat = cons._cons_value
                 (<PyxConstraintMat[@TYPE@]*>cpp_constraints[i]).parameter =\
                         &tmp_mat[0,0]
                 (<PyxConstraintMat[@TYPE@]*>cpp_constraints[i]).parameter_sz =\
@@ -258,7 +259,8 @@ cdef class FaustAlgoGen@TYPE_NAME@:
             elif(cons.is_mat_constraint()):
                 cpp_constraints[i] = <PyxConstraintMat[@TYPE@]*> \
                         PyMem_Malloc(sizeof(PyxConstraintMat[@TYPE@]))
-                tmp_mat = cons._cons_value.astype(type2dtype('@TYPE@'))
+                cons._cons_value = cons._cons_value.astype(type2dtype('@TYPE@'))
+                tmp_mat = cons._cons_value
                 (<PyxConstraintMat[@TYPE@]*>cpp_constraints[i]).parameter =\
                         &tmp_mat[0,0]
                 (<PyxConstraintMat[@TYPE@]*>cpp_constraints[i]).parameter_sz =\
@@ -365,7 +367,8 @@ cdef class FaustAlgoGen@TYPE_NAME@:
             elif cons.is_mat_constraint():
                 cpp_constraints[i] = <PyxConstraintMat[@TYPE@]*> \
                         PyMem_Malloc(sizeof(PyxConstraintMat[@TYPE@]))
-                tmp_mat = (cons._cons_value).astype(type2dtype('@TYPE@'))
+                cons._cons_value = cons._cons_value.astype(type2dtype('@TYPE@'))
+                tmp_mat = cons._cons_value
                 (<PyxConstraintMat[@TYPE@]*>cpp_constraints[i]).parameter =\
                         &tmp_mat[0,0]
                 (<PyxConstraintMat[@TYPE@]*>cpp_constraints[i]).parameter_sz =\
@@ -384,7 +387,6 @@ cdef class FaustAlgoGen@TYPE_NAME@:
             # is responsible to delete the object in case the
             # algorithm runs on GPU (hence the transform objects F_facts and
             # core are not the same)
-
 
         core = @CORE_CLASS@(core=True)
         core.@CORE_OBJ@ = \
@@ -507,7 +509,8 @@ cdef class FaustAlgoGen@TYPE_NAME@:
             elif(cons.is_mat_constraint()):
                 cpp_constraints[i] = <PyxConstraintMat[@TYPE@]*> \
                         PyMem_Malloc(sizeof(PyxConstraintMat[@TYPE@]))
-                tmp_mat = (cons._cons_value).astype(type2dtype('@TYPE@'))
+                cons._cons_value = cons._cons_value.astype(type2dtype('@TYPE@'))
+                tmp_mat = cons._cons_value
                 (<PyxConstraintMat[@TYPE@]*>cpp_constraints[i]).parameter =\
                         &tmp_mat[0,0]
                 (<PyxConstraintMat[@TYPE@]*>cpp_constraints[i]).parameter_sz =\
