@@ -333,10 +333,10 @@ class ConstraintMat(ConstraintGeneric):
             0.99999999999999989
 
         """
-        if not shape is None:
-            _shape = shape
-        elif not cons_value is None:
+        if not cons_value is None:
             _shape = cons_value.shape
+        elif not shape is None:
+            _shape = shape
         else:
             raise ValueError('either shape or cons_value must be defined')
         super(ConstraintMat, self).__init__(name, _shape[0], _shape[1],

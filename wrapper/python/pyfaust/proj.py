@@ -40,7 +40,7 @@ class proj_id(proj_gen):
 
     def __init__(self, shape):
         super(proj_id, self).__init__(shape)
-        self.constraint = ConstraintMat('id', np.empty(shape))
+        self.constraint = ConstraintMat('id', cons_value=np.empty(shape))
         self.constraint._num_rows = shape[0]
         self.constraint._num_cols = shape[1]
 
@@ -69,7 +69,8 @@ class toeplitz(proj_gen):
             pos: True to skip negative values (replaced by zero) of the matrix to project.
         """
         super(toeplitz, self).__init__(shape)
-        self.constraint = ConstraintMat('toeplitz', np.empty(shape), normalized, pos)
+        self.constraint = ConstraintMat('toeplitz', cons_valuenp.empty(shape),
+                                        normalized=normalized, pos=pos)
 
 class circ(proj_gen):
     """
@@ -100,7 +101,8 @@ class circ(proj_gen):
 
         """
         super(circ, self).__init__(shape)
-        self.constraint = ConstraintMat('circ', np.empty(shape), normalized, pos)
+        self.constraint = ConstraintMat('circ', cons_value=np.empty(shape),
+                                        normalized=normalized, pos=pos)
 
 class hankel(proj_gen):
     """
@@ -127,7 +129,8 @@ class hankel(proj_gen):
             pos: True to skip negative values (replaced by zero) of the matrix to project.
         """
         super(hankel, self).__init__(shape)
-        self.constraint = ConstraintMat('hankel', np.empty(shape), normalized, pos)
+        self.constraint = ConstraintMat('hankel', cons_value=np.empty(shape),
+                                        normalized=normalized, pos=pos)
 
 
 class sp(proj_gen):
@@ -328,7 +331,8 @@ class supp(proj_gen):
             pos: True to skip negative values (replaced by zero) of the matrix to project.
         """
         super(supp, self).__init__(shape)
-        self.constraint = ConstraintMat('supp', S, normalized, pos)
+        self.constraint = ConstraintMat('supp', cons_value=S,
+                                        normalized=normalized, pos=pos)
 
 class const(proj_gen):
     """
@@ -385,7 +389,7 @@ class const(proj_gen):
 
         """
         super(const, self).__init__(C.shape)
-        self.constraint = ConstraintMat('const', C, normalized, pos=False)
+        self.constraint = ConstraintMat('const', cons_value=C, normalized=normalized, pos=False)
 
 class normcol(proj_gen):
     """
@@ -508,9 +512,9 @@ class blockdiag(proj_gen):
 #                                                    " must be equal to"
 #                                                    " shape[1]")
         cons_value = np.asfortranarray(np.array(block_shapes, dtype=float))
-        self.constraint = ConstraintMat('blockdiag', cons_value,
-                                        normalized, pos,
-                                        cons_value.size)
+        self.constraint = ConstraintMat('blockdiag', cons_value=cons_value,
+                                        normalized=normalized, pos=pos,
+                                        cons_value_sz=cons_value.size)
 
     def __call__(self, M):
         """
