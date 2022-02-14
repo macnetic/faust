@@ -40,7 +40,7 @@ class proj_id(proj_gen):
 
     def __init__(self, shape):
         super(proj_id, self).__init__(shape)
-        self.constraint = ConstraintMat('id', cons_value=np.empty(shape))
+        self.constraint = ConstraintMat('id', shape=shape)
         self.constraint._num_rows = shape[0]
         self.constraint._num_cols = shape[1]
 
@@ -61,7 +61,7 @@ class toeplitz(proj_gen):
            [ 0.35021359,  0.65125443,  0.29650327,  0.62199717, 0.38925701]])
 
     """
-    def __init__(self, shape, normalized=False, pos=False):
+    def __init__(self, shape, normalized=True, pos=False):
         """
         Args:
             shape: the size of the input matrix.
@@ -69,7 +69,7 @@ class toeplitz(proj_gen):
             pos: True to skip negative values (replaced by zero) of the matrix to project.
         """
         super(toeplitz, self).__init__(shape)
-        self.constraint = ConstraintMat('toeplitz', cons_valuenp.empty(shape),
+        self.constraint = ConstraintMat('toeplitz', shape=shape,
                                         normalized=normalized, pos=pos)
 
 class circ(proj_gen):
@@ -101,7 +101,7 @@ class circ(proj_gen):
 
         """
         super(circ, self).__init__(shape)
-        self.constraint = ConstraintMat('circ', cons_value=np.empty(shape),
+        self.constraint = ConstraintMat('circ', shape=shape,
                                         normalized=normalized, pos=pos)
 
 class hankel(proj_gen):
@@ -129,7 +129,7 @@ class hankel(proj_gen):
             pos: True to skip negative values (replaced by zero) of the matrix to project.
         """
         super(hankel, self).__init__(shape)
-        self.constraint = ConstraintMat('hankel', cons_value=np.empty(shape),
+        self.constraint = ConstraintMat('hankel', shape=shape,
                                         normalized=normalized, pos=pos)
 
 
@@ -330,7 +330,7 @@ class supp(proj_gen):
             normalized: True to normalize the projection image according to its Frobenius norm.
             pos: True to skip negative values (replaced by zero) of the matrix to project.
         """
-        super(supp, self).__init__(shape)
+        super(supp, self).__init__(S.shape)
         self.constraint = ConstraintMat('supp', cons_value=S,
                                         normalized=normalized, pos=pos)
 

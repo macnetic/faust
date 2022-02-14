@@ -114,364 +114,6 @@ class StoppingCriterion(object):
         """
         return self.__str__()
 
-class ConstraintGeneric(ABC):
-    """
-    This is the parent class for representing a factor constraint in FAuST factorization algorithms.
-
-    This class shouldn't be instantiated, rather rely on sub-classes.
-    Typically, a constraint finds its place into a ParamsFact or sub-class
-    instance (as a container for the factorization parameters).
-    It's also possible to set a list of constraints with the ConstraintList class.
-
-    <b/> See also: ConstraintInt, ConstraintReal, ConstraintMat,
-    pyfaust.fact.palm4msa, pyfaust.fact.hierarchical, ParamsPalm4MSA,
-    ParamsHierarchical.
-
-    Attributes:
-        _name: The name of the constraint applied to the factor (ConstraintName instance).
-        _num_rows: the number of columns of the constrained matrix.
-        _num_cols: the number of columns of the constrained matrix.
-        _cons_value: The value of the constraint.
-
-    """
-
-    def __init__(self, name, num_rows, num_cols, cons_value, normalized=True, pos=False):
-        """
-        Constructs a generic constraint.
-
-        Warning: This constructor shouldn't be called directly as the class is
-        abstract.
-
-        Args:
-            name: The name of the constraint applied to the factor (ConstraintName instance).
-            num_rows: the number of columns of the constrained matrix.
-            num_cols: the number of columns of the constrained matrix.
-            cons_value: The value of the constraint.
-
-        Raises:
-            TypeError: Can't instantiate abstract class ConstraintGeneric with
-            abstract methods project. This exception is python 3 only, but
-            this class shouldn't be instantiated in python 2.7 either.
-
-        """
-        if(isinstance(name, str)):
-            name = ConstraintName(name)
-        self._name = name
-        self._num_rows = num_rows
-        self._num_cols = num_cols
-        self._cons_value = cons_value
-        self.normalized = normalized
-        self.pos = pos
-
-    @property
-    def name(self):
-        """
-            Property to access the ConstraintName of the constraint.
-        """
-        return self._name.name
-
-    def is_int_constraint(self):
-        """
-            Returns True if this constraint is a ConstraintInt, False otherwise.
-        """
-        return self._name.is_int_constraint()
-
-    def is_real_constraint(self):
-        """
-            Returns True if this constraint is a ConstraintReal, False otherwise.
-        """
-        return self._name.is_real_constraint()
-
-    def is_mat_constraint(self):
-        """
-            Returns True if this constraint is a ConstraintMat, False otherwise.
-        """
-        return self._name.is_mat_constraint()
-
-
-    @abstractmethod
-    def project(self, M):
-        """
-            Applies the constraint to the matrix M.
-
-            NOTE: The project function is also called a proximal operator.
-
-            Args:
-                M: a numpy array, it must be of the same size as set in object attributes self._num_rows, self._num_cols.
-
-            Raises:
-                ValueError: if M.shape and self._num_rows, self._num_cols don't agree.
-                TypeError: if M is not a numpy.ndarray
-
-            Returns:
-                The proximal operator result as a numpy array.
-        """
-        if(not isinstance(M, np.ndarray)):
-           raise TypeError("M must be a numpy array.")
-        if(M.shape[0] != self._num_rows or M.shape[1] != self._num_cols):
-            raise ValueError("The dimensions must agree.")
-
-    def __repr__(self):
-        return self._name.name_str()+"("+str(self._num_rows)+","+ \
-                str(self._num_cols) + (", "+str(self._cons_value) + ")" if not
-                                           self.is_mat_constraint()
-                                           else ")")
-    @property
-    def shape(self):
-        return (self._num_rows, self._num_cols)
-
-class ConstraintInt(ConstraintGeneric):
-    """
-        This class represents an integer constraint on a matrix.
-
-        It constrains a matrix by its column/row-vectors sparsity or also
-        called 0-norm: ConstraintName.SPLIN, ConstraintName.SPCOL, ConstraintName.SPLINCOL.
-
-        The other constraint names of this type are: ConstraintName.SP,
-        ConstraintName.SP_POS, which both designate the 0-norm based constraint of the
-        matrix with besides for SP_POS the zero replacement of all
-        negative values.
-
-
-    """
-    def __init__(self, name, num_rows, num_cols, cons_value, normalized=True, pos=False):
-        """
-            Args:
-                name: must be a ConstraintName instance set with a value among SP_POS, SP, SPLIN, SPCOL, SPLINCOL (cf. ConstraintName) or it can also be one of the more handy str aliases which are respectively: 'sppos', 'sp', 'splin', 'spcol', 'splincol'.
-                num_rows: the number of rows of the constrained matrix.
-                num_cols: the number of columns of the constrained matrix.
-                cons_value: the integer value of the constraint (the 0-norm as
-                sparsity).
-
-            Example:
-                >>> from pyfaust.factparams import ConstraintInt
-                >>> from numpy.random import rand
-                >>> import numpy as np
-                >>> cons = ConstraintInt('sppos', 10, 10, 2) # a short for ConstraintInt(ConstraintName(ConstraintName.SP_POS), 10, 10, 2)
-                >>> # cons_value == 2 here and this is the 0-norm we want to constrain M to
-                >>> M = rand(10,10)
-                >>> np.count_nonzero(M)
-                100
-                >>> np.count_nonzero(cons.project(M))
-                2
-
-            <b/> See also: ConstraintGeneric.__init__
-        """
-        super(ConstraintInt, self).__init__(name, num_rows, num_cols,
-                                            cons_value, normalized, pos)
-        if(not isinstance(cons_value, np.int)):
-            raise TypeError('ConstraintInt must receive a int as cons_value '
-                            'argument.')
-        if(not isinstance(self._name, ConstraintName) or not self._name.is_int_constraint()):
-            raise TypeError('ConstraintInt first argument must be a '
-                            'ConstraintName with a int type name '
-                            '(name.is_int_constraint() must return True).')
-
-    def project(self, M):
-        """
-            <b/> See: ConstraintGeneric.project
-        """
-        super(ConstraintInt, self).project(M)
-        from pyfaust.fact import _check_fact_mat
-        is_real = np.empty((1,))
-        M = _check_fact_mat('ConstraintInt.project', M, is_real)
-        if is_real:
-            is_float = M.dtype == 'float32'
-            if is_float:
-                return _FaustCorePy.ConstraintIntCoreFlt.project(M, self._name.name, self._num_rows,
-                                                                 self._num_cols, self._cons_value,
-                                                                 self.normalized, self.pos)
-
-            else:
-                return _FaustCorePy.ConstraintIntCoreDbl.project(M, self._name.name, self._num_rows,
-                                                                 self._num_cols, self._cons_value,
-                                                                 self.normalized, self.pos)
-        else:
-            return _FaustCorePy.ConstraintIntCoreCplxDbl.project(M, self._name.name, self._num_rows,
-                                                          self._num_cols, self._cons_value,
-                                                          self.normalized, self.pos)
-
-class ConstraintMat(ConstraintGeneric):
-    """
-        This class represents a matrix-based constraint to apply on a matrix.
-
-    """
-    def __init__(self, name, cons_value=None, shape=None, normalized=None, pos=False, cons_value_sz=None):
-        """
-        Constructs a matrix type constraint.
-
-        Args:
-            name: must be a ConstraintName instance set with a value among
-            ID, SUPP, CONST, TOEPLITZ or CIRC(ULANT) (cf. ConstraintName) or it can also be one of the
-            more handy str aliases which are respectively: 'supp' and 'const'.
-            cons_value: the value of the constraint, it must be a numpy.array
-            shape: the shape of the matrix (only useful for identity prox,
-            ConstraintName.ID. In this case the cons_value argument is None).
-            that defines the constraint (the matrix support for SUPP and the
-            constant matrix for CONST).
-
-        Example:
-            >>> from pyfaust.factparams import ConstraintMat
-            >>> from numpy.random import rand
-            >>> from numpy import eye
-            >>> from numpy.linalg import norm
-            >>> cons = ConstraintMat('supp', eye(10))
-            >>> M = rand(10,10)
-            >>> from numpy import count_nonzero
-            >>> count_nonzero(M)
-            100
-            >>> count_nonzero(cons.project(M))
-            10
-            >>> from numpy import diag
-            >>> diag(M)
-            array([ 0.77861201,  0.88512726,  0.56276019,  0.89159211,  0.85893333,
-                           0.59919467,  0.02603014,  0.16725741,  0.20578577,  0.40803648])
-            >>> diag(cons.project(M))
-            array([ 0.39756071,  0.4519476 ,  0.28734638,  0.45524856,  0.43857293,
-                           0.30594989,  0.01329104,  0.08540194,  0.10507459,  0.20834417])
-            >>> norm(cons.project(M))
-            0.99999999999999989
-
-        """
-        if not cons_value is None:
-            _shape = cons_value.shape
-        elif not shape is None:
-            _shape = shape
-        else:
-            raise ValueError('either shape or cons_value must be defined')
-        super(ConstraintMat, self).__init__(name, _shape[0], _shape[1],
-                                            cons_value, normalized, pos)
-        if(not isinstance(cons_value, np.ndarray)):
-            raise TypeError('ConstraintMat must receive a numpy.ndarray as cons_value '
-                            'argument.')
-        self.cons_value = np.asfortranarray(self._cons_value)
-        self._cons_value = self.cons_value
-        if(cons_value_sz == None):
-            self._cons_value_sz = self._num_cols*self._num_rows
-        else:
-            self._cons_value_sz = cons_value_sz
-        if(normalized == None):
-            self.normalized = False
-        if(not isinstance(self._name, ConstraintName) or not self._name.is_mat_constraint()):
-            raise TypeError('ConstraintMat first argument must be a '
-                            'ConstraintName with a matrix type name '
-                            '(name.is_mat_constraint() must return True)')
-        if self._name.name != ConstraintName.ID and cons_value is None:
-            raise ValueError('you must specify a matrix as cons_value except if'
-                             ' the ConstraintName is ID.')
-        if not shape is None and not cons_value is None \
-           and shape != cons_value.shape:
-            raise ValueError('cons_value shape must be equal to shape argument'
-                             ' if not None.')
-        if(self._name.name == ConstraintName.BLKDIAG):
-            self._num_rows = int(cons_value[-1][0])
-            self._num_cols = int(cons_value[-1][1])
-
-    def project(self, M):
-        """
-            <b/> See: ConstraintGeneric.project
-        """
-        super(ConstraintMat, self).project(M)
-        is_real = np.empty((1,))
-        from pyfaust.fact import _check_fact_mat
-        M = _check_fact_mat('ConstraintMat.project', M, is_real)
-        if is_real:
-            is_float = M.dtype == 'float32'
-            if is_float:
-                return _FaustCorePy.ConstraintMatCoreFlt.project(M, self._name.name, self._num_rows,
-                                                                 self._num_cols,
-                                                                 self._cons_value,
-                                                                 self._cons_value_sz,
-                                                                 self.normalized, self.pos)
-            else:
-                return _FaustCorePy.ConstraintMatCoreDbl.project(M, self._name.name, self._num_rows,
-                                                                 self._num_cols,
-                                                                 self._cons_value,
-                                                                 self._cons_value_sz,
-                                                                 self.normalized, self.pos)
-
-        else:
-            return _FaustCorePy.ConstraintMatCoreCplxDbl.project(M, self._name.name, self._num_rows,
-                                                              self._num_cols,
-                                                              self._cons_value,
-                                                              self._cons_value_sz,
-                                                              self.normalized, self.pos)
-
-
-class ConstraintReal(ConstraintGeneric):
-    """
-        This class represents a real constraint on a matrix.
-
-        It constrains a matrix by a column/row-vector 2-norm
-        (ConstraintName.NORMCOL, ConstraintName.NORMLIN).
-
-    """
-    def __init__(self, name, num_rows, num_cols, cons_value, normalized=False, pos=False):
-        """
-        Constructs a real type constraint.
-
-        Args:
-            name: must be a ConstraintName instance set with a value among NORMCOL, NORMLIN (cf. ConstraintName) or it can also be one of the more handy str aliases which are respectively: 'normcol', 'normlin'.
-            num_rows: the number of columns of the constrained matrix.
-            num_cols: the number of columns of the constrained matrix.
-            cons_value: the parameter value of the constraint, it must be a
-            float number that designates the 2-norm imposed to all columns (if
-            name is ConstraintName.NORMCOL) or rows (if
-            name is ConstraintName.NORMLIN).
-
-        Example:
-            >>> from pyfaust.factparams import ConstraintReal
-            >>> from numpy.random import rand
-            >>> from numpy.linalg import norm
-            >>> cons = ConstraintReal('normcol', 10, 10, 2.) # a short for ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 10, 10, 2.)
-            >>> M = rand(10,10)*10
-            >>> norm(M[:,2])
-            17.041462424512272
-            >>> norm(cons.project(M)[:,2])
-            2.0
-
-
-            <b/> See also: ConstraintGeneric.__init__
-        """
-        super(ConstraintReal, self).__init__(name, num_rows, num_cols,
-                                             cons_value, normalized=False, pos=False)
-        if(not isinstance(cons_value, np.float) and not isinstance(cons_value, np.int)):
-            raise TypeError('ConstraintReal must receive a float as cons_value '
-                            'argument.')
-        self._cons_value = float(self._cons_value)
-        if(not isinstance(self._name, ConstraintName) or not self._name.is_real_constraint()):
-            raise TypeError('ConstraintReal first argument must be a '
-                            'ConstraintName with a real type name '
-                            '(name.is_real_constraint() must return True).')
-
-    def project(self, M):
-        """
-        <b/> See: ConstraintGeneric.project
-        """
-        super(ConstraintReal, self).project(M)
-        is_real = np.empty((1,))
-        from pyfaust.fact import _check_fact_mat
-        M = _check_fact_mat('ConstraintReal.project', M, is_real)
-        if is_real:
-            is_float = M.dtype == 'float32'
-            if is_float:
-                return _FaustCorePy.ConstraintRealCoreFlt.project(M, self._name.name, self._num_rows,
-                                                       self._num_cols,
-                                                       self._cons_value,
-                                                       self.normalized, self.pos)
-
-            else:
-                return _FaustCorePy.ConstraintRealCoreDbl.project(M, self._name.name, self._num_rows,
-                                                                  self._num_cols,
-                                                                  self._cons_value,
-                                                                  self.normalized, self.pos)
-        else:
-            return _FaustCorePy.ConstraintRealCoreCplxDbl.project(M, self._name.name, self._num_rows,
-                                                           self._num_cols,
-                                                           self._cons_value,
-                                                           self.normalized, self.pos)
-
-
 class ConstraintName:
     """
     This class defines the names for the sub-types of constraints into the ConstraintGeneric hierarchy of classes.
@@ -686,6 +328,379 @@ class ConstraintName:
         else:
             raise ValueError(err_msg)
         return id
+
+
+class ConstraintGeneric(ABC):
+    """
+    This is the parent class for representing a factor constraint in FAuST factorization algorithms.
+
+    This class shouldn't be instantiated, rather rely on sub-classes.
+    Typically, a constraint finds its place into a ParamsFact or sub-class
+    instance (as a container for the factorization parameters).
+    It's also possible to set a list of constraints with the ConstraintList class.
+
+    <b/> See also: ConstraintInt, ConstraintReal, ConstraintMat,
+    pyfaust.fact.palm4msa, pyfaust.fact.hierarchical, ParamsPalm4MSA,
+    ParamsHierarchical.
+
+    Attributes:
+        _name: The name of the constraint applied to the factor (ConstraintName instance).
+        _num_rows: the number of columns of the constrained matrix.
+        _num_cols: the number of columns of the constrained matrix.
+        _cons_value: The value of the constraint.
+
+    """
+
+    def __init__(self, name, num_rows, num_cols, cons_value, normalized=True, pos=False):
+        """
+        Constructs a generic constraint.
+
+        Warning: This constructor shouldn't be called directly as the class is
+        abstract.
+
+        Args:
+            name: The name of the constraint applied to the factor (ConstraintName instance).
+            num_rows: the number of columns of the constrained matrix.
+            num_cols: the number of columns of the constrained matrix.
+            cons_value: The value of the constraint.
+
+        Raises:
+            TypeError: Can't instantiate abstract class ConstraintGeneric with
+            abstract methods project. This exception is python 3 only, but
+            this class shouldn't be instantiated in python 2.7 either.
+
+        """
+        if(isinstance(name, str)):
+            name = ConstraintName(name)
+        self._name = name
+        self._num_rows = num_rows
+        self._num_cols = num_cols
+        self._cons_value = cons_value
+        self.normalized = normalized
+        self.pos = pos
+
+    @property
+    def name(self):
+        """
+            Property to access the ConstraintName of the constraint.
+        """
+        return self._name.name
+
+    def is_int_constraint(self):
+        """
+            Returns True if this constraint is a ConstraintInt, False otherwise.
+        """
+        return self._name.is_int_constraint()
+
+    def is_real_constraint(self):
+        """
+            Returns True if this constraint is a ConstraintReal, False otherwise.
+        """
+        return self._name.is_real_constraint()
+
+    def is_mat_constraint(self):
+        """
+            Returns True if this constraint is a ConstraintMat, False otherwise.
+        """
+        return self._name.is_mat_constraint()
+
+
+    @abstractmethod
+    def project(self, M):
+        """
+            Applies the constraint to the matrix M.
+
+            NOTE: The project function is also called a proximal operator.
+
+            Args:
+                M: a numpy array, it must be of the same size as set in object attributes self._num_rows, self._num_cols.
+
+            Raises:
+                ValueError: if M.shape and self._num_rows, self._num_cols don't agree.
+                TypeError: if M is not a numpy.ndarray
+
+            Returns:
+                The proximal operator result as a numpy array.
+        """
+        if(not isinstance(M, np.ndarray)):
+           raise TypeError("M must be a numpy array.")
+        if(M.shape[0] != self._num_rows or M.shape[1] != self._num_cols):
+            raise ValueError("The dimensions must agree.")
+
+    def __repr__(self):
+        return self._name.name_str()+"("+str(self._num_rows)+","+ \
+                str(self._num_cols) + (", "+str(self._cons_value) + ")" if not
+                                           self.is_mat_constraint()
+                                           else ")")
+    @property
+    def shape(self):
+        return (self._num_rows, self._num_cols)
+
+class ConstraintInt(ConstraintGeneric):
+    """
+        This class represents an integer constraint on a matrix.
+
+        It constrains a matrix by its column/row-vectors sparsity or also
+        called 0-norm: ConstraintName.SPLIN, ConstraintName.SPCOL, ConstraintName.SPLINCOL.
+
+        The other constraint names of this type are: ConstraintName.SP,
+        ConstraintName.SP_POS, which both designate the 0-norm based constraint of the
+        matrix with besides for SP_POS the zero replacement of all
+        negative values.
+
+
+    """
+    def __init__(self, name, num_rows, num_cols, cons_value, normalized=True, pos=False):
+        """
+            Args:
+                name: must be a ConstraintName instance set with a value among SP_POS, SP, SPLIN, SPCOL, SPLINCOL (cf. ConstraintName) or it can also be one of the more handy str aliases which are respectively: 'sppos', 'sp', 'splin', 'spcol', 'splincol'.
+                num_rows: the number of rows of the constrained matrix.
+                num_cols: the number of columns of the constrained matrix.
+                cons_value: the integer value of the constraint (the 0-norm as
+                sparsity).
+
+            Example:
+                >>> from pyfaust.factparams import ConstraintInt
+                >>> from numpy.random import rand
+                >>> import numpy as np
+                >>> cons = ConstraintInt('sppos', 10, 10, 2) # a short for ConstraintInt(ConstraintName(ConstraintName.SP_POS), 10, 10, 2)
+                >>> # cons_value == 2 here and this is the 0-norm we want to constrain M to
+                >>> M = rand(10,10)
+                >>> np.count_nonzero(M)
+                100
+                >>> np.count_nonzero(cons.project(M))
+                2
+
+            <b/> See also: ConstraintGeneric.__init__
+        """
+        super(ConstraintInt, self).__init__(name, num_rows, num_cols,
+                                            cons_value, normalized, pos)
+        if(not isinstance(cons_value, np.int)):
+            raise TypeError('ConstraintInt must receive a int as cons_value '
+                            'argument.')
+        if(not isinstance(self._name, ConstraintName) or not self._name.is_int_constraint()):
+            raise TypeError('ConstraintInt first argument must be a '
+                            'ConstraintName with a int type name '
+                            '(name.is_int_constraint() must return True).')
+
+    def project(self, M):
+        """
+            <b/> See: ConstraintGeneric.project
+        """
+        super(ConstraintInt, self).project(M)
+        from pyfaust.fact import _check_fact_mat
+        is_real = np.empty((1,))
+        M = _check_fact_mat('ConstraintInt.project', M, is_real)
+        if is_real:
+            is_float = M.dtype == 'float32'
+            if is_float:
+                return _FaustCorePy.ConstraintIntCoreFlt.project(M, self._name.name, self._num_rows,
+                                                                 self._num_cols, self._cons_value,
+                                                                 self.normalized, self.pos)
+
+            else:
+                return _FaustCorePy.ConstraintIntCoreDbl.project(M, self._name.name, self._num_rows,
+                                                                 self._num_cols, self._cons_value,
+                                                                 self.normalized, self.pos)
+        else:
+            return _FaustCorePy.ConstraintIntCoreCplxDbl.project(M, self._name.name, self._num_rows,
+                                                          self._num_cols, self._cons_value,
+                                                          self.normalized, self.pos)
+
+class ConstraintMat(ConstraintGeneric):
+    """
+        This class represents a matrix-based constraint to apply on a matrix.
+
+    """
+
+    normalized_default = {ConstraintName.ID: False, ConstraintName.TOEPLITZ: True, ConstraintName.CIRC: True,
+                           ConstraintName.HANKEL: True, ConstraintName.SUPP: True, ConstraintName.CONST: False,
+                           ConstraintName.BLKDIAG: True}
+
+    def __init__(self, name, cons_value=None, shape=None, normalized=None, pos=False, cons_value_sz=None):
+        """
+        Constructs a matrix type constraint.
+
+        Args:
+            name: must be a ConstraintName instance set with a value among
+            ID, SUPP, CONST, TOEPLITZ or CIRC(ULANT) (cf. ConstraintName) or it can also be one of the
+            more handy str aliases which are respectively: 'supp' and 'const'.
+            cons_value: the value of the constraint, it must be a numpy.array
+            shape: (optional) the shape of the matrix (only useful for identity prox,
+            ConstraintName.ID. In this case the cons_value argument is None).
+            that defines the constraint (the matrix support for SUPP and the
+            constant matrix for CONST).
+            normalized: None because the default value depends on the
+            constraint name (it can be False or True, see
+            ConstraintMat.normalized_default).
+
+        Example:
+            >>> from pyfaust.factparams import ConstraintMat
+            >>> from numpy.random import rand
+            >>> from numpy import eye
+            >>> from numpy.linalg import norm
+            >>> cons = ConstraintMat('supp', eye(10))
+            >>> M = rand(10,10)
+            >>> from numpy import count_nonzero
+            >>> count_nonzero(M)
+            100
+            >>> count_nonzero(cons.project(M))
+            10
+            >>> from numpy import diag
+            >>> diag(M)
+            array([ 0.77861201,  0.88512726,  0.56276019,  0.89159211,  0.85893333,
+                           0.59919467,  0.02603014,  0.16725741,  0.20578577,  0.40803648])
+            >>> diag(cons.project(M))
+            array([ 0.39756071,  0.4519476 ,  0.28734638,  0.45524856,  0.43857293,
+                           0.30594989,  0.01329104,  0.08540194,  0.10507459,  0.20834417])
+            >>> norm(cons.project(M))
+            0.99999999999999989
+
+        """
+        if not cons_value is None:
+            _shape = cons_value.shape
+        elif not shape is None:
+            _shape = shape
+        else:
+            raise ValueError('either shape or cons_value must be defined')
+        super(ConstraintMat, self).__init__(name, _shape[0], _shape[1],
+                                            cons_value, normalized, pos)
+        if cons_value is not None and not isinstance(cons_value, np.ndarray):
+            raise TypeError('ConstraintMat must receive a numpy.ndarray as cons_value '
+                            'argument.')
+        if cons_value is not None:
+            self.cons_value = np.asfortranarray(self._cons_value)
+            self._cons_value = self.cons_value
+            if cons_value_sz is None:
+                self._cons_value_sz = self._num_cols*self._num_rows
+            else:
+                self._cons_value_sz = cons_value_sz
+        else:
+            self._cons_value = None
+            self._cons_value_sz = 0
+        if normalized is None:
+            self.normalized = ConstraintMat.normalized_default[self._name.name]
+        if(not isinstance(self._name, ConstraintName) or not self._name.is_mat_constraint()):
+            raise TypeError('ConstraintMat first argument must be a '
+                            'ConstraintName with a matrix type name '
+                            '(name.is_mat_constraint() must return True)')
+        no_mandatory_cons_value = [ConstraintName.ID, ConstraintName.TOEPLITZ,
+                                  ConstraintName.HANKEL, ConstraintName.CIRC]
+        if self._name.name not in no_mandatory_cons_value and cons_value is None:
+            raise ValueError('you must specify a matrix as cons_value except if'
+                             ' the ConstraintName is ID.')
+        if not shape is None and not cons_value is None \
+           and shape != cons_value.shape:
+            raise ValueError('cons_value shape must be equal to shape argument'
+                             ' if not None.')
+        if(self._name.name == ConstraintName.BLKDIAG):
+            self._num_rows = int(cons_value[-1][0])
+            self._num_cols = int(cons_value[-1][1])
+
+    def project(self, M):
+        """
+            <b/> See: ConstraintGeneric.project
+        """
+        super(ConstraintMat, self).project(M)
+        is_real = np.empty((1,))
+        from pyfaust.fact import _check_fact_mat
+        M = _check_fact_mat('ConstraintMat.project', M, is_real)
+        if is_real:
+            is_float = M.dtype == 'float32'
+            if is_float:
+                return _FaustCorePy.ConstraintMatCoreFlt.project(M, self._name.name, self._num_rows,
+                                                                 self._num_cols,
+                                                                 self._cons_value,
+                                                                 self._cons_value_sz,
+                                                                 self.normalized, self.pos)
+            else:
+                return _FaustCorePy.ConstraintMatCoreDbl.project(M, self._name.name, self._num_rows,
+                                                                 self._num_cols,
+                                                                 self._cons_value,
+                                                                 self._cons_value_sz,
+                                                                 self.normalized, self.pos)
+
+        else:
+            return _FaustCorePy.ConstraintMatCoreCplxDbl.project(M, self._name.name, self._num_rows,
+                                                              self._num_cols,
+                                                              self._cons_value,
+                                                              self._cons_value_sz,
+                                                              self.normalized, self.pos)
+
+
+class ConstraintReal(ConstraintGeneric):
+    """
+        This class represents a real constraint on a matrix.
+
+        It constrains a matrix by a column/row-vector 2-norm
+        (ConstraintName.NORMCOL, ConstraintName.NORMLIN).
+
+    """
+    def __init__(self, name, num_rows, num_cols, cons_value, normalized=False, pos=False):
+        """
+        Constructs a real type constraint.
+
+        Args:
+            name: must be a ConstraintName instance set with a value among NORMCOL, NORMLIN (cf. ConstraintName) or it can also be one of the more handy str aliases which are respectively: 'normcol', 'normlin'.
+            num_rows: the number of columns of the constrained matrix.
+            num_cols: the number of columns of the constrained matrix.
+            cons_value: the parameter value of the constraint, it must be a
+            float number that designates the 2-norm imposed to all columns (if
+            name is ConstraintName.NORMCOL) or rows (if
+            name is ConstraintName.NORMLIN).
+
+        Example:
+            >>> from pyfaust.factparams import ConstraintReal
+            >>> from numpy.random import rand
+            >>> from numpy.linalg import norm
+            >>> cons = ConstraintReal('normcol', 10, 10, 2.) # a short for ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 10, 10, 2.)
+            >>> M = rand(10,10)*10
+            >>> norm(M[:,2])
+            17.041462424512272
+            >>> norm(cons.project(M)[:,2])
+            2.0
+
+
+            <b/> See also: ConstraintGeneric.__init__
+        """
+        super(ConstraintReal, self).__init__(name, num_rows, num_cols,
+                                             cons_value, normalized=False, pos=False)
+        if(not isinstance(cons_value, np.float) and not isinstance(cons_value, np.int)):
+            raise TypeError('ConstraintReal must receive a float as cons_value '
+                            'argument.')
+        self._cons_value = float(self._cons_value)
+        if(not isinstance(self._name, ConstraintName) or not self._name.is_real_constraint()):
+            raise TypeError('ConstraintReal first argument must be a '
+                            'ConstraintName with a real type name '
+                            '(name.is_real_constraint() must return True).')
+
+    def project(self, M):
+        """
+        <b/> See: ConstraintGeneric.project
+        """
+        super(ConstraintReal, self).project(M)
+        is_real = np.empty((1,))
+        from pyfaust.fact import _check_fact_mat
+        M = _check_fact_mat('ConstraintReal.project', M, is_real)
+        if is_real:
+            is_float = M.dtype == 'float32'
+            if is_float:
+                return _FaustCorePy.ConstraintRealCoreFlt.project(M, self._name.name, self._num_rows,
+                                                       self._num_cols,
+                                                       self._cons_value,
+                                                       self.normalized, self.pos)
+
+            else:
+                return _FaustCorePy.ConstraintRealCoreDbl.project(M, self._name.name, self._num_rows,
+                                                                  self._num_cols,
+                                                                  self._cons_value,
+                                                                  self.normalized, self.pos)
+        else:
+            return _FaustCorePy.ConstraintRealCoreCplxDbl.project(M, self._name.name, self._num_rows,
+                                                           self._num_cols,
+                                                           self._cons_value,
+                                                           self.normalized, self.pos)
+
 
 class ConstraintList(object):
     """
