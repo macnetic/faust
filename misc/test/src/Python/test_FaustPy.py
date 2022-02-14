@@ -1499,11 +1499,11 @@ class TestFaustFactory(unittest.TestCase):
         verbose = params_struct['verbose'][0,0][0,0]==1
         is_update_way_R2L = params_struct['update_way'][0,0][0,0]==1
         init_lambda = params_struct['init_lambda'][0,0][0,0]
+        # default step_size
         stepsize = params_struct['stepsize'][0,0][0,0]
         factside = params_struct['fact_side'][0,0][0,0] == 1 # ignored
         # for convenience I set the constraints manually and don't take them
         # from mat file, but they are the same
-        # default step_size
         fact0_cons = ConstraintInt(ConstraintName(ConstraintName.SP), 128,
                                    128, 12288)
         fact1_cons = ConstraintInt(ConstraintName(ConstraintName.SP), 128, 128,
@@ -1680,6 +1680,69 @@ class TestFaustFactory(unittest.TestCase):
         for i in range(pM.shape[0]):
             self.assertAlmostEqual(norm(pM[i,:]), k)
 
+
+    def test_toeplitz(self):
+        print("test_toeplitz")
+        M = array([[0.0912995 , 0.94030087, 0.83110585, 0.53118248, 0.93799911],
+                   [0.80432231, 0.63536838, 0.85907982, 0.13178579, 0.33610065],
+                   [0.65570143, 0.80996454, 0.58217456, 0.90521081, 0.69633737],
+                   [0.67242761, 0.04777302, 0.61627327, 0.47974862, 0.06107523],
+                   [0.97367686, 0.27061922, 0.28952798, 0.22093562, 0.56537747]])
+        pM_ref = array([[0.47079371, 0.69141668, 0.55307634, 0.43364156, 0.93799911],
+                        [0.61287393, 0.47079371, 0.69141668, 0.55307634, 0.43364156],
+                        [0.33100081, 0.61287393, 0.47079371, 0.69141668, 0.55307634],
+                        [0.47152341, 0.33100081, 0.61287393, 0.47079371, 0.69141668],
+                        [0.97367686, 0.47152341, 0.33100081, 0.61287393,
+                         0.47079371]])
+        from pyfaust.proj import toeplitz
+        from numpy.random import rand
+        p = toeplitz(M.shape)
+        self.assertTrue(np.allclose(p(M), M))
+
+    def test_hankel(self):
+        print("test_hankel")
+        M = array([[0.0912995 , 0.94030087, 0.83110585, 0.53118248, 0.93799911],
+                   [0.80432231, 0.63536838, 0.85907982, 0.13178579, 0.33610065],
+                   [0.65570143, 0.80996454, 0.58217456, 0.90521081, 0.69633737],
+                   [0.67242761, 0.04777302, 0.61627327, 0.47974862, 0.06107523],
+                   [0.97367686, 0.27061922, 0.28952798, 0.22093562, 0.56537747]])
+        pM_ref = array([[0.0912995 , 0.87231159, 0.70739189, 0.71816361,
+                         0.53468187],
+                        [0.87231159, 0.70739189, 0.71816361, 0.53468187,
+                         0.53205099],
+                        [0.70739189, 0.71816361, 0.53468187, 0.53205099,
+                         0.48853799],
+                        [0.71816361, 0.53468187, 0.53205099, 0.48853799,
+                         0.14100543],
+                        [0.53468187, 0.53205099, 0.48853799, 0.14100543,
+                         0.56537747]])
+        from pyfaust.proj import hankel
+        from numpy.random import rand
+        p = hankel(M.shape)
+        self.assertTrue(np.allclose(p(M), M))
+
+    def test_circ(self):
+        print("test_circ")
+        M = array([[0.0912995 , 0.94030087, 0.83110585, 0.53118248, 0.93799911],
+                   [0.80432231, 0.63536838, 0.85907982, 0.13178579, 0.33610065],
+                   [0.65570143, 0.80996454, 0.58217456, 0.90521081, 0.69633737],
+                   [0.67242761, 0.04777302, 0.61627327, 0.47974862, 0.06107523],
+                   [0.97367686, 0.27061922, 0.28952798, 0.22093562, 0.56537747]])
+        pM_ref = array([[0.47079371, 0.74786872, 0.52045517, 0.37205711,
+                         0.67789897],
+                        [0.67789897, 0.47079371, 0.74786872,
+                         0.52045517, 0.37205711],
+                        [0.37205711, 0.67789897, 0.47079371,
+                         0.74786872, 0.52045517],
+                        [0.52045517, 0.37205711, 0.67789897,
+                         0.47079371, 0.74786872],
+                        [0.74786872, 0.52045517, 0.37205711,
+                         0.67789897, 0.47079371]])
+        from pyfaust.proj import circ
+        from numpy.random import rand
+        p = circ(M.shape)
+        self.assertTrue(np.allclose(p(M), pM_ref))
+
     def test_blockdiag(self):
         print("test_blockdiag")
         from pyfaust.proj import blockdiag
@@ -1722,17 +1785,90 @@ class TestFaustFactory(unittest.TestCase):
                   [ 0.,0.,-5.92900636,-6.51064175]]
         self.assertTrue(np.allclose(p(M), ref_pM))
 
+    def test_proj_id(self):
+        from pyfaust.proj import proj_id
+        from numpy.random import rand
+        M = rand(32, 33)
+        p = proj_id(M.shape)
+        self.assertTrue(np.allclose(p(M), np.eye(M.shape)))
+
+    def test_default_proj_cons_attributes(self):
+        print("Test default normalized/pos attributes of"
+              " pyfaust.proj*/pyfaust.factparams.Constraint*")
+        from pyfaust.proj import (proj_id, toeplitz, hankel, circ, blockdiag,
+                                  supp, const)
+        from pyfaust.factparams import ConstraintMat, ConstraintInt, ConstraintReal
+        shape = (10,11)
+        # Matrix Constraint/projectors
+        c = ConstraintMat('id', shape)
+        p = proj_id(shape)
+        self.assertTrue(c.normalized == False  == p.constraint.normalized and
+                        c.pos == False == p.pos)
+        c = ConstraintMat('toeplitz', shape)
+        p = toeplitz(shape)
+        self.assertTrue(c.normalized == p.constraint.normalized == True and
+                        c.pos == p.constraint.pos == False)
+        c = ConstraintMat('circ', shape)
+        p = circ(shape)
+        self.assertTrue(c.normalized == p.constraint.normalized == True and
+                        c.pos == p.constraint.pos == False)
+        c = ConstraintMat('hankel', shape)
+        p = hankel(shape)
+        self.assertTrue(c.normalized == p.constraint.normalized == True and
+                        c.pos == p.constraint.pos == False)
+        c = ConstraintMat('supp', shape)
+        p = supp(shape)
+        self.assertTrue(c.normalized == p.constraint.normalized == True and
+                        c.pos == p.constraint.pos == False)
+        c = ConstraintMat('const', shape)
+        p = const(shape)
+        self.assertTrue(c.normalized == p.constraint.normalized == False and
+                        c.pos == p.constraint.pos == False)
+        p = blockdiag(shape) # ConstraintMat doesn't handle blockdiag yet
+        self.assertTrue(p.constraint.normalized == True and
+                        p.constraint.pos == False)
+        # Int Constraint/projectors
+        c = ConstraintInt('sp', shape[0], shape[1], 15)
+        p = sp(shape, 15)
+        self.assertTrue(c.normalized == p.constraint.normalized == True and
+                        c.pos == p.constraint.pos == False)
+        c = ConstraintInt('splin', shape[0], shape[1], 2)
+        p = splin(shape, 2)
+        self.assertTrue(c.normalized == p.constraint.normalized == True and
+                        c.pos == p.constraint.pos == False)
+        c = ConstraintInt('spcol', shape[0], shape[1], 2)
+        p = spcol(shape, 2)
+        self.assertTrue(c.normalized == p.constraint.normalized == True and
+                        c.pos == p.constraint.pos == False)
+        c = ConstraintInt('splincol', shape[0], shape[1], 2)
+        p = splincol(shape, 2)
+        self.assertTrue(c.normalized == p.constraint.normalized == True and
+                        c.pos == p.constraint.pos == False)
+        c = ConstraintInt('skperm', shape[0], shape[1], 2)
+        p = skperm(shape, 2)
+        self.assertTrue(c.normalized == p.constraint.normalized == True and
+                        c.pos == p.constraint.pos == False)
+        # Real Constraint/projectors
+        c = ConstraintReal('normlin', shape[0], shape[1], .6)
+        p = normlin(shape, .6)
+        self.assertTrue(c.normalized == p.constraint.normalized == False and
+                        c.pos == p.constraint.pos == False)
+        c = ConstraintReal('normcol', shape[0], shape[1], .6)
+        p = normcol(shape, .6)
+        self.assertTrue(c.normalized == p.constraint.normalized == False and
+                        c.pos == p.constraint.pos == False)
+
     def test_butterfly(self):
         print("test pyfaust.fact.butterfly")
         from pyfaust import wht, dft
         from pyfaust.fact import butterfly
         H = wht(64).toarray()
-        for dir in ['right', 'left']:
-            FH = butterfly(H, dir=dir)
+        for dir in ['right', 'left', 'bbtree']:
+            FH = butterfly(H, type=dir)
             self.assertAlmostEqual((FH-H).norm()/norm(H), 0)
         D = dft(64).toarray()
-        for dir in ['right', 'left']:
-            FD = butterfly(D, dir=dir)
+        for dir in ['right', 'left', 'bbtree']:
+            FD = butterfly(D, type=dir)
             self.assertAlmostEqual((FD-D).norm()/norm(D), 0)
 
     def test_palm4msa_mhtp(self):
