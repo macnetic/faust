@@ -304,6 +304,8 @@ void prepare_fact(const FPP* mat, const unsigned int num_rows, const unsigned in
         }
         else
             handleError("FaustFact", "Invalid constraint.");
+        tmp_cons->set_pos(p->constraints[i]->pos);
+        tmp_cons->set_normalizing(p->constraints[i]->normalizing);
     }
 
 }
@@ -625,6 +627,8 @@ TransformHelper<FPP, DEV>* palm4msa2020_gen(FPP* mat, unsigned int num_rows, uns
         }
         else
             handleError("FaustFact", "Invalid constraint.");
+        tmp_cons->set_pos(constraints[i]->pos);
+        tmp_cons->set_normalizing(constraints[i]->normalizing);
     }
 
     if(MHTP_params.used)
@@ -792,6 +796,8 @@ Faust::TransformHelper<FPP,DEV>* hierarchical2020_gen(FPP* mat, unsigned int num
         }
         else
             handleError("FaustFact", "Invalid constraint.");
+        tmp_cons->set_pos(constraints[i]->pos);
+        tmp_cons->set_normalizing(constraints[i]->normalizing);
     }
 
     for(int i=0;i<num_facts-1;i++)

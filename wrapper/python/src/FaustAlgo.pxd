@@ -23,6 +23,8 @@ cdef extern from "FaustFact.h":
         int name
         unsigned long num_rows
         unsigned long num_cols
+        bool normalizing
+        bool pos
         bool is_int_constraint()
         bool is_real_constraint()
         bool is_mat_constraint()

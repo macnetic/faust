@@ -135,17 +135,17 @@ void Faust::ConstraintFPP<FPP,DEVICE,FPP2>::project(Faust::MatDense<FPP,DEVICE> 
 {
 	// no normalization on the whole matrix for this kind of constraint/prox (normalizing attribute ignored)
 	switch (this->m_constraintName)
-   	{
-      		case CONSTRAINT_NAME_NORMCOL:
-         		Faust::prox_normcol<FPP, FPP2>(mat,m_parameter);
-         	break;
-      		case CONSTRAINT_NAME_NORMLIN:
-         		Faust::prox_normlin<FPP, FPP2>(mat,m_parameter);
-         	break;
-      		default:
-         		handleError(m_className,"project : invalid constraint name");
-         	break;
-   }
+	{
+		case CONSTRAINT_NAME_NORMCOL:
+			Faust::prox_normcol<FPP, FPP2>(mat,m_parameter, normalizing, pos);
+			break;
+		case CONSTRAINT_NAME_NORMLIN:
+			Faust::prox_normlin<FPP, FPP2>(mat,m_parameter, normalizing, pos);
+			break;
+		default:
+			handleError(m_className,"project : invalid constraint name");
+			break;
+	}
 
 }
 
@@ -153,17 +153,17 @@ template<typename FPP,FDevice DEVICE, typename FPP2>
 Faust::MatGeneric<FPP,DEVICE>* Faust::ConstraintFPP<FPP,DEVICE, FPP2>::project_gen(Faust::MatDense<FPP,DEVICE> & mat) const
 {
 	switch (this->m_constraintName)
-   	{
-      		case CONSTRAINT_NAME_NORMCOL:
-         		return Faust::prox_normcol_gen(mat, m_parameter);
-         	break;
-      		case CONSTRAINT_NAME_NORMLIN:
-         		return Faust::prox_normlin_gen(mat, m_parameter);
-         	break;
-      		default:
-         		handleError(m_className,"project : invalid constraint name");
-         	break;
-   }
+	{
+		case CONSTRAINT_NAME_NORMCOL:
+			return Faust::prox_normcol_gen(mat, m_parameter, normalizing, pos);
+			break;
+		case CONSTRAINT_NAME_NORMLIN:
+			return Faust::prox_normlin_gen(mat, m_parameter, normalizing, pos);
+			break;
+		default:
+			handleError(m_className,"project : invalid constraint name");
+			break;
+	}
 }
 
 

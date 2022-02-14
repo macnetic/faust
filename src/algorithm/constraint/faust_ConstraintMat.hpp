@@ -146,25 +146,25 @@ void Faust::ConstraintMat<FPP,DEVICE>::project(Faust::MatDense<FPP,DEVICE> & mat
    {
       case CONSTRAINT_NAME_CONST:
          //mat=m_parameter;
-		 Faust::prox_const(mat, m_parameter, false); // normalizing is ignored for the CONST prox
+		 Faust::prox_const(mat, m_parameter, normalizing, pos);
          break;
       case CONSTRAINT_NAME_SUPP:
-         Faust::prox_supp(mat,m_parameter, normalizing);
+         Faust::prox_supp(mat,m_parameter, normalizing, pos);
          break;
 	  case CONSTRAINT_NAME_TOEPLITZ:
-		 Faust::prox_toeplitz(mat, normalizing);
+		 Faust::prox_toeplitz(mat, normalizing, pos);
 		 break;
 	  case CONSTRAINT_NAME_CIRC:
-		 Faust::prox_circ(mat, normalizing);
+		 Faust::prox_circ(mat, normalizing, pos);
 		 break;
 	  case CONSTRAINT_NAME_HANKEL:
-		 Faust::prox_hankel(mat, normalizing);
+		 Faust::prox_hankel(mat, normalizing, pos);
 		 break;
 	  case CONSTRAINT_NAME_BLKDIAG:
-		 Faust::prox_blockdiag(mat, m_parameter, normalizing);
+		 Faust::prox_blockdiag(mat, m_parameter, normalizing, pos);
 		 break;
 	  case CONSTRAINT_NAME_ID:
-		 Faust::prox_id(mat, false); // normalizing is ignored for the CONST prox
+		 Faust::prox_id(mat, normalizing, pos);
       default:
          handleError(m_className,"project : invalid constraint_name");
          break;
@@ -178,19 +178,19 @@ Faust::MatGeneric<FPP,DEVICE>* Faust::ConstraintMat<FPP,DEVICE>::project_gen(Fau
    {
       case CONSTRAINT_NAME_CONST:
          //mat=m_parameter;
-		return  Faust::prox_const_gen(mat, m_parameter, false); // normalizing is ignored for the CONST prox
+		return  Faust::prox_const_gen(mat, m_parameter, normalizing, pos);
       case CONSTRAINT_NAME_ID:
-		return  Faust::prox_id_gen(mat, false); // normalizing is ignored for the ID prox
+		return  Faust::prox_id_gen(mat, normalizing, pos);
       case CONSTRAINT_NAME_SUPP:
-         return Faust::prox_supp_gen(mat,m_parameter, normalizing);
+         return Faust::prox_supp_gen(mat,m_parameter, normalizing, pos);
 	  case CONSTRAINT_NAME_TOEPLITZ:
-		 return Faust::prox_toeplitz_gen(mat, normalizing);
+		 return Faust::prox_toeplitz_gen(mat, normalizing, pos);
 	  case CONSTRAINT_NAME_CIRC:
-		 return Faust::prox_circ_gen(mat, normalizing);
+		 return Faust::prox_circ_gen(mat, normalizing, pos);
 	  case CONSTRAINT_NAME_HANKEL:
-		 return Faust::prox_hankel_gen(mat, normalizing);
+		 return Faust::prox_hankel_gen(mat, normalizing, pos);
 	  case CONSTRAINT_NAME_BLKDIAG:
-		 return Faust::prox_blockdiag_gen(mat, m_parameter, normalizing);
+		 return Faust::prox_blockdiag_gen(mat, m_parameter, normalizing, pos);
       default:
          handleError(m_className,"project : invalid constraint_name");
          break;

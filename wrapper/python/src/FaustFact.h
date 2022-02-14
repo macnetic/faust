@@ -14,6 +14,9 @@ class PyxConstraintGeneric
         int name;
         unsigned long num_rows;
         unsigned long num_cols;
+        bool normalizing;
+        bool pos;
+        PyxConstraintGeneric(): normalizing(false), pos(false) {}
 
         bool is_int_constraint();
         bool is_real_constraint();

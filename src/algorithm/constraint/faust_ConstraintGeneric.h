@@ -87,17 +87,20 @@ namespace Faust
 		    const faust_constraint_name& constraintName_,
 		    const faust_unsigned_int nbRows_,
 		    const faust_unsigned_int nbCols_,
-			const bool normalizing=true) :
+			const bool normalizing=true,
+			const bool pos=false) :
 		m_constraintName(constraintName_),
 		m_nbRows(nbRows_),
 		m_nbCols(nbCols_),
-		normalizing(normalizing){}
+		normalizing(normalizing),
+		pos(pos){}
 
 	    ConstraintGeneric(const ConstraintGeneric& constraint) :
 		m_constraintName(constraint.m_constraintName),
 		m_nbRows(constraint.m_nbRows),
 		m_nbCols(constraint.m_nbCols),
-		normalizing(constraint.normalizing){}
+		normalizing(constraint.normalizing),
+		pos(constraint.pos){}
 
 
 
@@ -119,6 +122,7 @@ namespace Faust
 	    virtual void set_default_parameter()=0;
 	    virtual void check_constraint_name()const=0;
 		void set_normalizing(const bool normalizing) {this->normalizing = normalizing;}
+		void set_pos(const bool pos) {this->pos = pos;}
 		template<typename FPP, FDevice DEVICE>
 		/*virtual*/ void project(MatDense<FPP,DEVICE> & mat)const;//=0; //template with (pure) virtual not authorized (otherwise it must be templates from class, not function)
 		template<typename FPP, FDevice DEVICE, typename FPP2>
@@ -137,6 +141,8 @@ namespace Faust
 	    const faust_unsigned_int m_nbCols;
 		// \brief if normalizing is true the project function should normalize the result matrix
 		bool normalizing;
+		// \brief if pos is true the matrix negative values are ignored (set to zero before the projection)
+		bool pos;
 
 	private :
 	    static const char * m_className;
