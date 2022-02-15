@@ -45,6 +45,7 @@
 #include <iostream>
 #include <type_traits>
 #include <complex>
+#include <cmath>
 
 // const char * interface_prox_name="prox : ";
 
@@ -559,7 +560,6 @@ void Faust::prox_skperm(Faust::MatDense<FPP, Cpu> & M_, const unsigned int k, co
 		parent.setConstant(-1);
 		visited.setZero();
 		slack.setConstant(inf);
-		//		slack.setConstant(1e-10);
 		int unmatched_vertex = -1;
 
 		for(int v=0; v < size; v++)
@@ -568,15 +568,15 @@ void Faust::prox_skperm(Faust::MatDense<FPP, Cpu> & M_, const unsigned int k, co
 			{
 				q.push(std::make_pair(0,v));
 				visited(0,v) = 1;
-				assert(visited(0,v) == 1);
 			}
 		}
 
 		while(true)
 		{
-			if(q.empty())
+			if(q.empty() || q.size() <= 0)
 			{
-				Real<FPP> delta = inf;
+				q = queue<pair<int,int>>();
+				Real<FPP> delta = INFINITY;//numeric_limits<Real<FPP>>::infinity();
 				for(int side=0;side<2;side++)
 				{
 					for(int vertex=0; vertex < size; vertex++)
@@ -612,6 +612,8 @@ void Faust::prox_skperm(Faust::MatDense<FPP, Cpu> & M_, const unsigned int k, co
 			if(side == 1 && degree(side, vertex) < k)
 			{
 				unmatched_vertex = vertex;
+				if(unmatched_vertex < 0) // simulate python negative index
+					unmatched_vertex == degree.cols()+unmatched_vertex;
 				degree(1, unmatched_vertex) += 1;
 				break;
 			}
@@ -641,12 +643,12 @@ void Faust::prox_skperm(Faust::MatDense<FPP, Cpu> & M_, const unsigned int k, co
 				Real<FPP> p_diff = weight(u) - potential(side, vertex) - potential(1 - side, u);
 				if(std::abs(p_diff) > eps)
 				{
-					if(side == 0 && ! visited(1 - side, u) && (p_diff) > 0 && (p_diff) < (slack(1-side, u)))
+					if(side == 0 && ! visited(1 - side, u) && p_diff > 0 && p_diff < (slack(1-side, u)))
 					{
 						slack(1, u) = p_diff;
 						parent(1, u) = vertex;
 					}
-					if(side == 1 && ! visited(1 - side, u) && (p_diff) < 0 && - (p_diff) < (slack(1-side, u)))
+					if(side == 1 && ! visited(1 - side, u) && p_diff < 0 && - p_diff < (slack(1-side, u)))
 					{
 						slack(0, u) = - p_diff;
 						parent(0, u) = vertex;
@@ -670,7 +672,11 @@ void Faust::prox_skperm(Faust::MatDense<FPP, Cpu> & M_, const unsigned int k, co
 
 		while(true)
 		{
+			if(v < 0)
+				v = parent.cols()+v;
 			auto u = parent(1, v);
+			if(u < 0)
+				u = parent.cols()+u;
 			auto p = parent(0, u);
 			matching(u, v) = 1;
 			if(p == -1)
