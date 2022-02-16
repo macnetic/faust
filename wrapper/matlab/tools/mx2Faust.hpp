@@ -560,6 +560,7 @@ template<typename FPP, typename FPP2>
 void getConstraint(std::vector<const Faust::ConstraintGeneric*> & consS,mxArray* mxCons)
 {
 	mwSize bufCharLen,nbRowCons,nbColCons,nb_params, param_sz;
+	bool normalized, pos;
 	int status;
 	char * consName;
 	double paramCons;
@@ -567,8 +568,8 @@ void getConstraint(std::vector<const Faust::ConstraintGeneric*> & consS,mxArray*
 	if (!mxIsCell(mxCons))
 		mexErrMsgTxt("tools_mex.h : getConstraint : constraint must be a cell-array. ");
 	nb_params = mxGetNumberOfElements(mxCons);
-	if (nb_params < 4 || nb_params > 5)
-		mexErrMsgTxt("mx2Faust.hpp: getConstraint : size of constraint must be 4 or 5. ");
+	if (nb_params < 6 || nb_params > 7)
+		mexErrMsgTxt("mx2Faust.hpp: getConstraint : size of constraint must be 6 or 7. ");
 
 //	mexPrintf("getConstraint() nb_params=%d\n", nb_params);
 	mxConsParams=mxGetCell(mxCons,0);
@@ -588,11 +589,13 @@ void getConstraint(std::vector<const Faust::ConstraintGeneric*> & consS,mxArray*
 	nbRowCons   = (int) mxGetScalar(mxConsParams);
 	mxConsParams=mxGetCell(mxCons,3);
 	nbColCons = (int) mxGetScalar(mxConsParams);
+	normalized = (bool) mxGetScalar(mxGetCell(mxCons, 4));
+	pos = (bool) mxGetScalar(mxGetCell(mxCons, 5));
 
 	int const_type = get_type_constraint(consName);
 	faust_constraint_name consNameType=get_equivalent_constraint(consName);
-	if(const_type != 2 && nb_params != 4)
-		mexErrMsgTxt("mx2Faust.hpp: getConstraint for this constraint type (non-matrix) must be 4.");
+	if(const_type != 2 && nb_params != 6)
+		mexErrMsgTxt("mx2Faust.hpp: getConstraint for this constraint type (non-matrix) must be 6.");
 	switch(const_type)
 	{
 		case 0:
@@ -624,6 +627,8 @@ void getConstraint(std::vector<const Faust::ConstraintGeneric*> & consS,mxArray*
 			mexErrMsgTxt("Unknown constraint name ");
 			break;
 	}
+	const_cast<Faust::ConstraintGeneric*>(*(consS.end()-1))->set_normalizing(normalized);
+	const_cast<Faust::ConstraintGeneric*>(*(consS.end()-1))->set_pos(pos);
 
 	mxFree(consName); // deallocate even if the buf is in matlab managed memory
 	// the documentation advise to free managed buf in an opt. goal

@@ -108,6 +108,8 @@ classdef ParamsPalm4MSA < matfaust.factparams.ParamsFact
 				cur_cell{2} = this.constraints{i}.param;
 				cur_cell{3} = this.constraints{i}.num_rows;
 				cur_cell{4} = this.constraints{i}.num_cols;
+				cur_cell{5} = this.constraints{i}.normalized;
+				cur_cell{6} = this.constraints{i}.pos;
 				mex_constraints{i} = cur_cell;
 			end
 			if(iscell(this.init_facts) && strcmp(this.init_facts{1}, 'default_init_facts'))
