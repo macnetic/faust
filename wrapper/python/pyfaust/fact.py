@@ -553,21 +553,23 @@ def palm4msa(M, p, ret_lambda=False, backend=2016, on_gpu=False):
         if ret_lambda == True then the function returns a tuple (Faust, lambda).
 
     Examples:
-    >>> from pyfaust.fact import palm4msa
-    >>> from pyfaust.factparams import ParamsPalm4MSA, ConstraintList, StoppingCriterion
-    >>> import numpy as np
-    >>> M = np.random.rand(500, 32)
-    >>> cons = ConstraintList('splin', 5, 500, 32, 'normcol', 1.0, 32, 32)
-    >>> # or alternatively using pyfaust.proj
-    >>> # from pyfaust.proj import splin, normcol
-    >>> # cons = [ splin((500,32), 5), normcol((32,32), 1.0)]
-    >>> stop_crit = StoppingCriterion(num_its=200)
-    >>> param = ParamsPalm4MSA(cons, stop_crit)
-    >>> F = palm4msa(M, param)
-    >>> F
-    Faust size 500x32, density 0.22025, nnz_sum 3524, 2 factor(s):<br/>
-    FACTOR 0 (real) SPARSE, size 500x32, density 0.15625, nnz 2500<br/>
-    FACTOR 1 (real) SPARSE, size 32x32, density 1, nnz 1024<br/>
+        >>> from pyfaust.fact import palm4msa
+        >>> from pyfaust.factparams import ParamsPalm4MSA, ConstraintList, StoppingCriterion
+        >>> import numpy as np
+        >>> M = np.random.rand(500, 32)
+        >>> cons = ConstraintList('splin', 5, 500, 32, 'normcol', 1.0, 32, 32)
+        >>> # or alternatively using pyfaust.proj
+        >>> # from pyfaust.proj import splin, normcol
+        >>> # cons = [ splin((500,32), 5), normcol((32,32), 1.0)]
+        >>> stop_crit = StoppingCriterion(num_its=200)
+        >>> param = ParamsPalm4MSA(cons, stop_crit)
+        >>> F = palm4msa(M, param)
+        >>> F
+        Faust size 500x32, density 0.22025, nnz_sum 3524, 2 factor(s):<br/>
+        FACTOR 0 (real) SPARSE, size 500x32, density 0.15625, nnz 2500<br/>
+        FACTOR 1 (real) SPARSE, size 32x32, density 1, nnz 1024<br/>
+
+    See also pyfaust.factparams.ParamsPalm4msaWHT to factorize a Hadamard matrix using the SKPERM projector.
     """
     if(not isinstance(p, pyfaust.factparams.ParamsPalm4MSA)):
         raise TypeError("p must be a ParamsPalm4MSA object.")

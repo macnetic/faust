@@ -1927,24 +1927,64 @@ class ParamsPalm4MSAFGFT(ParamsPalm4MSA):
         self.init_D = _init_init_D(init_D, self.constraints[0]._num_rows)
 
 def _init_init_D(init_D, dim_sz):
-    """
-        Utility function for ParamsHierarchicalFGFT, ParamsPalm4MSAFGFT
-    """
-    def _check_init_D_is_consistent(init_D):
-        if(not isinstance(init_D, np.ndarray)):
-            raise ValueError("init_D must be a numpy ndarray")
-        if(init_D.ndim != 1):
-            raise ValueError("init_D must be a vector.")
-        if(init_D.shape[0] != dim_sz):
-            raise ValueError("init_D must have the same size as first "
-                             "constraint's number of rows")
+	"""
+	Utility function for ParamsHierarchicalFGFT, ParamsPalm4MSAFGFT
+	"""
+	def _check_init_D_is_consistent(init_D):
+		if(not isinstance(init_D, np.ndarray)):
+			raise ValueError("init_D must be a numpy ndarray")
+		if(init_D.ndim != 1):
+			raise ValueError("init_D must be a vector.")
+		if(init_D.shape[0] != dim_sz):
+			raise ValueError("init_D must have the same size as first "
+					"constraint's number of rows")
 
-    if(not isinstance(init_D, np.ndarray) and init_D == None):
-        init_D = np.ones(dim_sz)
-    _check_init_D_is_consistent(init_D)
-    return init_D
+	if(not isinstance(init_D, np.ndarray) and init_D == None):
+		init_D = np.ones(dim_sz)
+		_check_init_D_is_consistent(init_D)
+		return init_D
 
+class ParamsPalm4msaWHT(ParamsPalm4MSA):
+	"""
+	This class is a simple parameterization of PALM4MSA to factorize a Hadamard
+	matrix using the pyfaust.proj.skperm proximity operator.
 
+    Example:
+        >>> from pyfaust.factparams import ParamsPalm4msaWHT
+        >>> from pyfaust.fact import palm4msa
+        >>> from pyfaust import wht
+        >>> from numpy.linalg import norm
+        >>> H = wht(128).toarray()
+        >>> p = ParamsPalm4msaWHT(H.shape[0])
+        >>> F = palm4msa(H, p)
+        >>> err = (F-H).norm()/norm(H)
+        >>> print("Approximation error:", err)
+        Approximation error: 1.112389296475859e-16
+
+    Reference:
+        [1] Quoc-Tung Le, Rémi Gribonval. Structured Support Exploration For
+        Multilayer Sparse Matrix Fac- torization. ICASSP 2021 - IEEE International
+        Conference on Acoustics, Speech and Signal Processing, Jun 2021, Toronto,
+        Ontario, Canada. pp.1-5 <a href="https://hal.inria.fr/hal-03132013/document">hal-03132013</a>.
+
+    See also pyfaust.fact.palm4msa
+	"""
+	def __init__(self, matrix_size):
+		from pyfaust.proj import skperm
+		d = matrix_size
+		n = int(np.log2(d))
+
+		# set the proximity operators
+		fac_projs = []  # for the main factors
+
+		# skperm is used for all the factors
+		for i in range(n):
+			fac_projs += [skperm((d, d), 2, normalized=False, pos=False)]
+
+		# the number of iterations of PALM4MSA calls
+		stop_crit = StoppingCriterion(num_its=30)
+
+		super(ParamsPalm4msaWHT, self).__init__(fac_projs, stop_crit)
 
 
 class ParamsFactFactory:

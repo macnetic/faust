@@ -573,6 +573,13 @@ class skperm(proj_gen):
 	 [-0.0083095  -3.38725936  0.          0.        ]
 	 [ 0.         -1.71787215  0.         -3.71752454]
 	 [ 0.          0.         -5.92900636 -6.51064175]]
+
+    Reference:
+        [1] Quoc-Tung Le, Rémi Gribonval. Structured Support Exploration For
+        Multilayer Sparse Matrix Fac- torization. ICASSP 2021 - IEEE International
+        Conference on Acoustics, Speech and Signal Processing, Jun 2021, Toronto,
+        Ontario, Canada. pp.1-5 <a href="https://hal.inria.fr/hal-03132013/document">hal-03132013</a>.
+
     """
     def __init__(self, shape, k, normalized=False, pos=False):
         """
