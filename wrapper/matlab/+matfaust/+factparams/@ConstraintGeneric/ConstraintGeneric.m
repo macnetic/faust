@@ -30,9 +30,8 @@ classdef (Abstract) ConstraintGeneric
 			constraint.param = param;
 			% optional key-value arguments
 			argc = length(varargin);
-			constraint.normalized = false;
 			constraint.default_normalized = true;
-			constraint.pos = false;
+			[constraint.normalized, constraint.pos] = constraint.get_default_parameters();
 			if(argc > 0)
 				for i=1:argc
 					switch(varargin{i})

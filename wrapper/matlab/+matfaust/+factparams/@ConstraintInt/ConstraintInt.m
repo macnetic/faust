@@ -18,5 +18,12 @@ classdef ConstraintInt < matfaust.factparams.ConstraintGeneric
 					'(name.is_int_constraint() must return True).'])
 			end
 		end
+
+		function [normalized, pos] = get_default_parameters(self)
+			% all int constraints have the same default parameters
+			normalized = true;
+			pos = false;
+		end
+
 	end
 end

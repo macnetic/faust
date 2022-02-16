@@ -15,8 +15,8 @@ classdef skperm < matfaust.proj.proj_gen
 		%>
 		%> @param shape: vector of size 2, to define the size of the input matrix.
 		%> @param k: the sparsity parameter.
-		%> @param 'normalized', true: normalizes the projection image according to its Frobenius norm.
-		%> @param 'normalized', false: (the default) no normalization.
+		%> @param 'normalized', true: (the default) normalizes the projection image according to its Frobenius norm.
+		%> @param 'normalized', false: no normalization.
 		%> @param 'pos', true: skips the negative values (replaced by zero) of the input matrix.
 		%> @param 'pos', false: (the default) negative values are not skipped.
 		%> @retval proj the skperm projector.

@@ -15,8 +15,8 @@ classdef ConstraintMat < matfaust.factparams.ConstraintGeneric
 				param = real(param);
 			end
 			if(isa(name, 'matfaust.factparams.ConstraintName') && name.name == matfaust.factparams.ConstraintName.BLKDIAG || isstr(name) && matfaust.factparams.ConstraintName.str2name_int(name) == matfaust.factparams.ConstraintName.BLKDIAG)
-				nrows = param(end,1);
-				ncols = param(end,2);
+				nrows = param(end, 1);
+				ncols = param(end, 2);
 			else
 				nrows = size(param, 1);
 				ncols = size(param, 2);
@@ -25,11 +25,33 @@ classdef ConstraintMat < matfaust.factparams.ConstraintGeneric
 			if(~ isa(constraint.name, 'matfaust.factparams.ConstraintName') || ~ constraint.name.is_mat_constraint())
 				error('ConstraintMat first argument must be a ConstraintName with a matrix type name.')
 			end
-			if(constraint.default_normalized && constraint.name.name == matfaust.factparams.ConstraintName.CONST)
-				% for CONST proj the default is to not normalize
-				constraint.normalized = false;
-				% for SUPP it is true (which is handled by ConstraintGeneric parent
+
+		end
+
+		function [normalized, pos] = get_default_parameters(self)
+
+			import matfaust.factparams.ConstraintName
+			name = self.name.name;
+			switch(name)
+				%TODO: add ID
+				%case ConstraintName.ID:
+				%       normalized = false;
+				%       pos = false;
+				case {ConstraintName.TOEPLITZ,
+					ConstraintName.CIRC,
+					ConstraintName.HANKEL,
+					ConstraintName.SUPP,
+					ConstraintName.BLKDIAG}
+					normalized = true;
+					pos = false;
+				case ConstraintName.CONST
+					normalized = false;
+					pos = false;
+				otherwise
+					error('Invalid ConstraintName')
+				end
 			end
 		end
+
 	end
 end
