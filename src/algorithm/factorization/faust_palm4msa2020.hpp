@@ -247,14 +247,14 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 			cur_fac = S.get_gen_fact_nonconst(f_id);
 			if(mhtp_params.used && i%mhtp_params.palm4msa_period == 0)
 			{
-				perform_MHTP(mhtp_params, A, A_H, S, f_id, pL, pR, packing_RL,
+				perform_MHTP(i, mhtp_params, A, A_H, S, f_id, is_update_way_R2L, pL, pR, packing_RL,
 						is_verbose, *constraints[f_id], norm2_max_iter, norm2_threshold,
 						norm2_duration,
 						fgrad_duration,
 						sc, error, factors_format, prod_mod, c, lambda);
 			}
 			else
-				update_fact(cur_fac, f_id, A, S, pL, pR, packing_RL,
+				update_fact(i, cur_fac, f_id, is_update_way_R2L, A, S, pL, pR, packing_RL,
 						is_verbose, *constraints[f_id], norm2_max_iter, norm2_threshold,
 						norm2_duration,
 						fgrad_duration,
@@ -522,8 +522,10 @@ template<typename FPP>
 
 	template<typename FPP, FDevice DEVICE>
 void Faust::update_fact(
+		int it,
 		Faust::MatGeneric<FPP,DEVICE>* cur_fac,
 		int f_id,
+		bool is_update_way_R2L,
 		const Faust::MatDense<FPP,DEVICE>& A,
 		Faust::TransformHelper<FPP,DEVICE>& S,
 		std::vector<TransformHelper<FPP,DEVICE>*> &pL,
@@ -591,7 +593,8 @@ void Faust::update_fact(
 			std::cout << "S id:" << f_id << std::endl;
 			throw std::runtime_error("2-norm computation error: R or L 2-norm is NaN.");
 		}
-		if(nR == 0 || nL == 0)
+		if(nR == 0 && (it > 0 || ! is_update_way_R2L) || nL == 0 && (it > 0 || is_update_way_R2L)) // if it's the first iteration it can
+																									// be normal to have nR == 0 or nL == 0 depending on the sense of update (is_update_way_R2L) because the first factor to update is initialized to zero (see palm4msa2)
 		{
 			if(pR[f_id]->size() > 0)
 				pR[f_id]->save_mat_file("R.mat");

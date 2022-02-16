@@ -36,27 +36,29 @@ namespace Faust
 	}
 
 	template<typename FPP, FDevice DEVICE>
-		void perform_MHTP(
-				const MHTPParams<Real<FPP>>& mhtp_params,
-				const Faust::MatDense<FPP,DEVICE>& A,
-				const Faust::MatDense<FPP,DEVICE>& A_H,
-				Faust::TransformHelper<FPP,DEVICE>& S,
-				const int f_id,
-				std::vector<TransformHelper<FPP,DEVICE>*> &pL,
-				std::vector<TransformHelper<FPP,DEVICE>*> &pR,
-				const bool packing_RL,
-				const bool is_verbose,
-				const Faust::ConstraintGeneric &constraint,
-				const int norm2_max_iter,
-				const Real<FPP>& norm2_threshold,
-				std::chrono::duration<double>& norm2_duration,
-				std::chrono::duration<double>& fgrad_duration,
-				const StoppingCriterion<Real<FPP>>& sc,
-				Real<FPP> &error,
-				const FactorsFormat factors_format,
-				const int prod_mod,
-				Real<FPP> &c,
-				Real<FPP>& lambda)
+        void perform_MHTP(
+                const int it,
+                const MHTPParams<Real<FPP>>& mhtp_params,
+                const Faust::MatDense<FPP,DEVICE>& A,
+                const Faust::MatDense<FPP,DEVICE>& A_H,
+                Faust::TransformHelper<FPP,DEVICE>& S,
+                const int f_id,
+                const bool is_update_way_R2L,
+                std::vector<TransformHelper<FPP,DEVICE>*> &pL,
+                std::vector<TransformHelper<FPP,DEVICE>*> &pR,
+                const bool packing_RL,
+                const bool is_verbose,
+                const Faust::ConstraintGeneric &constraint,
+                const int norm2_max_iter,
+                const Real<FPP>& norm2_threshold,
+                std::chrono::duration<double>& norm2_duration,
+                std::chrono::duration<double>& fgrad_duration,
+                const StoppingCriterion<Real<FPP>>& sc,
+                Real<FPP> &error,
+                const FactorsFormat factors_format,
+                const int prod_mod,
+                Real<FPP> &c,
+                Real<FPP>& lambda)
 				{
 
 					Faust::MatGeneric<FPP,DEVICE>* cur_fac;
@@ -68,7 +70,7 @@ namespace Faust
 					while(mhtp_params.sc.do_continue(j)) // TODO: what about the error stop criterion?
 					{
 						cur_fac = S.get_gen_fact_nonconst(f_id);
-						update_fact(cur_fac, f_id, A, S, pL, pR, packing_RL,
+						update_fact(it, cur_fac, f_id, is_update_way_R2L, A, S, pL, pR, packing_RL,
 								is_verbose, constraint,
 								norm2_max_iter, norm2_threshold, norm2_duration, fgrad_duration,
 								mhtp_params.constant_step_size, mhtp_params.step_size,

@@ -105,10 +105,17 @@ namespace Faust
 	template<typename FPP, FDevice DEVICE>
 		void update_lambda(Faust::TransformHelper<FPP,DEVICE>& S, std::vector<TransformHelper<FPP,DEVICE>*> &pL, std::vector<TransformHelper<FPP,DEVICE>*>& pR, const MatDense<FPP, DEVICE> &A_H, Real<FPP>& lambda, bool no_lambda_error=false);
 
+	/**
+	 *
+     * \param it: PALM4MSA iteration
+	 *
+	 */
 	template<typename FPP, FDevice DEVICE>
 		void update_fact(
+				int it,
 				Faust::MatGeneric<FPP,DEVICE>* cur_fac,
 				int f_id,
+				bool is_update_way_R2L,
 				const Faust::MatDense<FPP,DEVICE>& A,
 				Faust::TransformHelper<FPP,DEVICE>& S,
 				std::vector<TransformHelper<FPP,DEVICE>*> &pL,
