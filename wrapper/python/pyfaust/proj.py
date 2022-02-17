@@ -144,7 +144,7 @@ class sp(proj_gen):
         >>> from pyfaust.proj import sp
         >>> from numpy.random import rand
         >>> M = rand(5,5)
-        >>> p = sp(M.shape, 3)
+        >>> p = sp(M.shape, 3, normalized=False)
         >>> p(M)
         array([[ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ],
                [ 0.        ,  0.        ,  0.        ,  0.        ,  0.
@@ -158,7 +158,7 @@ class sp(proj_gen):
 
     """
 
-    def __init__(self, shape, k, normalized=False, pos=False):
+    def __init__(self, shape, k, normalized=True, pos=False):
         """
 
         Args:
@@ -183,7 +183,7 @@ class splin(proj_gen):
         >>> from pyfaust.proj import splin
         >>> from numpy.random import rand
         >>> M = rand(5,5)
-        >>> p = sp(M.shape, 3)
+        >>> p = sp(M.shape, 3, normalized=False)
         >>> p(M)
         array([[ 0.15336612,  0.25445984,  0.        ,  0.        ,0.25009889],
                [ 0.        ,  0.        ,  0.22222948,  0.37763972, 0.        ],
@@ -192,7 +192,7 @@ class splin(proj_gen):
                [ 0.        ,  0.31022779,  0.        ,  0.2479237 , 0.        ]])
 
     """
-    def __init__(self, shape, k, normalized=False, pos=False):
+    def __init__(self, shape, k, normalized=True, pos=False):
         """
         Args:
             k: the number of nonzeros of the projection image.
@@ -211,7 +211,7 @@ class spcol(proj_gen):
         >>> from pyfaust.proj import spcol
         >>> from numpy.random import rand
         >>> M = rand(5,5)
-        >>> p = spcol(M.shape, 3)
+        >>> p = spcol(M.shape, 3, normalized=False)
         >>> p(M)
         array([[ 0.15336612,  0.25445984,  0.        ,  0.        ,0.25009889],
                [ 0.        ,  0.        ,  0.22222948,  0.37763972, 0.        ],
@@ -221,7 +221,7 @@ class spcol(proj_gen):
 
 
     """
-    def __init__(self, shape, k, normalized=False, pos=False):
+    def __init__(self, shape, k, normalized=True, pos=False):
         """
 
         Args:
@@ -243,9 +243,9 @@ class splincol(proj_gen):
         >>> from pyfaust.proj import splincol
         >>> from numpy.random import rand
         >>> M = rand(5,5)
-        >>> p1 = splin(M.shape, 3)
-        >>> p2 = spcol(M.shape, 3)
-        >>> p = splincol(M.shape, 3)
+        >>> p1 = splin(M.shape, 3, normalized=False)
+        >>> p2 = spcol(M.shape, 3, normalized=False)
+        >>> p = splincol(M.shape, 3, normalized=False)
         >>> p1(M)
         array([[ 0.        ,  0.73732727,  0.76317487,  0.        , 0.95740247],
                [ 0.45374662,  0.7458585 ,  0.        ,  0.        , 0.25951363],
@@ -278,7 +278,7 @@ class splincol(proj_gen):
         >>> (p1M+p2M == p(M)).all()
         True
     """
-    def __init__(self, shape, k, normalized=False, pos=False):
+    def __init__(self, shape, k, normalized=True, pos=False):
         """
 
         Args:
@@ -567,7 +567,7 @@ class skperm(proj_gen):
 	>>>             [-0.0083095,  -3.38725936, -0.78484126, -0.4883618 ],
 	>>>             [-1.48942563, -1.71787215, -0.84000212, -3.71752454],
 	>>>             [-0.88957883, -0.19107863, -5.92900636, -6.51064175]])
-	>>> p = skperm(M.shape, k)
+	>>> p = skperm(M.shape, k, normalized=False)
 	>>> print(p(M))
 	[[-0.04440802  0.         -0.02557815  0.        ]
 	 [-0.0083095  -3.38725936  0.          0.        ]
@@ -581,7 +581,7 @@ class skperm(proj_gen):
         Ontario, Canada. pp.1-5 <a href="https://hal.inria.fr/hal-03132013/document">hal-03132013</a>.
 
     """
-    def __init__(self, shape, k, normalized=False, pos=False):
+    def __init__(self, shape, k, normalized=True, pos=False):
         """
         Projector constructor.
 
