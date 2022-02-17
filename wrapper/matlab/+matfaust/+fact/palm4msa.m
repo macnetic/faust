@@ -32,6 +32,7 @@
 %> - FACTOR 1 (real) DENSE, size 32x32, density 1, nnz 1024
 %>
 %>
+%> See also matfaust.factparams.ParamsPalm4msaWHT to factorize a Hadamard matrix using the SKPERM projector.
 %==========================================================================================
 function  [F,lambda] = palm4msa(M, p, varargin)
 	import matfaust.Faust
