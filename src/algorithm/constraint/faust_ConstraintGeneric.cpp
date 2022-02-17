@@ -171,6 +171,8 @@ void Faust::ConstraintGeneric::Display() const
 	std::cout << this->get_constraint_name();
 	std::cout<<" nb_row: "<< this->get_rows();
 	std::cout<<" nb_col: "<< this->get_cols();
+	std::cout<<" normalized :"<< get_normalizing() << std::endl;
+	std::cout<<" pos :"<< get_pos() << std::endl;
 }
 
 const char * Faust::ConstraintGeneric::m_className="Faust::ConstraintGeneric::";

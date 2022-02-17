@@ -122,7 +122,10 @@ namespace Faust
 	    virtual void set_default_parameter()=0;
 	    virtual void check_constraint_name()const=0;
 		void set_normalizing(const bool normalizing) {this->normalizing = normalizing;}
+		bool get_normalizing() const {return normalizing;}
 		void set_pos(const bool pos) {this->pos = pos;}
+		bool get_pos() const {return pos;};
+		faust_constraint_name get_name() const {return m_constraintName;};
 		template<typename FPP, FDevice DEVICE>
 		/*virtual*/ void project(MatDense<FPP,DEVICE> & mat)const;//=0; //template with (pure) virtual not authorized (otherwise it must be templates from class, not function)
 		template<typename FPP, FDevice DEVICE, typename FPP2>
