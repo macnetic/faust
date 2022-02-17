@@ -141,24 +141,26 @@ classdef ParamsHierarchical < matfaust.factparams.ParamsFact
 			mex_constraints = cell(2, this.num_facts-1);
 			M_is_single = strcmp('single', class(M));
 			is_single = @(mat) strcmp('single', class(mat));
-			%mex_fact_constraints = cell(1, this.num_facts-1)
+			% main factors constraints
 			for i=1:this.num_facts-1
 				cur_cell = cell(1, 4);
 				cur_cell{1} = this.constraints{i}.name.conv2str();
 				cur_cell{2} = this.constraints{i}.param;
 				cur_cell{3} = this.constraints{i}.num_rows;
 				cur_cell{4} = this.constraints{i}.num_cols;
-				%mex_fact_constraints{i} = cur_cell;
+				cur_cell{5} = this.constraints{i}.normalized;
+				cur_cell{6} = this.constraints{i}.pos;
 				mex_constraints{1,i} = cur_cell;
 			end
-			%mex_residuum_constraints = cell(1, this.num_facts-1)
+			% residual factors constraints
 			for i=1:this.num_facts-1
 				cur_cell = cell(1, 4);
 				cur_cell{1} = this.constraints{i+this.num_facts-1}.name.conv2str();
 				cur_cell{2} = this.constraints{i+this.num_facts-1}.param;
 				cur_cell{3} = this.constraints{i+this.num_facts-1}.num_rows;
 				cur_cell{4} = this.constraints{i+this.num_facts-1}.num_cols;
-				%mex_residuum_constraints{i} = cur_cell;
+				cur_cell{5} = this.constraints{i+this.num_facts-1}.normalized;
+				cur_cell{6} = this.constraints{i+this.num_facts-1}.pos;
 				mex_constraints{2,i} = cur_cell;
 			end
 			% verify ConstraintMat type consistency with the factorized matrix
