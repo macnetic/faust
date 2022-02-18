@@ -86,25 +86,6 @@ namespace Faust
 
         public:
 
-        Params(
-            const faust_unsigned_int nbRow,
-            const faust_unsigned_int nbCol, 
-            const unsigned int nbFact_,
-            const std::vector<const ConstraintGeneric*> & cons_,
-            const std::vector<MatDense<FPP,DEVICE> >& init_fact_,
-            const StoppingCriterion<FPP2>& stop_crit_2facts_ = StoppingCriterion<FPP2>(defaultNiter1),
-            const StoppingCriterion<FPP2>& stop_crit_global_  = StoppingCriterion<FPP2>(defaultNiter2),
-            const FPP residuum_decrease_speed = defaultDecreaseSpeed,
-            const FPP residuum_prcent = defaultResiduumPercent,
-            const bool isVerbose_ = defaultVerbosity ,
-            const bool isUpdateWayR2L_ = defaultUpdateWayR2L ,
-            const bool isFactSideLeft_ = defaultFactSideLeft ,
-            const FPP2 init_lambda_ = defaultLambda ,
-            const bool constant_step_size_ = defaultConstantStepSize,
-            const FPP2 step_size_ = defaultStepSize,
-			const GradientCalcOptMode gradCalcOptMode = defaultGradCalcOptMode);
-
-
         /*!
         *   \brief Params constructor
         *   \param data : MatDense<FPP,DEVICE> to hierarchically factorize
@@ -164,11 +145,9 @@ namespace Faust
 
         public:
         // Required members
-        
-	// data is now independent from the params class,
-        //MatDense<FPP,DEVICE> data; 
-	faust_unsigned_int m_nbRow; // number of row of the matrix to be factorized
-	faust_unsigned_int m_nbCol; // number of columns of the matrix to be factorized
+
+        faust_unsigned_int m_nbRow; // number of row of the matrix to be factorized
+        faust_unsigned_int m_nbCol; // number of columns of the matrix to be factorized
 
         faust_unsigned_int m_nbFact; // number of factors
         std::vector<std::vector<const ConstraintGeneric*>> cons; // vector of constraints
@@ -183,16 +162,16 @@ namespace Faust
         FPP2 init_lambda;
         bool isConstantStepSize;
         FPP2 step_size;
-		GradientCalcOptMode gradCalcOptMode;
+        GradientCalcOptMode gradCalcOptMode;
         Real<FPP> norm2_threshold;
         unsigned int norm2_max_iter;
-		FactorsFormat factors_format;
-		bool packing_RL;
-		bool use_MHTP;
-		// \brief this parameter is to disable the normalization of prox out matrices
-		bool no_normalization;
-		bool no_lambda;
-		StoppingCriterion<Real<FPP>> stop_crit_MHTP;
+        FactorsFormat factors_format;
+        bool packing_RL;
+        bool use_MHTP;
+        // \brief this parameter is to disable the normalization of prox out matrices
+        bool no_normalization;
+        bool no_lambda;
+        StoppingCriterion<Real<FPP>> stop_crit_MHTP;
 
         //default value
         static const int defaultNiter1;
@@ -203,29 +182,15 @@ namespace Faust
         static const FPP2 defaultLambda;
         static const bool defaultConstantStepSize;
         static const FPP2 defaultStepSize;
-        static const FPP defaultDecreaseSpeed;
-        static const FPP defaultResiduumPercent;
-		static const GradientCalcOptMode defaultGradCalcOptMode;
-		static const FactorsFormat defaultFactorsFormat;
-		static const bool defaultPackingRL;
-		static const bool defaultUseMHTP;
-		static const bool defaultNoNormalization;
-		static const bool defaultNoLambda;
+        static const GradientCalcOptMode defaultGradCalcOptMode;
+        static const FactorsFormat defaultFactorsFormat;
+        static const bool defaultPackingRL;
+        static const bool defaultUseMHTP;
+        static const bool defaultNoNormalization;
+        static const bool defaultNoLambda;
 
-        //const int nb_rows; // number of rows of the first factor
-        //const int nb_cols; // number of columns of the last factor
-
-        /*const int nb_it;   // number of iterations
-        // if isStoppingCriterionError then criterion is error else criterion is number of iteration
-        bool  isStoppingCriterionError;
-        const faust_real errorThreshold;
-        // only used as stopping criterion, if isStoppingCriterionError, when error is still greater than
-        int maxIteration;*/
-
-        // modif AL AL ???
-        //static const char* m_className;
         private :
-            static const char* m_className;
+        static const char* m_className;
 
     };
 
