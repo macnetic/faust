@@ -709,7 +709,7 @@ def _palm4msa_fgft(Lap, p, ret_lambda=False):
     is_real = np.empty((1,))
     Lap = _check_fact_mat('_palm4msa_fgft()', Lap, is_real)
     if((Lap.T != Lap).any() or Lap.shape[0] != Lap.shape[1]):
-        raise ValueError("Laplacian matrix must be square and symmetric.")
+        raise ValueError("Laplacian matrix must be symmetric.")
     if(not p.is_mat_consistent(Lap)):
         raise ValueError("M's number of columns must be consistent with "
                          "the last residual constraint defined in p. "
@@ -1282,7 +1282,7 @@ def fgft_palm(U, Lap, p, init_D=None, ret_lambda=False, ret_params=False):
 
 
     """
-    from pyfaust.factparams import _init_init_D
+    from pyfaust.factparams import ParamsPalm4MSAFGFT
 
     is_real = np.empty((1,))
     p, M = _prepare_hierarchical_fact(U, p, "fgft_palm", ret_lambda,
@@ -1290,7 +1290,7 @@ def fgft_palm(U, Lap, p, init_D=None, ret_lambda=False, ret_params=False):
     if(init_D.dtype != Lap.dtype or Lap.dtype != U.dtype or U.dtype != init_D.dtype):
         raise ValueError("All the numpy arrays must be of the same dtype.")
 
-    init_D = _init_init_D(init_D, U.shape[0])
+    init_D = ParamsPalm4MSAFGFT._set_init_D(init_D, U.shape[0])
     if is_real:
         core_obj, _lambda, D = _FaustCorePy.FaustAlgoGenDbl.fact_hierarchical_fft(U, Lap, p,
                                                                             init_D)

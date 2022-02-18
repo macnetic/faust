@@ -1924,25 +1924,28 @@ class ParamsPalm4MSAFGFT(ParamsPalm4MSA):
                                                  init_facts, is_update_way_R2L,
                                                  init_lambda, step_size,
                                                  True, is_verbose)
-        self.init_D = _init_init_D(init_D, self.constraints[0]._num_rows)
+        self.init_D = ParamsPalm4MSAFGFT._set_init_D(init_D, self.constraints[0]._num_rows)
 
-def _init_init_D(init_D, dim_sz):
-	"""
-	Utility function for ParamsHierarchicalFGFT, ParamsPalm4MSAFGFT
-	"""
-	def _check_init_D_is_consistent(init_D):
-		if(not isinstance(init_D, np.ndarray)):
-			raise ValueError("init_D must be a numpy ndarray")
-		if(init_D.ndim != 1):
-			raise ValueError("init_D must be a vector.")
-		if(init_D.shape[0] != dim_sz):
-			raise ValueError("init_D must have the same size as first "
-					"constraint's number of rows")
+    @staticmethod
+    def _set_init_D(init_D, dim_sz):
+        """
+        Utility function for ParamsHierarchicalFGFT, ParamsPalm4MSAFGFT
+        """
+        def _check_init_D_is_consistent(init_D):
+            if(not isinstance(init_D, np.ndarray)):
+                raise ValueError("init_D must be a numpy ndarray")
+            if(init_D.ndim != 1):
+                raise ValueError("init_D must be a vector.")
+            if(init_D.shape[0] != dim_sz):
+                raise ValueError("init_D must have the same size as first "
+                        "constraint's number of rows")
 
-	if(not isinstance(init_D, np.ndarray) and init_D == None):
-		init_D = np.ones(dim_sz)
-		_check_init_D_is_consistent(init_D)
-		return init_D
+        if not isinstance(init_D, np.ndarray):
+            init_D = np.ones(dim_sz)
+            _check_init_D_is_consistent(init_D)
+            return init_D
+        else:
+            return init_D
 
 class ParamsPalm4msaWHT(ParamsPalm4MSA):
 	"""
