@@ -1193,7 +1193,8 @@ class TestFaustFactory(unittest.TestCase):
         print("err: ", norm(E,"fro")/norm(M,"fro"))
         # matrix to factorize and reference relative error come from
         # misc/test/src/C++/hierarchicalFactorization.cpp
-        self.assertAlmostEqual(norm(E,"fro")/norm(M,"fro"), 0.268443, places=5)
+        self.assertAlmostEqual(norm(E,"fro")/norm(M,"fro"),
+                               0.267959, places=5)
 
     def testFactHierarchCplx(self):
         print("Test pyfaust.fact.hierarchicalCplx()")
@@ -1778,7 +1779,7 @@ class TestFaustFactory(unittest.TestCase):
                    [-1.48942563, -1.71787215, -0.84000212, -3.71752454],
                    [-0.88957883, -0.19107863, -5.92900636, -6.51064175]])
         k = 2
-        p = skperm(M.shape, k)
+        p = skperm(M.shape, k, normalized=False)
         ref_pM = [[-0.04440802,0.,-0.02557815,0.,],
                   [-0.0083095,-3.38725936,0.,0.,],
                   [ 0.,-1.71787215,0.,-3.71752454],
