@@ -747,7 +747,7 @@ matvar_t* Faust::MatSparse<FPP, Cpu>::toMatIOVarDense(bool transpose, bool conju
 }
 
 template<typename FPP>
-matvar_t* Faust::MatSparse<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate) const {
+matvar_t* Faust::MatSparse<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate, const char* var_name/*=nullptr*/) const {
 	//TODO: refactor this function because it is a bit too long
 	matvar_t* var = NULL;
 	Eigen::SparseMatrix<FPP,Eigen::RowMajor> mat_;

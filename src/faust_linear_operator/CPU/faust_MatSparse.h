@@ -332,7 +332,7 @@ namespace Faust
 			//! M = (*this) * M if opThis='N'
 			// M = (*this)' * M if opThis='T'
 			void multiply(MatSparse<FPP,Cpu> & M, char opThis) const;
-			matvar_t* toMatIOVar(bool transpose, bool conjugate) const;
+			matvar_t* toMatIOVar(bool transpose, bool conjugate, const char* var_name=nullptr) const;
 			//! \brief multiply this by M into this.
 			void multiplyRight(MatSparse<FPP,Cpu> const & M);
 

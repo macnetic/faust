@@ -345,7 +345,7 @@ namespace Faust
 		}
 
 	template <typename FPP>
-		matvar_t* MatBSR<FPP,Cpu>::toMatIOVar(bool transpose, bool conjugate) const
+		matvar_t* MatBSR<FPP,Cpu>::toMatIOVar(bool transpose, bool conjugate, const char* var_name/*=nullptr*/) const
 		{
 			//			MatSparse<FPP, Cpu> smat(this->dim1, this->dim2);
 			//			smat.mat = bmat.to_sparse();

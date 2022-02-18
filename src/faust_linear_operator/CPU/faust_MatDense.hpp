@@ -56,6 +56,7 @@
 #include "faust_constant.h"
 #include <cassert>
 #include <Eigen/SVD>
+#include "faust_init_from_matio.h"
 
 namespace Faust
 {
@@ -1022,9 +1023,50 @@ void MatDense<FPP,Cpu>::init_from_file(const char* filename)
 #endif
 }
 
+	template<typename FPP>
+void MatDense<FPP, Cpu>::from_matio_var(matvar_t *var)
+{
+	matio_classes matio_class;
+	if(std::is_same<FPP, float>::value)
+		matio_class = MAT_C_SINGLE;
+	else
+		matio_class = MAT_C_DOUBLE;
+
+	if(var->class_type != matio_class
+			|| var->rank != 2
+			|| var->data_size != sizeof(FPP))
+		handleError("MatDense::from_matio_var", "variable isn't of good type.");
+
+	resize(var->dims[0], var->dims[1]);
+
+	memcpy(getData(), var->data, sizeof(FPP)*this->getNbRow()*this->getNbCol());
+}
 
 template<typename FPP>
-matvar_t* MatDense<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate) const
+void MatDense<FPP, Cpu>::read_from_mat_file(const char *filepath, const char *variable_name)
+{
+	matvar_t* matvar = faust_matio_read_variable(filepath, variable_name);
+	from_matio_var(matvar);
+}
+
+template<typename FPP>
+void MatDense<FPP, Cpu>::save_to_mat_file(const char *filepath, const char *var_name)
+{
+	int ret;
+	matvar_t* matvar = toMatIOVar(false, false, var_name);
+	mat_t* matfp = Mat_CreateVer(filepath, NULL, MAT_FT_MAT5);
+	if(matfp == NULL)
+		handleError("Faust::MatDense::save_to_mat_file()", "Failed creating file");
+//	Mat_VarPrint(matvar, 1);
+	ret = Mat_VarWrite(matfp, matvar, MAT_COMPRESSION_NONE); //TODO: enable compression ?
+	if(ret)
+		handleError("MatDense::save_to_mat_file", (std::string("Failed writing the MatDense to a Matlab file error code: ")+std::to_string(ret)).c_str());
+	Mat_VarFree(matvar);
+	Mat_Close(matfp);
+}
+
+template<typename FPP>
+matvar_t* MatDense<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate, const char *var_name/*=nullptr*/) const
 {
 	matvar_t *var = nullptr;
 	size_t dims[2];
@@ -1050,7 +1092,7 @@ matvar_t* MatDense<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate) const
 		if(!opt){
 			Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic> mat_copy(mat.transpose().eval());
 			//		mat_copy.transposeInPlace(); //undoing the transposition
-			var = Mat_VarCreate(nullptr, matio_class, matio_type, 2, dims, (FPP*) mat_copy.data() /*mat.transpose().eval().data() //  doesn't work so we copy above */, opt);
+			var = Mat_VarCreate(var_name, matio_class, matio_type, 2, dims, (FPP*) mat_copy.data() /*mat.transpose().eval().data() //  doesn't work so we copy above */, opt);
 		}
 		else {
 			Eigen::Matrix<Real<FPP>,Eigen::Dynamic,Eigen::Dynamic> dst_re(mat.rows(), mat.cols());
@@ -1064,7 +1106,7 @@ matvar_t* MatDense<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate) const
 			dst_im.transposeInPlace();
 			z.Re = dst_re.data();
 			z.Im = dst_im.data();
-			var = Mat_VarCreate(nullptr, matio_class, matio_type, 2, dims, &z /*mat.transpose().eval().data() //  doesn't work so we copy above */, opt);
+			var = Mat_VarCreate(var_name, matio_class, matio_type, 2, dims, &z /*mat.transpose().eval().data() //  doesn't work so we copy above */, opt);
 		}
 	}
 	else
@@ -1073,7 +1115,7 @@ matvar_t* MatDense<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate) const
 		dims[1] = this->getNbCol();
 		if(!opt) // we use directly the data pointer (col-major order organized)
 			// but without the MAT_F_DONT_COPY_DATA flag, MatIO copies the data internally
-			var = Mat_VarCreate(nullptr, matio_class, matio_type, 2, dims, (FPP*) mat.data(), opt);
+			var = Mat_VarCreate(var_name, matio_class, matio_type, 2, dims, (FPP*) mat.data(), opt);
 		else {
 			Eigen::Matrix<Real<FPP>,Eigen::Dynamic,Eigen::Dynamic> dst_re(mat.rows(), mat.cols());
 			Eigen::Matrix<Real<FPP>,Eigen::Dynamic,Eigen::Dynamic> dst_im(mat.rows(), mat.cols());
@@ -1084,7 +1126,7 @@ matvar_t* MatDense<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate) const
 				dst_im = mat.imag().template cast<Real<FPP>>();
 			z.Re = dst_re.data();
 			z.Im = dst_im.data();
-			var = Mat_VarCreate(nullptr, matio_class, matio_type, 2, dims, &z /*mat.transpose().eval().data() //  doesn't work so we copy above */, opt);
+			var = Mat_VarCreate(var_name, matio_class, matio_type, 2, dims, &z /*mat.transpose().eval().data() //  doesn't work so we copy above */, opt);
 		}
 	}
 	return var;

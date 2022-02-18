@@ -385,7 +385,13 @@ namespace Faust
 			//! All the other line contains one coefficient in ColMajor access of the MatDense
 			void print_file(const char* filename)const;
 
-			matvar_t* toMatIOVar(bool transpose, bool conjugate) const;
+			matvar_t* toMatIOVar(bool transpose, bool conjugate, const char *var_name=nullptr) const;
+			//!  \brief Creates a MatDense from at matio variable
+			void from_matio_var(matvar_t* var);
+			//!  \brief Creates a MatDense from at .mat file
+			void read_from_mat_file(const char *filepath, const char *var_name);
+			//!  \brief Saves a MatDense to a .mat file
+			void save_to_mat_file(const char *filepath, const char *var_name);
 			//! \brief Keeps only real part of the matrix, erase imaginary part.
 			//
 			//	If the matrix is real, it does nothing.

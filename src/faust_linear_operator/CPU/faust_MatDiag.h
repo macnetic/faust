@@ -70,7 +70,7 @@ namespace Faust
 			faust_unsigned_int getNonZeros() const { return mat.diagonal().nonZeros(); }
 
 			size_t getNBytes() const;
-			matvar_t* toMatIOVar(bool transpose, bool conjugate) const;
+			matvar_t* toMatIOVar(bool transpose, bool conjugate, const char* var_name=nullptr) const;
 			Real<FPP> normL1(const bool transpose=false) const;
 			typename Eigen::NumTraits<FPP>::Real norm() const;
 			Real<FPP> normL1(faust_unsigned_int& col_id, const bool transpose) const;

@@ -175,7 +175,7 @@ namespace Faust
 			// \param conjugate: set it to true to obtain the matio variable for the conjugate Matrix.
 			// \return The matio variable matvar_t if it succeeded or NULL otherwise.
 			// \see Faust::Transform::save_mat_file()
-			virtual matvar_t* toMatIOVar(bool transpose, bool conjugate) const=0;
+			virtual matvar_t* toMatIOVar(bool transpose, bool conjugate, const char *var_name=nullptr) const=0;
 
 			//TODO: only one function norm() with argument for type of norm
 			//! \brief Computes the L1-norm of the matrix.
