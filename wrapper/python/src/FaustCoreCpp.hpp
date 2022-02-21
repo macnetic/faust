@@ -374,10 +374,38 @@ bool FaustCoreCpp<FPP,DEV>::save_mat_file(const char* filepath) const
         this->transform->save_mat_file(filepath);
         return true;
     }
-    catch(exception& e) {
+    catch(exception& e)
+    {
         //cerr << e.what() << endl;
         return false;
     }
+}
+
+template<typename FPP, FDevice DEV>
+FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::read_from_mat_file(const char* filepath)
+{
+    FaustCoreCpp<FPP, DEV>* core = nullptr;
+    try
+    {
+        auto th = new Faust::TransformHelper<FPP, Cpu>();
+        th->read_from_mat_file(filepath);
+        core = new FaustCoreCpp<FPP,DEV>(th);
+    }
+    catch(exception& e)
+    {
+        if(core != nullptr)
+        {
+            delete core;
+            core = nullptr;
+        }
+    }
+    return core;
+}
+
+template<typename FPP, FDevice DEV>
+int FaustCoreCpp<FPP,DEV>::get_mat_file_type(const char* filepath)
+{
+    return Faust::TransformHelper<FPP,DEV>::get_mat_file_type(filepath);
 }
 
 template<typename FPP, FDevice DEV>

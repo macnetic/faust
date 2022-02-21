@@ -147,6 +147,8 @@ class FaustCoreCpp
                                   num_rows, unsigned long int* col_ids,
                                   unsigned long int num_cols) const;
     bool save_mat_file(const char* filepath) const;
+    static FaustCoreCpp<FPP, DEV>* read_from_mat_file(const char* filepath);
+    static int get_mat_file_type(const char* filepath);
     FaustCoreCpp<FPP,DEV>* swap_cols(const unsigned int id1, const unsigned int id2,
             const bool permutation, const bool inplace);
     FaustCoreCpp<FPP,DEV>* swap_rows(const unsigned int id1, const unsigned int id2,

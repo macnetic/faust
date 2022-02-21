@@ -1869,6 +1869,27 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                                                                             ncols))
         return Faust(factors)
 
+    def load_native(filepath):
+        """
+        The format is Matlab format version 5 and the filepath should end with
+        a .mat extension (native C++ version).
+
+        The Faust must have been saved before with Faust.save.
+
+        Args:
+            filepath: the filepath of the .mat file.
+
+        """
+        _type = _FaustCorePy.FaustCoreGenDblCPU.get_mat_file_type(filepath)
+        if _type == -1:
+            raise Exception("Invalid .mat file")
+        elif _type == 0:
+            F = Faust( core_obj=_FaustCorePy.FaustCoreGenFltCPU.read_from_mat_file(filepath))
+        elif _type == 1:
+            F = Faust( core_obj=_FaustCorePy.FaustCoreGenDblCPU.read_from_mat_file(filepath))
+        elif _type == 2:
+            F = Faust( core_obj=_FaustCorePy.FaustCoreGenCplxDblCPU.read_from_mat_file(filepath))
+        return F
 
     def astype(F, dtype):
         """

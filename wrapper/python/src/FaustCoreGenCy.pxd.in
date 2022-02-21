@@ -62,6 +62,10 @@ cdef extern from "FaustCoreCpp.h":
                                   num_rows, unsigned long int* col_ids,
                                   unsigned long int num_cols) const
         bool save_mat_file(const char* filepath) const
+        @staticmethod
+        @CPP_CORE_CLASS@[FPP]* read_from_mat_file(const char* filepath);
+        @staticmethod
+        int get_mat_file_type(const char* filepath);
         @CPP_CORE_CLASS@[FPP]* swap_cols(const unsigned int id1, const unsigned int id2,
                                 const bool permutation, const bool inplace);
         @CPP_CORE_CLASS@[FPP]* swap_rows(const unsigned int id1, const unsigned int id2,
