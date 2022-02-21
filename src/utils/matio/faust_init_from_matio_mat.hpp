@@ -365,8 +365,7 @@ namespace Faust {
             if( var->class_type != MAT_C_SPARSE
                     || var->rank != 2)
             {
-                std::cerr << "error in init_faust_mat<FPP,DEVICE>_from_matio : "<< "the variable seems not to be a double sparse matrix." << std::endl;
-                exit(EXIT_FAILURE);
+                throw std::runtime_error("error in init_spmat_from_matvar: the variable seems not to be a double sparse matrix.");
             }
 
             if( var->dims[1] + 1 != mat_sparse->njc
@@ -385,7 +384,7 @@ namespace Faust {
 
 
             for (size_t i = 0 ; i < mat_sparse->ndata ; i++)
-                values[i] = (FPP) (((double*)(mat_sparse->data))[i]);
+                values[i] = (FPP) (((Real<FPP>*)(mat_sparse->data))[i]);
 
             int cmpt=0;
             for (int i=0 ; i<var->dims[1] ; i++)
@@ -395,7 +394,7 @@ namespace Faust {
                     colind[cmpt] = i ;
                     cmpt++;
                 }
-            //MODIFAL
+
             S = MatSparse<FPP,DEVICE>(rowind, colind, values, var->dims[0], var->dims[1]);
 
             if (cmpt != S.getNonZeros())
