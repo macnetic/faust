@@ -71,6 +71,19 @@ class TestFaustPy(unittest.TestCase):
             self.assertEqual(fact_test.shape, fact_ref.shape)
             self.assertTrue((fact_ref == fact_test).all())
 
+    def testLoadNative(self):
+        print("test load native")
+        import pyfaust as pf
+        F = pf.rand(32, 295, density=.5)
+        F.save('rand_faust.mat')
+        F_ = pf.Faust.load_native('rand_faust.mat')
+        self.assertLessEqual((F-F_).norm()/F.norm(), 1e-6)
+        Ff = F.astype('float32')
+        Ff.save('test_float.mat')
+        Ff_ = pf.Faust.load_native('test_float.mat')
+        self.assertLessEqual((Ff-Ff_).norm()/Ff.norm(), 1e-6)
+        print("load_native type:", type)
+
     def testGetNumRows(self):
         print("testGetNumRows()")
         self.assertEqual(self.F.shape[0], self.factors[0].shape[0])
