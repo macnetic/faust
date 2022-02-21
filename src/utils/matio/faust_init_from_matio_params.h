@@ -50,26 +50,29 @@
 
 
 
-template<typename FPP,FDevice DEVICE> class ParamsPalm;
-template<typename FPP,FDevice DEVICE> class Params;
-template<typename FPP,FDevice DEVICE> class ConstraintGeneric;
+namespace Faust {
 
-template<typename FPP,FDevice DEVICE>
-void init_params_palm_from_matiofile(Faust::ParamsPalm<FPP,DEVICE>& params, const char* fileName, const char* variableName);
+//    template<typename FPP,FDevice DEVICE> class ParamsPalm;
+//    template<typename FPP,FDevice DEVICE> class Params;
+//    template<typename FPP,FDevice DEVICE> class ConstraintGeneric;
 
-/** \brief load data matrix from ".mat file"
- * \param params
- * \param fileName
- * \param variableName
- */
-template<typename FPP,FDevice DEVICE, typename FPP2 = double>
-void init_params_from_matiofile(Faust::Params<FPP,DEVICE,FPP2>& params, const char* fileName, const char* variableName);
+    template<typename FPP,FDevice DEVICE>
+        void init_params_palm_from_matiofile(ParamsPalm<FPP,DEVICE>& params, const char* fileName, const char* variableName);
 
-template<typename FPP,FDevice DEVICE, typename FPP2 = double>
-void add_constraint(std::vector<const Faust::ConstraintGeneric*> & consS,matvar_t* cons_var);
+    /** \brief load data matrix from ".mat file"
+     * \param params
+     * \param fileName
+     * \param variableName
+     */
+    template<typename FPP,FDevice DEVICE, typename FPP2 = double>
+        void init_params_from_matiofile(Params<FPP,DEVICE,FPP2>& params, const char* fileName, const char* variableName);
 
-template<typename FPP,FDevice DEVICE>
-void Display_params(Faust::Params<FPP,DEVICE> & params);
+    template<typename FPP,FDevice DEVICE, typename FPP2 = double>
+        void add_constraint(std::vector<const ConstraintGeneric*> & consS,matvar_t* cons_var);
+
+    template<typename FPP,FDevice DEVICE>
+        void Display_params(Params<FPP,DEVICE> & params);
+}
 
 #include "faust_init_from_matio_params.hpp"
 #endif
