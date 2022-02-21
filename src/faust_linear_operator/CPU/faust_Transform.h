@@ -177,6 +177,11 @@ namespace Faust
 					std::cout << std::endl;
 				}
 				void init_from_file(const char* filename);
+
+				/**
+				 * \brief Reads a Transform from a .mat file.
+				 */
+				void read_from_mat_file(const char *filepath);
 				/**
 				 *	\brief Writes the FAuST into a Matlab file. The product is written as a cell array with the matrix factors as elements.
 				 *	\arg \c filename The filepath to the output file (preferably with a .mat suffix).

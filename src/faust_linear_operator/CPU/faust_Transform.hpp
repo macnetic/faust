@@ -468,6 +468,36 @@ void Faust::Transform<FPP, Cpu>::save_mat_file(const char* filename, bool transp
 	delete[] faust_factor_matvars;
 }
 
+template<typename FPP>
+void Faust::Transform<FPP, Cpu>::read_from_mat_file(const char *filepath)
+{
+	clear();
+	matvar_t* cell_matvar = faust_matio_read_variable(filepath, "faust_factors");
+	if(cell_matvar->class_type != MAT_C_CELL || cell_matvar->rank != 2)
+	{
+		throw std::runtime_error("Faust::Transform<FPP, Cpu>::read_from_mat_file error: the matio variable is not a cell.");
+	}
+	MatGeneric<FPP, Cpu> *gmat;
+	for(int i=0;i<cell_matvar->dims[1];i++)
+	{
+		auto matvar = Mat_VarGetCell(cell_matvar, i);
+		if (matvar->class_type == MAT_C_SPARSE)
+		{
+			auto spmat = new MatSparse<FPP, Cpu>();
+			spmat->from_matio_var(matvar);
+			gmat = spmat;
+		}
+		else
+		{
+			auto dmat = new MatDense<FPP, Cpu>();
+			// this call will verify if it's a correct matlab array
+			dmat->from_matio_var(matvar);
+			gmat = dmat;
+		}
+		push_back(gmat, false, false, false, /*copying*/ false);
+	}
+}
+
 	template<typename FPP>
 void Faust::Transform<FPP,Cpu>::scalarMultiply(const FPP scalar)
 {
@@ -626,7 +656,7 @@ double Faust::Transform<FPP,Cpu>::spectralNorm(const int nbr_iter_max, double th
 	{
 		if(this->is_zero) // The Faust is zero by at least one of its factors
 			return 0;
-		// The Faust can still by zero (without any of its factor being)
+		// The Faust can still be zero (without any of its factor being)
 		// this case will be detected in power_iteration
 		//std::cout<<"Faust debut spectralNorm"<<std::endl;
 		//std::cout<<"copy constructor"<<std::endl;

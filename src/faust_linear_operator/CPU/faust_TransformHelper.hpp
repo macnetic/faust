@@ -1006,6 +1006,12 @@ template<typename FPP>
 	}
 
 template<typename FPP>
+	void TransformHelper<FPP,Cpu>::read_from_mat_file(const char* filepath)
+	{
+		this->transform->read_from_mat_file(filepath);
+	}
+
+template<typename FPP>
 	double TransformHelper<FPP,Cpu>::spectralNorm(const int nbr_iter_max, double threshold, int &flag) const
 	{
 //			std::cout << "TransformHelper<FPP,Cpu>::spectralNorm" << std::endl;

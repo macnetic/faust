@@ -166,6 +166,10 @@ namespace Faust
 			virtual MatDense<FPP,Cpu> get_product(const int mul_order_opt_mode=-1);// const;
 			virtual void get_product(MatDense<FPP,Cpu>& prod, const int mul_order_opt_mode=-1); //const;
 			virtual void save_mat_file(const char* filename) const;
+            /**
+             * \brief Reads a TransformHelper from a .mat file.
+             */
+            void read_from_mat_file(const char* filepath);
 			virtual double spectralNorm(const int nbr_iter_max, double threshold, int &flag) const;
 			FPP power_iteration(const faust_unsigned_int nbr_iter_max, const Real<FPP>& threshold, int & flag) const;
 			TransformHelper<FPP,Cpu>* transpose();
