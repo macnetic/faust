@@ -1,5 +1,6 @@
 
 #include "faust_MatDense.h"
+#include "faust_TransformHelper.h"
 
 using namespace Faust;
 typedef @TEST_FPP@ FPP;
@@ -13,7 +14,7 @@ int main(int argc, char** argv)
     read_mat.read_from_mat_file("rand_matdense.mat", "test");
     *mat -= read_mat;
     assert(mat->norm() == 0);
-    //test MatSparse backup and restore
+    // test MatSparse backup and restore
     auto smat = MatSparse<FPP, Cpu>::randMat(32, 128, .1);
     smat->save_to_mat_file("rand_matsparse.mat", "test");
     MatSparse<FPP, Cpu> read_smat;
@@ -21,4 +22,19 @@ int main(int argc, char** argv)
     MatDense<FPP, Cpu> diff = *smat;
     diff -= read_smat;
     assert(diff.norm() == 0);
+
+    // test Faust backup and restore
+    auto faust = TransformHelper<FPP, Cpu>::randFaust(32, 128, MIXED, 5, 10, 32, 128);
+    faust->save_mat_file("rand_faust.mat");
+    faust->display();
+
+    auto read_faust = new TransformHelper<FPP,Cpu>();
+    read_faust->read_from_mat_file("rand_faust.mat");
+    read_faust->display();
+
+    auto faust_array = faust->get_product();
+    auto read_faust_array = faust->get_product();
+
+    faust_array -= read_faust_array;
+    assert(faust_array.norm() == 0);
 }
