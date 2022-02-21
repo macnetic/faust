@@ -54,6 +54,7 @@
 #include "faust_BlasHandle.h"
 #include "faust_SpBlasHandle.h"
 #include "matio.h"
+#include "faust_init_from_matio.h"
 #include "faust_MatBSR.h"
 
 
@@ -496,6 +497,36 @@ void Faust::Transform<FPP, Cpu>::read_from_mat_file(const char *filepath)
 		}
 		push_back(gmat, false, false, false, /*copying*/ false);
 	}
+}
+
+template<typename FPP>
+int Faust::Transform<FPP, Cpu>::get_mat_file_type(const char *filepath)
+{
+	matvar_t* cell_matvar = faust_matio_read_variable(filepath, "faust_factors");
+	int ret_type = -1;
+	if(cell_matvar->class_type != MAT_C_CELL || cell_matvar->rank != 2)
+	{
+		throw std::runtime_error("Faust::Transform<FPP, Cpu>::read_from_mat_file error: the matio variable is not a cell.");
+	}
+
+	if(cell_matvar->dims[1] > 1)
+	{
+		auto matvar = Mat_VarGetCell(cell_matvar, 0);
+		if(matvar->isComplex)
+			ret_type = 2;
+		else
+			switch(matvar->data_type)
+			{
+				case MAT_T_SINGLE:
+					ret_type = 0;
+					break;
+				case MAT_T_DOUBLE:
+					ret_type = 1;
+					break;
+			}
+	}
+	Mat_VarFree(cell_matvar);
+	return ret_type;
 }
 
 	template<typename FPP>

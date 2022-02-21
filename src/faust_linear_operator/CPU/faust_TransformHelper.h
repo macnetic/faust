@@ -170,6 +170,11 @@ namespace Faust
              * \brief Reads a TransformHelper from a .mat file.
              */
             void read_from_mat_file(const char* filepath);
+            /**
+             * \brief Returns the type of the Faust::Transform stored in the .mat
+             * file (0: float, 1: double, 2: complex, -1: unknown/invalid).
+             */
+            static int get_mat_file_type(const char* filepath);
 			virtual double spectralNorm(const int nbr_iter_max, double threshold, int &flag) const;
 			FPP power_iteration(const faust_unsigned_int nbr_iter_max, const Real<FPP>& threshold, int & flag) const;
 			TransformHelper<FPP,Cpu>* transpose();

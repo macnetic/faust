@@ -183,6 +183,11 @@ namespace Faust
 				 */
 				void read_from_mat_file(const char *filepath);
 				/**
+				 * \brief Returns the type of the Faust::Transform stored in the .mat
+				 * file (0: float, 1: double, 2: complex, -1: unknown/invalid).
+				 */
+				static int get_mat_file_type(const char* filepath);
+				/**
 				 *	\brief Writes the FAuST into a Matlab file. The product is written as a cell array with the matrix factors as elements.
 				 *	\arg \c filename The filepath to the output file (preferably with a .mat suffix).
 				 *	\arg \c transpose The boolean to set to true if you want to save the transpose Faust of this instance or false otherwise.

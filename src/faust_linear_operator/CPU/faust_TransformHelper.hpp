@@ -1012,6 +1012,12 @@ template<typename FPP>
 	}
 
 template<typename FPP>
+	int TransformHelper<FPP,Cpu>::get_mat_file_type(const char* filepath)
+	{
+		return	Transform<FPP,Cpu>::get_mat_file_type(filepath);
+	}
+
+template<typename FPP>
 	double TransformHelper<FPP,Cpu>::spectralNorm(const int nbr_iter_max, double threshold, int &flag) const
 	{
 //			std::cout << "TransformHelper<FPP,Cpu>::spectralNorm" << std::endl;
