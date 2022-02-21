@@ -46,6 +46,7 @@
 #include <iomanip>
 #include <complex>
 #include <cstdlib>
+#include "faust_init_from_matio_mat.h"
 
 using namespace std;
 template<typename FPP>
@@ -747,7 +748,8 @@ matvar_t* Faust::MatSparse<FPP, Cpu>::toMatIOVarDense(bool transpose, bool conju
 }
 
 template<typename FPP>
-matvar_t* Faust::MatSparse<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate, const char* var_name/*=nullptr*/) const {
+matvar_t* Faust::MatSparse<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate, const char* var_name/*=nullptr*/) const
+{
 	//TODO: refactor this function because it is a bit too long
 	matvar_t* var = NULL;
 	Eigen::SparseMatrix<FPP,Eigen::RowMajor> mat_;
@@ -841,7 +843,7 @@ matvar_t* Faust::MatSparse<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate,
 	}
 	else
 		sparse.data = data;
-	var = Mat_VarCreate(NULL /* no-name */, MAT_C_SPARSE, matio_type, 2, dims, &sparse, opt);
+	var = Mat_VarCreate(var_name, MAT_C_SPARSE, matio_type, 2, dims, &sparse, opt);
 	//	if(var != NULL)
 	//		Mat_VarPrint(var,1);
 	delete[] jc;
@@ -849,6 +851,36 @@ matvar_t* Faust::MatSparse<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate,
 	if(!opt)
 		delete[] data;
 	return var;
+}
+//!  \brief Creates a MatSparse from at matio variable
+template<typename FPP>
+void Faust::MatSparse<FPP, Cpu>::from_matio_var(matvar_t* var)
+{
+	init_spmat_from_matvar(*this, var);
+}
+//!  \brief Creates a MatSparse from at .mat file
+template<typename FPP>
+void Faust::MatSparse<FPP, Cpu>::read_from_mat_file(const char *filepath, const char *var_name)
+{
+	init_faust_spmat_from_matio(*this, filepath, var_name);
+}
+
+//!  \brief Saves a MatSparse to a .mat file
+template<typename FPP>
+void Faust::MatSparse<FPP, Cpu>::save_to_mat_file(const char *filepath, const char *var_name)
+{
+	//TODO: refactor with MatDense::save_to_mat_file
+	int ret;
+	matvar_t* matvar = toMatIOVar(false, false, var_name);
+	mat_t* matfp = Mat_CreateVer(filepath, NULL, MAT_FT_MAT5);
+	if(matfp == NULL)
+		handleError("Faust::MatSparse::save_to_mat_file()", "Failed creating file");
+//	Mat_VarPrint(matvar, 1);
+	ret = Mat_VarWrite(matfp, matvar, MAT_COMPRESSION_NONE); //TODO: enable compression ?
+	if(ret)
+		handleError("Faust::MatSparse::save_to_mat_file", (std::string("Failed writing the MatSparse to a Matlab file error code: ")+std::to_string(ret)).c_str());
+	Mat_VarFree(matvar);
+	Mat_Close(matfp);
 }
 
 template<typename FPP>

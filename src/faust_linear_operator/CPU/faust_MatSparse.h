@@ -333,6 +333,13 @@ namespace Faust
 			// M = (*this)' * M if opThis='T'
 			void multiply(MatSparse<FPP,Cpu> & M, char opThis) const;
 			matvar_t* toMatIOVar(bool transpose, bool conjugate, const char* var_name=nullptr) const;
+			//!  \brief Creates a MatSparse from at matio variable
+			void from_matio_var(matvar_t* var);
+			//!  \brief Creates a MatSparse from at .mat file
+			void read_from_mat_file(const char *filepath, const char *var_name);
+			//!  \brief Saves a MatSparse to a .mat file
+			void save_to_mat_file(const char *filepath, const char *var_name);
+
 			//! \brief multiply this by M into this.
 			void multiplyRight(MatSparse<FPP,Cpu> const & M);
 
