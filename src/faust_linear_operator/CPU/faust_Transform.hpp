@@ -497,6 +497,7 @@ void Faust::Transform<FPP, Cpu>::read_from_mat_file(const char *filepath)
 		}
 		push_back(gmat, false, false, false, /*copying*/ false);
 	}
+	this->update_total_nnz();
 }
 
 template<typename FPP>
