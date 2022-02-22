@@ -116,3 +116,24 @@ FaustCoreCpp<Real<@TYPE@>,Cpu>* FaustCoreCpp2<@TYPE@, Real<@TYPE@>, Cpu>::real(F
 {
     return core->real();
 }
+
+template<>
+FaustCoreCpp<@TYPE@,Cpu>* FaustCoreCpp<@TYPE@,Cpu>::read_from_mat_file(const char* filepath)
+{
+    FaustCoreCpp<@TYPE@, Cpu>* core = nullptr;
+    try
+    {
+        auto th = new Faust::TransformHelper<@TYPE@, Cpu>();
+        th->read_from_mat_file(filepath);
+        core = new FaustCoreCpp<@TYPE@,Cpu>(th);
+    }
+    catch(exception& e)
+    {
+        if(core != nullptr)
+        {
+            delete core;
+            core = nullptr;
+        }
+    }
+    return core;
+}

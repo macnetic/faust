@@ -127,6 +127,8 @@ namespace Faust
 
 
 				void save_mat_file(const char* filepath) const;
+				TransformHelper<FPP,GPU2> read_from_mat_file(const char* filepath);
+				static int get_mat_file_type(const char* filepath);
 				FPP get_item(faust_unsigned_int i, faust_unsigned_int j);
 				virtual ~TransformHelper() {};
 				static TransformHelper<FPP,GPU2>* hadamardFaust(unsigned int n, const bool norma=true);

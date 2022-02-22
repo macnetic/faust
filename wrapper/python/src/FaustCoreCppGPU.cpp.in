@@ -97,3 +97,10 @@ FaustCoreCpp<Real<@TYPE@>,GPU2>* FaustCoreCpp2<@TYPE@,Real<@TYPE@>,GPU2>::real(F
 {
     return core->real();
 }
+
+template<>
+FaustCoreCpp<@TYPE@,GPU2>* FaustCoreCpp<@TYPE@,GPU2>::read_from_mat_file(const char* filepath)
+{
+    throw std::runtime_error("A .mat file is always read from CPU code not GPU's.");
+    return nullptr;
+}
