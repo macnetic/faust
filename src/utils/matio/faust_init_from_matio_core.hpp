@@ -59,7 +59,7 @@
 #include "faust_ConstraintMat.h"
 
 
-namespase Faust {
+namespace Faust {
 
 #ifdef COMPILE_GPU
     template<typename FPP>

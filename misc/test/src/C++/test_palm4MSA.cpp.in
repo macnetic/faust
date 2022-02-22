@@ -53,6 +53,7 @@
 //#include "faust_ConstraintFPP.h"
 
 using namespace std;
+using namespace Faust;
 typedef @TEST_FPP@ FPP;
 typedef @TEST_FPP2@ FPP2;
 

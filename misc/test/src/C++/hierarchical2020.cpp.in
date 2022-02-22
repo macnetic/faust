@@ -52,6 +52,8 @@
 #include <iostream>
 #include <iomanip>
 
+using namespace Faust;
+
 /** \brief An example of using the hierarchical factorization of a dense matrix. from .mat file.
 * An dense matrix is loaded from "@FAUST_DATA_MAT_DIR@
 * \param MatrixFilename :  a .mat (MATLAB file) where the matrix to be factorized is stored (or its transposed (cf. parameter transposeMatrix))
