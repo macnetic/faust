@@ -45,5 +45,9 @@
 #define __MEX_FAUST_SAVE__
 template <typename SCALAR, FDevice DEV>
 void faust_save(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs);
+template <typename SCALAR, FDevice DEV>
+void faust_restore(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs);
+template <typename SCALAR, FDevice DEV>
+void faust_get_mat_file_type(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs);
 #include "faust_save.hpp"
 #endif

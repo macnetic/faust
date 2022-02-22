@@ -187,6 +187,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			faust_is_all_dense<SCALAR, DEV>(prhs, nrhs, plhs, nlhs);
 		else if (!strcmp("save", cmd))
 			faust_save<SCALAR, DEV>(prhs, nrhs, plhs, nlhs);
+		else if (!strcmp("read_from_mat_file", cmd))
+			faust_restore<SCALAR, DEV>(prhs, nrhs, plhs, nlhs);
+		else if (!strcmp("get_mat_file_type", cmd))
+			faust_get_mat_file_type<SCALAR, DEV>(prhs, nrhs, plhs, nlhs);
 		else if(!strcmp("conj", cmd))
 			faust_conj<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
 		else if(!strcmp("transpose", cmd))

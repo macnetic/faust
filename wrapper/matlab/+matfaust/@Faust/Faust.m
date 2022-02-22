@@ -253,7 +253,7 @@ classdef Faust
 				F.matrix = FaustCore(factors, scale, optCopy, F.isReal, F.dev, F.dtype);
 			elseif(ischar(varargin{1}))
 				% init a Faust from file
-				F = matfaust.Faust.load(varargin{:});
+				F = matfaust.Faust.load_native(varargin{:});
 			elseif(isa(varargin{1}, 'matfaust.Faust'))
 				% create a Faust from another but not with the same
 				% handle to set inside the FaustCore object (matrix)
@@ -2371,6 +2371,44 @@ classdef Faust
 			end
 			F = matfaust.Faust(out_factors, varargin{1:end});
 		end
+
+		%================================================================
+		%> Loads a Faust from a .mat file (native C++ version).
+		%===
+		%>
+		%> @b Example
+		%> @code
+		%> import matfaust.*
+		%> F = rand(10,10)
+		%> F.save('my_faust.mat')
+		%> F2 = matfaust.Faust.load_native('my_faust.mat')
+		%> F3 = Faust('my_faust.mat')
+		%> % F == F2 == F3
+		%> @endcode
+		%>
+		%> <p> @b See @b also Faust.Faust
+		%================================================================
+		function F = load_native(filepath)
+			file_type = mexFaustReal('get_mat_file_type', filepath);
+			is_real = true;
+			dtype = 'double';
+			switch(file_type)
+				case 0
+					% single
+					core_obj = mexFaustRealFloat('read_from_mat_file', filepath);
+					dtype = 'float'
+				case 1
+					% double
+					core_obj = mexFaustReal('read_from_mat_file', filepath);
+				case 2
+					core_obj = mexFaustCplx('read_from_mat_file', filepath);
+					is_real = false;
+				otherwise
+					error('Invalid file type from .matfile')
+				end
+			F = matfaust.Faust(core_obj, is_real, 'cpu', dtype);
+		end
+
 	end
 end
 
