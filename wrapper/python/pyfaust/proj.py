@@ -91,7 +91,7 @@ class circ(proj_gen):
                [ 0.65139062,  0.56169998,  0.4051127 ,  0.47563316, 0.58798272]])
 
     """
-    def __init__(self, shape, normalized=False, pos=False):
+    def __init__(self, shape, normalized=True, pos=False):
         """
         Args:
             shape: the size of the input matrix.
@@ -121,7 +121,7 @@ class hankel(proj_gen):
                [ 0.74059554,  0.46299776,  0.50574944,  0.4539859 , 0.81595711]])
 
     """
-    def __init__(self, shape, normalized=False, pos=False):
+    def __init__(self, shape, normalized=True, pos=False):
         """
         Args:
             shape: the size of the input matrix.
@@ -322,7 +322,7 @@ class supp(proj_gen):
                    [ 0.,  0.,  0.,  1.,  0.]])
 
     """
-    def __init__(self, S, normalized=False, pos=False):
+    def __init__(self, S, normalized=True, pos=False):
         """
 
         Args:
@@ -485,7 +485,7 @@ class blockdiag(proj_gen):
 
     """
 
-    def __init__(self, shape, block_shapes, normalized=False, pos=False):
+    def __init__(self, shape, block_shapes, normalized=True, pos=False):
         """
         Constructor.
 
