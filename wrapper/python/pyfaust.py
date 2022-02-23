@@ -629,8 +629,8 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                 G = float(G)
             elif not isinstance(G, (np.float, np.complex)):
                 raise TypeError("scalar must be int, float or complex")
-            G, Gdtype = (float(G), np.float) if isinstance(G, np.float) else (G,
-                                                                              np.complex)
+            G, Gdtype = (float(G), np.float) if (isinstance(G, np.float) and
+                                                 F.dtype != 'complex') else (complex(G), np.complex)
             return Faust([np.ones((F.shape[0], 1), dtype=F.dtype)*G,
                           np.ones((1, F.shape[1]), dtype=F.dtype).astype(Gdtype)],
                          dev=F.device)

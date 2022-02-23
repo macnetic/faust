@@ -508,7 +508,7 @@ class TestFaustPy(unittest.TestCase):
         from pyfaust import rand as frand
         from numpy.random import rand
         print("testMinus()")
-        print("substraction of a Faust-scalar")
+        print("subtraction of a Faust-scalar")
         scals = [ self.r.random()*100,
                  np.complex(self.r.random()*100,self.r.random()*100),
                  self.r.randint(1,100)]
@@ -519,7 +519,7 @@ class TestFaustPy(unittest.TestCase):
             ref_full_F = self.mulFactors()+s
             self.assertAlmostEqual(norm(test_F.toarray()-ref_full_F), 0,
                                    places=3)
-        print("substraction Faust-Faust")
+        print("subtraction Faust-Faust")
         fausts = \
         [ frand(F.shape[0], F.shape[0])@Faust(rand(F.shape[0],F.shape[1])),
          frand(F.shape[0], F.shape[0], density=.5,
