@@ -272,12 +272,12 @@ cdef class FaustAlgoGen@TYPE_NAME@:
             cpp_constraints[i].name = cons.name
             cpp_constraints[i].num_rows = cons._num_rows
             cpp_constraints[i].num_cols = cons._num_cols
+            cpp_constraints[i].normalizing = cons.normalized
+            cpp_constraints[i].pos = cons.pos
 
         cpp_params.constraints = cpp_constraints
         cpp_params.num_rows = p.data_num_rows
         cpp_params.num_cols = p.data_num_cols
-        cpp_constraints[i].normalizing = cons.normalized
-        cpp_constraints[i].pos = cons.pos
         cpp_params.num_constraints = len(p.constraints)
 
         core = @CORE_CLASS@(core=True)
