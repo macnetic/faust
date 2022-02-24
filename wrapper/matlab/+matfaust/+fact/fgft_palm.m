@@ -111,31 +111,34 @@ function varargout = fgft_palm(U, Lap, p, varargin)
 	if(~ isa(p ,'ParamsHierarchical'))
 		error('p must be a ParamsHierarchical object.')
 	end
-	%mex_fact_constraints = cell(1, p.num_facts-1)
+	% main factor constraints
 	for i=1:p.num_facts-1
-		cur_cell = cell(1, 4);
+		cur_cell = cell(1, 6);
 		cur_cell{1} = p.constraints{i}.name.conv2str();
 		cur_cell{2} = p.constraints{i}.param;
 		cur_cell{3} = p.constraints{i}.num_rows;
 		cur_cell{4} = p.constraints{i}.num_cols;
-		%mex_fact_constraints{i} = cur_cell;
+		cur_cell{5} = p.constraints{i}.normalized;
+		cur_cell{6} = p.constraints{i}.pos;
 		mex_constraints{1,i} = cur_cell;
 	end
-	%mex_residuum_constraints = cell(1, p.num_facts-1)
+	% residual factors constraints
 	for i=1:p.num_facts-1
-		cur_cell = cell(1, 4);
+		cur_cell = cell(1, 6);
 		cur_cell{1} = p.constraints{i+p.num_facts-1}.name.conv2str();
 		cur_cell{2} = p.constraints{i+p.num_facts-1}.param;
 		cur_cell{3} = p.constraints{i+p.num_facts-1}.num_rows;
 		cur_cell{4} = p.constraints{i+p.num_facts-1}.num_cols;
-		%mex_residuum_constraints{i} = cur_cell;
+		cur_cell{5} = p.constraints{i}.normalized;
+		cur_cell{6} = p.constraints{i}.pos;
 		mex_constraints{2,i} = cur_cell;
 	end
 	if(~ p.is_mat_consistent(U))
 		error('U''s number of columns must be consistent with the last residuum constraint defined in p. Likewise its number of rows must be consistent with the first factor constraint defined in p.')
 	end
 	% the setters for num_rows/cols verifies consistency with constraints
-	mex_params = struct('nfacts', p.num_facts, 'cons', {mex_constraints}, 'niter1', p.stop_crits{1}.num_its,'niter2', p.stop_crits{2}.num_its, 'sc_is_criterion_error', p.stop_crits{1}.is_criterion_error, 'sc_error_treshold', p.stop_crits{1}.tol, 'sc_max_num_its', p.stop_crits{1}.maxiter, 'sc_is_criterion_error2', p.stop_crits{2}.is_criterion_error, 'sc_error_treshold2', p.stop_crits{2}.tol, 'sc_max_num_its2', p.stop_crits{2}.maxiter, 'nrow', p.data_num_rows, 'ncol', p.data_num_cols, 'fact_side', p.is_fact_side_left, 'update_way', p.is_update_way_R2L, 'init_D', init_D, 'verbose', p.is_verbose, 'init_lambda', p.init_lambda);
+	% TODO: should use ParamsHierarchical to_mex_struct
+	mex_params = struct('nfacts', p.num_facts, 'cons', {mex_constraints}, 'niter1', p.stop_crits{1}.num_its, 'niter2', p.stop_crits{2}.num_its, 'sc_is_criterion_error', p.stop_crits{1}.is_criterion_error, 'sc_error_treshold', p.stop_crits{1}.tol, 'sc_max_num_its', p.stop_crits{1}.maxiter, 'sc_is_criterion_error2', p.stop_crits{2}.is_criterion_error, 'sc_error_treshold2', p.stop_crits{2}.tol, 'sc_max_num_its2', p.stop_crits{2}.maxiter, 'nrow', p.data_num_rows, 'ncol', p.data_num_cols, 'fact_side', p.is_fact_side_left, 'update_way', p.is_update_way_R2L, 'init_D', init_D, 'verbose', p.is_verbose, 'init_lambda', p.init_lambda, 'grad_calc_opt_mode', p.grad_calc_opt_mode, 'step_size', p.step_size);
 	if(isreal(U))
 		[lambda, core_obj, Ddiag] = mexHierarchical_factReal(U, mex_params, Lap);
 	else
