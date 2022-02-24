@@ -911,7 +911,7 @@ const Params<SCALAR, Cpu, FPP2>* mxArray2FaustParams(const mxArray* matlab_param
 	if(presentFields[GRAD_CALC_OPT_MODE])
 	{
 		mxCurrentField = mxGetField(matlab_params, 0, mat_field_type2str(GRAD_CALC_OPT_MODE).c_str());
-		params->gradCalcOptMode = (Faust::GradientCalcOptMode) mxGetScalar(mxCurrentField);
+		params->gradCalcOptMode = (Faust::GradientCalcOptMode) (int) mxGetScalar(mxCurrentField); // VS can't directly cast to enum, so int is used as intermediate type // TODO: it should be a C++ static_cast
 	}
 	return params;
 }
