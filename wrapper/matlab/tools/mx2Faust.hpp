@@ -907,6 +907,12 @@ const Params<SCALAR, Cpu, FPP2>* mxArray2FaustParams(const mxArray* matlab_param
 		no_lambda = (bool) mxGetScalar(mxCurrentField);
 	}
 	params->no_lambda = no_lambda;
+
+	if(presentFields[GRAD_CALC_OPT_MODE])
+	{
+		mxCurrentField = mxGetField(matlab_params, 0, mat_field_type2str(GRAD_CALC_OPT_MODE).c_str());
+		params->gradCalcOptMode = (Faust::GradientCalcOptMode) mxGetScalar(mxCurrentField);
+	}
 	return params;
 }
 

@@ -120,6 +120,8 @@ const string mat_field_type2str(MAT_FIELD_TYPE f)
 			return "constant_step_size";
 		case STEP_SIZE:
 			return "step_size";
+		case GRAD_CALC_OPT_MODE:
+			return "grad_calc_opt_mode";
 	}
 }
 
