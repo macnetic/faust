@@ -49,7 +49,6 @@ classdef ConstraintMat < matfaust.factparams.ConstraintGeneric
 					pos = false;
 				otherwise
 					error('Invalid ConstraintName')
-				end
 			end
 		end
 
