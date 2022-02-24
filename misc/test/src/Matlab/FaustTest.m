@@ -371,7 +371,7 @@ classdef FaustTest < matlab.unittest.TestCase
 			% FaustMulMode.GREEDY replaced by GREEDY local variable because GREEDY is not a visible opt. method anymore
 			set_FM_mul_mode(H, GREEDY); % matfaust.FaustMulMode.GREEDY);
 			G = clone(F);
-			set_FM_mul_mode(G, matfaust.FaustMulMode.GREEDY);
+			set_FM_mul_mode(G, GREEDY);
 			this.verifyEqual(full(F), full(H), 'RelTol', 1e-5)
 			this.verifyEqual(full(F), full(G), 'RelTol', 1e-5)
 			M = rand(size(F,2), size(F,1))
@@ -386,12 +386,12 @@ classdef FaustTest < matlab.unittest.TestCase
 			this.verifyEqual(F*M, I*M, 'RelTol', 1e-5)
 			this.verifyEqual(F*S, I*S, 'RelTol', 1e-5)
 			% using the F*M benchmark
-			J = optimize_time('mat', M)
+			J = optimize_time(F, 'mat', M)
 			this.verifyEqual(full(F), full(J), 'RelTol', 1e-5)
 			this.verifyEqual(F*M, J*M, 'RelTol', 1e-5)
 			this.verifyEqual(F*S, J*S, 'RelTol', 1e-5)
 			% using the F*S benchmark
-			K = optimize_time('mat', M)
+			K = optimize_time(F, 'mat', M)
 			this.verifyEqual(full(F), full(K), 'RelTol', 1e-5)
 			this.verifyEqual(F*M, K*M, 'RelTol', 1e-5)
 			this.verifyEqual(F*S, K*S, 'RelTol', 1e-5)
