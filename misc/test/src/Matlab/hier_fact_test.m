@@ -81,6 +81,22 @@ end
 disp('*** MEX FACTORISATION ***');  
 tic
 %[lambda,fact]=mexHierarchical_fact(matrix,params);
+
+% workaround to the old API (we shouldn't directly use mexHierarchical_factReal now
+% so here normalized and pos constraint attributes are set manually
+%TODO: probably other default configurations should be taken into account
+for j=1:2
+	for i=1:length(params.cons)
+		c = params.cons{j, i};
+		if any(strcmp(c{1}, {'normcol', 'normlin'}))
+			c = { c{:} false false}; % normalized, pos default values
+		else
+			c = { c{:} true false}; % normalized, pos default values
+		end
+		params.cons{j, i} = c;
+	end
+end
+
 [lambda, core_obj] = mexHierarchical_factReal(matrix, params);
 F = Faust(core_obj, isreal(matrix));
 t=toc;
@@ -105,7 +121,7 @@ if (abs(lambda - expectedLambda) > expectedLambdaPrecision)
 end
 
 
-relative_error = norm(matrix - full(F));
+relative_error = norm(matrix - full(F))/norm(matrix);
 
 disp(['relative error :  ' num2str(relative_error)]);
 
