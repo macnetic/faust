@@ -28,10 +28,9 @@ void faust_multiply(const mxArray **prhs, const int nrhs, mxArray **plhs, const 
 	{
 		const size_t nbRowA = mxGetM(inMatlabMatrix);
 		const size_t nbColA = mxGetN(inMatlabMatrix);
-		faust_unsigned_int nbRowOp_,nbColOp_;
 		const size_t nbRowOp = core_ptr->getNbRow();
-		const size_t nbColOp = core_ptr->getNbCol();
-		const size_t nbRowB = nbRowOp;
+		const size_t nbColOp = core_ptr->getNbCol(); // getNbRow() and getNbCol is tranpose aware
+		const size_t nbRowB = transpose_flag?nbColOp:nbRowOp;
 		const size_t nbColB = nbColA;
 
 
@@ -39,7 +38,7 @@ void faust_multiply(const mxArray **prhs, const int nrhs, mxArray **plhs, const 
 
 		//check dimension match
 		if (mxGetNumberOfDimensions(inMatlabMatrix) != 2
-				|| nbRowA != nbColOp && (nbRowA != nbRowOp && transpose_flag))
+				|| nbRowA != nbColOp && ! transpose_flag || nbRowA != nbRowOp && transpose_flag)
 			mexErrMsgTxt("Multiply : Wrong number of dimensions for the input vector or matrix (third argument).");
 
 
@@ -61,6 +60,7 @@ void faust_multiply(const mxArray **prhs, const int nrhs, mxArray **plhs, const 
 			SCALAR* ptr_out;
 			mwSize out_dims[2] = {nbRowB, 1};
 			plhs[0] = helperCreateNumMxArray<SCALAR>(out_dims);
+			newMxGetData(ptr_out, plhs[0]);
 			core_ptr->multiply(ptr_data, ptr_out, transpose_flag);
 #else
 			Faust::Vect<SCALAR,Cpu> A(nbRowA, ptr_data);

@@ -36,6 +36,7 @@ namespace Faust
 			virtual void push_back(const MatGeneric<FPP,DEV>* M, const bool optimizedCopy=false, const bool copying=true, const bool transpose=false, const bool conjugate=false)=0;
 
 			const char isTransposed2char() const;
+			const char transposed2char(bool is_transposed, bool is_conjugate) const;
 			bool isTransposed() const;
 			bool isConjugate() const;
 			bool isReal() const;

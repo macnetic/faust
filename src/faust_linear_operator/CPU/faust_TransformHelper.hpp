@@ -220,11 +220,8 @@ namespace Faust {
 	template<typename FPP>
 		Vect<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const Vect<FPP,Cpu> &x, const bool transpose, const bool conjugate)
 		{
-			this->is_transposed ^= transpose;
-			this->is_conjugate ^= conjugate;
-			Vect<FPP,Cpu> v = std::move(this->transform->multiply(x, this->isTransposed2char()));
-			this->is_transposed ^= transpose;
-			this->is_conjugate ^= conjugate;
+			Vect<FPP,Cpu> v = std::move(this->transform->multiply(x,
+						this->transposed2char(this->is_transposed ^ transpose, this->is_conjugate ^ conjugate)));
 			return v;
 		}
 
@@ -233,10 +230,10 @@ namespace Faust {
 		{
 			int x_size;
 			// assuming that x size is valid, infer it from this size
-			if(this->is_transposed && transpose || ! this->is_transposed && ! transpose)
-				x_size = this->getNbCol();
+			if(this->is_transposed ^ transpose)
+				x_size = this->transform->getNbRow();
 			else
-				x_size = this->getNbRow();
+				x_size = this->transform->getNbCol();
 			Vect<FPP, Cpu> vx(x_size, x);
 			return std::move(this->multiply(vx, transpose, conjugate));
 		}
@@ -247,8 +244,13 @@ namespace Faust {
 			//TODO: move to Faust::Transform ?
 			// TODO: don't create vx, directly compute into y (as it's made for Faust-matrix product)
 			// x is a vector, it doesn't matter it's transpose or not, just keep the valid size to multiply against this Transform
-			int x_size = this->getNbCol();
 			// however x and y are supposed to be allocated to the good sizes
+			int x_size;
+			// assuming that x size is valid, infer it from this size
+			if(this->is_transposed ^ transpose)
+				x_size = this->transform->getNbRow();
+			else
+				x_size = this->transform->getNbCol();
 			Vect<FPP, Cpu> vx(x_size, x);
 			auto y_vec = std::move(this->multiply(vx, transpose, conjugate));
 			memcpy(y, y_vec.getData(), sizeof(FPP)*y_vec.size());

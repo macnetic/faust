@@ -579,10 +579,11 @@ classdef Faust
 					C_imag = call_mex(F, 'multiply', imag(A), trans);
 					C = C_real + 1i * C_imag;
 				end
-			else % F is a complex and A most likely a matrix
+			else % F is complex and A is most likely a matrix
 				if(isreal(A))
 					C = call_mex(F, 'multiply', F.convertFactorToComplex(A), trans);
 				else
+					% A is not necessarily a complex array, it could be a bsr matrix (a cell)
 					C = call_mex(F, 'multiply', F.convertFactorToComplex(A), trans);
 				end
 			end
@@ -2265,7 +2266,6 @@ classdef Faust
 		end
 
 		function out_factor = convertFactorToComplex(factor)
-			% this function replace complex in case of BSR cell or sparse matrices but it works for dense matrix too
 			if (iscell(factor) && strcmp(factor{1}, 'bsr'))
 				% bsr matrix cell
 				out_factor = factor;

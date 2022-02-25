@@ -63,7 +63,13 @@ namespace Faust
 	template<typename FPP, FDevice DEV>
 		const char TransformHelperGen<FPP,DEV>::isTransposed2char() const
 		{
-			return this->is_transposed?(this->is_conjugate?'H':'T'):'N';
+            return this->transposed2char(this->is_transposed, this->is_conjugate);
+		}
+
+	template<typename FPP, FDevice DEV>
+		const char TransformHelperGen<FPP,DEV>::transposed2char(bool is_transposed, bool is_conjugate) const
+		{
+			return is_transposed?(is_conjugate?'H':'T'):'N';
 		}
 
 	template<typename FPP, FDevice DEV>
