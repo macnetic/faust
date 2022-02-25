@@ -1034,7 +1034,7 @@ void MatDense<FPP, Cpu>::from_matio_var(matvar_t *var)
 
 	if(var->class_type != matio_class
 			|| var->rank != 2
-			|| var->data_size != sizeof(FPP))
+			|| var->data_size != sizeof(Real<FPP>))
 		handleError("MatDense::from_matio_var", "variable isn't of good type.");
 
 	resize(var->dims[0], var->dims[1]);
@@ -1060,7 +1060,7 @@ void MatDense<FPP, Cpu>::save_to_mat_file(const char *filepath, const char *var_
 //	Mat_VarPrint(matvar, 1);
 	ret = Mat_VarWrite(matfp, matvar, MAT_COMPRESSION_NONE); //TODO: enable compression ?
 	if(ret)
-		handleError("MatDense::save_to_mat_file", (std::string("Failed writing the MatDense to a Matlab file error code: ")+std::to_string(ret)).c_str());
+		handleError("Faust::MatDense::save_to_mat_file", (std::string("Failed writing the MatDense to a Matlab file error code: ")+std::to_string(ret)).c_str());
 	Mat_VarFree(matvar);
 	Mat_Close(matfp);
 }
