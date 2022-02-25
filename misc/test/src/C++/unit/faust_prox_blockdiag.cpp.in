@@ -83,7 +83,7 @@ int main(int argc, char* argv[])
 	std::vector<faust_unsigned_int> m_vec = {5u, 12u, 25u, 38u};
 	std::vector<faust_unsigned_int> n_vec = {9u, 18u, 32u, 42u};
 
-	Faust::prox_blockdiag(M_copy, m_vec, n_vec);
+	Faust::prox_blockdiag(M_copy, m_vec, n_vec, /* normalized */false); // normalized is true by default
 	cout << "====================== M:" << endl;
 	for(faust_unsigned_int i = 0; i < M->getNbRow(); i++)
 	{
@@ -99,7 +99,7 @@ int main(int argc, char* argv[])
 		for(faust_unsigned_int j = 0; j < M->getNbCol(); j++)
 		{
 			printf("%3.2f ", M_copy(i,j));
-			assert(M_copy(i,j) == 0.0 || M_copy(i,j) == (*M)(i,j));
+			assert(M_copy(i,j) == FPP(0.0) || M_copy(i,j) == (*M)(i,j));
 		}
 		printf("\n");
 	}
