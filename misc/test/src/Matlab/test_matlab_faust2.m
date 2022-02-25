@@ -78,7 +78,7 @@ disp('Ok');
 
 disp('test 2 : invalid factor empty'); 
 test_pass = 0;
-expected_err_message='concatMatGeneric : empty matlab matrix';
+expected_err_message='tools_mex.h:mxArray2FaustMat :input matrix is empty.';
 factors=cell(1,nb_fact); % each cell is empty, must contained a matrix
 
 
@@ -104,7 +104,7 @@ disp('Ok');
 
 disp('test 3 : invalid factor type (cell)');
 test_pass = 0;
-expected_err_message='Unknown matlab type.';
+expected_err_message='The cell Faust constructor 1st argument must contain only matrices or BSR matrix cell encodings.';
 factors=cell(1,1);
 factors{1}=cell(1); % contains a character and not a matrix 
 
