@@ -78,7 +78,7 @@ void faust_multiply(const mxArray **prhs, const int nrhs, mxArray **plhs, const 
 			mwSize out_dims[2] = {nbRowB, nbColA};
 			plhs[0] = helperCreateNumMxArray<SCALAR>(out_dims);
 			newMxGetData(ptr_out, plhs[0]);
-			core_ptr->multiply(ptr_data, nbColA, ptr_out);
+			core_ptr->multiply(ptr_data, nbColA, ptr_out, transpose_flag);
 
 #else
 			Faust::MatDense<SCALAR,Cpu> A(ptr_data, nbRowA, nbColA);
