@@ -510,7 +510,7 @@ int Faust::Transform<FPP, Cpu>::get_mat_file_type(const char *filepath)
 		throw std::runtime_error("Faust::Transform<FPP, Cpu>::read_from_mat_file error: the matio variable is not a cell.");
 	}
 
-	if(cell_matvar->dims[1] > 1)
+	if(cell_matvar->dims[1] >= 1)
 	{
 		auto matvar = Mat_VarGetCell(cell_matvar, 0);
 		if(matvar->isComplex)
