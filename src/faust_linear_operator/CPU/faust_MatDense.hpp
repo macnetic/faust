@@ -1039,7 +1039,19 @@ void MatDense<FPP, Cpu>::from_matio_var(matvar_t *var)
 
 	resize(var->dims[0], var->dims[1]);
 
-	memcpy(getData(), var->data, sizeof(FPP)*this->getNbRow()*this->getNbCol());
+	if(std::is_same<FPP,Real<FPP>>::value)
+		memcpy(getData(), var->data, sizeof(FPP)*this->getNbRow()*this->getNbCol());
+	else
+	{
+		// (it should be) complex data
+		mat_complex_split_t c_data = *static_cast<mat_complex_split_t*>(var->data);
+		for(int i=0;i<var->dims[0]*var->dims[1];i++)
+		{
+			((Real<FPP>*)this->getData())[i*2] = ((Real<FPP>*)c_data.Re)[i];
+			((Real<FPP>*)this->getData())[i*2+1] = ((Real<FPP>*)c_data.Im)[i];
+		}
+	}
+
 }
 
 template<typename FPP>
