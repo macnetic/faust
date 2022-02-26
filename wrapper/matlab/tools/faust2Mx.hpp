@@ -528,13 +528,21 @@ mxArray* transformFact2FullMxArray(faust_unsigned_int id, Faust::TransformHelper
 {
 	const mwSize dim_sizes[2] = {core_ptr->get_fact_nb_rows(id),
 			core_ptr->get_fact_nb_cols(id)};
-//	cout << "transformFact2FullMxArray() start" << endl;
 	mxClassID classId = typeid(FPP)==typeid(float)?mxSINGLE_CLASS:mxDOUBLE_CLASS;
-	mxArray* fullMat = mxCreateNumericArray(2, dim_sizes, classId, mxREAL);
+	mxArray* fullMat;
+
 	FPP* data_ptr;
 #ifdef MX_HAS_INTERLEAVED_COMPLEX
+	if(std::is_same<Real<FPP>,FPP>::value)
+		fullMat = mxCreateNumericArray(2, dim_sizes, classId, mxREAL);
+	else // complex
+	{
+		std::cout << "faust2Mx.hpp transformFact2FullMxArray complex mxArray" << std::endl;
+		fullMat = mxCreateNumericArray(2, dim_sizes, classId, mxCOMPLEX);
+	}
 	newMxGetData(data_ptr, fullMat);
 #else
+	fullMat = mxCreateNumericArray(2, dim_sizes, classId, mxREAL);
 	data_ptr = static_cast<FPP*>(mxGetData(fullMat));
 #endif
 	faust_unsigned_int num_rows, num_cols;
@@ -542,7 +550,6 @@ mxArray* transformFact2FullMxArray(faust_unsigned_int id, Faust::TransformHelper
 	core_ptr->get_fact(id, data_ptr, &num_rows, &num_cols);
 	//data_ptr now contains a copy of id-th factor elements
 	//then the matlab matrix is set in just one copy
-//	cout << "transformFact2FullMxArray() end" << endl;
 	return fullMat;
 }
 
@@ -559,37 +566,20 @@ mxArray* transformFact2FullMxArray(faust_unsigned_int id, Faust::TransformHelper
 	FPP* img_data_ptr = static_cast<FPP*>(mxGetImagData(fullMat));
 #endif
 	faust_unsigned_int num_rows, num_cols;
-	if(core_ptr->isTransposed())
-	{
-		// the factor is transposed, we can't directly access the data
-		// cause it needs to be reordered
-		complex<FPP>* src_data_ptr = (complex<FPP>*) malloc(sizeof(complex<FPP>)*dim_sizes[0]*dim_sizes[1]); // TODO: alloc-free in c++ style (new/delete)
-		core_ptr->get_fact(id, src_data_ptr, &num_rows, &num_cols);
-#ifdef MX_HAS_INTERLEAVED_COMPLEX
-		copyComplexDataToMxArray(src_data_ptr, num_cols*num_rows, fullMat);
-#else
-		splitComplexPtr(src_data_ptr, num_cols*num_rows, data_ptr, img_data_ptr/*, core_ptr->isConjugate()*/); //let conjugate to false because it's handled internally by get_fact()
-		// it's different to real transformFact2FullMxArray() case here
-		// because with complex we need to split im/real (until we stop to use separated complex API)
-		// when the split will be removed, we'll do as transformFact2SparseMxArray() for FPP==double/float
-		// (handling complex and real the same way)
-#endif
-		free(src_data_ptr);
-	}
-	else
-	{
-		complex<FPP>* src_data_ptr;
-		//not calling the same prototype of get_fact() called in transpose case (and real version of this function)
-		core_ptr->get_fact(id, src_data_ptr, &num_rows, &num_cols);
-#ifdef MX_HAS_INTERLEAVED_COMPLEX
-		copyComplexDataToMxArray(src_data_ptr, num_rows*num_cols, fullMat, core_ptr->isConjugate());
-#else
-		splitComplexPtr(src_data_ptr, num_rows*num_cols, data_ptr, img_data_ptr, core_ptr->isConjugate());//let conjugate to false because it's handled internally by get_fact()
-#endif
+	complex<FPP>* data_ptr = (complex<FPP>*) malloc(sizeof(complex<FPP>)*dim_sizes[0]*dim_sizes[1]); // TODO: alloc-free in c++ style (new/delete)
+	core_ptr->get_fact(id, data_ptr, &num_rows, &num_cols); // manages transpose and conjugate case
 
-	}
-	//TODO: matlab 2018 setComplexDoubles()/setComplexSingles() to avoid separating
-	// in real and imaginary part to copy, directly copy into mxArray with get_fact() in the pointer returned by mxComplexSingles()/mxComplexDoubles()
+#ifdef MX_HAS_INTERLEAVED_COMPLEX
+	copyComplexDataToMxArray(data_ptr, num_cols*num_rows, fullMat);
+#else
+	splitComplexPtr(data_ptr, num_cols*num_rows, data_ptr, img_data_ptr/*, core_ptr->isConjugate()*/);
+	// let conjugate to false because it's handled internally by get_fact()
+	// it's different to real transformFact2FullMxArray() case here
+	// because with complex we need to split im/real (until we stop to use separated complex API)
+	// when the split will be removed, we'll do as transformFact2SparseMxArray() for FPP==double/float
+	// (handling complex and real the same way)
+#endif
+	free(data_ptr);
 	return fullMat;
 }
 
