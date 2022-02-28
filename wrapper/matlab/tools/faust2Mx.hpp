@@ -495,32 +495,32 @@ template<typename FPP, FDevice DEV>
 mxArray* transformFact2SparseMxArray(faust_unsigned_int id, Faust::TransformHelper<complex<FPP>,DEV>* core_ptr)
 {
 	faust_unsigned_int nnz, num_rows, num_cols;
-	mxArray* sparseMat = mxCreateSparse(core_ptr->get_fact_nb_rows(id),
+	mxArray* mxSparseMat = mxCreateSparse(core_ptr->get_fact_nb_rows(id),
 			core_ptr->get_fact_nb_cols(id),
 			core_ptr->get_fact_nnz(id),
 			mxCOMPLEX);
-	mwIndex* ir = mxGetIr(sparseMat);
-	mwIndex* jc = mxGetJc(sparseMat);
-	int * i_ir = (int*) malloc(sizeof(int)*mxGetNzmax(sparseMat)); //TODO: use new[]/delete[]
-	int * i_jc = (int*) malloc(sizeof(int)*mxGetN(sparseMat)+1);
-	complex<FPP>* cplxData  = (complex<FPP>*) malloc(sizeof(complex<FPP>)*mxGetNzmax(sparseMat));
+	mwIndex* ir = mxGetIr(mxSparseMat);
+	mwIndex* jc = mxGetJc(mxSparseMat);
+	int * i_ir = (int*) malloc(sizeof(int)*mxGetNzmax(mxSparseMat)); //TODO: use new[]/delete[]
+	int * i_jc = (int*) malloc(sizeof(int)*mxGetN(mxSparseMat)+1);
+	complex<FPP>* cplxData  = (complex<FPP>*) malloc(sizeof(complex<FPP>)*mxGetNzmax(mxSparseMat));
 	core_ptr->get_fact(id, i_jc, i_ir, cplxData, &nnz, &num_rows, &num_cols, true);
-	assert(nnz == mxGetNzmax(sparseMat));
+	assert(nnz == mxGetNzmax(mxSparseMat));
 #if MX_HAS_INTERLEAVED_COMPLEX
-	copyComplexDataToMxArray(cplxData, sizeof(complex<FPP>)*nnz, sparseMat);
+	copyComplexDataToMxArray(cplxData, nnz, mxSparseMat);
 #else
-	FPP*    ptr_real_data = static_cast<FPP*> (mxGetPr(sparseMat));
-	FPP*    ptr_imag_data = static_cast<FPP*> (mxGetPi(sparseMat));
+	FPP*    ptr_real_data = static_cast<FPP*> (mxGetPr(mxSparseMat));
+	FPP*    ptr_imag_data = static_cast<FPP*> (mxGetPi(mxSparseMat));
 	splitComplexPtr(cplxData, nnz, ptr_real_data, ptr_imag_data);
 #endif
 	for(int i=0;i<nnz;i++)
 		ir[i] = i_ir[i];
-	for(int i=0;i<mxGetN(sparseMat)+1;i++)
+	for(int i=0;i<mxGetN(mxSparseMat)+1;i++)
 		jc[i] = i_jc[i];
 	free(i_ir);
 	free(i_jc);
 	free(cplxData);
-	return sparseMat;
+	return mxSparseMat;
 }
 
 template<typename FPP, FDevice DEV>
