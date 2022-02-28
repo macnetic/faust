@@ -90,7 +90,7 @@ nontransposed=0;
 
 Y_star = F*x;
 
-if (~isequal(Y_expected,Y_star))
+if (norm(Y_expected-Y_star)/norm(Y_expected) > 1e-6)
     error(['multiplication faust : invalid result  ' ]);
 end
 
@@ -119,7 +119,7 @@ end
 
 Y_mtimes = mtimes_trans(F,x,nontransposed);
 %(Y_expected ~= Y_mtimes)
-if (~isequal(Y_expected,Y_mtimes))
+if (norm(Y_expected-Y_mtimes)/norm(Y_expected) > 1e-6)
     error(['multiplication faust : invalid result  '  ]);
 end
 
@@ -132,7 +132,7 @@ end
 
 Y_mtimes_trans_T = mtimes_trans(F.',x,istransposed);
 %(y_expected ~= y_mtimes_trans_T)
-if (~isequal(Y_expected,Y_mtimes_trans_T))
+if (norm(Y_expected-Y_mtimes_trans_T)/norm(Y_expected) > 1e-6)
     error(['multiplication faust : invalid result  '  ]);
 end
 

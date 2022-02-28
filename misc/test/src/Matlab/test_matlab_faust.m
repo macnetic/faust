@@ -178,7 +178,7 @@ F_dense= full(F);
 if((dim1_dense ~= dim1) | (dim2_dense ~= dim2))
     error('full : invalid dimension');
 end
-if ( ~isequal(expected_F_dense,F_dense) ) 
+if ( norm(expected_F_dense-F_dense) > 1e-6) 
     expected_F_dense
     F_dense	 
     error(['full : invalid full-storage matrix']);
@@ -204,9 +204,16 @@ disp('TEST NNZ : ');
 
 nz = nnz_sum(F);
 
+expected_nz = 0
+nf = numfactors(F)
+for i=1:numfactors(F)
+	expected_nz = expected_nz + numel(nonzeros(factors(F, i)))
+end
+
 if(expected_nz ~= nz)
     error('nnz : invalid number of nonzeros');
 end
+expected_density = expected_nz / size(F, 1) / size(F, 2)
 
 new_facts{1}=eye(dim1,dim1);
 new_facts{2}=eye(dim1,dim1);
@@ -309,7 +316,7 @@ disp('Ok');
 disp('TEST TRANSPOSE : ');
 disp('operation F_trans = F'' ');
 F_trans=F.';
-[dim1_trans,dim2_trans]=size(F_trans);
+[dim1_trans,dim2_trans] = size(F_trans);
 if ((dim1_trans ~= dim2) | (dim2_trans ~= dim1))
     error(['transpose : invalid dimension']);
 end
@@ -317,12 +324,12 @@ end
 F_dense_trans = full(F_trans);
 
 %(F_dense_trans ~= F_dense')
-if (~isequal(F_dense_trans,F_dense.'))    
+if (norm(F_dense_trans- F_dense.')/norm(F_dense.') > 1e-6)
 	error(['transpose : invalid transpose matrix']);
 end
 
 %% verification de la non modification du faust
-[new_dim1,new_dim2]=size(F); 
+[new_dim1,new_dim2]=size(F);
 if ((new_dim1 ~= dim1) | (dim2 ~= new_dim2))
     error(['transpose : modification du faust de depart']);
 end
@@ -560,7 +567,7 @@ disp('Ok');
 
 %% load_faust and save_faust test
 disp('TEST LOAD AND SAVE : ');
-filename = [ '@FAUST_BIN_TEST_OUTPUT_DIR@' filesep 'faust.mat'];
+filename = ['@FAUST_BIN_TEST_OUTPUT_DIR@' filesep 'faust.mat'];
 disp(['save faust into the file : ' filename]); 
 save(F,filename);
 F_loaded = Faust(filename);
@@ -577,13 +584,18 @@ end
 
 for i=1:nb_fact
 	A=factors(F_loaded,i);
-	if(~isequal(A,factors_{i}))
+	err = norm(full(A)-full(factors(F, i)))/norm(full(factors(F, i)))
+	if(err > 1e-6)
+		F
+		F_loaded
+		i
+        factors(F_loaded,i)
         factors(F,i)
+		factors_{i}
         error('get_fact : invalid factor');
 	end
 
 end
-
 
 
 
@@ -599,7 +611,8 @@ if (dim1_trans_faust_loaded ~= dim2) | (dim2_trans_faust_loaded ~= dim1)
 end
 
 F_dense_trans_loaded=full(F_trans_loaded);
-if (~isequal(F_dense_trans_loaded,F_dense.'))
+err = norm(F_dense_trans_loaded-F_dense.')/norm(F_dense.')
+if(err > 1e-6)
     disp('F_dense_trans_loaded')
     F_dense_trans_loaded
     disp('F_dense_trans=')
@@ -618,7 +631,7 @@ disp('Ok');
 disp('TEST GET_FACT : ');
 for i=1:nb_fact
 	A=factors(F,i);
-	if(A~=factors_{i})
+	if(norm(full(A-factors_{i}))/norm(full(factors_{i})) > 1e-6)
 		error('get_fact : invalid factor');
 	end
 
@@ -724,7 +737,7 @@ end
 % test factors_ on conj
 for i=1:nb_fact
 	A=factors(F_conj,i);
-	if(~isequal(A,conj(factors_{i})))
+	if(norm(full(A-conj(factors_{i})))/norm(full(conj(factors_{i}))) > 1e-6)
 		conj(factors_{i})
         factors(F_conj,i)
 		error('get_fact : invalid factor');
@@ -757,7 +770,7 @@ if((dim1_ctranspose ~= dim1) | (dim2_ctranspose ~= dim2))
     dim2_ctranspose
     error('full : invalid dimension');
 end
-if ( ~isequal(expected_F_ctranspose_full,F_ctranspose_full) )
+if(norm(expected_F_ctranspose_full-F_ctranspose_full)/norm(expected_F_ctranspose_full) > 1e-6)
     expected_F_ctranspose_full
     F_ctranspose_full
     error(['ctranspose test 1 failed.']);
@@ -765,7 +778,8 @@ end
 % test factors_ on ctranspose
 for i=1:nb_fact
 	A=factors(F_ctranspose,i)
-	if(~isequal(A,ctranspose(factors_{nb_fact-i+1})))
+	cT=ctranspose(factors_{nb_fact-i+1})
+	if(norm(full(A-cT))/norm(full(cT)) > 1e-6)
 		ctranspose(factors_{nb_fact-i+1})
         factors(F_ctranspose,i)
 		error('get_fact : invalid factor');
