@@ -383,9 +383,22 @@ namespace Faust {
             std::vector<FPP> values(mat_sparse->ndata);
 
 
-            for (size_t i = 0 ; i < mat_sparse->ndata ; i++)
-                values[i] = (FPP) (((Real<FPP>*)(mat_sparse->data))[i]);
-
+			if(std::is_same<FPP,Real<FPP>>::value)
+				for (size_t i = 0 ; i < mat_sparse->ndata ; i++)
+					values[i] = (FPP) (((Real<FPP>*)(mat_sparse->data))[i]);
+			else
+			{
+				// (it should be) complex data
+				mat_complex_split_t c_data = *static_cast<mat_complex_split_t*>(mat_sparse->data);
+				for(int i=0;i<mat_sparse->ndata;i++)
+				{
+					std::complex<Real<FPP>> *c, c_;
+					c = &c_;
+					((Real<FPP>*)c)[0] = ((Real<FPP>*)c_data.Re)[i];
+					((Real<FPP>*)c)[1] = ((Real<FPP>*)c_data.Im)[i];
+					memcpy(&values[i],  c, sizeof(FPP));
+				}
+			}
             int cmpt=0;
             for (int i=0 ; i<var->dims[1] ; i++)
                 for (int j = mat_sparse->jc[i] ; j < mat_sparse->jc[i + 1] ; j++)
