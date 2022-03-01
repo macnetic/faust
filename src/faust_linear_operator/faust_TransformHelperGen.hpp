@@ -145,7 +145,7 @@ namespace Faust
 	template<typename FPP, FDevice DEV>
 		MatType TransformHelperGen<FPP,DEV>::get_fact_type(const faust_unsigned_int id) const
 		{
-			return this->transform->get_fact(id, false)->getType();
+			return this->transform->get_fact(this->is_transposed?size()-id-1:id, false)->getType();
 		}
 
 
