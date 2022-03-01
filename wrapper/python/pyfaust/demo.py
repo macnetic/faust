@@ -138,7 +138,7 @@ class quickstart:
         A_trans = A.transpose()
 
         # multiplication a numpy array by a Faust
-        x = np.random.randint(int_max, size=(dim2,1))
+        x = np.random.rand(dim2,1)
         y = A @ x
 
         # convert a faust to numpy array
@@ -158,7 +158,7 @@ class quickstart:
         t_faust = 0.0;
 
         for i in range(nb_mult):
-            x=np.random.randint(int_max, size=(dim2,1))
+            x=np.random.rand(dim2,1)
 
             t_begin = time.time()
             y_dense = A_numpy.dot(x)

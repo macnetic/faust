@@ -69,9 +69,9 @@ print('nb_factor : '+str(nb_factor))
 #initialisation de la liste des facteurs
 list_factor=[0]*nb_factor
 for i in range(nb_factor):
-	list_factor[i]=np.random.randint(int_max, size=(dim1,dim1))
+	list_factor[i]=np.random.rand(dim1,dim1)
 
-list_factor[nb_factor-1]=np.random.randint(int_max, size=(dim1,dim2))
+list_factor[nb_factor-1]=np.random.rand(dim1,dim2)
 
 
 
@@ -137,7 +137,7 @@ if not (F_dense.shape == (dim1, dim2)) :
 	print("expected size : "+str([dim1, dim2]))
 	print("got : "+str(F_dense.shape))
 	raise ValueError('invalid  size of the dense matrix')
-if not (F_dense==F_dense_expected).all():
+if not (np.allclose(F_dense, F_dense_expected)):
 	raise ValueError('invalid value')
 	
 
@@ -147,7 +147,7 @@ if not (F_trans_dense.shape == (dim2, dim1)) :
 	print("expected size : "+str([dim2, dim1]))
 	print("got : "+str(F_dense_trans.shape))
 	raise ValueError('invalid  size of the dense matrix')
-if not (np.transpose(F_dense)==F_trans_dense).all():
+if not (np.allclose(np.transpose(F_dense), F_trans_dense)):
 	raise ValueError('invalid value')
 	
 	
@@ -157,7 +157,7 @@ if not (F_trans_trans_dense.shape == (dim1, dim2)) :
 	print("expected size : "+str([dim1, dim2]))
 	print("got : "+str(F_dense.shape))
 	raise ValueError('invalid  size of the dense matrix')
-if not (F_dense==F_dense_expected).all():
+if not (np.allclose(F_trans_trans_dense, F_dense)):
 	raise ValueError('invalid value')
 print("Ok")
 
@@ -168,20 +168,20 @@ print("Ok")
 
 #####################################
 print("*** MULTIPLICATION VECTOR ***")
-x=np.random.randint(int_max, size=(dim2,1))
+x=np.random.rand(dim2,1)
 x_old=x.copy()
 
 expected_y=F_dense.dot(x)
 
 
-y=F*x
+y=F@x
 
 if (y.shape[0] != dim1) | (y.shape[1] != 1):
 	print('expected size :  (' + str(dim1) + ',1)')
 	print('got  ' + str(y.shape[0])+','+str(y.shape[1]))
 	raise ValueError('multiplication : invalid size of ouput vector')
 
-if not (y==expected_y).all():
+if not np.allclose(expected_y, y):
 	raise ValueError('multiplication : invalid ouput vector y')
 	
 if not (x_old==x).all():
@@ -193,20 +193,20 @@ print("Ok")
 
 ######################################
 print("*** MULTIPLICATION MATRIX ***")
-X=np.random.randint(int_max, size=(dim2,dim3))
+X=np.random.rand(dim2,dim3)
 X_old=X.copy()
 
 expected_Y=F_dense.dot(X)
 
 
-Y=F*X
+Y=F@X
 
 if (Y.shape[0] != dim1) | (Y.shape[1] != dim3):
 	print('expected size :  (' + str(dim1) + ','+str(dim3)+')')
 	print('got  ' + str(Y.shape[0])+','+str(Y.shape[1]))
 	raise ValueError('multiplication : invalid size of ouput matrix')
 
-if not (Y==expected_Y).all():
+if not np.allclose(expected_Y, Y):
 	raise ValueError('multiplication : invalid ouput matrix Y')
 
 
@@ -225,7 +225,7 @@ for i in range(dim1):
 		if F_i_j[0,0] != F_dense[i,j]:
 			raise ValueError('invalid value')
 			
-		if F_i_j[0,0] != F_trans_dense[j,i]:
+		if np.abs(F_trans_j_i[0,0]-F_trans_dense[j,i]) > 1e-6:
 			raise ValueError('invalid value')
 		
 F_dense_slice = F[...]
