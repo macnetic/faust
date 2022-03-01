@@ -967,7 +967,7 @@ template<typename FPP>
 			old_FM_mul_mod = this->mul_order_opt_mode;
 			this->set_FM_mul_mode(mul_order_opt_mode);
 		}
-		if(this->mul_order_opt_mode)
+		if(this->mul_order_opt_mode && this->size() > 1 /* no need to do something special if this is a single factor Faust*/)
 		{
 			if(this->mul_order_opt_mode == DYNPROG)
 			{
