@@ -145,7 +145,7 @@ for j in range(nb_dim):
 
 	for i in range(nb_mult):
 		#print(str(i)+"/"+str(nb_mult))
-		x=np.random.randint(int_max, size=(dim,1))
+		x=np.random.rand(dim,1)
 		
 		t=time.time()
 		y_dense=F_dense.dot(x)
@@ -159,7 +159,7 @@ for j in range(nb_dim):
 		t=time.time()
 		y_Faust=F.dot(x)
 		t_list[i,j,2]=time.time()-t
-		assert((y_dense == y_Faust).all())
+		assert(np.allclose(y_Faust, y_scipy))
 		
 		
 		t=time.time()
@@ -170,7 +170,7 @@ for j in range(nb_dim):
 		t=time.time()
 		y_Faust_trans=F.transpose().dot(x)
 		t_list[i,j,4]=time.time()-t
-		assert((y_dense_trans == y_Faust_trans).all())
+		assert(np.allclose(y_dense_trans, y_Faust_trans))
 
 
 
@@ -182,13 +182,13 @@ for j in range(nb_dim):
 			if not (y_Faust==y_scipy).all():
 				raise ValueError('multiplication : invalid ouput vector Y')
 			
-			if not (y_Faust==y_dense).all():
+			if not np.allclose(y_Faust,y_dense):
 				print("Error")
 				print(y_Faust)
 				print(y_dense)
 				raise ValueError('multiplication : dense_multiplication different from Faust one')
 			
-			if not (y_Faust_trans==y_dense_trans).all():
+			if not np.allclose(y_Faust_trans, y_dense_trans):
 				print("Error")
 				print(y_Faust)
 				print(y_dense)
