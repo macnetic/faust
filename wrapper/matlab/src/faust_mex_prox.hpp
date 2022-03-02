@@ -89,6 +89,9 @@ void faust_prox(const mxArray **prhs, const int nrhs, mxArray **plhs, const int 
 			case CONSTRAINT_NAME_SKPERM:
 				Faust::prox_skperm(mat, (faust_unsigned_int) scal_param, normalized, pos);
 				break;
+			case CONSTRAINT_NAME_ID:
+				Faust::prox_id(mat, normalized, pos);
+				break;
 			default:
 				mexErrMsgTxt("Unknown constraint name/type.");
 		}

@@ -23,6 +23,7 @@ classdef ConstraintName
 		CIRC = 11
 		HANKEL = 12
 		SKPERM = 13
+		ID = 14
 	end
 	properties(SetAccess = public)
 		name
@@ -34,7 +35,7 @@ classdef ConstraintName
 			if(ischar(name) || iscell(name))
 				name = ConstraintName.str2name_int(name);
 			end
-			if(name > ConstraintName.SKPERM || name < ConstraintName.SP) %|| name == ConstraintName.BLKDIAG)
+			if(name > ConstraintName.ID || name < ConstraintName.SP) %|| name == ConstraintName.BLKDIAG)
 				msg = 'name must be an integer among ConstraintName.SP, ConstraintName.SPCOL, ConstraintName.NORMCOL, ConstraintName.SPLINCOL, ConstraintName.CONST, ConstraintName.SP_POS, ConstraintName.SUPP, ConstraintName.NORMLIN, ConstraintName.TOEPLITZ, ConstraintName.CIRC, ConstraintName.HANKEL, ConstraintName.SKPERM.';
 				error(msg)
 			end
@@ -56,7 +57,7 @@ classdef ConstraintName
 		end
 
 		function is_mat = is_mat_constraint(obj)
-			is_mat = obj.name == obj.SUPP || obj.name == obj.CONST || obj.name == obj.CIRC || obj.name == obj.TOEPLITZ || obj.name == obj.HANKEL || obj.name == obj.BLKDIAG;
+			is_mat = obj.name == obj.SUPP || obj.name == obj.CONST || obj.name == obj.CIRC || obj.name == obj.TOEPLITZ || obj.name == obj.HANKEL || obj.name == obj.BLKDIAG || obj.name == obj.ID;
 		end
 
 		function str = conv2str (obj)
@@ -89,6 +90,8 @@ classdef ConstraintName
 					str = 'hankel';
 				case obj.BLKDIAG;
 					str = 'blockdiag';
+				case obj.ID
+					str = 'id';
 				otherwise
 					error('Unknown name')
 			end
@@ -130,6 +133,8 @@ classdef ConstraintName
 					id = ConstraintName.HANKEL;
 				case 'blockdiag'
 					id = ConstraintName.BLKDIAG;
+				case 'id'
+					id = ConstraintName.ID;
 				otherwise
 					error(err_msg)
 			end
