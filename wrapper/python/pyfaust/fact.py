@@ -914,8 +914,8 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
 
         This factorization parameterization is the same as the one shown in 2.
         except that there is no constraints at all on residual factors. See
-        pyfaust.factparams.ParamsHierarchicalSimpleCons and
-        pyfaust.factparams.ParamsHierarchicalWHTSimpleCons for more details.
+        pyfaust.factparams.ParamsHierarchicalNoResCons and
+        pyfaust.factparams.ParamsHierarchicalWHTNoResCons for more details.
 
         >>> from pyfaust import wht
         >>> from pyfaust.fact import hierarchical
@@ -940,8 +940,8 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
 
        The factorization parameterization shown here is the same as in 3.
        except that there is no constraint at all on residual factors. See
-       pyfaust.factparams.ParamsHierarchicalSimpleCons and
-       pyfaust.factparams.ParamsHierarchicalRectMatSimpleCons for more details.
+       pyfaust.factparams.ParamsHierarchicalNoResCons and
+       pyfaust.factparams.ParamsHierarchicalRectMatNoResCons for more details.
        In the example below the MEG matrix is factorized according to the
        parameterization shown in 3. (aka "MEG") and on the other hand with
        the parameterization of interest here (aka "MEG_SIMPLE", with no
