@@ -287,19 +287,13 @@ void prepare_fact(const FPP* mat, const unsigned int num_rows, const unsigned in
             cons_mat = static_cast<PyxConstraintMat<FPP>*>(p->constraints[i]);
 //            if(p->is_verbose)
 //                cout << "constraint[" << i << "]->parameter: " << cons_mat->parameter[0] << endl;
-            if(p->constraints[i]->name == CONSTRAINT_NAME_ID)
-            {
-                tmp_cons = new Faust::ConstraintMat<FPP, Cpu>(CONSTRAINT_NAME_ID, p->constraints[i]->num_rows, p->constraints[i]->num_cols);
-            }
-            else
-            {
-                Faust::MatDense<FPP, Cpu> P;
+            Faust::MatDense<FPP, Cpu> P;
+            if(cons_mat->parameter_sz > 0) // Identity Constraint has not cons_mat->parameter matrix
                 if(p->constraints[i]->num_rows * p->constraints[i]->num_cols == cons_mat->parameter_sz)
                     P = Faust::MatDense<FPP, Cpu>(cons_mat->parameter, p->constraints[i]->num_rows, p->constraints[i]->num_cols);
                 else
                     P = Faust::MatDense<FPP, Cpu>(cons_mat->parameter, cons_mat->parameter_sz/2, 2);
-                tmp_cons = new Faust::ConstraintMat<FPP,Cpu>(static_cast<faust_constraint_name>(p->constraints[i]->name), P, p->constraints[i]->num_rows, p->constraints[i]->num_cols);
-            }
+            tmp_cons = new Faust::ConstraintMat<FPP,Cpu>(static_cast<faust_constraint_name>(p->constraints[i]->name), P, p->constraints[i]->num_rows, p->constraints[i]->num_cols);
             cons.push_back(tmp_cons);
         }
         else
@@ -621,7 +615,8 @@ TransformHelper<FPP, DEV>* palm4msa2020_gen(FPP* mat, unsigned int num_rows, uns
 				nrows = cons_mat->parameter_sz/2;
 				ncols = 2;
 			}
-			P = Faust::MatDense<FPP, DEV>(nrows, ncols, cons_mat->parameter);
+            if(cons_mat->parameter_sz > 0) // Identity Constraint has not cons_mat->parameter matrix
+                P = Faust::MatDense<FPP, DEV>(nrows, ncols, cons_mat->parameter);
             tmp_cons = new Faust::ConstraintMat<FPP,DEV>(static_cast<faust_constraint_name>(constraints[i]->name), P, constraints[i]->num_rows, constraints[i]->num_cols);
             fact_cons.push_back(tmp_cons);
         }
@@ -772,26 +767,20 @@ Faust::TransformHelper<FPP,DEV>* hierarchical2020_gen(FPP* mat, unsigned int num
 			faust_unsigned_int nrows, ncols;
             //            if(is_verbose)
             //                cout << "constraint[" << i << "]->parameter: " << cons_mat->parameter[0] << endl;
-            if(constraints[i]->name == CONSTRAINT_NAME_ID)
+            Faust::MatDense<FPP, DEV> P;
+            if(constraints[i]->num_rows * constraints[i]->num_cols == cons_mat->parameter_sz)
             {
-                tmp_cons = new Faust::ConstraintMat<FPP, Cpu>(CONSTRAINT_NAME_ID, constraints[i]->num_rows, constraints[i]->num_cols);
+                nrows = constraints[i]->num_rows;
+                ncols = constraints[i]->num_cols;
             }
             else
             {
-                Faust::MatDense<FPP, DEV> P;
-                if(constraints[i]->num_rows * constraints[i]->num_cols == cons_mat->parameter_sz)
-                {
-                    nrows = constraints[i]->num_rows;
-                    ncols = constraints[i]->num_cols;
-                }
-                else
-                {
-                    nrows = cons_mat->parameter_sz/2;
-                    ncols = 2;
-                }
-                P = Faust::MatDense<FPP, DEV>(nrows, ncols, cons_mat->parameter);
-                tmp_cons = new Faust::ConstraintMat<FPP, DEV>(static_cast<faust_constraint_name>(constraints[i]->name), P, constraints[i]->num_rows, constraints[i]->num_cols);
+                nrows = cons_mat->parameter_sz/2;
+                ncols = 2;
             }
+            if(cons_mat->parameter_sz > 0) // Identity Constraint has not cons_mat->parameter matrix
+                P = Faust::MatDense<FPP, DEV>(nrows, ncols, cons_mat->parameter);
+            tmp_cons = new Faust::ConstraintMat<FPP, DEV>(static_cast<faust_constraint_name>(constraints[i]->name), P, constraints[i]->num_rows, constraints[i]->num_cols);
             cons.push_back(tmp_cons);
         }
         else
