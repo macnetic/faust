@@ -954,6 +954,35 @@ class ParamsFact(ABC):
                                  +repr(range(len(a))))
             return factor_format
 
+    @staticmethod
+    def get_constraints(projs):
+        """
+        Returns a python list of constraints from the projs list/tuple that can be a
+        mix of pyfaust.factparams.ConstraintGeneric or pyfaust.proj.proj_gen.
+        If projs is a ConstraintList then the function just returns the same
+        object as is.
+
+        The function purpose is to make the list uniform as ConstraintGeneric
+        objects.
+        """
+        from pyfaust.proj import proj_gen
+        if isinstance(projs, ConstraintList):
+            return projs
+        constraints = []
+        for p in projs:
+            if isinstance(p, ConstraintGeneric):
+                constraints += [p]
+            elif isinstance(p, proj_gen):
+                if not hasattr(p, 'constraint') or not isinstance(p.constraint,
+                                                                 ConstraintGeneric):
+                    raise TypeError('The proj_gen object must have a'
+                                    ' constraint attribute which is a ConstraintGen')
+                constraints += [p.constraint]
+            else:
+                raise TypeError("The tuple/list element must be a"
+                                " ConstraintGeneric or a proj_gen")
+        return constraints
+
 class ParamsHierarchical(ParamsFact):
     """
         The parent class to set input parameters for the hierarchical factorization algorithm.
@@ -1037,24 +1066,16 @@ class ParamsHierarchical(ParamsFact):
             is experimental, its value shouln't be changed.
         """
         import pyfaust.proj
-        if((isinstance(fact_constraints, list) or isinstance(fact_constraints, tuple))
-           and np.array([isinstance(fact_constraints[i],pyfaust.proj.proj_gen) for i in
-                    range(0,len(fact_constraints))]).all()):
-            # "convert" projs to constraints
-            fact_constraints = [ p.constraint for p in fact_constraints ]
-        if((isinstance(res_constraints, list) or isinstance(res_constraints, tuple))
-           and np.array([isinstance(res_constraints[i],pyfaust.proj.proj_gen) for i in
-                    range(0,len(res_constraints))]).all()):
-            # "convert" projs to constraints
-            res_constraints = [ p.constraint for p in res_constraints ]
-        if(not isinstance(fact_constraints, list) and not
-           isinstance(fact_constraints, ConstraintList)):
+        if not isinstance(fact_constraints, (list, tuple, ConstraintList)):
             raise TypeError('fact_constraints must be a list of '
                             'ConstraintGeneric or pyfaust.proj.proj_gen or a'
                             ' ConstraintList.')
-        if(not isinstance(res_constraints, list) and not
-           isinstance(res_constraints, ConstraintList)):
+        if not isinstance(res_constraints, (list, tuple, ConstraintList)):
             raise TypeError('res_constraints must be a list or a ConstraintList.')
+        fact_constraints = ParamsFact.get_constraints(fact_constraints)
+        res_constraints = ParamsFact.get_constraints(res_constraints)
+        print("fact_constraints", fact_constraints)
+        print("res_constraints", res_constraints)
         if(len(fact_constraints) != len(res_constraints)):
             raise ValueError('fact_constraints and res_constraints must have'
                              ' same length.')
@@ -1308,7 +1329,7 @@ class ParamsHierarchicalSimpleCons(ParamsHierarchical):
         Constructor.
 
         Args:
-            fact_constraints: the list of pyfaust.proj.proj_gen or pyfaust.factparams.ConstraintGen that define the structure of the pyfaust.fact.hierarchical resulting Faust factors in the same order if is_fact_side_left==False in the reverse order otherwise.
+            fact_constraints: the list of pyfaust.proj.proj_gen or pyfaust.factparams.ConstraintGeneric that define the structure of the pyfaust.fact.hierarchical resulting Faust factors in the same order if is_fact_side_left==False in the reverse order otherwise.
             stop_crit1: cf. pyfaust.fact.ParamsHierarchical.__init__
             stop_crit2: cf. pyfaust.fact.ParamsHierarchical.__init__
             is_update_way_R2L: cf. pyfaust.fact.ParamsHierarchical.__init__
@@ -1842,10 +1863,10 @@ class ParamsPalm4MSA(ParamsFact):
                 cost).
 
         """
-        if(not isinstance(constraints, list) and not
-           isinstance(constraints, ConstraintList)):
+        if not isinstance(constraints, (list, tuple, ConstraintList)):
             raise TypeError('constraints argument must be a list or a'
                             ' ConstraintList.')
+        constraints = ParamsFact.get_constraints(constraints)
         num_facts = len(constraints)
         super(ParamsPalm4MSA, self).__init__(num_facts, is_update_way_R2L,
                                              init_lambda,
@@ -1880,7 +1901,7 @@ class ParamsPalm4MSA(ParamsFact):
                             ' shape attribute')
         # check matrix against constraints consistency
         cons_ok = False
-        # either constraints[i] is a ConstraintGen or a proj_gen object, it has
+        # either constraints[i] is a ConstraintGeneric or a proj_gen object, it has
         # the shape attribute/property
         if not (cons_ok := M.shape[0] == self.constraints[0].shape[0]):
             raise ValueError('ParamsPalm4MSA error: the matrix M to factorize must have the same'
