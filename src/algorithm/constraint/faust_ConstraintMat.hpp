@@ -165,6 +165,7 @@ void Faust::ConstraintMat<FPP,DEVICE>::project(Faust::MatDense<FPP,DEVICE> & mat
 		 break;
 	  case CONSTRAINT_NAME_ID:
 		 Faust::prox_id(mat, normalizing, pos);
+		 break;
       default:
          handleError(m_className,"project : invalid constraint_name");
          break;

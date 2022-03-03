@@ -72,7 +72,7 @@ bool is_constraint_name_real(const char * type)
 
 bool is_constraint_name_mat(const char * type)
 {
-	return (strcmp(type,"supp") == 0) || (strcmp(type,"const")==0) || ! strcmp(type, "toeplitz") || ! strcmp(type, "circ") || ! strcmp(type, "blockdiag") || !strcmp(type, "blkdiag") || ! strcmp (type, "hankel");
+	return (strcmp(type,"supp") == 0) || (strcmp(type,"const")==0) || ! strcmp(type, "toeplitz") || ! strcmp(type, "circ") || ! strcmp(type, "blockdiag") || !strcmp(type, "blkdiag") || ! strcmp (type, "hankel") || ! strcmp(type, "id") || ! strcmp(type, "proj_id");
 }
 
 faust_constraint_name get_equivalent_constraint(const char * type)
@@ -100,7 +100,8 @@ faust_constraint_name get_equivalent_constraint(const char * type)
 		return CONSTRAINT_NAME_NORMLIN;
 	if(!strcmp(type, "skperm"))
 		return CONSTRAINT_NAME_SKPERM;
-
+	if(!strcmp(type, "id"))
+		return CONSTRAINT_NAME_ID;
 	handleError("Faust::ConstraintGeneric","get_equivalent_constraint : Unknown type of constraint");
 }
 
@@ -161,6 +162,8 @@ const char* Faust::ConstraintGeneric::get_constraint_name()const
 		 return "CONSTRAINT_NAME_HANKEL";
 	  case CONSTRAINT_NAME_TOEPLITZ:
 		 return "CONSTRAINT_NAME_TOEPLITZ";
+	  case CONSTRAINT_NAME_ID:
+		 return "CONSTRAINT_NAME_ID";
       default:
          return "unknown constraint name";
    }
