@@ -1547,11 +1547,9 @@ class ParamsHierarchicalWHTNoResCons(ParamsHierarchicalNoResCons):
     """
     def __init__(self, n):
         """
-        args:
+        Args:
             n: the number of output factors (the input matrix to factorize must
             be of shape (2**n, 2**n)) .
-            proj_name: the type of projector used, must be either
-            'splincol' (default value) or 'skperm'.
         """
         proj_name = 'skperm' # when proj_id is used to constraint intermediate
         # residual factors the splincol prox doesn't work well (bad

@@ -133,7 +133,7 @@ classdef ConstraintName
 					id = ConstraintName.HANKEL;
 				case 'blockdiag'
 					id = ConstraintName.BLKDIAG;
-				case 'id'
+				case {'id', 'proj_id'}
 					id = ConstraintName.ID;
 				otherwise
 					error(err_msg)
