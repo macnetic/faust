@@ -262,5 +262,35 @@ classdef (Abstract) ParamsFact
 			end
 
 		end
+
+        % =========================================================
+        %> @brief Returns a cell array of constraints from constraints which is a ConstraintList or cell array that can be a
+        %> mix of pyfaust.factparams.ConstraintGeneric or pyfaust.proj.proj_gen.
+        %> If projs is a ConstraintList then the function just returns the same
+        %> object as is.
+        %>
+        %> The function purpose is to make the list uniform as ConstraintGeneric
+        %> objects.
+        % =========================================================
+        function clist = get_constraints(constraints)
+			if(isa(constraints, 'matfaust.factparams.ConstraintList'))
+				clist = constraints.clist;
+			elseif(isa(constraints, 'cell'))
+				clist = cell(1, length(constraints));
+				for i=1:length(constraints)
+					c = constraints{i};
+					if(isa(c, 'matfaust.proj.proj_gen'))
+						clist{i} = c.constraint;
+					elseif(isa(c, 'matfaust.factparams.ConstraintGeneric'))
+						clist{i} = c;
+					else
+						error('constraints items must be of type ConstraintGeneric or proj_gen')
+					end
+				end
+			else
+				error('constraints must be of type ConstraintList or cell array')
+			end
+		end
+
 	end
 end

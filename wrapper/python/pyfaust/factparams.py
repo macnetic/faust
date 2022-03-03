@@ -957,7 +957,8 @@ class ParamsFact(ABC):
     @staticmethod
     def get_constraints(projs):
         """
-        Returns a python list of constraints from the projs list/tuple that can be a
+        Returns a python list of constraints from the projs which is a
+        ConstralintList or a list/tuple that can be a
         mix of pyfaust.factparams.ConstraintGeneric or pyfaust.proj.proj_gen.
         If projs is a ConstraintList then the function just returns the same
         object as is.
