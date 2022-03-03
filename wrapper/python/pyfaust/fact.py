@@ -957,7 +957,7 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
         >>> F1 = hierarchical(MEG, ['MEG', 5, 10, 8], backend=2020)
         >>> F2 = hierarchical(MEG, ['MEG_SIMPLE', 5, 10, 8], backend=2020)
         # compare the error:
-        >>> F2 - MEG).norm() / Faust(MEG).norm()
+        >>> (F2 - MEG).norm() / Faust(MEG).norm()
         0.13033595653237676
         >>> (F1 - MEG).norm() / Faust(MEG).norm()
         0.12601709513741005

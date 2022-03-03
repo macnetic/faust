@@ -8,7 +8,7 @@ from abc import ABC, abstractmethod
 from warnings import warn
 
 
-## @package pyfaust.factparams @brief The module for the parametrization of FAuST's algorithms (Palm4MSA and Hierarchical Factorization).
+## @package pyfaust.factparams @brief The module for the parameterization of FAuST's algorithms (Palm4MSA and Hierarchical Factorization).
 ## <b/> See also: pyfaust.fact.hierarchical, pyfaust.fact.palm4msa
 
 """
@@ -989,7 +989,7 @@ class ParamsHierarchical(ParamsFact):
         The parent class to set input parameters for the hierarchical factorization algorithm.
 
         The class' goal is to instantiate a fully defined set of parameters
-        for the algorithm. But it exists simplified parametrizations for the
+        for the algorithm. But it exists simplified parameterizations for the
         same algorithm as child classes.
 
         <b/> See also ParamsHierarchicalWHT,
@@ -1075,8 +1075,6 @@ class ParamsHierarchical(ParamsFact):
             raise TypeError('res_constraints must be a list or a ConstraintList.')
         fact_constraints = ParamsFact.get_constraints(fact_constraints)
         res_constraints = ParamsFact.get_constraints(res_constraints)
-        print("fact_constraints", fact_constraints)
-        print("res_constraints", res_constraints)
         if(len(fact_constraints) != len(res_constraints)):
             raise ValueError('fact_constraints and res_constraints must have'
                              ' same length.')
@@ -1253,7 +1251,7 @@ class ParamsHierarchicalNoResCons(ParamsHierarchical):
 
 
     Example:
-        This example shows two parametrizations that are equivalent. The first one,
+        This example shows two parameterizations that are equivalent. The first one,
         p1, is defined trough a ParamsHierarchical instance while the second one,
         p2, is defined using a ParamsHierarchicalNoResCons instance.
 
@@ -1547,9 +1545,11 @@ class ParamsHierarchicalWHTNoResCons(ParamsHierarchicalNoResCons):
     """
     def __init__(self, n):
         """
-        Args:
+        args:
             n: the number of output factors (the input matrix to factorize must
             be of shape (2**n, 2**n)) .
+            proj_name: the type of projector used, must be either
+            'splincol' (default value) or 'skperm'.
         """
         proj_name = 'skperm' # when proj_id is used to constraint intermediate
         # residual factors the splincol prox doesn't work well (bad
@@ -1611,7 +1611,7 @@ class ParamsHierarchicalRectMat(ParamsHierarchical):
 
     def __init__(self, m, n, j, k, s, rho=0.8, P=None):
         """
-        Constructor for the specialized parametrization used for example in the pyfaust.demo.bsl (brain souce localization).
+        Constructor for the specialized parameterization used for example in the pyfaust.demo.bsl (brain souce localization).
 
         For a better understanding you might refer to [1].
 
@@ -1657,11 +1657,33 @@ class ParamsHierarchicalRectMat(ParamsHierarchical):
                                                             stop_crit,
                                                             is_update_way_R2L=True,
                                                             is_fact_side_left=True)
+    @staticmethod
+    def _parse_p(p):
+        # p = ('rectmat', j, k, s)
+        # or p is (['rectmat', j, k, s ],{'rho':rho, P: P})
+        if(isinstance(p, tuple) or isinstance(p, list)):
+            if(len(p) == 2 and (isinstance(p[0], list) or isinstance(p[0],
+                                                                    tuple))
+              and len(p[0]) == 4 and isinstance(p[1], dict) and 'rho' in
+               p[1].keys() and 'P' in p[1].keys()):
+                # ENOTE: concatenation instead of unpacking into list
+                # because of py2 (it would be ok for py3)
+                p = list(p[0][:])+[p[1]['rho'], p[1]['P']]
+            elif(len(p) == 4 and (isinstance(p, list) or isinstance(p,
+                                                                    tuple))):
+                pass #nothing to do
+            else:
+                raise ValueError('The valid formats for p are: '
+                                 '("rectmat",j,k,s) or '
+                                 '[("rectmat",j,k,s),{"rho": rho, "P": P}]'
+                                 ' with j, k, s being integers and rho and'
+                                 ' P being floats')
+        return p
 
     @staticmethod
     def createParams(M, p):
         """
-        Static member function to create a ParamsHierarchicalRectMat instance by a simplified parametrization expression.
+        Static member function to create a ParamsHierarchicalRectMat instance by a simplified parameterization expression.
 
         Args:
             p: a list of the form ['rectmat', j, k, s] to create a parameter
@@ -1677,108 +1699,47 @@ class ParamsHierarchicalRectMat(ParamsHierarchical):
             >>> p = ParamsHierarchicalRectMat.createParams(rand(256, 1024), ['rectmat', num_facts, k, s])
         """
         # caller is responsible to check if name in p is really 'rectmat'
-        def parse_p(p):
-            # p = ('rectmat', j, k, s)
-            # or p is (['rectmat', j, k, s ],{'rho':rho, P: P})
-            if(isinstance(p, tuple) or isinstance(p, list)):
-                if(len(p) == 2 and (isinstance(p[0], list) or isinstance(p[0],
-                                                                        tuple))
-                  and len(p[0]) == 4 and isinstance(p[1], dict) and 'rho' in
-                   p[1].keys() and 'P' in p[1].keys()):
-                    # ENOTE: concatenation instead of unpacking into list
-                    # because of py2 (it would be ok for py3)
-                    p = list(p[0][:])+[p[1]['rho'], p[1]['P']]
-                elif(len(p) == 4 and (isinstance(p, list) or isinstance(p,
-                                                                        tuple))):
-                    pass #nothing to do
-                else:
-                    raise ValueError('The valid formats for p are: '
-                                     '("rectmat",j,k,s) or '
-                                     '[("rectmat",j,k,s),{"rho": rho, "P": P}]'
-                                     ' with j, k, s being integers and rho and'
-                                     ' P being floats')
-            return p
-        p = parse_p(p)
+        p = ParamsHierarchicalRectMat._parse_p(p)
         if(not isinstance(M, np.ndarray)):
             raise TypeError('M must be a numpy.ndarray.')
         p = ParamsHierarchicalRectMat(M.shape[0], M.shape[1], *p[1:])
         return p
 
-class ParamsHierarchicalRectMatNoResCons(ParamsHierarchical):
+class ParamsHierarchicalRectMatNoResCons(ParamsHierarchicalRectMat):
     """
     This parameter class is the same as ParamsHierarchicalRectMat except that there is no residual factor constraints (see ParamsHierachicalNoResCons).
 
     <b/> See also pyfaust.fact.hierarchical, pyfaust.demo.bsl, pyfaust.factparams.ParamsHierarchicalRectMat, pyfaust.factparams.ParamsHierarchicalNoResCons
     """
 
-    DEFAULT_P_CONST_FACT = 1.4
-
-    def __init__(self, m, n, j, k, s, rho=0.8, P=None):
+    def __init__(self, m, n, j, k, s, rho=0.8, P=None, **kwargs):
         """
-        Constructor for the specialized parametrization used for example in the pyfaust.demo.bsl (brain souce localization).
-
-        For a better understanding you might refer to [1].
-
-        [1] Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse
-        approximations of matrices and applications", Journal of Selected
-        Topics in Signal Processing, 2016. [https://hal.archives-ouvertes.fr/hal-01167948v1]
+        This class defines the same parameterization as ParamsHierarchicalRectMat except that there is no constraint on the residual factors (cf.  pyfaust.proj.proj_id).
 
         Args:
-            m: the number of rows of the input matrix.
-            n: the number of columns of the input matrix.
-            j: the total number of factors.
-            k: the integer sparsity per column (SPCOL, pyfaust.proj.spcol) applied to the
-            rightmost factor (index j-1) of shape (m, n).
-            s: the integer sparsity targeted (SP, pyfaust.proj.sp) for all the factors from the
-            second (index 1) to index j-2. These factors are square of order n.
-            rho: defines the integer sparsity (SP, pyfaust.proj.sp) of the i-th residual (i=0:j-2): ceil(P*rho**i).
-            P: (default value is ParamsHierarchicalRectMat.DEFAULT_P_CONST_FACT) defines the integer sparsity of the i-th residual (i=0:j-2): ceil(P*rho**i).
+            m: cf. ParamsHierarchicalRectMat.__init__
+            n: cf. ParamsHierarchicalRectMat.__init__
+            j: cf. ParamsHierarchicalRectMat.__init__
+            k: cf. ParamsHierarchicalRectMat.__init__
+            s: cf. ParamsHierarchicalRectMat.__init__
+            rho: cf. ParamsHierarchicalRectMat.__init__
+            P: cf. ParamsHierarchicalRectMat.__init__
         """
-        from math import ceil
-        from pyfaust.proj import spcol, sp, proj_id
-        #test args
-        for arg,aname in zip([m, n, j, k, s],["m","n","j","k","s"]):
-            if(not isinstance(m, int) and not isinstance(m, np.integer)):
-                raise TypeError(aname+" must be an integer.")
-        if(not isinstance(rho, float)):
-            raise TypeError('rho must be a float')
-        if(not P):
-            P=ParamsHierarchicalRectMat.DEFAULT_P_CONST_FACT*m**2
-        elif(not isinstance(P, float)):
-            raise TypeError('P must be a float')
-        #S1_cons = ConstraintInt('spcol', m, n, k)
-        S1_cons = spcol((m,n), k)
-        S_cons = [S1_cons]
-        for i in range(j-2):
-#            S_cons += [ ConstraintInt('sp', m, m, s*m) ]
-            S_cons += [ sp((m, m), s*m) ]
-
-        R_cons = []
-        for i in range(j-1):
-            #R_cons += [ConstraintInt('sp', m, m, int(ceil(P*rho**i)))]
-            if i < j-2:
-                R_cons += [proj_id((m,m))]
-            else:
-                R_cons += [sp((m,m), int(ceil(P*rho**i)))]
-
-        stop_crit = StoppingCriterion(num_its=30)
-
+        from pyfaust.proj import proj_id
         super(ParamsHierarchicalRectMatNoResCons,
-              self).__init__([prox.constraint for prox in S_cons], [prox.constraint for prox in R_cons],
-                                                            stop_crit,
-                                                            stop_crit,
-                                                            is_update_way_R2L=True,
-                                                            is_fact_side_left=True)
-        self.S_cons = S_cons
-        self.R_cons = R_cons
+              self).__init__(m, n, j, k, s, rho, P, **kwargs)
+        n_cons = len(self.constraints)
+        # Remove all constraints on residuals factors
+        for i in range(0, n_cons//2):
+            self.constraints[i] = proj_id((m, m)).constraint
 
     @staticmethod
     def createParams(M, p):
         """
-        Static member function to create a ParamsHierarchicalRectMat instance by a simplified parametrization expression.
+        Static member function to create a ParamsHierarchicalRectMatNoResCons instance by a simplified parameterization expression.
 
         Args:
-            p: a list of the form ['rectmat', j, k, s] to create a parameter
+            p: a list of the form ['rectmat_simple', j, k, s] to create a parameter
             instance with the parameters j, k, s (see the class
             ParamsHierarchicalRectMat.__init__ for
             their definitions).
@@ -1788,31 +1749,12 @@ class ParamsHierarchicalRectMatNoResCons(ParamsHierarchical):
             >>> num_facts = 9
             >>> k = 10
             >>> s = 8
-            >>> p = ParamsHierarchicalRectMat.createParams(rand(256, 1024), ['rectmat', num_facts, k, s])
+            >>> p = ParamsHierarchicalRectMat.createParams(rand(256, 1024),
+                                                           ['rectmat_simple', num_facts, k, s])
         """
-        # caller is responsible to check if name in p is really 'rectmat'
-        def parse_p(p):
-            # p = ('rectmat', j, k, s)
-            # or p is (['rectmat', j, k, s ],{'rho':rho, P: P})
-            if(isinstance(p, tuple) or isinstance(p, list)):
-                if(len(p) == 2 and (isinstance(p[0], list) or isinstance(p[0],
-                                                                        tuple))
-                  and len(p[0]) == 4 and isinstance(p[1], dict) and 'rho' in
-                   p[1].keys() and 'P' in p[1].keys()):
-                    # ENOTE: concatenation instead of unpacking into list
-                    # because of py2 (it would be ok for py3)
-                    p = list(p[0][:])+[p[1]['rho'], p[1]['P']]
-                elif(len(p) == 4 and (isinstance(p, list) or isinstance(p,
-                                                                        tuple))):
-                    pass #nothing to do
-                else:
-                    raise ValueError('The valid formats for p are: '
-                                     '("rectmat",j,k,s) or '
-                                     '[("rectmat",j,k,s),{"rho": rho, "P": P}]'
-                                     ' with j, k, s being integers and rho and'
-                                     ' P being floats')
-            return p
-        p = parse_p(p)
+        # caller is responsible to check if name in p is really
+        # 'rectmat_simple' or 'meg_simple'
+        p = ParamsHierarchicalRectMat._parse_p(p)
         if(not isinstance(M, np.ndarray)):
             raise TypeError('M must be a numpy.ndarray.')
         p = ParamsHierarchicalRectMatNoResCons(M.shape[0], M.shape[1], *p[1:])
@@ -2063,7 +2005,7 @@ class ParamsFactFactory:
         c = ParamsFactFactory # class alias
         if(not c.is_a_valid_simplification(p)):
             raise TypeError('Invalid p to represent a simplified '
-                            'parametrization.')
+                            'parameterization.')
         param_id = c.get_simplification_name(p)
         if(param_id.lower() in c.SIMPLIFIED_PARAM_NAMES[c.SQRMAT_ID]):
             return ParamsHierarchicalWHT.createParams(M, p)
@@ -2076,7 +2018,7 @@ class ParamsFactFactory:
         elif(param_id.lower() in c.SIMPLIFIED_PARAM_NAMES[c.DFTMAT_ID]):
             return ParamsHierarchicalDFT.createParams(M, p)
         else:
-            raise ValueError("p is not a known simplified parametrization.")
+            raise ValueError("p is not a known simplified parameterization.")
 
     @staticmethod
     def get_simplification_name(p):
