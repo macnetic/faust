@@ -1250,7 +1250,12 @@ class ParamsHierarchicalNoResCons(ParamsHierarchical):
 
     <b/> See also ParamsHierarchical, pyfaust.fact.hierarchical
 
+
     Example:
+        This example shows two parametrizations that are equivalent. The first one,
+        p1, is defined trough a ParamsHierarchical instance while the second one,
+        p2, is defined using a ParamsHierarchicalNoResCons instance.
+
         >>> from pyfaust import wht
         >>> from pyfaust.proj import skperm, proj_id
         >>> from pyfaust.factparams import ParamsHierarchical, ParamsHierarchicalNoResCons, StoppingCriterion
@@ -1329,7 +1334,10 @@ class ParamsHierarchicalNoResCons(ParamsHierarchical):
         Constructor.
 
         Args:
-            fact_constraints: the list of pyfaust.proj.proj_gen or pyfaust.factparams.ConstraintGeneric that define the structure of the pyfaust.fact.hierarchical resulting Faust factors in the same order if is_fact_side_left==False in the reverse order otherwise.
+            fact_constraints: the list of pyfaust.proj.proj_gen or
+            pyfaust.factparams.ConstraintGeneric that define the structure of
+            the pyfaust.fact.hierarchical resulting Faust factors in the same
+            order if is_fact_side_left==False, in the reverse order otherwise.
             stop_crit1: cf. pyfaust.fact.ParamsHierarchical.__init__
             stop_crit2: cf. pyfaust.fact.ParamsHierarchical.__init__
             is_update_way_R2L: cf. pyfaust.fact.ParamsHierarchical.__init__
@@ -1346,7 +1354,15 @@ class ParamsHierarchicalNoResCons(ParamsHierarchical):
             grad_calc_opt_mode: cf. pyfaust.fact.ParamsHierarchical.__init__
         """
         from pyfaust.proj import proj_id
-        fact_constraints = list(fact_constraints) # copy it because it'll be modified
+        if isinstance(fact_constraints, ConstraintList):
+            fact_constraints = list(fact_constraints.clist)
+        elif isinstance(fact_constraints, list):
+            fact_constraints = list(fact_constraints) # copy it because it'll be modified
+        else:
+            raise TypeError('fact_constraints must be a list of'
+                            ' ConstraintGeneric/proj_gen or a'
+                            ' ConstraintList')
+        fact_constraints = ParamsFact.get_constraints(fact_constraints)
         res_constraints = []
         for i in range(len(fact_constraints)-2): # there is as many residuals than factors
             if is_fact_side_left:
