@@ -51,6 +51,7 @@ FUNCTIONS=$(sed -ne 's/^[[:blank:]]*function[[:blank:]]\{1,\}\([^=]\{1,\}=\)\{0,
 
 [[ -z "${FUNCTIONS}" ]] && echo "ERROR in getting the list of functions in $INPUT_FILE" && cp "$INPUT_FILE" "$OUTPUT_FILE" && exit 0 # not taken as an error for the calling script
 
+[[ "$DEBUG" = "FUNCTIONS" ]] && echo $FUNCTIONS
 
 mkdir -p $(dirname "$OUTPUT_FILE")
 cp "$INPUT_FILE" "$OUTPUT_FILE"
@@ -58,6 +59,7 @@ cp "$INPUT_FILE" "$OUTPUT_FILE"
 [ ! "$?" = 0 ] && echo "ERROR in copying file." >&2 && exit 4
 
 DOXY_BLOCKS_LIMITS=($(sed -ne '/[[:blank:]]*\%=\{4,\}[[:blank:]]*/=' "$INPUT_FILE"))
+[[ "$DEBUG" = DOXY_BLOCKS_LIMITS ]] && echo DOXY_BLOCKS_LIMITS=$DOXY_BLOCKS_LIMITS
 typeset -i DOXY_BLOCK_ID=0
 
 for FUNC in $FUNCTIONS
@@ -68,7 +70,7 @@ do
         NLINES=$(($(sed -ne '/^[[:blank:]]*function[[:blank:]]\{1,\}\([^=]\{1,\}=\)\{0,1\}[[:blank:]]*\('$FUNC'\)[[:blank:]]*(.*$/,/^[[:blank:]]*[^%]\{1,\}$/p' $OUTPUT_FILE | wc -l)-1))
         INLINE_DOC_END_NUM=$(($INLINE_DOC_START_NUM+$NLINES))
         FILE_NLINES=$(wc -l ${OUTPUT_FILE} | awk '{print $1}')
-        [[ "$DEBUG" = "INLINE_DOC_BLOCK" ]] && echo "INLINE_DOC_START_NUM=$INLINE_DOC_START_NUM NLINES=$NLINES INLINE_DOC_END_NUM=$INLINE_DOC_END_NUM"
+        [[ "$DEBUG" = "INLINE_DOC_BLOCK" ]] && echo "FUNC=$FUNC INLINE_DOC_START_NUM=$INLINE_DOC_START_NUM NLINES=$NLINES INLINE_DOC_END_NUM=$INLINE_DOC_END_NUM"
         # delete not empty inline code doc block
         # if [ ${#INLINE_DOC_LINE_NUMS[*]} -gt  2 ]
         # then
