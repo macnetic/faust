@@ -10,6 +10,24 @@ classdef ParamsHierarchicalRectMat < matfaust.factparams.ParamsHierarchical
 		OPT_ARG_NAMES3 = { 'rho', 'P' }
 	end
 	methods
+        %==================================
+        %>  Constructor for the specialized parameterization used for example in the matfaust.demo.bsl (brain souce localization).
+        %> For a better understanding you might refer to [1].
+        %>
+        %> [1] Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse
+        %> approximations of matrices and applications", Journal of Selected
+        %> Topics in Signal Processing, 2016. [https://hal.archives-ouvertes.fr/hal-01167948v1]
+        %>
+        %> @param m: the number of rows of the input matrix.
+        %> @param n: the number of columns of the input matrix.
+        %> @param j: the total number of factors.
+        %> @param k: the integer sparsity per column (SPCOL, matfaust.proj.spcol) applied to the
+        %> @param rightmost factor (index j-1) of shape (m, n).
+        %> @param s: s*m is the integer sparsity targeted (SP, matfaust.proj.sp) for all the factors from the
+        %> @param second (index 1) to index j-2. These factors are square of order n.
+        %> @param rho: defines the integer sparsity (SP, matfaust.proj.sp) of the i-th residual (i=0:j-2): ceil(P*rho**i).
+        %> @param P: (default value is ParamsHierarchicalRectMat.DEFAULT_P_CONST_FACT) defines the integer sparsity of the i-th residual (i=0:j-2): ceil(P*rho**i).
+        %==================================
 		function p = ParamsHierarchicalRectMat(m, n, j, k, s, varargin)
 			import matfaust.factparams.*
 			% verify arguments
@@ -36,7 +54,7 @@ classdef ParamsHierarchicalRectMat < matfaust.factparams.ParamsHierarchical
 			P = ParamsHierarchicalRectMat.DEFAULT_P_CONST_FACT*m^2;
 			idx_rho = ParamsHierarchicalRectMat.IDX_RHO;
 			idx_P = ParamsHierarchicalRectMat.IDX_P;
-			% get customed values if provided
+			% get custom values if provided
 			if(opt_arg_map.isKey(opt_arg_names{idx_rho}))
 				rho = opt_arg_map(opt_arg_names{idx_rho});
 			end

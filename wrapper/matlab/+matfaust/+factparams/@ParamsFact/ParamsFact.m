@@ -1,6 +1,7 @@
 
 % =========================================================
-%> The parent abstract class to represent the general factorization parameters.
+%> @brief The parent abstract class to represent the general factorization parameters.
+%> <p>@b See @b  matfaust.fact.hierarchical</p>
 % =========================================================
 classdef (Abstract) ParamsFact
 	properties (SetAccess = public)
@@ -263,7 +264,7 @@ classdef (Abstract) ParamsFact
 
 		end
 
-        % =========================================================
+        %=========================================================
         %> @brief Returns a cell array of constraints from constraints which is a ConstraintList or cell array that can be a
         %> mix of pyfaust.factparams.ConstraintGeneric or pyfaust.proj.proj_gen.
         %> If projs is a ConstraintList then the function just returns the same
@@ -271,7 +272,7 @@ classdef (Abstract) ParamsFact
         %>
         %> The function purpose is to make the list uniform as ConstraintGeneric
         %> objects.
-        % =========================================================
+        %=========================================================
         function clist = get_constraints(constraints)
 			if(isa(constraints, 'matfaust.factparams.ConstraintList'))
 				clist = constraints.clist;

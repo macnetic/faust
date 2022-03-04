@@ -1729,8 +1729,8 @@ class ParamsHierarchicalRectMatNoResCons(ParamsHierarchicalRectMat):
         super(ParamsHierarchicalRectMatNoResCons,
               self).__init__(m, n, j, k, s, rho, P, **kwargs)
         n_cons = len(self.constraints)
-        # Remove all constraints on residuals factors
-        for i in range(0, n_cons//2):
+        # Remove all constraints on residual factors except the last one
+        for i in range(0, n_cons//2-1):
             self.constraints[i] = proj_id((m, m)).constraint
 
     @staticmethod
