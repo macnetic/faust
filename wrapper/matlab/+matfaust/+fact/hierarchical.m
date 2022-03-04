@@ -160,6 +160,106 @@
 %> - FACTOR 4 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
 %> - FACTOR 5 (complex) SPARSE, size 32x32, density 1, nnz 1024
 %>
+%> @b Example 5: Simplified Parameters for Hadamard Factorization without residual
+%> constraints</b>
+%>
+%> This factorization parameterization is the same as the one shown in 2.
+%> except that there is no constraints at all on residual factors. See
+%> matfaust.factparams.ParamsHierarchicalNoResCons and
+%> matfaust.factparams.ParamsHierarchicalWHTNoResCons for more details.
+%> @code
+%> >> import matfaust.wht
+%> >> import matfaust.fact.hierarchical
+%> >> % generate a Hadamard Faust of size 32x32
+%> >> FH = wht(32);
+%> >> H = full(FH); % the full matrix version
+%> >> % factorize it
+%> >> FH2 = hierarchical(H, 'hadamard_simple', 'backend', 2020);
+%> @endcode
+%> Faust::hierarchical: 1/4<br/>
+%> Faust::hierarchical: 2/4<br/>
+%> Faust::hierarchical: 3/4<br/>
+%> Faust::hierarchical: 4/4<br/>
+%> @code
+%> >> % test the relative error
+%> >> norm(H-full(FH2), 'fro')/norm(H, 'fro')
+%> @endcode
+%> ans =
+%>
+%>      0
+%> @code
+%> >> FH2
+%> @endcode
+%>
+%> FH2 =
+%>
+%>      Faust size 32x32, density 0.3125, nnz_sum 320, 5 factor(s):
+%>      - FACTOR 0 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+%>      - FACTOR 1 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+%>      - FACTOR 2 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+%>      - FACTOR 3 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+%>      - FACTOR 4 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+%>
+%> @b Example 6: Simplified Parameters for a Rectangular Matrix Factorization (the BSL demo MEG matrix) without residual constraints</b>
+%>
+%> The factorization parameterization shown here is the same as in 3.
+%> except that there is no constraint at all on residual factors. See
+%> matfaust.factparams.ParamsHierarchicalNoResCons and
+%> matfaust.factparams.ParamsHierarchicalRectMatNoResCons for more details.
+%> In the example below the MEG matrix is factorized according to the
+%> parameterization shown in 3. (aka "MEG") and on the other hand with
+%> the parameterization of interest here (aka "MEG_SIMPLE", with no
+%> residual constraints), the approximate accuracy is quite the same so we
+%> can conclude that on this case (as in 5.) removing residual constraints can
+%> not only simplify the parameterization of hierarchical PALM4MSA but also
+%> be as efficient.
+%>
+%> @code
+%> >> import matfaust.fact.hierarchical
+%> >> MEG = load('matrix_MEG.mat');
+%> >> MEG = MEG.matrix.';
+%> >> F1 = hierarchical(MEG, {'MEG', 5, 10, 8}, 'backend', 2020)
+%> @endcode
+%>
+%> F1 =
+%>
+%> Faust size 204x8193, density 0.0697966, nnz_sum 116656, 5 factor(s):
+%> - FACTOR 0 (double) DENSE, size 204x204, density 0.716792, nnz 29830
+%> - FACTOR 1 (double) SPARSE, size 204x204, density 0.0392157, nnz 1632
+%> - FACTOR 2 (double) SPARSE, size 204x204, density 0.0392157, nnz 1632
+%> - FACTOR 3 (double) SPARSE, size 204x204, density 0.0392157, nnz 1632
+%> - FACTOR 4 (double) SPARSE, size 204x8193, density 0.0490196, nnz 81930
+%>
+%> @code
+%> >> F2 = hierarchical(MEG, {'MEG_SIMPLE', 5, 10, 8}, 'backend', 2020)
+%> @endcode
+%>
+%> F2 =
+%>
+%> Faust size 204x8193, density 0.0697966, nnz_sum 116656, 5 factor(s):
+%> - FACTOR 0 (double) DENSE, size 204x204, density 0.716792, nnz 29830
+%> - FACTOR 1 (double) SPARSE, size 204x204, density 0.0392157, nnz 1632
+%> - FACTOR 2 (double) SPARSE, size 204x204, density 0.0392157, nnz 1632
+%> - FACTOR 3 (double) SPARSE, size 204x204, density 0.0392157, nnz 1632
+%> - FACTOR 4 (double) SPARSE, size 204x8193, density 0.0490196, nnz 81930
+%>
+%> @code
+%> >> % compare the errors:
+%> >> norm(MEG-full(F2), 'fro') / norm(MEG, 'fro')
+%> @endcode
+%>
+%> ans =
+%>
+%>     0.1303
+%>
+%> @code
+%> >> norm(MEG-full(F1), 'fro') / norm(MEG, 'fro')
+%> @endcode
+%>
+%> ans =
+%>
+%>     0.1260
+%>
 %> <p> @b See @b also matfaust.faust_fact, factparams.ParamsHierarchical, factparams.ParamsHierarchicalSquareMat, factparams.ParamsHierarchicalRectMat,factparams.ParamsHierarchicalDFT
 %==========================================================================================
 function varargout = hierarchical(M, p, varargin)
