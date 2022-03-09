@@ -1,0 +1,46 @@
+#include "faust_constant.h"
+
+#include "faust_MatBSR.h"
+#include "faust_MatBSR_gpu.h"
+#include "faust_cuda_device.h"
+#include <cstdlib>
+#include <cmath>
+using namespace std;
+using namespace Faust;
+
+typedef @TEST_FPP@ FPP;
+
+void test_gpu_ctor_and_tocpu()
+{
+	auto nrows = 10;
+	auto ncols = 15;
+	auto bnrows = 5;
+	auto bncols = 5;
+	auto bnnz = 2;
+	auto cpu_bsr_mat = Faust::MatBSR<double, Cpu>::randMat(nrows, ncols, bnrows, bncols, bnnz);
+	Faust::MatBSR<double, Cpu> cpu_bsr_mat2;
+	Faust::MatBSR<double, GPU2> gpu_bsr_mat(
+			cpu_bsr_mat->getNbRow(),
+			cpu_bsr_mat->getNbCol(),
+			cpu_bsr_mat->getNbBlockRow(),
+			cpu_bsr_mat->getNbBlockCol(),
+			cpu_bsr_mat->getNBlocks(),
+			cpu_bsr_mat->get_bdata(),
+			cpu_bsr_mat->get_browptr(),
+			cpu_bsr_mat->get_bcolinds());
+	gpu_bsr_mat.tocpu(cpu_bsr_mat2);
+	assert(cpu_bsr_mat->norm() == cpu_bsr_mat2.norm());
+	MatDense<double, Cpu> diff_mat = cpu_bsr_mat->to_dense();
+	diff_mat -= cpu_bsr_mat2.to_dense();
+	assert(diff_mat.norm() < 1e-3);
+	cout << "OK" << endl;
+	delete cpu_bsr_mat;
+}
+
+int main()
+{
+	Faust::enable_gpu_mod();
+	test_gpu_ctor_and_tocpu();
+}
+
+
