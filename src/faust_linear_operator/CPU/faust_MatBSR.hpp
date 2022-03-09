@@ -13,10 +13,23 @@ namespace Faust
 	{
 	}
 
+	template<typename FPP>
+		MatBSR<FPP, Cpu>::MatBSR(faust_unsigned_int nrows, faust_unsigned_int ncols, faust_unsigned_int bnrows, faust_unsigned_int bncols, faust_unsigned_int nblocks) : MatGeneric<FPP, Cpu>(nrows, ncols), bmat(nrows, ncols, bnrows, bncols, nblocks)
+	{
+	}
+
 	template <typename FPP>
 		MatBSR<FPP,Cpu>::MatBSR(BSRMat<FPP>& bmat)
 		{
 			this->bmat = bmat;
+			this->dim1 = bmat.m;
+			this->dim2 = bmat.n;
+		}
+
+	template <typename FPP>
+		MatBSR<FPP,Cpu>::MatBSR(BSRMat<FPP>&& bmat)
+		{
+			this->bmat = std::move(bmat);
 			this->dim1 = bmat.m;
 			this->dim2 = bmat.n;
 		}
@@ -278,6 +291,24 @@ namespace Faust
 		void MatBSR<FPP,Cpu>::copy_bcolinds(int*& bcolinds_out) const
 		{
 			memcpy(bcolinds_out, bmat.bcolinds, bmat.bnnz*sizeof(int));
+		}
+
+	template <typename FPP>
+		const FPP* MatBSR<FPP,Cpu>::get_bdata() const
+		{
+			return bmat.data;
+		}
+
+	template <typename FPP>
+		const int* MatBSR<FPP,Cpu>::get_browptr() const
+		{
+			return bmat.browptr;
+		}
+
+	template <typename FPP>
+		const int* MatBSR<FPP,Cpu>::get_bcolinds() const
+		{
+			return bmat.bcolinds;
 		}
 
 	template<typename FPP>
@@ -570,7 +601,15 @@ BSRMat<T, BlockStorageOrder>::BSRMat(const BSRMat<T, BlockStorageOrder>& src_bma
 }
 
 template<typename T, int BlockStorageOrder>
-BSRMat<T, BlockStorageOrder>::BSRMat(unsigned long int nrows, unsigned long int ncols, unsigned long int bnrows, unsigned long int bncols, unsigned long int nblocks, const T* data, const int *block_rowptr, const int *block_colinds) : BSRMat<T, BlockStorageOrder>()
+BSRMat<T, BlockStorageOrder>::BSRMat(unsigned long int nrows, unsigned long int ncols, unsigned long int bnrows, unsigned long int bncols, unsigned long int nblocks, const T* data, const int *block_rowptr, const int *block_colinds) : BSRMat<T, BlockStorageOrder>(nrows, ncols, bnrows, bncols, nblocks)
+{
+		memcpy(this->data, data, sizeof(T)*nblocks*bm*bn);
+		memcpy(this->browptr, block_rowptr, sizeof(int)*(this->b_per_rowdim+1));
+		memcpy(this->bcolinds, block_colinds, sizeof(int)*this->bnnz);
+}
+
+template<typename T, int BlockStorageOrder>
+BSRMat<T, BlockStorageOrder>::BSRMat(unsigned long int nrows, unsigned long int ncols, unsigned long int bnrows, unsigned long int bncols, unsigned long int nblocks) : BSRMat<T, BlockStorageOrder>()
 {
 		// verify bm and bn evenly divide m and n
 		if(nrows%bnrows)
@@ -589,11 +628,8 @@ BSRMat<T, BlockStorageOrder>::BSRMat(unsigned long int nrows, unsigned long int 
 		int data_size = bnnz*bm*bn;
 		// init data
 		this->data = new T[data_size];
-		memcpy(this->data, data, sizeof(T)*nblocks*bm*bn);
 		this->browptr = new int[this->b_per_rowdim+1];
-		memcpy(this->browptr, block_rowptr, sizeof(int)*(this->b_per_rowdim+1));
 		this->bcolinds = new int[this->bnnz];
-		memcpy(this->bcolinds, block_colinds, sizeof(int)*this->bnnz);
 }
 
 template<typename T, int BlockStorageOrder>

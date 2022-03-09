@@ -42,10 +42,14 @@ namespace Faust
 
 			friend Transform<FPP,Cpu>; // TODO: limit to needed member functions only
 			BSRMat<FPP> bmat; // low-level BSRMat
-			MatBSR() : MatGeneric<FPP, Cpu>() {}
-			MatBSR(BSRMat<FPP>& mat);
+
 			public:
+			MatBSR() : MatGeneric<FPP, Cpu>(), bmat(BSRMat<FPP>()) {}
+			MatBSR(BSRMat<FPP>& mat);
+			MatBSR(BSRMat<FPP>&& bmat);
 			MatBSR(faust_unsigned_int nrows, faust_unsigned_int ncols, faust_unsigned_int bnrows, faust_unsigned_int bncols, faust_unsigned_int nblocks, const FPP* data, const int *block_rowptr, const int* block_colinds);
+			// \brief allocates buffers to the proper size but doesn't set them to any values
+			MatBSR(faust_unsigned_int nrows, faust_unsigned_int ncols, faust_unsigned_int bnrows, faust_unsigned_int bncols, faust_unsigned_int nblocks);
 			MatGeneric<FPP,Cpu>* Clone(const bool isOptimize=false) const;
 			void multiply(Vect<FPP,Cpu> & vec, char opThis) const;
 			Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> &v) const; // from LinearOperator
@@ -62,6 +66,9 @@ namespace Faust
 			void copy_bdata(FPP*& bdata_out) const;
 			void copy_browptr(int*& browptr_out) const;
 			void copy_bcolinds(int*& bcolinds) const;
+			const FPP* get_bdata() const;
+			const int* get_browptr() const;
+			const int* get_bcolinds() const;
 			void get_buf_sizes(size_t &bdata_size, size_t &browptr_size, size_t &bcolinds_size);
 			void operator*=(const FPP alpha);
 			std::string to_string(MatType type, const bool transpose=false, const bool displaying_small_mat_elts=false) const;
@@ -142,6 +149,7 @@ class BSRMat
 	BSRMat(): data(nullptr), bcolinds(nullptr), browptr(nullptr), bnnz(0), m(0), n(0), bm(0), bn(0), b_per_rowdim(0), b_per_coldim(0), zero(T(0)) {}
 	public:
 	BSRMat(unsigned long int nrows, unsigned long int ncols, unsigned long int bnrows, unsigned long int bncols, unsigned long int nblocks, const T* data, const int *block_rowptr, const int *block_colinds);
+	BSRMat(unsigned long int nrows, unsigned long int ncols, unsigned long int bnrows, unsigned long int bncols, unsigned long int nblocks);
 	/** Copy constructor */
 	BSRMat(const BSRMat<T, BlockStorageOrder>& src_bmat);
 	/** Move constructor */
