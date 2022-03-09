@@ -1,0 +1,45 @@
+#include "faust_MatBSR_gpu.h"
+namespace Faust
+{
+	template<>
+		MatBSR<@FAUST_SCALAR_FOR_GM@,GPU2>::MatBSR(
+				const faust_unsigned_int nrows,
+				const faust_unsigned_int ncols,
+				const faust_unsigned_int bnrows,
+				const faust_unsigned_int bncols,
+				const faust_unsigned_int bnnz,
+				const @FAUST_SCALAR_FOR_GM@* bdata,
+				const int32_t* browptr,
+				const int32_t* bcolinds,
+				const int32_t dev_id/*=-1*/,
+				const void* stream/*=nullptr*/)
+		{
+			auto bsr_funcs = GPUModHandler::get_singleton()->bsr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			auto gp_funcs = GPUModHandler::get_singleton()->gp_funcs();
+			auto cur_dev_id = gp_funcs->cur_dev();
+			gp_funcs->set_dev(dev_id);
+			//TODO: gpu_stream
+			//	gpu_mat = spm_funcs->togpu_stream();
+			gpu_mat = bsr_funcs->togpu(nrows, ncols, bnrows, bncols,  (@GM_SCALAR@*) reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(bdata), browptr, bcolinds, bnnz);
+			gp_funcs->set_dev(cur_dev_id);
+		}
+
+	template<>
+		void MatBSR<@FAUST_SCALAR_FOR_GM@,GPU2>::tocpu(int32_t* browptr, int32_t* bcolinds, @FAUST_SCALAR_FOR_GM@* bdata, int32_t* nrows/*=nullptr*/, int32_t* ncols/*=nullptr*/, int32_t *bnrows/*=nullptr*/, int32_t *bncols/*=nullptr*/, int32_t* bnnz/*=nullptr*/) const
+		{
+			auto bsr_funcs = GPUModHandler::get_singleton()->bsr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			bsr_funcs->tocpu(gpu_mat, browptr, bcolinds, (@GM_SCALAR@*) reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(bdata), nrows, ncols, bnrows, bncols, bnnz);
+		}
+
+	template<>
+		void MatBSR<@FAUST_SCALAR_FOR_GM@,GPU2>::tocpu(MatBSR<@FAUST_SCALAR_FOR_GM@, Cpu> &cpu_mat) const
+		{
+			auto bsr_funcs = GPUModHandler::get_singleton()->bsr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			int32_t nrows, ncols, bnrows, bncols, bnnz;
+			bsr_funcs->info(gpu_mat, &nrows, &ncols, &bnrows, &bncols, &bnnz);
+			MatBSR<@FAUST_SCALAR_FOR_GM@, Cpu> M(nrows, ncols, bnrows, bncols, bnnz);
+			bsr_funcs->tocpu(gpu_mat, const_cast<int*>(M.get_browptr()), const_cast<int*>(M.get_bcolinds()), (@GM_SCALAR@*) reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(const_cast<@FAUST_SCALAR_FOR_GM@*>(M.get_bdata())), nullptr, nullptr, nullptr, nullptr, nullptr);
+			cpu_mat = std::move(M);
+		}
+}
+
