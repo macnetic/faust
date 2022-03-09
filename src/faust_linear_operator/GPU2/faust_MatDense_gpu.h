@@ -7,6 +7,7 @@
 #include "faust_MatGeneric_gpu.h"
 #include "faust_Vect_gpu.h"
 #include "faust_MatSparse_gpu.h"
+#include "faust_MatBSR_gpu.h"
 #include "faust_gpu_mod_utils.h"
 namespace Faust
 {
@@ -19,6 +20,7 @@ namespace Faust
 		{
 			friend Transform<FPP,GPU2>; // need to access to get_gpu_mat_ptr
 			friend MatSparse<FPP,GPU2>;
+			friend MatBSR<FPP,GPU2>;
 			friend MatDense<std::complex<double>,GPU2>; // TODO limit to real function
 //			friend void gemm<>(const MatDense<FPP, GPU2> &A, const MatDense<FPP, GPU2> &B, MatDense<FPP, GPU2> &C, const FPP& alpha, const FPP& beta, const char opA, const char opB);
 //

@@ -65,6 +65,7 @@ namespace Faust
 
 			virtual void set_gpu_mat_ptr(void*);
 			/*********** own member functions **************/
+			void multiply(MatDense<FPP,GPU2>& M, char opThis='N') const;
 
 			void tocpu(int32_t* browptr, int32_t* bcolinds, FPP* bdata, int32_t* nrows=nullptr, int32_t* ncols=nullptr, int32_t *bnrows=nullptr, int32_t *bncol=nullptr, int32_t* bnnz=nullptr) const;
 			void tocpu(MatBSR<FPP, Cpu> &cpu_mat) const;

@@ -25,6 +25,18 @@ namespace Faust
 		}
 
 	template<>
+		void MatBSR<@FAUST_SCALAR_FOR_GM@,GPU2>::multiply(MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>& M, char opThis/*='N'*/) const
+		{
+			gm_Op gop_this;
+			char2gm_Op(opThis, gop_this);
+			auto bsr_funcs = GPUModHandler::get_singleton()->bsr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			auto gpu_dmat = bsr_funcs->mul_gpu_dsm_ext(gpu_mat, M.gpu_mat, nullptr, gop_this, OP_NOTRANSP);
+			dsm_funcs->free(M.get_gpu_mat_ptr());
+			M.gpu_mat = gpu_dmat;
+		}
+
+	template<>
 		void MatBSR<@FAUST_SCALAR_FOR_GM@,GPU2>::tocpu(int32_t* browptr, int32_t* bcolinds, @FAUST_SCALAR_FOR_GM@* bdata, int32_t* nrows/*=nullptr*/, int32_t* ncols/*=nullptr*/, int32_t *bnrows/*=nullptr*/, int32_t *bncols/*=nullptr*/, int32_t* bnnz/*=nullptr*/) const
 		{
 			auto bsr_funcs = GPUModHandler::get_singleton()->bsr_funcs((@FAUST_SCALAR_FOR_GM@)(0));

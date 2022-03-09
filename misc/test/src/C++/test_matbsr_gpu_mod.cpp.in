@@ -12,6 +12,7 @@ typedef @TEST_FPP@ FPP;
 
 void test_gpu_ctor_and_tocpu()
 {
+	std::cout << "test_gpu_ctor_and_tocpu" << std::endl;
 	auto nrows = 10;
 	auto ncols = 15;
 	auto bnrows = 5;
@@ -30,17 +31,42 @@ void test_gpu_ctor_and_tocpu()
 			cpu_bsr_mat->get_bcolinds());
 	gpu_bsr_mat.tocpu(cpu_bsr_mat2);
 	assert(cpu_bsr_mat->norm() == cpu_bsr_mat2.norm());
-	MatDense<double, Cpu> diff_mat = cpu_bsr_mat->to_dense();
+	MatDense<FPP, Cpu> diff_mat = cpu_bsr_mat->to_dense();
 	diff_mat -= cpu_bsr_mat2.to_dense();
 	assert(diff_mat.norm() < 1e-3);
 	cout << "OK" << endl;
 	delete cpu_bsr_mat;
 }
 
+void test_gpu_mul_dense()
+{
+	std::cout << "test_gpu_mul_dense" << std::endl;
+	// gen a cpu random dense matrix
+	MatDense<FPP, Cpu> *cpu_dmat = MatDense<FPP, Cpu>::randMat(15, 10);
+	// convert it to gpu
+	MatDense<FPP, GPU2> gpu_dmat(*cpu_dmat);
+	// idem for bsr mats
+	auto cpu_bmat = MatBSR<double, Cpu>::randMat(10, 15, 5, 5, 2);
+	MatBSR<FPP, GPU2> gpu_bmat(*cpu_bmat);
+
+	// multiply on cpu
+	cpu_bmat->multiply(*cpu_dmat, 'N');
+	gpu_bmat.multiply(gpu_dmat, 'N');
+
+	MatDense<FPP, Cpu> diff_mat;
+	gpu_dmat.tocpu(diff_mat);
+	diff_mat -= *cpu_dmat;
+	assert(diff_mat.norm() < 1e-3);
+	delete cpu_bmat;
+	delete cpu_dmat;
+	std::cout << "OK" << std::endl;
+}
+
 int main()
 {
 	Faust::enable_gpu_mod();
 	test_gpu_ctor_and_tocpu();
+	test_gpu_mul_dense();
 }
 
 
