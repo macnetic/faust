@@ -5,6 +5,7 @@
 #include <Eigen/Dense>
 #include <list>
 #include <utility>
+template<typename T,int BlockStorageOrder=0> class BSRMat;
 #include "faust_MatGeneric.h"
 
 //template<typename FPP, FDevice DEVICE> class MatGeneric;
@@ -26,7 +27,6 @@ template<typename T>
 using Real = typename Eigen::NumTraits<T>::Real;
 #endif
 
-template<typename T,int BlockStorageOrder=0> class BSRMat;
 template<typename FPP, FDevice DEVICE> class Transform;
 
 

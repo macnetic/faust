@@ -1577,7 +1577,7 @@ void Faust::Transform<FPP,Cpu>::multiply(const FPP* A, int A_ncols, FPP* C, cons
 	using SparseMat = Eigen::SparseMatrix<FPP,Eigen::RowMajor>;
 	using DenseMat = Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>;
 	using DenseMatMap = Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>>;
-	using BSRMat = BSRMat<FPP, Cpu>;
+	using BSRMat = BSRMat<FPP, 0>;
 	std::function<void(SparseMat&, DenseMatMap&,  DenseMatMap&)> mul_sp_mat;
 	std::function<void(DenseMat&, DenseMatMap&,  DenseMatMap&)> mul_ds_mat;
 	std::function<void(BSRMat&, DenseMatMap&,  DenseMatMap&)> mul_bsr_mat;
