@@ -7,7 +7,7 @@ namespace Faust {
 
 	GPUModHandler* GPUModHandler::singleton = nullptr;
 
-	GPUModHandler::GPUModHandler() : gm_handle(nullptr), marr_funcs_double(nullptr), marr_funcs_float(nullptr), marr_funcs_cuComplex(nullptr), marr_funcs_cuDoubleComplex(nullptr), dsm_funcs_double(nullptr), dsm_funcs_float(nullptr), dsm_funcs_cuComplex(nullptr), dsm_funcs_cuDoubleComplex(nullptr), spm_funcs_double(nullptr), spm_funcs_float(nullptr), spm_funcs_cuComplex(nullptr), spm_funcs_cuDoubleComplex(nullptr), gp_funcs_(nullptr)
+	GPUModHandler::GPUModHandler() : gm_handle(nullptr), marr_funcs_double(nullptr), marr_funcs_float(nullptr), marr_funcs_cuComplex(nullptr), marr_funcs_cuDoubleComplex(nullptr), dsm_funcs_double(nullptr), dsm_funcs_float(nullptr), dsm_funcs_cuComplex(nullptr), dsm_funcs_cuDoubleComplex(nullptr), spm_funcs_double(nullptr), spm_funcs_float(nullptr), spm_funcs_cuComplex(nullptr), spm_funcs_cuDoubleComplex(nullptr), gp_funcs_(nullptr), bsr_funcs_double(nullptr), bsr_funcs_float(nullptr), bsr_funcs_cuComplex(nullptr), bsr_funcs_cuDoubleComplex(nullptr)
 	{
 		// class is only instatiatable with get_singleton (private ctor)
 	}
@@ -151,6 +151,26 @@ namespace Faust {
 		return marr_funcs_cuDoubleComplex;
 	}
 
+	gm_BSRMatFunc_double* GPUModHandler::bsr_funcs(const double &d) const
+	{
+		return bsr_funcs_double;
+	}
+
+	gm_BSRMatFunc_float* GPUModHandler::bsr_funcs(const float &d) const
+	{
+		return bsr_funcs_float;
+	}
+
+	gm_BSRMatFunc_cuComplex* GPUModHandler::bsr_funcs(const complex<float> &c) const
+	{
+		return bsr_funcs_cuComplex;
+	}
+
+	gm_BSRMatFunc_cuDoubleComplex* GPUModHandler::bsr_funcs(const complex<double> &c) const
+	{
+		return bsr_funcs_cuDoubleComplex;
+	}
+
 	gm_GenPurposeFunc* GPUModHandler::gp_funcs() const
 	{
 		return gp_funcs_;
@@ -177,5 +197,6 @@ namespace Faust {
 		else
 			throw std::runtime_error("invalid character to convert to gm_Op");
 	}
+
 
 }

@@ -50,6 +50,12 @@ namespace Faust
 		gm_SparseMatFunc_cuComplex* spm_funcs_cuComplex;
 		gm_SparseMatFunc_cuDoubleComplex* spm_funcs_cuDoubleComplex;
 
+		// BSRMat funcs for all scalar types
+		gm_BSRMatFunc_double* bsr_funcs_double;
+		gm_BSRMatFunc_float* bsr_funcs_float;
+		gm_BSRMatFunc_cuComplex* bsr_funcs_cuComplex;
+		gm_BSRMatFunc_cuDoubleComplex* bsr_funcs_cuDoubleComplex;
+
 		GPUModHandler();
 		void load_gm_functions();
 		void* init_gpu_mod(const string& libpath, bool silent, void* gm_handle);
@@ -62,7 +68,7 @@ namespace Faust
 		void check_gpu_mod_loaded() const;
 		bool is_gpu_mod_loaded() const;
 
-		// functions to access the good scalar type gpu_mod functions specifiying the type by argument value (templates are not possible here because of the C interface of the library)
+		// functions to access the good scalar type gpu_mod functions specifiying the type by argument value (templates are not possible here because of the library C interface )
 		// functions for sparse matrix (typically used in MatSparse<FPP,GPU2>)
 		gm_SparseMatFunc_double* spm_funcs(const double &d) const;
 		gm_SparseMatFunc_float* spm_funcs(const float &d) const;
@@ -81,6 +87,12 @@ namespace Faust
 		gm_MatArrayFunc_cuComplex* marr_funcs(const complex<float> &c) const;
 		gm_MatArrayFunc_cuDoubleComplex* marr_funcs(const complex<double> &c) const;
 
+		// functions for sparse matrix (typically used in MatBSR<FPP,GPU2>)
+		gm_BSRMatFunc_double* bsr_funcs(const double &d) const;
+		gm_BSRMatFunc_float* bsr_funcs(const float &d) const;
+		gm_BSRMatFunc_cuComplex* bsr_funcs(const complex<float> &c) const;
+		gm_BSRMatFunc_cuDoubleComplex* bsr_funcs(const complex<double> &c) const;
+
 		gm_GenPurposeFunc* gp_funcs() const;
 	};
 
@@ -93,12 +105,15 @@ namespace Faust
 			marr_funcs_##type = new gm_MatArrayFunc_##type();\
 			dsm_funcs_##type = new gm_DenseMatFunc_##type();\
 			spm_funcs_##type = new gm_SparseMatFunc_##type();\
+			bsr_funcs_##type = new gm_BSRMatFunc_##type();\
 			load_marr_funcs_##type(gm_handle, marr_funcs_##type);\
 			load_dsm_funcs_##type(gm_handle, dsm_funcs_##type);\
-			load_spm_funcs_##type(gm_handle, spm_funcs_##type)
+			load_spm_funcs_##type(gm_handle, spm_funcs_##type);\
+			load_bsr_funcs_##type(gm_handle, bsr_funcs_##type)
 
 #define delete_mat_funcs(type) \
 			delete marr_funcs_##type; \
 			delete dsm_funcs_##type; \
-			delete spm_funcs_##type
+			delete spm_funcs_##type; \
+			delete bsr_funcs_##type
 #endif
