@@ -514,4 +514,12 @@ namespace Faust
 			real_mat.gpu_mat = real_gpu_mat;
 		}
 
+		template<>
+			MatBSR<@FAUST_SCALAR_FOR_GM@, GPU2> MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::to_bsr(int bsize) const
+			{
+				auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs(@FAUST_SCALAR_FOR_GM@(0));
+				MatBSR<@FAUST_SCALAR_FOR_GM@, GPU2> bsr_mat;
+				bsr_mat.set_gpu_mat_ptr(spm_funcs->to_bsr(this->gpu_mat, bsize));
+				return bsr_mat;
+			}
 };

@@ -101,6 +101,7 @@ namespace Faust
 				MatType getType() const;
 				void multiply(Vect<FPP,GPU2>& vec, char opThis='N') const;
 				void multiply(MatDense<FPP,GPU2>& vec, char opThis='N') const;
+				MatBSR<FPP, GPU2> to_bsr(int bsize) const;
 				~MatSparse();
 
 			MatSparse<FPP,GPU2>* get_rows(faust_unsigned_int row_id_start, faust_unsigned_int num_rows) const;
