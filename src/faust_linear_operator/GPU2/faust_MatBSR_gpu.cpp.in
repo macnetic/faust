@@ -12,7 +12,7 @@ namespace Faust
 				const int32_t* browptr,
 				const int32_t* bcolinds,
 				const int32_t dev_id/*=-1*/,
-				const void* stream/*=nullptr*/)
+				const void* stream/*=nullptr*/) : MatBSR<@FAUST_SCALAR_FOR_GM@, GPU2>()
 		{
 			auto bsr_funcs = GPUModHandler::get_singleton()->bsr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 			auto gp_funcs = GPUModHandler::get_singleton()->gp_funcs();

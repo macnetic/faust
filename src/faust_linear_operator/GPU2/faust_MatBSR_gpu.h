@@ -43,6 +43,8 @@ namespace Faust
 					const int32_t dev_id=-1,
 					const void* stream=nullptr);
 
+			MatBSR();
+
 			/*********** MatGeneric member functions **************/
 			void setZeros();
 			size_t getNBytes() const;

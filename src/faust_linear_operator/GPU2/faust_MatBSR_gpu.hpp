@@ -20,6 +20,11 @@ namespace Faust
 	}
 
 	template<typename FPP>
+		MatBSR<FPP, GPU2>::MatBSR() : gpu_mat(nullptr)
+		{
+		}
+
+	template<typename FPP>
 		void MatBSR<FPP, GPU2>::setZeros()
 		{
 			//TODO: implement (maybe by moving into .cpp.in
@@ -129,8 +134,8 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		void MatBSR<FPP, GPU2>::set_gpu_mat_ptr(void*)
+		void MatBSR<FPP, GPU2>::set_gpu_mat_ptr(void* gpu_mat)
 		{
-			//TODO: implement (maybe by moving into .cpp.in
+			this->gpu_mat = gpu_mat;
 		}
 };
