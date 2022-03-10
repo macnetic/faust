@@ -227,7 +227,10 @@ FPP Faust::Vect<FPP,Cpu>::mean_relative_error(const Faust::Vect<FPP,Cpu>& v_ref)
 
    Faust::Vect<FPP,Cpu> tmp(size());
    for(int i=0 ; i<size() ; i++)
-      tmp[i] = Faust::fabs((vec[i]-v_ref.vec[i])/v_ref.vec[i]);
+	  if(vec[i] != FPP(0) && v_ref.vec[i] != FPP(0))
+		  tmp[i] = Faust::fabs((vec[i]-v_ref.vec[i])/v_ref.vec[i]);
+	  else
+		  tmp[i] = 0;
 
    return tmp.mean();
 }
