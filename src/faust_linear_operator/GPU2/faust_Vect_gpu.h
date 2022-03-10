@@ -25,6 +25,10 @@ namespace Faust
 					const int32_t dev_id=-1,
 					const void* stream=nullptr);
 
+			Vect(const Vect<FPP, Cpu>& vec,
+					const int32_t dev_id=-1,
+					const void* stream=nullptr);
+
 			faust_unsigned_int size() const;
 
 			void resize(const faust_unsigned_int size);

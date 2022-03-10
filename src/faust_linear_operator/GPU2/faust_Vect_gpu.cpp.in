@@ -21,6 +21,13 @@ namespace Faust
 	}
 
 	template<>
+		Vect<FSFG,GPU2>::Vect(const Vect<FSFG, Cpu>& vec,
+					const int32_t dev_id/*=-1*/,
+					const void* stream/*=nullptr*/): Vect(vec.size(), vec.getData(), /*no_alloc*/ false, dev_id, stream)
+	{
+	}
+
+	template<>
 	faust_unsigned_int Vect<FSFG,GPU2>::size() const
 	{
 		return this->getNbRow();
