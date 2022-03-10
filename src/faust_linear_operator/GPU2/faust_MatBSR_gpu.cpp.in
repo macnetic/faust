@@ -37,6 +37,19 @@ namespace Faust
 		}
 
 	template<>
+		void MatBSR<@FAUST_SCALAR_FOR_GM@,GPU2>::multiply(Vect<@FAUST_SCALAR_FOR_GM@,GPU2>& vec, char opThis/*='N'*/) const
+		{
+			gm_Op gop_this;
+			char2gm_Op(opThis, gop_this);
+			auto bsr_funcs = GPUModHandler::get_singleton()->bsr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			// the backend code is specialized for vector (the number of columns is tested to call another function, see gpu_mod)
+			auto gpu_dmat = bsr_funcs->mul_gpu_dsm_ext(gpu_mat, vec.gpu_mat, nullptr, gop_this, OP_NOTRANSP);
+			dsm_funcs->free(vec.get_gpu_mat_ptr());
+			vec.gpu_mat = gpu_dmat;
+		}
+
+	template<>
 		void MatBSR<@FAUST_SCALAR_FOR_GM@,GPU2>::tocpu(int32_t* browptr, int32_t* bcolinds, @FAUST_SCALAR_FOR_GM@* bdata, int32_t* nrows/*=nullptr*/, int32_t* ncols/*=nullptr*/, int32_t *bnrows/*=nullptr*/, int32_t *bncols/*=nullptr*/, int32_t* bnnz/*=nullptr*/) const
 		{
 			auto bsr_funcs = GPUModHandler::get_singleton()->bsr_funcs((@FAUST_SCALAR_FOR_GM@)(0));

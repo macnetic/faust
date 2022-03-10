@@ -62,11 +62,38 @@ void test_gpu_mul_dense()
 	std::cout << "OK" << std::endl;
 }
 
+void test_gpu_mul_vec()
+{
+	std::cout << "test_gpu_mul_vec" << std::endl;
+	// gen a cpu random dense matrix
+	Vect<FPP, Cpu> *cpu_vec = Vect<FPP, Cpu>::rand(15);
+	// convert it to gpu
+	Vect<FPP, GPU2> gpu_vec(*cpu_vec);
+	// idem for bsr mats
+	auto cpu_bmat = MatBSR<double, Cpu>::randMat(10, 15, 5, 5, 2);
+	MatBSR<FPP, GPU2> gpu_bmat(*cpu_bmat);
+
+	// multiply on cpu
+	cpu_bmat->multiply(*cpu_vec, 'N');
+	gpu_bmat.multiply(gpu_vec, 'N');
+//	cpu_vec->Display();
+//	gpu_vec.Display();
+
+	auto gpu_vec_cpu = gpu_vec.tocpu();
+//	gpu_vec_cpu.Display();
+	std::cout << gpu_vec_cpu.mean_relative_error(*cpu_vec) << std::endl;
+	assert(gpu_vec_cpu.mean_relative_error(*cpu_vec) < 1e-1);
+	delete cpu_bmat;
+	delete cpu_vec;
+	std::cout << "OK" << std::endl;
+}
+
 int main()
 {
 	Faust::enable_gpu_mod();
 	test_gpu_ctor_and_tocpu();
 	test_gpu_mul_dense();
+	test_gpu_mul_vec();
 }
 
 
