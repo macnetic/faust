@@ -11,6 +11,9 @@ namespace Faust
 		class MatSparse;
 	template<typename FPP, FDevice DEVICE>
 		class MatDense;
+	template<typename FPP, FDevice DEVICE>
+		class MatBSR;
+
 
 	template<typename FPP>
 		class MatSparse<FPP, GPU2> : public MatGeneric<FPP,GPU2>
@@ -19,6 +22,7 @@ namespace Faust
 			friend Transform<FPP,GPU2>; // need to access to get_gpu_mat_ptr
 			friend MatDense<FPP,GPU2>;
 			friend MatSparse<std::complex<double>,GPU2>; // TODO limit to real function
+			friend MatBSR<FPP, GPU2>;
 			public:
 				/** \brief Inits from CPU buffers.
 				 *

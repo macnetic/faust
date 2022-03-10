@@ -66,5 +66,14 @@ namespace Faust
 			bsr_funcs->tocpu(gpu_mat, const_cast<int*>(M.get_browptr()), const_cast<int*>(M.get_bcolinds()), (@GM_SCALAR@*) reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(const_cast<@FAUST_SCALAR_FOR_GM@*>(M.get_bdata())), nullptr, nullptr, nullptr, nullptr, nullptr);
 			cpu_mat = std::move(M);
 		}
+
+	template<>
+		MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2> MatBSR<@FAUST_SCALAR_FOR_GM@,GPU2>::to_sparse() const
+		{
+			MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2> spm;
+			auto bsr_funcs = GPUModHandler::get_singleton()->bsr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			spm.set_gpu_mat_ptr(bsr_funcs->to_csr(gpu_mat));
+			return spm;
+		}
 }
 
