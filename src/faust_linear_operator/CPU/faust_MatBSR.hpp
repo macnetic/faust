@@ -55,12 +55,14 @@ namespace Faust
 			{
 				case 'N': {
 					vec.vec = bmat.mul(vec.vec);
+					vec.resize(this->getNbRow());
 						  }
 				break;
 				case 'T': {
 					auto bmat_t = bmat;
 					bmat_t.transpose(/*inplace*/ true);
 					vec.vec = bmat_t.mul(vec.vec);
+					vec.resize(this->getNbCol());
 						  }
 				break;
 				case 'H': {
@@ -68,6 +70,7 @@ namespace Faust
 					bmat_tc.transpose(/*inplace*/ true);
 					bmat_tc.conjugate(/*inplace*/ true);
 					vec.vec = bmat_tc.mul(vec.vec);
+					vec.resize(this->getNbCol());
 						  }
 				break;
 				default:
