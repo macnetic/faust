@@ -350,6 +350,12 @@ namespace Faust
 	}
 
 	template <typename FPP>
+	void MatBSR<FPP,Cpu>::print_bufs() 
+	{
+		this->bmat.print_bufs();
+	}
+
+	template <typename FPP>
 		std::string MatBSR<FPP,Cpu>::to_string(MatType type, const bool transpose/*=false*/, const bool displaying_small_mat_elts/*=false*/) const
 		{
 			std::ostringstream  str;
@@ -747,7 +753,7 @@ BSRMat<T, BlockStorageOrder> BSRMat<T, BlockStorageOrder>::rand(int m, int n, in
 	}
 	for(int i=1; i < bmat.b_per_rowdim+1; i++)
 		bmat.browptr[i] += bmat.browptr[i-1];
-	return bmat;
+	return std::move(bmat);
 }
 
 

@@ -77,6 +77,7 @@ namespace Faust
 			 * Returns a string representing size of nz blocks.
 			 */
 			std::string to_string_blocks(bool transpose=false) const;
+			void print_bufs();
 			matvar_t* toMatIOVar(bool transpose, bool conjugate, const char* var_name=nullptr) const;
 			Real<FPP> normL1(const bool transpose=false) const;
 			Real<FPP> norm() const;
