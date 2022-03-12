@@ -124,7 +124,30 @@ void test_sparse_to_bsr()
 	diff -= cpu_dmat_test;
 	assert(diff.norm() / cpu_dmat_ref.norm() < 1e-3);
 	std::cout << "OK" << std::endl;
+	delete cpu_smat;
 }
+
+void test_transpose()
+{
+	std::cout << "test_transpose" << std::endl;
+	auto nrows = 10;
+	auto ncols = 10;
+	auto bnrows = 2;
+	auto bncols = 2;
+	auto bnnz = 2;
+	auto cpu_bsr_mat = Faust::MatBSR<double, Cpu>::randMat(nrows, ncols, bnrows, bncols, bnnz);
+	Faust::MatBSR<double, GPU2> gpu_bsr_mat(*cpu_bsr_mat);
+	Faust::MatBSR<double, Cpu> cpu_bsr_mat2;
+	cpu_bsr_mat->transpose();
+	gpu_bsr_mat.transpose();
+	gpu_bsr_mat.tocpu(cpu_bsr_mat2);
+	MatDense<FPP, Cpu> diff_mat = cpu_bsr_mat->to_dense();
+	diff_mat -= cpu_bsr_mat2.to_dense();
+	assert(diff_mat.norm() < 1e-3);
+	cout << "OK" << endl;
+	delete cpu_bsr_mat;
+}
+
 int main()
 {
 	Faust::enable_gpu_mod();
@@ -133,6 +156,7 @@ int main()
 	test_gpu_mul_vec();
 	test_bsr_to_sparse();
 	test_sparse_to_bsr();
+	test_transpose();
 }
 
 

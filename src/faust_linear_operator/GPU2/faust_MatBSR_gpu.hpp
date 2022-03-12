@@ -79,12 +79,6 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		void MatBSR<FPP, GPU2>::transpose()
-		{
-			//TODO: implement (maybe by moving into .cpp.in
-		}
-
-	template<typename FPP>
 		void MatBSR<FPP, GPU2>::conjugate()
 		{
 			//TODO: implement (maybe by moving into .cpp.in

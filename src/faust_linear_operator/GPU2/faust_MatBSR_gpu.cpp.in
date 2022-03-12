@@ -75,5 +75,12 @@ namespace Faust
 			spm.set_gpu_mat_ptr(bsr_funcs->to_csr(gpu_mat));
 			return spm;
 		}
+
+	template<>
+		void MatBSR<@FAUST_SCALAR_FOR_GM@, GPU2>::transpose()
+		{
+			auto bsr_funcs = GPUModHandler::get_singleton()->bsr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			bsr_funcs->transpose(gpu_mat);
+		}
 }
 
