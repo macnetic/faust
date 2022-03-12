@@ -79,18 +79,6 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		void MatBSR<FPP, GPU2>::conjugate()
-		{
-			//TODO: implement (maybe by moving into .cpp.in
-		}
-
-	template<typename FPP>
-		void MatBSR<FPP, GPU2>::adjoint()
-		{
-			//TODO: implement (maybe by moving into .cpp.in
-		}
-
-	template<typename FPP>
 		MatGeneric<FPP,GPU2>* MatBSR<FPP, GPU2>::get_rows(faust_unsigned_int row_id_start, faust_unsigned_int num_rows) const
 		{
 			//TODO: implement (maybe by moving into .cpp.in

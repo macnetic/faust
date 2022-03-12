@@ -18,9 +18,9 @@ void test_gpu_ctor_and_tocpu()
 	auto bnrows = 5;
 	auto bncols = 5;
 	auto bnnz = 2;
-	auto cpu_bsr_mat = Faust::MatBSR<double, Cpu>::randMat(nrows, ncols, bnrows, bncols, bnnz);
-	Faust::MatBSR<double, Cpu> cpu_bsr_mat2;
-	Faust::MatBSR<double, GPU2> gpu_bsr_mat(
+	auto cpu_bsr_mat = Faust::MatBSR<FPP, Cpu>::randMat(nrows, ncols, bnrows, bncols, bnnz);
+	Faust::MatBSR<FPP, Cpu> cpu_bsr_mat2;
+	Faust::MatBSR<FPP, GPU2> gpu_bsr_mat(
 			cpu_bsr_mat->getNbRow(),
 			cpu_bsr_mat->getNbCol(),
 			cpu_bsr_mat->getNbBlockRow(),
@@ -46,7 +46,7 @@ void test_gpu_mul_dense()
 	// convert it to gpu
 	MatDense<FPP, GPU2> gpu_dmat(*cpu_dmat);
 	// idem for bsr mats
-	auto cpu_bmat = MatBSR<double, Cpu>::randMat(10, 15, 5, 5, 2);
+	auto cpu_bmat = MatBSR<FPP, Cpu>::randMat(10, 15, 5, 5, 2);
 	MatBSR<FPP, GPU2> gpu_bmat(*cpu_bmat);
 
 	// multiply on cpu
@@ -70,7 +70,7 @@ void test_gpu_mul_vec()
 	// convert it to gpu
 	Vect<FPP, GPU2> gpu_vec(*cpu_vec);
 	// idem for bsr mats
-	auto cpu_bmat = MatBSR<double, Cpu>::randMat(10, 15, 5, 5, 2);
+	auto cpu_bmat = MatBSR<FPP, Cpu>::randMat(10, 15, 5, 5, 2);
 	MatBSR<FPP, GPU2> gpu_bmat(*cpu_bmat);
 
 	// multiply on cpu
@@ -82,7 +82,7 @@ void test_gpu_mul_vec()
 	auto gpu_vec_cpu = gpu_vec.tocpu();
 //	gpu_vec_cpu.Display();
 //	std::cout << gpu_vec_cpu.mean_relative_error(*cpu_vec) << std::endl;
-	assert(gpu_vec_cpu.mean_relative_error(*cpu_vec) < 1e-1);
+	assert(std::abs(gpu_vec_cpu.mean_relative_error(*cpu_vec)) < 1e-1);
 	delete cpu_bmat;
 	delete cpu_vec;
 	std::cout << "OK" << std::endl;
@@ -91,7 +91,7 @@ void test_gpu_mul_vec()
 void test_bsr_to_sparse()
 {
 	std::cout << "test_bsr_to_sparse" << std::endl;
-	auto cpu_bmat = MatBSR<double, Cpu>::randMat(10, 15, 5, 5, 2);
+	auto cpu_bmat = MatBSR<FPP, Cpu>::randMat(10, 15, 5, 5, 2);
 	MatBSR<FPP, GPU2> gpu_bmat(*cpu_bmat);
 	auto gpu_spmat = gpu_bmat.to_sparse();
 
@@ -111,7 +111,7 @@ void test_bsr_to_sparse()
 void test_sparse_to_bsr()
 {
 	std::cout << "test_sparse_to_bsr" << std::endl;
-	auto cpu_smat = MatSparse<double, Cpu>::randMat(10, 15, .01);
+	auto cpu_smat = MatSparse<FPP, Cpu>::randMat(10, 15, .01);
 	MatSparse<FPP, GPU2> gpu_smat(*cpu_smat);
 	auto gpu_bmat = gpu_smat.to_bsr(5);
 	MatBSR<FPP, Cpu> cpu_bmat;
@@ -131,15 +131,57 @@ void test_transpose()
 {
 	std::cout << "test_transpose" << std::endl;
 	auto nrows = 10;
-	auto ncols = 10;
+	auto ncols = 8;
 	auto bnrows = 2;
 	auto bncols = 2;
 	auto bnnz = 2;
-	auto cpu_bsr_mat = Faust::MatBSR<double, Cpu>::randMat(nrows, ncols, bnrows, bncols, bnnz);
-	Faust::MatBSR<double, GPU2> gpu_bsr_mat(*cpu_bsr_mat);
-	Faust::MatBSR<double, Cpu> cpu_bsr_mat2;
+	auto cpu_bsr_mat = Faust::MatBSR<FPP, Cpu>::randMat(nrows, ncols, bnrows, bncols, bnnz);
+	Faust::MatBSR<FPP, GPU2> gpu_bsr_mat(*cpu_bsr_mat);
+	Faust::MatBSR<FPP, Cpu> cpu_bsr_mat2;
 	cpu_bsr_mat->transpose();
 	gpu_bsr_mat.transpose();
+	gpu_bsr_mat.tocpu(cpu_bsr_mat2);
+	MatDense<FPP, Cpu> diff_mat = cpu_bsr_mat->to_dense();
+	diff_mat -= cpu_bsr_mat2.to_dense();
+	assert(diff_mat.norm() < 1e-3);
+	cout << "OK" << endl;
+	delete cpu_bsr_mat;
+}
+
+void test_adjoint()
+{
+	std::cout << "test_adjoint" << std::endl;
+	auto nrows = 10;
+	auto ncols = 8;
+	auto bnrows = 2;
+	auto bncols = 2;
+	auto bnnz = 2;
+	auto cpu_bsr_mat = Faust::MatBSR<FPP, Cpu>::randMat(nrows, ncols, bnrows, bncols, bnnz);
+	Faust::MatBSR<FPP, GPU2> gpu_bsr_mat(*cpu_bsr_mat);
+	Faust::MatBSR<FPP, Cpu> cpu_bsr_mat2;
+	cpu_bsr_mat->adjoint();
+	gpu_bsr_mat.adjoint();
+	gpu_bsr_mat.tocpu(cpu_bsr_mat2);
+	MatDense<FPP, Cpu> diff_mat = cpu_bsr_mat->to_dense();
+	diff_mat -= cpu_bsr_mat2.to_dense();
+	assert(diff_mat.norm() < 1e-3);
+	cout << "OK" << endl;
+	delete cpu_bsr_mat;
+}
+
+void test_conjugate()
+{
+	std::cout << "test_conjugate" << std::endl;
+	auto nrows = 10;
+	auto ncols = 8;
+	auto bnrows = 2;
+	auto bncols = 2;
+	auto bnnz = 2;
+	auto cpu_bsr_mat = Faust::MatBSR<FPP, Cpu>::randMat(nrows, ncols, bnrows, bncols, bnnz);
+	Faust::MatBSR<FPP, GPU2> gpu_bsr_mat(*cpu_bsr_mat);
+	Faust::MatBSR<FPP, Cpu> cpu_bsr_mat2;
+	cpu_bsr_mat->conjugate();
+	gpu_bsr_mat.conjugate();
 	gpu_bsr_mat.tocpu(cpu_bsr_mat2);
 	MatDense<FPP, Cpu> diff_mat = cpu_bsr_mat->to_dense();
 	diff_mat -= cpu_bsr_mat2.to_dense();
@@ -157,6 +199,8 @@ int main()
 	test_bsr_to_sparse();
 	test_sparse_to_bsr();
 	test_transpose();
+	test_adjoint();
+	test_conjugate();
 }
 
 

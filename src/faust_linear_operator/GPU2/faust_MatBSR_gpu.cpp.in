@@ -82,5 +82,19 @@ namespace Faust
 			auto bsr_funcs = GPUModHandler::get_singleton()->bsr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 			bsr_funcs->transpose(gpu_mat);
 		}
+
+	template<>
+		void MatBSR<@FAUST_SCALAR_FOR_GM@, GPU2>::adjoint()
+		{
+			auto bsr_funcs = GPUModHandler::get_singleton()->bsr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			bsr_funcs->adjoint(gpu_mat);
+		}
+
+	template<>
+		void MatBSR<@FAUST_SCALAR_FOR_GM@, GPU2>::conjugate()
+		{
+			auto bsr_funcs = GPUModHandler::get_singleton()->bsr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			bsr_funcs->conjugate(gpu_mat);
+		}
 }
 
