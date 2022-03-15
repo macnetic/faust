@@ -1011,7 +1011,7 @@ BSRMat<T, BlockStorageOrder> BSRMat<T, BlockStorageOrder>::apply_op(const char o
 					if(op == 'H')
 						block = DenseMatMap<T>(this->data+block_offset*this->bm*this->bn, this->bm, this->bn).adjoint().eval();
 					else if(op == 'T')
-						block = DenseMatMap<T>(this->data+block_offset*this->bm*this->bn, this->bm, this->bn).adjoint().eval();
+						block = DenseMatMap<T>(this->data+block_offset*this->bm*this->bn, this->bm, this->bn).transpose().eval();
 					bcolinds[t_block_offset++] = mat_row_id/this->bm;
 					i++;
 					}
