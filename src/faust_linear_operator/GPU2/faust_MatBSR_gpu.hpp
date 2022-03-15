@@ -25,33 +25,24 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		void MatBSR<FPP, GPU2>::setZeros()
-		{
-			//TODO: implement (maybe by moving into .cpp.in
-		}
-
-	template<typename FPP>
-		size_t MatBSR<FPP, GPU2>::getNBytes() const
-		{
-			//TODO: implement (maybe by moving into .cpp.in
-		}
-
-	template<typename FPP>
 		MatType MatBSR<FPP, GPU2>::getType() const
 		{
-			//TODO: implement (maybe by moving into .cpp.in
+			return BSR;
 		}
 
 	template<typename FPP>
-		int32_t MatBSR<FPP, GPU2>::getNbRow() const
+		void MatBSR<FPP, GPU2>::Display() const
 		{
-			//TODO: implement (maybe by moving into .cpp.in
+			std::cout << this->to_string();
 		}
 
 	template<typename FPP>
-		int32_t MatBSR<FPP, GPU2>::getNbCol() const
+		std::string MatBSR<FPP, GPU2>::to_string() const
 		{
-			//TODO: implement (maybe by moving into .cpp.in
+			MatBSR<FPP, Cpu> bsr_mat;
+			tocpu(bsr_mat);
+			//TODO: rely on gpu_mod display function (yet to write)
+		    return "(on GPU device: " + std::to_string(getDevice())+ ") "+ bsr_mat.to_string();
 		}
 
 	template<typename FPP>
@@ -69,13 +60,7 @@ namespace Faust
 	template<typename FPP>
 		void* MatBSR<FPP, GPU2>::get_gpu_mat_ptr() const
 		{
-			//TODO: implement (maybe by moving into .cpp.in
-		}
-
-	template<typename FPP>
-		faust_unsigned_int MatBSR<FPP, GPU2>::getNonZeros() const
-		{
-			//TODO: implement (maybe by moving into .cpp.in
+			return this->gpu_mat;
 		}
 
 	template<typename FPP>
@@ -102,22 +87,10 @@ namespace Faust
 			//TODO: implement (maybe by moving into .cpp.in
 		}
 
-
-	template<typename FPP>
-		void MatBSR<FPP, GPU2>::Display() const
-		{
-			//TODO: implement (maybe by moving into .cpp.in
-		}
-
-	template<typename FPP>
-		Real<FPP> MatBSR<FPP, GPU2>::norm() const
-		{
-			//TODO: implement (maybe by moving into .cpp.in
-		}
-
 	template<typename FPP>
 		void MatBSR<FPP, GPU2>::set_gpu_mat_ptr(void* gpu_mat)
 		{
 			this->gpu_mat = gpu_mat;
 		}
+
 };

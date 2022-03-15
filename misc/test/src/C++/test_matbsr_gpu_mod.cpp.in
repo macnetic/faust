@@ -190,6 +190,65 @@ void test_conjugate()
 	delete cpu_bsr_mat;
 }
 
+void test_norm()
+{
+	std::cout << "test_norm" << std::endl;
+	auto nrows = 10;
+	auto ncols = 8;
+	auto bnrows = 2;
+	auto bncols = 2;
+	auto bnnz = 2;
+	auto cpu_bsr_mat = Faust::MatBSR<FPP, Cpu>::randMat(nrows, ncols, bnrows, bncols, bnnz);
+	Faust::MatBSR<FPP, GPU2> gpu_bsr_mat(*cpu_bsr_mat);
+	assert(std::abs(cpu_bsr_mat->norm()-gpu_bsr_mat.norm()) < 1e-3);
+	cout << "OK" << endl;
+	delete cpu_bsr_mat;
+}
+
+void test_infos()
+{
+	std::cout << "test_infos" << std::endl;
+	auto nrows = 10;
+	auto ncols = 8;
+	auto bnrows = 2;
+	auto bncols = 2;
+	auto bnnz = 2;
+	auto cpu_bsr_mat = Faust::MatBSR<FPP, Cpu>::randMat(nrows, ncols, bnrows, bncols, bnnz);
+	Faust::MatBSR<FPP, GPU2> gpu_bsr_mat(*cpu_bsr_mat);
+	assert(cpu_bsr_mat->getType() == gpu_bsr_mat.getType());
+	assert(cpu_bsr_mat->getNbRow() == gpu_bsr_mat.getNbRow());
+	assert(cpu_bsr_mat->getNbCol() == gpu_bsr_mat.getNbCol());
+	assert(cpu_bsr_mat->getNonZeros() == gpu_bsr_mat.getNonZeros());
+	assert(cpu_bsr_mat->getNBytes() == gpu_bsr_mat.getNBytes());
+	cpu_bsr_mat->Display();
+	gpu_bsr_mat.Display();
+	cout << "OK" << endl;
+	delete cpu_bsr_mat;
+}
+
+void test_set_zeros()
+{
+	std::cout << "test_set_zeros" << std::endl;
+	auto nrows = 10;
+	auto ncols = 8;
+	auto bnrows = 2;
+	auto bncols = 2;
+	auto bnnz = 2;
+	auto cpu_bsr_mat = Faust::MatBSR<FPP, Cpu>::randMat(nrows, ncols, bnrows, bncols, bnnz);
+	Faust::MatBSR<FPP, GPU2> gpu_bsr_mat(*cpu_bsr_mat);
+	Faust::MatBSR<FPP, Cpu> cpu_bsr_mat2;
+	gpu_bsr_mat.tocpu(cpu_bsr_mat2);
+	cpu_bsr_mat->setZeros();
+	gpu_bsr_mat.setZeros();
+//	assert(std::abs(cpu_bsr_mat->norm()-gpu_bsr_mat.norm()) < 1e-3);
+//	assert(std::abs(cpu_bsr_mat->norm()-cpu_bsr_mat2.norm()) < 1e-3);
+	cpu_bsr_mat->Display();
+	gpu_bsr_mat.Display();
+	cout << "OK" << endl;
+	delete cpu_bsr_mat;
+}
+
+
 int main()
 {
 	Faust::enable_gpu_mod();
@@ -201,6 +260,9 @@ int main()
 	test_transpose();
 	test_adjoint();
 	test_conjugate();
+	test_norm();
+	test_infos();
+	test_set_zeros();
 }
 
 
