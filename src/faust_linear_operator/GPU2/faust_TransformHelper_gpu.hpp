@@ -84,6 +84,7 @@ namespace Faust
             MatGeneric<FPP,GPU2>* gpu_M = nullptr;
             const MatDense<FPP,Cpu>* cpu_dM = nullptr;
             const MatSparse<FPP,Cpu>* cpu_sM = nullptr;
+            const MatBSR<FPP,Cpu>* cpu_bM = nullptr;
             if(nullptr != (cpu_dM = dynamic_cast<const MatDense<FPP,Cpu>*>(M)))
             {
                 auto gpu_dM = new MatDense<FPP,GPU2>(M->getNbRow(), M->getNbCol(), cpu_dM->getData());
@@ -93,6 +94,11 @@ namespace Faust
             {
                 auto gpu_sM = new MatSparse<FPP,GPU2>(M->getNbRow(), M->getNbCol(), cpu_sM->getNonZeros(), cpu_sM->getValuePtr(), cpu_sM->getRowPtr(), cpu_sM->getColInd(), dev_id);
                 gpu_M = gpu_sM;
+            }
+            else if(nullptr != (cpu_bM = dynamic_cast<const MatBSR<FPP,Cpu>*>(M)))
+            {
+                auto gpu_bM = new MatBSR<FPP,GPU2>(*cpu_bM);
+                gpu_M = gpu_bM;
             }
             this->transform->push_back(gpu_M, false);
         }
@@ -725,6 +731,16 @@ namespace Faust
             delete cpu_faust;
             return gpu_faust;
         }
+
+
+    template<typename FPP>
+	TransformHelper<FPP, GPU2>* TransformHelper<FPP,GPU2>::randBSRFaust(unsigned int faust_nrows, unsigned int faust_ncols, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int bnrows, unsigned int bncols, float density/*=.1f*/)
+	{
+		auto cpu_faust = TransformHelper<FPP,Cpu>::randBSRFaust(faust_nrows, faust_ncols, min_num_factors, max_num_factors, bnrows, bncols, density);
+		TransformHelper<FPP,GPU2>* gpu_faust = new TransformHelper<FPP,GPU2>(*cpu_faust, -1, nullptr /*TODO: dev_id and stream ?*/);
+		delete cpu_faust;
+		return gpu_faust;
+	}
 
     template<typename FPP>
         TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::swap_rows(const faust_unsigned_int id1,

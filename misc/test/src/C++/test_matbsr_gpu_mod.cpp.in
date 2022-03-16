@@ -5,6 +5,9 @@
 #include "faust_cuda_device.h"
 #include <cstdlib>
 #include <cmath>
+#include "faust_TransformHelper.h"
+#include "faust_TransformHelper_gpu.h"
+
 using namespace std;
 using namespace Faust;
 
@@ -321,6 +324,21 @@ void test_clone()
 	delete cpu_bsr_mat;
 }
 
+void test_transform_rand_bsr()
+{
+	std::cout << "test_transform_rand_bsr" << std::endl;
+	unsigned int faust_nrows = 10;
+	unsigned int faust_ncols = 10;
+       	unsigned int min_num_factors = 2;
+	unsigned int max_num_factors = 5;
+       	unsigned int bnrows = 2;
+       	unsigned int bncols = 2;
+       	float density = .1f;
+	auto F = TransformHelper<FPP, GPU2>::randBSRFaust(faust_nrows, faust_ncols, min_num_factors, max_num_factors, bnrows, bncols);
+	F->display();
+	delete F;
+}
+
 int main()
 {
 	Faust::enable_gpu_mod();
@@ -337,6 +355,7 @@ int main()
 	test_set_zeros();
 	test_get_nrows_ncols();
 	test_clone();
+	test_transform_rand_bsr();
 }
 
 
