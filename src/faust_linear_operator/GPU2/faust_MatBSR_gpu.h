@@ -77,6 +77,7 @@ namespace Faust
 			void tocpu(int32_t* browptr, int32_t* bcolinds, FPP* bdata, int32_t* nrows=nullptr, int32_t* ncols=nullptr, int32_t *bnrows=nullptr, int32_t *bncol=nullptr, int32_t* bnnz=nullptr) const;
 			void tocpu(MatBSR<FPP, Cpu> &cpu_mat) const;
 			MatSparse<FPP, GPU2> to_sparse() const;
+			MatDense<FPP, GPU2> to_dense() const;
 
 		};
 }

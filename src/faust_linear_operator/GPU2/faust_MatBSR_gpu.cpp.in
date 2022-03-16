@@ -136,6 +136,15 @@ namespace Faust
 		}
 
 	template<>
+		MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> MatBSR<@FAUST_SCALAR_FOR_GM@,GPU2>::to_dense() const
+		{
+			MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> dsm;
+			auto bsr_funcs = GPUModHandler::get_singleton()->bsr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			dsm.set_gpu_mat_ptr(bsr_funcs->bsr2dense(gpu_mat, OP_NOTRANSP));
+			return dsm;
+		}
+
+	template<>
 		void MatBSR<@FAUST_SCALAR_FOR_GM@, GPU2>::transpose()
 		{
 			auto bsr_funcs = GPUModHandler::get_singleton()->bsr_funcs((@FAUST_SCALAR_FOR_GM@)(0));

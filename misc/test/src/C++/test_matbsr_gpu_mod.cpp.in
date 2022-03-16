@@ -91,6 +91,26 @@ void test_gpu_mul_vec()
 	std::cout << "OK" << std::endl;
 }
 
+void test_bsr_to_dense()
+{
+	std::cout << "test_bsr_to_dense" << std::endl;
+	auto cpu_bmat = MatBSR<FPP, Cpu>::randMat(10, 15, 5, 5, 2);
+	MatBSR<FPP, GPU2> gpu_bmat(*cpu_bmat);
+	auto gpu_dsmat = gpu_bmat.to_dense();
+
+	MatDense<FPP, Cpu> cpu_dsmat_test;
+	gpu_dsmat.tocpu(cpu_dsmat_test);
+	auto cpu_dsmat_ref = cpu_bmat->to_dense();
+
+	MatDense<FPP, Cpu> cpu_dmat_test = cpu_dsmat_test;
+	MatDense<FPP, Cpu> cpu_dmat_ref = cpu_dsmat_ref;
+
+	MatDense<FPP, Cpu> diff = cpu_dmat_ref;
+	diff -= cpu_dmat_test;
+	assert(diff.norm() / cpu_dmat_ref.norm() < 1e-3);
+	std::cout << "OK" << std::endl;
+}
+
 void test_bsr_to_sparse()
 {
 	std::cout << "test_bsr_to_sparse" << std::endl;
@@ -346,6 +366,7 @@ int main()
 	test_gpu_mul_dense();
 	test_gpu_mul_vec();
 	test_bsr_to_sparse();
+	test_bsr_to_dense();
 	test_sparse_to_bsr();
 	test_transpose();
 	test_adjoint();
