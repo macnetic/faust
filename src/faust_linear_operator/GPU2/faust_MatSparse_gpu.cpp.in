@@ -292,19 +292,6 @@ namespace Faust
 			delete [] colids2;
 		}
 
-	template<typename FPP>
-		MatGeneric<FPP,GPU2>* MatSparse<FPP,GPU2>::Clone(const bool isOptimize /*default value=false*/) const
-		{
-			if (isOptimize)
-			{
-				Faust::MatDense<FPP,GPU2> M((*this));
-				return optimize(M,(*this));
-			} else
-			{
-				return new Faust::MatSparse<FPP,GPU2>((*this));
-			}
-		}
-
 	template<>
 		MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>* MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::clone(const int32_t dev_id/*=-1*/, const void* stream/*=nullptr*/) const
 	{
