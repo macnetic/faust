@@ -25,6 +25,26 @@ namespace Faust
 		}
 
 	template<>
+		MatBSR<@FAUST_SCALAR_FOR_GM@, GPU2>::MatBSR(const MatBSR<@FAUST_SCALAR_FOR_GM@, GPU2>& src) : MatBSR<@FAUST_SCALAR_FOR_GM@, GPU2>()
+		{
+			if(src.gpu_mat != nullptr)
+			{
+				auto bsr_funcs = GPUModHandler::get_singleton()->bsr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+				gpu_mat = bsr_funcs->clone(src.gpu_mat, /* dev_id */ -1, /* stream */ nullptr);
+			}
+		}
+
+	template<>
+		MatBSR<@FAUST_SCALAR_FOR_GM@,GPU2>* MatBSR<@FAUST_SCALAR_FOR_GM@, GPU2>::clone(const int32_t dev_id/*=*-1*/, const void* stream/*=*nullptr*/) const
+		{
+			auto mat = new MatBSR<@FAUST_SCALAR_FOR_GM@, GPU2>();
+			auto bsr_funcs = GPUModHandler::get_singleton()->bsr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			if(gpu_mat != nullptr)
+				mat->gpu_mat = bsr_funcs->clone(gpu_mat, dev_id, stream);
+			return mat;
+		}
+
+	template<>
 		int32_t MatBSR<@FAUST_SCALAR_FOR_GM@, GPU2>::getNbRow() const
 		{
 			auto bsr_funcs = GPUModHandler::get_singleton()->bsr_funcs((@FAUST_SCALAR_FOR_GM@)(0));

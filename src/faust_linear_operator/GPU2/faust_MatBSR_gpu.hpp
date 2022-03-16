@@ -46,15 +46,15 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		MatGeneric<FPP,GPU2>* MatBSR<FPP, GPU2>::clone(const int32_t dev_id/*=*-1*/, const void* stream/*=*nullptr*/) const
+		MatBSR<FPP,GPU2>* MatBSR<FPP,GPU2>::Clone(const bool isOptimize /*default value=false*/) const
 		{
-			//TODO: implement (maybe by moving into .cpp.in
-		}
-
-	template<typename FPP>
-		MatGeneric<FPP,GPU2>* MatBSR<FPP, GPU2>::Clone(const bool isOptimize/*=*false*/) const
-		{
-			//TODO: implement (maybe by moving into .cpp.in
+			if (isOptimize)
+			{
+				throw std::runtime_error("MatBSR doesn't handle isOptimize flag");
+			} else
+			{
+				return new MatBSR<FPP,GPU2>((*this));
+			}
 		}
 
 	template<typename FPP>

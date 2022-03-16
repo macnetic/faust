@@ -22,12 +22,11 @@ namespace Faust
 
 
 			gm_BSRMat_t gpu_mat;
+			public:
+			/*********** ctors **************/
 			/** \brief Inits from CPU buffers.
 			 *
 			 */
-
-			public:
-			/*********** ctors **************/
 			MatBSR(const faust_unsigned_int nrows,
 					const faust_unsigned_int ncols,
 					const faust_unsigned_int bnrows,
@@ -45,6 +44,8 @@ namespace Faust
 
 			MatBSR();
 
+			MatBSR(const MatBSR<FPP, GPU2> &);
+
 			/*********** MatGeneric member functions **************/
 			void setZeros();
 			size_t getNBytes() const;
@@ -53,8 +54,8 @@ namespace Faust
 			int32_t getNbCol() const;
 			faust_unsigned_int getNonZeros() const;
 			int32_t getDevice() const;
-			MatGeneric<FPP,GPU2>* clone(const int32_t dev_id=-1, const void* stream=nullptr) const;
-			MatGeneric<FPP,GPU2>* Clone(const bool isOptimize=false) const;
+			MatBSR<FPP,GPU2>* clone(const int32_t dev_id=-1, const void* stream=nullptr) const;
+			MatBSR<FPP,GPU2>* Clone(const bool isOptimize=false) const;
 			void* get_gpu_mat_ptr() const;
 			void transpose();
 			void conjugate();

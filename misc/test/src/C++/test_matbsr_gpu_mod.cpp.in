@@ -299,6 +299,27 @@ void test_get_nrows_ncols()
 	cout << "OK" << endl;
 }
 
+void test_clone()
+{
+	std::cout << "test_clone" << std::endl;
+	auto nrows = 10;
+	auto ncols = 8;
+	auto bnrows = 2;
+	auto bncols = 2;
+	auto bnnz = 2;
+	auto cpu_bsr_mat = Faust::MatBSR<FPP, Cpu>::randMat(nrows, ncols, bnrows, bncols, bnnz);
+	Faust::MatBSR<FPP, GPU2> gpu_bsr_mat(*cpu_bsr_mat);
+	Faust::MatBSR<FPP, Cpu> cpu_bsr_mat2;
+	auto gpu_bsr_clone = gpu_bsr_mat.clone();
+	gpu_bsr_clone->tocpu(cpu_bsr_mat2);
+	gpu_bsr_mat.Display();
+	gpu_bsr_clone->Display();
+	MatDense<FPP, Cpu> diff_mat = cpu_bsr_mat->to_dense();
+	diff_mat -= cpu_bsr_mat2.to_dense();
+	assert(diff_mat.norm() < 1e-3);
+	cout << "OK" << endl;
+	delete cpu_bsr_mat;
+}
 
 int main()
 {
@@ -315,6 +336,7 @@ int main()
 	test_infos();
 	test_set_zeros();
 	test_get_nrows_ncols();
+	test_clone();
 }
 
 
