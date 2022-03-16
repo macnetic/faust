@@ -248,6 +248,57 @@ void test_set_zeros()
 	delete cpu_bsr_mat;
 }
 
+void test_get_nrows_ncols()
+{
+	cout << "test_get_nrows_ncols" << endl;
+	auto nrows = 10;
+	auto ncols = 8;
+	auto bnrows = 2;
+	auto bncols = 2;
+	auto bnnz = 2;
+	auto cpu_bsr_mat = Faust::MatBSR<FPP, Cpu>::randMat(nrows, ncols, bnrows, bncols, bnnz);
+	Faust::MatBSR<FPP, GPU2> gpu_bsr_mat(*cpu_bsr_mat);
+
+	auto gpu_rows = dynamic_cast<MatSparse<FPP, GPU2>*>(gpu_bsr_mat.get_rows(4, 3));
+	auto cpu_rows = cpu_bsr_mat->get_rows(4, 3);
+	MatSparse<FPP, Cpu> test_rows;
+	gpu_rows->tocpu(test_rows);
+	auto diff = MatDense<FPP, Cpu>(test_rows);
+	diff -= MatDense<FPP, Cpu>(*cpu_rows);
+	assert(diff.norm() < 1e-6);
+	delete gpu_rows;
+	delete cpu_rows;
+
+
+	auto gpu_cols = dynamic_cast<MatSparse<FPP, GPU2>*>(gpu_bsr_mat.get_cols(4, 3));
+	auto cpu_cols = cpu_bsr_mat->get_cols(4, 3);
+	MatSparse<FPP, Cpu> test_cols;
+	gpu_cols->tocpu(test_cols);
+	diff = MatDense<FPP, Cpu>(test_cols);
+	diff -= MatDense<FPP, Cpu>(*cpu_cols);
+	assert(diff.norm() < 1e-6);
+	delete gpu_cols;
+	delete cpu_cols;
+
+	faust_unsigned_int row_ids[3] = {1, 4, 6};
+	gpu_rows = dynamic_cast<MatSparse<FPP, GPU2>*>(gpu_bsr_mat.get_rows(row_ids, 3));
+	cpu_rows = cpu_bsr_mat->get_rows(row_ids, 3);
+	gpu_rows->tocpu(test_rows);
+	diff = MatDense<FPP, Cpu>(test_rows);
+	diff -= MatDense<FPP, Cpu>(*cpu_rows);
+	assert(diff.norm() < 1e-6);
+
+	faust_unsigned_int col_ids[3] = {1, 4, 6};
+	gpu_cols = dynamic_cast<MatSparse<FPP, GPU2>*>(gpu_bsr_mat.get_cols(col_ids, 3));
+	cpu_cols = cpu_bsr_mat->get_cols(col_ids, 3);
+	gpu_cols->tocpu(test_cols);
+	diff = MatDense<FPP, Cpu>(test_cols);
+	diff -= MatDense<FPP, Cpu>(*cpu_cols);
+	assert(diff.norm() < 1e-6);
+
+	cout << "OK" << endl;
+}
+
 
 int main()
 {
@@ -263,6 +314,7 @@ int main()
 	test_norm();
 	test_infos();
 	test_set_zeros();
+	test_get_nrows_ncols();
 }
 
 

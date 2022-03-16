@@ -64,27 +64,51 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		MatGeneric<FPP,GPU2>* MatBSR<FPP, GPU2>::get_rows(faust_unsigned_int row_id_start, faust_unsigned_int num_rows) const
+		Faust::MatGeneric<FPP,GPU2>* Faust::MatBSR<FPP,GPU2>::get_rows(faust_unsigned_int row_id_start, faust_unsigned_int num_rows) const
 		{
-			//TODO: implement (maybe by moving into .cpp.in
+			//TODO: pure GPU impl.
+			MatBSR<FPP,Cpu> cpu_copy;
+			tocpu(cpu_copy);
+			auto cpu_rows = cpu_copy.get_rows(row_id_start, num_rows);
+			auto gpu_rows = new MatSparse<FPP,GPU2>(*cpu_rows);
+			delete cpu_rows;
+			return gpu_rows;
 		}
 
 	template<typename FPP>
-		MatGeneric<FPP,GPU2>* MatBSR<FPP, GPU2>::get_rows(faust_unsigned_int* row_ids, faust_unsigned_int num_rows) const
+		Faust::MatGeneric<FPP,GPU2>* Faust::MatBSR<FPP,GPU2>::get_rows(faust_unsigned_int* row_ids, faust_unsigned_int num_rows) const
 		{
-			//TODO: implement (maybe by moving into .cpp.in
+			//TODO: pure GPU impl.
+			MatBSR<FPP,Cpu> cpu_copy;
+			tocpu(cpu_copy);
+			auto cpu_rows = cpu_copy.get_rows(row_ids, num_rows);
+			auto gpu_rows = new MatSparse<FPP,GPU2>(*cpu_rows);
+			delete cpu_rows;
+			return gpu_rows;
 		}
 
 	template<typename FPP>
-		Faust::MatGeneric<FPP,GPU2>* MatBSR<FPP, GPU2>::get_cols(faust_unsigned_int col_id_start, faust_unsigned_int num_cols) const
+		Faust::MatGeneric<FPP,GPU2>* Faust::MatBSR<FPP,GPU2>::get_cols(faust_unsigned_int col_id_start, faust_unsigned_int num_cols) const
 		{
-			//TODO: implement (maybe by moving into .cpp.in
+			//TODO: pure GPU impl.
+			MatBSR<FPP,Cpu> cpu_copy;
+			tocpu(cpu_copy);
+			auto cpu_cols = cpu_copy.get_cols(col_id_start, num_cols);
+			auto gpu_cols = new MatSparse<FPP,GPU2>(*cpu_cols);
+			delete cpu_cols;
+			return gpu_cols;
 		}
 
 	template<typename FPP>
-		Faust::MatGeneric<FPP,GPU2>* MatBSR<FPP, GPU2>::get_cols(faust_unsigned_int* col_ids, faust_unsigned_int num_cols) const
+		Faust::MatGeneric<FPP,GPU2>* Faust::MatBSR<FPP,GPU2>::get_cols(faust_unsigned_int* col_ids, faust_unsigned_int num_cols) const
 		{
-			//TODO: implement (maybe by moving into .cpp.in
+			//TODO: pure GPU impl.
+			MatBSR<FPP,Cpu> cpu_copy;
+			tocpu(cpu_copy);
+			auto cpu_cols = cpu_copy.get_cols(col_ids, num_cols);
+			auto gpu_cols = new MatSparse<FPP,GPU2>(*cpu_cols);
+			delete cpu_cols;
+			return gpu_cols;
 		}
 
 	template<typename FPP>
