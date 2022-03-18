@@ -124,7 +124,11 @@ namespace Faust
     template<typename FPP>
         void TransformHelper<FPP,GPU2>::push_back(const FPP* bdata, const int* brow_ptr, const int* bcol_inds, const int nrows, const int ncols, const int bnnz, const int bnrows, const int bncols, const bool optimizedCopy/*=false*/, const bool transpose/*=false*/, const bool conjugate/*=false*/)
         {
-            throw std::runtime_error("BSR Matrices are not yet handled by the GPU2 implementation");
+
+			auto bsr_mat = new MatBSR<FPP, GPU2>(nrows, ncols, bnrows, bncols, bnnz, bdata, brow_ptr, bcol_inds);
+			auto copying = optimizedCopy || transpose || conjugate;
+			this->push_back(bsr_mat, copying, transpose, conjugate);
+			if(copying) delete bsr_mat;
         }
 
     template<typename FPP>
