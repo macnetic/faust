@@ -172,8 +172,8 @@ namespace Faust
 			return bsr_funcs->norm_frob(gpu_mat);
 		}
 
-	template<typename FPP>
-		void MatBSR<FPP, GPU2>::setZeros()
+	template<>
+		void MatBSR<@FAUST_SCALAR_FOR_GM@, GPU2>::setZeros()
 		{
 			auto bsr_funcs = GPUModHandler::get_singleton()->bsr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 			bsr_funcs->set_zeros(gpu_mat);
