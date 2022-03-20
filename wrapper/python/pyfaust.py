@@ -104,6 +104,8 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             filepath: the file from which a Faust is created.<br/>
                       The format is Matlab version 5 (.mat extension).<br/>
                       The file must have been saved before with Faust.save().
+            dev: 'cpu' (by default) or 'gpu' to instantiate the Faust resp. on
+            CPU or on NVIDIA GPU memory.
             kwargs: internal purpose arguments.
 
         NOTE: filepath and factors arguments are mutually exclusive. Either
@@ -2824,7 +2826,30 @@ def rand_bsr(num_rows, num_cols, bnrows, bncols, num_factors=None, density=.1,
                                                                                  bncols,
                                                                                  density))
     elif dev.startswith("gpu"):
-        raise ValueError('BSR matrices are not yet supported on GPU.')
+        if dtype in ['float64', 'double']:
+            rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUDbl.randBSRFaust(num_rows,
+                                                                             num_cols,
+                                                                             min_num_factors,
+                                                                             max_num_factors,
+                                                                             bnrows,
+                                                                             bncols,
+                                                                             density))
+        elif dtype in ['float32', 'float']: # type == 'float'
+            rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUFlt.randBSRFaust(num_rows,
+                                                                             num_cols,
+                                                                             min_num_factors,
+                                                                             max_num_factors,
+                                                                             bnrows,
+                                                                             bncols,
+                                                                             density))
+        elif dtype in ['complex', 'complex128']:
+            rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUCplxDbl.randBSRFaust(num_rows,
+                                                                                 num_cols,
+                                                                                 min_num_factors,
+                                                                                 max_num_factors,
+                                                                                 bnrows,
+                                                                                 bncols,
+                                                                                 density))
     else:
         raise ValueError('Invalid device')
     return rF
