@@ -133,18 +133,18 @@ function F = rand_bsr(M, N, BM, BN, varargin)
 			is_real = true;
 		end
 	else
-		error('BSR Fausts are not yet supported on GPU')
-%		if(field == COMPLEX)
-%			core_obj = mexFaustGPUCplx('rand_bsr', M, N, min_num_factors, max_num_factors, BM, BN, density);
-%			is_real = false;
-%		else %if(field == REAL)
-%			if(strcmp(class, 'double'))
-%				core_obj = mexFaustGPUReal('rand_bsr', M, N, min_num_factors, max_num_factors, BM, BN, density);
-%			else % float/single
-%				core_obj = mexFaustGPURealFloat('rand_bsr', M, N, min_num_factors, max_num_factors, BM, BN, density);
-%			end
-%			is_real = true;
-%		end
+		% dev is 'gpu'
+		if(strcmp(field, 'complex'))
+			core_obj = mexFaustGPUCplx('rand_bsr', M, N, min_num_factors, max_num_factors, BM, BN, density);
+			is_real = false;
+		else %if(field == REAL)
+			if(strcmp(class, 'double'))
+				core_obj = mexFaustGPUReal('rand_bsr', M, N, min_num_factors, max_num_factors, BM, BN, density);
+			else % float/single
+				core_obj = mexFaustGPURealFloat('rand_bsr', M, N, min_num_factors, max_num_factors, BM, BN, density);
+			end
+			is_real = true;
+		end
 	end
 	if(core_obj == 0)
 		throw(MException('FAUST:OOM', 'Out of Memory'))
