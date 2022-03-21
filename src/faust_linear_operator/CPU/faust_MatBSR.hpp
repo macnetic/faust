@@ -5,7 +5,6 @@
 #include <iostream>
 #include <numeric>
 
-
 namespace Faust
 {
 	template<typename FPP>

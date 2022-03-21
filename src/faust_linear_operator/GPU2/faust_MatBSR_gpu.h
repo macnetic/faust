@@ -1,6 +1,9 @@
 #ifndef __FAUST_MATBSR_GPU2__
 #define __FAUST_MATBSR_GPU2__
 #ifdef USE_GPU_MOD
+#ifndef NOMINMAX
+#define NOMINMAX // avoids VS min/max issue with std::min/max
+#endif
 #include <complex>
 #include "faust_gpu_mod_utils.h"
 #include "faust_constant.h"
