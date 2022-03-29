@@ -450,6 +450,7 @@ namespace Faust {
 				this->set_FM_mul_mode(old_meth);
 			}
 			delete [] times;
+			t_opt->copy_transconj_state(*this);
 			return t_opt;
 		}
 
@@ -569,6 +570,15 @@ namespace Faust {
 
 				_npasses++;
 				if(!factor_touched && npasses == -1) break;
+			}
+			// remove 0x0 factors
+			for(int i = pth->size()-2; i > 0; i--)
+			{
+				auto fac_nrows = pth->get_fact_nb_rows(i);
+				auto fac_ncols = pth->get_fact_nb_cols(i);
+				std::cout << "fac nrows, ncols:" << fac_nrows << " " << fac_ncols << std::endl;
+				if(fac_nrows == 0 && fac_ncols == 0)
+					pth->transform->erase(i);
 			}
 			pth->transform->update_total_nnz();
 			pth->copy_transconj_state(*this);
