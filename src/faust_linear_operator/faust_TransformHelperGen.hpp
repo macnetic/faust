@@ -399,13 +399,13 @@ namespace Faust
 		}
 
 	template<typename FPP, FDevice DEV>
-		TransformHelper<FPP,DEV>* TransformHelperGen<FPP,DEV>::optimize_storage(const bool time/*=true*/)
+		TransformHelper<FPP,DEV>* TransformHelperGen<FPP,DEV>::optimize_storage(const bool time/*=false*/)
 		{
 //			throw std::runtime_error("optimize_storage is yet to implement in Faust C++ core for GPU.");
 //			return nullptr;
 			Faust::MatDense<FPP,DEV> *dfac = nullptr;
 			Faust::MatSparse<FPP,DEV> *sfac = nullptr;
-			faust_unsigned_int sparse_weight;
+			faust_unsigned_int sparse_weight, dense_weight;
 			std::vector<Faust::MatGeneric<FPP,DEV>*> opt_factors;
 
 			for(auto fac : *(this->transform))
@@ -429,7 +429,8 @@ namespace Faust
 				else
 				{ // storage size is the main criterion
 					sparse_weight = fac->getNonZeros()*(sizeof(FPP)+sizeof(int))+(fac->getNbRow()+1)*sizeof(int);
-					if(sparse_weight < fac->getNBytes())
+					dense_weight = fac->getNbCol()*fac->getNbRow()*sizeof(FPP);
+					if(sparse_weight < dense_weight)
 					{
 						// choose CSR format
 						if(dfac)
@@ -448,8 +449,11 @@ namespace Faust
 				}
 			}
 			TransformHelper<FPP,DEV> *pth = new TransformHelper<FPP,DEV>(opt_factors, FPP(1), false, false, true);
+			//TODO: should use copy_transconj_state copy_slice_state
+			pth->is_transposed = this->is_transposed;
+			pth->is_conjugate = this->is_conjugate;
+//			this->mul_order_opt_mode = th.mul_order_opt_mode; // do not copy the mul method because it might be inefficient for the transpose case
 			return pth;
-
 		}
 
 	template<typename FPP, FDevice DEV>
