@@ -26,6 +26,8 @@ su ci -c "gitlab-runner start"
 ### 3. Install dependency libraries to build FAµST
 yes | port install eigen3 matio cmake p7zip zlib
 sudo ln -sf /opt/local/lib/libmatio.a /usr/local/lib/
+sudo ln -sf /opt/local/include/matio.h /usr/local/include
+sudo ln -sf /opt/local/include/matio_pub.h /usr/local/include
 yes | port install libomp-devel libomp 
 ### 4. Install and configure clang compiler environment (and OpenMP)
 port -f activate libomp
@@ -39,6 +41,7 @@ ln -sf /opt/local/bin/clang-mp-8.0 /opt/local/bin/clang
 ln -sf /opt/local/bin/clang++-mp-8.0 /opt/local/bin/clang++
 ### 5. Install Python packages and dependencies
 yes | port install graphviz doxygen
+sudo ln -sf /opt/local/bin/dot /usr/bin/
 yes | port install python39 py39-pip
 yes | port install jpeg # pillow (indirect denpendency of pyfaust needs this to build)
 port select --set python python39
@@ -47,9 +50,11 @@ ln -sf /opt/local/bin/python3.9 /opt/local/bin/python3
 yes | port install py39-cython
 yes | port select --set cython cython39
 yes |pip install doxypypy chardet wheel pygsp numpy
+# get dest dir before downloading because otherwise it would be the current path
+DOXYPYPY_DIR=$(dirname $(python3 -c "import doxypypy; print(doxypypy.__file__)"))
 wget https://raw.githubusercontent.com/Feneric/doxypypy/master/doxypypy/doxypypy.py
 # use rather the github doxypypy instead of the pypy version
-mv doxypypy.py $(dirname $(python3 -c "import doxypypy; print(doxypypy.__file__)"))
+sudo mv doxypypy.py ${DOXYPYPY_DIR}
 yes | pip install matplotlib # separately because it could fail 
 #### 6. Install C++ libtorch
 wget https://download.pytorch.org/libtorch/cpu/libtorch-macos-1.4.0.zip
@@ -61,6 +66,13 @@ echo "Finally add matlab to the PATH (in .bash_profile)."
 echo "It is also useful to symlink the matlab binary in /usr/bin/ for the root user env. to be OK for installing/testing the pkg (postinstall script needs to find matlab)."
 echo "Other need about matlab OpenMP: you need to copy the library as for example: ciosx:~ ci$ cp /Volumes/Untitled/MATLAB_R2018b.app/sys/os/maci64/libiomp5.dylib /opt/local/lib/libomp/libiomp5_matlab.dylib"
 echo "ABOUT SUDO: add this line in /etc/sudoers: ci ALL=(ALL:ALL) NOPASSWD: ALL (this way the runner won't need to type the password for running commands as root)"
+echo "matio should be reinstalled too because the version from MacPorts is 1.5.21, not compatible with FAµST (at least because of the type mat_sparse_t which contain fields of different types compared to previous version). The version to install is matio-1.5.19 in /usr/local or another way is to copy files /usr/local/matio_pub.h /usr/local/matio.h and /usr/local/lib/libmatio*from faust2-macosx-2019
+echo ===== manually install concurrent version of python, eg.:
+echo port install py310 py310-cython py310-pip
+echo pip-3.10 install doxypypy chardet wheel pygsp numpy
+echo DOXYPYPY_DIR=$(dirname $(python3.10 -c "import doxypypy; print(doxypypy.__file__)"))
+echo wget https://raw.githubusercontent.com/Feneric/doxypypy/master/doxypypy/doxypypy.py
+echo sudo mv doxypypy.py ${DOXYPYPY_DIR}
 #echo "WARNING: the matlab installer link is likely to fail"
 #wget "https://esd.mathworks.com/R2018b/R2018b/installers/web/matlab_R2018b_maci64.dmg.zip?__gda__=1608282997_72bccb4cda14022857f8691914aea21a&dl_id=aYudAe6N&ext=.zip" || echo "the link failed, please update."
 #mv matlab_R2018b_maci64.dmg.zip\?__gda__\=1608282997_72bccb4cda14022857f8691914aea21a\&dl_id\=aYudAe6N\&ext\=.zip matlab_R2018b_maci64.dmg.zip
