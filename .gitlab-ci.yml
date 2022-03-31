@@ -730,7 +730,7 @@ test_linux_pkg_release:
     - tags
 
 test_macos_purepy_release: # take care to keep this variable consistent with the version used in pkg_macos_purepy_release
-  variables: {JOB_PYTHON: 'python3'}
+  variables: {JOB_PYTHON: 'python3.10'}
   extends: .test_unix_purepy_pkg
   needs:
     - job: pkg_macos_purepy_release
