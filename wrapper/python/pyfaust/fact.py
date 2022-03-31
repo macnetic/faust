@@ -849,6 +849,10 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
             - FACTOR 3 (real) SPARSE, size 32x32, density 0.0625, nnz 64
             - FACTOR 4 (real) SPARSE, size 32x32, density 0.0625, nnz 64
 
+       <br/>
+       See also pyfaust.factparams.ParamsHierarchicalWHT
+       <br/>
+
        <b> 3. Simplified Parameters for a Rectangular Matrix Factorization
        (the BSL demo MEG matrix)</b>
        >>> from pyfaust import *
@@ -881,6 +885,9 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
        8.0
 
        <br/>
+       See also pyfaust.factparams.ParamsHierarchicalRectMat
+       <br/>
+
        <b>4. Simplified Parameters for the Discrete Fourier Transform Factorization</b>
        >>> from pyfaust import dft
        >>> from pyfaust.fact import hierarchical
@@ -909,6 +916,9 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
            - FACTOR 4 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
            - FACTOR 5 (complex) SPARSE, size 32x32, density 0.03125, nnz 32
 
+       See also pyfaust.factparams.ParamsHierarchicalDFT
+       <br/>
+
         <b>5. Simplified Parameters for Hadamard Factorization without residual
         constraints</b>
 
@@ -927,13 +937,17 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
         >>> FH2 = hierarchical(H, 'hadamard_simple', backend=2020);
         >>> # test the relative error
         >>> (FH-FH2).norm('fro')/FH.norm('fro') # the result is about 1e-16, the factorization is accurate
-        >>> FH
+        >>> FH2
         Faust size 32x32, density 0.3125, nnz_sum 320, 5 factor(s):
         - FACTOR 0 (real) SPARSE, size 32x32, density 0.0625, nnz 64
         - FACTOR 1 (real) SPARSE, size 32x32, density 0.0625, nnz 64
         - FACTOR 2 (real) SPARSE, size 32x32, density 0.0625, nnz 64
         - FACTOR 3 (real) SPARSE, size 32x32, density 0.0625, nnz 64
         - FACTOR 4 (real) SPARSE, size 32x32, density 0.0625, nnz 64
+
+       <br/>
+       See also pyfaust.factparams.ParamsHierarchicalWHTNoResCons
+       <br/>
 
        <b> 6. Simplified Parameters for a Rectangular Matrix Factorization (the
        BSL demo MEG matrix) without residual constraints</b>
@@ -956,13 +970,18 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
         >>> MEG = loadmat(get_data_dirpath()+'/matrix_MEG.mat')['matrix'].T
         >>> F1 = hierarchical(MEG, ['MEG', 5, 10, 8], backend=2020)
         >>> F2 = hierarchical(MEG, ['MEG_SIMPLE', 5, 10, 8], backend=2020)
-        # compare the error:
+        # compare the errors:
         >>> (F2 - MEG).norm() / Faust(MEG).norm()
         0.13033595653237676
         >>> (F1 - MEG).norm() / Faust(MEG).norm()
         0.12601709513741005
 
+       <br/>
+       See also pyfaust.factparams.ParamsHierarchicalRectMatNoResCons
+       <br/>
+
     <b/> See also pyfaust.factparams.ParamsHierarchicalRectMat, pyfaust.factparams.ParamsHierarchicalSquareMat, pyfaust.factparams.ParamsHierarchicalDFT
+    <b/> See also pyfaust.factparams.ParamsHierarchicalRectMatNoResCons, pyfaust.factparams.ParamsHierarchicalWHTNoResCons
 
     [1] <a href="https://hal.archives-ouvertes.fr/hal-01167948">Le Magoarou L. and Gribonval R., “Flexible multi-layer
     sparse approximations of matrices and applications”, Journal of Selected

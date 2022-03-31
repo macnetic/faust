@@ -1615,6 +1615,14 @@ class ParamsHierarchicalRectMat(ParamsHierarchical):
 
         For a better understanding you might refer to [1].
 
+        The figure below describes the sparsity of each factor of the Faust
+        you'll obtain using pyfaust.fact.hierarchical with a
+        ParamsHierarchicalRectMat instance.
+
+        <img src="https://faust.inria.fr/files/2022/03/ParamsHierarchicalRectMat_nnz_figure.png" width="512" height="264" style="display:block;margin-left:auto;margin-right:auto"/>
+
+        The resulting Faust.nnz_sum is: \f$ \lceil P m^2 \rho^{j-2} \rceil + (j-2) s m + k n \f$
+
         [1] Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse
         approximations of matrices and applications", Journal of Selected
         Topics in Signal Processing, 2016. [https://hal.archives-ouvertes.fr/hal-01167948v1]
@@ -1627,8 +1635,10 @@ class ParamsHierarchicalRectMat(ParamsHierarchical):
             rightmost factor (index j-1) of shape (m, n).
             s: s*m is the integer sparsity targeted (SP, pyfaust.proj.sp) for all the factors from the
             second (index 1) to index j-2. These factors are square of order n.
-            rho: defines the integer sparsity (SP, pyfaust.proj.sp) of the i-th residual (i=0:j-2): ceil(P*rho**i).
-            P: (default value is ParamsHierarchicalRectMat.DEFAULT_P_CONST_FACT) defines the integer sparsity of the i-th residual (i=0:j-2): ceil(P*rho**i).
+            rho: defines the integer sparsity (SP, pyfaust.proj.sp) of the i-th residual (i=0:j-2): ceil(P*m**2*rho**i).
+            P: (default value is
+            ParamsHierarchicalRectMat.DEFAULT_P_CONST_FACT) defines the integer
+            sparsity of the i-th residual (i=0:j-2): ceil(P*m**2*rho**i).
         """
         from math import ceil
         #test args
@@ -1637,8 +1647,8 @@ class ParamsHierarchicalRectMat(ParamsHierarchical):
                 raise TypeError(aname+" must be an integer.")
         if(not isinstance(rho, float)):
             raise TypeError('rho must be a float')
-        if(not P):
-            P=ParamsHierarchicalRectMat.DEFAULT_P_CONST_FACT*m**2
+        if P is None:
+            P = ParamsHierarchicalRectMat.DEFAULT_P_CONST_FACT*m**2
         elif(not isinstance(P, float)):
             raise TypeError('P must be a float')
         S1_cons = ConstraintInt('spcol', m, n, k)
