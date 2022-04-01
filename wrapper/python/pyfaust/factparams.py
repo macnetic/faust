@@ -1607,9 +1607,7 @@ class ParamsHierarchicalRectMat(ParamsHierarchical):
     <b/> See also pyfaust.fact.hierarchical, pyfaust.demo.bsl
     """
 
-    DEFAULT_P_CONST_FACT = 1.4
-
-    def __init__(self, m, n, j, k, s, rho=0.8, P=None):
+    def __init__(self, m, n, j, k, s, rho=0.8, P=1.4):
         """
         Constructor for the specialized parameterization used for example in the pyfaust.demo.bsl (brain souce localization).
 
@@ -1623,10 +1621,6 @@ class ParamsHierarchicalRectMat(ParamsHierarchical):
 
         The resulting Faust.nnz_sum is: \f$ \lceil P m^2 \rho^{j-2} \rceil + (j-2) s m + k n \f$
 
-        [1] Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse
-        approximations of matrices and applications", Journal of Selected
-        Topics in Signal Processing, 2016. [https://hal.archives-ouvertes.fr/hal-01167948v1]
-
         Args:
             m: the number of rows of the input matrix.
             n: the number of columns of the input matrix.
@@ -1636,9 +1630,20 @@ class ParamsHierarchicalRectMat(ParamsHierarchical):
             s: s*m is the integer sparsity targeted (SP, pyfaust.proj.sp) for all the factors from the
             second (index 1) to index j-2. These factors are square of order n.
             rho: defines the integer sparsity (SP, pyfaust.proj.sp) of the i-th residual (i=0:j-2): ceil(P*m**2*rho**i).
-            P: (default value is
-            ParamsHierarchicalRectMat.DEFAULT_P_CONST_FACT) defines the integer
+            P: defines the integer
             sparsity of the i-th residual (i=0:j-2): ceil(P*m**2*rho**i).
+
+        Example:
+            >>> from pyfaust.factparams import ParamsHierarchicalRectMat
+            >>> # set p1 with m, n, j, k parameters
+            >>> p1 = ParamsHierarchicalRectMat(32, 128, 8, 4, 2)
+            >>> # now with additional optional rho and P
+            >>> p2 =  ParamsHierarchicalRectMat(32, 128, 8, 4, 2, rho=.7, P=1.5)
+
+        [1] Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse
+        approximations of matrices and applications", Journal of Selected
+        Topics in Signal Processing, 2016. [https://hal.archives-ouvertes.fr/hal-01167948v1]
+
         """
         from math import ceil
         #test args
@@ -1647,9 +1652,7 @@ class ParamsHierarchicalRectMat(ParamsHierarchical):
                 raise TypeError(aname+" must be an integer.")
         if(not isinstance(rho, float)):
             raise TypeError('rho must be a float')
-        if P is None:
-            P = ParamsHierarchicalRectMat.DEFAULT_P_CONST_FACT*m**2
-        elif(not isinstance(P, float)):
+        if not isinstance(P, float):
             raise TypeError('P must be a float')
         S1_cons = ConstraintInt('spcol', m, n, k)
         S_cons = [S1_cons]
@@ -1658,7 +1661,7 @@ class ParamsHierarchicalRectMat(ParamsHierarchical):
 
         R_cons = []
         for i in range(j-1):
-            R_cons += [ConstraintInt('sp', m, m, int(ceil(P*rho**i)))]
+            R_cons += [ConstraintInt('sp', m, m, int(ceil(P*m**2*rho**i)))]
 
         stop_crit = StoppingCriterion(num_its=30)
 
@@ -1696,10 +1699,10 @@ class ParamsHierarchicalRectMat(ParamsHierarchical):
         Static member function to create a ParamsHierarchicalRectMat instance by a simplified parameterization expression.
 
         Args:
-            p: a list of the form ['rectmat', j, k, s] to create a parameter
-            instance with the parameters j, k, s (see the class
-            ParamsHierarchicalRectMat.__init__ for
-            their definitions).
+            p: a list of the form ['rectmat', j, k, s] or
+            [['rectmat', num_facts, k, s], {'rho': rho, 'P': P}] to create a parameter
+            instance with the parameters j, k, s and optionally rho and P (see the class constructor
+            ParamsHierarchicalRectMat.__init__ for their definitions).
 
         Example:
             >>> from pyfaust.factparams import ParamsHierarchicalRectMat
@@ -1707,6 +1710,9 @@ class ParamsHierarchicalRectMat(ParamsHierarchical):
             >>> k = 10
             >>> s = 8
             >>> p = ParamsHierarchicalRectMat.createParams(rand(256, 1024), ['rectmat', num_facts, k, s])
+            >>> rho = 1.2
+            >>> P = 1.5
+            >>> p2 = ParamsHierarchicalRectMat.createParams(rand(256, 1024), [['rectmat', num_facts, k, s], {'rho': rho, 'P': P}])
         """
         # caller is responsible to check if name in p is really 'rectmat'
         p = ParamsHierarchicalRectMat._parse_p(p)
