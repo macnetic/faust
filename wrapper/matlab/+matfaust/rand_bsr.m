@@ -1,19 +1,19 @@
 %==========================================================================================
 %> @brief Generates a random Faust composed only of BSR matrices.
-%> @param M (arg. 1) The number of rows of the random Faust.
-%> @param N (arg. 2) The number of columns of the random Faust.
-%> @param BM (arg. 3) The nonzero block number of rows (must divide M).
-%> @param BN (arg. 4)  The nonzero block number of columns (must divide N).
-%> @param 'num_factors', NF (optional) If it's an integer it will be the number of random factors to set in the Faust.
+%> @param M the number of rows of the random Faust.
+%> @param N the number of columns of the random Faust.
+%> @param BM the nonzero block number of rows (must divide M).
+%> @param BN  the nonzero block number of columns (must divide N).
+%> @param 'num_factors', NF  if it's an integer it will be the number of random factors to set in the Faust.
 %>                    If NF is a vector of 2 integers then the
 %>                    number of factors will be set randomly between
 %>                    NF(1) and NF(2) (inclusively).
-%> @param 'density',D	(optional) the approximate density of generated factors.
+%> @param 'density',D the approximate density of generated factors.
 %> 				   D must be a floating point number between 0 and 1.
-%> @param 'field', str	(optional) str is either 'real' or 'complex' to set the Faust field.
+%> @param 'field', str	str is either 'real' or 'complex' to set the Faust field.
 %>                  The default value is 'real'.
-%> @param 'dev', 'gpu or 'cpu' (optional) to create the random Faust on CPU or GPU (by default on CPU).
-%> @param 'class', 'double' (by default) or 'single' (optional) to select the scalar type used for the Faust generated.
+%> @param 'dev', str 'cpu' or 'gpu' to create the random Faust on CPU or GPU (by default on CPU).
+%> @param 'class', str 'double' (by default) or 'single' to select the scalar type used for the generated Faust.
 %>
 %> @retval F the random Faust.
 %>
@@ -119,6 +119,10 @@ function F = rand_bsr(M, N, BM, BN, varargin)
 					end
 			end
 		end
+	end
+	if(strcmp(field, 'complex') && strcmp(class, 'single'))
+		warning('complex type with single class is not supported, falling back to complex double.')
+		class = 'double';
 	end
 	if(strcmp(dev, 'cpu'))
 		if(strcmp(field, 'complex'))

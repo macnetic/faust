@@ -2780,11 +2780,11 @@ def rand_bsr(num_rows, num_cols, bnrows, bncols, num_factors=None, density=.1,
         bnrows: the nonzero block number of rows (must divide num_rows).
         bncols: the nonzero block number of columns (must divide num_cols).
         num_factors: If it's an integer it will be the number of random factors to set in the Faust.
-                    If num_factors is a list or tuple of 2 integers then the
+                    If num_factors is a tuple of 2 integers then the
                     number of factors will be set randomly between
                     num_factors[0] and num_factors[1] (inclusively).
                     If num_factors is None then 5 factors are generated.
-        density: the Faust factor density (it determines the number of nonzero blocks).
+        density: the Faust factor density (it determines the number of nonzero blocks). It must be between 0 and 1.
         dev: the device on which the Faust is created.
         dtype: the numpy dtype of the Faust.
 
@@ -2811,6 +2811,14 @@ def rand_bsr(num_rows, num_cols, bnrows, bncols, num_factors=None, density=.1,
         max_num_factors = num_factors[1]
     else:
         raise ValueError('num_factors must be None, a int or a tuple of int')
+    # sanity checks
+    if num_rows != num_cols:
+        raise ValueError('currently only random square BSR Fausts can be'
+                         ' generated.')
+    if num_rows % bnrows != 0 or num_cols % bncols != 0:
+        raise ValueError('the size of blocks must evenly divide the size of Faust matrices')
+    if dev.startswith('gpu') and bnrows != bncols:
+        raise ValueError('currently only square blocks are supported on GPU.')
     if dev == "cpu":
         if dtype in ['float64', 'double']:
             rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUDbl.randBSRFaust(num_rows,
