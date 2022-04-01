@@ -18,7 +18,7 @@ function usage_exit {
 function parse_doxy_block {
         local FUNC=$(echo $1 | tr '[a-z]' '[A-Z]')
         local FUNC_LINE=$(echo "$3" | sed -e 's/^[[:blank:]]\{1,\}//')
-        echo -e "$2" | sed -e "{
+        echo "$2" | sed -e "{
                                                         s/^[[:blank:]]*%=\{4,\}//;
                                                         s/%>[[:blank:]]*@brief/%% $FUNC/;
                                                         s/^\([[:blank:]]\{1,\}\)%> @param F/\1% SPECS: $FUNC_LINE:\n\1\t% - Parameter F: /;
@@ -28,13 +28,17 @@ function parse_doxy_block {
                                                         s/@param[[:blank:]]\([^[:blank:]]\{1,\}\)/- Parameter \1: /;
                                                         s/@code/=========== code ===========/;
                                                         s/@endcode/========= end code =========/;
-                                                        s/\(Examples\{0,1\}\)/\1:/
-                                                        s/<[^>]*>//g;
+                                                        s/\(Examples\{0,1\}\)/\1:/;
+                                                        #s/<[^>]*>//g;
+                                                        s/<b>//g;
+                                                        s/<\/b>//g;
+                                                        s/<br\/>//g;
+                                                        s/<p>//g;
+                                                        s/<img.*src=\"\([^\"]\{1,\}\)\".*\/>/\1/g;
                                                         s/&nbsp;/ /g;
                                                         s/@retval/Returns/g;
-							s/@warning/Warning:/g;
+                                                        s/@warning/Warning:/g;
                                                         s/@[^[:blank:]]* \{0,1\}//g;
-                                                        s/\\\./\./g
                                                 }"
 }
 
@@ -96,7 +100,7 @@ do
 	sed -ne '1,'$FUNC_LINE'p' $OUTPUT_FILE > ${OUTPUT_FILE}_tmp
 	# parse doxy block for inline block
         INLINE_BLOCK=$(parse_doxy_block $FUNC "$DOXY_BLOCK" "$FUNC_DEF_LINE")
-        echo -e "$INLINE_BLOCK" >> ${OUTPUT_FILE}_tmp
+        echo "$INLINE_BLOCK" >> ${OUTPUT_FILE}_tmp
         sed -ne $(($FUNC_LINE+1))','$(wc -l ${OUTPUT_FILE} | awk '{print $1}')'p' $OUTPUT_FILE >> ${OUTPUT_FILE}_tmp
         [ "$?" = 0 ] && mv ${OUTPUT_FILE}_tmp ${OUTPUT_FILE}
         DOXY_BLOCK_ID+=2
@@ -112,7 +116,7 @@ DOXY_HEADER=$(sed -ne "$((${HEADER_START_END[0]}+1)),$((${HEADER_START_END[1]}-1
 [[ "$DEBUG" = "DOXY_HEADER" ]] && echo "DOXY_HEADER=$DOXY_HEADER"
 INLINE_HEADER=$(parse_doxy_block "FAUST" "$DOXY_HEADER")
 [[ "$DEBUG" = "INLINE_HEADER" ]] && echo "INLINE_HEADER=$INLINE_HEADER"
-echo -e "$INLINE_HEADER" | sed 's/^[[:blank:]]\{1,\}//' > ${OUTPUT_FILE}_tmp
+echo "$INLINE_HEADER" | sed 's/^[[:blank:]]\{1,\}//' > ${OUTPUT_FILE}_tmp
 echo -e '\n\n' >> ${OUTPUT_FILE}_tmp
 sed -ne "${HEADER_START_END[0]},${OUT_NUM_LINES}p" $OUTPUT_FILE >> ${OUTPUT_FILE}_tmp
 [ "$?" = 0 ] && mv ${OUTPUT_FILE}_tmp ${OUTPUT_FILE}
