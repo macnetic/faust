@@ -1043,6 +1043,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                 ValueError
                 The dimensions of the two Fausts must agree.
                 <code>
+                >>> from pyfaust import rand
                 >>> F = rand(2,51);
                 >>> G = rand(2,25);
                 >>> F.concatenate(G, 0)
@@ -1050,6 +1051,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                 ValueError
                 Axis must be 0 or 1.
                 <code>
+                >>> from pyfaust import rand
                 >>> F = rand(2,51);
                 >>> G = rand(2,25);
                 >>> F.concatenate(G, 5)
@@ -1058,12 +1060,13 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                 You can't concatenate a Faust with something that is not a
                 Faust, a numpy array or a scipy sparse matrix.
                 <code>
+                >>> from pyfaust import rand
                 >>> F = rand(2,51);
                 >>> F.concatenate(['a', 'b', 'c'], 5)
                 </code>
 
             Examples:
-                >>> import pyfaust import rand
+                >>> from pyfaust import rand
                 >>> F = rand(50, 50)
                 >>> G = rand(50, 50)
                 >>> F.concatenate(G) # equivalent to F.concatenate(G, 0)
@@ -1103,6 +1106,14 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                 FACTOR 4 (real) SPARSE, size 100x100, density 0.0285, nnz 285<br/>
                 FACTOR 5 (real) SPARSE, size 100x74, density 0.0355405, nnz 263<br/>
                 >>> F.concatenate(F, G, F, G, rand(34,50), F, G) # it's allowed to concatenate an arbitrary number of Fausts
+                Faust size 384x50, density 0.575521, nnz_sum 11050, 6 factor(s): <br/>
+                FACTOR 0 (double) SPARSE, size 384x400, density 0.0224609, nnz 3450<br/>
+                FACTOR 1 (double) SPARSE, size 400x400, density 0.01125, nnz 1800<br/>
+                FACTOR 2 (double) SPARSE, size 400x400, density 0.01125, nnz 1800<br/>
+                FACTOR 3 (double) SPARSE, size 400x400, density 0.01125, nnz 1800<br/>
+                FACTOR 4 (double) SPARSE, size 400x400, density 0.01125, nnz 1800<br/>
+                FACTOR 5 (double) SPARSE, size 400x50, density 0.02, nnz 400<br/>
+
         """
         if("axis" in kwargs.keys()):
             axis = kwargs['axis']
@@ -2559,7 +2570,7 @@ def concatenate(F, *args, axis=0, **kwargs):
 
 def hstack(_tuple):
     """
-    Concatenates horizontally Faust and/or numpy.ndarray objects using Faust.concatenate().
+    Concatenates horizontally Faust-s and/or numpy.ndarray objects using Faust.concatenate().
 
     <b>See also</b> numpy.hstack
 
@@ -2575,7 +2586,7 @@ def hstack(_tuple):
 
 def vstack(_tuple):
     """
-    Concatenates vertically Faust and/or numpy.ndarray arrays using Faust.concatenate().
+    Concatenates vertically Faust-s and/or numpy.ndarray arrays using Faust.concatenate().
 
     <b>See also</b> numpy.vstack
 
