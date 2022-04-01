@@ -2603,9 +2603,9 @@ def isFaust(obj):
 
 def wht(n, normed=True, dev="cpu", dtype='double'):
     """
-    Constructs a Faust implementing the Hadamard transform of dimension n.
+    Constructs a Faust implementing the Walsh-Hadamard transform of order n.
 
-    The resulting Faust has n sparse factors of order n, each one having
+    The resulting Faust has log2(n) sparse factors of order n, each one having
     2 nonzero elements per row and per column.
 
     Args:
@@ -2613,7 +2613,7 @@ def wht(n, normed=True, dev="cpu", dtype='double'):
        and a factorization in log2(n) factors.
        normed: default to True to normalize the Hadamard Faust as if you called
        Faust.normalize() and False otherwise.
-       dev: device to create the Faust on.
+       dev: device on which to create the Faust ('cpu' or 'gpu').
        dtype: the Faust dtype, it must be 'double' or 'complex'.
 
     Returns:

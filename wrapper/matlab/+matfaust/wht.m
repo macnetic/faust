@@ -7,13 +7,13 @@
 %> @b Usage
 %>
 %> &nbsp;&nbsp;&nbsp; @b H = wht(n) <br/>
-%> &nbsp;&nbsp;&nbsp; @b H = wht(n, 'normed', bool)
+%> &nbsp;&nbsp;&nbsp; @b H = wht(n, 'normed', bool) <br/>
 %> &nbsp;&nbsp;&nbsp; @b H = wht(n, 'normed', bool, 'dev', str) str might be 'cpu' or 'gpu'.
 %>
 %> @param n the power of two exponent for a Hadamard matrix of order n and a factorization into log2(n) factors.
 %> @param 'normed',bool: (optional) true (by default) to normalize the returned Faust as if Faust.normalize() was called, false otherwise.
 %> @param 'dev',str: (optional) 'cpu' to create a CPU Faust (default choice) and 'gpu' for a GPU Faust.
-%> @param 'dtype', 'double' (by default) or 'float' (optional) to select the scalar type used for the Faust generated.
+%> @param 'dtype', str: (optional) 'double' (default choice) or 'float' to select the scalar type of the generated Faust.
 %>
 %> @retval H the Faust implementing the Hadamard transform of dimension n.
 %>
