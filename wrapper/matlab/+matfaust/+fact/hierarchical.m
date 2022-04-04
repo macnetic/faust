@@ -260,7 +260,7 @@
 %>
 %>     0.1260
 %>
-%> <p> @b See @b also matfaust.faust_fact, factparams.ParamsHierarchical, factparams.ParamsHierarchicalSquareMat, factparams.ParamsHierarchicalRectMat,factparams.ParamsHierarchicalDFT
+%> <p> @b See @b also matfaust.faust_fact, factparams.ParamsHierarchical, factparams.ParamsHierarchicalWHT, factparams.ParamsHierarchicalRectMat,factparams.ParamsHierarchicalDFT
 %==========================================================================================
 function varargout = hierarchical(M, p, varargin)
 	import matfaust.Faust

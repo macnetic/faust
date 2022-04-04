@@ -27,7 +27,7 @@ classdef ParamsFactFactory
                 param_id = lower(p{1});
             end
             if(any(strcmp(param_id, ParamsFactFactory.SIMPLIFIED_PARAMS{ParamsFactFactory.SQRTMAT_ID})))
-                sp = ParamsHierarchicalSquareMat.createParams(M, p);
+                sp = ParamsHierarchicalWHT.createParams(M, p);
             elseif(any(strcmp(param_id, ParamsFactFactory.SIMPLIFIED_PARAMS{ParamsFactFactory.WHT_SIMPLE_ID})))
                 sp = ParamsHierarchicalWHTNoResCons.createParams(M, p);
             elseif(any(strcmp(param_id, ParamsFactFactory.SIMPLIFIED_PARAMS{ParamsFactFactory.RECTMAT_ID})))
