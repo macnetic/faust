@@ -7,9 +7,9 @@
 %>    @param libpath the absolute or relative path where to find the dynamic
 %>    library (gm) to load. By default, it's none to auto-find the library
 %>    (if possible).
-%>    @param backend the GPU backend to use, only cuda is available for now.
-%>    @param silent if True nothing or almost will be displayed on loading
-%>    (e.g. silent errors), otherwise all messages are visible.
+%>    @param backend the GPU backend to use, only 'cuda' is available for now.
+%>    @param silent if True nothing or almost will be displayed on loading,
+%>    otherwise all messages are visible.
 %>
 %===============================
 function enable_gpu_mod(varargin)

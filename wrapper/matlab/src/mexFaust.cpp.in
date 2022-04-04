@@ -138,6 +138,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		char cmd[256];
 		if (nrhs < 1 || mxGetString(prhs[0], cmd, sizeof(cmd)))
 			mexErrMsgTxt("First input should be a command string less than 256 characters long.");
+		// no handle commands (or at least command without second argument)
+		if(!strcmp("is_gpu_mod_enabled", cmd))
+		{
+			is_gpu_mod_enabled(prhs, nrhs, plhs, nlhs);
+			return;
+		}
 		// Check there is a second input, which should be the class instance handle
 		if (nrhs < 2)
 			mexErrMsgTxt("Second input should be a class instance handle.");

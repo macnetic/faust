@@ -3047,17 +3047,17 @@ def enable_gpu_mod(libpaths=None, backend='cuda', silent=False, fatal=False):
 
     Args:
         libpaths: the absolute or relative paths where to search the dynamic
-        library (gm) to load. By default, it's none to auto-find the library
-        (if possible).
-        backend: the GPU backend to use, only cuda is available for now.
-        silent: if True nothing or almost will be displayed on loading (e.g.
-        silent errors), otherwise all messages are visible.
+                library (gm) to load. By default, it's none to auto-find the library
+                (if possible).
+        backend: the GPU backend to use, only 'cuda' is available for now.
+        silent: if True nothing or almost will be displayed on loading,
+                otherwise all messages are visible.
     """
     return _FaustCorePy.enable_gpu_mod(libpaths, backend, silent, fatal)
 
 def is_gpu_mod_enabled():
     """
-    Returns True if the gpu_mod plug-in has been loaded correctly, false otherwise.
+    Returns True if the gpu_mod plug-in has been loaded correctly, False otherwise.
     """
     return _FaustCorePy._is_gpu_mod_enabled()
 
