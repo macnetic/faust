@@ -40,6 +40,6 @@
 # 		Luc Le Magoarou,                                                         #
 # 		Remi Gribonval                                                           #
 #                                                                                        #
-# 	INRIA Rennes, FRANCE                                                             #
+# 	INRIA, France                                                             #
 # 	http://www.inria.fr/                                                             #
 ##########################################################################################
