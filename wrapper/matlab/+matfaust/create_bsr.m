@@ -7,7 +7,7 @@
 %> @param N The number of columns of the BSR matrix.
 %> @param bnnz The number of nonzero blocks of the BSR matrix.
 %> @param bdata The horizontal concatenation of the matrix nonzero blocks taken in rowmajor order. Note that all the nonzero blocks have the same size.
-%> @param bcolinds The block column indices corresponding (in the same order) to the blocks in bdata. A block column index is not a column index, for example if your matrix contains N columns and each nonzero block contains BN columns, the block column indices must lay in {1, ..., N/BN}.
+%> @param bcolinds The block column indices corresponding (in the same order) to the blocks in bdata. A block column index is not a column index, for example if your matrix contains N columns and each nonzero block contains BN columns, the block column indices must lay in {1, …, N/BN}.
 %> @param brow_count The number of nonzero blocks in each block-row of the matrix (a vector of size M/BM, where brow_count(i) is the number of nonzero blocks in the i-th block-row).
 %>
 %> @b Examples
@@ -22,7 +22,7 @@
 %> F =
 %>
 %> Faust size 10x10, density 0.2, nnz_sum 18, 1 factor(s):
-%> - FACTOR 0 (double) BSR, size 10x9, density 0.2, nnz 18
+%> - FACTOR 0 (double) BSR, size 10x9  (blocksize = 2x3), density 0.2, nnz 18 (nnz blocks: 3)
 %> >> full(F)
 %>
 %>
