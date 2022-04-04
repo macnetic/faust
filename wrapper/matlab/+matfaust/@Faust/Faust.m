@@ -2089,7 +2089,7 @@ classdef Faust
 		%>  &nbsp;&nbsp;&nbsp; <b> X = F\ B </b> is the matrix division of full(F) into B, which is roughly the
 		%>          same as Faust.pinv(F)*B.
 		%>
-		%> @warning this functions makes a call to Faust.full.
+		%> @warning this function makes a call to Faust.full.
 		%>
 		%> <p> @b See @b also Faust.pinv, mldivide Matlab built-in.
 		%=====================================================================
@@ -2107,7 +2107,7 @@ classdef Faust
 		%>  &nbsp;&nbsp;&nbsp; <b> X = PINV(F) </b> produces the matrix X of the same dimensions as F'
 		%>  so that F*(F'*X')' == full(F) (or approximately).
 		%>
-		%> @warning this functions makes a call to Faust.full.
+		%> @warning this function makes a call to Faust.full.
 		%>
 		%> <p> @b See @b also Faust.mldivide, pinv Matlab built-in.
 		%=====================================================================

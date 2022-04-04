@@ -2007,12 +2007,14 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
     def pinv(F):
         """
-        Computes the (Moore-Penrose) pseudo-inverse of a Faust full matrix.
+        Computes the (Moore-Penrose) pseudo-inverse of F.toarray().
 
         Warning: this function makes a call to Faust.toarray().
 
         Returns:
             The dense pseudo-inverse matrix.
+
+        See also <a href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.pinv.html">numpy.linalg.pinv</a>
         """
         from numpy.linalg.linalg import pinv
         return pinv(F.toarray())
@@ -2537,14 +2539,11 @@ def dot(A, B, **kwargs):
 def pinv(F):
     """
     A package function alias for the member function Faust.pinv().
-
-    Args:
-        F: is a Faust object.
     """
     if(Faust.isFaust(F)):
         return F.pinv()
     else:
-        return np.linalg.linalg.pinv(F)
+        return np.linalg.pinv(F)
 
 
 @implements(np.concatenate)
