@@ -2611,7 +2611,7 @@ def wht(n, normed=True, dev="cpu", dtype='double'):
     Constructs a Faust implementing the Walsh-Hadamard transform of order n.
 
     The resulting Faust has log2(n) sparse factors of order n, each one having
-    2 nonzero elements per row and per column.
+    2 nonzero per row and per column.
 
     Args:
        n: the power of two exponent for a Hadamard matrix of order n
@@ -2671,7 +2671,7 @@ def dft(n, normed=True, dev='cpu'):
     The factorization algorithm used is Cooley-Tukey.
 
     The resulting Faust is complex and has (log2(n)+1) sparse factors
-    whose the log2(n) first has 2 non-zero elements per row and per column.
+    whose the log2(n) first has 2 nonzeros per row and per column.
     The last factor is a permutation matrix.
 
     Args:
@@ -2679,7 +2679,7 @@ def dft(n, normed=True, dev='cpu'):
         factorization in log2(n)+1 factors.
         normed: default to True to normalize the DFT Faust as if you called
         Faust.normalize() and False otherwise.
-        dev: device to create the Faust on.
+        dev: device to create the Faust on ('cpu' or 'gpu').
 
     Returns:
         The Faust implementing the DFT of dimension n.

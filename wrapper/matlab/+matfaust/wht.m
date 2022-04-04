@@ -1,7 +1,7 @@
 %==========================================================================================
 %> @brief Constructs a Faust implementing the Walsh-Hadamard Transform of order n.
 %>
-%> The resulting Faust has log2(n) sparse factors of order n, each one having 2 non-zero elements
+%> The resulting Faust has log2(n) sparse factors of order n, each one having 2 nonzeros
 %> per row and per column.
 %>
 %> @b Usage

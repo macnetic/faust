@@ -4,7 +4,7 @@
 %> The factorization algorithm used is Cooley-Tukey (FFT).
 %>
 %> The resulting Faust is complex and has log2(n)+1 sparse factors whose the log2(n) first
-%> have 2 nonzero elements per row and per column. The last factor is a permutation matrix.
+%> have 2 nonzeros per row and per column. The last factor is a permutation matrix.
 %>
 %>
 %> @b Usage
@@ -13,8 +13,8 @@
 %> &nbsp;&nbsp;&nbsp; @b F = dft(n, normed)
 %>
 %> @param n: the power of two for a FFT of order n and a factorization in log2(n)+1 factors.
-%> @param normed: (optional) true (by default) to normalize the returned Faust as if Faust.normalize() was called, false otherwise.
-%> @param 'dev', 'gpu or 'cpu' (optional) to create the Faust on CPU or GPU (by default on CPU).
+%> @param 'normed',bool: true (by default) to normalize the returned Faust as if Faust.normalize() was called, false otherwise.
+%> @param 'dev', str: 'gpu or 'cpu' to create the Faust on CPU or GPU ('cpu' by default).
 %>
 %>
 %> @retval F the Faust implementing the FFT transform of dimension n.
