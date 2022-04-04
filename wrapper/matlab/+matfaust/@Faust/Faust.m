@@ -2313,10 +2313,27 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%> import matfaust.*
-		%> Faust.isFaust(1) % returns 0
-		%> Faust.isFaust(matfaust.rand(5,10)) % returns 1
+		%> >> import matfaust.*
+		%> >> F = matfaust.rand(5,10)
+		%> >> Faust.isFaust(F) % isFaust(F) alone works as well
 		%> @endcode
+		%>
+		%> ans =
+		%>
+		%>  logical
+		%>
+		%>     1
+		%>
+		%> @code
+		%> >> Faust.isFaust(1)
+		%> @endcode
+		%>
+		%> ans =
+		%>
+		%>  logical
+		%>
+		%>     0
+		%>
 		%>
 		%> <p> @b See @b also Faust.Faust
 		%================================================================

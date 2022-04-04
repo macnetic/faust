@@ -1,16 +1,9 @@
 
 %================================================================
-%> @brief Returns true if obj is a Faust object, false otherwise.
+%> @brief Package alias of Faust.isFaust.
 %===
 %>
-%> @b Example
-%> @code
-%> import matfaust.*
-%> isFaust(1) % returns 0
-%> isFaust(FaustFactory.rand(5,10)) % returns 1
-%> @endcode
-%>
-%> <p> @b See @b also Faust.Faust
+%> <p> @b See @b also Faust.Faust, Faust.isFaust
 %================================================================
 function bool = isFaust(obj)
 	import matfaust.Faust.isFaust

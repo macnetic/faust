@@ -2026,7 +2026,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         Examples:
             >>> from pyfaust import *
-            >>> Faust.isFaust(2)
+            >>> Faust.isFaust(2) # isFaust(2) works as well
             False
             >>> Faust.isFaust(rand(5,10))
             True
@@ -2600,14 +2600,9 @@ def vstack(_tuple):
 
 def isFaust(obj):
     """
-        Returns True if obj is a Faust object, False otherwise.
+    Package alias function of Faust.isFaust.
 
-        Examples:
-            >>> from pyfaust import isFaust
-            >>> isFaust(2)
-            False
-            >>> isFaust(rand(5,10))
-            True
+    <b>See also:</b> Faust.__init__, Faust.isFaust.
     """
     return Faust.isFaust(obj)
 
