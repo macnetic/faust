@@ -2714,23 +2714,22 @@ def dft(n, normed=True, dev='cpu'):
 
 def eye(m, n=None, t='real', dev="cpu"):
     """
-        Identity matrix as a Faust object.
+        Faust identity.
 
         Args:
           m: number of rows,
-          n (optional): number of columns, set to m if not specified.
-          t (optional): 'complex' to return a complex Faust otherwise (by default)
-          it's a real Faust.
+          n: number of columns, set to m by default.
+          t: 'complex' to return a complex Faust, otherwise it's a real Faust.
 
         Examples:
             >>> from pyfaust import eye
             >>> eye(5)
             Faust size 5x5, density 0.2, nnz_sum 5, 1 factor(s):<br/>
             FACTOR 0 (real) SPARSE, size 5x5, density 0.2, nnz 5<br/>
-            >>> eye(5,4)
+            >>> eye(5, 4)
             Faust size 5x4, density 0.2, nnz_sum 4, 1 factor(s):<br/>
             FACTOR 0 (real) SPARSE, size 5x4, density 0.2, nnz 4<br/>
-            >>> eye(5,t='complex')
+            >>> eye(5, t='complex')
             Faust size 5x4, density 0.2, nnz_sum 4, 1 factor(s):<br/>
             FACTOR 0 (complex) SPARSE, size 5x4, density 0.2, nnz 4<br/>
     """

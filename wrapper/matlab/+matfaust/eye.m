@@ -1,15 +1,15 @@
 %==========================================================================================
-%> @brief Faust identity.
+%> @brief Identity Faust.
 %>
 %> @b Usage
 %>
 %> &nbsp;&nbsp;&nbsp; @b eye(m,n) or eye([m,n]) forms a M-by-N Faust F = Faust(speye(M,N)).<br/>
 %> &nbsp;&nbsp;&nbsp; @b eye(m) is a short for eye(m,m).<br/>
-%> &nbsp;&nbsp;&nbsp; @b eye(S, 'complex') with S the size, does the same as above but returns a complex Faust.</br>
-%> &nbsp;&nbsp;&nbsp; @b eye(S, 'complex', 'dev', 'gpu') or eye(S, 'dev', 'gpu') same as above but creates the Faust on GPU.</br>
+%> &nbsp;&nbsp;&nbsp; @b eye(S, 'complex') with S the size, does the same as above but returns a complex Faust.<br/>
+%> &nbsp;&nbsp;&nbsp; @b eye(S, 'complex', 'dev', 'gpu') or eye(S, 'dev', 'gpu') same as above but creates the Faust on GPU.<br/>
 %>
-%> @param 'dev', 'gpu or 'cpu' (optional) to create the Faust on CPU or GPU (by default on CPU).
-%> @param 'dtype', 'double' (by default) or 'float' (optional) to select the scalar type used for the Faust generated.
+%> @param 'dev',str 'gpu or 'cpu' to create the Faust on CPU or GPU (by default on CPU).
+%> @param 'dtype',str 'double' (by default) or 'float' to select the scalar type used for the Faust generated.
 %>
 %> @b Example
 %>
