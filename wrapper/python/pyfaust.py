@@ -2799,8 +2799,8 @@ def rand_bsr(num_rows, num_cols, bnrows, bncols, num_factors=None, density=.1,
             - FACTOR 4 (double) BSR, size 100x100, density 0.1, nnz 1000
             - FACTOR 5 (double) BSR, size 100x100, density 0.1, nnz 1000
 
-    <b> See also:</b> <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.bsr_matrix.html">bsr_matrix</a>
-
+    <b>See also:</b> <a
+    href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.bsr_matrix.html">bsr_matrix</a>, Faust.__init__, pyfaust.rand
     """
     if num_factors is None:
         min_num_factors = max_num_factors = 5
@@ -2875,44 +2875,51 @@ def rand_bsr(num_rows, num_cols, bnrows, bncols, num_factors=None, density=.1,
 
 
 def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
-         density=None, fac_type="sparse",
-         field='real', per_row=True, dev="cpu", dtype='double'):
+         density=None, fac_type='sparse',
+         field='real', per_row=True, dev='cpu', dtype='double'):
     """
     Generates a random Faust.
 
         Args:
             num_rows: the Faust number of rows.
             num_cols: the Faust number of columns.
-            num_factors: If it's an integer it will be the number of random factors to set in the Faust.
+            num_factors: if it's an integer it is the number of random factors to set in the Faust.
                         If num_factors is a list or tuple of 2 integers then the
-                        number of factors will be set randomly between
+                        number of factors is set randomly between
                         num_factors[0] and num_factors[1] (inclusively).
-                        If num_factors is None then 5 factors are generated.
-            dim_sizes: if it's an integer it will be the order of the square
-            matrix factors (of size size_dims**2).
+                        Defaultly, num_factors is None, it means a 5 factors
+                        long Faust is generated.
+                        dim_sizes: if it's an integer all Faust factors
+                        are square matrices (except maybe the first and last
+                        ones, depending on num_rows and num_cols). The size of
+                        the intermediary square factors is size_dims**2.
                         If it's a list or tuple of 2 integers then the
-                        number of rows and columns will
-                        be a random number between size_dims[0] and
+                        number of rows and columns are both
+                        a random number between size_dims[0] and
                         size_dims[1] (inclusively).
                         Note that the first factor number of rows and the last
                         factor number of columns are always fixed (they are the
                         dimension sizes of the Faust: num_rows, num_cols arguments).
-                        if dim_sizes is None then dim_sizes will be [num_rows,
+                        if dim_sizes is None then dim_sizes is defaultly [num_rows,
                         num_cols].
-            density: (optional) the approximate density of factors. The
-            default value is such that each factor will have 5 non-zero
-            elements per row, if per_row is True, or per column otherwise.
-            It should be a floating point number between 0 and 1.
-            fac_type: (optional) the storage representation of factors. Must be
-            "sparse", "dense" or "mixed" if you want a mix of dense and
-            sparse matrices in the generated Faust (choice's done according
-            to an uniform distribution).
-                        The default value is "sparse".
-            field: (optional) a str to set the Faust field: 'real'(or 'double'
-            or 'float' for simple precision) or 'complex'. By default, the value is 'real'.
+            density: the approximate density of factors. The
+                    default value is such that each factor gets 5 non-zero
+                    elements per row, if per_row is True, or per column otherwise.
+                    It should be a floating point number greater than 0 and
+                    lower or equal to 1.
+                    A density of zero is equivalent to the default case.
+            fac_type: the storage representation of factors. It must be
+                    'sparse', 'dense' or 'mixed'. The latter designates a mix of dense and
+                    sparse matrices in the generated Faust (the choice is made according
+                    to a uniform distribution).
+            field:  a str to set the Faust field: 'real' or 'complex'.
             per_row: if True the factor matrix is constructed per row
-            applying the density to each row. If False the construction is
-            made with the density applied on each column.
+                    applying the density to each row. If False the construction is
+                    made with the density applied on each column.
+            dev: the device on which to create the Faust ('cpu' or 'gpu').
+            dtype: the dtype of the Faust ('float32' and 'float128' == 'double'
+                   are supported for fiel == 'real', only 'double' for field ==
+                   'complex'.
 
     Returns:
         the random Faust.
@@ -2932,29 +2939,35 @@ def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
         FACTOR 2 (real) DENSE, size 10x13, density 0.515385, nnz 67<br/>
         FACTOR 3 (real) DENSE, size 13x16, density 0.495192, nnz 103<br/>
 
-    <b>See also</b> Faust.__init__
+    <b>See also</b> Faust.__init__, pyfaust.rand_bsr
     """
     check_dev(dev)
     field = field.lower()
-    if field in ['real', 'double', 'float']:
+    if field == 'real':
         is_real = True
-        type = 'double' if field == 'real' else field
-    elif(field == 'complex'):
+        if dtype in [np.float64, 'float', 'double']:
+            type = 'double'
+        elif dtype in [np.float32, 'float32']:
+            type = 'float'
+    elif field == 'complex':
+        if not dtype in [np.float64, 'float', 'double']:
+            raise TypeError('Invalid dtype: only double are handled for for'
+                            ' complex field')
         is_real = False
     else:
-        raise ValueError('field argument must be either "real" or "complex".')
+        raise ValueError('field argument must be either \'real\' or \'complex\'.')
     DENSE=0
     SPARSE=1
     MIXED=2
     REAL=3
     COMPLEX=4
     # set repr. type of factors
-    if(not isinstance(fac_type, str) or fac_type not in ["sparse",
-                                                         "dense",
-                                                         "mixed"]):
+    if(not isinstance(fac_type, str) or fac_type not in ['sparse',
+                                                         'dense',
+                                                         'mixed']):
         raise ValueError('rand(): argument fac_type must be a'
-                         ' str equal to "sparse",'
-                         ' "dense" or "mixed".')
+                         ' str equal to \'sparse\','
+                         ' \'dense\' or \'mixed\'.')
 
     fac_type_map = {"sparse" : SPARSE, "dense" : DENSE, "mixed" : MIXED}
     # set field of matrices/factors
@@ -2989,10 +3002,11 @@ def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
     if(not isinstance(per_row, bool)):
        raise ValueError("FaustFact.rand(): per_row argument must be a "
                         "bool.")
-    if(not density):
+    if not density:
         density = -1
-    elif(not isinstance(density, np.float)):
+    elif not isinstance(density, (float, int)):
         raise ValueError("rand(): density must be a float")
+    density = float(density)
     if dev == "cpu":
         if field == REAL:
             if type == 'double':
@@ -3013,7 +3027,7 @@ def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
         # no else possible (see above)
     elif dev.startswith("gpu"):
         if field == REAL:
-            if type == 'double': 
+            if type == 'double':
                 rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUDbl.randFaust(num_rows,
                                                                               num_cols,
                                                                               fac_type_map[fac_type], min_num_factors, max_num_factors,

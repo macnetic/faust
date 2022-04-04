@@ -50,6 +50,8 @@
 %>
 %>
 %> @endcode
+%>
+%> <p>@b See @b also Faust.Faust, matfaust.rand.
 function F = rand_bsr(M, N, BM, BN, varargin)
 	argc = length(varargin);
 	dev = 'cpu';

@@ -1,7 +1,7 @@
 %==========================================================================================
 %> @brief Generates a random Faust.
 %>
-%> @warning if this function is imported through 'import matfaust.rand' or 'import matfaust.*' the Matlab builtin function rand will be unreachable (matfaust.rand will be called instead). So it is not advisable to import this function, rather directly call matfaust.rand without any import.
+%> @warning if this function is imported through 'import matfaust.rand' or 'import matfaust.*' the Matlab builtin function rand will be unreachable (matfaust.rand will be called instead). So, generally, it is not advisable to import this function, rather directly call matfaust.rand without any import.
 %>
 %> @b Usage
 %>
@@ -15,7 +15,7 @@
 %>
 %> &nbsp;&nbsp;&nbsp; @b rand(@b M, @b N, @b 'num_factors', @b NF, @b 'dim_sizes', @b S, @b 'density', @b D) or @b rand(@b M, @b N, @b 'num_factors', [@b N1, @b N2], @b 'dim_sizes', [@b S1, @b S2], @b 'density', @b D) same as above but specifying D the approximate density of each factor.
 %>
-%> &nbsp;&nbsp;&nbsp; @b rand(@b M, @b N, @b 'num_factors', @b NF, @b 'dim_sizes', @b S, @b 'density', @b D, @b 'per_row', @b true}) or @b rand(@b M, @b N, @b 'num_factors', [@b N1, @b N2], @b 'dim_sizes', [@b S1, @b S2], @b 'density',@b D, @b 'per_row', true) same as above but specifying D, the density of each factor per row ('per_row', true) or per column ('per_row', false).
+%> &nbsp;&nbsp;&nbsp; @b rand(@b M, @b N, @b 'num_factors', @b NF, @b 'dim_sizes', @b S, @b 'density', @b D, @b 'per_row', @b true) or @b rand(@b M, @b N, @b 'num_factors', [@b N1, @b N2], @b 'dim_sizes', [@b S1, @b S2], @b 'density',@b D, @b 'per_row', true) same as above but specifying D, the density of each factor per row ('per_row', true) or per column ('per_row', false).
 %>
 %> &nbsp;&nbsp;&nbsp; @b @b rand(@b M, @b N, @b 'num_factors', @b NF, @b 'dim_sizes', @b S, @b 'density', @b D, @b 'fac_type', @b 'dense') or @b rand(@b M, @b N, @b 'num_factors', @b [@b  N1, @b N2], @b 'dim_sizes', [@b S1, @b S2], @b 'density', @b D, @b 'fac_type', @b 'dense') same as above but generating only dense matrices as factors.
 %>
@@ -29,31 +29,31 @@
 %>
 %>
 %>
-%> @param M (arg. 1) The number of rows of the random Faust.
-%> @param N (arg. 2) The number of columns of the random Faust.
-%> @param 'num_factors', NF (optional) If it's an integer it will be the number of random factors to set in the Faust.
+%> @param M the Faust number of rows.
+%> @param N the Faust number of columns.
+%> @param 'num_factors', NF if it's an integer it is the number of random factors to set in the Faust.
 %>                    If NF is a vector of 2 integers then the
-%>                    number of factors will be set randomly between
-%>                    NF(1) and NF(2) (inclusively).
-%> @param 'dim_sizes',S (optional) if it's an integer it will be the order of the square
-%> 					matrix factors (of size S^2).
-%> 					If it's a vector of 2 integers then the
-%> 					number of rows and columns will
-%> 					be a random number between size_dims(1) and
-%> 					size_dims(2) (inclusively).
-%> @param 'density',D	(optional) the approximate density of generated factors.
-%> 				   D must be a floating point number between 0 and 1.
-%> @param 'per_row',bool (optional) this argument is to specify the density per row or per column.
-%>				    By default the density is set per row and is such that the Faust's factors will have 5 non-zero elements per row.
-%> @param fac_type, str (optional) the type of factors, str must be 'sparse', 'dense' or 'mixed' if you want a mix of dense and
-%>                  		sparse matrices in the generated Faust (choice's done according
-%>                  		to an uniform distribution).
-%>                  		The default value is 'sparse'.
-%> @param 'field', str	(optional) str is either 'real' or 'complex' to set the Faust field.
-%>                  The default value is 'real'.
-%>
-%> @param 'dev', 'gpu or 'cpu' (optional) to create the random Faust on CPU or GPU (by default on CPU).
-%> @param 'dtype', 'double' (by default) or 'float' (optional) to select the scalar type used for the Faust generated.
+%>                    number of factors is set randomly between
+%>                    NF(1) and NF(2) (inclusively). Defaultly, a 5 factors long Faust is generated.
+%> @param 'dim_sizes',S if it's an integer all Faust factors are square matrices (except maybe the first
+%>			and last ones, depending on M and N). The size of the intermediary square factors is S**2.
+%>			If it's a vector of 2 integers then the number of rows and columns are both a random number between size_dims(1) and
+%> 			size_dims(2) (inclusively). Defaultly, dim_sizes is [M, N].
+%> @param 'density',D the approximate density of generated factors.
+%>		      D must be a floating point number greater than 0 and lower of equal to 1.
+%> 	              The default value is such that each factor gets 5 non-zero
+%> 	              elements per row, if per_row is true, or per column otherwise.
+%> 	              A density of zero is equivalent to the default case.
+%> @param 'per_row',bool this argument is to specify the density per row or per column.
+%>		         By default the density is set per row and is such that the Faust's factors will have 5 non-zero elements per row.
+%> @param fac_type, str the storage representation of factors. str must be 'sparse', 'dense' or 'mixed'.
+%> 			The latter designates a mix of dense and sparse matrices in the generated Faust (the choice is made according
+%>                      to a uniform distribution).
+%>			The default value is 'sparse'.
+%> @param 'field', str	str is either 'real' or 'complex' (the Faust field).
+%>                      The default value is 'real'.
+%> @param 'dev', str 'gpu or 'cpu' to create the random Faust on CPU or GPU (by default on CPU).
+%> @param 'class', str 'double' (by default) or 'single' to select the scalar type used for the Faust generated.
 %>
 %>
 %> @retval F the random Faust.
@@ -97,7 +97,7 @@
 %>
 %> @endcode
 %>
-%> <p>@b See @b also Faust.Faust.
+%> <p>@b See @b also Faust.Faust, matfaust.rand_bsr.
 %==========================================================================================
 function F = rand(M, N, varargin)
 	import matfaust.*
@@ -129,7 +129,7 @@ function F = rand(M, N, varargin)
 	max_dim_size = max(num_rows, num_cols);
 	argc = length(varargin);
 	dev = 'cpu';
-	dtype = 'double';
+	class = 'double';
 	if(argc > 0)
 		for i=1:2:argc
 			if(argc > i)
@@ -191,11 +191,11 @@ function F = rand(M, N, varargin)
 					else
 						dev = tmparg;
 					end
-				case 'dtype'
-					if(argc == i || ~ strcmp(tmparg, 'double') && ~ strcmp(tmparg, 'float'))
-						error('dtype keyword argument is not followed by a valid value: float, double.')
+				case 'class'
+					if(argc == i || ~ strcmp(tmparg, 'double') && ~ strcmp(tmparg, 'single'))
+						error('class keyword argument is not followed by a valid value: single, double.')
 					else
-						dtype = tmparg;
+						class = tmparg;
 					end
 				otherwise
 					if((isstr(varargin{i}) || ischar(varargin{i}))  && ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu') && ~ strcmp(tmparg, 'dense') && ~ strcmp(tmparg, 'sparse') && ~ strcmp(tmparg, 'mixed') && ~ strcmp(tmparg, 'real') && ~ strcmp(tmparg, 'complex'))
@@ -222,17 +222,17 @@ function F = rand(M, N, varargin)
 		error('field has an unknown char array value.')
 	end
 	e = MException('FAUST:OOM', 'Out of Memory');
-	if(field == COMPLEX && strcmp(dtype, 'float'))
-		warning('Complex Faust-s are not available in single precision (only double precision is possible).')
+	if(field == COMPLEX && strcmp(class, 'single'))
+		error('Complex Faust-s are not available in single precision (only double precision is possible).')
 	end
 	if(strcmp(dev, 'cpu'))
 		if(field == COMPLEX)
 			core_obj = mexFaustCplx('rand', num_rows, num_cols, fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
 			is_real = false;
 		else %if(field == REAL)
-			if(strcmp(dtype, 'double'))
+			if(strcmp(class, 'double'))
 				core_obj = mexFaustReal('rand', num_rows, num_cols, fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
-			else % float
+			else % single
 				core_obj = mexFaustRealFloat('rand', num_rows, num_cols, fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
 			end
 			is_real = true;
@@ -242,7 +242,7 @@ function F = rand(M, N, varargin)
 			core_obj = mexFaustGPUCplx('rand', num_rows, num_cols, fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
 			is_real = false;
 		else %if(field == REAL)
-			if(strcmp(dtype, 'double'))
+			if(strcmp(class, 'double'))
 				core_obj = mexFaustGPUReal('rand', num_rows, num_cols, fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
 			else % float
 				core_obj = mexFaustGPURealFloat('rand', num_rows, num_cols, fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
@@ -253,5 +253,5 @@ function F = rand(M, N, varargin)
 	if(core_obj == 0)
 		throw(e)
 	end
-	F = matfaust.Faust(core_obj, is_real, dev, dtype);
+	F = matfaust.Faust(core_obj, is_real, dev, class);
 end
