@@ -22,7 +22,7 @@ void enable_gpu_mod(const mxArray **prhs, const int nrhs, mxArray **plhs, const 
 	ptr_out[0] = (double)((unsigned long long)ptr);
 }
 
-void is_gpu_mod_enabled(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs)
+void _is_gpu_mod_enabled(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs)
 {
 	bool enabled;
 #ifdef USE_GPU_MOD

@@ -110,6 +110,7 @@
 #include "faust_clone.h"
 #endif
 #include "faust_get_item.h"
+#include "is_gpu_mod_enabled.h"
 
 typedef @FAUST_SCALAR@ SCALAR;
 typedef @FAUST_FPP@ FPP;
@@ -141,7 +142,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		// no handle commands (or at least command without second argument)
 		if(!strcmp("is_gpu_mod_enabled", cmd))
 		{
-			is_gpu_mod_enabled(prhs, nrhs, plhs, nlhs);
+			_is_gpu_mod_enabled<DEV>(prhs, nrhs, plhs, nlhs);
 			return;
 		}
 		// Check there is a second input, which should be the class instance handle
