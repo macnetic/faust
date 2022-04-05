@@ -2216,6 +2216,28 @@ classdef Faust
 		%===
 		%>
 		%> @retval c: the Faust class.
+		%>
+		%>@b Example:
+		%>@code
+		%> >> class(matfaust.Faust(rand(10, 10)))
+		%>
+		%> ans =
+		%>
+		%>     'double'
+		%>
+		%> >> class(matfaust.Faust(single(rand(10, 10))))
+		%>
+		%> ans =
+		%>
+		%>     'single'
+		%>
+		%> >> class(matfaust.Faust(complex(rand(10, 10))))
+		%>
+		%> ans =
+		%>
+		%>     'double'
+		%>@endcode
+		%>
 		%================================================================
 		function c = class(F)
 			if(strcmp(F.dtype, 'float'))

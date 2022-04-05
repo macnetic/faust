@@ -1938,16 +1938,11 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         This function is intended to be used as a property (see the examples).
 
-        NOTE: if F is a real Faust, all factors are real. If F is a complex
-        Faust, at least one factor is complex.
-
         Args:
             F: the Faust object.
 
         Returns:
-            A numpy.complex128 if the Faust is complex otherwise (if it's
-            a real Faust) it returns a numpy.float64.
-
+            the dtype of F, which can be float32, float64 or complex128.
 
         Examples:
             >>> from pyfaust import rand
@@ -1957,6 +1952,9 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             >>> F = rand(5, 10)
             >>> F.dtype
             dtype('float64')
+            >>> G = rand(5, 5, dtype='float32')
+            >>> G.dtype
+            dtype('float32')
 
 
         """
