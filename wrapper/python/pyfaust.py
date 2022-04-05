@@ -1908,13 +1908,33 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
     def astype(F, dtype):
         """
-        Convert F to the dtype passed as argument.
+        Converts F to the dtype passed as argument in a new Faust.
 
         Args:
             dtype: np.float or np.complex.
 
         Returns:
             A Faust copy of F converted to dtype.
+
+        Example:
+            >>> from pyfaust import rand
+            >>> F = rand(10, 10, dtype='double')
+            >>> F.astype('float32')
+            Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
+                - FACTOR 0 (float) SPARSE, size 10x10, density 0.5, nnz 50
+                - FACTOR 1 (float) SPARSE, size 10x10, density 0.5, nnz 50
+                - FACTOR 2 (float) SPARSE, size 10x10, density 0.5, nnz 50
+                - FACTOR 3 (float) SPARSE, size 10x10, density 0.5, nnz 50
+                - FACTOR 4 (float) SPARSE, size 10x10, density 0.5, nnz 50
+
+            >>> F.astype("complex")
+            Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
+                - FACTOR 0 (complex) SPARSE, size 10x10, density 0.5, nnz 50
+                - FACTOR 1 (complex) SPARSE, size 10x10, density 0.5, nnz 50
+                - FACTOR 2 (complex) SPARSE, size 10x10, density 0.5, nnz 50
+                - FACTOR 3 (complex) SPARSE, size 10x10, density 0.5, nnz 50
+                - FACTOR 4 (complex) SPARSE, size 10x10, density 0.5, nnz 50
+
         """
         #TODO: full list of numpy args or **kw_unknown
         if np.dtype(dtype) not in [np.complex, np.float32, np.double]:
