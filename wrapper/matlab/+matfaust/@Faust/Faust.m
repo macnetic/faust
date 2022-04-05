@@ -2178,12 +2178,58 @@ classdef Faust
 		%> Clones the Faust (in a new memory space).
 		%===
 		%>
+		%> @param 'dev',str 'gpu or 'cpu' to clone the Faust on CPU or GPU (by default on CPU).
+		%>
+		%> @b Example
+		%>
+		%> @code
+		%> >> F = matfaust.rand(10, 10)
+		%>
+		%> F =
+		%>
+		%> Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
+		%> - FACTOR 0 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 1 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%>
+		%> >> Fc = clone(F)
+		%>
+		%> Fc =
+		%>
+		%> Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
+		%> - FACTOR 0 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 1 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%>
+		%> >> % and only if your device supports a compatible NVIDIA device
+		%> >> Fc_gpu = clone(F, 'dev', 'gpu')
+		%>
+		%> Fc_gpu =
+		%>
+		%> - GPU FACTOR 0 (double) SPARSE size 10 x 10, addr: 0x14a9a28aa300, density 0.500000, nnz 50
+		%> - GPU FACTOR 1 (double) SPARSE size 10 x 10, addr: 0x14a8f1379750, density 0.500000, nnz 50
+		%> - GPU FACTOR 2 (double) SPARSE size 10 x 10, addr: 0x14a8efa95cc0, density 0.500000, nnz 50
+		%> - GPU FACTOR 3 (double) SPARSE size 10 x 10, addr: 0x14a9a23c3eb0, density 0.500000, nnz 50
+		%> - GPU FACTOR 4 (double) SPARSE size 10 x 10, addr: 0x14a9a27eff70, density 0.500000, nnz 50
+		%> @endcode
+		%>
 		%> @retval Fc: the Faust clone.
 		%================================================================
 		function Fc = clone(F, varargin)
 			%%
 			if(nargin > 1)
 				dev = varargin{1};
+				if(strcmp(dev, 'dev'))
+					if(nargin > 2)
+						dev = varargin{2};
+					else
+						error('dev keyword argument must be followed by ''cpu'' or ''gpu''')
+					end
+				end
 			else
 				dev = F.dev;
 			end

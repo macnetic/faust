@@ -2252,14 +2252,31 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         """Clones the Faust (in a new memory space).
 
         Args:
-            dev (optional): 'cpu' to clone on CPU RAM, 'gpu[:id]' to clone on
-            the GPU device #id (e.g. gpu:0). By default (None), the device is
+            dev (optional): 'cpu' to clone on CPU RAM, 'gpu' to clone on
+            the GPU device. By default (None), the device is
             the F.device.
-
-        NOTE: id suffix is a future feature that remains to implement.
 
         Returns:
             The Faust clone.
+
+        Example:
+            >>> from pyfaust import rand
+            >>> F = rand(10, 10)
+            >>> F.clone()
+            Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
+                - FACTOR 0 (double) SPARSE, size 10x10, density 0.5, nnz 50
+                - FACTOR 1 (double) SPARSE, size 10x10, density 0.5, nnz 50
+                - FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
+                - FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
+                - FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
+
+            >>> F.clone(dev='gpu') # only if a NVIDIA compatible GPU is available
+			- GPU FACTOR 0 (double) SPARSE size 10 x 10, addr: 0x2c85390, density 0.500000, nnz 50
+			- GPU FACTOR 1 (double) SPARSE size 10 x 10, addr: 0x7ff00c0, density 0.500000, nnz 50
+			- GPU FACTOR 2 (double) SPARSE size 10 x 10, addr: 0x977f280, density 0.500000, nnz 50
+			- GPU FACTOR 3 (double) SPARSE size 10 x 10, addr: 0x9780120, density 0.500000, nnz 50
+			- GPU FACTOR 4 (double) SPARSE size 10 x 10, addr: 0x9780fc0, density 0.500000, nnz 50
+
         """
         if dev == None:
             dev = F.device
