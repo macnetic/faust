@@ -98,6 +98,8 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                      numpy.ndarray with ndim == 2).
                      scipy.sparse.csc_matrix/coo_matrix are supported but
                      converted to csr_matrix on the fly.<br/>
+                     The Faust will be in the same dtype as the factors
+                     (only 'float32', 'float64'/'double' and 'complex128'/'complex' dtype are supported).
                      Passing only an array or a sparse matrix to the
                      constructor is equivalent to
                      passing a list of a single factor.
@@ -161,7 +163,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                 >>>
 
 
-        <b>See also</b> Faust.save, pyfaust.rand
+        <b>See also</b> Faust.save, pyfaust.rand, pyfaust.dft, pyfaust.wht
         <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csr_matrix.html">csr_matrix, </a>
         <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.bsr_matrix.html">bsr_matrix</a>
         <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csc_matrix.html">csc_matrix, </a>

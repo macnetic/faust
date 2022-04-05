@@ -279,6 +279,4 @@ $output=$output."};\n";
 if ($namespace ne "") {
   $output=$output."};\n";
 }
-# bad dirty custom filters for Faust
-$output =~ s/function Faust\(varargin\);/function Faust(factors_or_filepath);/; 
 print $output;

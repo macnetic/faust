@@ -112,29 +112,32 @@ classdef Faust
 		%>
 		%> @b Usage
 		%>
-		%> &nbsp;&nbsp;&nbsp; Faust(factors) creates a Faust from a list of factors (1D cell array).<br/><br>
-		%> &nbsp;&nbsp;&nbsp; Faust(filepath) creates a Faust from a previously saved Faust file (filepath is a character array).<br/><br/>
+		%> &nbsp;&nbsp;&nbsp; @b Faust(factors) creates a Faust from a list of factors (1D cell array).<br/><br>
+		%> &nbsp;&nbsp;&nbsp; @b Faust(filepath) creates a Faust from a previously saved Faust file (filepath is a character array).<br/><br/>
 		%>
 		%>
-		%> @param factors (1st arg.) the 1D cell array of factors to initialize the Faust with.
+		%> @param factors <b>(varargin{1}, first argument)</b> the 1D cell array of factors to initialize the Faust with.
 		%> <br/> The factors must respect the dimensions needed for the product to be defined (for i=1 to size(factors,2), size(factors{i},2) == size(factors{i+1},1)).
 		%> <br/> The factors can be sparse, dense or BSR matrices.
+		%> It might be real matrices in single or double precision but also complex matrices. The created Faust will be consequently a single, double or complex Faust.
 		%> <br/> To create a BSR matrix you must use the matfaust.create_bsr function.
 		%> <br/> Passing a single matrix to the constructor instead of
 		%> a cell array is equivalent to passing a singleton cell array.
-		%> @param filepath (1st arg.) the file from which a Faust is created. It must be a character array.<br/>
+		%> @param filepath <b>(varargin{1}, first argument)</b> the file from which a Faust is created. It must be a character array.<br/>
 		%>								The format is Matlab version 5 (.mat extension).<br/>
 		%>								The file must have been saved before with Faust.save().
+		%> @param 'dev',str 'gpu or 'cpu' to create the Faust on CPU or GPU (by default on CPU).
 		%>
 		%> @b Examples
 		%> @code
-		%>	import matfaust.*
+		%>	import matfaust.Faust
 		%>	factors = cell(1,5);
 		%>	is_sparse = false;
 		%>	for i=1:5
-		%>		if(is_sparse) % odd index factors are sparse matrices
+		%>		% alternate sparse and dense factors
+		%>		if(is_sparse)
 		%>			factors{i} = sprand(100, 100, 0.1);
-		%>		else % even index gives a dense matrix
+		%>		else
 		%>			factors{i} = rand(100, 100);
 		%>		end
 		%>		is_sparse = ~ is_sparse;
@@ -145,14 +148,39 @@ classdef Faust
 		%>
 		%>	save(F, 'F.mat')
 		%>	% define a Faust from file
-		%>	H = Faust('F.mat')
+		%>	G = Faust('F.mat')
 		%>
-		%>	Faust(rand(10,10)) % creating a Faust with only one factor
+		%>	H = Faust(rand(10,10)) % creating a Faust with only one factor
 		%>
 		%> @endcode
 		%>
+		%> <b>Output:</b>
 		%>
-		%> <p>@b See @b also Faust.delete, Faust.save, matfaust.rand</p>
+		%> F =
+		%>
+		%> Faust size 100x100, density 3.1912, nnz_sum 31912, 5 factor(s):<br/>
+		%> - FACTOR 0 (double) DENSE, size 100x100, density 1, nnz 10000<br/>
+		%> - FACTOR 1 (double) SPARSE, size 100x100, density 0.0956, nnz 956<br/>
+		%> - FACTOR 2 (double) DENSE, size 100x100, density 1, nnz 10000<br/>
+		%> - FACTOR 3 (double) SPARSE, size 100x100, density 0.0956, nnz 956<br/>
+		%> - FACTOR 4 (double) DENSE, size 100x100, density 1, nnz 10000<br/>
+		%>
+		%> G =
+		%>
+		%> Faust size 100x100, density 3.1912, nnz_sum 31912, 5 factor(s):
+		%> - FACTOR 0 (double) DENSE, size 100x100, density 1, nnz 10000
+		%> - FACTOR 1 (double) SPARSE, size 100x100, density 0.0956, nnz 956
+		%> - FACTOR 2 (double) DENSE, size 100x100, density 1, nnz 10000
+		%> - FACTOR 3 (double) SPARSE, size 100x100, density 0.0956, nnz 956
+		%> - FACTOR 4 (double) DENSE, size 100x100, density 1, nnz 10000
+		%>
+		%> H =
+		%>
+		%> Faust size 10x10, density 1, nnz_sum 100, 1 factor(s):
+		%> - FACTOR 0 (double) DENSE, size 10x10, density 1, nnz 100
+		%>
+		%>
+		%> <p>@b See @b also Faust.delete, Faust.save, matfaust.rand, matfaust.dft, matfaust.wht</p>
 		%>
 		%======================================================================
 		function F = Faust(varargin)
