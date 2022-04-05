@@ -689,6 +689,30 @@ classdef Faust
 		%>
 		%> @retval sF the single class/precision Faust.
 		%>
+		%> @b Example:
+		%> @code
+		%> >> dF = matfaust.rand(5, 5, 'field', 'real', 'class', 'double')
+		%>
+		%> dF =
+		%>
+		%> Faust size 5x5, density 5, nnz_sum 125, 5 factor(s):
+		%> - FACTOR 0 (double) SPARSE, size 5x5, density 1, nnz 25
+		%> - FACTOR 1 (double) SPARSE, size 5x5, density 1, nnz 25
+		%> - FACTOR 2 (double) SPARSE, size 5x5, density 1, nnz 25
+		%> - FACTOR 3 (double) SPARSE, size 5x5, density 1, nnz 25
+		%> - FACTOR 4 (double) SPARSE, size 5x5, density 1, nnz 25
+		%> >> sF = single(dF)
+		%>
+		%> sF =
+		%>
+		%> Faust size 5x5, density 5, nnz_sum 125, 5 factor(s):
+		%> - FACTOR 0 (float) SPARSE, size 5x5, density 1, nnz 25
+		%> - FACTOR 1 (float) SPARSE, size 5x5, density 1, nnz 25
+		%> - FACTOR 2 (float) SPARSE, size 5x5, density 1, nnz 25
+		%> - FACTOR 3 (float) SPARSE, size 5x5, density 1, nnz 25
+		%> - FACTOR 4 (float) SPARSE, size 5x5, density 1, nnz 25
+		%> @endcode
+		%>
 		%> <p/>@b See @b also Faust.class
 		%======================================================================
 		function sF = single(F)
@@ -2144,7 +2168,7 @@ classdef Faust
 		end
 
 		%================================================================
-		%> Converts F to a complex Faust.
+		%> Converts F to a new complex Faust.
 		%===
 		%> This function overloads a Matlab built-in function.
 		%>
@@ -2153,12 +2177,41 @@ classdef Faust
 		%> &nbsp;&nbsp;&nbsp; <b> cF = COMPLEX(F) </b> for real Faust F returns the complex result cF
 		%> with real part F and zero matrix as imaginary part of all cF's factors.
 		%>
+		%> @b Example:
+		%>
+		%> @code
+		%> >> dF = matfaust.rand(5, 5, 'field', 'real', 'class', 'double')
+		%>
+		%> dF =
+		%>
+		%> Faust size 5x5, density 5, nnz_sum 125, 5 factor(s):
+		%> - FACTOR 0 (double) SPARSE, size 5x5, density 1, nnz 25
+		%> - FACTOR 1 (double) SPARSE, size 5x5, density 1, nnz 25
+		%> - FACTOR 2 (double) SPARSE, size 5x5, density 1, nnz 25
+		%> - FACTOR 3 (double) SPARSE, size 5x5, density 1, nnz 25
+		%> - FACTOR 4 (double) SPARSE, size 5x5, density 1, nnz 25
+		%> >> cF = complex(F)
+		%>
+		%> cF =
+		%>
+		%> Faust size 5x5, density 5, nnz_sum 125, 5 factor(s):
+		%> - FACTOR 0 (complex) SPARSE, size 5x5, density 1, nnz 25
+		%> - FACTOR 1 (complex) SPARSE, size 5x5, density 1, nnz 25
+		%> - FACTOR 2 (complex) SPARSE, size 5x5, density 1, nnz 25
+		%> - FACTOR 3 (complex) SPARSE, size 5x5, density 1, nnz 25
+		%> - FACTOR 4 (complex) SPARSE, size 5x5, density 1, nnz 25
+		%> @endcode
+		%>
+		%>
 		%> <p> @b See @b also Faust.isreal, Faust.conj
 		%================================================================
 		function cF = complex(F)
 			if(~ isreal(F))
 				cF = F;
 			else
+				if(strcmp(class(F), 'single'))
+					error('The Faust to convert is single, only double precision is handled.')
+				end
 				n = numfactors(F);
 				facs = cell(1,n);
 				for i=1:n
