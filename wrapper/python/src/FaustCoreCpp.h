@@ -115,7 +115,7 @@ class FaustCoreCpp
     double get_nb_factors() const;
     unsigned int get_fact_nb_rows(unsigned int& i) const;
     unsigned int get_fact_nb_cols(unsigned int& i) const;
-    bool is_all_sparse() const;
+    bool is_all_sparse(bool csr, bool bsr) const;
     bool is_all_dense() const;
     void get_fact(const unsigned int& i, FPP* fact_ptr) const;
     void get_fact_sparse(const unsigned int& i,

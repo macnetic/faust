@@ -480,11 +480,13 @@ namespace Faust
 		}
 
 	template<typename FPP, FDevice DEV>
-		bool TransformHelperGen<FPP, DEV>::is_all_sparse() const
+		bool TransformHelperGen<FPP, DEV>::is_all_sparse(bool csr/*=true*/, bool bsr/*=false*/) const
 		{
+			if(this->size() == 0)
+				return false;
 			for(int i=0;i<this->size();i++)
 			{
-				if(! dynamic_cast<const MatSparse<FPP,DEV>*>(this->get_gen_fact(i)))
+				if(! (csr && dynamic_cast<const MatSparse<FPP,DEV>*>(this->get_gen_fact(i)) || bsr && dynamic_cast<const MatBSR<FPP,DEV>*>(this->get_gen_fact(i))))
 					return false;
 			}
 			return true;

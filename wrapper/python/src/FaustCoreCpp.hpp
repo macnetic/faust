@@ -686,9 +686,9 @@ FaustCoreCpp<FPP,DEV>::~FaustCoreCpp()
 }
 
 template<typename FPP, FDevice DEV>
-bool FaustCoreCpp<FPP,DEV>::is_all_sparse() const
+bool FaustCoreCpp<FPP,DEV>::is_all_sparse(bool csr, bool bsr) const
 {
-    return transform->is_all_sparse();
+    return transform->is_all_sparse(csr, bsr);
 }
 
 template<typename FPP, FDevice DEV>

@@ -2085,11 +2085,55 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         """
         return isinstance(obj, Faust)
 
-    def issparse(F):
+    def issparse(F, csr=True, bsr=False):
         """
-        Returns True if all factors are sparse (csr_matrix format) False otherwise.
+        Returns True if all F factors are sparse False otherwise.
+
+        What a sparse factor is, depends on csr and bsr arguments.
+
+        Args:
+            csr: True to consider CSR matrices in F as sparse matrices, False otherwise.
+            bsr: True to consider BSR matrices in F as sparse matrices, False otherwise.
+
+        Example:
+			>>> import pyfaust as pf
+			>>> F = pf.rand(10, 10, fac_type='sparse')
+			>>> F
+			Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
+			- FACTOR 0 (double) SPARSE, size 10x10, density 0.5, nnz 50
+			- FACTOR 1 (double) SPARSE, size 10x10, density 0.5, nnz 50
+			- FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
+			- FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
+			- FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
+
+			>>> F.issparse()
+			True
+			>>> F.issparse(csr=True)
+			True
+			>>> F.issparse(csr=False)
+			ValueError: It doesn't make sense to set csr=False and bsr=False as the function will always return False
+
+			>>> F = pf.rand_bsr(10, 10, 2, 2, 2, .1)
+			>>> F
+			Faust size 10x10, density 0.24, nnz_sum 24, 2 factor(s):
+			- FACTOR 0 (double) BSR, size 10x10 (blocksize = 2x2), density 0.12, nnz 12 (nnz blocks: 3)
+			- FACTOR 1 (double) BSR, size 10x10 (blocksize = 2x2), density 0.12, nnz 12 (nnz blocks: 3)
+
+			>>> F.issparse() # default config. recognizes only csr 
+            False
+            >>> F.issparse(bsr=True)
+            True
+            >>> F = pf.rand(10, 10, fac_type='dense')
+            >>> F.issparse()
+            False
+
+        <b>See also</b> Faust.isdense, pyfaust.rand, pyfaust.rand_bsr
         """
-        return F.m_faust.is_all_sparse()
+        if not csr and not bsr:
+            raise ValueError('It doesn\'t make sense to set csr=False and'
+                             ' bsr=False as the function will always return'
+                             ' False')
+        return F.m_faust.is_all_sparse(csr, bsr)
 
     def isdense(F):
         """
@@ -2130,6 +2174,8 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
             >>> F.isdense()
             False
+
+        <b>See also</b> Faust.issparse, pyfaust.rand, pyfaust.rand_bsr
         """
         return F.m_faust.is_all_dense()
 

@@ -40,7 +40,7 @@ namespace Faust
 			bool isTransposed() const;
 			bool isConjugate() const;
 			bool isReal() const;
-			bool is_all_sparse() const;
+			bool is_all_sparse(bool csr=true, bool bsr=false) const;
 			bool is_all_dense() const;
 
 			virtual faust_unsigned_int size() const=0;

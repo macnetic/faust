@@ -1279,7 +1279,7 @@ classdef Faust
 		%>	nf = numfactors(F)
 		%> @endcode
 		%>
-		%> <p>@b See @b also Faust.factors.
+		%> <p>@b See @b also Faust.factors
 		%==========================================================================================
 		function num_factors = numfactors(F)
 			num_factors = call_mex(F, 'numfactors');
@@ -1288,9 +1288,94 @@ classdef Faust
 		%==========================================================================================
 		%> @brief Returns true if F factors are all sparse matrices false otherwise.
 		%>
+		%> What a sparse factor is, depends on csr and bsr arguments. Defaultly,
+		%> only a Faust full of CSR matrices is taken as a sparse Faust.
+		%>
+		%> @param csr, bool true to consider a CSR matrix as a sparse matrix, false otherwise (true by default).
+		%> @param bsr, bool true to consider a BSR matrix as a sparse matrix, false otherwise (false by default).
+		%>
+		%> @b Example:
+		%> @code
+		%> >> F = matfaust.rand(10, 10, 'fac_type', 'sparse')
+		%>
+		%> F =
+		%>
+		%> Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
+		%> - FACTOR 0 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 1 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> >> issparse(F) % equivalent to issparse(F, 'csr', true)
+		%>
+		%> ans =
+		%>
+		%>      1
+		%>
+		%> >> issparse(F, 'csr', false, 'bsr', false)
+		%>
+		%> ans =
+		%>
+		%>      0
+		%>
+		%> >> issparse(F, 'csr', false, 'bsr', false)
+		%> ans =
+		%>
+		%>      0
+		%> >> issparse(F, 'csr', false, 'bsr', false)
+		%> Error using matfaust.Faust/issparse (line 1945)
+		%> It doesn't make sense to set csr=false and bsr=false as the function always return false
+		%>
+		%> >> F = matfaust.rand_bsr(10, 10, 2, 2, 2, .1)
+		%>
+		%> F =
+		%>
+		%> Faust size 10x10, density 0.6, nnz_sum 60, 5 factor(s):
+		%> - FACTOR 0 (double) BSR, size 10x10 (blocksize = 2x2), density 0.12, nnz 12 (nnz blocks: 3)
+		%> - FACTOR 1 (double) BSR, size 10x10 (blocksize = 2x2), density 0.12, nnz 12 (nnz blocks: 3)
+		%> - FACTOR 2 (double) BSR, size 10x10 (blocksize = 2x2), density 0.12, nnz 12 (nnz blocks: 3)
+		%> - FACTOR 3 (double) BSR, size 10x10 (blocksize = 2x2), density 0.12, nnz 12 (nnz blocks: 3)
+		%> - FACTOR 4 (double) BSR, size 10x10 (blocksize = 2x2), density 0.12, nnz 12 (nnz blocks: 3)
+		%> >> issparse(F) % default config. recognizes only csr
+		%>
+		%> ans =
+		%>
+		%>      0
+		%>
+		%> >> issparse(F, 'bsr', true)
+		%>
+		%> ans =
+		%>
+		%>      1
+		%>
+		%> >> F = matfaust.rand(10, 10, 'fac_type', 'dense')
+		%>
+		%> F =
+		%>
+		%> Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
+		%> - FACTOR 0 (double) DENSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 1 (double) DENSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 2 (double) DENSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 3 (double) DENSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 4 (double) DENSE, size 10x10, density 0.5, nnz 50
+		%> >> issparse(F)
+		%>
+		%> ans =
+		%>
+		%>      0
+		%> @endcode
+		%>
+		%> <p>@b See @b also Faust.isdense, matfaust.rand, matfaust.rand_bsr
 		%==========================================================================================
-		function is_sparse = issparse(F)
-			is_sparse = call_mex(F, 'is_all_sparse');
+		function is_sparse = issparse(F, varargin)
+			p = inputParser;
+			addOptional(p, 'csr', true, @islogical);
+			addOptional(p, 'bsr', false, @islogical);
+			parse(p, varargin{:});
+			if(~ p.Results.csr && ~ p.Results.bsr)
+				error('It doesn''t make sense to set csr=false and bsr=false as the function will always return false')
+			end
+			is_sparse = call_mex(F, 'is_all_sparse', p.Results.csr, p.Results.bsr);
 		end
 
 		%==========================================================================================
@@ -1347,6 +1432,8 @@ classdef Faust
 		%>      0
 		%>
 		%> @endcode
+		%>
+		%> <p>@b See @b also Faust.issparse, matfaust.rand, matfaust.rand_bsr
 		%==========================================================================================
 		function is_dense = isdense(F)
 			is_dense = call_mex(F, 'is_all_dense');
