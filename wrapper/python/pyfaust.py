@@ -1692,7 +1692,9 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
     def factors(F, indices):
         """
-        Returns the i-th factor of F.
+        Returns the i-th factor of F or a new Faust composed of F factors whose indices are listed in indices.
+
+        Note: Factors are copied in memory.
 
         Args:
             F: the Faust object.
@@ -1714,7 +1716,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             ValueError.
 
 
-        Examples:
+        Example:
             >>> from pyfaust import rand
             >>> F = rand(5, 10)
             >>> f0 = F.factors(0)

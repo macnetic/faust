@@ -1144,8 +1144,10 @@ classdef Faust
 
 
 		%=====================================================================
-		%> @brief Returns the i-th factor or a range of factors of F.
-		%>
+		%> @brief Returns the i-th factor or a new Faust composed of F factors whose indices are listed in indices.
+                %>
+                %> @note Factors are copied in memory.
+                %>
 		%> @b Usage
 		%>
 		%> &nbsp;&nbsp;&nbsp; @b factor = factors(F, i) returns the i-th factor of F.<br/>
