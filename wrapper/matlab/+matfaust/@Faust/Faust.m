@@ -1091,6 +1091,8 @@ classdef Faust
 		%======================================================================
 		%> @brief The last index when slicing or indexing a Faust.
 		%>
+		%> <code>size(F, K) == end</code> when indexing the K-th dimension of F \f$(K \in {1, 2})\f$.
+		%>
 		%> This function overloads a Matlab built-in function.
 		%>
 		%>
