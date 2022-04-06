@@ -919,6 +919,19 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
     def matvec(F, x):
         """
         This function implements the scipy.sparse.linalg.LinearOperator.matvec function such that scipy.sparse.linalg.aslinearoperator function works on a Faust object.
+
+        Example:
+            >>> import numpy as np
+            >>> import pyfaust as pf
+            >>> F = pf.rand(10, 10)
+            >>> x = np.random.rand(F.shape[1])
+            >>> F@x
+            array([ 69.88213474,  80.99557416, 106.05274531,  55.55415099, 127.4286391 ,  43.72638629,  90.05175021, 105.05742936, 78.14695324,  98.79773085])
+            >>> F.matvec(F, x)
+            array([ 69.88213474,  80.99557416, 106.05274531,  55.55415099, 127.4286391 ,  43.72638629,  90.05175021, 105.05742936, 78.14695324,  98.79773085])
+
+
+        <b>See also</b> Faust.dot, Faust.__matmul__
         """
         return F.dot(x)
 
