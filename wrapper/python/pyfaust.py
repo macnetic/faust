@@ -548,14 +548,27 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             >>> from pyfaust import rand
             >>> F = rand(50, 50)
             >>> F.__repr__()
-            >>> # the same function is called when typing F in a terminal:
+            >>> F.__repr__()
+            'Faust size 50x50, density 0.5, nnz_sum 1250, 5 factor(s): \n-
+            FACTOR 0 (double) SPARSE, size 50x50, density 0.1, nnz 250\n-
+            FACTOR 1 (double) SPARSE, size 50x50, density 0.1, nnz 250\n-
+            FACTOR 2 (double) SPARSE, size 50x50, density 0.1, nnz 250\n-
+            FACTOR 3 (double) SPARSE, size 50x50, density 0.1, nnz 250\n-
+            FACTOR 4 (double) SPARSE, size 50x50, density 0.1, nnz 250\n'
+            >>> # the same function is called when typing F in a terminal (but
+            >>> # the output is properly formatted with line feeds):
             >>> F
+            Faust size 50x50, density 0.5, nnz_sum 1250, 5 factor(s):
+                - FACTOR 0 (double) SPARSE, size 50x50, density 0.1, nnz 250
+                - FACTOR 1 (double) SPARSE, size 50x50, density 0.1, nnz 250
+                - FACTOR 2 (double) SPARSE, size 50x50, density 0.1, nnz 250
+                - FACTOR 3 (double) SPARSE, size 50x50, density 0.1, nnz 250
+                - FACTOR 4 (double) SPARSE, size 50x50, density 0.1, nnz 250
 
         <b>See also</b> Faust.nnz_sum, Faust.rcg, Faust.shape, Faust.factors,
         <b/>Faust.numfactors, Faust.display
 
         """
-        #_str = super(object, F).__repr__()
         _str = str(F.m_faust.to_string())
         return _str
 
@@ -584,6 +597,10 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             FACTOR 0 (real) SPARSE, size 50x63, density 0.492063, nnz 1550 <br/>
             FACTOR 1 (real) SPARSE, size 63x100, density 0.5, nnz 3150 <br/>
             >>> F
+            Faust size 50x100, density 0.94, nnz_sum 4700, 2 factor(s): <br/>
+            FACTOR 0 (real) SPARSE, size 50x63, density 0.492063, nnz 1550 <br/>
+            FACTOR 1 (real) SPARSE, size 63x100, density 0.5, nnz 3150 <br/>
+            >>> print(F)
             Faust size 50x100, density 0.94, nnz_sum 4700, 2 factor(s): <br/>
             FACTOR 0 (real) SPARSE, size 50x63, density 0.492063, nnz 1550 <br/>
             FACTOR 1 (real) SPARSE, size 63x100, density 0.5, nnz 3150 <br/>
