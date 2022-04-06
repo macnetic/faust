@@ -1246,7 +1246,13 @@ classdef Faust
 		%================================================================
 		%> Returns the left hand side factors of F from index 1 to i included (in 1-base index).
 		%===
-		%> @Example
+		%>
+		%>
+		%> @retval a Faust if the number of factors to be returned is greater than 1,
+		%>           an array or a sparse matrix otherwise.
+		%>
+		%> @b Example
+		%>
 		%> @code
 		%> %in a matlab terminal
 		%> >> F = matfaust.rand(8, 5)
@@ -1280,7 +1286,12 @@ classdef Faust
 		%> Returns the right hand side factors of F from index i to end (in 1-base index).
 		%===
 		%>
-		%> @Example
+		%> @retval a Faust if the number of factors to be returned is greater than 1,
+		%>           an array or a sparse matrix otherwise.
+		%>
+		%>
+		%> @b Example
+		%>
 		%> @code
 		%> >> F = matfaust.rand(7,7, 'dim_sizes', [7, 10])
 		%>

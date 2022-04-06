@@ -1750,8 +1750,8 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Returns the right hand side factors of F from index i to F.numfactors()-1.
 
         Returns:
-            a Faust if the size factor set to be returned is greater than 1, a
-            numpy array otherwise.
+            a Faust if the number of factors to be returned is greater than 1, a
+            numpy array or a sparse matrix otherwise.
 
         Examples:
             >>> from pyfaust import rand
@@ -1786,8 +1786,8 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Returns the left hand side factors of F from index 0 to i included.
 
         Returns:
-            a Faust if the size of factor set to be returned is greater than 1, a
-            numpy array otherwise.
+            a Faust if the number of factors to be returned is greater than 1, a
+            numpy array or a sparse matrix otherwise.
 
         Examples:
             >>> from pyfaust import rand
