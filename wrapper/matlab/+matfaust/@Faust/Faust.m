@@ -1296,6 +1296,57 @@ classdef Faust
 		%==========================================================================================
 		%> @brief Returns true if F factors are all dense matrices/arrays false otherwise.
 		%>
+		%> @b Example
+		%> @code
+		%> >> F = matfaust.rand(10, 10, 'fac_type', 'dense')
+		%>
+		%> F =
+		%>
+		%> Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
+		%> - FACTOR 0 (double) DENSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 1 (double) DENSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 2 (double) DENSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 3 (double) DENSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 4 (double) DENSE, size 10x10, density 0.5, nnz 50
+		%> >> isdense(F)
+		%>
+		%> ans =
+		%>
+		%>      1
+		%>
+		%> >> F = matfaust.rand(10, 10, 'fac_type', 'sparse')
+		%>
+		%> F =
+		%>
+		%> Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
+		%> - FACTOR 0 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 1 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> >> isdense(F)
+		%>
+		%> ans =
+		%>
+		%>      0
+		%>
+		%> >> F = matfaust.rand(10, 10, 'fac_type', 'mixed')
+		%>
+		%> F =
+		%>
+		%> Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
+		%> - FACTOR 0 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 1 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 3 (double) DENSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> >> isdense(F)
+		%>
+		%> ans =
+		%>
+		%>      0
+		%>
+		%> @endcode
 		%==========================================================================================
 		function is_dense = isdense(F)
 			is_dense = call_mex(F, 'is_all_dense');

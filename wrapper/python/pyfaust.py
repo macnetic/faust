@@ -2094,6 +2094,42 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
     def isdense(F):
         """
         Returns True if all factors are dense arrays (as np.ndarray-s) False otherwise.
+
+        Example:
+            >>> import pyfaust as pf
+            >>> F = pf.rand(10, 10, fac_type='sparse')
+            >>> F
+            Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
+            - FACTOR 0 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 1 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
+
+            >>> F.isdense()
+            False
+            >>> F = pf.rand(10, 10, fac_type='dense')
+            >>> F
+            Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
+            - FACTOR 0 (double) DENSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 1 (double) DENSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 2 (double) DENSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 3 (double) DENSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 4 (double) DENSE, size 10x10, density 0.5, nnz 50
+
+            >>> F.isdense()
+            True
+            >>> F = pf.rand(10, 10, fac_type='mixed')
+            >>> F
+            Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
+            - FACTOR 0 (double) DENSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 1 (double) DENSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 3 (double) DENSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
+
+            >>> F.isdense()
+            False
         """
         return F.m_faust.is_all_dense()
 
