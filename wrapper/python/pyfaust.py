@@ -342,7 +342,16 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
     @property
     def device(self):
         """
-        Returns the device on which the Faust is located (cpu or gpu).
+        Returns the device on which the Faust is located ('cpu' or 'gpu').
+
+        Example:
+            >>> import pyfaust as pf
+            >>> cpuF = pf.rand(5, 5, dev='cpu')
+            >>> cpuF.device
+            'cpu'
+            >>> gpuF = pf.rand(5, 5, dev='gpu')
+            >>> gpuF.device
+            'gpu'
         """
         return self.m_faust.device()
 

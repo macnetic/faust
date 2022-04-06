@@ -2305,6 +2305,24 @@ classdef Faust
 		%===
 		%>
 		%> @retval dev: the Faust device.
+		%>
+		%> @b Example:
+		%>@code
+		%> >> cpuF = matfaust.rand(5, 5, 'dev', 'cpu');
+		%> >> device(cpuF)
+		%>
+		%> ans =
+		%>
+		%>     'cpu'
+		%>
+		%> >> gpuF = matfaust.rand(5,5, 'dev', 'gpu');
+		%> >> device(gpuF)
+		%>
+		%> ans =
+		%>
+		%>     'gpu'
+		%>@endcode
+		%>
 		%================================================================
 		function dev = device(F)
 			dev = F.dev;
