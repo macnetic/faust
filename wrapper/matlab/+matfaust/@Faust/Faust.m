@@ -2378,8 +2378,15 @@ classdef Faust
 			set_Fv_mul_mode(self.matrix, mode)
 		end
 
-		function H = get_handle(self)
-			H = self.matrix.objectHandle;
+		%================================================================
+		%> Returns the Faust F C++ native object pointer as an integer.
+		%===
+		%>
+		%> @retval H: handle (address as an integer).
+		%>
+		%================================================================
+		function H = get_handle(F)
+			H = F.matrix.objectHandle;
 		end
 	end
 	methods(Access = private)
