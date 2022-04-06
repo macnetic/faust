@@ -1253,6 +1253,9 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         WARNING: running the example below is likely to raise a memory
         error or freeze your computer for a certain amount of time.
 
+        WARNING: this function is deprecated and might be deleted in future
+        versions of pyfaust. Please use Faust.toarray instead.
+
         Examples:
             >>> from pyfaust import rand
             >>> F = rand(10**5, 10**5, 2, 10**5, density=10**-4, fac_type='sparse')
