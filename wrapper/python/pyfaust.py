@@ -1856,7 +1856,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         The file is saved in Matlab format version 5 (.mat extension).
 
         NOTE: storing F should typically use rcg(F) times less disk space than
-        storing F.toarray().
+        storing F.toarray(). See Faust.nbytes for a precise size.
 
         Args:
             F: the Faust object.
@@ -1870,13 +1870,13 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             ValueError.
 
 
-        Examples:
+        Example:
             >>> from pyfaust import rand, Faust
             >>> F = rand(5, 10, field='complex')
             >>> F.save("F.mat")
             >>> G = Faust(filepath="F.mat")
 
-            <b>See also</b> Faust.__init__, Faust.rcg.
+        <b>See also</b> Faust.__init__ Faust.rcg Faust.load Faust.load_native
         """
         if(format not in ["Matlab"]):
             raise ValueError("Only Matlab or Matlab_core format is supported.")
@@ -1894,6 +1894,14 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         Args:
             filepath: the filepath of the .mat file.
+
+        Example:
+            >>> from pyfaust import rand, Faust
+            >>> F = rand(5, 10, field='complex')
+            >>> F.save("F.mat")
+            >>> G = Faust.load(filepath="F.mat") # equiv. to Faust("F.mat")
+
+        <b>See also</b> Faust.__init__, Faust.save
         """
         contents = loadmat(filepath)
         factors = contents['faust_factors'][0].tolist()
@@ -1925,6 +1933,13 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Args:
             filepath: the filepath of the .mat file.
 
+        Example:
+            >>> from pyfaust import rand, Faust
+            >>> F = rand(5, 10, field='complex')
+            >>> F.save("F.mat")
+            >>> G = Faust.load_native(filepath="F.mat") # equiv. to Faust("F.mat")
+
+        <b>See also</b> Faust.__init__, Faust.save
         """
         _type = _FaustCorePy.FaustCoreGenDblCPU.get_mat_file_type(filepath)
         if _type == -1:

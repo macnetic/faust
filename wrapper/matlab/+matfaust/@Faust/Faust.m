@@ -1540,7 +1540,7 @@ classdef Faust
 		%>
 		%> The file is saved in Matlab format version 5 (.mat extension).
 		%>
-		%> @b @note storing F should typically use rcg(F) times less disk space than storing full(F).
+		%> @note Storing F should typically use rcg(F) times less disk space than storing full(F). See Faust.nbytes for a precise size.
 		%>
 		%> @b Usage
 		%>
@@ -1557,7 +1557,7 @@ classdef Faust
 		%>	G = Faust('F.mat')
 		%> @endcode
 		%>
-		%> <p>@b See @b also Faust.Faust, Faust.rcg.
+		%> <p>@b See @b also Faust.Faust, Faust.rcg, Faust.load, Faust.load_native
 		%==========================================================================================
 		function save(F, filepath)
 			call_mex(F, 'save', filepath);
@@ -2774,7 +2774,7 @@ classdef Faust
 		%> % F == F2 == F3
 		%> @endcode
 		%>
-		%> <p> @b See @b also Faust.Faust
+		%> <p> @b See @b also Faust.Faust, Faust.save
 		%================================================================
 		function F = load(filepath, varargin)
 			filename = filepath;
@@ -2823,7 +2823,7 @@ classdef Faust
 		%> % F == F2 == F3
 		%> @endcode
 		%>
-		%> <p> @b See @b also Faust.Faust
+		%> <p> @b See @b also Faust.Faust, Faust.save
 		%================================================================
 		function F = load_native(filepath)
 			file_type = mexFaustReal('get_mat_file_type', filepath);
