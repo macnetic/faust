@@ -1445,8 +1445,8 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         NOTE: A value of density below one indicates potential memory savings
         compared to storing the corresponding dense matrix F.toarray(), as well
-        as potentially faster matrix-vector multiplication when applying F * x
-        instead of F.toarray()*x.
+        as potentially faster matrix-vector multiplication when applying F @ x
+        instead of F.toarray() @ x.
 
         NOTE: A density above one is possible but prevents any saving.
 
