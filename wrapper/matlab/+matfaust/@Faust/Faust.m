@@ -2040,7 +2040,7 @@ classdef Faust
 
 
 		%=====================================================================
-		%> Displays image of F's full matrix and its factors.
+		%> Displays image of F full matrix and its factors.
 		%===
 		%> This function overloads a Matlab built-in function.
 		%>
@@ -2049,14 +2049,16 @@ classdef Faust
 		%> &nbsp;&nbsp;&nbsp; @b imagesc(F)<br/>
 		%> &nbsp;&nbsp;&nbsp; @b imagesc(F, 'faust_name') to name the Faust on the plotted figure.
 		%>
+		%> @param faust_name (varargin{1}) The Faust name shown in the figure title (defaultly it's 'F').
+		%>
 		%> Data is scaled to use the full colormap.
 		%>
 		%> @b Example
 		%> @code
 		%>	F = matfaust.rand(5, 10)
-		%>	imagesc(F)
-		%>	print('test_imsc', '-dpng')
-		%>	@endcode
+		%>	imagesc(F) % imagesc(F, 'my faust') to name the faust differently than 'F'
+		%>	print('test_imsc', '-dpng') % figure saved in test_imsc.png file
+		%> @endcode
 		%>
 		%> <p>@b See @b also Faust.disp.
 		%======================================================================
@@ -2133,7 +2135,12 @@ classdef Faust
 					b = b - maxh - 0.01;
 				end
 			end
-			suptitle(['Factors of the Faust ' name ])
+			if(verLessThan('matlab', '9.5.0'))
+				suptitle(['Factors of the Faust ' name ])
+			else
+				% matlab R2018b and later versions have the sgtitle builtin
+				sgtitle(['Factors of the Faust ' name ])
+			end
 		end
 
 		%=====================================================================

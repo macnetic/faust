@@ -2028,7 +2028,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         >>> plt.show()
 
 
-        <b>See also</b> Faust.display.
+        <b>See also</b> Faust.display
         """
         import matplotlib.pyplot as plt
         if(not isinstance(name, str)): raise TypeError('name must be a str.')
