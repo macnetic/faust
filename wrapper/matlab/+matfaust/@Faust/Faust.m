@@ -98,7 +98,7 @@
 classdef Faust
 	properties (SetAccess = protected, Hidden = true)
 		matrix; % Handle to the FaustCore class instance
-		isReal;
+		is_real;
 		dev; % cpu or gpu
 		dtype; % double (for complex or real), or float
 	end
@@ -202,7 +202,7 @@ classdef Faust
 					error([ err_msg ' Cannot create an empty Faust.'])
 				end
 				% default argument values
-				F.isReal = true;
+				F.is_real = true;
 				scale = 1;
 				F.dev = 'cpu';
 				F.dtype = 'float';
@@ -214,8 +214,8 @@ classdef Faust
 					if (iscell(factor) && strcmp(factor{1}, 'bsr'))
 						% bsr factor
 						%  factor is supposed to be created using create_bsr (so it is well-formed)
-						if (F.isReal)
-							F.isReal = isreal(factor{5});
+						if (F.is_real)
+							F.is_real = isreal(factor{5});
 						end
 						if(strcmp(F.dtype, 'float'))
 							if(strcmp(class(factor{5}), 'double'))
@@ -227,8 +227,8 @@ classdef Faust
 							error('The cell Faust constructor 1st argument must contain only matrices or BSR matrix cell encodings.')
 						end
 						% if any factor is complex then the Faust is complex
-						if (F.isReal)
-							F.isReal = isreal(factor);
+						if (F.is_real)
+							F.is_real = isreal(factor);
 						end
 						if(strcmp(F.dtype, 'float'))
 							if(strcmp(class(factor), 'double'))
@@ -243,7 +243,7 @@ classdef Faust
 					factors = F.convertFactorsToDouble(factors);
 				end
 				% at least one factor is complex, convert all the others
-				if(~ F.isReal)
+				if(~ F.is_real)
 					factors = F.convertFactorsToComplex(factors);
 				end
 				for i=2:nargin
@@ -254,7 +254,7 @@ classdef Faust
 							end
 							scale = varargin{i+1};
 							if(~ isreal(scale))
-								F.isReal = false;
+								F.is_real = false;
 							end
 						case 'dev'
 							if(nargin < i+1 || ~ strcmp(varargin{i+1}, 'cpu') && ~ strcmp(varargin{i+1}, 'gpu'))
@@ -278,7 +278,7 @@ classdef Faust
 						end
 
 					end
-				F.matrix = FaustCore(factors, scale, optCopy, F.isReal, F.dev, F.dtype);
+				F.matrix = FaustCore(factors, scale, optCopy, F.is_real, F.dev, F.dtype);
 			elseif(ischar(varargin{1}))
 				% init a Faust from file
 				F = matfaust.Faust.load_native(varargin{:});
@@ -286,13 +286,13 @@ classdef Faust
 				% create a Faust from another but not with the same
 				% handle to set inside the FaustCore object (matrix)
 				oF = varargin{1};
-				F.matrix = FaustCore(varargin{2}, oF.isReal, oF.dev, oF.dtype);
-				F.isReal = oF.isReal;
+				F.matrix = FaustCore(varargin{2}, oF.is_real, oF.dev, oF.dtype);
+				F.is_real = oF.is_real;
 				F.dev = oF.dev;
 				F.dtype = oF.dtype;
 			elseif(isa(varargin{1}, 'integer') && islogical(varargin{2}))
 				% create a Faust directly with the c++ object handler/pointer without any pre-existing Faust
-				F.isReal = varargin{2};
+				F.is_real = varargin{2};
 				if(nargin >= 3)
 					F.dev = varargin{3};
 				else
@@ -303,12 +303,12 @@ classdef Faust
 				else
 					F.dtype = 'double';
 				end
-				F.matrix = FaustCore(varargin{1}, F.isReal, F.dev, F.dtype);
-				% hack to raise an error in case of non-consistent handle and isReal arg.
+				F.matrix = FaustCore(varargin{1}, F.is_real, F.dev, F.dtype);
+				% hack to raise an error in case of non-consistent handle and is_real arg.
 				try
 					n = numfactors(F);
 				catch
-					error('The Faust handle passed as first argument is not valid or not consistent with the value of isReal (2nd argument).')
+					error('The Faust handle passed as first argument is not valid or not consistent with the value of is_real (2nd argument).')
 				end
 			elseif(ismatrix(varargin{1}))
 				% create a Faust from a matrix (single factor)
@@ -377,14 +377,14 @@ classdef Faust
 						error('Dimensions must agree.')
 					end
 					C = [F,G];
-					if(~ C.isReal)
+					if(~ C.is_real)
 						Fid = matfaust.eye(size(C,2)/2, 'complex', 'dtype', F.dtype, 'dev', F.dev);
 					else
 						Fid = matfaust.eye(size(C,2)/2, 'dtype', F.dtype, 'dev', F.dev);
 					end
 					F = C*[Fid;Fid];
 				elseif(isscalar(G))
-					if(~ isreal(G) && F.isReal)
+					if(~ isreal(G) && F.is_real)
 						F = complex(F);
 					elseif(~ isreal(F) && isreal(G))
 						G = complex(G);
@@ -577,20 +577,20 @@ classdef Faust
 					C = mtimes_trans(A, F, 0); % F is scalar or something else (in which case it'll fail later)
 				end
 			elseif(isa(A,'matfaust.Faust'))
-				if (F.isReal)
+				if (F.is_real)
 					if(isreal(A))
 						C = matfaust.Faust(F, call_mex(F, 'mul_faust', A.matrix.objectHandle));
 					else
 						C = mtimes_trans(complex(F), A, trans);
 					end
 				else
-					if(A.isReal)
+					if(A.is_real)
 						A = complex(A);
 					end
 					C = matfaust.Faust(F, call_mex(F, 'mul_faust', A.matrix.objectHandle));
 				end
 			elseif(isscalar(A))
-				if (F.isReal)
+				if (F.is_real)
 					if(isreal(A))
 						C = matfaust.Faust(F, call_mex(F, 'mul_scalar', A));
 					else
@@ -599,7 +599,7 @@ classdef Faust
 				else
 					C = matfaust.Faust(F, call_mex(F, 'mul_scalar', A));
 				end
-			elseif (F.isReal) % A is not a Faust, not a scalar (should be a matrix)
+			elseif (F.is_real) % A is not a Faust, not a scalar (should be a matrix)
 				if (isreal(A))
 					C = call_mex(F, 'multiply', A, trans);
 				else
@@ -661,7 +661,7 @@ classdef Faust
 		%>
 		%> This function overloads a Matlab built-in function.
 		%>
-		%> @b @note if F is a real Faust, all factors are real.
+		%> @note If F is a real Faust, all factors are real.
 		%> If F is a complex Faust, at least one factor is complex.
 		%>
 		%> @b Usage
@@ -670,11 +670,59 @@ classdef Faust
 		%>
 		%> @retval bool 1 if F is a real Faust, 0 if it's a complex Faust.
 		%>
+		%> @b Example:
+		%>
+		%> @code
+		%> >> F = matfaust.rand(10, 10, 'field', 'real')
+		%> @endcode
+		%>
+		%> F =
+		%>
+		%> Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
+		%> - FACTOR 0 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 1 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%>
+		%> @code
+		%> >> isreal(F)
+		%> @endcode
+		%>
+		%> ans =
+		%>
+		%>   logical
+		%>
+		%>    1
+		%>
+		%> @code
+		%> >> F = matfaust.rand(10, 10, 'field', 'complex')
+		%> @endcode
+		%>
+		%> F =
+		%>
+		%> Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
+		%> - FACTOR 0 (complex) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 1 (complex) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 2 (complex) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 3 (complex) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 4 (complex) SPARSE, size 10x10, density 0.5, nnz 50
+		%>
+		%> @code
+		%> >> isreal(F)
+		%> @endcode
+		%>
+		%> ans =
+		%>
+		%>   logical
+		%>
+		%>    0
+		%>
 		%> <p/>@b See @b also Faust.complex
 		%======================================================================
 		function bool = isreal(F)
-			%% 
-			bool=F.isReal;
+			%%
+			bool=F.is_real;
 
 		end
 
@@ -692,7 +740,7 @@ classdef Faust
 		%> @b Example:
 		%> @code
 		%> >> dF = matfaust.rand(5, 5, 'field', 'real', 'class', 'double')
-		%>
+		%> @endcode
 		%> dF =
 		%>
 		%> Faust size 5x5, density 5, nnz_sum 125, 5 factor(s):
@@ -701,7 +749,10 @@ classdef Faust
 		%> - FACTOR 2 (double) SPARSE, size 5x5, density 1, nnz 25
 		%> - FACTOR 3 (double) SPARSE, size 5x5, density 1, nnz 25
 		%> - FACTOR 4 (double) SPARSE, size 5x5, density 1, nnz 25
+		%>
+		%> @code
 		%> >> sF = single(dF)
+		%> @endcode
 		%>
 		%> sF =
 		%>
@@ -711,13 +762,12 @@ classdef Faust
 		%> - FACTOR 2 (float) SPARSE, size 5x5, density 1, nnz 25
 		%> - FACTOR 3 (float) SPARSE, size 5x5, density 1, nnz 25
 		%> - FACTOR 4 (float) SPARSE, size 5x5, density 1, nnz 25
-		%> @endcode
 		%>
 		%> <p/>@b See @b also Faust.class
 		%======================================================================
 		function sF = single(F)
 			sF = matfaust.Faust(call_mex(F, 'single'), true, F.dev, 'float');
-			% 2nd argument (true) is for isReal attribute
+			% 2nd argument (true) is for is_real attribute
 		end
 
 		%======================================================================
@@ -1297,6 +1347,7 @@ classdef Faust
 		%> @b Example:
 		%> @code
 		%> >> F = matfaust.rand(10, 10, 'fac_type', 'sparse')
+		%> @endcode
 		%>
 		%> F =
 		%>
@@ -1306,27 +1357,38 @@ classdef Faust
 		%> - FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
 		%> - FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
 		%> - FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%>
+		%> @code
 		%> >> issparse(F) % equivalent to issparse(F, 'csr', true)
+		%> @endcode
 		%>
 		%> ans =
 		%>
 		%>      1
 		%>
+		%> @code
 		%> >> issparse(F, 'csr', false, 'bsr', false)
+		%> @endcode
 		%>
 		%> ans =
 		%>
 		%>      0
 		%>
+		%> @code
 		%> >> issparse(F, 'csr', false, 'bsr', false)
+		%> @endcode
 		%> ans =
 		%>
 		%>      0
+		%> @code
 		%> >> issparse(F, 'csr', false, 'bsr', false)
+		%> @endcode
 		%> Error using matfaust.Faust/issparse (line 1945)
 		%> It doesn't make sense to set csr=false and bsr=false as the function always return false
 		%>
+		%> @code
 		%> >> F = matfaust.rand_bsr(10, 10, 2, 2, 2, .1)
+		%> @endcode
 		%>
 		%> F =
 		%>
@@ -1336,19 +1398,26 @@ classdef Faust
 		%> - FACTOR 2 (double) BSR, size 10x10 (blocksize = 2x2), density 0.12, nnz 12 (nnz blocks: 3)
 		%> - FACTOR 3 (double) BSR, size 10x10 (blocksize = 2x2), density 0.12, nnz 12 (nnz blocks: 3)
 		%> - FACTOR 4 (double) BSR, size 10x10 (blocksize = 2x2), density 0.12, nnz 12 (nnz blocks: 3)
+		%>
+		%> @code
 		%> >> issparse(F) % default config. recognizes only csr
+		%> @endcode
 		%>
 		%> ans =
 		%>
 		%>      0
 		%>
+		%> @code
 		%> >> issparse(F, 'bsr', true)
+		%> @endcode
 		%>
 		%> ans =
 		%>
 		%>      1
 		%>
+		%> @code
 		%> >> F = matfaust.rand(10, 10, 'fac_type', 'dense')
+		%> @endcode
 		%>
 		%> F =
 		%>
@@ -1358,12 +1427,14 @@ classdef Faust
 		%> - FACTOR 2 (double) DENSE, size 10x10, density 0.5, nnz 50
 		%> - FACTOR 3 (double) DENSE, size 10x10, density 0.5, nnz 50
 		%> - FACTOR 4 (double) DENSE, size 10x10, density 0.5, nnz 50
+		%>
+		%> @code
 		%> >> issparse(F)
+		%> @endcode
 		%>
 		%> ans =
 		%>
 		%>      0
-		%> @endcode
 		%>
 		%> <p>@b See @b also Faust.isdense, matfaust.rand, matfaust.rand_bsr
 		%==========================================================================================
@@ -1382,8 +1453,10 @@ classdef Faust
 		%> @brief Returns true if F factors are all dense matrices/arrays false otherwise.
 		%>
 		%> @b Example
+		%>
 		%> @code
 		%> >> F = matfaust.rand(10, 10, 'fac_type', 'dense')
+		%> @endcode
 		%>
 		%> F =
 		%>
@@ -1393,13 +1466,18 @@ classdef Faust
 		%> - FACTOR 2 (double) DENSE, size 10x10, density 0.5, nnz 50
 		%> - FACTOR 3 (double) DENSE, size 10x10, density 0.5, nnz 50
 		%> - FACTOR 4 (double) DENSE, size 10x10, density 0.5, nnz 50
+		%>
+		%> @code
 		%> >> isdense(F)
+		%> @endcode
 		%>
 		%> ans =
 		%>
 		%>      1
 		%>
+		%> @code
 		%> >> F = matfaust.rand(10, 10, 'fac_type', 'sparse')
+		%> @endcode
 		%>
 		%> F =
 		%>
@@ -1409,13 +1487,18 @@ classdef Faust
 		%> - FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
 		%> - FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
 		%> - FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%>
+		%> @code
 		%> >> isdense(F)
+		%> @endcode
 		%>
 		%> ans =
 		%>
 		%>      0
 		%>
+		%> @code
 		%> >> F = matfaust.rand(10, 10, 'fac_type', 'mixed')
+		%> @endcode
 		%>
 		%> F =
 		%>
@@ -1425,13 +1508,15 @@ classdef Faust
 		%> - FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
 		%> - FACTOR 3 (double) DENSE, size 10x10, density 0.5, nnz 50
 		%> - FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%>
+		%> @code
 		%> >> isdense(F)
+		%> @endcode
 		%>
 		%> ans =
 		%>
 		%>      0
 		%>
-		%> @endcode
 		%>
 		%> <p>@b See @b also Faust.issparse, matfaust.rand, matfaust.rand_bsr
 		%==========================================================================================
@@ -2114,7 +2199,7 @@ classdef Faust
 					if(~ isa(A, 'matfaust.Faust'))
 						error('Can''t concatenate a Faust to something that is not a Faust or a matrix.')
 					end
-					if(C.isReal)
+					if(C.is_real)
 						if(~ isreal(A))
 							C = complex(C);
 						end
@@ -2441,7 +2526,7 @@ classdef Faust
 				Fc = matfaust.Faust(call_mex(F, 'clone_gpu2cpu'), F.isreal, 'cpu');
 			else % dev == gpu
 				func_name = 'clone_cpu2gpu';
-				if(F.isReal)
+				if(F.is_real)
 					Fc = matfaust.Faust(mexFaustGPUReal(func_name, F.matrix.objectHandle, varargin{:}), F.isreal, 'gpu');
 				else
 					Fc = matfaust.Faust(mexFaustGPUCplx(func_name, F.matrix.objectHandle, varargin{:}), F.isreal, 'gpu');
@@ -2556,7 +2641,7 @@ classdef Faust
 		%================================================================
 		function varargout = call_mex(F, func_name, varargin)
 			if (strcmp(F.dev, 'cpu'))
-				if(F.isReal)
+				if(F.is_real)
 					if(strcmp(F.dtype, 'double'))
 						[varargout{1:nargout}] = mexFaustReal(func_name, F.matrix.objectHandle, varargin{:});
 					else % float
@@ -2566,7 +2651,7 @@ classdef Faust
 					[varargout{1:nargout}] = mexFaustCplx(func_name, F.matrix.objectHandle, varargin{:});
 				end
 			elseif(startsWith(F.dev, 'gpu'))
-				if(F.isReal)
+				if(F.is_real)
 					if(strcmp(F.dtype, 'double'))
 						[varargout{1:nargout}] = mexFaustGPUReal(func_name, F.matrix.objectHandle, varargin{:});
 					else % float
