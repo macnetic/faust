@@ -1,4 +1,4 @@
-# the script suppose that PWD is the <build directory>/wrapper/python
+# the script supposes that PWD is the <build directory>/wrapper/python
 file(GLOB LIBS _FaustCorePy*dylib _FaustCorePy*dll _FaustCorePy*pxd _FaustCorePy*so) # only one can exist
 list(GET LIBS 0 PYLIB)
 # add paths of (DY)LD_LIBRARY_PATH in considered directories because GET_RUNTIME_DEPENDENCIES doesn't take it into account
