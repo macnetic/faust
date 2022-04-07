@@ -99,6 +99,7 @@
 #include "faust_mex_prox.h"
 #include "faust_isreal.h"
 #include "faust_single.h"
+#include "faust_double.h"
 #include "faust_fourier.h"
 #include "faust_hadamard.h"
 #include "faust_eye.h"
@@ -164,6 +165,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			faust_isreal<SCALAR,Cpu>(prhs, nrhs, plhs, nlhs);
 		else if(!strcmp("single", cmd))
 			faust_single<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("double", cmd))
+			faust_double<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
 		else if(!strcmp("nnz", cmd))
 			faust_nnz<SCALAR, DEV>(prhs, nrhs, plhs, nlhs);
 		else if(!strcmp("full", cmd))

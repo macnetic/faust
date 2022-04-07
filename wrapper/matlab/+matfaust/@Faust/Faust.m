@@ -1025,6 +1025,49 @@ classdef Faust
 		end
 
 		%======================================================================
+		%> @brief Returns a new Faust whose class is double. It allows to convert all the factors to double precision.
+		%>
+		%>
+		%> @b Usage
+		%>
+		%> &nbsp;&nbsp;&nbsp; @b sF = double(F)
+		%>
+		%> @retval sF the double class/precision Faust.
+		%>
+		%> @b Example:
+		%> @code
+		%> >> sF = matfaust.rand(5, 5, 'field', 'real', 'class', 'single')
+		%> @endcode
+		%> sF =
+		%>
+		%> Faust size 5x5, density 5, nnz_sum 125, 5 factor(s):
+		%> - FACTOR 0 (float) SPARSE, size 5x5, density 1, nnz 25
+		%> - FACTOR 1 (float) SPARSE, size 5x5, density 1, nnz 25
+		%> - FACTOR 2 (float) SPARSE, size 5x5, density 1, nnz 25
+		%> - FACTOR 3 (float) SPARSE, size 5x5, density 1, nnz 25
+		%> - FACTOR 4 (float) SPARSE, size 5x5, density 1, nnz 25
+		%>
+		%> @code
+		%> >> dF = single(sF)
+		%> @endcode
+		%>
+		%> dF =
+		%>
+		%> Faust size 5x5, density 5, nnz_sum 125, 5 factor(s):
+		%> - FACTOR 0 (double) SPARSE, size 5x5, density 1, nnz 25
+		%> - FACTOR 1 (double) SPARSE, size 5x5, density 1, nnz 25
+		%> - FACTOR 2 (double) SPARSE, size 5x5, density 1, nnz 25
+		%> - FACTOR 3 (double) SPARSE, size 5x5, density 1, nnz 25
+		%> - FACTOR 4 (double) SPARSE, size 5x5, density 1, nnz 25
+		%>
+		%> <p/>@b See @b also Faust.class, Faust.single
+		%======================================================================
+		function sF = double(F)
+			sF = matfaust.Faust(call_mex(F, 'double'), true, F.dev, 'double');
+			% 2nd argument (true) is for is_real attribute
+		end
+
+		%======================================================================
 		%> @brief The transpose of F.
 		%>
 		%> This function overloads a Matlab built-in function/operator.
