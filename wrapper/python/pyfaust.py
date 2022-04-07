@@ -623,16 +623,89 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             args: the list of variables to sum all together with F.
             These can be Faust objects, numpy arrays (and
             scipy.sparse.csr_matrix) or scalars.
-            Faust and arrays/matrices must be of compatible size.
+            Faust and arrays/matrices must be of compatible sizes.
 
         Returns:
             the sum as a Faust object.
 
         Example:
-            >>> from pyfaust import *
-            >>> F = rand(5,10)
-            >>> G = F+F
-            >>> H = F+2
+			>>> import pyfaust
+			>>> from numpy.linalg import norm
+			>>> F = pyfaust.rand(10, 12)
+			>>> F
+			Faust size 10x12, density 2.08333, nnz_sum 250, 5 factor(s):
+			- FACTOR 0 (double) SPARSE, size 10x11, density 0.454545, nnz 50
+			- FACTOR 1 (double) SPARSE, size 11x10, density 0.5, nnz 55
+			- FACTOR 2 (double) SPARSE, size 10x11, density 0.454545, nnz 50
+			- FACTOR 3 (double) SPARSE, size 11x10, density 0.5, nnz 55
+			- FACTOR 4 (double) SPARSE, size 10x12, density 0.333333, nnz 40
+
+			>>> G = pyfaust.rand(10, 12)
+			>>> G
+			Faust size 10x12, density 2.025, nnz_sum 243, 5 factor(s):
+			- FACTOR 0 (double) SPARSE, size 10x10, density 0.5, nnz 50
+			- FACTOR 1 (double) SPARSE, size 10x11, density 0.454545, nnz 50
+			- FACTOR 2 (double) SPARSE, size 11x10, density 0.5, nnz 55
+			- FACTOR 3 (double) SPARSE, size 10x12, density 0.333333, nnz 40
+			- FACTOR 4 (double) SPARSE, size 12x12, density 0.333333, nnz 48
+
+			>>> F+G
+			Faust size 10x12, density 4.475, nnz_sum 537, 7 factor(s):
+			- FACTOR 0 (double) SPARSE, size 10x20, density 0.1, nnz 20
+			- FACTOR 1 (double) SPARSE, size 20x21, density 0.238095, nnz 100
+			- FACTOR 2 (double) SPARSE, size 21x21, density 0.238095, nnz 105
+			- FACTOR 3 (double) SPARSE, size 21x21, density 0.238095, nnz 105
+			- FACTOR 4 (double) SPARSE, size 21x22, density 0.205628, nnz 95
+			- FACTOR 5 (double) SPARSE, size 22x24, density 0.166667, nnz 88
+			- FACTOR 6 (double) DENSE, size 24x12, density 0.0833333, nnz 24
+
+			>>> norm((F+G).toarray() - F.toarray() - G.toarray())
+			8.09693699147347e-15
+			>>> F+2
+			Faust size 10x12, density 2.88333, nnz_sum 346, 7 factor(s):
+			- FACTOR 0 (double) SPARSE, size 10x20, density 0.1, nnz 20
+			- FACTOR 1 (double) SPARSE, size 20x21, density 0.142857, nnz 60
+			- FACTOR 2 (double) SPARSE, size 21x20, density 0.154762, nnz 65
+			- FACTOR 3 (double) SPARSE, size 20x21, density 0.142857, nnz 60
+			- FACTOR 4 (double) SPARSE, size 21x11, density 0.281385, nnz 65
+			- FACTOR 5 (double) SPARSE, size 11x24, density 0.19697, nnz 52
+			- FACTOR 6 (double) DENSE, size 24x12, density 0.0833333, nnz 24
+
+			>>> norm((F+2).toarray() - F.toarray() - 2)
+			3.580361673049448e-15
+			>>> F+G+2
+			Faust size 10x12, density 5.44167, nnz_sum 653, 9 factor(s):
+			- FACTOR 0 (double) SPARSE, size 10x20, density 0.1, nnz 20
+			- FACTOR 1 (double) SPARSE, size 20x30, density 0.05, nnz 30
+			- FACTOR 2 (double) SPARSE, size 30x31, density 0.11828, nnz 110
+			- FACTOR 3 (double) SPARSE, size 31x31, density 0.119667, nnz 115
+			- FACTOR 4 (double) SPARSE, size 31x31, density 0.119667, nnz 115
+			- FACTOR 5 (double) SPARSE, size 31x32, density 0.105847, nnz 105
+			- FACTOR 6 (double) SPARSE, size 32x25, density 0.1225, nnz 98
+			- FACTOR 7 (double) SPARSE, size 25x24, density 0.06, nnz 36
+			- FACTOR 8 (double) DENSE, size 24x12, density 0.0833333, nnz 24
+
+			>>> norm((F+G+2).toarray() - F.toarray() - G.toarray() - 2)
+			1.0082879011490611e-14
+			>>> F+G+F+2+F
+			Faust size 10x12, density 11.175, nnz_sum 1341, 13 factor(s):
+			- FACTOR 0 (double) SPARSE, size 10x20, density 0.1, nnz 20
+			- FACTOR 1 (double) SPARSE, size 20x30, density 0.05, nnz 30
+			- FACTOR 2 (double) SPARSE, size 30x40, density 0.0333333, nnz 40
+			- FACTOR 3 (double) SPARSE, size 40x50, density 0.025, nnz 50
+			- FACTOR 4 (double) SPARSE, size 50x51, density 0.0509804, nnz 130
+			- FACTOR 5 (double) SPARSE, size 51x52, density 0.0659879, nnz 175
+			- FACTOR 6 (double) SPARSE, size 52x51, density 0.0678733, nnz 180
+			- FACTOR 7 (double) SPARSE, size 51x54, density 0.0744372, nnz 205
+			- FACTOR 8 (double) SPARSE, size 54x54, density 0.0713306, nnz 208
+			- FACTOR 9 (double) SPARSE, size 54x36, density 0.063786, nnz 124
+			- FACTOR 10 (double) SPARSE, size 36x34, density 0.0743464, nnz 91
+			- FACTOR 11 (double) SPARSE, size 34x24, density 0.0784314, nnz 64
+			- FACTOR 12 (double) DENSE, size 24x12, density 0.0833333, nnz 24
+
+			>>> norm((F+G+F+2+F).toarray() - 3*F.toarray() - G.toarray() - 2)
+			2.892210888531005e-14
+
 
         See also Faust.__sub__
         """
@@ -718,16 +791,88 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Args:
             args: the list of variables to compute the difference with F. These can
             be Faust objects, arrays (and scipy.sparse.csr_matrix) or scalars.
-            Faust and arrays/matrices must be of compatible size.
+            Faust and arrays/matrices must be of compatible sizes.
 
         Returns:
             the difference as a Faust object.
 
         Example:
-            >>> from pyfaust import *
-            >>> F = rand(5,10)
-            >>> G = F-F
-            >>> H = F-2
+            >>> import pyfaust
+            >>> from numpy.linalg import norm
+            >>> F = pyfaust.rand(10, 12)
+            >>> F
+            Faust size 10x12, density 2.075, nnz_sum 249, 5 factor(s):
+                - FACTOR 0 (double) SPARSE, size 10x12, density 0.333333, nnz 40
+                - FACTOR 1 (double) SPARSE, size 12x11, density 0.454545, nnz 60
+                - FACTOR 2 (double) SPARSE, size 11x10, density 0.5, nnz 55
+                - FACTOR 3 (double) SPARSE, size 10x11, density 0.454545, nnz 50
+                - FACTOR 4 (double) SPARSE, size 11x12, density 0.333333, nnz 44
+
+            >>> G = pyfaust.rand(10, 12)
+            >>> G
+            Faust size 10x12, density 1.96667, nnz_sum 236, 5 factor(s):
+                - FACTOR 0 (double) SPARSE, size 10x12, density 0.333333, nnz 40
+                - FACTOR 1 (double) SPARSE, size 12x10, density 0.5, nnz 60
+                - FACTOR 2 (double) SPARSE, size 10x12, density 0.333333, nnz 40
+                - FACTOR 3 (double) SPARSE, size 12x12, density 0.333333, nnz 48
+                - FACTOR 4 (double) SPARSE, size 12x12, density 0.333333, nnz 48
+
+            >>> F-G
+            Faust size 10x12, density 4.40833, nnz_sum 529, 7 factor(s):
+                - FACTOR 0 (double) SPARSE, size 10x20, density 0.1, nnz 20
+                - FACTOR 1 (double) SPARSE, size 20x24, density 0.166667, nnz 80
+                - FACTOR 2 (double) SPARSE, size 24x21, density 0.238095, nnz 120
+                - FACTOR 3 (double) SPARSE, size 21x22, density 0.205628, nnz 95
+                - FACTOR 4 (double) SPARSE, size 22x23, density 0.193676, nnz 98
+                - FACTOR 5 (double) SPARSE, size 23x24, density 0.166667, nnz 92
+                - FACTOR 6 (double) DENSE, size 24x12, density 0.0833333, nnz 24
+
+            >>> norm((F-G).toarray() - F.toarray() + G.toarray())
+            2.8527547341127496e-15
+            >>> F-2
+            Faust size 10x12, density 2.875, nnz_sum 345, 7 factor(s):
+                - FACTOR 0 (double) SPARSE, size 10x20, density 0.1, nnz 20
+                - FACTOR 1 (double) SPARSE, size 20x22, density 0.113636, nnz 50
+                - FACTOR 2 (double) SPARSE, size 22x21, density 0.151515, nnz 70
+                - FACTOR 3 (double) SPARSE, size 21x20, density 0.154762, nnz 65
+                - FACTOR 4 (double) SPARSE, size 20x12, density 0.25, nnz 60
+                - FACTOR 5 (double) SPARSE, size 12x24, density 0.194444, nnz 56
+                - FACTOR 6 (double) DENSE, size 24x12, density 0.0833333, nnz 24
+
+            >>> norm((F-2).toarray() - F.toarray() + 2)
+            0.0
+            >>> F-G-2
+            Faust size 10x12, density 5.375, nnz_sum 645, 9 factor(s):
+                - FACTOR 0 (double) SPARSE, size 10x20, density 0.1, nnz 20
+                - FACTOR 1 (double) SPARSE, size 20x30, density 0.05, nnz 30
+                - FACTOR 2 (double) SPARSE, size 30x34, density 0.0882353, nnz 90
+                - FACTOR 3 (double) SPARSE, size 34x31, density 0.12334, nnz 130
+                - FACTOR 4 (double) SPARSE, size 31x32, density 0.105847, nnz 105
+                - FACTOR 5 (double) SPARSE, size 32x33, density 0.102273, nnz 108
+                - FACTOR 6 (double) SPARSE, size 33x25, density 0.123636, nnz 102
+                - FACTOR 7 (double) SPARSE, size 25x24, density 0.06, nnz 36
+                - FACTOR 8 (double) DENSE, size 24x12, density 0.0833333, nnz 24
+
+            >>> norm((F-G-2).toarray() - F.toarray() + G.toarray() + 2)
+            3.748544367384395e-15
+            >>> F-G-F-2-F
+            Faust size 10x12, density 11.0917, nnz_sum 1331, 13 factor(s):
+                - FACTOR 0 (double) SPARSE, size 10x20, density 0.1, nnz 20
+                - FACTOR 1 (double) SPARSE, size 20x30, density 0.05, nnz 30
+                - FACTOR 2 (double) SPARSE, size 30x40, density 0.0333333, nnz 40
+                - FACTOR 3 (double) SPARSE, size 40x50, density 0.025, nnz 50
+                - FACTOR 4 (double) SPARSE, size 50x54, density 0.0407407, nnz 110
+                - FACTOR 5 (double) SPARSE, size 54x53, density 0.0628931, nnz 180
+                - FACTOR 6 (double) SPARSE, size 53x53, density 0.0622998, nnz 175
+                - FACTOR 7 (double) SPARSE, size 53x55, density 0.0696398, nnz 203
+                - FACTOR 8 (double) SPARSE, size 55x56, density 0.0688312, nnz 212
+                - FACTOR 9 (double) SPARSE, size 56x35, density 0.0678571, nnz 133
+                - FACTOR 10 (double) SPARSE, size 35x35, density 0.0702041, nnz 86
+                - FACTOR 11 (double) SPARSE, size 35x24, density 0.0809524, nnz 68
+                - FACTOR 12 (double) DENSE, size 24x12, density 0.0833333, nnz 24
+
+            >>> norm((F-G-F-2-F).toarray() - F.toarray() + 2*F.toarray() + G.toarray() + 2)
+            1.2631196225257117e-14
 
         <b>See also</b> Faust.__add__
         """

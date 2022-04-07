@@ -356,14 +356,151 @@ classdef Faust
 		%>
 		%> @b Usage
 		%>
-		%> &nbsp;&nbsp;&nbsp; @b plus(F,G) or F+G adds two Faust together, sizes must be compatible.<br/>
-		%> &nbsp;&nbsp;&nbsp; @b plus(F,A) or F+A adds a Faust and a matrix A, sizes must be compatible.<br/>
-		%> &nbsp;&nbsp;&nbsp; @b plus(F,s) or F+s, with s being a scalar, such that full(F+s) == full(F)+s.<br/>
+		%> &nbsp;&nbsp;&nbsp; @b plus(F,G) or @b F+G adds two Faust together, sizes must be compatible.<br/>
+		%> &nbsp;&nbsp;&nbsp; @b plus(F,A) or @b F+A adds a Faust and a matrix A, sizes must be compatible.<br/>
+		%> &nbsp;&nbsp;&nbsp; @b plus(F,s) or @b F+s, with s being a scalar, such that full(F+s) == full(F)+s.<br/>
 		%>
 		%> @param F (first arg.) The Faust object.
 		%> @param G, A, s,… (2nd to n-th args) The variables to add to F; Fausts, matrices or scalars.
 		%>
 		%> @retval S: the sum as a Faust object.
+		%>
+		%> @b Examples:
+		%> @code
+		%> >> F = matfaust.rand(10, 12)
+		%> @endcode
+		%>
+		%> F =
+		%>
+		%> Faust size 10x12, density 1.95, nnz_sum 234, 5 factor(s):
+		%> - FACTOR 0 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 1 (double) SPARSE, size 10x12, density 0.333333, nnz 40
+		%> - FACTOR 2 (double) SPARSE, size 12x12, density 0.333333, nnz 48
+		%> - FACTOR 3 (double) SPARSE, size 12x12, density 0.333333, nnz 48
+		%> - FACTOR 4 (double) SPARSE, size 12x12, density 0.333333, nnz 48
+		%>
+		%> @code
+		%> >> G = matfaust.rand(10, 12)
+		%> @endcode
+		%>
+		%> G =
+		%>
+		%> Faust size 10x12, density 2.075, nnz_sum 249, 5 factor(s):
+		%> - FACTOR 0 (double) SPARSE, size 10x12, density 0.333333, nnz 40
+		%> - FACTOR 1 (double) SPARSE, size 12x10, density 0.5, nnz 60
+		%> - FACTOR 2 (double) SPARSE, size 10x11, density 0.454545, nnz 50
+		%> - FACTOR 3 (double) SPARSE, size 11x11, density 0.454545, nnz 55
+		%> - FACTOR 4 (double) SPARSE, size 11x12, density 0.333333, nnz 44
+		%>
+		%> @code
+		%> >> F+G
+		%> @endcode
+		%>
+		%> ans =
+		%>
+		%> Faust size 10x12, density 4.59167, nnz_sum 551, 8 factor(s):
+		%> - FACTOR 0 (double) SPARSE, size 10x20, density 0.1, nnz 20
+		%> - FACTOR 1 (double) SPARSE, size 20x22, density 0.204545, nnz 90
+		%> - FACTOR 2 (double) SPARSE, size 22x22, density 0.206612, nnz 100
+		%> - FACTOR 3 (double) SPARSE, size 22x23, density 0.193676, nnz 98
+		%> - FACTOR 4 (double) SPARSE, size 23x23, density 0.194707, nnz 103
+		%> - FACTOR 5 (double) SPARSE, size 23x24, density 0.166667, nnz 92
+		%> - FACTOR 6 (double) SPARSE, size 24x24, density 0.0416667, nnz 24
+		%> - FACTOR 7 (double) SPARSE, size 24x12, density 0.0833333, nnz 24
+		%>
+		%> @code
+		%> >> norm(full(F+G) - full(F) - full(G))
+		%> @endcode
+		%>
+		%> ans =
+		%>
+		%>    3.4925e-15
+		%>
+		%> @code
+		%> >> F+2
+		%> @endcode
+		%>
+		%> ans =
+		%>
+		%> Faust size 10x12, density 2.96667, nnz_sum 356, 8 factor(s):
+		%> - FACTOR 0 (double) SPARSE, size 10x20, density 0.1, nnz 20
+		%> - FACTOR 1 (double) SPARSE, size 20x20, density 0.15, nnz 60
+		%> - FACTOR 2 (double) SPARSE, size 20x22, density 0.113636, nnz 50
+		%> - FACTOR 3 (double) SPARSE, size 22x24, density 0.109848, nnz 58
+		%> - FACTOR 4 (double) SPARSE, size 24x13, density 0.192308, nnz 60
+		%> - FACTOR 5 (double) SPARSE, size 13x24, density 0.192308, nnz 60
+		%> - FACTOR 6 (double) SPARSE, size 24x24, density 0.0416667, nnz 24
+		%> - FACTOR 7 (double) SPARSE, size 24x12, density 0.0833333, nnz 24
+		%>
+		%> @code
+		%> >> norm(full(F+2) - full(F) - 2)
+		%> @endcode
+		%>
+		%> ans =
+		%>
+		%>    1.5819e-15
+		%>
+		%> @code
+		%> >> F+G+2
+		%> @endcode
+		%>
+		%> ans =
+		%>
+		%> Faust size 10x12, density 5.85833, nnz_sum 703, 11 factor(s):
+		%> - FACTOR 0 (double) SPARSE, size 10x20, density 0.1, nnz 20
+		%> - FACTOR 1 (double) SPARSE, size 20x30, density 0.05, nnz 30
+		%> - FACTOR 2 (double) SPARSE, size 30x32, density 0.104167, nnz 100
+		%> - FACTOR 3 (double) SPARSE, size 32x32, density 0.107422, nnz 110
+		%> - FACTOR 4 (double) SPARSE, size 32x33, density 0.102273, nnz 108
+		%> - FACTOR 5 (double) SPARSE, size 33x33, density 0.103765, nnz 113
+		%> - FACTOR 6 (double) SPARSE, size 33x36, density 0.0858586, nnz 102
+		%> - FACTOR 7 (double) SPARSE, size 36x25, density 0.04, nnz 36
+		%> - FACTOR 8 (double) SPARSE, size 25x24, density 0.06, nnz 36
+		%> - FACTOR 9 (double) SPARSE, size 24x24, density 0.0416667, nnz 24
+		%> - FACTOR 10 (double) SPARSE, size 24x12, density 0.0833333, nnz 24
+		%>
+		%> @code
+		%> >> norm(full(F+G+2) - full(F) - full(G) - 2)
+		%> @endcode
+		%>
+		%> ans =
+		%>
+		%>    4.1029e-15
+		%>
+		%> @code
+		%> >> F+G+F+2+F
+		%> @endcode
+		%>
+		%> ans =
+		%>
+		%> Faust size 10x12, density 12.1417, nnz_sum 1457, 17 factor(s):
+		%> - FACTOR 0 (double) SPARSE, size 10x20, density 0.1, nnz 20
+		%> - FACTOR 1 (double) SPARSE, size 20x30, density 0.05, nnz 30
+		%> - FACTOR 2 (double) SPARSE, size 30x40, density 0.0333333, nnz 40
+		%> - FACTOR 3 (double) SPARSE, size 40x50, density 0.025, nnz 50
+		%> - FACTOR 4 (double) SPARSE, size 50x52, density 0.0461538, nnz 120
+		%> - FACTOR 5 (double) SPARSE, size 52x52, density 0.0480769, nnz 130
+		%> - FACTOR 6 (double) SPARSE, size 52x53, density 0.0609579, nnz 168
+		%> - FACTOR 7 (double) SPARSE, size 53x55, density 0.0559177, nnz 163
+		%> - FACTOR 8 (double) SPARSE, size 55x56, density 0.0519481, nnz 160
+		%> - FACTOR 9 (double) SPARSE, size 56x56, density 0.0293367, nnz 92
+		%> - FACTOR 10 (double) SPARSE, size 56x46, density 0.0512422, nnz 132
+		%> - FACTOR 11 (double) SPARSE, size 46x37, density 0.0446533, nnz 76
+		%> - FACTOR 12 (double) SPARSE, size 37x36, density 0.0630631, nnz 84
+		%> - FACTOR 13 (double) SPARSE, size 36x36, density 0.0555556, nnz 72
+		%> - FACTOR 14 (double) SPARSE, size 36x24, density 0.0833333, nnz 72
+		%> - FACTOR 15 (double) SPARSE, size 24x24, density 0.0416667, nnz 24
+		%> - FACTOR 16 (double) SPARSE, size 24x12, density 0.0833333, nnz 24
+		%>
+		%> @code
+		%> >> norm(full(F+G+F+2+F) - 3*full(F) - full(G) - 2)
+		%> @endcode
+		%>
+		%> ans =
+		%>
+		%>    1.0288e-14
+		%>
+		%>
 		%>
 		%> <p>@b See @b also Faust.minus
 		%======================================================================
@@ -411,14 +548,150 @@ classdef Faust
 		%>
 		%> @b Usage
 		%>
-		%> &nbsp;&nbsp;&nbsp; @b minus(F,G) or F-G subtracts the Faust G from F, sizes must be compatible.<br/>
-		%> &nbsp;&nbsp;&nbsp; @b minus(F,A) or F-A subtracts a matrix A from F, sizes must be compatible.<br/>
-		%> &nbsp;&nbsp;&nbsp; @b minus(F,s) or F-s subtracts a scalar s from F, such that full(F-s) == full(F)-s.<br/>
+		%> &nbsp;&nbsp;&nbsp; @b minus(F,G) or @b F-G subtracts the Faust G from F, sizes must be compatible.<br/>
+		%> &nbsp;&nbsp;&nbsp; @b minus(F,A) or @b F-A subtracts a matrix A from F, sizes must be compatible.<br/>
+		%> &nbsp;&nbsp;&nbsp; @b minus(F,s) or @b F-s subtracts a scalar s from F, such that full(F-s) == full(F)-s.<br/>
 		%>
 		%> @param F (first arg.) The Faust object.
 		%> @param G, A, s,… (2nd to n-th args) The variables to subtract from F; Fausts, matrices or scalars.
 		%>
 		%> @retval M: the difference as a Faust object.
+		%>
+		%> Example:
+		%>
+		%> @code
+		%> >> F = matfaust.rand(10, 12)
+		%> @endcode
+		%>
+		%> F =
+		%>
+		%> Faust size 10x12, density 2.04167, nnz_sum 245, 5 factor(s):
+		%> - FACTOR 0 (double) SPARSE, size 10x12, density 0.333333, nnz 40
+		%> - FACTOR 1 (double) SPARSE, size 12x11, density 0.454545, nnz 60
+		%> - FACTOR 2 (double) SPARSE, size 11x10, density 0.5, nnz 55
+		%> - FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 4 (double) SPARSE, size 10x12, density 0.333333, nnz 40
+		%>
+		%> @code
+		%> >> G = matfaust.rand(10, 12)
+		%> @endcode
+		%>
+		%> G =
+		%>
+		%> Faust size 10x12, density 1.98333, nnz_sum 238, 5 factor(s):
+		%> - FACTOR 0 (double) SPARSE, size 10x12, density 0.333333, nnz 40
+		%> - FACTOR 1 (double) SPARSE, size 12x12, density 0.333333, nnz 48
+		%> - FACTOR 2 (double) SPARSE, size 12x10, density 0.5, nnz 60
+		%> - FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 4 (double) SPARSE, size 10x12, density 0.333333, nnz 40
+		%>
+		%> @code
+		%> >> F-G
+		%> @endcode
+		%>
+		%> ans =
+		%>
+		%> Faust size 10x12, density 4.59167, nnz_sum 551, 8 factor(s):
+		%> - FACTOR 0 (double) SPARSE, size 10x20, density 0.1, nnz 20
+		%> - FACTOR 1 (double) SPARSE, size 20x24, density 0.166667, nnz 80
+		%> - FACTOR 2 (double) SPARSE, size 24x23, density 0.195652, nnz 108
+		%> - FACTOR 3 (double) SPARSE, size 23x20, density 0.25, nnz 115
+		%> - FACTOR 4 (double) SPARSE, size 20x20, density 0.25, nnz 100
+		%> - FACTOR 5 (double) SPARSE, size 20x24, density 0.166667, nnz 80
+		%> - FACTOR 6 (double) SPARSE, size 24x24, density 0.0416667, nnz 24
+		%> - FACTOR 7 (double) SPARSE, size 24x12, density 0.0833333, nnz 24
+		%>
+		%> @code
+		%> >> norm(full(F-G) - full(F) + full(G))
+		%> @endcode
+		%>
+		%> ans =
+		%>
+		%>    9.2816e-16
+		%>
+		%> @code
+		%> >> F-2
+		%> @endcode
+		%>
+		%> ans =
+		%>
+		%> Faust size 10x12, density 3.05833, nnz_sum 367, 8 factor(s):
+		%> - FACTOR 0 (double) SPARSE, size 10x20, density 0.1, nnz 20
+		%> - FACTOR 1 (double) SPARSE, size 20x22, density 0.113636, nnz 50
+		%> - FACTOR 2 (double) SPARSE, size 22x21, density 0.151515, nnz 70
+		%> - FACTOR 3 (double) SPARSE, size 21x22, density 0.140693, nnz 65
+		%> - FACTOR 4 (double) SPARSE, size 22x11, density 0.256198, nnz 62
+		%> ²- FACTOR 5 (double) SPARSE, size 11x24, density 0.19697, nnz 52
+		%> - FACTOR 6 (double) SPARSE, size 24x24, density 0.0416667, nnz 24
+		%> - FACTOR 7 (double) SPARSE, size 24x12, density 0.0833333, nnz 24
+		%>
+		%> @code
+		%> >> norm(full(F-2) - full(F) + 2)
+		%> @endcode
+		%>
+		%> ans =
+		%>
+		%>      0
+		%>
+		%> @code
+		%> >> F-G-2
+		%> @endcode
+		%>
+		%> ans =
+		%>
+		%> Faust size 10x12, density 5.85833, nnz_sum 703, 11 factor(s):
+		%> - FACTOR 0 (double) SPARSE, size 10x20, density 0.1, nnz 20
+		%> - FACTOR 1 (double) SPARSE, size 20x30, density 0.05, nnz 30
+		%> - FACTOR 2 (double) SPARSE, size 30x34, density 0.0882353, nnz 90
+		%> - FACTOR 3 (double) SPARSE, size 34x33, density 0.105169, nnz 118
+		%> - FACTOR 4 (double) SPARSE, size 33x30, density 0.126263, nnz 125
+		%> - FACTOR 5 (double) SPARSE, size 30x30, density 0.122222, nnz 110
+		%> - FACTOR 6 (double) SPARSE, size 30x36, density 0.0833333, nnz 90
+		%> - FACTOR 7 (double) SPARSE, size 36x25, density 0.04, nnz 36
+		%> - FACTOR 8 (double) SPARSE, size 25x24, density 0.06, nnz 36
+		%> - FACTOR 9 (double) SPARSE, size 24x24, density 0.0416667, nnz 24
+		%> - FACTOR 10 (double) SPARSE, size 24x12, density 0.0833333, nnz 24
+		%>
+		%> @code
+		%> >> norm(full(F-G-2) - full(F) + full(G) + 2)
+		%> @endcode
+		%>
+		%> ans =
+		%>
+		%>    1.9650e-15
+		%>
+		%> @code
+		%> >> F-G-F-2-F
+		%> @endcode
+		%>
+		%> ans =
+		%>
+		%> Faust size 10x12, density 12.325, nnz_sum 1479, 17 factor(s):
+		%> - FACTOR 0 (double) SPARSE, size 10x20, density 0.1, nnz 20
+		%> - FACTOR 1 (double) SPARSE, size 20x30, density 0.05, nnz 30
+		%> - FACTOR 2 (double) SPARSE, size 30x40, density 0.0333333, nnz 40
+		%> - FACTOR 3 (double) SPARSE, size 40x50, density 0.025, nnz 50
+		%> - FACTOR 4 (double) SPARSE, size 50x54, density 0.0407407, nnz 110
+		%> - FACTOR 5 (double) SPARSE, size 54x53, density 0.048218, nnz 138
+		%> - FACTOR 6 (double) SPARSE, size 53x52, density 0.0634978, nnz 175
+		%> - FACTOR 7 (double) SPARSE, size 52x51, density 0.0678733, nnz 180
+		%> - FACTOR 8 (double) SPARSE, size 51x54, density 0.0562818, nnz 155
+		%> - FACTOR 9 (double) SPARSE, size 54x54, density 0.0322359, nnz 94
+		%> - FACTOR 10 (double) SPARSE, size 54x48, density 0.0439815, nnz 114
+		%> - FACTOR 11 (double) SPARSE, size 48x36, density 0.0555556, nnz 96
+		%> - FACTOR 12 (double) SPARSE, size 36x34, density 0.0743464, nnz 91
+		%> - FACTOR 13 (double) SPARSE, size 34x34, density 0.0640138, nnz 74
+		%> - FACTOR 14 (double) SPARSE, size 34x24, density 0.0784314, nnz 64
+		%> - FACTOR 15 (double) SPARSE, size 24x24, density 0.0416667, nnz 24
+		%> - FACTOR 16 (double) SPARSE, size 24x12, density 0.0833333, nnz 24
+		%>
+		%> @code
+		%> >> norm(full(F-G-F-2-F) - full(F) + 2*full(F) + full(G) + 2)
+		%> @endcode
+		%>
+		%> ans =
+		%>
+		%>    6.1753e-15
 		%>
 		%> <p>@b See @b also Faust.plus
 		%======================================================================
