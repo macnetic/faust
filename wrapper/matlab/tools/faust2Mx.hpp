@@ -394,7 +394,7 @@ mxArray* transformFact2SparseMxArray(faust_unsigned_int id, Faust::TransformHelp
 	mwIndex* jc = mxGetJc(sparseMat);
 	//	std::cout << "transformFact2SparseMxArray()" << std::endl;
 	//	FPP* pr = static_cast<FPP*>(mxGetDoubles(sparseMat)); //given up because fails to compile with template FPP
-	float* pr;
+	double* pr; // matlab doesn't support single sparse matrix, so we convert the Faust::MatSparse<float> to double buffer
 #ifdef MX_HAS_INTERLEAVED_COMPLEX
 	newMxGetData(pr, sparseMat);
 #else
@@ -438,6 +438,7 @@ mxArray* transformFact2SparseMxArray(faust_unsigned_int id, Faust::TransformHelp
 	free(i_jc);
 	return sparseMat;
 }
+
 	template<typename FPP, FDevice DEV>
 mxArray* transformFact2SparseMxArray(faust_unsigned_int id, Faust::TransformHelper<FPP, DEV>* core_ptr)
 {
