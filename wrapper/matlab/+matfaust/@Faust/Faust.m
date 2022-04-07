@@ -747,7 +747,7 @@ classdef Faust
 		%> factors(F*A,1) == factors(F,1)*A
 		%> @endcode
 		%>
-		%> - Any Faust F (real or complex) can be multiplied by any Faust/array/scalar (real or complex) of appropriate dimensions.
+		%> - Any Faust F (real or complex) can be multiplied by any (real or complex) Faust/array of appropriate dimensions or a scalar.
 		%>
 		%> @b Usage
 		%>
@@ -769,7 +769,6 @@ classdef Faust
 		%> - When either F or A is complex, G=F*A is also complex.
 		%>
 		%>
-		%>
 		%> @b Example
 		%> @code
 		%>   F = matfaust.rand(5, 10)
@@ -782,24 +781,6 @@ classdef Faust
 		%>   Fs = F*2
 		%>   sF = 2*F
 		%> % sF == Fs, i.e. the Faust F times 2.
-		%> @endcode
-		%>
-		%> @b Errors
-		%>
-		%> - F is real but A is a complex scalar.
-		%>
-		%> @code
-		%>>> isreal(F)
-		%>
-		%>ans =
-		%>
-		%>  logical
-		%>
-		%>     1
-		%>
-		%>>>F*i
-		%>Error using mexFaustReal
-		%>You cannot multiply a real Faust by a complex scalar (not yet implemented).
 		%> @endcode
 		%>
 		%> <p>@b See @b also Faust.Faust, Faust.rcg, Faust.ctranspose, Faust.complex
