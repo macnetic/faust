@@ -28,6 +28,8 @@ function parse_doxy_block {
                                                         s/@param[[:blank:]]\([^[:blank:]]\{1,\}\)/- Parameter \1: /;
                                                         s/@code/=========== code ===========/;
                                                         s/@endcode/========= end code =========/;
+							s/<code>//g;
+							s/<\/code>//g;
                                                         s/\(Examples\{0,1\}\)/\1:/;
                                                         #s/<[^>]*>//g;
                                                         s/<b>//g;
