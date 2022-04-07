@@ -1086,45 +1086,33 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         More specifically:
         - It's a scalar multiplication if A is a scalar number.
-        - If A is a Faust or a numpy.ndarray it performs a
-        Faust.__matmul__() (@ operator).
+        - if A is a vector of appropriate size, the function performs a Faust-vector broadcasting.
 
         Args:
             F: the Faust object.
-            A: is a scalar number, a Faust object or a numpy.ndarray
-            or a sparse matrix (scipy.sparse.csr_matrix or dia_matrix).
-            <br/> In the latter case, A must be Fortran contiguous (i.e. Column-major order;
-                `order' argument passed to np.ndararray() must be equal to str
-                'F').
+            A: is a scalar number or a (vector) numpy.ndarray
 
-        Returns: The result of the multiplication
-            - as a numpy.ndarray if A is a ndarray,<br/>
-            - as a Faust object if A is a Faust or a scalar number.
-            - When either F or A is complex, G=F*A is also complex.
+        Returns: The result of the multiplication as a Faust (either A is a
+        vector or a scalar).
 
         Raises: TypeError
             If the type of A is not supported:
             <code>
             >>> import numpy
             >>> F*'a'
-            TypeError ufunc 'multiply' did not contain a loop with signature matching types dtype('<U32') dtype('<U32') dtype('<U32')
+            TypeError: * use is forbidden in this case. It is allowed only for Faust-scalar multiplication or Faust vector broadcasting.
             </code>
 
         Examples:
             >>> from pyfaust import rand
             >>> import numpy as np
             >>> F = rand(50, 100)
-            >>> A = np.random.rand(F.shape[1], 10)
-            >>> B = F*A
-            >>> # is equivalent to B = F.__mul__(A)
-            >>> G = rand(F.shape[1], 5)
-            >>> H = F*G
-            >>> # H is a Faust because F and G are
-            >>> ((F*G).toarray() == (F@G).toarray()).all() #@ is not supported in python2
-            True
+            >>> v = np.random.rand(F.shape[1])
+            >>> B = F*v # Faust vector broadcasting
+            >>> # is equivalent to B = F.__mul__(v)
             >>> F_times_two = F*2
 
-        <b>See also</b> Faust.__init__, Faust.rcg, Faust.__mul__, Faust.__matmul__, Faust.dot
+        <b>See also</b> Faust.__rmul__
         """
         if(isinstance(A, (float, int, np.complex))):
             if isinstance(A, int):
@@ -1147,15 +1135,9 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             or A.ndim == 2 and A.shape[0] == 1:
                 return F@Faust(np.diag(A.squeeze()), dev=F.device)
         # A is a Faust, a numpy.ndarray (eg. numpy.matrix) or anything
-        raise Exception("* use is forbidden in this case. It is allowed only"
+        raise TypeError("* use is forbidden in this case. It is allowed only"
                         " for Faust-scalar multiplication or Faust vector"
                         " broadcasting.")
-#        warnings.warn("The * is deprecated as a matrix product and will soon"
-#                      " be removed")
-        try:
-            return F.__matmul__(A)
-        except:
-            raise TypeError("invalid type operand for Faust.__mul__.")
 
     def __rmul__(F, lhs_op):
         """ lhs_op*F
@@ -1164,7 +1146,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         if isinstance(lhs_op, (float, int, np.complex)):
             return F.__mul__(lhs_op)
         elif(isinstance(lhs_op, np.ndarray)):
-            #TODO: refactor with __mul__ when * won't longer execute a matmul
+            #TODO: refactor with __mul__
             if(lhs_op.size == 1):
                 if lhs_op.dtype == np.complex:
                     return F*(np.complex(lhs_op.squeeze()))
@@ -1173,12 +1155,10 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             if lhs_op.ndim == 1 and lhs_op.size == F.shape[1] \
             or lhs_op.ndim == 2 and lhs_op.shape[0] == 1:
                 return F@Faust(np.diag(lhs_op.squeeze()), dev=F.device)
-        warnings.warn("The * is deprecated as a matrix product and will soon"
-                      " be removed")
-        try:
-            return F.__rmatmul__(lhs_op)
-        except:
-            raise TypeError("invalid type operand for Faust.__rmul__.")
+        # A is a Faust, a numpy.ndarray (eg. numpy.matrix) or anything
+        raise TypeError("* use is forbidden in this case. It is allowed only"
+                        " for Faust-scalar multiplication or Faust vector"
+                        " broadcasting.")
 
     def __rmatmul__(F, lhs_op):
         """Returns lhs_op.__matmul__(F).
