@@ -1017,7 +1017,7 @@ classdef Faust
 		%> - FACTOR 3 (float) SPARSE, size 5x5, density 1, nnz 25
 		%> - FACTOR 4 (float) SPARSE, size 5x5, density 1, nnz 25
 		%>
-		%> <p/>@b See @b also Faust.class
+		%> <p/>@b See @b also Faust.class, Faust.double
 		%======================================================================
 		function sF = single(F)
 			sF = matfaust.Faust(call_mex(F, 'single'), true, F.dev, 'float');
@@ -1387,6 +1387,53 @@ classdef Faust
 		%>
 		%>
 		%> @retval n Faust size in bytes.
+		%>
+		%>
+		%> @b Example:
+		%> @code
+		%> >> F = matfaust.rand(1024, 1024, 'num_factors', 6)
+		%> @endcode
+		%>
+		%> F =
+		%>
+		%> Faust size 1024x1024, density 0.0292969, nnz_sum 30720, 6 factor(s):
+		%> - FACTOR 0 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+		%> - FACTOR 1 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+		%> - FACTOR 2 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+		%> - FACTOR 3 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+		%> - FACTOR 4 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+		%> - FACTOR 5 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+		%>
+		%> @code
+		%> >> nbytes(F)
+		%> @endcode
+		%>
+		%> ans =
+		%>
+		%>       393240
+		%>
+		%> @code
+		%> >> F = matfaust.rand(1024, 1024, 'num_factors', 6, 'fac_type', 'dense')
+		%> @endcode
+		%>
+		%> F =
+		%>
+		%> Faust size 1024x1024, density 0.0292969, nnz_sum 30720, 6 factor(s):
+		%> - FACTOR 0 (double) DENSE, size 1024x1024, density 0.00488281, nnz 5120
+		%> - FACTOR 1 (double) DENSE, size 1024x1024, density 0.00488281, nnz 5120
+		%> - FACTOR 2 (double) DENSE, size 1024x1024, density 0.00488281, nnz 5120
+		%> - FACTOR 3 (double) DENSE, size 1024x1024, density 0.00488281, nnz 5120
+		%> - FACTOR 4 (double) DENSE, size 1024x1024, density 0.00488281, nnz 5120
+		%> - FACTOR 5 (double) DENSE, size 1024x1024, density 0.00488281, nnz 5120
+		%>
+		%> @code
+		%> >> nbytes(F)
+		%> @endcode
+		%>
+		%> ans =
+		%>
+		%>     50331648
+		%>
 		%======================================================================
 		function n = nbytes(F)
 			n = call_mex(F, 'nbytes');
@@ -2245,11 +2292,11 @@ classdef Faust
 
 
 		%==========================================================================================
-		%> @brief The total number of non-zero elements in the factors of F.
+		%> @brief The total number of nonzeros in the factors of F.
 		%>
-		%> The function sums together the number of non-zero elements of
-		%> each factor and returns the result. Note that for efficiency the sum is
-		%>                        computed at Faust creation time and kept in cache.
+		%> The function sums together the number of nonzeros of
+		%> each factor and returns the result.
+		%> Note that for efficiency the sum is computed at Faust creation time and kept in cache.
 		%>
 		%> @b Usage
 		%>
@@ -2257,6 +2304,32 @@ classdef Faust
 		%> @param F the Faust object.
 		%>
 		%> @retval nz the number of non-zeros.
+		%>
+		%> @b Example:
+		%>
+		%> @code
+		%> >> F = matfaust.rand(1024, 1024, 'num_factors', 6)
+		%> @endcode
+		%>
+		%> F =
+		%>
+		%> Faust size 1024x1024, density 0.0292969, nnz_sum 30720, 6 factor(s):
+		%> - FACTOR 0 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+		%> - FACTOR 1 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+		%> - FACTOR 2 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+		%> - FACTOR 3 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+		%> - FACTOR 4 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+		%> - FACTOR 5 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+		%>
+		%> @code
+		%> >> nnz_sum(F)
+		%> @endcode
+		%>
+		%> ans =
+		%>
+		%>        30720
+		%>
+		%>
 		%>
 		%> <p>@b See @b also Faust.rcg, Faust.density.
 		%==========================================================================================

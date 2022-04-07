@@ -275,6 +275,32 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
     def nbytes(F):
         """
         Gives the memory size of the Faust in bytes.
+
+        Example:
+            >>> import pyfaust as pf
+            >>> F = pf.rand(1024, 1024)
+            >>> F
+            Faust size 1024x1024, density 0.0244141, nnz_sum 25600, 5 factor(s):
+            - FACTOR 0 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+            - FACTOR 1 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+            - FACTOR 2 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+            - FACTOR 3 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+            - FACTOR 4 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+
+            >>> F.nbytes
+            327700
+            >>> F = pf.rand(1024, 1024, fac_type='dense')
+            >>> F
+            Faust size 1024x1024, density 0.0244141, nnz_sum 25600, 5 factor(s):
+            - FACTOR 0 (double) DENSE, size 1024x1024, density 0.00488281, nnz 5120
+            - FACTOR 1 (double) DENSE, size 1024x1024, density 0.00488281, nnz 5120
+            - FACTOR 2 (double) DENSE, size 1024x1024, density 0.00488281, nnz 5120
+            - FACTOR 3 (double) DENSE, size 1024x1024, density 0.00488281, nnz 5120
+            - FACTOR 4 (double) DENSE, size 1024x1024, density 0.00488281, nnz 5120
+
+            >>> F.nbytes
+            41943040
+
         """
         return F.m_faust.nbytes()
 
@@ -1596,12 +1622,27 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
     def nnz_sum(F):
         """Gives the total number of non-zero elements in the factors of F.
+
         The function sums together the number of non-zero elements of
         each factor and returns the result. Note that for efficiency the sum is
         computed at Faust creation time and kept in cache.
 
         Returns:
             the number of non-zeros.
+
+        Example:
+			>>> import pyfaust as pf
+			>>> F = pf.rand(1024, 1024)
+			>>> F
+			Faust size 1024x1024, density 0.0244141, nnz_sum 25600, 5 factor(s): 
+			- FACTOR 0 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+			- FACTOR 1 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+			- FACTOR 2 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+			- FACTOR 3 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+			- FACTOR 4 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+
+			>>> F.nnz_sum()
+			25600
 
         <b>See also</b> Faust.rcg, Faust.density.
         """
