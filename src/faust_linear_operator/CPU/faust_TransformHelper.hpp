@@ -507,12 +507,12 @@ namespace Faust {
 							{
 								if(nnz_i <= nnz_tres)
 									tmp_sp->delete_row(offset);
-								else
-								{
-									tmp_ds = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(S_j);
-									if(nnz_i <= nnz_tres)
-										tmp_ds->delete_row(offset);
-								}
+							}
+							else
+							{
+								tmp_ds = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(S_j);
+								if(nnz_i <= nnz_tres)
+									tmp_ds->delete_row(offset);
 							}
 						}
 					}
@@ -576,7 +576,7 @@ namespace Faust {
 			{
 				auto fac_nrows = pth->get_fact_nb_rows(i);
 				auto fac_ncols = pth->get_fact_nb_cols(i);
-				std::cout << "fac nrows, ncols:" << fac_nrows << " " << fac_ncols << std::endl;
+//				std::cout << "fac nrows, ncols:" << fac_nrows << " " << fac_ncols << std::endl;
 				if(fac_nrows == 0 && fac_ncols == 0)
 					pth->transform->erase(i);
 			}
