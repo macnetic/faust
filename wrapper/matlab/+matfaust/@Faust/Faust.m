@@ -2163,6 +2163,8 @@ classdef Faust
 		%> 738.0057
 		%> @endcode
 		%>
+		%> <p>@b See @b also Faust.normalize
+		%>
 		%======================================================================
 		function n = norm(F, varargin)
 			%%
@@ -2280,8 +2282,91 @@ classdef Faust
 		%>
 		%> &nbsp;&nbsp;&nbsp; @b normalize(F,'norm')  normalizes columns with vector 2-norm.<br/>
 		%> &nbsp;&nbsp;&nbsp; @b normalize(F,'norm',p) normalizes columns with vector p-norm (see Faust.norm).<br/>
-		%> &nbsp;&nbsp;&nbsp; @b normalize(F,DIM,'norm') normalizes rows (DIM=1) or columns (DIM=2, default) with vector 2-norm.<br/>
+		%> &nbsp;&nbsp;&nbsp; @b normalize(F,DIM,'norm', 2) normalizes rows (DIM=1) or columns (DIM=2, default) with vector 2-norm.<br/>
 		%> &nbsp;&nbsp;&nbsp; @b normalize(F,DIM,'norm',p) normalizes rows (DIM=1) or columns (DIM=2, default) with vector p-norm.<br/>
+		%>
+		%> @b Examples:
+		%> @code
+		%> >> F = matfaust.rand(10, 10)
+		%> @endcode
+		%>
+		%> F =
+		%>
+		%> Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
+		%> - FACTOR 0 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 1 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%>
+		%> @code
+		%> >> % normalize columns according to default 2-norm
+		%> >> % then test the second column is properly normalized
+		%> >> nF2 = normalize(F)
+		%> @endcode
+		%>
+		%> nF2 =
+		%>
+		%> Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
+		%> - FACTOR 0 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 1 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%>
+		%> @code
+		%> >> norm(full(nF2(:,2)) - full(F(:,2))/norm(F(:,2)))
+		%> @endcode
+		%>
+		%> ans =
+		%>
+		%>    8.3267e-17
+		%>
+		%> @code
+		%> >> % this time normalize rows using 1-norm and test the third row
+		%> >> nF1 = normalize(F, 1, 'norm', 1)
+		%> @endcode
+		%>
+		%> nF1 =
+		%>
+		%> Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
+		%> - FACTOR 0 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 1 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%>
+		%> @code
+		%> >> norm(full(nF1(3, :)) - full(F(3,:))/norm(F(3,:), 1))
+		%> @endcode
+		%>
+		%> ans =
+		%>
+		%>    1.4153e-16
+		%>
+		%> @code
+		%> >> % and the same except  with inf-norm
+		%> >> nFinf = normalize(F, 1, 'norm', inf)
+		%> @endcode
+		%>
+		%> nFinf =
+		%>
+		%> Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
+		%> - FACTOR 0 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 1 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%> - FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
+		%>
+		%> @code
+		%> >> norm(full(nFinf(3, :)) - full(F(3,:))/norm(F(3,:), inf))
+		%> @endcode
+		%>
+		%>
+		%> ans =
+		%>
+		%>    3.9252e-17
+		%>
 		%>
 		%> <p>@b See @b also Faust.norm
 		%===============================================================================

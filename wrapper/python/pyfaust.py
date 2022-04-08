@@ -1766,6 +1766,8 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             23.55588891399667
             >>> F.norm(np.inf)
             18.509101197826254
+
+        <b>See also</b>: Faust.normalize
         """
         if ord not in [1, 2, "fro", np.inf]:
             raise ValueError("ord must have the value 1, 2, 'fro' or numpy.inf.")
@@ -1812,6 +1814,52 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         Returns:
             the normalized Faust
+
+        Example:
+			>>> from numpy.linalg import norm
+			>>> import numpy as np
+			>>> import pyfaust as pf
+			>>> F = pf.rand(10, 10)
+			>>> F
+			Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
+			- FACTOR 0 (double) SPARSE, size 10x10, density 0.5, nnz 50
+			- FACTOR 1 (double) SPARSE, size 10x10, density 0.5, nnz 50
+			- FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
+			- FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
+			- FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
+
+			>>> # normalize columns according to default fro-norm/2-norm
+			>>> # then test the second column is properly normalized
+			>>> nF2 = F.normalize()
+			>>> nF2
+			Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
+			- FACTOR 0 (double) SPARSE, size 10x10, density 0.5, nnz 50
+			- FACTOR 1 (double) SPARSE, size 10x10, density 0.5, nnz 50
+			- FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
+			- FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
+			- FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
+
+			>>> norm(nF2[:,1].toarray() - F[:, 1].toarray()/F[:,1].norm())
+			1.2719202621569003e-16
+			>>>
+			>>> # this time normalize rows using 1-norm and test the third row
+			>>> nF1 = F.normalize(ord=1, axis=0)
+			>>> nF1
+			Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
+			- FACTOR 0 (double) SPARSE, size 10x10, density 0.5, nnz 50
+			- FACTOR 1 (double) SPARSE, size 10x10, density 0.5, nnz 50
+			- FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
+			- FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
+			- FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
+
+			>>> norm(nF1[2, :].toarray() - F[2, :].toarray()/F[2, :].norm(ord=1))
+			2.5438405243138006e-16
+			>>>
+			>>> # and the same with inf-norm
+			>>> nFinf = F.normalize(ord=np.inf, axis=0)
+			>>> norm(nFinf[2, :].toarray() - F[2, :].toarray()/F[2, :].norm(ord=np.inf))
+			4.3885418357208765e-17
+
 
         <b>See also</b>: Faust.norm
         """
