@@ -520,18 +520,26 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         return F.getH()
 
     def pruneout(F, thres=0, **kwargs):
-        """
-        Returns a Faust optimized by removing useless zero rows and columns as many times as needed.
+        """Returns a Faust optimized by removing useless zero rows and columns as many times as needed.
 
         Args:
             F: the Faust to optimize.
             thres: the threshold of number of nonzeros under what the
             rows/columns are removed.
 
-
         Returns:
             The optimized Faust.
 
+        Example:
+			>>> from pyfaust import rand
+			>>> F = rand(1024, 1024, dim_sizes=[1, 1024], num_factors=32, fac_type='mixed')
+			>>> pF = F.pruneout()
+			>>> F.nbytes
+			42875160
+			>>> pF.nbytes
+			38594468
+
+        <b>See also</b> Faust.optimize
         """
         # hidden parameters (useless unless for debug)
         #            only_forward: True for applying only the forward passes of removal.
@@ -1396,8 +1404,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
 
     def todense(F):
-        """
-        Returns a numpy matrix for the full matrix implemented by F.
+        """Returns a numpy matrix for the full matrix implemented by F.
 
         WARNING: Using this function is discouraged except for test purposes,
         as it loses the main potential interests of the Faust structure:
@@ -2556,6 +2563,32 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Returns:
             The optimized Faust.
 
+        Example:
+            >>> from pyfaust import rand
+            >>> F = rand(1024, 1024, fac_type='mixed')
+            >>> F
+            Faust size 1024x1024, density 0.0244141, nnz_sum 25600, 5 factor(s):
+            - FACTOR 0 (double) DENSE, size 1024x1024, density 0.00488281, nnz 5120
+            - FACTOR 1 (double) DENSE, size 1024x1024, density 0.00488281, nnz 5120
+            - FACTOR 2 (double) DENSE, size 1024x1024, density 0.00488281, nnz 5120
+            - FACTOR 3 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+            - FACTOR 4 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+
+            >>> F.nbytes
+            25296904
+            >>> pF = F.optimize_memory()
+            >>> pF
+            Faust size 1024x1024, density 0.0244141, nnz_sum 25600, 5 factor(s):
+            - FACTOR 0 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+            - FACTOR 1 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+            - FACTOR 2 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+            - FACTOR 3 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+            - FACTOR 4 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+
+            >>> pF.nbytes
+            327700
+
+
         <b>See also</b> Faust.optimize
         """
         F_opt = Faust(core_obj=F.m_faust.optimize_storage(False))
@@ -2575,7 +2608,59 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Faust.optimize_time, Faust.optimize_memory or Faust.pruneout to be
         more specific about the optimization to proceed.
 
-        <b>See also</b> Faust.optimize_time, Faust.optimize_memory, Faust.pruneout
+        Example:
+			This example shows how Faust.optimize can diminish the memory size and
+			speed up the Faust.toarray() and Faust-vector multiplication.
+			>>> from pyfaust import rand
+			>>> F = rand(1024, 1024, dim_sizes=[1, 1024], num_factors=32, fac_type='mixed')
+			>>> F.nbytes
+			24014520
+			>>> pF = F.optimize()
+			>>> pF.nbytes
+			911816
+			>>> from time import time
+			>>> t1 = time(); F.toarray(); print("F.toarray() time:", time()-t1)
+			array([[0.00000000e+00, 9.47768987e+07, 3.54841410e+07, ...,
+					5.02648254e+08, 1.69126326e+08, 6.60395426e+08],
+				   [0.00000000e+00, 4.53823851e+07, 1.69910070e+07, ...,
+					2.40685014e+08, 8.09834069e+07, 3.16219690e+08],
+				   [0.00000000e+00, 7.05413763e+07, 2.64104431e+07, ...,
+					3.74115410e+08, 1.25878813e+08, 4.91524836e+08],
+				   ...,
+				   [0.00000000e+00, 6.19890617e+07, 2.32084866e+07, ...,
+					3.28758359e+08, 1.10617488e+08, 4.31933316e+08],
+				   [0.00000000e+00, 1.05375223e+08, 3.94521173e+07, ...,
+					5.58856367e+08, 1.88038697e+08, 7.34243484e+08],
+				   [0.00000000e+00, 1.04672252e+08, 3.91889277e+07, ...,
+					5.55128177e+08, 1.86784271e+08, 7.29345296e+08]])
+			F.toarray() time: 0.3663349151611328
+			>>> t1 = time(); pF.toarray(); print("pF.toarray() time:", time()-t1)
+			array([[0.00000000e+00, 9.47768987e+07, 3.54841410e+07, ...,
+					5.02648254e+08, 1.69126326e+08, 6.60395426e+08],
+				   [0.00000000e+00, 4.53823851e+07, 1.69910070e+07, ...,
+					2.40685014e+08, 8.09834069e+07, 3.16219690e+08],
+				   [0.00000000e+00, 7.05413763e+07, 2.64104431e+07, ...,
+					3.74115410e+08, 1.25878813e+08, 4.91524836e+08],
+				   ...,
+				   [0.00000000e+00, 6.19890617e+07, 2.32084866e+07, ...,
+					3.28758359e+08, 1.10617488e+08, 4.31933316e+08],
+				   [0.00000000e+00, 1.05375223e+08, 3.94521173e+07, ...,
+					5.58856367e+08, 1.88038697e+08, 7.34243484e+08],
+				   [0.00000000e+00, 1.04672252e+08, 3.91889277e+07, ...,
+					5.55128177e+08, 1.86784271e+08, 7.29345296e+08]])
+			pF.toarray() time: 0.10646939277648926
+			>>> import numpy as np
+			>>> v = np.random.rand(F.shape[1])
+			>>> t1 = time(); F@v;print("F@v time:", time()-t1)
+			array([2.79905047e+11, 1.34028007e+11, 2.08330156e+11, ...,
+				   1.83072593e+11, 3.11205142e+11, 3.09129061e+11])
+			F@v time: 0.003871440887451172
+			>>> t1 = time(); pF@v; print("pF@v time:", time()-t1)
+			array([2.79905047e+11, 1.34028007e+11, 2.08330156e+11, ...,
+				   1.83072593e+11, 3.11205142e+11, 3.09129061e+11])
+			pF@v time: 0.0013530254364013672
+
+        <b>See also</b> Faust.optimize_time, Faust.optimize_memory, Faust.pruneout, Faust.nbytes, <a href="https://faust.inria.fr/tutorials/pyfaust-jupyter-notebooks/faust-optimizations-with-pyfaust/">Jupyter notebook about Faust optimizations</a>
         """
         F_opt = Faust(core_obj=F.m_faust.optimize(transp))
         return F_opt
@@ -2585,9 +2670,8 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Returns a Faust configured with the quickest Faust-matrix multiplication mode (benchmark ran on the fly).
 
         NOTE: this function launches a small benchmark on the fly. Basically, the methods
-        available differ by the order used to compute the matrix chain
-        multiplication or by the use (or unuse) of libraries to performs the
-        calculation.
+        available differ by the order used to compute the matrix chain.
+
         The evaluated methods in the benchmark are listed in pyfaust.FaustMulMode.
         Although depending on the package you installed and the capability of your
         hardware the methods based on Torch library can be used.
@@ -2609,7 +2693,45 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Returns:
             The optimized Faust.
 
-        <b>See also</b> Faust.optimize
+        Example:
+			>>> from pyfaust import rand
+			>>> from time import time
+			>>> F = rand(1024, 1024, dim_sizes=[1, 1024], num_factors=32, fac_type='dense')
+			>>> oF = F.optimize_time()
+			best method measured in time on operation Faust-toarray is: DYNPROG
+			>>> t1 = time(); F.toarray(); print("F.toarray() time:", time()-t1)
+			array([[1.08456293e+08, 9.06809253e+08, 2.14092678e+08, ...,
+					2.39420597e+08, 1.73687901e+08, 1.48511336e+08],
+				   [1.45686856e+08, 1.21809603e+09, 2.87585796e+08, ...,
+					3.21608188e+08, 2.33310996e+08, 1.99491872e+08],
+				   [1.37868515e+08, 1.15272644e+09, 2.72152397e+08, ...,
+					3.04348964e+08, 2.20790272e+08, 1.88786066e+08],
+				   ...,
+				   [1.60235010e+08, 1.33973397e+09, 3.16303847e+08, ...,
+					3.53723686e+08, 2.56609207e+08, 2.19412950e+08],
+				   [1.24235524e+08, 1.03874022e+09, 2.45240878e+08, ...,
+					2.74253715e+08, 1.98957633e+08, 1.70118148e+08],
+				   [1.19470236e+08, 9.98897401e+08, 2.35834204e+08, ...,
+					2.63734204e+08, 1.91326235e+08, 1.63592947e+08]])
+			F.toarray() time: 0.2891380786895752
+			>>> t1 = time(); oF.toarray(); print("oF.toarray() time:", time()-t1)
+			array([[1.08456293e+08, 9.06809253e+08, 2.14092678e+08, ...,
+					2.39420597e+08, 1.73687901e+08, 1.48511336e+08],
+				   [1.45686856e+08, 1.21809603e+09, 2.87585796e+08, ...,
+					3.21608188e+08, 2.33310996e+08, 1.99491872e+08],
+				   [1.37868515e+08, 1.15272644e+09, 2.72152397e+08, ...,
+					3.04348964e+08, 2.20790272e+08, 1.88786066e+08],
+				   ...,
+				   [1.60235010e+08, 1.33973397e+09, 3.16303847e+08, ...,
+					3.53723686e+08, 2.56609207e+08, 2.19412950e+08],
+				   [1.24235524e+08, 1.03874022e+09, 2.45240878e+08, ...,
+					2.74253715e+08, 1.98957633e+08, 1.70118148e+08],
+				   [1.19470236e+08, 9.98897401e+08, 2.35834204e+08, ...,
+					2.63734204e+08, 1.91326235e+08, 1.63592947e+08]])
+			oF.toarray() time: 0.0172119140625
+
+
+        <b>See also</b> Faust.optimize, pyfaust.FaustMulMode
 
         """
         if(inplace):

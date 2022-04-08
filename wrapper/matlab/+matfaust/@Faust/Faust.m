@@ -1164,6 +1164,28 @@ classdef Faust
 		%>            rows/columns are removed.
 		%>
 		%> @retval G The optimized Faust.
+		%>
+		%> @b Example:
+		%>
+		%> @code
+		%> >> F = matfaust.rand(1024, 1024, 'dim_sizes', [1, 1024], 'num_factors', 32, 'fac_type', 'mixed');
+		%> >> pF = pruneout(F);
+		%> >> nbytes(F)
+		%> @endcode
+		%>
+		%> ans =
+		%>
+		%>     22733392
+		%>
+		%> @code
+		%> >> nbytes(pF)
+		%> @endcode
+		%>
+		%> ans =
+		%>
+		%>     22695284
+		%>
+		%> @b See @b also Faust.optimize
 		%======================================================================
 		function G = pruneout(F, varargin)
 			thres = 0;
@@ -1210,6 +1232,49 @@ classdef Faust
 		%>
 		%>@retval OF The optimized Faust.
 		%>
+		%> @b Example:
+		%> @code
+		%> >> F = matfaust.rand(1024, 1024, 'fac_type', 'mixed')
+		%> @endcode
+		%>
+		%> F =
+		%>
+		%> Faust size 1024x1024, density 0.0244141, nnz_sum 25600, 5 factor(s):
+		%> - FACTOR 0 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+		%> - FACTOR 1 (double) DENSE, size 1024x1024, density 0.00488281, nnz 5120
+		%> - FACTOR 2 (double) DENSE, size 1024x1024, density 0.00488281, nnz 5120
+		%> - FACTOR 3 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+		%> - FACTOR 4 (double) DENSE, size 1024x1024, density 0.00488281, nnz 5120
+		%>
+		%> @code
+		%> >> nbytes(F)
+		%> @endcode
+		%>
+		%> ans =
+		%>
+		%>     25296904
+		%>
+		%> @code
+		%> >> oF = optimize_memory(F)
+		%> @endcode
+		%>
+		%> oF =
+		%>
+		%> Faust size 1024x1024, density 0.0244141, nnz_sum 25600, 5 factor(s):
+		%> - FACTOR 0 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+		%> - FACTOR 1 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+		%> - FACTOR 2 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+		%> - FACTOR 3 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+		%> - FACTOR 4 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+		%>
+		%> @code
+		%> >> nbytes(oF)
+		%> @endcode
+		%>
+		%> ans =
+		%>
+		%>       327700
+		%>
 		%> @b See @b also Faust.optimize
 		%=====================================================================
 		function OF = optimize_memory(F)
@@ -1231,8 +1296,48 @@ classdef Faust
 		%> Faust.optimize_time, Faust.optimize_memory or Faust.pruneout to be
 		%> more specific about the optimization to proceed.
 		%>
+		%> @b Example:
 		%>
-		%> @b See @b also Faust.optimize_time, Faust.optimize_memory, Faust.pruneout
+		%> @code
+		%> >> F = matfaust.rand(1024, 1024, 'dim_sizes', [1, 1024], 'num_factors', 32, 'fac_type', 'mixed');
+		%> >> nbytes(F)
+		%> @endcode
+		%>
+		%> ans =
+		%>
+		%>     31118372
+		%>
+		%> @code
+		%> >> oF = optimize(F);
+		%> >> nbytes(oF)
+		%> @endcode
+		%>
+		%> ans =
+		%>
+		%>       805008
+		%>
+		%> @code
+		%> >> tic; full(F); toc
+		%> @endcode
+		%> Elapsed time is 0.402074 seconds.
+		%>
+		%> @code
+		%> >> tic; full(oF); toc
+		%> @endcode
+		%> Elapsed time is 0.106642 seconds.
+		%>
+		%> @code
+		%> >> v = rand(size(F, 1), 1);
+		%> >> tic; F*v; toc
+		%> @endcode
+		%> Elapsed time is 0.012632 seconds.
+		%>
+		%> @code
+		%> >> tic; oF*v; toc
+		%> @endcode
+		%> Elapsed time is 0.001487 seconds.
+		%>
+		%> @b See @b also Faust.optimize_time, Faust.optimize_memory, Faust.pruneout, <a href="https://faust.inria.fr/tutorials/matfaust-matlab-livescripts/faust-optimizations-with-matfaust/">Lives Script about Faust optimizations</a>
 		%=====================================================================
 		function OF = optimize(F, varargin)
 			len_args = length(varargin);
@@ -1249,30 +1354,53 @@ classdef Faust
 
 		%===============================
 		%> @brief Returns a Faust configured with the quickest Faust-matrix multiplication mode (benchmark ran on the fly).
-		%> @note this function launches a small benchmark on the fly. Basically, the methods
-		%> available differ by the order used to compute the matrix chain
-		%> multiplication or by the use (or unuse) of threads for the calculation of intermediary
-		%> matrix products of the Faust.
 		%>
+		%> @note this function launches a small benchmark on the fly. Basically, the methods
+		%> available differ by the order used to compute the matrix chain.
+		%>
+		%>
+		%> The evaluated methods in the benchmark are listed in matfaust.FaustMulMode.
+		%> Although depending on the package you installed and the capability of your
+		%> hardware the methods based on Torch library can be used.
 		%>
 		%> @b Usage<br/>
 		%> &nbsp;&nbsp;&nbsp; @b OF = @b optimize_time(F) returns a new object with the best product method enabled.<br/>
-		%> &nbsp;&nbsp;&nbsp; @b OF = @b optimize_time(@b F, @b 'inplace', @b true) modify directly F instead of creating a new Faust (i.e. OF references the same object as F).<br/>
-		%> &nbsp;&nbsp;&nbsp; @b OF = @b optimize_time(@b F, @b 'transp', @b true) try to optimize the Faust transpose instead of the Faust itself. <br/>
-		%> &nbsp;&nbsp;&nbsp; @b OF = @b optimize_time(@b F, @b 'nsamples', @b 10) benchmark product methods by computing 10 product instead of one by default.
+		%> &nbsp;&nbsp;&nbsp; @b OF = @b optimize_time(@b F, @b 'inplace', @b true) modifies directly F instead of creating a new Faust (i.e. OF references the same object as F).<br/>
+		%> &nbsp;&nbsp;&nbsp; @b OF = @b optimize_time(@b F, @b 'transp', @b true) tries to optimize the Faust transpose instead of the Faust itself. <br/>
+		%> &nbsp;&nbsp;&nbsp; @b OF = @b optimize_time(@b F, @b 'nsamples', @b 10) benchmarks the product methods by computing 10 products instead of one by default.
 		%>
 		%> @param F the Faust object.
-		%> @param 'inplace', bool (optional) default to false. If true the current Faust is modified directly.
-		%> @param 'transp', bool (optional) default to false. If true optimize the Faust according to its transpose.
-		%> @param 'nsamples', int (optional) default to 1.The number of Faust-Dense matrix products
+		%> @param 'inplace', bool  default to false. If true the current Faust is modified directly.
+		%> @param 'transp', bool  default to false. If true optimize the Faust according to its transpose.
+		%> @param 'nsamples', int  default to 1.The number of Faust-Dense matrix products
 		%> calculated in order to measure time taken by each method (it could matter
 		%> to discriminate methods when the performances are similar). By default,
 		%> only one product is computed to evaluate the method.
-		%> @param 'mat', matrix (optional) Use this argument to run the benchmark on the Faust multiplication by the matrix mat instead of Faust.full(). Note that mat must be of the same scalar type as F.
+		%> @param 'mat', matrix  Use this argument to run the benchmark on the Faust multiplication by the matrix mat instead of Faust.full(). Note that mat must be of the same scalar type as F.
 		%>
 		%> @retval OF The optimized Faust.
 		%>
-		%> @b See @b also Faust.optimize
+		%> @b Example:
+		%> @code
+		%> >> F = matfaust.rand(1024, 1024, 'dim_sizes', [1, 1024], 'num_factors', 32, 'fac_type', 'dense');
+		%> >> oF = optimize_time(F);
+		%> @endcode
+		%>
+		%> best method measured in time on operation Faust-toarray is: DYNPROG
+		%>
+		%> @code
+		%> >> tic; full(F); toc
+		%> @endcode
+		%>
+		%> Elapsed time is 0.759454 seconds.
+		%>
+		%> @code
+		%> >> tic; full(oF); toc
+		%> @endcode
+		%>
+		%> Elapsed time is 0.207121 seconds.
+		%>
+		%> @b See @b also Faust.optimize, matfaust.FaustMulMode
 		%===============================
 		function OF = optimize_time(F, varargin)
 			transp = false;
