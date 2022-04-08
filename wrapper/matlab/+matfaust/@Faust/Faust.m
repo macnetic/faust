@@ -1414,9 +1414,12 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>	F = matfaust.rand(5, 10)
-		%>	n = numel(F)
+		%>	>> F = matfaust.rand(5, 10);
+		%>	>> n = numel(F)
 		%> @endcode
+		%>	n =
+		%>
+		%>	    50
 		%>
 		%> <p/>@b See @b also Faust.size
 		%>
@@ -1533,8 +1536,6 @@ classdef Faust
 
 
 		end
-
-
 
 
 		%=====================================================================
@@ -1680,13 +1681,42 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>	F = matfaust.rand(5, 10)
-		%>	nf = numfactors(F)
+		%> >> F = matfaust.rand(5, 10, 'num_factors', 6);
+		%> >> nf = numfactors(F)
+		%>
+		%> ans =
+		%> 	6
 		%> @endcode
 		%>
 		%> <p>@b See @b also Faust.factors
 		%==========================================================================================
 		function num_factors = numfactors(F)
+			num_factors = call_mex(F, 'numfactors');
+		end
+
+		%==========================================================================================
+		%> @brief The number of factors of F.
+		%>
+		%> @b Usage
+		%>
+		%> &nbsp;&nbsp;&nbsp; @b A = length(F)
+		%>
+		%> @param F the Faust object.
+		%>
+		%> @retval num_factors the number of factors.
+		%>
+		%> @b Example
+		%> @code
+		%> >> F = matfaust.rand(5, 10, 'num_factors', 6);
+		%> >> nf = length(F)
+		%>
+		%> ans =
+		%> 	6
+		%> @endcode
+		%>
+		%> <p>@b See @b also Faust.numfactors
+		%==========================================================================================
+		function num_factors = length(F)
 			num_factors = call_mex(F, 'numfactors');
 		end
 

@@ -1893,8 +1893,10 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         Examples:
         >>> from pyfaust import rand
-        >>> F = rand(100,100, 2, density=.5)
+        >>> F = rand(100,100, num_factors=2, density=.5)
         >>> nf = F.numfactors()
+        >>> nf
+        2
         >>> nf == len(F)
         True
 
@@ -1913,6 +1915,8 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         >>> from pyfaust import rand
         >>> F = rand(50, 100)
         >>> nf = F.numfactors()
+        >>> nf
+        2
         >>> nf == len(F)
         True
 
