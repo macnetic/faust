@@ -97,9 +97,13 @@
 
 classdef Faust
 	properties (SetAccess = protected, Hidden = true)
+		%> @brief Underlying Faust native object handle.
 		matrix; % Handle to the FaustCore class instance
+		%> @brief See Faust.isreal.
 		is_real;
+		%> @brief See Faust.device.
 		dev; % cpu or gpu
+		%> @brief See Faust.class.
 		dtype; % double (for complex or real), or float
 	end
 %	properties (Constant)
