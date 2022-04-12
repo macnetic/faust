@@ -1683,9 +1683,10 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
     def rcg(F):
         """Computes the Relative Complexity Gain.
-        RCG is the theoretical gain brought by the Faust representation relatively to its dense
+
+        The RCG is the theoretical gain brought by the Faust representation relatively to its dense
         matrix equivalent. <br/>The higher is the RCG, the more computational
-        savings will be made.
+        savings are made.
         This gain applies both for storage space and computation time.
 
         NOTE: F.rcg() == 1/F.density()
@@ -1695,6 +1696,22 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         Returns:
             the RCG value (float).
+
+        >>> from pyfaust import rand
+        >>> F = rand(1024, 1024)
+        >>> F.rcg()
+        40.96
+        >>> F
+        Faust size 1024x1024, density 0.0244141, nnz_sum 25600, 5 factor(s):
+            - FACTOR 0 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+            - FACTOR 1 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+            - FACTOR 2 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+            - FACTOR 3 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+            - FACTOR 4 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+
+        >>> F.size/F.nnz_sum()
+        40.96
+
 
         <b>See also</b>: Faust.density, Faust.nnz_sum, Faust.shape.
         """
@@ -2310,13 +2327,21 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                 plt.imshow(fac, aspect='equal')
 
     def pinv(F):
-        """
-        Computes the (Moore-Penrose) pseudo-inverse of F.toarray().
+        """Computes the (Moore-Penrose) pseudo-inverse of F.toarray().
 
         Warning: this function makes a call to Faust.toarray().
 
         Returns:
             The dense pseudo-inverse matrix.
+
+        Example:
+            >>> from pyfaust import rand
+            >>> import numpy as np
+            >>> from numpy.linalg import pinv
+            >>> F = rand(128, 32)
+            >>> M = F.toarray()
+            >>> np.allclose(F.pinv(), pinv(M))
+            True
 
         See also <a href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.pinv.html">numpy.linalg.pinv</a>
         """
@@ -2557,8 +2582,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         return F_swapped
 
     def optimize_memory(F):
-        """
-        Optimizes a Faust by changing the storage format of each factor in order to optimize the memory size.
+        """Optimizes a Faust by changing the storage format of each factor in order to optimize the memory size.
 
         Returns:
             The optimized Faust.
@@ -2595,8 +2619,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         return F_opt
 
     def optimize(F, transp=False):
-        """
-        Returns a Faust optimized with Faust.pruneout, Faust.optimize_memory and Faust.optimize_time.
+        """Returns a Faust optimized with Faust.pruneout, Faust.optimize_memory and Faust.optimize_time.
 
         Args:
             transp: True in order to optimize the Faust according to its transpose.
@@ -2666,8 +2689,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         return F_opt
 
     def optimize_time(F, transp=False, inplace=False, nsamples=1, mat=None):
-        """
-        Returns a Faust configured with the quickest Faust-matrix multiplication mode (benchmark ran on the fly).
+        """Returns a Faust configured with the quickest Faust-matrix multiplication mode (benchmark ran on the fly).
 
         NOTE: this function launches a small benchmark on the fly. Basically, the methods
         available differ by the order used to compute the matrix chain.
@@ -3055,8 +3077,7 @@ def dot(A, B, **kwargs):
         return np.dot(A,B)
 
 def pinv(F):
-    """
-    A package function alias for the member function Faust.pinv().
+    """A package function alias for the member function Faust.pinv().
     """
     if(Faust.isFaust(F)):
         return F.pinv()

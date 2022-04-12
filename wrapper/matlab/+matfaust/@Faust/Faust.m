@@ -2664,12 +2664,12 @@ classdef Faust
 		%> @brief The Relative Complexity Gain of F.
 		%>
 		%>
-		%> RCG is the theoretical gain brought by the Faust representation relatively to its dense
+		%> The RCG is the theoretical gain brought by the Faust representation relatively to its dense
 		%> matrix equivalent. <br/>The higher is the RCG, the more computational
-		%> savings will be made.
+		%> savings are made.
 		%> This gain applies both for storage space and computation time.
 		%>
-		%> @b @note rcg(F) == 1/density(F)
+		%> @note rcg(F) == 1/density(F)
 		%>
 		%> @b Usage
 		%>
@@ -2679,6 +2679,36 @@ classdef Faust
 		%>
 		%>
 		%> @retval gain the RCG value (real).
+		%>
+		%> @b Example
+		%> @code
+		%> >> F = matfaust.rand(1024, 1024)
+		%> @endcode
+		%>
+		%> F =
+		%>
+		%> Faust size 1024x1024, density 0.0244141, nnz_sum 25600, 5 factor(s):
+		%> - FACTOR 0 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+		%> - FACTOR 1 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+		%> - FACTOR 2 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+		%> - FACTOR 3 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+		%> - FACTOR 4 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+		%>
+		%> @code
+		%> >> rcg(F)
+		%> @endcode
+		%>
+		%> ans =
+		%>
+		%>    40.9600
+		%>
+		%> @code
+		%> >> numel(F)/nnz_sum(F)
+		%> @endcode
+		%>
+		%> ans =
+		%>
+		%>    40.9600
 		%>
 		%> <p>@b See @b also Faust.density, Faust.nnz_sum, Faust.size.
 		%==========================================================================================
@@ -3018,6 +3048,25 @@ classdef Faust
 		%>  so that F*(F'*X')' == full(F) (or approximately).
 		%>
 		%> @warning this function makes a call to Faust.full.
+		%>
+		%> @b Example:
+		%> @code
+		%> >> F = matfaust.rand(128, 32);
+		%> >> M = full(F);
+		%> >> norm(pinv(M)-pinv(F))/norm(pinv(M))
+		%> @endcode
+		%>
+		%> ans =
+		%>
+		%>      0
+		%> @code
+		%> >> norm(M-(F*(F'*pinv(F)')))/norm(M)
+		%> @endcode
+		%>
+		%> ans =
+		%>
+		%>    3.8527e-14
+		%>
 		%>
 		%> <p> @b See @b also Faust.mldivide, pinv Matlab built-in.
 		%=====================================================================
