@@ -173,6 +173,8 @@ class FaustCoreCpp
 	void device(char* dev) const;
     FaustCoreCpp<Real<FPP>,DEV>* real();
     FPP get_item(unsigned long int i, unsigned long int j);
+    void sliceMultiply(unsigned long int j1, unsigned long int j2, const FPP* vec_data, FPP* vec_out) const;
+    void indexMultiply(unsigned long int* ids, size_t ids_len, const FPP* vec_data, FPP* vec_out) const;
     ~FaustCoreCpp();
     static FaustCoreCpp<FPP,DEV>* randFaust(unsigned int t,
             unsigned int min_num_factors, unsigned int max_num_factors,

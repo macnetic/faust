@@ -2896,6 +2896,13 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                              " (only two dimensions)")
         return F
 
+    def sliceMultiply(F, start_col_id, end_col_id, vec):
+        return F.m_faust.sliceMultiply(start_col_id, end_col_id, vec)
+
+    def indexMultiply(F, ids, vec):
+        ids = ids if isinstance(ids, np.ndarray) else np.array(ids)
+        return F.m_faust.indexMultiply(ids, vec)
+
     def average(F, axis=None, weights=None, returned=False):
         """
         Computes the weighted average of F along the specified axis.

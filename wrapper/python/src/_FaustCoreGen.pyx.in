@@ -121,6 +121,37 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
                                   x_nnz, X.shape[0], X.shape[1])
         return y_data_arr
 
+    def sliceMultiply(self, col_start_id, col_end_id, x):
+        cdef @TYPE@ [:] x_data
+        cdef @TYPE@ [:] y_data
+        x_data = x.data
+        nbrow = self.@CORE_OBJ@.getNbRow()
+        if(self.@CORE_OBJ@.getNbCol() != x.size): raise ValueError("Dimensions"
+                                                                  " must agree")
+        y_data_arr = np.empty((nbrow), dtype=np.@TYPE@, order='F') # we don't know beforehand Y nnz
+        y_data = y_data_arr
+        self.@CORE_OBJ@.sliceMultiply(col_start_id, col_end_id, &x_data[0],
+                                      &y_data[0])
+        return y_data_arr
+
+    def indexMultiply(self, ids, x):
+        cdef @TYPE@ [:] x_data
+        cdef @TYPE@ [:] y_data
+        cdef unsigned long int[:] ids_view
+        x_data = x.data
+        nbrow = self.@CORE_OBJ@.getNbRow()
+        if not isinstance(ids, np.ndarray) or ids.ndim != 1:
+            raise ValueError('ids must be a np.ndarray of ndim=1 and'
+                             ' dtype=uint64')
+        ids = ids.astype('uint64')
+        ids_view = ids.data
+        if(self.@CORE_OBJ@.getNbCol() != x.size): raise ValueError("Dimensions"
+                                                                  " must agree")
+        y_data_arr = np.empty((nbrow), dtype=np.@TYPE@, order='F') # we don't know beforehand Y nnz
+        y_data = y_data_arr
+        self.@CORE_OBJ@.indexMultiply(&ids_view[0], ids.size, &x_data[0], &y_data[0])
+        return y_data_arr
+
     def get_product(self):
         cdef @TYPE@[:,:] y_data
 

@@ -137,3 +137,20 @@ FaustCoreCpp<@TYPE@,Cpu>* FaustCoreCpp<@TYPE@,Cpu>::read_from_mat_file(const cha
     }
     return core;
 }
+
+template<>
+void FaustCoreCpp<@TYPE@,Cpu>::sliceMultiply(unsigned long int j1, unsigned long int j2, const @TYPE@* vec_data, @TYPE@* vec_out) const
+{
+    Faust::Vect<@TYPE@, Cpu> y;
+    Faust::Slice s(j1, j2);
+    y = this->transform->sliceMultiply(s, vec_data);
+    memcpy(vec_out, y.getData(), sizeof(@TYPE@)*y.size()); // TODO: this copy could be avoided
+}
+
+template<>
+void FaustCoreCpp<@TYPE@,Cpu>::indexMultiply(unsigned long int* ids, size_t ids_len, const @TYPE@* vec_data, @TYPE@* vec_out) const
+{
+    Faust::Vect<@TYPE@, Cpu> y;
+    y = this->transform->indexMultiply(ids, ids_len, vec_data);
+    memcpy(vec_out, y.getData(), sizeof(@TYPE@)*y.size()); // TODO: this copy could be avoided
+}

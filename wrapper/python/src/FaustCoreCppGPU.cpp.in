@@ -104,3 +104,9 @@ FaustCoreCpp<@TYPE@,GPU2>* FaustCoreCpp<@TYPE@,GPU2>::read_from_mat_file(const c
     throw std::runtime_error("A .mat file is always read from CPU code not GPU's.");
     return nullptr;
 }
+
+template<>
+void FaustCoreCpp<@TYPE@,GPU2>::sliceMultiply(unsigned long int j1, unsigned long int j2, const @TYPE@* vec_data, @TYPE@* vec_out) const
+{
+    throw std::runtime_error("sliceMultiply is not yet supported on GPU");
+}
