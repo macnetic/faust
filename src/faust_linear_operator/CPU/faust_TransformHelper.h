@@ -67,7 +67,7 @@ namespace Faust
 
 
 	template<typename FPP>
-		class TransformHelper<FPP,Cpu> : public TransformHelperGen<FPP,Cpu> 
+		class TransformHelper<FPP,Cpu> : public TransformHelperGen<FPP,Cpu>
 		{
 
 			friend TransformHelper<FPP,Cpu>* vertcat<FPP>(const std::vector<TransformHelper<FPP,Cpu>*>& THs);
@@ -82,7 +82,7 @@ namespace Faust
 			TransformHelper(const std::vector<MatGeneric<FPP,Cpu> *>& facts, const FPP lambda_ = (FPP)1.0, const bool optimizedCopy=false, const bool cloning_fact = true, const bool internal_call=false);
 			TransformHelper();
 			TransformHelper(const TransformHelper<FPP,Cpu>* th_left, const TransformHelper<FPP,Cpu>* th_right);
-			TransformHelper(TransformHelper<FPP,Cpu>* th);
+			TransformHelper(TransformHelper<FPP,Cpu>* th); //TODO: it shouldn't be necessary to have a copy ctor on pointer and another one on reference
 			TransformHelper(TransformHelper<FPP,Cpu>& th);
 			void operator=(TransformHelper<FPP,Cpu>& th);
 			TransformHelper(const TransformHelper<FPP,Cpu>* th, bool transpose, bool conjugate);
@@ -97,6 +97,8 @@ namespace Faust
 			virtual Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> &x, const bool transpose=false, const bool conjugate=false);
 			virtual Vect<FPP,Cpu> multiply(const FPP* x, const bool transpose=false, const bool conjugate=false);
 			virtual void multiply(const FPP* x, FPP* y, const bool transpose=false, const bool conjugate=false);
+			// Multiplies the slice s of this by the vector x (of size this->getNbCols())
+			Vect<FPP, Cpu> sliceMultiply(const Slice &s, const FPP* x) const;
 			// \brief multiply this by A (of size: this->getNbCol()*A_ncols) into C (buffers must be properly allocated from the callee).
 			virtual void multiply(const FPP* A, int A_ncols, FPP* C, const bool transpose=false, const bool conjugate=false);
 			//			MatDense<FPP,Cpu> multiply(const MatDense<FPP,Cpu> A) const;
