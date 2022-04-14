@@ -1579,6 +1579,99 @@ bool Faust::TransformHelper<FPP,Cpu>::is_zero() const
 }
 
 template<typename FPP>
+Faust::Vect<FPP, Cpu> Faust::TransformHelper<FPP,Cpu>::indexMultiply(faust_unsigned_int* ids, size_t ids_len, const FPP* x) const
+{
+	//TODO: refactor with sliceMultiply if it applies
+	//TODO: manage conjugate case
+	using Mat = Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>;
+	using SpMat = Eigen::SparseMatrix<FPP, Eigen::ColMajor>;
+	using Vec = Eigen::Matrix<FPP, Eigen::Dynamic, 1>;
+	using VecMap = Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>>;
+	VecMap x_map(const_cast<FPP*>(x), this->is_transposed?this->getNbRow():this->getNbCol()); // the const_cast is harmless, no modif. is made
+	MatDense<FPP, Cpu>* ds_fac;
+	MatSparse<FPP, Cpu>* sp_fac;
+//	MatBSR<FPP, Cpu>* bsr_fac; // TODO
+	Vec v;
+	std::vector<int> vec_ids(ids, ids+ids_len);
+	std::sort(vec_ids.begin(), vec_ids.end()); // mandatory in order to assign v elements in proper order
+	if(this->is_transposed)
+	{
+		// 1. multiply the first factor sliced according to s to the corresponding portion of x in the new vector x_
+		// 1.1 get the first factor
+		auto gen_first_fac = *(this->begin());
+		if(ds_fac = dynamic_cast<MatDense<FPP, Cpu>*>(gen_first_fac))
+		{
+			// 1.2 multiply the ids columns of the factor by the corresponding entries of the vector
+//			auto a = ds_fac->mat.transpose().eval();
+			v = ds_fac->mat.transpose()(Eigen::placeholders::all, vec_ids) * x_map(vec_ids);
+		}
+		else if(sp_fac = dynamic_cast<MatSparse<FPP, Cpu>*>(gen_first_fac))
+		{
+			// 1.2 multiply the ids columns of the factor by the corresponding entries of the vector
+			// 'Eigen::SparseMatrix<FPP, 0>' does not provide a call operator
+			//			v = a(Eigen::placeholders::all, vec_ids) * x_map(vec_ids);
+			v = Vec::Zero(gen_first_fac->getNbCol());
+			for(auto id: vec_ids)
+				v += sp_fac->mat.transpose().col(id) * x_map(id);
+		}
+		else
+		{
+			throw std::runtime_error("Only MatDense and MatSparse factors are handled by sliceMultiply op for the moment.");
+		}
+		// 2. then create a subFaust with all factors except the first one (copy-free)
+		if(size() == 1)
+			return Vect<FPP, Cpu>(gen_first_fac->getNbCol(), v.data()); // TODO: a copy could be avoided
+		std::vector<MatGeneric<FPP,Cpu> *> other_facs(this->begin()+1, this->end());
+		TransformHelper<FPP, Cpu> sub_th(other_facs, (FPP) 1.0, /* opt_copy */false, /* cloning */ false, /* internal call */ true);
+		// 3. finally multiply this new Faust by v and return the result
+		auto sub_th_t = sub_th.transpose();
+		auto vec = sub_th_t->multiply(v.data());
+		delete sub_th_t;
+		return vec;
+	}
+	else
+	{
+		// 1. multiply the last factor sliced according to s to the corresponding portion of x in the new vector x_
+		// 1.1 get the last factor
+		auto gen_last_fac = *(this->end()-1);
+		if(ds_fac = dynamic_cast<MatDense<FPP, Cpu>*>(gen_last_fac))
+		{
+			// 1.2 multiply the slice of the factor by the slice of the vector
+			v = ds_fac->mat(Eigen::placeholders::all, vec_ids) * x_map(vec_ids);
+		}
+		else if(sp_fac = dynamic_cast<MatSparse<FPP, Cpu>*>(gen_last_fac))
+		{
+			// 1.2 multiply the slice of the factor by the slice of the vector
+			v = Vec::Zero(gen_last_fac->getNbRow());
+//			Mat M = Mat::Zero(gen_last_fac->getNbRow(), vec_ids.size());
+			SpMat M(gen_last_fac->getNbRow(), vec_ids.size());
+//			#pragma omp parallel for // no OpenMP is possible for editing M
+			for(int i=0;i<vec_ids.size(); i++)
+//			for(auto id: vec_ids)
+//				v += sp_fac->mat.col(id) * x_map(id);
+				M.col(i) = sp_fac->mat.col(vec_ids[i]);// * x_map(vec_ids[i]);
+//			auto ones = Vec::Ones(vec_ids.size());
+//			v = M*ones;
+//			std::cout << "M:" << M << std::endl;
+			v = M*x_map(vec_ids);
+//			std::cout << "v:" << v << std::endl;
+		}
+		else
+		{
+			throw std::runtime_error("Only MatDense and MatSparse factors are handled by sliceMultiply op for the moment.");
+		}
+		// 2. then create a subFaust with all factors except the last one (copy-free)
+		if(size() == 1)
+			return Vect<FPP, Cpu>(gen_last_fac->getNbRow(), v.data()); // TODO: a copy could be avoided
+		std::vector<MatGeneric<FPP,Cpu> *> other_facs(this->begin(), this->end()-1);
+		TransformHelper<FPP, Cpu> sub_th(other_facs, (FPP) 1.0, /* opt_copy */false, /* cloning */ false, /* internal call */ true);
+		// 3. finally multiply this new Faust by v and return the result
+		auto vec = sub_th.multiply(v.data());
+		return vec;
+	}
+}
+
+template<typename FPP>
 Faust::Vect<FPP, Cpu> Faust::TransformHelper<FPP,Cpu>::sliceMultiply(const Slice &s, const FPP* x) const
 {
 	//TODO: manage conjugate case

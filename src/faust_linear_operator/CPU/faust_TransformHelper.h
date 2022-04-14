@@ -97,8 +97,10 @@ namespace Faust
 			virtual Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> &x, const bool transpose=false, const bool conjugate=false);
 			virtual Vect<FPP,Cpu> multiply(const FPP* x, const bool transpose=false, const bool conjugate=false);
 			virtual void multiply(const FPP* x, FPP* y, const bool transpose=false, const bool conjugate=false);
-			// Multiplies the slice s of this by the vector x (of size this->getNbCols())
+			// Multiplies the slice s of this by the vector x corresponding elements (x size is this->getNbCol())
 			Vect<FPP, Cpu> sliceMultiply(const Slice &s, const FPP* x) const;
+			// Multiplies the columns ids of this by the vector x corresponding elements (x size is this->getNbCol())
+			Vect<FPP, Cpu> indexMultiply(faust_unsigned_int* ids, size_t ids_len, const FPP* x) const;
 			// \brief multiply this by A (of size: this->getNbCol()*A_ncols) into C (buffers must be properly allocated from the callee).
 			virtual void multiply(const FPP* A, int A_ncols, FPP* C, const bool transpose=false, const bool conjugate=false);
 			//			MatDense<FPP,Cpu> multiply(const MatDense<FPP,Cpu> A) const;
