@@ -1,5 +1,8 @@
 #include "faust_Slice.h"
 
+#include <iostream>
+using namespace std;
+
 namespace Faust {
 
 	Slice::Slice(faust_unsigned_int start_id, faust_unsigned_int end_id)
@@ -48,5 +51,11 @@ namespace Faust {
 		s1.end_id = s2.end_id;
 		s2.start_id = tmp.start_id;
 		s2.end_id = tmp.end_id;
+	}
+
+	void Slice::display()
+	{
+		cout << "start_id:" << start_id << endl;
+		cout << "end_id:" << end_id << endl;
 	}
 }

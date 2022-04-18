@@ -20,6 +20,7 @@ namespace Faust
 		bool belong_to(Slice& s);
 		void copy(const Slice& s);
 
+		void display();
 		static void swap(Slice& s1, Slice& s2);
 
 	};
