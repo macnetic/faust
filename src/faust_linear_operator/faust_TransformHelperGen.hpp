@@ -1,4 +1,6 @@
 #include "faust_linear_algebra.h"
+#include <iostream>
+
 namespace Faust
 {
 	template<typename FPP, FDevice DEV>
@@ -57,7 +59,7 @@ namespace Faust
 		this->slices[1] = s[1];
 		this->is_sliced = true;
 		this->eval_sliced_Transform();
-		this->copy_mul_mode_state(*th);
+//		this->copy_mul_mode_state(*th);
 	}
 
 	template<typename FPP, FDevice DEV>
@@ -282,8 +284,19 @@ namespace Faust
 			std::vector<MatGeneric<FPP,DEV>*> factors((size_t) this->size());
 			faust_unsigned_int size = this->size();
 			MatGeneric<FPP,DEV>* gen_fac, *first_sub_fac, *last_sub_fac;
+			Slice first_fact_slice, last_fact_slice;
+			if(this->is_transposed)
+			{
+				first_fact_slice = this->slices[1];
+				last_fact_slice = this->slices[0];
+			}
+			else
+			{
+				first_fact_slice = this->slices[0];
+				last_fact_slice = this->slices[1];
+			}
 			gen_fac = this->transform->get_fact(0, cloning_fact);
-			first_sub_fac = gen_fac->get_rows(this->slices[0].start_id, this->slices[0].end_id-this->slices[0].start_id);
+			first_sub_fac = gen_fac->get_rows(first_fact_slice.start_id, first_fact_slice.end_id-first_fact_slice.start_id);
 			//		first_sub_fac->Display();
 			//
 			if(cloning_fact)
@@ -291,7 +304,7 @@ namespace Faust
 			if(size > 1)
 			{
 				gen_fac = this->transform->get_fact(size-1, cloning_fact);
-				last_sub_fac = gen_fac->get_cols(this->slices[1].start_id, this->slices[1].end_id-this->slices[1].start_id);
+				last_sub_fac = gen_fac->get_cols(last_fact_slice.start_id, last_fact_slice.end_id-last_fact_slice.start_id);
 				//		std::cout << "---" << std::endl;
 				//		last_sub_fac->Display();
 				if(cloning_fact)
@@ -312,7 +325,7 @@ namespace Faust
 			}
 			else
 			{ //only one factor
-				last_sub_fac = first_sub_fac->get_cols(this->slices[1].start_id, this->slices[1].end_id-this->slices[1].start_id);
+				last_sub_fac = first_sub_fac->get_cols(last_fact_slice.start_id, last_fact_slice.end_id-last_fact_slice.start_id);
 				delete first_sub_fac;
 				factors[0] = last_sub_fac;
 				factors.resize(1);
@@ -332,16 +345,8 @@ namespace Faust
 			Slice sr(start_row_id, end_row_id);
 			Slice sc(start_col_id, end_col_id);
 			Slice s[2];
-			if(this->is_transposed)
-			{
-				s[0] = sc;
-				s[1] = sr;
-			}
-			else
-			{
-				s[0] = sr;
-				s[1] = sc;
-			}
+			s[0] = sr;
+			s[1] = sc;
 			return new TransformHelper<FPP, DEV>(dynamic_cast<TransformHelper<FPP, DEV>*>(this), s);
 		}
 

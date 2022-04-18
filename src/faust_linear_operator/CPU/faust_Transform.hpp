@@ -690,19 +690,15 @@ double Faust::Transform<FPP,Cpu>::spectralNorm(const int nbr_iter_max, double th
 			return 0;
 		// The Faust can still be zero (without any of its factor being)
 		// this case will be detected in power_iteration
-		//std::cout<<"Faust debut spectralNorm"<<std::endl;
-		//std::cout<<"copy constructor"<<std::endl;
-		Faust::Transform<FPP,Cpu> AtA((*this)); // modif AL <FPP,Cpu>
-		//std::cout<<"transposition"<<std::endl;
+		Faust::Transform<FPP,Cpu> AtA((*this));
 		AtA.adjoint();
 		if (getNbCol() < getNbRow())
 		{
-			AtA.multiply((*this));
+			AtA.multiply(*this);
 		}else
 		{
-			AtA.multiplyLeft((*this));
+			AtA.multiplyLeft(*this);
 		}
-		//std::cout<<"Faust fin spectralNorm"<<std::endl;
 		FPP maxAbsValue = std::sqrt(Faust::power_iteration(AtA,nbr_iter_max,threshold,flag));
 		return absValue(maxAbsValue);
 

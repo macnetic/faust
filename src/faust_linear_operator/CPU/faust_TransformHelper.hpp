@@ -1743,4 +1743,30 @@ Faust::Vect<FPP, Cpu> Faust::TransformHelper<FPP,Cpu>::sliceMultiply(const Slice
 	}
 }
 
+	template<typename FPP>
+void Faust::TransformHelper<FPP, Cpu>::eval_sliced_Transform()
+{
+	// new transform object (to avoid modifying original Faust::Transform*) but the matrices are shared (not copied)
+	this->transform = make_shared<Transform<FPP,Cpu>>(this->transform->data, 1.0, false, /* cloning_fact */ false);
+	auto first_fact = this->transform->data[0];
+	auto last_fact = this->transform->data[size()-1];
+	Slice first_fact_slice, last_fact_slice;
+	if(this->is_transposed)
+	{
+		first_fact_slice = this->slices[1];
+		last_fact_slice = this->slices[0];
+	}
+	else
+	{
+		first_fact_slice = this->slices[0];
+		last_fact_slice = this->slices[1];
+	}
+	// Replace only the first and last factors if necessary
+	if(first_fact_slice.start_id != 0 || first_fact_slice.end_id != first_fact->getNbRow())
+		// the row slice is smaller than the first factor num of rows, replace the first factor
+		this->transform->replace(first_fact->get_rows(first_fact_slice.start_id, first_fact_slice.end_id-first_fact_slice.start_id), 0);
+	if(last_fact_slice.start_id != 0 || last_fact_slice.end_id != last_fact->getNbCol())
+		// the column slice is smaller than the last factor num of cols, replace the first factor
+		this->transform->replace(last_fact->get_cols(last_fact_slice.start_id, last_fact_slice.end_id-last_fact_slice.start_id), size()-1);
+}
 #include "faust_TransformHelper_cat.hpp"

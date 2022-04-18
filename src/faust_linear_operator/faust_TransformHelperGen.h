@@ -86,7 +86,7 @@ namespace Faust
 			virtual void copy_mul_mode_state(const TransformHelper<FPP,DEV>& th);
 			void copy_state(const TransformHelper<FPP,DEV>& th);
 			int get_mul_order_opt_mode() const;
-			void eval_sliced_Transform();
+			virtual void eval_sliced_Transform();
 			void eval_fancy_idx_Transform();
 			virtual TransformHelper<FPP, DEV>* slice(faust_unsigned_int start_row_id, faust_unsigned_int end_row_id,
 					faust_unsigned_int start_col_id, faust_unsigned_int end_col_id);
