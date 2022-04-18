@@ -15,12 +15,27 @@ namespace Faust
 		this->transform = th->transform;
 		this->is_transposed = transpose?!th->is_transposed:th->is_transposed;
 		this->is_conjugate = conjugate?!th->is_conjugate:th->is_conjugate;
+		if(th->is_sliced)
+		{
+			this->is_sliced = true;
+			if(transpose)
+			{
+				slices[0] = th->slices[1];
+				slices[1] = th->slices[0];
+			}
+			else
+			{
+				slices[0] = th->slices[0];
+				slices[1] = th->slices[1];
+			}
+		}
     }
 
 
 	template<typename FPP, FDevice DEV>
 	void TransformHelperGen<FPP,DEV>::init_fancy_idx_transform(TransformHelper<FPP,DEV>* th, faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols)
 	{
+		//TODO: lazy slicing, lazy indexing
 		this->transform = th->transform; //do not remove this line, necessary for eval*()
 		this->copy_transconj_state(*th);
 		this->is_sliced = false;
@@ -51,14 +66,14 @@ namespace Faust
 		void TransformHelperGen<FPP,DEV>::init_sliced_transform(TransformHelper<FPP,DEV>* th, Slice s[2])
 
 	{
-		this->transform = th->transform; //do not remove this line, necessary for eval_sliced_transform()
+		this->transform = th->transform; //do not remove this line, necessary for eval_sliced_Transform()
 		this->copy_transconj_state(*th);
 		if(! (s[0].belong_to(0, th->getNbRow()) || s[1].belong_to(0, th->getNbCol())))
 			handleError("Faust::TransformHelper::TransformHelper(TransformHelper,Slice)", "Slice overflows a Faust dimension.");
 		this->slices[0] = s[0];
 		this->slices[1] = s[1];
 		this->is_sliced = true;
-		this->eval_sliced_Transform();
+//		this->eval_sliced_Transform();
 //		this->copy_mul_mode_state(*th);
 	}
 
@@ -102,30 +117,39 @@ namespace Faust
 	template<typename FPP, FDevice DEV>
 		unsigned int TransformHelperGen<FPP,DEV>::get_fact_dim_size(const faust_unsigned_int id, unsigned short dim) const
 		{
-			//dim == 0 to get num of cols, >0 otherwise
-			faust_unsigned_int rid; //real id
-			if(this->is_transposed) {
-				rid = size()-id-1;
-				dim = !dim;
-			}
-			else {
-				rid = id;
-				//dim = dim;
-			}
-			MatGeneric<FPP,DEV>* mat;
-			if(rid == 0 || rid == this->size()-1)
-				mat = this->transform->get_fact(rid, false);
+			if(is_sliced && id == 0 && dim == 0)
+				return slices[0].size();
+			else if (is_sliced && id == size()-1 && dim == 1)
+				return slices[1].size();
 			else
-				mat = this->transform->get_fact(rid, false);
-			if(dim)
-				return mat->getNbCol();
-			else
-				return mat->getNbRow();
+			{
+				//dim == 0 to get num of cols, >0 otherwise
+				faust_unsigned_int rid; //real id
+				if(this->is_transposed) {
+					rid = size()-id-1;
+					dim = !dim;
+				}
+				else {
+					rid = id;
+					//dim = dim;
+				}
+				MatGeneric<FPP,DEV>* mat;
+				if(rid == 0 || rid == this->size()-1)
+					mat = this->transform->get_fact(rid, false);
+				else
+					mat = this->transform->get_fact(rid, false);
+				if(dim)
+					return mat->getNbCol();
+				else
+					return mat->getNbRow();
+			}
 		}
 
 	template<typename FPP, FDevice DEV>
 		faust_unsigned_int TransformHelperGen<FPP,DEV>::get_fact_nnz(const faust_unsigned_int id) const
 		{
+			if(is_sliced && (id == 0 || id == size()-1))
+				const_cast<Faust::TransformHelperGen<FPP, DEV>*>(this)->eval_sliced_Transform();
 			if(id == 0 || id == this->size()-1)
 				return this->transform->get_fact_nnz(this->is_transposed?size()-id-1:id);
 			else
@@ -164,6 +188,8 @@ namespace Faust
 				faust_unsigned_int* num_cols,
 				const bool transpose /* default to false */) const
 		{
+			if(is_sliced && (id == 0 || id == size()-1))
+				const_cast<Faust::TransformHelperGen<FPP, DEV>*>(this)->eval_sliced_Transform();
 			this->transform->get_fact(this->is_transposed?this->size()-id-1:id, elts, num_rows, num_cols, this->is_transposed ^ transpose);
 			if(this->is_conjugate)
 				conjugate(elts,*num_cols*(*num_rows));
@@ -179,6 +205,8 @@ namespace Faust
 				faust_unsigned_int* num_cols,
 				const bool transpose /* = false*/) const
 		{
+			if(is_sliced && (id == 0 || id == size()-1))
+				const_cast<Faust::TransformHelperGen<FPP, DEV>*>(this)->eval_sliced_Transform();
 			this->transform->get_fact(this->is_transposed?this->size()-id-1:id, rowptr, col_ids, elts, nnz, num_rows, num_cols, this->is_transposed ^ transpose);
 			if(this->is_conjugate)
 				Faust::conjugate(elts, *nnz);
@@ -188,6 +216,7 @@ namespace Faust
 		TransformHelper<FPP,DEV>* TransformHelperGen<FPP,DEV>::left(const faust_unsigned_int id, const bool copy /* default to false */) const
 		{
 			if(id >= this->size()) throw out_of_range("factor id is lower than zero or greater or equal to the size of Transform.");
+			const_cast<Faust::TransformHelperGen<FPP, DEV>*>(this)->eval_sliced_Transform();
 			std::vector<Faust::MatGeneric<FPP,DEV>*> left_factors;
 			for(int i=0; (faust_unsigned_int)i <= id; i++)
 				left_factors.push_back(const_cast<Faust::MatGeneric<FPP,DEV>*>(this->get_gen_fact(i)));
@@ -198,6 +227,7 @@ namespace Faust
 		TransformHelper<FPP,DEV>* TransformHelperGen<FPP,DEV>::right(const faust_unsigned_int id, const bool copy /* default to false */) const
 		{
 			if(id >= this->size()) throw out_of_range("factor id is lower than zero or greater or equal to the size of Transform.");
+			const_cast<Faust::TransformHelperGen<FPP, DEV>*>(this)->eval_sliced_Transform();
 			std::vector<Faust::MatGeneric<FPP,DEV>*> right_factors;
 			for(int i=id; (faust_unsigned_int)i < size(); i++)
 				right_factors.push_back(const_cast<Faust::MatGeneric<FPP,DEV>*>(this->get_gen_fact(i)));
@@ -207,10 +237,8 @@ namespace Faust
 	template<typename FPP, FDevice DEV>
 		faust_unsigned_int TransformHelperGen<FPP,DEV>::getNbRow() const
 		{
-			if(this->is_sliced){
-				faust_unsigned_int id = this->is_transposed?1:0;
-				return	this->slices[id].end_id-this->slices[id].start_id;
-			}
+			if(this->is_sliced)
+				return	this->slices[0].size();
 			else
 				return this->is_transposed?this->transform->getNbCol():this->transform->getNbRow();
 		}
@@ -219,10 +247,7 @@ namespace Faust
 		faust_unsigned_int TransformHelperGen<FPP,DEV>::getNbCol() const
 		{
 			if(this->is_sliced)
-			{
-				faust_unsigned_int id = this->is_transposed?0:1;
-				return this->slices[id].end_id-this->slices[id].start_id;
-			}
+				return this->slices[1].size();
 			else
 				return this->is_transposed?this->transform->getNbRow():this->transform->getNbCol();
 		}
@@ -344,9 +369,7 @@ namespace Faust
 		{
 			Slice sr(start_row_id, end_row_id);
 			Slice sc(start_col_id, end_col_id);
-			Slice s[2];
-			s[0] = sr;
-			s[1] = sc;
+			Slice s[2] = {sr, sc};
 			return new TransformHelper<FPP, DEV>(dynamic_cast<TransformHelper<FPP, DEV>*>(this), s);
 		}
 
@@ -406,6 +429,7 @@ namespace Faust
 	template<typename FPP, FDevice DEV>
 		TransformHelper<FPP,DEV>* TransformHelperGen<FPP,DEV>::optimize_storage(const bool time/*=false*/)
 		{
+			eval_sliced_Transform();
 //			throw std::runtime_error("optimize_storage is yet to implement in Faust C++ core for GPU.");
 //			return nullptr;
 			Faust::MatDense<FPP,DEV> *dfac = nullptr;
@@ -464,6 +488,7 @@ namespace Faust
 	template<typename FPP, FDevice DEV>
 		TransformHelper<FPP,DEV>* TransformHelperGen<FPP,DEV>::clone()
 		{
+			eval_sliced_Transform();
 			auto clone = new TransformHelper<FPP,DEV>(this->transform->getData(), /* lambda_ */(FPP)1.0, /*optimizedCopy*/false, /*cloning_fact*/ true, /*internal_call*/ true);
 			auto th = dynamic_cast<TransformHelper<FPP,DEV>*>(this);
 			clone->copy_transconj_state(*th);

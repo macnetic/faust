@@ -77,6 +77,8 @@ namespace Faust {
 		TransformHelper<FPP,Cpu>::TransformHelper(const TransformHelper<FPP,Cpu>* th_left, const TransformHelper<FPP,Cpu>* th_right)
 		: TransformHelper<FPP,Cpu>()
 		{
+			eval_sliced_Transform();
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(th_left)->eval_sliced_Transform();
 			bool right_left_transposed = th_left->is_transposed && th_right->is_transposed;
 			bool right_left_conjugate = th_left->is_conjugate && th_right->is_conjugate;
 			if(right_left_transposed)
@@ -131,6 +133,7 @@ namespace Faust {
 	template<typename FPP>
 		TransformHelper<FPP,Cpu>::TransformHelper(TransformHelper<FPP,Cpu>* th, faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols): TransformHelper<FPP,Cpu>()
 	{
+		eval_sliced_Transform();
 		this->init_fancy_idx_transform(th, row_ids, num_rows, col_ids, num_cols);
 	}
 
@@ -151,6 +154,7 @@ namespace Faust {
 	template<typename FPP>
 		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const MatSparse<FPP,Cpu> &A, const bool transpose /* deft to false */, const bool conjugate)
 		{
+			eval_sliced_Transform();
 			//TODO: refactor with multiply(MatDense)
 			this->is_transposed ^= transpose;
 			this->is_conjugate ^= conjugate;
@@ -220,6 +224,7 @@ namespace Faust {
 	template<typename FPP>
 		Vect<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const Vect<FPP,Cpu> &x, const bool transpose, const bool conjugate)
 		{
+			eval_sliced_Transform();
 			Vect<FPP,Cpu> v = std::move(this->transform->multiply(x,
 						this->transposed2char(this->is_transposed ^ transpose, this->is_conjugate ^ conjugate)));
 			return v;
@@ -228,6 +233,7 @@ namespace Faust {
 	template<typename FPP>
 		Vect<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const FPP *x, const bool transpose, const bool conjugate)
 		{
+			eval_sliced_Transform();
 			int x_size;
 			// assuming that x size is valid, infer it from this size
 			if(this->is_transposed ^ transpose)
@@ -241,6 +247,7 @@ namespace Faust {
 	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::multiply(const FPP *x, FPP* y, const bool transpose, const bool conjugate)
 		{
+			eval_sliced_Transform();
 			//TODO: move to Faust::Transform ?
 			// TODO: don't create vx, directly compute into y (as it's made for Faust-matrix product)
 			// x is a vector, it doesn't matter it's transpose or not, just keep the valid size to multiply against this Transform
@@ -259,6 +266,7 @@ namespace Faust {
 	template<typename FPP>
 		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const MatDense<FPP,Cpu> &A, const bool transpose, const bool conjugate)
 		{
+			//TODO: don't alter this state to multiply
 			this->is_transposed ^= transpose;
 			this->is_conjugate ^= conjugate;
 			Faust::MatDense<FPP,Cpu> M;
@@ -328,7 +336,8 @@ namespace Faust {
 	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::multiply(const FPP* A, int A_ncols, FPP* C, const bool transpose/*=false*/, const bool conjugate/*=false*/)
 		{
-			this->is_transposed ^= transpose;
+			eval_sliced_Transform();
+			this->is_transposed ^= transpose; //TODO: don't alter this state to multiply
 			this->is_conjugate ^= conjugate;
 			this->transform->multiply(A, A_ncols, C, this->isTransposed2char());
 			this->is_conjugate ^= conjugate;
@@ -338,6 +347,7 @@ namespace Faust {
 	template<typename FPP>
 		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::optimize(const bool transp /* deft to false */)
 		{
+			eval_sliced_Transform();
 			//TODO: need a nsamples argument to feed optimize_time*
 			Faust::TransformHelper<FPP,Cpu> *th = this->pruneout(/*nnz_tres=*/0), *th2;
 			th2 = th->optimize_storage(false);
@@ -350,6 +360,7 @@ namespace Faust {
 	template<typename FPP>
 		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::optimize_time(const bool transp /* deft to false */, const bool inplace, /* deft to 1 */ const int nsamples)
 		{
+			eval_sliced_Transform();
 			// choose the quickest method for the Faust "toarray"
 			auto t = this->optimize_time_full(transp, inplace, nsamples);
 			return t;
@@ -358,12 +369,14 @@ namespace Faust {
 	template<typename FPP>
 		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::optimize_time_full(const bool transp /* deft to false */, const bool inplace, /* deft to 1 */ const int nsamples)
 		{
+			eval_sliced_Transform();
 			return this->optimize_multiply([this](){this->get_product();}, transp, inplace, nsamples, "Faust-toarray");
 		}
 
 	template<typename FPP>
 		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::optimize_time_prod(const MatGeneric<FPP, Cpu>* test_mat, const bool transp /* deft to false */, const bool inplace, /* deft to 1 */ const int nsamples)
 		{
+			eval_sliced_Transform();
 			std::function<void(void)> benchmark_func;
 			auto md = dynamic_cast<const MatDense<FPP,Cpu>*>(test_mat);
 			auto ms = dynamic_cast<const MatSparse<FPP,Cpu>*>(test_mat);
@@ -379,6 +392,7 @@ namespace Faust {
 	template<typename FPP>
 		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::optimize_multiply(std::function<void()> f, const bool transp /* deft to false */, const bool inplace, /* deft to 1 */ const int nsamples, const char* op_name)
 		{
+			eval_sliced_Transform();
 			std::vector<string> meth_names = {"DEFAULT_L2R", "GREEDY_ALL_ENDS", "GREEDY_1ST_BEST", "GREEDY_ALL_BEST_CONVDENSE", "GREEDY", "DYNPROG", "CPP_PROD_PAR_REDUC", "OMP_PROD_PAR_REDUC", "TORCH_CPU_L2R", "TORCH_CPU_GREEDY","TORCH_CPU_DENSE_DYNPROG_SPARSE_L2R" }; //TODO: it should be a function of faust_prod_opt module
 			// GREEDY_ALL_BEST_GENMAT is printed out as GREEDY to follow the wrappers name
 			TransformHelper<FPP,Cpu>* t_opt = nullptr;
@@ -457,6 +471,7 @@ namespace Faust {
 	template<typename FPP>
 		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::pruneout(const int nnz_tres, const int npasses, const bool only_forward)
 		{
+			eval_sliced_Transform();
 			//TODO: refactor into src/algorithm/faust_pruneout.h/hpp in non-member function Faust::pruneout(TransformHelper<FPP,Cpu>& th, const int nnz_tres, const int npasses, const bool only_forward)
 			int _npasses = 0;
 			TransformHelper<FPP,Cpu> *pth = new TransformHelper<FPP,Cpu>(this->transform->data, 1.0);
@@ -588,6 +603,7 @@ namespace Faust {
 	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::update_total_nnz()
 		{
+			eval_sliced_Transform();
 			this->transform->update_total_nnz();
 		}
 
@@ -608,12 +624,14 @@ namespace Faust {
 	template<typename FPP>
 		TransformHelper<FPP, Cpu>* TransformHelper<FPP,Cpu>::multiply(const TransformHelper<FPP, Cpu>* th_right) const
 		{
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
 			return new TransformHelper<FPP,Cpu>(this, th_right);
 		}
 
 	template<typename FPP>
 		TransformHelper<FPP, Cpu>* TransformHelper<FPP,Cpu>::multiply(FPP& scalar)
 		{
+			eval_sliced_Transform();
 			const vector<MatGeneric<FPP,Cpu>*>& vec = this->transform->data; //TransformHelper is a friend class of Transform // we can access private attribute data
 			//the point here is to minimize the number of copies (with direct access)
 			// the constructor then will copy the factors from the vector
@@ -640,6 +658,7 @@ namespace Faust {
 	template<typename FPP>
 			void TransformHelper<FPP,Cpu>::push_back(const FPP* bdata, const int* brow_ptr, const int* bcol_inds, const int nrows, const int ncols, const int bnnz, const int bnrows, const int bncols, const bool optimizedCopy/*=false*/, const bool transpose/*=false*/, const bool conjugate/*=false*/)
 			{
+				eval_sliced_Transform();
 				auto bsr_mat = new MatBSR<FPP, Cpu>(nrows, ncols, bnrows, bncols, bnnz, bdata, brow_ptr, bcol_inds);
 				auto copying = optimizedCopy||transpose||conjugate;
 				this->push_back(bsr_mat, optimizedCopy, copying, transpose, conjugate);
@@ -649,6 +668,7 @@ namespace Faust {
 	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::push_back(const FPP* data, int nrows, int ncols, const bool optimizedCopy/*=famse*/, const bool transpose/*=famse*/, const bool conjugate/*=famse*/)
 		{
+			eval_sliced_Transform();
 			auto copying = optimizedCopy||transpose||conjugate;
 			auto dense_mat = new MatDense<FPP, Cpu>(data, nrows, ncols);
 			this->push_back(dense_mat, optimizedCopy, copying, transpose, conjugate);
@@ -658,6 +678,7 @@ namespace Faust {
 	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::push_back(const FPP* data, const int* row_ptr, const int* id_col, const int nnz, const int nrows, const int ncols, const bool optimizedCopy /* false by deft */, const bool transpose/*=false*/, const bool conjugate/*=false*/)
 		{
+			eval_sliced_Transform();
 			auto sparse_mat = new MatSparse<FPP,Cpu>(nnz, nrows, ncols, data, row_ptr, id_col);
 			auto copying = optimizedCopy||transpose||conjugate;
 			this->push_back(sparse_mat, optimizedCopy, copying, transpose, conjugate);
@@ -667,6 +688,7 @@ namespace Faust {
 	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::push_back(const MatGeneric<FPP,Cpu>* M, const bool optimizedCopy /* false by default */, const bool copying /* true to default */, const bool transpose/*=false*/, const bool conjugate/*=false*/, const bool verify_dims_agree/*=true*/)
 		{
+			eval_sliced_Transform();
 			//warning: should not be called after initialization of factors (to respect the immutability property)
 			//this function is here only for the python wrapper (TODO: see how to modify that wrapper in order to delete this function after or just use it internally -- not py/matfaust)
 			this->transform->push_back(M, optimizedCopy, transpose, conjugate, copying, verify_dims_agree); // 2nd argument is for opt. (possibly converting dense <-> sparse)
@@ -675,12 +697,14 @@ namespace Faust {
 	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::push_back(const MatGeneric<FPP,Cpu>* M, const bool optimizedCopy /* false by default */, const bool copying /* true to default */, const bool transpose/*=false*/, const bool conjugate/*=false*/)
 		{
+			eval_sliced_Transform();
 			this->push_back(M, optimizedCopy, copying, transpose, conjugate, /* verify_dims_agree */ true);
 		}
 
 	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::push_first(const MatGeneric<FPP,Cpu>* M, const bool optimizedCopy /* false by default */, const bool copying /* true to default */)
 		{
+			eval_sliced_Transform();
 			//warning: should not be called after initialization of factors (to respect the immutability property)
 			//this function is here only for python wrapper (TODO: see how to modify that wrapper in order to delete this function after or just use it internally -- not py/matfaust)
 			this->transform->push_first(M, optimizedCopy, this->is_conjugate, copying); //2nd argument is for opt. (possibly converting dense <-> sparse)
@@ -690,6 +714,7 @@ namespace Faust {
 		template<typename Head, typename ... Tail>
 		void TransformHelper<FPP,Cpu>::push_back_(Head& h, Tail&... t)
 		{
+			eval_sliced_Transform();
 //			for(auto f: h)
 //				this->push_back(f, false, false);
 			for(auto it=h.begin(); it < h.end(); it++)
@@ -710,6 +735,7 @@ namespace Faust {
 	template<typename FPP>
 		faust_unsigned_int TransformHelper<FPP,Cpu>::getNBytes() const
 		{
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
 			faust_unsigned_int nbytes = 0;
 			for(auto fac : this->transform->data)
 			{
@@ -739,12 +765,14 @@ namespace Faust {
 	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::display() const
 		{
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
 			std::cout << this->to_string() << std::endl;
 		}
 
 	template<typename FPP>
 		std::string TransformHelper<FPP,Cpu>::to_string() const
 		{
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
 			return this->transform->to_string(this->is_transposed);
 		}
 
@@ -752,12 +780,14 @@ namespace Faust {
 	template<typename FPP>
 	const MatGeneric<FPP,Cpu>* TransformHelper<FPP,Cpu>::get_gen_fact(const faust_unsigned_int id) const
 	{
+		const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
 		return this->transform->data[this->is_transposed?size()-id-1:id];
 	}
 
 template<typename FPP>
 	MatGeneric<FPP,Cpu>* TransformHelper<FPP,Cpu>::get_gen_fact_nonconst(const faust_unsigned_int id) const
 	{
+		const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
 		return this->transform->data[this->is_transposed?size()-id-1:id];
 	}
 
@@ -792,6 +822,7 @@ template<typename FPP>
 template<typename FPP>
 	void TransformHelper<FPP, Cpu>::convertToSparse()
 	{
+		eval_sliced_Transform();
 		const MatDense<FPP,Cpu> * mat_dense;
 		const MatSparse<FPP,Cpu> * mat_sparse;
 		const MatBSR<FPP,Cpu> * mat_bsr;
@@ -813,6 +844,7 @@ template<typename FPP>
 template<typename FPP>
 	void TransformHelper<FPP, Cpu>::convertToDense()
 	{
+		eval_sliced_Transform();
 		const MatDense<FPP,Cpu> * mat_dense;
 		const MatSparse<FPP,Cpu> * mat_sparse;
 		const MatBSR<FPP,Cpu> * mat_bsr;
@@ -853,6 +885,8 @@ template<typename FPP>
 			throw std::domain_error("get_fact(BSR): index out of bounds.");
 		if(this->get_fact_type(id) != BSR)
 			throw std::runtime_error("get_fact(BSR): matrix requested is not a MatBSR.");
+		if(this->is_sliced && (id == 0 || id == this->size()-1))
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
 		MatBSR<FPP, Cpu> *bmat = dynamic_cast<MatBSR<FPP, Cpu>*>(this->transform->data[id]);
 		bmat->copy_bdata(bdata);
 		bmat->copy_browptr(brow_ptr);
@@ -872,6 +906,8 @@ template<typename FPP>
 			throw std::domain_error("get_fact_bsr_info(BSR): index out of bounds.");
 		if(this->get_fact_type(id) != BSR)
 			throw std::runtime_error("get_fact_bsr_info(BSR): matrix requested is not a MatBSR.");
+		if(this->is_sliced && (id == 0 || id == this->size()-1))
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
 		MatBSR<FPP, Cpu> *bmat = dynamic_cast<MatBSR<FPP, Cpu>*>(this->transform->data[id]);
 		bmat->get_buf_sizes(bdata_sz, browptr_sz, bcolinds_sz);
 		bnnz = bmat->getNBlocks();
@@ -889,6 +925,8 @@ template<typename FPP>
 			faust_unsigned_int* num_rows,
 			faust_unsigned_int* num_cols) const
 	{
+		if(this->is_sliced && (id == 0 || id = this->size()-1))
+			eval_sliced_Transform();
 		this->transform->get_fact(this->is_transposed?this->size()-id-1:id, rowptr, col_ids, elts, nnz, num_rows, num_cols);
 
 	}
@@ -903,6 +941,8 @@ template<typename FPP>
 			faust_unsigned_int* num_cols,
 			const bool transpose /* = false*/) const
 	{
+		if(this->is_sliced && (id == 0 || id == this->size()-1))
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
 		this->transform->get_fact(this->is_transposed?this->size()-id-1:id, rowptr, col_ids, elts, nnz, num_rows, num_cols, this->is_transposed ^ transpose);
 		if(this->is_conjugate)
 			Faust::conjugate(elts, *nnz);
@@ -914,12 +954,16 @@ template<typename FPP>
 			faust_unsigned_int* num_rows,
 			faust_unsigned_int* num_cols) const
 	{
+		if(this->is_sliced && (id == 0 || id == this->size()-1))
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
 		this->transform->get_fact(this->is_transposed?this->size()-id-1:id, elts, num_rows, num_cols);
 	}
 
 template<typename FPP>
 	MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::get_fact(faust_unsigned_int id) const
 	{
+		if(this->is_sliced && (id == 0 || id == this->size()-1))
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
 		MatDense<FPP,Cpu> dense_factor;
 		MatGeneric<FPP,Cpu>* factor_generic;
 		factor_generic = this->transform->get_fact(this->is_transposed?size()-id-1:id);
@@ -958,6 +1002,8 @@ template<typename FPP>
 			faust_unsigned_int* num_cols,
 			const bool transpose /* default to false */) const
 	{
+		if(this->is_sliced && (id == 0 || id == this->size()-1))
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
 		this->transform->get_fact(this->is_transposed?this->size()-id-1:id, elts, num_rows, num_cols, this->is_transposed ^ transpose);
 		if(this->is_conjugate)
 			Faust::conjugate(elts,*num_cols*(*num_rows));
@@ -969,6 +1015,7 @@ template<typename FPP>
 template<typename FPP>
 	MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::get_product(const int mul_order_opt_mode/*=-1*/) // const
 	{
+		eval_sliced_Transform();
 		int old_FM_mul_mod = -1;
 		MatDense<FPP, Cpu> P;
 		// keep current mul mode to restore it on the function end
@@ -1005,6 +1052,7 @@ template<typename FPP>
 template<typename FPP>
 	void TransformHelper<FPP,Cpu>::get_product(Faust::MatDense<FPP,Cpu>& prod, const int mul_order_opt_mode/*=-1*/) //const
 	{
+		eval_sliced_Transform();
 		if(mul_order_opt_mode != DEFAULT_L2R)
 			prod = this->get_product(mul_order_opt_mode);
 		else
@@ -1014,6 +1062,7 @@ template<typename FPP>
 template<typename FPP>
 	void TransformHelper<FPP,Cpu>::save_mat_file(const char* filepath) const
 	{
+		const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
 		this->transform->save_mat_file(filepath, this->is_transposed, this->is_conjugate);
 	}
 
@@ -1032,6 +1081,7 @@ template<typename FPP>
 template<typename FPP>
 	double TransformHelper<FPP,Cpu>::spectralNorm(const int nbr_iter_max, double threshold, int &flag) const
 	{
+		const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
 //			std::cout << "TransformHelper<FPP,Cpu>::spectralNorm" << std::endl;
 		vector <MatGeneric<FPP, Cpu>*>& orig_facts = this->transform->data;
 		int start_id, end_id;
@@ -1050,6 +1100,7 @@ template<typename FPP>
 template<typename FPP>
 	FPP Faust::TransformHelper<FPP,Cpu>::power_iteration(const faust_unsigned_int nbr_iter_max, const Real<FPP>& threshold, int & flag) const
 	{
+		const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
 		return this->transform->power_iteration(nbr_iter_max, threshold, flag);
 	}
 
@@ -1075,18 +1126,21 @@ template<typename FPP>
 template<typename FPP>
 	double TransformHelper<FPP,Cpu>::normL1(const bool full_array/*=true*/, const int batch_sz/*=1*/) const
 	{
+		const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
 		return this->transform->normL1(this->is_transposed, full_array, batch_sz);
 	}
 
 template<typename FPP>
 	double TransformHelper<FPP,Cpu>::normInf(const bool full_array/*=true*/, const int batch_sz/*=1*/) const
 	{
+		const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
 		return this->transform->normInf(this->is_transposed, full_array, batch_sz);
 	}
 
 template<typename FPP>
 	double TransformHelper<FPP,Cpu>::normFro(const bool full_array/*=true*/, const int batch_sz/*=1*/) const
 	{
+		const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
 		vector <MatGeneric<FPP, Cpu>*>& orig_facts = this->transform->data;
 		int start_id, end_id;
 		this->transform->get_nonortho_interior_prod_ids(start_id, end_id);
@@ -1102,6 +1156,7 @@ template<typename FPP>
 template<typename FPP>
 	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::normalize(const int meth /* 1 for 1-norm, 2 for 2-norm (2-norm), -1 for inf-norm */) const
 	{
+		const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
 		unsigned int ncols = this->getNbCol();
 		unsigned int nrows = this->getNbRow();
 		//2-norm parameters
@@ -1379,18 +1434,23 @@ template<typename FPP>
 template<typename FPP>
 	Faust::transf_iterator<FPP> Faust::TransformHelper<FPP, Cpu>::begin() const
 	{
+		const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
 		return this->transform->begin();
 	}
 
 template<typename FPP>
 	Faust::transf_iterator<FPP> Faust::TransformHelper<FPP, Cpu>::end() const
 	{
+		const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
 		return this->transform->end();
 	}
 
 template<typename FPP>
 	void Faust::TransformHelper<FPP,Cpu>::pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id, const int mul_order_opt_mode/*=DEFAULT_L2R*/)
 	{
+		if(this->is_sliced && (start_id == 0 || end_id == size()-1))
+			eval_sliced_Transform();
+		// else no end factors is concerned by the packing, keep the "virtual" slice as is
 		if(start_id < 0 || start_id >= size())
 			throw out_of_range("start_id is out of range.");
 		if(end_id < 0 || end_id >= size())
@@ -1401,6 +1461,7 @@ template<typename FPP>
 			//nothing to do except converting to MatDense if start_id
 			//factor is a MatSparse
 			packed_fac = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(*(begin()+start_id));
+			//TODO: and MatBSR, MatDiag ?
 			if(packed_fac == nullptr)
 			{// factor start_id is not at MatDense, convert it
 				packed_fac = new MatDense<FPP,Cpu>(*dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(*(begin()+start_id)));
@@ -1447,6 +1508,7 @@ template<typename FPP>
 			const bool inplace/*=false*/,
 			const bool check_transpose/*=true*/)
 {
+	eval_sliced_Transform();
 	if(check_transpose && this->is_transposed)
 		return swap_cols(id1, id2, permutation, inplace, false);
 	TransformHelper<FPP,Cpu>* t = nullptr;
@@ -1491,6 +1553,7 @@ template<typename FPP>
 			const bool inplace/*=false*/,
 			const bool check_transpose/*=true*/)
 {
+	eval_sliced_Transform();
 	if(check_transpose && this->is_transposed)
 		return swap_rows(id1, id2, permutation, inplace, false);
 	TransformHelper<FPP,Cpu>* t = nullptr;
@@ -1746,27 +1809,32 @@ Faust::Vect<FPP, Cpu> Faust::TransformHelper<FPP,Cpu>::sliceMultiply(const Slice
 	template<typename FPP>
 void Faust::TransformHelper<FPP, Cpu>::eval_sliced_Transform()
 {
-	// new transform object (to avoid modifying original Faust::Transform*) but the matrices are shared (not copied)
-	this->transform = make_shared<Transform<FPP,Cpu>>(this->transform->data, 1.0, false, /* cloning_fact */ false);
-	auto first_fact = this->transform->data[0];
-	auto last_fact = this->transform->data[size()-1];
-	Slice first_fact_slice, last_fact_slice;
-	if(this->is_transposed)
+	if(this->is_sliced)
 	{
-		first_fact_slice = this->slices[1];
-		last_fact_slice = this->slices[0];
+		// new transform object (to avoid modifying original Faust::Transform*) but the matrices are shared (not copied)
+		this->transform = make_shared<Transform<FPP,Cpu>>(this->transform->data, 1.0, false, /* cloning_fact */ false);
+		auto first_fact = this->transform->data[0];
+		Slice first_fact_slice, last_fact_slice;
+		if(this->is_transposed)
+		{
+			first_fact_slice = this->slices[1];
+			last_fact_slice = this->slices[0];
+		}
+		else
+		{
+			first_fact_slice = this->slices[0];
+			last_fact_slice = this->slices[1];
+		}
+		// Replace only the first and last factors if necessary
+		if(first_fact_slice.start_id != 0 || first_fact_slice.end_id != first_fact->getNbRow())
+			// the row slice is smaller than the first factor num of rows, replace the first factor
+			this->transform->replace(first_fact->get_rows(first_fact_slice.start_id, first_fact_slice.size()), 0);
+		auto last_fact = this->transform->data[size()-1]; // if first_fact is the last fact, it may have changed since first_fact was read
+		if(last_fact_slice.start_id != 0 || last_fact_slice.end_id != last_fact->getNbCol())
+			// the column slice is smaller than the last factor num of cols, replace the first factor
+			this->transform->replace(last_fact->get_cols(last_fact_slice.start_id, last_fact_slice.size()), size()-1);
+		// now that the sliced was evaluated, consider this Transform as a basic one
+		this->is_sliced = false;
 	}
-	else
-	{
-		first_fact_slice = this->slices[0];
-		last_fact_slice = this->slices[1];
-	}
-	// Replace only the first and last factors if necessary
-	if(first_fact_slice.start_id != 0 || first_fact_slice.end_id != first_fact->getNbRow())
-		// the row slice is smaller than the first factor num of rows, replace the first factor
-		this->transform->replace(first_fact->get_rows(first_fact_slice.start_id, first_fact_slice.end_id-first_fact_slice.start_id), 0);
-	if(last_fact_slice.start_id != 0 || last_fact_slice.end_id != last_fact->getNbCol())
-		// the column slice is smaller than the last factor num of cols, replace the first factor
-		this->transform->replace(last_fact->get_cols(last_fact_slice.start_id, last_fact_slice.end_id-last_fact_slice.start_id), size()-1);
 }
 #include "faust_TransformHelper_cat.hpp"
