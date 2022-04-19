@@ -1740,7 +1740,8 @@ Faust::Vect<FPP, Cpu> Faust::TransformHelper<FPP,Cpu>::sliceMultiply(const Slice
 	//TODO: manage conjugate case
 	using Vec = Eigen::Matrix<FPP, Eigen::Dynamic, 1>;
 	using VecMap = Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>>;
-	VecMap x_map(const_cast<FPP*>(x), this->is_transposed?this->getNbRow():this->getNbCol()); // the const_cast is harmless, no modif. is made
+	VecMap x_map(const_cast<FPP*>(x), this->getNbCol()); // the const_cast is harmless, no modif. is made
+														 // getNbCol is transpose aware
 	MatDense<FPP, Cpu>* ds_fac;
 	MatSparse<FPP, Cpu>* sp_fac;
 //	MatBSR<FPP, Cpu>* bsr_fac; // TODO
@@ -1776,12 +1777,12 @@ Faust::Vect<FPP, Cpu> Faust::TransformHelper<FPP,Cpu>::sliceMultiply(const Slice
 		if(ds_fac = dynamic_cast<MatDense<FPP, Cpu>*>(gen_first_fac))
 		{
 			// 1.2 multiply the slice of the factor by the slice of the vector
-			v = ds_fac->mat.transpose().block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * x_map.block(s1.start_id, 0, s1.size(), 1);
+			v = ds_fac->mat.transpose().block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * x_map;
 		}
 		else if(sp_fac = dynamic_cast<MatSparse<FPP, Cpu>*>(gen_first_fac))
 		{
 			// 1.2 multiply the slice of the factor by the slice of the vector
-			v = sp_fac->mat.transpose().block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * x_map.block(s1.start_id, 0, s1.size(), 1);
+			v = sp_fac->mat.transpose().block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * x_map;
 		}
 		else
 		{
@@ -1811,12 +1812,12 @@ Faust::Vect<FPP, Cpu> Faust::TransformHelper<FPP,Cpu>::sliceMultiply(const Slice
 		if(ds_fac = dynamic_cast<MatDense<FPP, Cpu>*>(gen_last_fac))
 		{
 			// 1.2 multiply the slice of the factor by the slice of the vector
-			v = ds_fac->mat.block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * x_map.block(s1.start_id, 0, s1.size(), 1);
+			v = ds_fac->mat.block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * x_map;
 		}
 		else if(sp_fac = dynamic_cast<MatSparse<FPP, Cpu>*>(gen_last_fac))
 		{
 			// 1.2 multiply the slice of the factor by the slice of the vector
-			v = sp_fac->mat.block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * x_map.block(s1.start_id, 0, s1.size(), 1);
+			v = sp_fac->mat.block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * x_map;
 		}
 		else
 		{

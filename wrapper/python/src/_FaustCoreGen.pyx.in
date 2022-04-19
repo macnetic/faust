@@ -126,7 +126,7 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
         cdef @TYPE@ [:] y_data
         x_data = x.data
         nbrow = self.@CORE_OBJ@.getNbRow()
-        if(self.@CORE_OBJ@.getNbCol() != x.size): raise ValueError("Dimensions"
+        if(col_end_id-col_start_id != x.size): raise ValueError("Dimensions"
                                                                   " must agree")
         y_data_arr = np.empty((nbrow), dtype=np.@TYPE@, order='F') # we don't know beforehand Y nnz
         y_data = y_data_arr
