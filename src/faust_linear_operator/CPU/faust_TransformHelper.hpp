@@ -1735,7 +1735,7 @@ Faust::Vect<FPP, Cpu> Faust::TransformHelper<FPP,Cpu>::indexMultiply(faust_unsig
 }
 
 template<typename FPP>
-Faust::Vect<FPP, Cpu> Faust::TransformHelper<FPP,Cpu>::sliceMultiply(const Slice &s, const FPP* x) const
+Faust::Vect<FPP, Cpu> Faust::TransformHelper<FPP,Cpu>::sliceMultiply(const Slice s[2], const FPP* x) const
 {
 	//TODO: manage conjugate case
 	using Vec = Eigen::Matrix<FPP, Eigen::Dynamic, 1>;
@@ -1745,51 +1745,78 @@ Faust::Vect<FPP, Cpu> Faust::TransformHelper<FPP,Cpu>::sliceMultiply(const Slice
 	MatSparse<FPP, Cpu>* sp_fac;
 //	MatBSR<FPP, Cpu>* bsr_fac; // TODO
 	Vec v;
-	auto x_size = s.end_id-s.start_id+1;
+	auto s0 = s[0]; // row slice
+	auto s1 = s[1]; // column slice
+	int rf_row_offset, rf_nrows;
+	auto gen_first_fac = *(this->begin());
+	auto gen_last_fac = *(this->end()-1);
+	MatGeneric<FPP, Cpu>* left_sliced_factor = nullptr;
+	std::vector<MatGeneric<FPP,Cpu> *> other_facs;
+	Vect<FPP, Cpu> vec;
+	if(size() == 1)
+	{
+		// might be row and column slicing on the right factor
+		rf_row_offset = s0.start_id;
+		rf_nrows = s0.size();
+	}
+	else
+	{
+		// only column slicing on the right factor
+		rf_row_offset = 0;
+		if(this->is_transposed)
+			rf_nrows = gen_first_fac->getNbCol();
+		else
+			rf_nrows = gen_last_fac->getNbRow();
+	}
+	//TODO: x_map should be on full size
 	if(this->is_transposed)
 	{
-		// 1. multiply the first factor sliced according to s to the corresponding portion of x in the new vector x_
+		// 1. multiply the first factor sliced according to s1 to the corresponding portion of x in the new vector x_
 		// 1.1 get the first factor
-		auto gen_first_fac = *(this->begin());
 		if(ds_fac = dynamic_cast<MatDense<FPP, Cpu>*>(gen_first_fac))
 		{
 			// 1.2 multiply the slice of the factor by the slice of the vector
-			v = ds_fac->mat.transpose().block(0, s.start_id, ds_fac->getNbRow(), x_size) * x_map.block(s.start_id, 0, x_size, 1);
+			v = ds_fac->mat.transpose().block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * x_map.block(s1.start_id, 0, s1.size(), 1);
 		}
 		else if(sp_fac = dynamic_cast<MatSparse<FPP, Cpu>*>(gen_first_fac))
 		{
 			// 1.2 multiply the slice of the factor by the slice of the vector
-			v = sp_fac->mat.transpose().block(0, s.start_id, sp_fac->getNbRow(), x_size) * x_map.block(s.start_id, 0, x_size, 1);
+			v = sp_fac->mat.transpose().block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * x_map.block(s1.start_id, 0, s1.size(), 1);
 		}
 		else
 		{
 			throw std::runtime_error("Only MatDense and MatSparse factors are handled by sliceMultiply op for the moment.");
 		}
-		// 2. then create a subFaust with all factors except the first one (copy-free)
 		if(size() == 1)
 			return Vect<FPP, Cpu>(gen_first_fac->getNbCol(), v.data()); // TODO: a copy could be avoided
-		std::vector<MatGeneric<FPP,Cpu> *> other_facs(this->begin()+1, this->end());
+		// 2. then create a subFaust with all factors except the first one (copy-free)
+		// but a slicing on rows is also possible on the left factor
+		if(s0.start_id != 0 || s0.end_id != gen_last_fac->getNbCol())
+		{
+			other_facs.assign(this->begin()+1, this->end()-1);
+			left_sliced_factor = gen_first_fac;
+		}
+		else
+			other_facs.assign(this->begin()+1, this->end());
 		TransformHelper<FPP, Cpu> sub_th(other_facs, (FPP) 1.0, /* opt_copy */false, /* cloning */ false, /* internal call */ true);
 		// 3. finally multiply this new Faust by v and return the result
 		auto sub_th_t = sub_th.transpose();
-		auto vec = sub_th_t->multiply(v.data());
+		vec = sub_th_t->multiply(v.data());
 		delete sub_th_t;
-		return vec;
 	}
 	else
 	{
-		// 1. multiply the last factor sliced according to s to the corresponding portion of x in the new vector x_
+		// 1. multiply the last factor sliced according to s1 to the corresponding portion of x in the new vector x_
 		// 1.1 get the last factor
-		auto gen_last_fac = *(this->end()-1);
 		if(ds_fac = dynamic_cast<MatDense<FPP, Cpu>*>(gen_last_fac))
 		{
 			// 1.2 multiply the slice of the factor by the slice of the vector
-			v = ds_fac->mat.block(0, s.start_id, ds_fac->getNbRow(), x_size) * x_map.block(s.start_id, 0, x_size, 1);
+			v = ds_fac->mat.block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * x_map.block(s1.start_id, 0, s1.size(), 1);
 		}
 		else if(sp_fac = dynamic_cast<MatSparse<FPP, Cpu>*>(gen_last_fac))
 		{
 			// 1.2 multiply the slice of the factor by the slice of the vector
-			v = sp_fac->mat.block(0, s.start_id, sp_fac->getNbRow(), x_size) * x_map.block(s.start_id, 0, x_size, 1);
+			v = sp_fac->mat.block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * x_map.block(s1.start_id, 0, s1.size(), 1);
 		}
 		else
 		{
@@ -1798,12 +1825,39 @@ Faust::Vect<FPP, Cpu> Faust::TransformHelper<FPP,Cpu>::sliceMultiply(const Slice
 		// 2. then create a subFaust with all factors except the last one (copy-free)
 		if(size() == 1)
 			return Vect<FPP, Cpu>(gen_last_fac->getNbRow(), v.data()); // TODO: a copy could be avoided
-		std::vector<MatGeneric<FPP,Cpu> *> other_facs(this->begin(), this->end()-1);
+		// but a slicing on rows is also possible on the left factor
+		if(s0.start_id != 0 || s0.end_id != gen_first_fac->getNbRow())
+		{
+			std::cout << "slicing also on rows" << std::endl;
+			other_facs.assign(this->begin()+1, this->end()-1);
+			left_sliced_factor = gen_first_fac;
+		}
+		else
+			other_facs.assign(this->begin(), this->end()-1);
 		TransformHelper<FPP, Cpu> sub_th(other_facs, (FPP) 1.0, /* opt_copy */false, /* cloning */ false, /* internal call */ true);
+		sub_th.display();
 		// 3. finally multiply this new Faust by v and return the result
-		auto vec = sub_th.multiply(v.data());
-		return vec;
+		vec = sub_th.multiply(v.data());
 	}
+	if(other_facs.size() < this->size()-1)
+	{
+		// slicing on the left too with last factor
+		if(ds_fac = dynamic_cast<MatDense<FPP, Cpu>*>(left_sliced_factor))
+		{
+			// 1.2 multiply the slice of the factor by vec
+			v = ds_fac->mat.transpose().block(s0.start_id, 0, s0.size(), vec.size()) * vec.vec;
+		}
+		else if(sp_fac = dynamic_cast<MatSparse<FPP, Cpu>*>(left_sliced_factor))
+		{
+			// 1.2 multiply the slice of the factor by vec
+			v = sp_fac->mat.transpose().block(s0.start_id, 0, s0.size(), vec.size()) * vec.vec;
+		}
+		else
+		{
+			throw std::runtime_error("Only MatDense and MatSparse factors are handled by sliceMultiply op for the moment.");
+		}
+	}
+	return vec;
 }
 
 	template<typename FPP>
