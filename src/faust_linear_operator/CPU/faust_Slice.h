@@ -22,6 +22,7 @@ namespace Faust
 
 		void display();
 		static void swap(Slice& s1, Slice& s2);
+		size_t size() const;
 
 	};
 

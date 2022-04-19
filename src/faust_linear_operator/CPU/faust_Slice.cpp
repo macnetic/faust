@@ -58,4 +58,9 @@ namespace Faust {
 		cout << "start_id:" << start_id << endl;
 		cout << "end_id:" << end_id << endl;
 	}
+
+	size_t Slice::size() const
+	{
+		return end_id - start_id;
+	}
 }
