@@ -139,14 +139,14 @@ FaustCoreCpp<@TYPE@,Cpu>* FaustCoreCpp<@TYPE@,Cpu>::read_from_mat_file(const cha
 }
 
 template<>
-void FaustCoreCpp<@TYPE@,Cpu>::colSliceMultiply(unsigned long int j1, unsigned long int j2, const @TYPE@* vec_data, @TYPE@* vec_out) const
+void FaustCoreCpp<@TYPE@,Cpu>::colSliceMultiply(unsigned long int j1, unsigned long int j2, const @TYPE@* data, unsigned long int data_ncols, @TYPE@* out) const
 {
-    Faust::Vect<@TYPE@, Cpu> y;
+    Faust::MatDense<@TYPE@, Cpu> y;
     Faust::Slice s[2];
     s[0] = Faust::Slice(0, this->transform->getNbRow());
     s[1] = Faust::Slice(j1, j2);
-    y = this->transform->sliceMultiply(s, vec_data);
-    memcpy(vec_out, y.getData(), sizeof(@TYPE@)*y.size()); // TODO: this copy could be avoided
+    y = this->transform->sliceMultiply(s, data, data_ncols);
+    memcpy(out, y.getData(), sizeof(@TYPE@)*y.getNbRow()*y.getNbCol()); // TODO: this copy could be avoided
 }
 
 template<>

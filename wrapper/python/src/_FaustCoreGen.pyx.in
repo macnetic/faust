@@ -130,8 +130,7 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
                                                                   " must agree")
         y_data_arr = np.empty((nbrow), dtype=np.@TYPE@, order='F') # we don't know beforehand Y nnz
         y_data = y_data_arr
-        self.@CORE_OBJ@.colSliceMultiply(col_start_id, col_end_id, &x_data[0],
-                                      &y_data[0])
+        self.@CORE_OBJ@.colSliceMultiply(col_start_id, col_end_id, &x_data[0], 1, &y_data[0])
         return y_data_arr
 
     def indexMultiply(self, ids, x):

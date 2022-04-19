@@ -17,8 +17,7 @@ cdef extern from "FaustCoreCpp.h":
         void set_FM_mul_mode(const int mode, const bool silent);
         # Faust-by-csr product -> dense mat
         void multiply(FPP* y_data, int y_nrows, int y_ncols, FPP* x_data, int* x_row_ptr, int* x_id_col, int x_nnz, int x_nrows, int x_ncols);
-        void colSliceMultiply(unsigned long int start_id, unsigned long int
-                           end_id, const FPP* x_data, FPP* out_data) const
+        void colSliceMultiply(unsigned long int j1, unsigned long int j2, const FPP* data, unsigned long int data_ncols, FPP* vec_out) const
         void indexMultiply(unsigned long int *ids, unsigned long int ids_len, const FPP* x_data, FPP* out_data) const
         unsigned int getNbRow() const
         unsigned int getNbCol() const
