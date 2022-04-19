@@ -2897,7 +2897,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         return F
 
     def sliceMultiply(F, start_col_id, end_col_id, vec):
-        return F.m_faust.sliceMultiply(start_col_id, end_col_id, vec)
+        return F.m_faust.colSliceMultiply(start_col_id, end_col_id, vec)
 
     def indexMultiply(F, ids, vec):
         ids = ids if isinstance(ids, np.ndarray) else np.array(ids)
