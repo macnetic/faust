@@ -70,8 +70,17 @@ namespace Faust
 		this->copy_transconj_state(*th);
 		if(! (s[0].belong_to(0, th->getNbRow()) || s[1].belong_to(0, th->getNbCol())))
 			handleError("Faust::TransformHelper::TransformHelper(TransformHelper,Slice)", "Slice overflows a Faust dimension.");
-		this->slices[0] = s[0];
-		this->slices[1] = s[1];
+		if(th->is_sliced)
+		{
+			// the original Faust is already sliced, combine slices
+			this->slices[0] = Slice(s[0].start_id+th->slices[0].start_id, s[0].end_id+th->slices[0].start_id);
+			this->slices[1] = Slice(s[1].start_id+th->slices[1].start_id, s[1].end_id+th->slices[1].start_id);
+		}
+		else
+		{
+			this->slices[0] = s[0];
+			this->slices[1] = s[1];
+		}
 		this->is_sliced = true;
 //		this->eval_sliced_Transform();
 //		this->copy_mul_mode_state(*th);
@@ -361,6 +370,7 @@ namespace Faust
 				for(faust_unsigned_int i = 0; i < size; i++)
 					delete factors[i];
 			}
+			this->is_sliced = false;
 		}
 
 	template<typename FPP, FDevice DEV>
