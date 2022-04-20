@@ -145,8 +145,7 @@ void FaustCoreCpp<@TYPE@,Cpu>::colSliceMultiply(unsigned long int j1, unsigned l
     Faust::Slice s[2];
     s[0] = Faust::Slice(0, this->transform->getNbRow());
     s[1] = Faust::Slice(j1, j2);
-    y = this->transform->sliceMultiply(s, data, data_ncols);
-    memcpy(out, y.getData(), sizeof(@TYPE@)*y.getNbRow()*y.getNbCol()); // TODO: this copy could be avoided
+    this->transform->sliceMultiply(s, data, out, data_ncols);
 }
 
 template<>
