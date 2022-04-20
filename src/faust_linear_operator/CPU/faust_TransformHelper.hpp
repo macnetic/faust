@@ -1796,6 +1796,7 @@ FPP* Faust::TransformHelper<FPP,Cpu>::sliceMultiply(const Slice s[2], const FPP*
 	MatMap out_map(out, s[0].size(), X_ncols);
 	FPP* tmp_ptr;
 	int tmp_nrows;
+	
 	if(size() == 1)
 	{
 		// might be row and column slicing on the right factor
@@ -1819,17 +1820,29 @@ FPP* Faust::TransformHelper<FPP,Cpu>::sliceMultiply(const Slice s[2], const FPP*
 		{
 			// 1.2 multiply the slice of the factor by the slice of the vector
 			if(size() == 1)
-				out_map = ds_fac->mat.transpose().block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * X_map;
+				if(this->is_conjugate)
+					out_map = ds_fac->mat.adjoint().block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * X_map;
+				else
+					out_map = ds_fac->mat.transpose().block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * X_map;
 			else
-				M = ds_fac->mat.transpose().block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * X_map;
+				if(this->is_conjugate)
+					M = ds_fac->mat.adjoint().block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * X_map;
+				else
+					M = ds_fac->mat.transpose().block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * X_map;
 		}
 		else if(sp_fac = dynamic_cast<MatSparse<FPP, Cpu>*>(gen_first_fac))
 		{
 			// 1.2 multiply the slice of the factor by the slice of the vector
 			if(size() == 1)
-				out_map = sp_fac->mat.transpose().block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * X_map;
+				if(this->is_conjugate)
+					out_map = sp_fac->mat.adjoint().block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * X_map;
+				else
+					out_map = sp_fac->mat.transpose().block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * X_map;
 			else
-				M = sp_fac->mat.transpose().block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * X_map;
+				if(this->is_conjugate)
+					M = sp_fac->mat.adjoint().block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * X_map;
+				else
+					M = sp_fac->mat.transpose().block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * X_map;
 		}
 		else
 		{
@@ -1854,7 +1867,11 @@ FPP* Faust::TransformHelper<FPP,Cpu>::sliceMultiply(const Slice s[2], const FPP*
 		}
 		TransformHelper<FPP, Cpu> sub_th(other_facs, (FPP) 1.0, /* opt_copy */false, /* cloning */ false, /* internal call */ true);
 		// 3. finally multiply this new Faust by M and return the result
-		auto sub_th_t = sub_th.transpose();
+		TransformHelper<FPP, Cpu> *sub_th_t;
+		if(this->is_conjugate)
+			sub_th_t = sub_th.adjoint();
+		else
+			sub_th_t = sub_th.transpose();
 		sub_th_t->multiply(M.data(), M.cols(), tmp_ptr);
 		delete sub_th_t;
 	}
@@ -1866,17 +1883,29 @@ FPP* Faust::TransformHelper<FPP,Cpu>::sliceMultiply(const Slice s[2], const FPP*
 		{
 			// 1.2 multiply the slice of the factor by the slice of the vector
 			if(size() == 1)
-				out_map = ds_fac->mat.block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * X_map;
+				if(this->is_conjugate)
+					out_map = ds_fac->mat.conjugate().block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * X_map;
+				else
+					out_map = ds_fac->mat.block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * X_map;
 			else
-				M = ds_fac->mat.block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * X_map;
+				if(this->is_conjugate)
+					M = ds_fac->mat.conjugate().block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * X_map;
+				else
+					M = ds_fac->mat.block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * X_map;
 		}
 		else if(sp_fac = dynamic_cast<MatSparse<FPP, Cpu>*>(gen_last_fac))
 		{
 			// 1.2 multiply the slice of the factor by the slice of the vector
 			if(size() == 1)
-				out_map = sp_fac->mat.block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * X_map;
+				if(this->is_conjugate)
+					out_map = sp_fac->mat.conjugate().block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * X_map;
+				else
+					out_map = sp_fac->mat.block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * X_map;
 			else
-				M = sp_fac->mat.block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * X_map;
+				if(this->is_conjugate)
+					M = sp_fac->mat.conjugate().block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * X_map;
+				else
+					M = sp_fac->mat.block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * X_map;
 		}
 		else
 		{
@@ -1899,25 +1928,38 @@ FPP* Faust::TransformHelper<FPP,Cpu>::sliceMultiply(const Slice s[2], const FPP*
 			other_facs.assign(this->transform->begin(), this->transform->end()-1);
 			tmp_ptr = out;
 		}
-		TransformHelper<FPP, Cpu> sub_th(other_facs, (FPP) 1.0, /* opt_copy */false, /* cloning */ false, /* internal call */ true);
 		// 3. finally multiply this new Faust by M and return the result
-		sub_th.multiply(M.data(), M.cols(), tmp_ptr);
+		TransformHelper<FPP, Cpu> sub_th(other_facs, (FPP) 1.0, /* opt_copy */false, /* cloning */ false, /* internal call */ true);
+		if(this->is_conjugate)
+		{
+			auto sub_th_c = sub_th.conjugate();
+			sub_th_c->multiply(M.data(), M.cols(), tmp_ptr);
+			delete sub_th_c;
+		}
+		else
+			sub_th.multiply(M.data(), M.cols(), tmp_ptr);
 	}
 	if(left_sliced_factor != nullptr)
 	{
-		MatMap tmp_map(tmp_ptr, tmp_nrows, X_ncols);
 		// slice left factor too
+		MatMap tmp_map(tmp_ptr, tmp_nrows, X_ncols);
 		if(ds_fac = dynamic_cast<MatDense<FPP, Cpu>*>(left_sliced_factor))
 		{
 			// 1.2 multiply the slice of the factor by mat
 			Mat tmp;
 			if(this->is_transposed)
 			{
-				tmp = ds_fac->mat.transpose();
+				if(this->is_conjugate)
+					tmp = ds_fac->mat.adjoint();
+				else
+					tmp = ds_fac->mat.transpose();
 			}
 			else
 			{
-				tmp = ds_fac->mat;
+				if(this->is_conjugate)
+					tmp = ds_fac->mat.conjugate();
+				else
+					tmp = ds_fac->mat;
 			}
 			out_map = tmp.block(s0.start_id, 0, s0.size(), tmp.cols()) * tmp_map;
 		}
@@ -1926,9 +1968,15 @@ FPP* Faust::TransformHelper<FPP,Cpu>::sliceMultiply(const Slice s[2], const FPP*
 			// 1.2 multiply the slice of the factor by mat
 			Eigen::SparseMatrix<FPP, Eigen::RowMajor> tmp;
 			if(this->is_transposed)
-				tmp = sp_fac->mat.transpose();
+				if(this->is_conjugate)
+					tmp = sp_fac->mat.adjoint();
+				else
+					tmp = sp_fac->mat.transpose();
 			else
-				tmp = sp_fac->mat;
+				if(this->is_conjugate)
+					tmp = sp_fac->mat.conjugate();
+				else
+					tmp = sp_fac->mat;
 			out_map = tmp.block(s0.start_id, 0, s0.size(), tmp.cols()) * tmp_map;
 		}
 		else

@@ -124,11 +124,11 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
     def colSliceMultiply(self, col_start_id, col_end_id, x):
         cdef @TYPE@ [:] x_data
         cdef @TYPE@ [:] y_data
-        x_data = x.data
+        x_data = x.astype(type2dtype('@TYPE@')).data
         nbrow = self.@CORE_OBJ@.getNbRow()
         if(col_end_id-col_start_id != x.size): raise ValueError("Dimensions"
                                                                   " must agree")
-        y_data_arr = np.empty((nbrow), dtype=np.@TYPE@, order='F') # we don't know beforehand Y nnz
+        y_data_arr = np.empty((nbrow), dtype=type2dtype('@TYPE@'), order='F') # we don't know beforehand Y nnz
         y_data = y_data_arr
         self.@CORE_OBJ@.colSliceMultiply(col_start_id, col_end_id, &x_data[0], 1, &y_data[0])
         return y_data_arr
