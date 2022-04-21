@@ -312,65 +312,38 @@ namespace Faust
 		}
 
 	template<typename FPP, FDevice DEV>
-		void TransformHelperGen<FPP, DEV>::eval_sliced_Transform()
+		void Faust::TransformHelperGen<FPP, DEV>::eval_sliced_Transform()
 		{
-			bool cloning_fact = true;
-			std::vector<MatGeneric<FPP,DEV>*> factors((size_t) this->size());
-			faust_unsigned_int size = this->size();
-			MatGeneric<FPP,DEV>* gen_fac, *first_sub_fac, *last_sub_fac;
-			Slice first_fact_slice, last_fact_slice;
-			if(this->is_transposed)
+			if(this->is_sliced)
 			{
-				first_fact_slice = this->slices[1];
-				last_fact_slice = this->slices[0];
-			}
-			else
-			{
-				first_fact_slice = this->slices[0];
-				last_fact_slice = this->slices[1];
-			}
-			gen_fac = this->transform->get_fact(0, cloning_fact);
-			first_sub_fac = gen_fac->get_rows(first_fact_slice.start_id, first_fact_slice.end_id-first_fact_slice.start_id);
-			//		first_sub_fac->Display();
-			//
-			if(cloning_fact)
-				delete gen_fac;
-			if(size > 1)
-			{
-				gen_fac = this->transform->get_fact(size-1, cloning_fact);
-				last_sub_fac = gen_fac->get_cols(last_fact_slice.start_id, last_fact_slice.end_id-last_fact_slice.start_id);
-				//		std::cout << "---" << std::endl;
-				//		last_sub_fac->Display();
-				if(cloning_fact)
-					delete gen_fac;
-				factors.reserve(size);
-				factors.insert(factors.begin(), first_sub_fac);
-				if(size > 2)
+				// new transform object (to avoid modifying original Faust::Transform*) but the matrices are shared (not copied)
+				vector<Faust::MatGeneric<FPP, DEV>*> factors;
+				for(auto ite=transform->begin(); ite != transform->end(); ite++)
+					factors.push_back(*ite);
+				this->transform = make_shared<Transform<FPP,DEV>>(factors, 1.0, false, /* cloning_fact */ false);
+				auto first_fact = factors[0];
+				Slice first_fact_slice, last_fact_slice;
+				if(this->is_transposed)
 				{
-					for(faust_unsigned_int i = 1; i < size-1; i++)
-					{
-						gen_fac = this->transform->get_fact(i, cloning_fact);
-						factors[i] = gen_fac;
-					}
-
+					first_fact_slice = this->slices[1];
+					last_fact_slice = this->slices[0];
 				}
-				factors.insert(factors.begin()+(size-1), last_sub_fac);
-				factors.resize(size);
+				else
+				{
+					first_fact_slice = this->slices[0];
+					last_fact_slice = this->slices[1];
+				}
+				// Replace only the first and last factors if necessary
+				if(first_fact_slice.start_id != 0 || first_fact_slice.end_id != first_fact->getNbRow())
+					// the row slice is smaller than the first factor num of rows, replace the first factor
+					this->transform->replace(first_fact->get_rows(first_fact_slice.start_id, first_fact_slice.size()), 0);
+				auto last_fact = factors[size()-1]; // if first_fact is the last fact, it may have changed since first_fact was read
+				if(last_fact_slice.start_id != 0 || last_fact_slice.end_id != last_fact->getNbCol())
+					// the column slice is smaller than the last factor num of cols, replace the first factor
+					this->transform->replace(last_fact->get_cols(last_fact_slice.start_id, last_fact_slice.size()), size()-1);
+				// now that the sliced was evaluated, consider this Transform as a basic one
+				this->is_sliced = false;
 			}
-			else
-			{ //only one factor
-				last_sub_fac = first_sub_fac->get_cols(last_fact_slice.start_id, last_fact_slice.end_id-last_fact_slice.start_id);
-				delete first_sub_fac;
-				factors[0] = last_sub_fac;
-				factors.resize(1);
-			}
-			this->transform = make_shared<Transform<FPP,DEV>>(factors, 1.0, false, cloning_fact);
-			if(cloning_fact)
-			{
-				for(faust_unsigned_int i = 0; i < size; i++)
-					delete factors[i];
-			}
-			this->is_sliced = false;
 		}
 
 	template<typename FPP, FDevice DEV>

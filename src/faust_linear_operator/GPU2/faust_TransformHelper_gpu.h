@@ -130,6 +130,7 @@ namespace Faust
 				TransformHelper<FPP,GPU2> read_from_mat_file(const char* filepath);
 				static int get_mat_file_type(const char* filepath);
 				FPP get_item(faust_unsigned_int i, faust_unsigned_int j);
+				void init_sliced_transform(TransformHelper<FPP,GPU2>* th, Slice s[2]);
 				virtual ~TransformHelper() {};
 				static TransformHelper<FPP,GPU2>* hadamardFaust(unsigned int n, const bool norma=true);
 				static TransformHelper<FPP,GPU2>* fourierFaust(unsigned int n, const bool norma=true);

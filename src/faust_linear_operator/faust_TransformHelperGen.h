@@ -103,7 +103,7 @@ namespace Faust
 
 		protected:
 			void init_fancy_idx_transform(TransformHelper<FPP,DEV>* th, faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols);
-			void init_sliced_transform(TransformHelper<FPP,DEV>* th, Slice s[2]);
+			virtual void init_sliced_transform(TransformHelper<FPP,DEV>* th, Slice s[2]);
 			bool is_transposed;
 			bool is_conjugate;
 			bool is_sliced;

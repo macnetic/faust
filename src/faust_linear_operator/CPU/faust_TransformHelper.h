@@ -245,7 +245,6 @@ namespace Faust
 			FPP get_item(faust_unsigned_int i, faust_unsigned_int j);
 			template<typename FPP2>
 			TransformHelper<Real<FPP2>, Cpu>* real();
-			void eval_sliced_Transform();
 		};
 
 

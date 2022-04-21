@@ -863,6 +863,13 @@ namespace Faust
             throw std::runtime_error("TransformHelper<FPP,GPU2>::get_fact error: GPU2 doesn't support the BSR matrix yet.");
         }
 
+	template<typename FPP>
+		void TransformHelper<FPP,GPU2>::init_sliced_transform(TransformHelper<FPP,GPU2>* th, Slice s[2])
+		{
+			TransformHelperGen<FPP, GPU2>::init_sliced_transform(th, s);
+			//TODO: lazy slicing for GPU2 as for CPU (it needs to implement sliceMultiply too)
+			this->eval_sliced_Transform();
+		}
 }
 
 #include "faust_TransformHelper_cat_gpu.hpp"
