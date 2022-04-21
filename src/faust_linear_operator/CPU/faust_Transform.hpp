@@ -1556,6 +1556,93 @@ int Faust::Transform<FPP,Cpu>::max_ncols() const
 	return max_ncols;
 }
 
+// don't use this function, it is slower even if it allows to avoid copies (use rather Vect multiply(Vect))
+// the function is not deleted just for matter of comparison
+template<typename FPP>
+void Faust::Transform<FPP,Cpu>::multiply(const FPP* v, FPP* v_out, const char opThis/*='N'*/) const
+{
+	int rhs_nrows, out_nrows;
+	int i, fac_i;
+	int max_nrows;
+	FPP *tmp_buf1, *tmp_buf2;
+	auto rhs_buf = v;
+	FPP* out_buf = nullptr;
+	MatSparse<FPP, Cpu>* sp_mat = nullptr;
+	MatDense<FPP, Cpu>* ds_mat = nullptr;
+	MatBSR<FPP, Cpu>* bsr_mat = nullptr;
+	std::function<int(int)> get_fac_i, calc_out_nrows;
+	using SparseMat = Eigen::SparseMatrix<FPP,Eigen::RowMajor>;
+	using DenseMat = Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>;
+	using Vec = Eigen::Matrix<FPP, Eigen::Dynamic, 1>;
+	using VecMap = Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>>;
+	using BSRMat = BSRMat<FPP, 0>;
+	std::function<void(SparseMat&, VecMap&,  VecMap&)> mul_sp_mat;
+	std::function<void(DenseMat&, VecMap&,  VecMap&)> mul_ds_mat;
+	std::function<void(BSRMat&, VecMap&,  VecMap&)> mul_bsr_mat;
+	std::function<DenseMat(DenseMat&)> op_dsmat;
+	std::function<SparseMat(SparseMat&)> op_spmat;
+	std::function<BSRMat(BSRMat&)> op_bsrmat;
+	if(opThis == 'N')
+	{
+		max_nrows = this->max_nrows();
+		rhs_nrows = this->getNbCol();
+		get_fac_i = [this](int i) {return this->size()-1-i;};
+		calc_out_nrows = [this](int i) { return this->data[i]->getNbRow();};
+		op_spmat = [](SparseMat& sp_mat) {return sp_mat;};
+		op_dsmat = [](DenseMat& ds_mat) {return ds_mat;};
+		op_bsrmat = [](BSRMat& bsr_mat) {return bsr_mat;};
+	}
+	else
+	{
+		max_nrows = this->max_ncols();
+		rhs_nrows = this->getNbRow();
+		get_fac_i = [this](int i) {return i;};
+		calc_out_nrows = [this](int i) { return this->data[i]->getNbCol();};
+		if(opThis == 'T')
+		{
+			op_spmat = [](SparseMat& sp_mat) {return sp_mat.transpose();};
+			op_dsmat = [](DenseMat& ds_mat) {return ds_mat.transpose();};
+			op_bsrmat = [](BSRMat& bsr_mat) {return bsr_mat.transpose();};
+		}
+		else if(opThis == 'H')
+		{
+			op_spmat = [](SparseMat& sp_mat) {return sp_mat.adjoint();};
+			op_dsmat = [](DenseMat& ds_mat) {return ds_mat.adjoint();};
+			op_bsrmat = [](BSRMat& bsr_mat) {return bsr_mat.adjoint();};
+		}
+		else
+			throw std::runtime_error("Unknown opThis");
+	}
+	mul_ds_mat = [&op_dsmat](DenseMat& ds_mat, VecMap& rhs_vec, VecMap& out_vec) {out_vec.noalias() = op_dsmat(ds_mat) *  rhs_vec;};
+	mul_sp_mat = [&op_spmat](SparseMat& sp_mat, VecMap& rhs_vec,  VecMap& out_vec) { out_vec.noalias() = op_spmat(sp_mat) * rhs_vec;};
+	mul_bsr_mat = [&op_bsrmat](BSRMat& bsr_mat, VecMap& rhs_vec,  VecMap& out_vec) { out_vec.noalias() = op_bsrmat(bsr_mat).mul(rhs_vec);};
+	tmp_buf1 = new FPP[max_nrows];
+	tmp_buf2 = new FPP[max_nrows];
+	for(i=0; i < this->size(); i++)
+	{
+		if(i == size()-1)
+			out_buf = v_out;
+		else
+			out_buf = i&1?tmp_buf1:tmp_buf2;
+		fac_i = get_fac_i(i);
+		out_nrows = calc_out_nrows(fac_i);
+		VecMap out_vec(const_cast<FPP*>(out_buf), out_nrows);
+		VecMap rhs_vec(const_cast<FPP*>(rhs_buf), rhs_nrows);
+		if(sp_mat = dynamic_cast<MatSparse<FPP, Cpu>*>(data[fac_i]))
+			mul_sp_mat(sp_mat->mat, rhs_vec, out_vec);
+		else if(ds_mat = dynamic_cast<MatDense<FPP, Cpu>*>(data[fac_i]))
+			mul_ds_mat(ds_mat->mat, rhs_vec, out_vec);
+		else if(bsr_mat = dynamic_cast<MatBSR<FPP, Cpu>*>(data[fac_i]))
+			mul_bsr_mat(bsr_mat->bmat, rhs_vec, out_vec);
+		else
+			throw std::runtime_error(std::string("Unknown matrix at index: ")+std::to_string(fac_i));
+		rhs_buf = out_buf;
+		rhs_nrows = out_vec.rows();
+	}
+	delete [] tmp_buf1;
+	delete [] tmp_buf2;
+}
+
 template<typename FPP>
 void Faust::Transform<FPP,Cpu>::multiply(const FPP* A, int A_ncols, FPP* C, const char opThis/*='N'*/) const
 {

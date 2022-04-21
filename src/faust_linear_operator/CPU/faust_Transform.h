@@ -312,6 +312,11 @@ namespace Faust
 				 */
 				void multiply(const FPP* A, int A_ncols, FPP* C, const char opThis='N') const;
 
+
+				// don't use this function, it is slower even if it allows to avoid copies (use rather Vect multiply(Vect))
+				// the function is not deleted just for matter of comparison
+				void multiply(const FPP* v, FPP* v_out, const char opThis='N') const;
+
 				MatSparse<FPP,Cpu> multiply(const MatSparse<FPP,Cpu> &A,const char opThis='N') const;
 
 

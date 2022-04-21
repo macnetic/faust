@@ -224,17 +224,14 @@ namespace Faust {
 	template<typename FPP>
 		Vect<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const Vect<FPP,Cpu> &x, const bool transpose, const bool conjugate)
 		{
-			//TODO: why not calling the prototype multiply(FPP* x) from here, no need to reimplement
+			// the prototypes below use this function
 			Vect<FPP,Cpu> v;
 			if(this->is_sliced)
-			{
-				auto mat = sliceMultiply(this->slices, x.getData(), 1); //TODO: take transpose and conjugate into account
-				v.resize(mat.getNbRow());
-				memcpy(v.getData(), mat.getData(), sizeof(FPP)*mat.getNbRow()); // TODO: avoid this copy
-			}
+				return this->multiply(x.getData(), transpose, conjugate); // this->is_sliced will be checked twice but it doesn't really matter (it is more important to factorize the code)
 			else
 				v = std::move(this->transform->multiply(x,
 							this->transposed2char(this->is_transposed ^ transpose, this->is_conjugate ^ conjugate)));
+				//NOTE: the function below depends on this one for the non-sliced case
 			return v;
 		}
 
@@ -251,27 +248,28 @@ namespace Faust {
 			{
 				//TODO: manage transpose and conjugate
 				Vect<FPP, Cpu> v;
-				v.resize(x_size);
-				auto mat =	sliceMultiply(this->slices, x, 1);
-				memcpy(v.getData(), mat.getData(), sizeof(FPP)*mat.getNbRow()); // TODO: avoid this copy
+				int v_size;
+				if(this->is_transposed ^ transpose)
+					v_size = this->transform->getNbCol();
+				else
+					v_size = this->transform->getNbRow();
+				v.resize(v_size);
+				sliceMultiply(this->slices, x, v.getData(), 1);
 				return v;
 			}
 			else
 			{
 				Vect<FPP, Cpu> vx(x_size, x);
 				return std::move(this->multiply(vx, transpose, conjugate));
+				// do not use the prototype below because it results in fact in a larger number of copies
 			}
 		}
 
 	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::multiply(const FPP *x, FPP* y, const bool transpose, const bool conjugate)
 		{
-//			this->eval_sliced_Transform();
-			//TODO: move to Faust::Transform ?
-			// TODO: don't create vx, directly compute into y (as it's made for Faust-matrix product)
-			// x is a vector, it doesn't matter it's transpose or not, just keep the valid size to multiply against this Transform
-			// however x and y are supposed to be allocated to the good sizes
 			if(this->is_sliced)
+				//TODO: manage transpose and conjugate
 				sliceMultiply(this->slices, x, y, 1);
 			else
 			{
@@ -284,6 +282,8 @@ namespace Faust {
 				Vect<FPP, Cpu> vx(x_size, x);
 				auto y_vec = std::move(this->multiply(vx, transpose, conjugate));
 				memcpy(y, y_vec.getData(), sizeof(FPP)*y_vec.size());
+				// this alternative call is commented out because even if it avoids all copies made above, it is slower because the method above keeps only one Eigen vector to compute the whole product contrary to the following function that uses two vectors (output and operand vectors), which is slower
+//				this->transform->multiply(x, y, this->transposed2char(this->is_transposed ^ transpose, this->is_conjugate ^ conjugate));
 			}
 		}
 
