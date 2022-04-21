@@ -100,6 +100,7 @@ namespace Faust
 
 	template<typename FPP,FDevice DEVICE> class Transform;
 	template<typename FPP> class TransformHelperPoly;
+	template<typename FPP, FDevice DEVICE> class TransformHelper;
 
 
 
@@ -117,6 +118,7 @@ namespace Faust
 
 		friend class MatBSR<FPP, Cpu>;
 		friend TransformHelperPoly<FPP>; // TODO: limit to needed member functions only
+		friend TransformHelper<FPP,Cpu>; // TODO: limit to needed member functions only (sliceMultiply at least)
 
         public :
         Vect() : dim(0), vec() {}
