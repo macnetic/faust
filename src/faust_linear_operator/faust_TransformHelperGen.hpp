@@ -337,7 +337,7 @@ namespace Faust
 				if(first_fact_slice.start_id != 0 || first_fact_slice.end_id != first_fact->getNbRow())
 					// the row slice is smaller than the first factor num of rows, replace the first factor
 					this->transform->replace(first_fact->get_rows(first_fact_slice.start_id, first_fact_slice.size()), 0);
-				auto last_fact = factors[size()-1]; // if first_fact is the last fact, it may have changed since first_fact was read
+				auto last_fact = *(transform->end()-1); // if first_fact is also the last fact, it may have changed since first_fact was read
 				if(last_fact_slice.start_id != 0 || last_fact_slice.end_id != last_fact->getNbCol())
 					// the column slice is smaller than the last factor num of cols, replace the first factor
 					this->transform->replace(last_fact->get_cols(last_fact_slice.start_id, last_fact_slice.size()), size()-1);
