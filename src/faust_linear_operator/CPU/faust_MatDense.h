@@ -590,11 +590,22 @@ namespace Faust
 
 			void print_timers()const;
 #endif
+			/**
+			 * \brief index this(row_ids, col_ids) Eigen matrix and mutliplies the result by in_mat into out_mat (two Eigen dense matrices of respective types MatType1, MatTyp2)
+			 *
+			 */
+			template<typename MatType1, typename MatType2>
+				void eigenIndexMul(const faust_unsigned_int* row_ids, const faust_unsigned_int* col_ids, size_t nrows, size_t ncols, const MatType1 &in_mat, MatType2 &out_mat, bool transpose = false, bool conjugate = false);
+
+
 		};
 
 	// \brief Computes the Kronecker product A \otimes B into out.
 	template<typename FPP>
 			void kron(const MatDense<FPP,Cpu> &A, const MatDense<FPP, Cpu> &B, MatDense<FPP,Cpu>& out);
+
+
+
 }
 
 #include "faust_MatDense.hpp"

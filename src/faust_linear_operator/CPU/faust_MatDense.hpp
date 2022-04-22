@@ -1763,6 +1763,64 @@ std::vector<std::pair<int,int>> MatDense<FPP, Cpu>::get_antidiag_indices(int ind
 	return indices;
 }
 
+	template<typename FPP>
+	template<typename MatType1, typename MatType2>
+void MatDense<FPP, Cpu>::eigenIndexMul(const faust_unsigned_int* row_ids, const faust_unsigned_int* col_ids, size_t nrows, size_t ncols, const MatType1 &in_mat, MatType2 &out_mat, bool transpose/* = false*/, bool conjugate /*= false*/)
+{
+	if(row_ids == nullptr && col_ids == nullptr)
+	{
+		auto tmp = mat(Eigen::all, Eigen::all);
+		if(transpose && conjugate)
+			out_mat = tmp.adjoint() * in_mat;
+		else if(transpose)
+			out_mat = tmp.adjoint() * in_mat;
+		else if(conjugate)
+			out_mat = tmp.conjugate() * in_mat;
+		else
+			out_mat = tmp * in_mat;
+	}
+	else if(row_ids == nullptr && col_ids != nullptr)
+	{
+
+		std::vector<int> vec_cols(col_ids, col_ids+ncols);
+		if(transpose && conjugate)
+			out_mat = mat(vec_cols, Eigen::all).adjoint() * in_mat;
+		else if(transpose)
+			out_mat = mat(vec_cols, Eigen::all).transpose() * in_mat;
+		else if(conjugate)
+			out_mat = mat(Eigen::all, vec_cols).conjugate() * in_mat;
+		else
+			out_mat = mat(Eigen::all, vec_cols) * in_mat;
+	}
+	else if(row_ids != nullptr && col_ids == nullptr)
+	{
+
+		std::vector<int> vec_rows(col_ids, col_ids+nrows);
+		if(transpose && conjugate)
+			out_mat = mat(Eigen::all, vec_rows).adjoint() * in_mat;
+		else if(transpose)
+			out_mat = mat(Eigen::all, vec_rows).transpose() * in_mat;
+		else if(conjugate)
+			out_mat = mat(vec_rows, Eigen::all).conjugate() * in_mat;
+		else
+			out_mat = mat(vec_rows, Eigen::all) * in_mat;
+	}
+	else // if(row_ids != nullptr && col_ids != nullptr)
+	{
+
+		std::vector<int> vec_rows(col_ids, col_ids+nrows);
+		std::vector<int> vec_cols(col_ids, col_ids+ncols);
+		if(transpose && conjugate)
+			out_mat = mat(vec_cols, vec_rows).adjoint() * in_mat;
+		else if(transpose)
+			out_mat = mat(vec_cols, vec_rows).transpose() * in_mat;
+		else if(conjugate)
+			out_mat = mat(vec_rows, vec_cols).conjugate() * in_mat;
+		else
+			out_mat = mat(vec_rows, vec_cols) * in_mat;
+	}
+}
+
 #ifdef __COMPILE_TIMERS__
 template<typename FPP>
 Timer MatDense<FPP,Cpu>::t_constr;
@@ -1838,5 +1896,7 @@ void MatDense<FPP,Cpu>::print_timers()const
 	std::cout << "t_add_ext         = " << t_add_ext.get_time()         << " s for "<< t_add_ext.get_nb_call()         << " calls" << std::endl<<std::endl<<std::endl;
 }
 #endif
+
+
 }
 #endif
