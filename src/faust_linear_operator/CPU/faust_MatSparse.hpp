@@ -1536,4 +1536,72 @@ bool Faust::MatSparse<FPP,Cpu>::containsNaN() const
 {
 	return Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>>(const_cast<FPP*>(getValuePtr()) /* no worry, just a read access */, getNonZeros(), 1).hasNaN();
 }
+
+namespace Faust {
+	template<typename FPP>
+		template<typename MatType1, typename MatType2>
+		void MatSparse<FPP, Cpu>::eigenIndexMul(const faust_unsigned_int* row_ids, const faust_unsigned_int* col_ids, size_t nrows, size_t ncols, const MatType1 &in_mat, MatType2 &out_mat, bool transpose/* = false*/, bool conjugate /*= false*/)
+		{
+			if(row_ids == nullptr && col_ids == nullptr)
+			{
+				if(transpose && conjugate)
+					out_mat = mat.adjoint() * in_mat;
+				else if(transpose)
+					out_mat = mat.adjoint() * in_mat;
+				else if(conjugate)
+					out_mat = mat.conjugate() * in_mat;
+				else
+					out_mat = mat * in_mat;
+			}
+			else if(row_ids == nullptr && col_ids != nullptr)
+			{
+				out_mat = MatType1::Zero(transpose?mat.cols():mat.rows(), ncols);
+				auto dim_size = transpose?nrows:ncols;
+				for(int i=0;i < dim_size; i++)
+				{
+					if(transpose && conjugate)
+						out_mat += mat.row(col_ids[i]).adjoint() * in_mat.row(i);
+					else if(transpose)
+						out_mat += mat.row(col_ids[i]).transpose() * in_mat.row(i);
+					else if(conjugate)
+						out_mat += mat.col(col_ids[i]).conjugate() * in_mat.row(i);
+					else
+						out_mat += mat.col(col_ids[i]) * in_mat.row(i);
+				}
+			}
+			else if(row_ids != nullptr && col_ids == nullptr)
+			{
+				SpMat tmp(nrows,transpose?mat.rows():mat.cols());
+				#pragma omp parallel for
+				for(int i=0;i<nrows;i++)
+					if(transpose && conjugate)
+						tmp.row(i) = mat.col(row_ids[i]).adjoint();
+					else if(transpose)
+						tmp.row(i) = mat.col(row_ids[i]).transpose();
+					else if(conjugate)
+						tmp.row(i) = mat.row(row_ids[i]).conjugate();
+					else
+						tmp.row(i) = mat.row(row_ids[i]);
+				out_mat = tmp*in_mat;
+			}
+			else // if(row_ids != nullptr && col_ids != nullptr)
+			{
+				SpMat tmp(nrows, ncols);
+				for(int i = 0; i < nrows; i++)
+				{
+					for(int j = 0; j < ncols; j++)
+					{
+					  auto e = tmp.coeffRef(i, j);
+					  if(transpose)
+						  e = mat.coeff(col_ids[j], row_ids[j]);
+					  else
+						  e = mat.coeff(row_ids[j], col_ids[j]);
+					}
+				}
+				if(conjugate)
+					tmp = tmp.conjugate();
+				out_mat = tmp * in_mat;
+			}
+		}
+}
 #endif

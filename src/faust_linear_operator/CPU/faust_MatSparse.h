@@ -421,6 +421,12 @@ namespace Faust
 
 			template<typename FPP2>
 				MatSparse<FPP2, Cpu> to_real() const;
+			/**
+			 * \brief index this(row_ids, col_ids) Eigen matrix and mutliplies the result by in_mat into out_mat (two Eigen dense matrices of respective types MatType1, MatTyp2)
+			 *
+			 */
+			template<typename MatType1, typename MatType2>
+				void eigenIndexMul(const faust_unsigned_int* row_ids, const faust_unsigned_int* col_ids, size_t nrows, size_t ncols, const MatType1 &in_mat, MatType2 &out_mat, bool transpose = false, bool conjugate = false);
 
 
 			bool containsNaN() const;
@@ -436,12 +442,12 @@ namespace Faust
 			//! Destructor
 			~MatSparse(){/*std::cout<<"destructor MatSparse"<<std::endl;*//*this->mat.resize(0,0);*/}
 
+			using SpMat = Eigen::SparseMatrix<FPP,Eigen::RowMajor>;
 			private:
 			void update_dim(){this->dim1=mat.rows();this->dim2=mat.cols();nnz=mat.nonZeros();}
 			static const char * m_className;
 
 
-			private:
 			Eigen::SparseMatrix<FPP,Eigen::RowMajor> mat;
 
 			//! number of non-zero
