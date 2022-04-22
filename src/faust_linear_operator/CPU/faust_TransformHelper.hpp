@@ -1687,23 +1687,24 @@ Faust::Vect<FPP, Cpu> Faust::TransformHelper<FPP,Cpu>::indexMultiply(faust_unsig
 	std::sort(vec_ids.begin(), vec_ids.end()); // mandatory in order to assign v elements in proper order
 	if(this->is_transposed)
 	{
-		// 1. multiply the first factor sliced according to s to the corresponding portion of x in the new vector x_
+		// 1. multiply the first factor indexed according to ids by x
 		// 1.1 get the first factor
 		auto gen_first_fac = *(this->begin());
 		if(ds_fac = dynamic_cast<MatDense<FPP, Cpu>*>(gen_first_fac))
 		{
-			// 1.2 multiply the ids columns of the factor by the corresponding entries of the vector
+			// 1.2 multiply the ids columns of the factor by x
 //			auto a = ds_fac->mat.transpose().eval();
-			v = ds_fac->mat.transpose()(Eigen::placeholders::all, vec_ids) * x_map(vec_ids);
+			v = ds_fac->mat.transpose()(Eigen::placeholders::all, vec_ids) * x_map;
 		}
 		else if(sp_fac = dynamic_cast<MatSparse<FPP, Cpu>*>(gen_first_fac))
 		{
-			// 1.2 multiply the ids columns of the factor by the corresponding entries of the vector
+			// 1.2 multiply the ids columns of the factor by x
 			// 'Eigen::SparseMatrix<FPP, 0>' does not provide a call operator
-			//			v = a(Eigen::placeholders::all, vec_ids) * x_map(vec_ids);
+			//			v = a(Eigen::placeholders::all, vec_ids) * x_map;
 			v = Vec::Zero(gen_first_fac->getNbCol());
+			int i = 0;
 			for(auto id: vec_ids)
-				v += sp_fac->mat.transpose().col(id) * x_map(id);
+				v += sp_fac->mat.transpose().col(id) * x_map(i++);
 		}
 		else
 		{
@@ -1722,17 +1723,17 @@ Faust::Vect<FPP, Cpu> Faust::TransformHelper<FPP,Cpu>::indexMultiply(faust_unsig
 	}
 	else
 	{
-		// 1. multiply the last factor sliced according to s to the corresponding portion of x in the new vector x_
+		// 1. multiply the indexed last factor according to ids by x
 		// 1.1 get the last factor
 		auto gen_last_fac = *(this->end()-1);
 		if(ds_fac = dynamic_cast<MatDense<FPP, Cpu>*>(gen_last_fac))
 		{
-			// 1.2 multiply the slice of the factor by the slice of the vector
-			v = ds_fac->mat(Eigen::placeholders::all, vec_ids) * x_map(vec_ids);
+			// 1.2 multiply the slice of the factor by x
+			v = ds_fac->mat(Eigen::placeholders::all, vec_ids) * x_map;
 		}
 		else if(sp_fac = dynamic_cast<MatSparse<FPP, Cpu>*>(gen_last_fac))
 		{
-			// 1.2 multiply the slice of the factor by the slice of the vector
+			// 1.2 multiply the indexed factor by x
 			v = Vec::Zero(gen_last_fac->getNbRow());
 //			Mat M = Mat::Zero(gen_last_fac->getNbRow(), vec_ids.size());
 			SpMat M(gen_last_fac->getNbRow(), vec_ids.size());
@@ -1740,12 +1741,8 @@ Faust::Vect<FPP, Cpu> Faust::TransformHelper<FPP,Cpu>::indexMultiply(faust_unsig
 			for(int i=0;i<vec_ids.size(); i++)
 //			for(auto id: vec_ids)
 //				v += sp_fac->mat.col(id) * x_map(id);
-				M.col(i) = sp_fac->mat.col(vec_ids[i]);// * x_map(vec_ids[i]);
-//			auto ones = Vec::Ones(vec_ids.size());
-//			v = M*ones;
-//			std::cout << "M:" << M << std::endl;
-			v = M*x_map(vec_ids);
-//			std::cout << "v:" << v << std::endl;
+				M.col(i) = sp_fac->mat.col(vec_ids[i]);// * x_map;
+			v = M*x_map;
 		}
 		else
 		{
@@ -1818,7 +1815,7 @@ FPP* Faust::TransformHelper<FPP,Cpu>::sliceMultiply(const Slice s[2], const FPP*
 		// 1.1 get the first factor
 		if(ds_fac = dynamic_cast<MatDense<FPP, Cpu>*>(gen_first_fac))
 		{
-			// 1.2 multiply the slice of the factor by the slice of the vector
+			// 1.2 multiply the slice of the factor by X
 			if(size() == 1)
 				if(this->is_conjugate)
 					out_map = ds_fac->mat.adjoint().block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * X_map;
@@ -1832,7 +1829,7 @@ FPP* Faust::TransformHelper<FPP,Cpu>::sliceMultiply(const Slice s[2], const FPP*
 		}
 		else if(sp_fac = dynamic_cast<MatSparse<FPP, Cpu>*>(gen_first_fac))
 		{
-			// 1.2 multiply the slice of the factor by the slice of the vector
+			// 1.2 multiply the slice of the factor by X
 			if(size() == 1)
 				if(this->is_conjugate)
 					out_map = sp_fac->mat.adjoint().block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * X_map;
@@ -1881,7 +1878,7 @@ FPP* Faust::TransformHelper<FPP,Cpu>::sliceMultiply(const Slice s[2], const FPP*
 		// 1.1 get the last factor
 		if(ds_fac = dynamic_cast<MatDense<FPP, Cpu>*>(gen_last_fac))
 		{
-			// 1.2 multiply the slice of the factor by the slice of the vector
+			// 1.2 multiply the slice of the factor by X
 			if(size() == 1)
 				if(this->is_conjugate)
 					out_map = ds_fac->mat.conjugate().block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * X_map;
@@ -1895,7 +1892,7 @@ FPP* Faust::TransformHelper<FPP,Cpu>::sliceMultiply(const Slice s[2], const FPP*
 		}
 		else if(sp_fac = dynamic_cast<MatSparse<FPP, Cpu>*>(gen_last_fac))
 		{
-			// 1.2 multiply the slice of the factor by the slice of the vector
+			// 1.2 multiply the slice of the factor by X
 			if(size() == 1)
 				if(this->is_conjugate)
 					out_map = sp_fac->mat.conjugate().block(rf_row_offset, s1.start_id, rf_nrows, s1.size()) * X_map;
@@ -1913,7 +1910,9 @@ FPP* Faust::TransformHelper<FPP,Cpu>::sliceMultiply(const Slice s[2], const FPP*
 		}
 		// 2. then create a subFaust with all factors except the last one (copy-free)
 		if(size() == 1)
+		{
 			return out;
+		}
 		// but a slicing on rows is also possible on the left factor
 		if(s0.start_id != 0 || s0.end_id != gen_first_fac->getNbRow())
 		{
@@ -1945,7 +1944,7 @@ FPP* Faust::TransformHelper<FPP,Cpu>::sliceMultiply(const Slice s[2], const FPP*
 		MatMap tmp_map(tmp_ptr, tmp_nrows, X_ncols);
 		if(ds_fac = dynamic_cast<MatDense<FPP, Cpu>*>(left_sliced_factor))
 		{
-			// 1.2 multiply the slice of the factor by mat
+			// multiply the slice of the left factor by the right product
 			Mat tmp;
 			if(this->is_transposed)
 			{
@@ -1965,7 +1964,7 @@ FPP* Faust::TransformHelper<FPP,Cpu>::sliceMultiply(const Slice s[2], const FPP*
 		}
 		else if(sp_fac = dynamic_cast<MatSparse<FPP, Cpu>*>(left_sliced_factor))
 		{
-			// 1.2 multiply the slice of the factor by mat
+			// multiply the slice of the left factor by the right product
 			Eigen::SparseMatrix<FPP, Eigen::RowMajor> tmp;
 			if(this->is_transposed)
 				if(this->is_conjugate)

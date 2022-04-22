@@ -144,8 +144,8 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
                              ' dtype=uint64')
         ids = ids.astype('uint64')
         ids_view = ids.data
-        if(self.@CORE_OBJ@.getNbCol() != x.size): raise ValueError("Dimensions"
-                                                                  " must agree")
+        if(len(ids) != x.size): raise ValueError("Dimensions"
+                                                 " must agree")
         y_data_arr = np.empty((nbrow), dtype=np.@TYPE@, order='F') # we don't know beforehand Y nnz
         y_data = y_data_arr
         self.@CORE_OBJ@.indexMultiply(&ids_view[0], ids.size, &x_data[0], &y_data[0])
