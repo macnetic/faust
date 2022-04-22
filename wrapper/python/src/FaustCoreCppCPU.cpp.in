@@ -152,6 +152,12 @@ template<>
 void FaustCoreCpp<@TYPE@,Cpu>::indexMultiply(unsigned long int* ids, size_t ids_len, const @TYPE@* vec_data, @TYPE@* vec_out) const
 {
     Faust::Vect<@TYPE@, Cpu> y;
-    y = this->transform->indexMultiply(ids, ids_len, vec_data);
+    unsigned long int* ids_[2];
+    ids_[0] = nullptr;
+    ids_[1] = ids;
+    size_t lens[2];
+    lens[0] = 0;
+    lens[1] = ids_len;
+    y = this->transform->indexMultiply(ids_, lens, vec_data);
     memcpy(vec_out, y.getData(), sizeof(@TYPE@)*y.size()); // TODO: this copy could be avoided
 }

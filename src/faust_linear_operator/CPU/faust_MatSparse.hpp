@@ -1555,14 +1555,15 @@ namespace Faust {
 			}
 			else if(row_ids == nullptr && col_ids != nullptr)
 			{
-				out_mat = MatType1::Zero(transpose?mat.cols():mat.rows(), ncols);
-				auto dim_size = transpose?nrows:ncols;
-				for(int i=0;i < dim_size; i++)
+				out_mat = MatType1::Zero(transpose?mat.cols():mat.rows(), in_mat.cols());
+				for(int i=0;i < ncols; i++)
 				{
 					if(transpose && conjugate)
 						out_mat += mat.row(col_ids[i]).adjoint() * in_mat.row(i);
 					else if(transpose)
+					{
 						out_mat += mat.row(col_ids[i]).transpose() * in_mat.row(i);
+					}
 					else if(conjugate)
 						out_mat += mat.col(col_ids[i]).conjugate() * in_mat.row(i);
 					else
@@ -1572,7 +1573,7 @@ namespace Faust {
 			else if(row_ids != nullptr && col_ids == nullptr)
 			{
 				SpMat tmp(nrows,transpose?mat.rows():mat.cols());
-				#pragma omp parallel for
+				//#pragma omp parallel for // can't use OpenMP because even if the rows are independent the whole rowptr buffer is modified when a row is
 				for(int i=0;i<nrows;i++)
 					if(transpose && conjugate)
 						tmp.row(i) = mat.col(row_ids[i]).adjoint();
@@ -1582,7 +1583,7 @@ namespace Faust {
 						tmp.row(i) = mat.row(row_ids[i]).conjugate();
 					else
 						tmp.row(i) = mat.row(row_ids[i]);
-				out_mat = tmp*in_mat;
+				out_mat = tmp * in_mat;
 			}
 			else // if(row_ids != nullptr && col_ids != nullptr)
 			{
@@ -1591,11 +1592,10 @@ namespace Faust {
 				{
 					for(int j = 0; j < ncols; j++)
 					{
-					  auto e = tmp.coeffRef(i, j);
 					  if(transpose)
-						  e = mat.coeff(col_ids[j], row_ids[j]);
+						 tmp.coeffRef(i, j) = mat.coeff(col_ids[j], row_ids[i]);
 					  else
-						  e = mat.coeff(row_ids[j], col_ids[j]);
+						  tmp.coeffRef(i, j) = mat.coeff(row_ids[i], col_ids[j]);
 					}
 				}
 				if(conjugate)

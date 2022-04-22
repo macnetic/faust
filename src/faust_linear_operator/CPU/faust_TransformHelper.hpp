@@ -1670,7 +1670,7 @@ bool Faust::TransformHelper<FPP,Cpu>::is_zero() const
 }
 
 template<typename FPP>
-Faust::Vect<FPP, Cpu> Faust::TransformHelper<FPP,Cpu>::indexMultiply(faust_unsigned_int* ids, size_t ids_len, const FPP* x) const
+Faust::Vect<FPP, Cpu> Faust::TransformHelper<FPP,Cpu>::indexMultiply(faust_unsigned_int* ids[2], size_t ids_len[2], const FPP* x) const
 {
 	//TODO: refactor with sliceMultiply if it applies
 	//TODO: manage conjugate case
@@ -1683,8 +1683,7 @@ Faust::Vect<FPP, Cpu> Faust::TransformHelper<FPP,Cpu>::indexMultiply(faust_unsig
 	MatSparse<FPP, Cpu>* sp_fac;
 //	MatBSR<FPP, Cpu>* bsr_fac; // TODO
 	Vec v;
-	std::vector<int> vec_ids(ids, ids+ids_len);
-	std::sort(vec_ids.begin(), vec_ids.end()); // mandatory in order to assign v elements in proper order
+	std::vector<int> vec_ids(ids[1], ids[1]+ids_len[1]);
 	if(this->is_transposed)
 	{
 		// 1. multiply the first factor indexed according to ids by x
@@ -1692,19 +1691,13 @@ Faust::Vect<FPP, Cpu> Faust::TransformHelper<FPP,Cpu>::indexMultiply(faust_unsig
 		auto gen_first_fac = *(this->begin());
 		if(ds_fac = dynamic_cast<MatDense<FPP, Cpu>*>(gen_first_fac))
 		{
-			// 1.2 multiply the ids columns of the factor by x
-//			auto a = ds_fac->mat.transpose().eval();
-			v = ds_fac->mat.transpose()(Eigen::placeholders::all, vec_ids) * x_map;
+			// 1.2 index ds_fac and multiply by x
+			ds_fac->eigenIndexMul(ids[0], ids[1], ids_len[0], ids_len[1], x_map, v, this->is_transposed, this->is_conjugate);
 		}
 		else if(sp_fac = dynamic_cast<MatSparse<FPP, Cpu>*>(gen_first_fac))
 		{
 			// 1.2 multiply the ids columns of the factor by x
-			// 'Eigen::SparseMatrix<FPP, 0>' does not provide a call operator
-			//			v = a(Eigen::placeholders::all, vec_ids) * x_map;
-			v = Vec::Zero(gen_first_fac->getNbCol());
-			int i = 0;
-			for(auto id: vec_ids)
-				v += sp_fac->mat.transpose().col(id) * x_map(i++);
+			sp_fac->eigenIndexMul(ids[0], ids[1], ids_len[0], ids_len[1], x_map, v, this->is_transposed, this->is_conjugate);
 		}
 		else
 		{
@@ -1729,20 +1722,12 @@ Faust::Vect<FPP, Cpu> Faust::TransformHelper<FPP,Cpu>::indexMultiply(faust_unsig
 		if(ds_fac = dynamic_cast<MatDense<FPP, Cpu>*>(gen_last_fac))
 		{
 			// 1.2 multiply the slice of the factor by x
-			v = ds_fac->mat(Eigen::placeholders::all, vec_ids) * x_map;
+			ds_fac->eigenIndexMul(ids[0], ids[1], ids_len[0], ids_len[1], x_map, v, this->is_transposed, this->is_conjugate);
 		}
 		else if(sp_fac = dynamic_cast<MatSparse<FPP, Cpu>*>(gen_last_fac))
 		{
 			// 1.2 multiply the indexed factor by x
-			v = Vec::Zero(gen_last_fac->getNbRow());
-//			Mat M = Mat::Zero(gen_last_fac->getNbRow(), vec_ids.size());
-			SpMat M(gen_last_fac->getNbRow(), vec_ids.size());
-//			#pragma omp parallel for // no OpenMP is possible for editing M
-			for(int i=0;i<vec_ids.size(); i++)
-//			for(auto id: vec_ids)
-//				v += sp_fac->mat.col(id) * x_map(id);
-				M.col(i) = sp_fac->mat.col(vec_ids[i]);// * x_map;
-			v = M*x_map;
+			sp_fac->eigenIndexMul(ids[0], ids[1], ids_len[0], ids_len[1], x_map, v, this->is_transposed, this->is_conjugate);
 		}
 		else
 		{

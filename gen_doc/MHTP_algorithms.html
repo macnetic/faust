@@ -14567,7 +14567,7 @@ The goal is to factorize the MEG matrix as $M_{MEG} \approx A \times B$ with $M_
 <span class="c1"># the number of iterations of PALM4MSA</span>
 <span class="n">stop_crit</span> <span class="o">=</span> <span class="n">StoppingCriterion</span><span class="p">(</span><span class="n">num_its</span><span class="o">=</span><span class="mi">2000</span><span class="p">)</span>
 <span class="n">param</span> <span class="o">=</span> <span class="n">ParamsPalm4MSA</span><span class="p">(</span><span class="n">projs</span><span class="p">,</span> <span class="n">stop_crit</span><span class="p">,</span> <span class="n">is_verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">param</span><span class="o">.</span><span class="n">use_csr</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1"># for not using sparse matrices during the algorithm</span>
+<span class="n">param</span><span class="o">.</span><span class="n">factor_format</span> <span class="o">=</span> <span class="kc">'dense'</span> <span class="c1"># for not using sparse matrices during the algorithm</span>
 </pre></div>
 
      </div>
