@@ -2899,9 +2899,12 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
     def sliceMultiply(F, start_col_id, end_col_id, vec):
         return F.m_faust.colSliceMultiply(start_col_id, end_col_id, vec)
 
-    def indexMultiply(F, ids, vec):
-        ids = ids if isinstance(ids, np.ndarray) else np.array(ids)
-        return F.m_faust.indexMultiply(ids, vec)
+    def indexMultiply(F, vec, d0_ids=None, d1_ids=None):
+        if d0_ids is not None:
+            d0_ids = d0_ids if isinstance(d0_ids, np.ndarray) else np.array(d0_ids)
+        if d1_ids is not None:
+            d1_ids = d1_ids if isinstance(d1_ids, np.ndarray) else np.array(d1_ids)
+        return F.m_faust.indexMultiply(d0_ids, d1_ids, vec)
 
     def average(F, axis=None, weights=None, returned=False):
         """

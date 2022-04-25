@@ -133,22 +133,39 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
         self.@CORE_OBJ@.colSliceMultiply(col_start_id, col_end_id, &x_data[0], 1, &y_data[0])
         return y_data_arr
 
-    def indexMultiply(self, ids, x):
+    def indexMultiply(self, d0_ids, d1_ids, x):
         cdef @TYPE@ [:] x_data
         cdef @TYPE@ [:] y_data
-        cdef unsigned long int[:] ids_view
+        cdef unsigned long int[:] d0_ids_view
+        cdef unsigned long int[:] d1_ids_view
         x_data = x.data
-        nbrow = self.@CORE_OBJ@.getNbRow()
-        if not isinstance(ids, np.ndarray) or ids.ndim != 1:
-            raise ValueError('ids must be a np.ndarray of ndim=1 and'
-                             ' dtype=uint64')
-        ids = ids.astype('uint64')
-        ids_view = ids.data
-        if(len(ids) != x.size): raise ValueError("Dimensions"
+        d1_ids = d1_ids.astype('uint64')
+        d1_ids_view = d1_ids.data
+        ve = ValueError('ids must be a np.ndarray of ndim=1 and'
+                         ' dtype=uint64')
+
+        if not isinstance(d1_ids, np.ndarray) or d1_ids.ndim != 1:
+            raise ve
+
+        no_d0 = d0_ids is None or \
+        (isinstance(d0_ids, (np.ndarray, list)) and len(d0_ids) == 0)
+        if no_d0:
+            nbrow = self.@CORE_OBJ@.getNbRow()
+        else:
+            nbrow = len(d0_ids)
+            if not isinstance(d0_ids, np.ndarray) or d0_ids.ndim != 1:
+                raise ve
+            d0_ids = d0_ids.astype('uint64')
+            d0_ids_view = d0_ids.data
+
+        if(len(d1_ids) != x.size): raise ValueError("Dimensions"
                                                  " must agree")
         y_data_arr = np.empty((nbrow), dtype=np.@TYPE@, order='F') # we don't know beforehand Y nnz
         y_data = y_data_arr
-        self.@CORE_OBJ@.indexMultiply(&ids_view[0], ids.size, &x_data[0], &y_data[0])
+        if no_d0:
+            self.@CORE_OBJ@.indexMultiply(NULL, 0, &d1_ids_view[0], d1_ids.size, &x_data[0], &y_data[0])
+        else:
+            self.@CORE_OBJ@.indexMultiply(&d0_ids_view[0], d0_ids.size, &d1_ids_view[0], d1_ids.size, &x_data[0], &y_data[0])
         return y_data_arr
 
     def get_product(self):
