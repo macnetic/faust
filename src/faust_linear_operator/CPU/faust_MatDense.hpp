@@ -1781,7 +1781,6 @@ void MatDense<FPP, Cpu>::eigenIndexMul(const faust_unsigned_int* row_ids, const 
 	}
 	else if(row_ids == nullptr && col_ids != nullptr)
 	{
-
 		std::vector<int> vec_cols(col_ids, col_ids+ncols);
 		if(transpose && conjugate)
 			out_mat = mat(vec_cols, Eigen::all).adjoint() * in_mat;
@@ -1795,7 +1794,7 @@ void MatDense<FPP, Cpu>::eigenIndexMul(const faust_unsigned_int* row_ids, const 
 	else if(row_ids != nullptr && col_ids == nullptr)
 	{
 
-		std::vector<int> vec_rows(col_ids, col_ids+nrows);
+		std::vector<int> vec_rows(row_ids, row_ids+nrows);
 		if(transpose && conjugate)
 			out_mat = mat(Eigen::all, vec_rows).adjoint() * in_mat;
 		else if(transpose)
@@ -1808,7 +1807,7 @@ void MatDense<FPP, Cpu>::eigenIndexMul(const faust_unsigned_int* row_ids, const 
 	else // if(row_ids != nullptr && col_ids != nullptr)
 	{
 
-		std::vector<int> vec_rows(col_ids, col_ids+nrows);
+		std::vector<int> vec_rows(row_ids, row_ids+nrows);
 		std::vector<int> vec_cols(col_ids, col_ids+ncols);
 		if(transpose && conjugate)
 			out_mat = mat(vec_cols, vec_rows).adjoint() * in_mat;
