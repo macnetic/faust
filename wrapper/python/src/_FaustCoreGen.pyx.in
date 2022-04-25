@@ -134,11 +134,16 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
         return y_data_arr
 
     def indexMultiply(self, d0_ids, d1_ids, x):
-        cdef @TYPE@ [:] x_data
-        cdef @TYPE@ [:] y_data
+        cdef @TYPE@ [:,:] x_data
+        cdef @TYPE@ [:, :] y_data
         cdef unsigned long int[:] d0_ids_view
         cdef unsigned long int[:] d1_ids_view
-        x_data = x.data
+        if x.ndim == 2:
+            x_data = x.data
+            x_ncols = x.shape[1]
+        else:
+            x_data = x.reshape(x.size, 1).data
+            x_ncols = 1
         d1_ids = d1_ids.astype('uint64')
         d1_ids_view = d1_ids.data
         ve = ValueError('ids must be a np.ndarray of ndim=1 and'
@@ -158,14 +163,20 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
             d0_ids = d0_ids.astype('uint64')
             d0_ids_view = d0_ids.data
 
-        if(len(d1_ids) != x.size): raise ValueError("Dimensions"
-                                                 " must agree")
-        y_data_arr = np.empty((nbrow), dtype=np.@TYPE@, order='F') # we don't know beforehand Y nnz
+        if(len(d1_ids) != x.shape[0]): raise ValueError("Dimensions"
+                                                    " must agree")
+        y_data_arr = np.empty((nbrow, x_ncols), dtype=np.@TYPE@, order='F') # we don't know beforehand Y nnz
         y_data = y_data_arr
         if no_d0:
-            self.@CORE_OBJ@.indexMultiply(NULL, 0, &d1_ids_view[0], d1_ids.size, &x_data[0], &y_data[0])
+            self.@CORE_OBJ@.indexMultiply(NULL, 0, &d1_ids_view[0],
+                                          d1_ids.size, &x_data[0, 0], x_ncols,
+                                          &y_data[0, 0])
         else:
-            self.@CORE_OBJ@.indexMultiply(&d0_ids_view[0], d0_ids.size, &d1_ids_view[0], d1_ids.size, &x_data[0], &y_data[0])
+            self.@CORE_OBJ@.indexMultiply(&d0_ids_view[0], d0_ids.size,
+                                          &d1_ids_view[0], d1_ids.size,
+                                          &x_data[0, 0], x_ncols, &y_data[0, 0])
+        if y_data_arr.shape[1] == 1:
+            y_data_arr = y_data_arr.squeeze()
         return y_data_arr
 
     def get_product(self):

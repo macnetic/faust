@@ -103,6 +103,7 @@ namespace Faust
 			MatDense<FPP, Cpu> sliceMultiply(const Slice s[2], const FPP* X, int X_ncols=1) const;
 			// Multiplies the columns ids of this by the vector x corresponding elements (x size is this->getNbCol())
 			Vect<FPP, Cpu> indexMultiply(faust_unsigned_int* ids[2], size_t ids_len[2], const FPP* x) const;
+			MatDense<FPP, Cpu> indexMultiply(faust_unsigned_int* ids[2], size_t ids_len[2], const FPP* X, int ncols) const;
 			// \brief multiply this by A (of size: this->getNbCol()*A_ncols) into C (buffers must be properly allocated from the callee).
 			virtual void multiply(const FPP* A, int A_ncols, FPP* C, const bool transpose=false, const bool conjugate=false);
 			//			MatDense<FPP,Cpu> multiply(const MatDense<FPP,Cpu> A) const;

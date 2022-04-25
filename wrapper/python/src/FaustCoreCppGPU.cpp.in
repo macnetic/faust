@@ -112,7 +112,7 @@ void FaustCoreCpp<@TYPE@,GPU2>::colSliceMultiply(unsigned long int j1, unsigned 
 }
 
 template<>
-void FaustCoreCpp<@TYPE@,GPU2>::indexMultiply(unsigned long int* d0_ids, size_t d0_ids_len, unsigned long int* d1_ids, size_t d1_ids_len, const @TYPE@* vec_data, @TYPE@* vec_out) const
+void FaustCoreCpp<@TYPE@,GPU2>::indexMultiply(unsigned long int* d0_ids, size_t d0_ids_len, unsigned long int* d1_ids, size_t d1_ids_len, const @TYPE@* mat_data, int mat_ncols, @TYPE@* mat_out) const
 {
 
     throw std::runtime_error("indexMultiply is not yet supported on GPU");
