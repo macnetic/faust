@@ -870,6 +870,15 @@ namespace Faust
 			//TODO: lazy slicing for GPU2 as for CPU (it needs to implement sliceMultiply too)
 			this->eval_sliced_Transform();
 		}
+
+	template<typename FPP>
+		void TransformHelper<FPP,GPU2>::init_fancy_idx_transform(TransformHelper<FPP,GPU2>* th, faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols)
+		{
+			TransformHelperGen<FPP, GPU2>::init_fancy_idx_transform(th, s);
+			//TODO: lazy indexing for GPU2 as for CPU (it needs to implement indexMultiply too)
+			this->eval_sliced_Transform();
+		}
+
 }
 
 #include "faust_TransformHelper_cat_gpu.hpp"

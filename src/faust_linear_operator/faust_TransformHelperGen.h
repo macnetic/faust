@@ -81,7 +81,8 @@ namespace Faust
 			virtual TransformHelper<FPP,DEV>* right(const faust_unsigned_int id, const bool copy=false) const;
 
 			void copy_slices(const TransformHelper<FPP,DEV>* th, const bool transpose = false);
-			void copy_slice_state(const TransformHelper<FPP,DEV>& th);
+			void copy_slice_state(const TransformHelper<FPP,DEV>& th, bool transpose=false);
+			void copy_fancy_idx_state(const TransformHelper<FPP, DEV> &th, bool transpose=false);
 			void copy_transconj_state(const TransformHelper<FPP,DEV>& th);
 			virtual void copy_mul_mode_state(const TransformHelper<FPP,DEV>& th);
 			void copy_state(const TransformHelper<FPP,DEV>& th);
@@ -100,9 +101,10 @@ namespace Faust
 			 */
 			virtual FPP get_item(faust_unsigned_int i, faust_unsigned_int j)=0;
 			void get_item(faust_unsigned_int i, faust_unsigned_int j, MatDense<FPP, DEV>& out_mat, faust_unsigned_int &out_id);
+			virtual ~TransformHelperGen();
 
 		protected:
-			void init_fancy_idx_transform(TransformHelper<FPP,DEV>* th, faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols);
+			virtual void init_fancy_idx_transform(TransformHelper<FPP,DEV>* th, faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols);
 			virtual void init_sliced_transform(TransformHelper<FPP,DEV>* th, Slice s[2]);
 			bool is_transposed;
 			bool is_conjugate;
