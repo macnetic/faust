@@ -57,7 +57,7 @@ namespace Faust
 					this->fancy_indices[0][i] = th->fancy_indices[0][id];
 				// else error delayed to the sanity check below
 			}
-			for(int j=0;j < num_rows; j++)
+			for(int j=0;j < num_cols; j++)
 			{
 				auto id = this->fancy_indices[1][j];
 				if(id < th->fancy_num_cols)
@@ -89,7 +89,7 @@ namespace Faust
 		void TransformHelperGen<FPP,DEV>::init_sliced_transform(TransformHelper<FPP,DEV>* th, Slice s[2])
 
 	{
-		eval_fancy_idx_Transform();
+		th->eval_fancy_idx_Transform();
 		this->transform = th->transform; //do not remove this line, necessary for eval_sliced_Transform()
 		this->copy_transconj_state(*th);
 		if(! (s[0].belong_to(0, th->getNbRow()) || s[1].belong_to(0, th->getNbCol())))
@@ -346,6 +346,8 @@ namespace Faust
 					fancy_num_cols = th.fancy_num_cols;
 					id0 = 0, id1 = 1;
 				}
+				fancy_indices[0] = new faust_unsigned_int[fancy_num_rows];
+				fancy_indices[1] = new faust_unsigned_int[fancy_num_cols];
 				memcpy(fancy_indices[0], th.fancy_indices[id0], fancy_num_rows*sizeof(faust_unsigned_int));
 				memcpy(fancy_indices[1], th.fancy_indices[id1], fancy_num_cols*sizeof(faust_unsigned_int));
 			}

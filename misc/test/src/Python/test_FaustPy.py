@@ -317,6 +317,8 @@ class TestFaustPy(unittest.TestCase):
         if(n2 == 0): # avoid nan error
             self.assertLessEqual(n1,0.0005)
         else:
+            print("slices:", rand_i, rand_ii, rand_j, rand_jj)
+            self.F.save('test_sF.mat')
             self.assertLessEqual(n1/n2,0.005)
         # test a second slice on sF only if the shape allows it # min shape (1,1)
         if(sF.shape[0] >= 2 and sF.shape[1] >= 2):
@@ -462,9 +464,40 @@ class TestFaustPy(unittest.TestCase):
             else:
                 self.assertLessEqual(n1/n2, 0.005)
 
-
-
-
+    def testLazySlicingIndexing(self):
+        print("testLazySlicingIndexing()")
+        from pyfaust import rand as frand
+        for F in [frand(512, 512, fac_type='dense'),
+                  frand(512, 512, fac_type='sparse')] + \
+                 [frand(512, 512, fac_type='dense', num_factors=1),
+                  frand(512, 512, fac_type='sparse', num_factors=1)]:
+            # test that two slicings in a row make a consistent Faust
+            self.assertTrue(np.allclose(F[:15, :42][:12, :13].toarray(),
+                                        F.toarray()[:15, :42][:12, :13]))
+            # the same but with a transpose between
+            self.assertTrue(np.allclose(F[:15, :42].T[:12, :13].toarray(),
+                                        F.toarray()[:15, :42].T[:12, :13]))
+            # test that two indexings in a row make a consistent Faust
+            I = list(range(0, 15, 3))
+            J = list(range(0, 42, 5))
+            I2 = list(range(0, len(I), 2))
+            J2 = list(range(0, len(J), 2))
+            self.assertTrue(np.allclose(F[I][:,J][I2][:,J2].toarray(),
+                                        F.toarray()[I][:,J][I2][:,J2]))
+            # the same with a transpose between
+            self.assertTrue(np.allclose(F[I][:,J].T[J2][:,I2].toarray(),
+                                        F.toarray()[I][:,J].T[J2][:,I2]))
+            # test that a slicing followed by an indexing works
+            self.assertTrue(np.allclose(F[:15, :42][I][:,J].toarray(),
+                                        F.toarray()[:15, :42][I][:,J]))
+            # the same with a transpose between
+            self.assertTrue(np.allclose(F[:15, :42].T[J][:,I].toarray(),
+                                        F.toarray()[:15, :42].T[J][:,I]))
+            # now do the same but the indexing first
+            self.assertTrue(np.allclose(F[I][:,J][:len(I)//2, :len(J)//2].toarray(),
+                                        F.toarray()[I][:,J][:len(I)//2, :len(J)//2]))
+            self.assertTrue(np.allclose(F[I][:,J].T[:len(I)//2, :len(J)//2].toarray(),
+                                        F.toarray()[I][:,J].T[:len(I)//2, :len(J)//2]))
 
     def testToDense(self):
         print("testToDense()")
@@ -540,6 +573,7 @@ class TestFaustPy(unittest.TestCase):
         from pyfaust import FaustMulMode
         print("test GREEDY and DYNPROG prod opt methods and optimize_time.")
         GREEDY = 4
+        self.F.save('/tmp/F.mat')
         H = self.F.clone()
         H.m_faust.set_FM_mul_mode(GREEDY) # FaustMulMode.GREEDY replaced by GREEDY local variable because GREEDY is not a visible opt. method anymore
         G = self.F.clone()
