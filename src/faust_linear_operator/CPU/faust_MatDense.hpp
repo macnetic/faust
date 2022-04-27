@@ -1470,20 +1470,57 @@ std::vector<int> MatDense<FPP, Cpu>::row_nonzero_inds(faust_unsigned_int row_id)
 	return ids;
 }
 
+template<typename EigenDenseMat, typename EigenDim0Ind, typename EigenDim1Ind>
+EigenDenseMat submatrix(const EigenDenseMat& in_mat, EigenDenseMat& out_submat, const EigenDim0Ind &row_ids,  const EigenDim1Ind &col_ids)
+{
+#ifdef _MSC_VER // TODO: replace by a check on Eigen version EIGEN_WORLD_VERSION, EIGEN_MAJOR_VERSION
+	// as far as I tested eigen3.4rc1 doesn't compile with VS 14
+	// so extract the matrix manually in this env.
+	for(int i=0;i<row_ids.size();i++)
+		for(int j=0;j<col_ids.size();j++)
+			out_submat(i,j) = in_mat(row_ids[i], col_ids[j]);
+#else
+	out_submat = in_mat(row_ids, col_ids);
+#endif
+	return out_submat;
+}
+
+template<typename EigenDenseMat, typename EigenDim1Ind>
+EigenDenseMat mat_cols(const EigenDenseMat& in_mat, EigenDenseMat& out_submat, const EigenDim1Ind &col_ids)
+{
+#ifdef _MSC_VER // TODO: replace by a check on Eigen version EIGEN_WORLD_VERSION, EIGEN_MAJOR_VERSION
+	// as far as I tested eigen3.4rc1 doesn't compile with VS 14
+	// so extract the matrix manually in this env.
+	for(int i=0;i<in_mat.rows();i++)
+		for(int j=0;j<col_ids.size();j++)
+			out_submat(i,j) = in_mat(i, col_ids[j]);
+#else
+	out_submat = in_mat(Eigen::all, col_ids);
+#endif
+	return out_submat;
+}
+
+template<typename EigenDenseMat, typename EigenDim0Ind>
+EigenDenseMat mat_rows(const EigenDenseMat& in_mat, EigenDenseMat& out_submat, const EigenDim0Ind &row_ids)
+{
+#ifdef _MSC_VER // TODO: replace by a check on Eigen version EIGEN_WORLD_VERSION, EIGEN_MAJOR_VERSION
+	// as far as I tested eigen3.4rc1 doesn't compile with VS 14
+	// so extract the matrix manually in this env.
+	for(int i=0;i<row_ids.size();i++)
+		for(int j=0;j<in_mat.cols();j++)
+			out_submat(i,j) = in_mat(row_ids[i], j);
+#else
+	out_submat = in_mat(row_ids, Eigen::all);
+#endif
+	return out_submat;
+}
+
 template<typename FPP>
 void MatDense<FPP, Cpu>::submatrix(const std::vector<int> &row_ids, const std::vector<int> &col_ids, MatDense<FPP, Cpu> & submat) const
 {
 	if(this->dim1 != row_ids.size() || this->dim2 != col_ids.size())
 		submat.resize(row_ids.size(), col_ids.size());
-#ifdef _MSC_VER
-	// as far as I tested eigen3.4rc1 doesn't compile with VS 14
-	// so extract the matrix manually in this env.
-	for(int i=0;i<row_ids.size();i++)
-		for(int j=0;j<col_ids.size();j++)
-			submat.mat(i,j) = mat(row_ids[i], col_ids[j]);
-#else
-	submat.mat = mat(row_ids, col_ids);
-#endif
+	Faust::submatrix(mat, submat.mat, row_ids, col_ids);
 }
 
 template<typename FPP>
@@ -1767,9 +1804,10 @@ std::vector<std::pair<int,int>> MatDense<FPP, Cpu>::get_antidiag_indices(int ind
 	template<typename MatType1, typename MatType2>
 void MatDense<FPP, Cpu>::eigenIndexMul(const faust_unsigned_int* row_ids, const faust_unsigned_int* col_ids, size_t nrows, size_t ncols, const MatType1 &in_mat, MatType2 &out_mat, bool transpose/* = false*/, bool conjugate /*= false*/)
 {
+	Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic> tmp_mat;
 	if(row_ids == nullptr && col_ids == nullptr)
 	{
-		auto tmp = mat(Eigen::all, Eigen::all);
+		auto tmp = mat;
 		if(transpose && conjugate)
 			out_mat = tmp.adjoint() * in_mat;
 		else if(transpose)
@@ -1783,26 +1821,39 @@ void MatDense<FPP, Cpu>::eigenIndexMul(const faust_unsigned_int* row_ids, const 
 	{
 		std::vector<int> vec_cols(col_ids, col_ids+ncols);
 		if(transpose && conjugate)
-			out_mat = mat(vec_cols, Eigen::all).adjoint() * in_mat;
+//			out_mat = mat(vec_cols, Eigen::all).adjoint() * in_mat;
+//			out_mat = Faust::submatrix(mat, tmp_mat, vec_cols, Eigen::all) * in_mat;
+			out_mat = Faust::mat_rows(mat, tmp_mat, vec_cols) * in_mat;
 		else if(transpose)
-			out_mat = mat(vec_cols, Eigen::all).transpose() * in_mat;
+//			out_mat = mat(vec_cols, Eigen::all).transpose() * in_mat;
+//			out_mat = Faust::submatrix(mat, tmp_mat, vec_cols, Eigen::all).transpose() * in_mat;
+			out_mat = Faust::mat_rows(mat, tmp_mat, vec_cols).transpose() * in_mat;
 		else if(conjugate)
-			out_mat = mat(Eigen::all, vec_cols).conjugate() * in_mat;
+//			out_mat = mat(Eigen::all, vec_cols).conjugate() * in_mat;
+//			out_mat = Faust::submatrix(mat, tmp_mat, Eigen::all, vec_cols).conjugate() * in_mat;
+			out_mat = Faust::mat_cols(mat, tmp_mat, vec_cols).conjugate() * in_mat;
 		else
-			out_mat = mat(Eigen::all, vec_cols) * in_mat;
+//			out_mat = mat(Eigen::all, vec_cols) * in_mat;
+//			out_mat = Faust::submatrix(mat, tmp_mat, Eigen::all, vec_cols) * in_mat;
+			out_mat = Faust::mat_cols(mat, tmp_mat, vec_cols) * in_mat;
 	}
 	else if(row_ids != nullptr && col_ids == nullptr)
 	{
 
 		std::vector<int> vec_rows(row_ids, row_ids+nrows);
 		if(transpose && conjugate)
-			out_mat = mat(Eigen::all, vec_rows).adjoint() * in_mat;
+//			out_mat = mat(Eigen::all, vec_rows).adjoint() * in_mat;
+//			out_mat = Faust::submatrix(mat, tmp_mat, Eigen::all, vec_rows).adjoint() * in_mat;
+			out_mat = Faust::mat_cols(mat, tmp_mat, vec_rows).adjoint() * in_mat;
 		else if(transpose)
-			out_mat = mat(Eigen::all, vec_rows).transpose() * in_mat;
+//			out_mat = Faust::submatrix(mat, tmp_mat, Eigen::all, vec_rows).transpose() * in_mat;
+			out_mat = Faust::mat_cols(mat, tmp_mat, vec_rows).transpose() * in_mat;
 		else if(conjugate)
-			out_mat = mat(vec_rows, Eigen::all).conjugate() * in_mat;
+//			out_mat = Faust::submatrix(mat, tmp_mat, vec_rows, Eigen::all).conjugate() * in_mat;
+			out_mat = Faust::mat_rows(mat, tmp_mat, vec_rows).conjugate() * in_mat;
 		else
-			out_mat = mat(vec_rows, Eigen::all) * in_mat;
+//			out_mat = Faust::submatrix(mat, tmp_mat, vec_rows, Eigen::all) * in_mat;
+			out_mat = Faust::mat_rows(mat, tmp_mat, vec_rows) * in_mat;
 	}
 	else // if(row_ids != nullptr && col_ids != nullptr)
 	{
@@ -1810,13 +1861,17 @@ void MatDense<FPP, Cpu>::eigenIndexMul(const faust_unsigned_int* row_ids, const 
 		std::vector<int> vec_rows(row_ids, row_ids+nrows);
 		std::vector<int> vec_cols(col_ids, col_ids+ncols);
 		if(transpose && conjugate)
-			out_mat = mat(vec_cols, vec_rows).adjoint() * in_mat;
+//			out_mat = mat(vec_cols, vec_rows).adjoint() * in_mat;
+			out_mat = Faust::submatrix(mat, tmp_mat, vec_cols, vec_rows).adjoint() * in_mat;
 		else if(transpose)
-			out_mat = mat(vec_cols, vec_rows).transpose() * in_mat;
+//			out_mat = mat(vec_cols, vec_rows).transpose() * in_mat;
+			out_mat = Faust::submatrix(mat, tmp_mat, vec_cols, vec_rows).transpose() * in_mat;
 		else if(conjugate)
-			out_mat = mat(vec_rows, vec_cols).conjugate() * in_mat;
+//			out_mat = mat(vec_rows, vec_cols).conjugate() * in_mat;
+			out_mat = Faust::submatrix(mat, tmp_mat, vec_rows, vec_cols).conjugate() * in_mat;
 		else
-			out_mat = mat(vec_rows, vec_cols) * in_mat;
+//			out_mat = mat(vec_rows, vec_cols) * in_mat;
+			out_mat = Faust::submatrix(mat, tmp_mat, vec_rows, vec_cols) * in_mat;
 	}
 }
 
