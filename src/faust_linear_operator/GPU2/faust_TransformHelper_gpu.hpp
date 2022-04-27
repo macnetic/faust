@@ -874,9 +874,9 @@ namespace Faust
 	template<typename FPP>
 		void TransformHelper<FPP,GPU2>::init_fancy_idx_transform(TransformHelper<FPP,GPU2>* th, faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols)
 		{
-			TransformHelperGen<FPP, GPU2>::init_fancy_idx_transform(th, s);
+			TransformHelperGen<FPP, GPU2>::init_fancy_idx_transform(th, row_ids, num_rows, col_ids, num_cols);
 			//TODO: lazy indexing for GPU2 as for CPU (it needs to implement indexMultiply too)
-			this->eval_sliced_Transform();
+			this->eval_fancy_idx_Transform();
 		}
 
 }
