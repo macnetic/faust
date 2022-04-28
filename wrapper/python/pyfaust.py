@@ -1057,16 +1057,22 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             raise ValueError("Scalar operands are not allowed, use '*'"
                              " instead")
         elif isinstance(A, np.ndarray):
+            w = lambda: warnings.warn("The numpy array to multiply is not "
+                                      "F_CONTIGUOUS, costly conversion on the "
+                                      "fly. Please use np.asfortranarray by "
+                                      "yourself.")
             if A.dtype == np.complex and F.dtype != np.complex:
                 A_r = np.asfortranarray(A.real)
                 A_i = np.asfortranarray(A.imag)
                 if not A.imag.flags['F_CONTIGUOUS']:
+                    w()
                     A_i = np.asfortranarray(A_i)
                     A_r = np.asfortranarray(A_r)
                 G = F.m_faust.multiply(A_r) + 1j*F.m_faust.multiply(A_i)
                 return G
             else:
                 if not A.flags['F_CONTIGUOUS']:
+                    w()
                     A = np.asfortranarray(A)
                 if F.dtype == 'complex' and A.dtype != 'complex':
                     A = A.astype('complex')
