@@ -27,12 +27,50 @@ namespace Faust
 		this->transform = th->transform; //do not remove this line, necessary for eval*()
 		this->copy_transconj_state(*th);
 		//				handleError("Faust::TransformHelper::TransformHelper(TransformHelper,Slice)", "Fancy indexing overflows a Faust dimension.");
-		this->fancy_num_cols = num_cols;
-		this->fancy_num_rows = num_rows;
-		this->fancy_indices[0] = new faust_unsigned_int[num_rows]; // deleted after evaluation or in destructor
-		this->fancy_indices[1] = new faust_unsigned_int[num_cols];
-		memcpy(this->fancy_indices[0], row_ids, num_rows*sizeof(faust_unsigned_int));
-		memcpy(this->fancy_indices[1], col_ids, num_cols*sizeof(faust_unsigned_int));
+		assert(num_rows == 0 && row_ids == nullptr);
+		assert(num_cols == 0 && row_ids == nullptr);
+		assert(row_ids != nullptr || col_ids != nullptr);
+		if(row_ids != nullptr)
+		{
+			this->fancy_num_rows = num_rows;
+			this->fancy_indices[0] = new faust_unsigned_int[num_rows]; // deleted after evaluation or in destructor
+			memcpy(this->fancy_indices[0], row_ids, num_rows*sizeof(faust_unsigned_int));
+		}
+		else
+		{
+			// same row indexing as th
+			if(th->fancy_indices[0] != nullptr)
+			{
+				this->fancy_num_rows = th->fancy_num_rows;
+				this->fancy_indices[0] = new faust_unsigned_int[th->fancy_num_rows]; // deleted after evaluation or in destructor
+				memcpy(this->fancy_indices[0], th->fancy_indices[0], th->fancy_num_rows*sizeof(faust_unsigned_int));
+			}
+			else
+			{
+				this->fancy_num_rows = 0;
+				this->fancy_indices[0] = nullptr;
+			}
+		}
+		if(col_ids != nullptr)
+		{
+			this->fancy_num_cols = num_cols;
+			this->fancy_indices[1] = new faust_unsigned_int[num_cols];
+			memcpy(this->fancy_indices[1], col_ids, num_cols*sizeof(faust_unsigned_int));
+		}
+		else
+		{
+			if(th->fancy_indices[1] != nullptr)
+			{
+				this->fancy_num_cols = th->fancy_num_cols;
+				this->fancy_indices[1] = new faust_unsigned_int[th->fancy_num_cols]; // deleted after evaluation or in destructor
+				memcpy(this->fancy_indices[1], th->fancy_indices[1], th->fancy_num_cols*sizeof(faust_unsigned_int));
+			}
+			else
+			{
+				this->fancy_num_cols = 0;
+				this->fancy_indices[1] = nullptr;
+			}
+		}
 		// the Faust is sliced, shift the indices to do as if the Faust wasn't sliced
 		if(th->is_sliced)
 		{
@@ -50,20 +88,22 @@ namespace Faust
 		else if(th->is_fancy_indexed) // a Faust can't be sliced and fancy_indexed at the same time
 		{
 			// the Faust is already indexed, convert the indices taking account of th indices
-			for(int i=0;i < num_rows; i++)
-			{
-				auto id = this->fancy_indices[0][i];
-				if(id < th->fancy_num_rows)
-					this->fancy_indices[0][i] = th->fancy_indices[0][id];
-				// else error delayed to the sanity check below
-			}
-			for(int j=0;j < num_cols; j++)
-			{
-				auto id = this->fancy_indices[1][j];
-				if(id < th->fancy_num_cols)
-					this->fancy_indices[1][j] = th->fancy_indices[1][id];
-				// else error delayed to the sanity check below
-			}
+			if(th->fancy_indices[0] != nullptr)
+				for(int i=0;i < num_rows; i++)
+				{
+					auto id = this->fancy_indices[0][i];
+					if(id < th->fancy_num_rows)
+						this->fancy_indices[0][i] = th->fancy_indices[0][id];
+					// else error delayed to the sanity check below
+				}
+			if(th->fancy_indices[1] != nullptr)
+				for(int j=0;j < num_cols; j++)
+				{
+					auto id = this->fancy_indices[1][j];
+					if(id < th->fancy_num_cols)
+						this->fancy_indices[1][j] = th->fancy_indices[1][id];
+					// else error delayed to the sanity check below
+				}
 		}
 		// prevent overflows
 		for(int i=0;i < num_rows; i++)
@@ -284,7 +324,7 @@ namespace Faust
 		{
 			if(this->is_sliced)
 				return	this->slices[0].size();
-			else if(this->is_fancy_indexed)
+			else if(this->is_fancy_indexed and fancy_indices[0] != nullptr)
 				return this->fancy_num_rows;
 			else
 				return this->is_transposed?this->transform->getNbCol():this->transform->getNbRow();
@@ -295,7 +335,7 @@ namespace Faust
 		{
 			if(this->is_sliced)
 				return this->slices[1].size();
-			else if(this->is_fancy_indexed)
+			else if(this->is_fancy_indexed && fancy_indices[1] != nullptr)
 				return this->fancy_num_cols;
 			else
 				return this->is_transposed?this->transform->getNbRow():this->transform->getNbCol();
@@ -455,14 +495,20 @@ namespace Faust
 					left_ind_size = fancy_num_cols;
 					right_ind_size = fancy_num_rows;
 				}
-				first_sub_fac = gen_fac->get_rows(fancy_indices[id_left], left_ind_size);
+				if(fancy_indices[id_left] != nullptr)
+					first_sub_fac = gen_fac->get_rows(fancy_indices[id_left], left_ind_size);
+				else
+					first_sub_fac = gen_fac;
 				if(cloning_fact)
 					delete gen_fac;
 				if(size > 1)
 				{
 					gen_fac = transform->get_fact(size-1, cloning_fact);
-					last_sub_fac = gen_fac->get_cols(fancy_indices[id_right], right_ind_size);	//		std::cout << "---" << std::endl;
+					if(fancy_indices[id_right] != nullptr)
+						last_sub_fac = gen_fac->get_cols(fancy_indices[id_right], right_ind_size);	//		std::cout << "---" << std::endl;
 																									//		last_sub_fac->Display();
+					else
+						last_sub_fac = gen_fac;
 					if(cloning_fact)
 						delete gen_fac;
 					factors.reserve(size);
@@ -481,19 +527,29 @@ namespace Faust
 				}
 				else
 				{ //only one factor
-					last_sub_fac = first_sub_fac->get_cols(fancy_indices[id_right], right_ind_size);
-					delete first_sub_fac;
-					factors[0] = last_sub_fac;
-					factors.resize(1);
+					if(fancy_indices[id_right] != nullptr)
+					{
+						last_sub_fac = first_sub_fac->get_cols(fancy_indices[id_right], right_ind_size);
+						if(gen_fac != first_sub_fac)
+							delete first_sub_fac;
+						factors[0] = last_sub_fac;
+					}
+					else
+					{
+						factors[0] = first_sub_fac;
+					}
 				}
 				transform = make_shared<Transform<FPP, DEV>>(factors, 1.0, false, cloning_fact);
-				if(cloning_fact) {
+				if(cloning_fact)
+				{
 					for(faust_unsigned_int i = 0; i < size; i++)
 						delete factors[i];
 				}
 				is_fancy_indexed = false;
-				delete[] fancy_indices[id_left];
-				delete[] fancy_indices[id_right];
+				if(fancy_indices[id_left] != nullptr)
+					delete[] fancy_indices[id_left];
+				if(fancy_indices[id_right] != nullptr)
+					delete[] fancy_indices[id_right];
 				fancy_indices[id_left] = fancy_indices[id_right] = nullptr;
 			}
 		}

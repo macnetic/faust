@@ -1527,7 +1527,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             #F[i:j] a group of contiguous lines
             out_indices = [indices, slice(0, F.shape[1])]
         elif(isinstance(indices, list)):
-            out_indices = [indices, list(range(0,F.shape[1]))]
+            out_indices = [indices, slice(0, F.shape[1])]
             #TODO: check indices are all integers lying into F shape
         elif(isinstance(indices, tuple)):
             if(len(indices) == 1):
