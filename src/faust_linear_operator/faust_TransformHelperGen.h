@@ -80,9 +80,9 @@ namespace Faust
 */
 			virtual TransformHelper<FPP,DEV>* right(const faust_unsigned_int id, const bool copy=false) const;
 
-			void copy_slices(const TransformHelper<FPP,DEV>* th, const bool transpose = false);
-			void copy_slice_state(const TransformHelper<FPP,DEV>& th, bool transpose=false);
-			void copy_fancy_idx_state(const TransformHelper<FPP, DEV> &th, bool transpose=false);
+			void copy_slices(const TransformHelperGen<FPP,DEV>* th, const bool transpose = false);
+			void copy_slice_state(const TransformHelperGen<FPP,DEV>& th, bool transpose=false);
+			void copy_fancy_idx_state(const TransformHelperGen<FPP, DEV> &th, bool transpose=false);
 			void copy_transconj_state(const TransformHelper<FPP,DEV>& th);
 			virtual void copy_mul_mode_state(const TransformHelper<FPP,DEV>& th);
 			void copy_state(const TransformHelper<FPP,DEV>& th);

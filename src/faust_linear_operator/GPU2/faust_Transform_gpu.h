@@ -104,6 +104,7 @@ namespace Faust
 			typename Transform<FPP,GPU2>::iterator end() const;
 
 			friend TransformHelper<FPP,GPU2>;
+			friend TransformHelperGen<FPP,GPU2>;
 		};
 }
 

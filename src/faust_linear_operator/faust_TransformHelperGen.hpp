@@ -302,7 +302,7 @@ namespace Faust
 		}
 
 	template<typename FPP, FDevice DEV>
-		void TransformHelperGen<FPP, DEV>::copy_slices(const TransformHelper<FPP, DEV> *th, const bool transpose /*=false*/)
+		void TransformHelperGen<FPP, DEV>::copy_slices(const TransformHelperGen<FPP, DEV> *th, const bool transpose /*=false*/)
 		{
 			if(transpose)
 			{
@@ -316,7 +316,7 @@ namespace Faust
 		}
 
 	template<typename FPP, FDevice DEV>
-		void TransformHelperGen<FPP,DEV>::copy_slice_state(const TransformHelper<FPP,DEV>& th, bool transpose /*=false*/)
+		void TransformHelperGen<FPP,DEV>::copy_slice_state(const TransformHelperGen<FPP,DEV>& th, bool transpose /*=false*/)
 		{
 			this->is_sliced = th.is_sliced;
 			if(th.is_sliced)
@@ -324,7 +324,7 @@ namespace Faust
 		}
 
 	template<typename FPP, FDevice DEV>
-		void TransformHelperGen<FPP,DEV>::copy_fancy_idx_state(const TransformHelper<FPP,DEV>& th, bool transpose /*=false*/)
+		void TransformHelperGen<FPP,DEV>::copy_fancy_idx_state(const TransformHelperGen<FPP,DEV>& th, bool transpose /*=false*/)
 		{
 			this->is_fancy_indexed = th.is_fancy_indexed;
 			if(th.is_fancy_indexed)
