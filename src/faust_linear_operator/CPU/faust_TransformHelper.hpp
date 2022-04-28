@@ -1762,12 +1762,30 @@ bool Faust::TransformHelper<FPP,Cpu>::is_zero() const
 template<typename FPP>
 Faust::Vect<FPP, Cpu> Faust::TransformHelper<FPP,Cpu>::indexMultiply(faust_unsigned_int* ids[2], size_t ids_len[2], const FPP* x) const
 {
-	auto mat = indexMultiply(ids, ids_len, x, 1);
-	return Vect<FPP, Cpu>(mat.getNbRow(), mat.getData());
+	auto out_nrows = ids[0]==nullptr?this->getNbRow():ids_len[0];
+	Vect<FPP, Cpu> out_vec(out_nrows);
+	indexMultiply(ids, ids_len, x, out_vec.getData());
+	return out_vec;
+}
+
+template<typename FPP>
+FPP* Faust::TransformHelper<FPP,Cpu>::indexMultiply(faust_unsigned_int* ids[2], size_t ids_len[2], const FPP* x, FPP *out) const
+{
+	return indexMultiply(ids, ids_len, x, 1, out);
 }
 
 template<typename FPP>
 Faust::MatDense<FPP, Cpu> Faust::TransformHelper<FPP,Cpu>::indexMultiply(faust_unsigned_int* ids[2], size_t ids_len[2], const FPP* X, int ncols) const
+{
+	MatDense<FPP, Cpu> out_mat;
+	auto out_nrows = ids[0]==nullptr?this->getNbRow():ids_len[0];
+	out_mat.resize(out_nrows, ncols);
+	indexMultiply(ids, ids_len, X, ncols, out_mat.getData());
+	return out_mat;
+}
+
+template<typename FPP>
+FPP* Faust::TransformHelper<FPP,Cpu>::indexMultiply(faust_unsigned_int* ids[2], size_t ids_len[2], const FPP* X, int ncols, FPP* out) const
 {
 	//TODO: refactor with sliceMultiply if it applies
 	using Mat = Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>;
@@ -1784,6 +1802,11 @@ Faust::MatDense<FPP, Cpu> Faust::TransformHelper<FPP,Cpu>::indexMultiply(faust_u
 	auto gen_first_fac = *(this->transform->begin());
 	auto gen_last_fac = *(this->transform->end()-1);
 	MatGeneric<FPP, Cpu>* left_indexed_factor = nullptr;
+	auto out_nrows = ids[0]==nullptr?this->getNbRow():ids_len[0];
+	if(out == nullptr)
+		//TODO: document that out must be deleted by the callee
+		out = new FPP[out_nrows*ncols];
+	MatMap out_map(out, out_nrows, ncols);
 	if(this->is_transposed)
 	{
 		// 1. multiply the first factor indexed according to ids by X
@@ -1792,12 +1815,18 @@ Faust::MatDense<FPP, Cpu> Faust::TransformHelper<FPP,Cpu>::indexMultiply(faust_u
 		{
 			// 1.2 index ds_fac and multiply by X
 			// eigenIndexMul ignores ids_len[0]if ids[0] is nullptr, so no worry
-			ds_fac->eigenIndexMul(size() == 1 ? ids[0] : nullptr, ids[1], ids_len[0], ids_len[1], X_map, M, this->is_transposed, this->is_conjugate);
+			if(size() == 1)
+				ds_fac->eigenIndexMul(ids[0], ids[1], ids_len[0], ids_len[1], X_map, out_map, this->is_transposed, this->is_conjugate);
+			else
+				ds_fac->eigenIndexMul(nullptr, ids[1], ids_len[0], ids_len[1], X_map, M, this->is_transposed, this->is_conjugate);
 		}
 		else if(sp_fac = dynamic_cast<MatSparse<FPP, Cpu>*>(gen_first_fac))
 		{
 			// 1.2 multiply the ids columns of the factor by X
-			sp_fac->eigenIndexMul(size() == 1 ? ids[0] : nullptr, ids[1], ids_len[0], ids_len[1], X_map, M, this->is_transposed, this->is_conjugate);
+			if(size() == 1)
+				sp_fac->eigenIndexMul(ids[0], ids[1], ids_len[0], ids_len[1], X_map, out_map, this->is_transposed, this->is_conjugate);
+			else
+				sp_fac->eigenIndexMul(nullptr, ids[1], ids_len[0], ids_len[1], X_map, M, this->is_transposed, this->is_conjugate);
 		}
 		else
 		{
@@ -1805,7 +1834,7 @@ Faust::MatDense<FPP, Cpu> Faust::TransformHelper<FPP,Cpu>::indexMultiply(faust_u
 		}
 		// 2. then create a subFaust with all factors except the first one (copy-free)
 		if(size() == 1)
-			return MatDense<FPP, Cpu>(M.data(), M.rows(), M.cols()); // TODO: a copy could be avoided
+			return out;
 		auto end_fac_it = this->end();
 		if(ids[0] != nullptr)
 		{
@@ -1816,8 +1845,15 @@ Faust::MatDense<FPP, Cpu> Faust::TransformHelper<FPP,Cpu>::indexMultiply(faust_u
 		TransformHelper<FPP, Cpu> sub_th(other_facs, (FPP) 1.0, /* opt_copy */false, /* cloning */ false, /* internal call */ true);
 		// 3. finally multiply this new Faust by M and return the result
 		auto sub_th_t = sub_th.transpose();
-		mat.resize(sub_th_t->getNbRow(), M.cols());
-		sub_th_t->multiply(M.data(), M.cols(), mat.getData());
+		if(ids[0] == nullptr)
+		{
+			sub_th_t->multiply(M.data(), M.cols(), out);
+		}
+		else
+		{
+			mat.resize(sub_th_t->getNbRow(), M.cols());
+			sub_th_t->multiply(M.data(), M.cols(), mat.getData());
+		}
 		delete sub_th_t;
 	}
 	else
@@ -1828,12 +1864,18 @@ Faust::MatDense<FPP, Cpu> Faust::TransformHelper<FPP,Cpu>::indexMultiply(faust_u
 		{
 			// 1.2 multiply the slice of the factor by X
 			// eigenIndexMul ignores ids_len[0]if ids[0] is nullptr, so no worry
-			ds_fac->eigenIndexMul(size() == 1 ? ids[0] : nullptr, ids[1], ids_len[0], ids_len[1], X_map, M, this->is_transposed, this->is_conjugate);
+			if(size() == 1)
+				ds_fac->eigenIndexMul(ids[0], ids[1], ids_len[0], ids_len[1], X_map, out_map, this->is_transposed, this->is_conjugate);
+			else
+				ds_fac->eigenIndexMul(nullptr, ids[1], ids_len[0], ids_len[1], X_map, M, this->is_transposed, this->is_conjugate);
 		}
 		else if(sp_fac = dynamic_cast<MatSparse<FPP, Cpu>*>(gen_last_fac))
 		{
 			// 1.2 multiply the indexed factor by X
-			sp_fac->eigenIndexMul(size() == 1 ? ids[0] : nullptr, ids[1], ids_len[0], ids_len[1], X_map, M, this->is_transposed, this->is_conjugate);
+			if(size() == 1)
+				sp_fac->eigenIndexMul(ids[0], ids[1], ids_len[0], ids_len[1], X_map, out_map, this->is_transposed, this->is_conjugate);
+			else
+				sp_fac->eigenIndexMul(nullptr, ids[1], ids_len[0], ids_len[1], X_map, M, this->is_transposed, this->is_conjugate);
 		}
 		else
 		{
@@ -1841,7 +1883,7 @@ Faust::MatDense<FPP, Cpu> Faust::TransformHelper<FPP,Cpu>::indexMultiply(faust_u
 		}
 		// 2. then create a subFaust with all factors except the last one (copy-free) and the first one if indexing on the row too
 		if(size() == 1)
-			return MatDense<FPP, Cpu>(M.data(), M.rows(), M.cols()); // TODO: a copy could be avoided
+			return out;
 		auto start_fac_it = this->begin();
 		if(ids[0] != nullptr)
 		{
@@ -1851,8 +1893,15 @@ Faust::MatDense<FPP, Cpu> Faust::TransformHelper<FPP,Cpu>::indexMultiply(faust_u
 		std::vector<MatGeneric<FPP,Cpu> *> other_facs(start_fac_it, this->end()-1);
 		TransformHelper<FPP, Cpu> sub_th(other_facs, (FPP) 1.0, /* opt_copy */false, /* cloning */ false, /* internal call */ true);
 		// 3. finally multiply this new Faust by M and return the result
-		mat.resize(sub_th.getNbRow(), M.cols());
-		sub_th.multiply(M.data(), M.cols(), mat.getData());
+		if(ids[0] == nullptr)
+		{
+			sub_th.multiply(M.data(), M.cols(), out);
+		}
+		else
+		{
+			mat.resize(sub_th.getNbRow(), M.cols());
+			sub_th.multiply(M.data(), M.cols(), mat.getData());
+		}
 	}
 	if(ids[0] != nullptr)
 	{
@@ -1860,26 +1909,24 @@ Faust::MatDense<FPP, Cpu> Faust::TransformHelper<FPP,Cpu>::indexMultiply(faust_u
 		if(ds_fac = dynamic_cast<MatDense<FPP, Cpu>*>(left_indexed_factor))
 		{
 			// 1.2 multiply the slice of the factor by X
-			ds_fac->eigenIndexMul(ids[0], nullptr, ids_len[0], 0, X_map, M, this->is_transposed, this->is_conjugate);
+			ds_fac->eigenIndexMul(ids[0], nullptr, ids_len[0], 0, X_map, out_map, this->is_transposed, this->is_conjugate);
 		}
 		else if(sp_fac = dynamic_cast<MatSparse<FPP, Cpu>*>(left_indexed_factor))
 		{
 			// 1.2 multiply the indexed factor by X
-			sp_fac->eigenIndexMul(ids[0], nullptr, ids_len[0], 0, X_map, M, this->is_transposed, this->is_conjugate);
+			sp_fac->eigenIndexMul(ids[0], nullptr, ids_len[0], 0, X_map, out_map, this->is_transposed, this->is_conjugate);
 		}
 		else
 		{
 			throw std::runtime_error("Only MatDense and MatSparse factors are handled by sliceMultiply op for the moment.");
 		}
-		mat = MatDense<FPP, Cpu>(M.data(), M.rows(), M.cols()); // TODO: a copy could be avoided
 	}
-	return mat;
+	return out;
 }
 
 template<typename FPP>
 Faust::MatDense<FPP, Cpu> Faust::TransformHelper<FPP,Cpu>::sliceMultiply(const Slice s[2], const FPP* X, int X_ncols/*=1*/) const
 {
-
 	Faust::MatDense<FPP, Cpu> out(s[0].size(), X_ncols);
 	sliceMultiply(s, X, out.getData(), X_ncols);
 	return out;
@@ -2028,9 +2075,7 @@ FPP* Faust::TransformHelper<FPP,Cpu>::sliceMultiply(const Slice s[2], const FPP*
 		}
 		// 2. then create a subFaust with all factors except the last one (copy-free)
 		if(size() == 1)
-		{
 			return out;
-		}
 		// but a slicing on rows is also possible on the left factor
 		if(s0.start_id != 0 || s0.end_id != gen_first_fac->getNbRow())
 		{
