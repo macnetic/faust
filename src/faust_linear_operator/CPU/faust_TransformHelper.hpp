@@ -380,7 +380,7 @@ namespace Faust {
 		{
 			this->is_transposed ^= transpose; //TODO: don't alter this state to multiply // or remove args
 			this->is_conjugate ^= conjugate;
-			if(this->is_sliced)
+			if(this->is_sliced && (A_ncols == 1 || this->size() > 1)) // benchmarks have shown that a single factor Faust is less efficient to multiply a marix (A_ncols > 1) with sliceMultiply than using eval_sliced_Transform and multiply
 			{
 				this->sliceMultiply(this->slices, A, C, A_ncols);
 			}
@@ -392,6 +392,7 @@ namespace Faust {
 			}
 			else
 			{
+				this->eval_sliced_Transform();
 				this->eval_fancy_idx_Transform();
 				this->transform->multiply(A, A_ncols, C, this->isTransposed2char());
 			}
