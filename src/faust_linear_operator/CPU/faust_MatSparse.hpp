@@ -1013,7 +1013,7 @@ void Faust::MatSparse<FPP,Cpu>::get_cols(const faust_unsigned_int* orig_col_ids,
 					  // https://github.com/scipy/scipy/blob/8a64c938ddf1ae4c02a08d2c5e38daeb8d061d38/scipy/sparse/_compressed.py, function _minor_index_fancy
 	auto col_ids = new faust_unsigned_int[num_cols];
 	std::iota(col_ids,  col_ids+num_cols, 0);
-	std::sort(col_ids, col_ids+num_cols, [orig_col_ids](faust_unsigned_int a, faust_unsigned_int b){return orig_col_ids[a] > orig_col_ids[b];});
+	std::sort(col_ids, col_ids+num_cols, [orig_col_ids](faust_unsigned_int a, faust_unsigned_int b){return orig_col_ids[a] < orig_col_ids[b];});
 	auto col_offsets = new int[this->getNbCol()];
 	memset(col_offsets, 0, sizeof(int)*this->getNbCol());
 	auto res_indptr = new int[this->getNbRow()+1];
@@ -1604,6 +1604,7 @@ namespace Faust {
 		void MatSparse<FPP, Cpu>::eigenIndexMul(const faust_unsigned_int* row_ids, const faust_unsigned_int* col_ids, size_t nrows, size_t ncols, const MatType1 &in_mat, MatType2 &out_mat, bool transpose/* = false*/, bool conjugate /*= false*/)
 		{
 
+#if (EIGEN_WORLD_VERSION >= 3 && EIGEN_MAJOR_VERSION >= 4)
 
 			if(row_ids == nullptr && col_ids == nullptr)
 			{
@@ -1665,6 +1666,9 @@ namespace Faust {
 					tmp = tmp.conjugate();
 				out_mat = tmp * in_mat;
 			}
+#else
+			throw std::runtime_error("MatSparse::eigenIndexMul is not supported with eigen version < 3.9");
+#endif
 		}
 }
 #endif

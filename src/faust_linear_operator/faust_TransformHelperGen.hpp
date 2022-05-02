@@ -324,7 +324,7 @@ namespace Faust
 		{
 			if(this->is_sliced)
 				return	this->slices[0].size();
-			else if(this->is_fancy_indexed and fancy_indices[0] != nullptr)
+			else if(this->is_fancy_indexed && fancy_indices[0] != nullptr)
 				return this->fancy_num_rows;
 			else
 				return this->is_transposed?this->transform->getNbCol():this->transform->getNbRow();

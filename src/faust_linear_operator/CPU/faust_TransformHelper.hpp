@@ -256,15 +256,25 @@ namespace Faust {
 //					v_size = this->transform->getNbCol();
 //				else
 //					v_size = this->transform->getNbRow();
+#if (EIGEN_WORLD_VERSION >= 3 && EIGEN_MAJOR_VERSION >= 4)
 				v.resize(this->getNbRow());
 				sliceMultiply(this->slices, x, v.getData(), 1);
 				return v;
+#else
+				this->eval_sliced_Transform();
+				return this->multiply(x, transpose, conjugate);
+#endif
 			}
 			else if(this->is_fancy_indexed && this->is_all_dense()) // benchmarks have shown that indexMultiply worths it only if the Faust is dense
 			{
 				size_t id_lens[2] = {this->fancy_num_rows, this->fancy_num_cols};
+#if (EIGEN_WORLD_VERSION >= 3 && EIGEN_MAJOR_VERSION >= 4)
 				auto v = indexMultiply(this->fancy_indices, id_lens, x);
 				return v;
+#else
+				this->eval_fancy_idx_Transform();
+				return this->multiply(x, transpose, conjugate);
+#endif
 			}
 			else
 			{
@@ -279,8 +289,15 @@ namespace Faust {
 		void TransformHelper<FPP,Cpu>::multiply(const FPP *x, FPP* y, const bool transpose, const bool conjugate)
 		{
 			if(this->is_sliced)
+			{
 				//TODO: manage transpose and conjugate (or remove args) // is_transposed and is_conjugate are already managed
+#if (EIGEN_WORLD_VERSION >= 3 && EIGEN_MAJOR_VERSION >= 4)
 				sliceMultiply(this->slices, x, y, 1);
+#else
+				this->eval_sliced_Transform();
+				return this->multiply(x, y, transpose, conjugate);
+#endif
+			}
 			else if(this->is_fancy_indexed && this->is_all_dense()) // benchmarks have shown that indexMultiply worths it only if the Faust is dense
 			{
 				//TODO: manage transpose and conjugate (or remove args) // is_transposed and is_conjugate are already managed
@@ -382,7 +399,12 @@ namespace Faust {
 			this->is_conjugate ^= conjugate;
 			if(this->is_sliced && (A_ncols == 1 || this->size() > 1)) // benchmarks have shown that a single factor Faust is less efficient to multiply a marix (A_ncols > 1) with sliceMultiply than using eval_sliced_Transform and multiply
 			{
+#if (EIGEN_WORLD_VERSION >= 3 && EIGEN_MAJOR_VERSION >= 4)
 				this->sliceMultiply(this->slices, A, C, A_ncols);
+#else
+				this->eval_sliced_Transform();
+				return multiply(A, A_ncols, C, transpose, conjugate);
+#endif
 			}
 			else if(this->is_fancy_indexed && this->is_all_dense()) // benchmarks have shown that indexMultiply worths it only if the Faust is dense
 			{
@@ -1788,6 +1810,7 @@ Faust::MatDense<FPP, Cpu> Faust::TransformHelper<FPP,Cpu>::indexMultiply(faust_u
 template<typename FPP>
 FPP* Faust::TransformHelper<FPP,Cpu>::indexMultiply(faust_unsigned_int* ids[2], size_t ids_len[2], const FPP* X, int ncols, FPP* out) const
 {
+#if (EIGEN_WORLD_VERSION >= 3 && EIGEN_MAJOR_VERSION >= 4)
 	//TODO: refactor with sliceMultiply if it applies
 	using Mat = Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>;
 	using SpMat = Eigen::SparseMatrix<FPP, Eigen::ColMajor>;
@@ -1922,6 +1945,10 @@ FPP* Faust::TransformHelper<FPP,Cpu>::indexMultiply(faust_unsigned_int* ids[2], 
 			throw std::runtime_error("Only MatDense and MatSparse factors are handled by sliceMultiply op for the moment.");
 		}
 	}
+#else
+	throw std::runtime_error("TransformHelper::indexMultiply is not supported with eigen version < 3.9");
+#endif
+
 	return out;
 }
 
@@ -1936,6 +1963,7 @@ Faust::MatDense<FPP, Cpu> Faust::TransformHelper<FPP,Cpu>::sliceMultiply(const S
 template<typename FPP>
 FPP* Faust::TransformHelper<FPP,Cpu>::sliceMultiply(const Slice s[2], const FPP* X, FPP* out/*=nullptr*/, int X_ncols/*=1*/) const
 {
+#if (EIGEN_WORLD_VERSION >= 3 && EIGEN_MAJOR_VERSION >= 4)
 	// NOTE: Take care if you edit this method, it must avoid any method that calls eval_sliced_Transform or it would became useless or bugged
 	//TODO: refactor this function (too long)
 	//TODO: refactor with MatDense/MatSparse/eigenSliceMul, similar to eigenIndexMul
@@ -2148,6 +2176,9 @@ FPP* Faust::TransformHelper<FPP,Cpu>::sliceMultiply(const Slice s[2], const FPP*
 		}
 		delete [] tmp_ptr;
 	}
+#else
+	throw std::runtime_error("TransformHelper::sliceMultiply is not supported with eigen version < 3.9");
+#endif
 	return out;
 }
 
