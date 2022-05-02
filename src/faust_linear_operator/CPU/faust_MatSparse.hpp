@@ -1017,12 +1017,17 @@ void Faust::MatSparse<FPP,Cpu>::get_cols(const faust_unsigned_int* orig_col_ids,
 	auto col_offsets = new int[this->getNbCol()];
 	memset(col_offsets, 0, sizeof(int)*this->getNbCol());
 	auto res_indptr = new int[this->getNbRow()+1];
-	csr_column_index1(num_cols, orig_col_ids, this->getNbRow(), this->getNbCol(), getRowPtr(), getColInd(), col_offsets, res_indptr);
+	scipy::csr_column_index1(num_cols, orig_col_ids, this->getNbRow(), this->getNbCol(), getRowPtr(), getColInd(), col_offsets, res_indptr);
 	auto nnz = res_indptr[this->getNbRow()];
 	auto res_indices = new int[nnz];
 	auto res_data = new FPP[nnz];
-	csr_column_index2(col_ids, col_offsets, this->getNonZeros(), getColInd(), getValuePtr(), res_indices, res_data);
+	scipy::csr_column_index2(col_ids, col_offsets, this->getNonZeros(), getColInd(), getValuePtr(), res_indices, res_data);
 	out_cols = MatSparse<FPP, Cpu>(nnz, this->getNbRow(), num_cols, res_data, res_indptr, res_indices);
+	delete[] col_ids;
+	delete[] col_offsets;
+	delete[] res_indptr;
+	delete[] res_indices;
+	delete[] res_data;
 	//TODO: (optimization) initialize out_cols before calling csr_column_index2 and use its buffer directly in csr_column_index2, it would allow to copy only res_indptr
 #elif EIGEN_COL_MAJOR_GET_COLS // this implementation is not faster than the two other ones
 	Eigen::SparseMatrix<FPP, Eigen::ColMajor> cols_mat(this->getNbRow(), num_cols); // ColMajor to use cols() in write-access (for row-major it is only read-access)
@@ -1079,7 +1084,8 @@ void Faust::MatSparse<FPP,Cpu>::get_rows(faust_unsigned_int start_row_id, faust_
 	//	tripletList.reserve((int)(this->getNbCol()*num_rows));
 	faust_unsigned_int count = 0;
 	for(faust_unsigned_int i=start_row_id ; i< start_row_id+num_rows ; i++)
-		for(typename Eigen::SparseMatrix<FPP,Eigen::RowMajor>::InnerIterator it(mat,i); it; ++it){
+		for(typename Eigen::SparseMatrix<FPP,Eigen::RowMajor>::InnerIterator it(mat,i); it; ++it)
+		{
 			tripletList.push_back(T(it.row()-start_row_id, it.col(), it.value()));
 			count++;
 		}
@@ -1101,6 +1107,31 @@ Faust::MatSparse<FPP,Cpu>* Faust::MatSparse<FPP,Cpu>::get_rows(faust_unsigned_in
 template<typename FPP>
 void Faust::MatSparse<FPP,Cpu>::get_rows(const faust_unsigned_int* row_ids, faust_unsigned_int num_rows, Faust::MatSparse<FPP, Cpu>& out_rows) const
 {
+#define SCIPY_GET_ROWS
+#ifdef SCIPY_GET_ROWS // the scipy method isn't especially faster (nor slower) than the default one but use it to be consistent with get_cols
+	auto res_indptr = new int[num_rows+1];
+	// compute number of elements per indexed row
+	auto rowptr = getRowPtr();
+	for(int i=1;i<=num_rows;i++)
+		res_indptr[i] = rowptr[row_ids[i-1]+1] - rowptr[row_ids[i-1]];
+
+	// compute cumulative sum
+	res_indptr[0] = 0;
+	for(int i=1;i <= num_rows; i++)
+		res_indptr[i] += res_indptr[i-1];
+
+	// copy column indices and values for the columns of interest
+	auto nnz = res_indptr[num_rows];
+	auto res_indices = new int[nnz];
+	auto res_data = new FPP[nnz];
+	scipy::csr_row_index(num_rows, row_ids, getRowPtr(), getColInd(), getValuePtr(), res_indices, res_data);
+
+	out_rows = MatSparse<FPP, Cpu>(nnz, num_rows, this->getNbCol(), res_data, res_indptr, res_indices);
+	delete[] res_indptr;
+	delete[] res_indices;
+	delete[] res_data;
+	//TODO: (optimization) initialize out_rows before calling csr_column_index2 and use its buffer directly in csr_column_index2, it would allow to copy only res_indptr
+#else
 	typedef Eigen::Triplet<FPP> T;
 	std::vector<T> tripletList;
 	faust_unsigned_int count = 0;
@@ -1117,6 +1148,7 @@ void Faust::MatSparse<FPP,Cpu>::get_rows(const faust_unsigned_int* row_ids, faus
 	out_rows.resize(count, num_rows, this->getNbCol());
 	out_rows.mat.setFromTriplets(tripletList.begin(), tripletList.end());
 	out_rows.nnz = count;
+#endif
 }
 
 template<typename FPP>
@@ -1571,6 +1603,8 @@ namespace Faust {
 		template<typename MatType1, typename MatType2>
 		void MatSparse<FPP, Cpu>::eigenIndexMul(const faust_unsigned_int* row_ids, const faust_unsigned_int* col_ids, size_t nrows, size_t ncols, const MatType1 &in_mat, MatType2 &out_mat, bool transpose/* = false*/, bool conjugate /*= false*/)
 		{
+
+
 			if(row_ids == nullptr && col_ids == nullptr)
 			{
 				if(transpose && conjugate)
