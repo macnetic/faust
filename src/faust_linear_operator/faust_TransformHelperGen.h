@@ -87,7 +87,7 @@ namespace Faust
 			virtual void copy_mul_mode_state(const TransformHelper<FPP,DEV>& th);
 			void copy_state(const TransformHelper<FPP,DEV>& th);
 			int get_mul_order_opt_mode() const;
-			virtual void eval_sliced_Transform();
+			virtual void eval_sliced_Transform(bool ignore_fancy_idx=false);
 			void eval_fancy_idx_Transform();
 			virtual TransformHelper<FPP, DEV>* slice(faust_unsigned_int start_row_id, faust_unsigned_int end_row_id,
 					faust_unsigned_int start_col_id, faust_unsigned_int end_col_id);
@@ -101,6 +101,10 @@ namespace Faust
 			 */
 			virtual FPP get_item(faust_unsigned_int i, faust_unsigned_int j)=0;
 			void get_item(faust_unsigned_int i, faust_unsigned_int j, MatDense<FPP, DEV>& out_mat, faust_unsigned_int &out_id);
+			bool is_row_fancy_indexed() {return is_fancy_indexed && fancy_indices[0] != nullptr;}
+			bool is_col_fancy_indexed() {return is_fancy_indexed && fancy_indices[1] != nullptr;}
+			bool is_row_sliced() {return is_sliced && (slices[0].start_id != 0 || slices[0].end_id != this->getNbRow());}
+			bool is_col_sliced() {return is_sliced && (slices[1].start_id != 0 || slices[1].end_id != this->getNbCol());}
 			virtual ~TransformHelperGen();
 
 		protected:

@@ -35,6 +35,7 @@ namespace Faust
 			this->fancy_num_rows = num_rows;
 			this->fancy_indices[0] = new faust_unsigned_int[num_rows]; // deleted after evaluation or in destructor
 			memcpy(this->fancy_indices[0], row_ids, num_rows*sizeof(faust_unsigned_int));
+			is_fancy_indexed = true;
 		}
 		else
 		{
@@ -44,6 +45,7 @@ namespace Faust
 				this->fancy_num_rows = th->fancy_num_rows;
 				this->fancy_indices[0] = new faust_unsigned_int[th->fancy_num_rows]; // deleted after evaluation or in destructor
 				memcpy(this->fancy_indices[0], th->fancy_indices[0], th->fancy_num_rows*sizeof(faust_unsigned_int));
+				is_fancy_indexed = true;
 			}
 			else
 			{
@@ -56,6 +58,7 @@ namespace Faust
 			this->fancy_num_cols = num_cols;
 			this->fancy_indices[1] = new faust_unsigned_int[num_cols];
 			memcpy(this->fancy_indices[1], col_ids, num_cols*sizeof(faust_unsigned_int));
+			is_fancy_indexed = true;
 		}
 		else
 		{
@@ -64,6 +67,7 @@ namespace Faust
 				this->fancy_num_cols = th->fancy_num_cols;
 				this->fancy_indices[1] = new faust_unsigned_int[th->fancy_num_cols]; // deleted after evaluation or in destructor
 				memcpy(this->fancy_indices[1], th->fancy_indices[1], th->fancy_num_cols*sizeof(faust_unsigned_int));
+				is_fancy_indexed = true;
 			}
 			else
 			{
@@ -71,19 +75,37 @@ namespace Faust
 				this->fancy_indices[1] = nullptr;
 			}
 		}
+		// respect invariant: a Faust can't be sliced and fancy indexed at the same time
+		// but don't forget to slice the other dimension if it applies, otherwise the slicing information will be lost (is_sliced is set to false below)
+		if(th->is_row_sliced() && is_col_fancy_indexed())
+		{
+			slices[0] = th->slices[0];
+			slices[1] = th->slices[1];
+			is_sliced = true;
+			eval_sliced_Transform(true);
+		}
+		if(th->is_col_sliced() && is_row_fancy_indexed())
+		{
+			slices[0] = th->slices[0];
+			slices[1] = th->slices[1];
+			is_sliced = true;
+			eval_sliced_Transform(true);
+		}
+		//TODO: (optimization) the real invariant should be that a Faust can't be sliced and indexed on the same dimension but totally can be on two different dimensions
+
 		// the Faust is sliced, shift the indices to do as if the Faust wasn't sliced
 		if(th->is_sliced)
 		{
-			if(th->slices[0].start_id != 0)
+			if(this->fancy_indices[0] != nullptr && th->slices[0].start_id != 0)
 				for(int i=0; i < num_rows; i++)
 				{
 					this->fancy_indices[0][i] += th->slices[0].start_id;
 				}
-			if(th->slices[1].start_id != 0)
-				for(int i=1; i < num_cols; i++)
-				{
-					this->fancy_indices[1][i] += th->slices[1].start_id;
-				}
+			if(this->fancy_indices[1] != nullptr && th->slices[1].start_id != 0)
+					for(int i=1; i < num_cols; i++)
+					{
+						this->fancy_indices[1][i] += th->slices[1].start_id;
+					}
 		}
 		else if(th->is_fancy_indexed) // a Faust can't be sliced and fancy_indexed at the same time
 		{
@@ -106,21 +128,23 @@ namespace Faust
 				}
 		}
 		// prevent overflows
-		for(int i=0;i < num_rows; i++)
-		{
-			auto size = is_transposed?transform->getNbCol():transform->getNbRow();
-			if(this->fancy_indices[0][i] > size)
-				throw std::runtime_error("Faust indexing error: row index is greater than Faust number of rows.");
+		if(fancy_indices[0] != nullptr)
+			for(int i=0;i < num_rows; i++)
+			{
+				auto size = is_transposed?transform->getNbCol():transform->getNbRow();
+				if(this->fancy_indices[0][i] > size)
+					throw std::runtime_error("Faust indexing error: row index is greater than Faust number of rows.");
 
-		}
-		for(int j=0;j < num_cols; j++)
-		{
-			auto size = is_transposed?transform->getNbRow():transform->getNbCol();
-			if(this->fancy_indices[1][j] > size)
-				throw std::runtime_error("Faust indexing error: column index is greater than Faust number of columns.");
-		}
+			}
+		if(fancy_indices[1] != nullptr)
+			for(int j=0;j < num_cols; j++)
+			{
+				auto size = is_transposed?transform->getNbRow():transform->getNbCol();
+				if(this->fancy_indices[1][j] > size)
+					throw std::runtime_error("Faust indexing error: column index is greater than Faust number of columns.");
+			}
+		is_fancy_indexed = true;
 		is_sliced = false; // absolute indices were computed, consider the Faust is not sliced in any case (even if it was before)
-		this->is_fancy_indexed = true;
 //		this->eval_fancy_idx_Transform(); // lazy indexing
 //		copy_mul_mode_state(*th); // the best product method can be totally different after indexing
 	}
@@ -423,9 +447,10 @@ namespace Faust
 		}
 
 	template<typename FPP, FDevice DEV>
-		void Faust::TransformHelperGen<FPP, DEV>::eval_sliced_Transform()
+		void Faust::TransformHelperGen<FPP, DEV>::eval_sliced_Transform(bool ignore_fancy_idx/*=false*/)
 		{
-			eval_fancy_idx_Transform();
+			if(! ignore_fancy_idx)
+				eval_fancy_idx_Transform();
 			if(is_sliced)
 			{
 				// new transform object (to avoid modifying original Faust::Transform*) but the matrices are shared (not copied)

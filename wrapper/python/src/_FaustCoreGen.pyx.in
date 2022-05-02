@@ -599,19 +599,41 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
         if id0_slice and not id1_slice:
             col_indices = np.array(indices[1], dtype=dtype)
             col_indices_view = col_indices
-            core.@CORE_OBJ@ = \
-                    self.@CORE_OBJ@.fancy_idx(NULL,
-                                              0,
-                                              &col_indices_view[0],
-                                              col_indices.size)
+            if indices[0].start != 0 or indices[0].stop != self.@CORE_OBJ@.getNbRow():
+                core.@CORE_OBJ@ = self.@CORE_OBJ@.slice(indices[0].start,
+                                                    indices[0].stop,
+                                                    0,
+                                                    self.@CORE_OBJ@.getNbCol())
+                core.@CORE_OBJ@ = \
+                        core.@CORE_OBJ@.fancy_idx(NULL,
+                                                         0,
+                                                         &col_indices_view[0],
+                                                         col_indices.size)
+            else:
+                core.@CORE_OBJ@ = \
+                        self.@CORE_OBJ@.fancy_idx(NULL,
+                                                  0,
+                                                  &col_indices_view[0],
+                                                  col_indices.size)
         elif not id0_slice and id1_slice:
             row_indices = np.array(indices[0], dtype=dtype)
             row_indices_view = row_indices
-            core.@CORE_OBJ@ = \
-                    self.@CORE_OBJ@.fancy_idx(&row_indices_view[0],
-                                              row_indices.size,
-                                              NULL,
-                                              0)
+            if indices[1].start != 0 or indices[1].stop != self.@CORE_OBJ@.getNbCol():
+                core.@CORE_OBJ@ = self.@CORE_OBJ@.slice(0,
+                                                        self.@CORE_OBJ@.getNbRow(),
+                                                        indices[1].start,
+                                                        indices[1].stop)
+                core.@CORE_OBJ@ = \
+                        core.@CORE_OBJ@.fancy_idx(&row_indices_view[0],
+                                                         row_indices.size,
+                                                         NULL,
+                                                         0)
+            else:
+                core.@CORE_OBJ@ = \
+                        self.@CORE_OBJ@.fancy_idx(&row_indices_view[0],
+                                                         row_indices.size,
+                                                         NULL,
+                                                         0)
         else:
             raise ValueError("Other cases like F[I, J] or F[:, :] can't happen here.")
             # F[:, :] is handlded by slice and F[I, J] is not implemented, it
