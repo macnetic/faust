@@ -1650,7 +1650,7 @@ void Faust::Transform<FPP,Cpu>::multiply(const FPP* A, int A_ncols, FPP* C, cons
 	int rhs_nrows, out_nrows;
 	int i, fac_i;
 	int max_nrows;
-	FPP *tmp_buf1, *tmp_buf2;
+	FPP *tmp_buf1 = nullptr, *tmp_buf2 = nullptr;
 	auto rhs_buf = A;
 	FPP* out_buf = nullptr;
 	MatSparse<FPP, Cpu>* sp_mat = nullptr;
@@ -1701,7 +1701,8 @@ void Faust::Transform<FPP,Cpu>::multiply(const FPP* A, int A_ncols, FPP* C, cons
 	mul_ds_mat = [&op_dsmat](DenseMat& ds_mat, DenseMatMap& rhs_mat, DenseMatMap& out_mat) {out_mat.noalias() = op_dsmat(ds_mat) *  rhs_mat;};
 	mul_sp_mat = [&op_spmat](SparseMat& sp_mat, DenseMatMap& rhs_mat,  DenseMatMap& out_mat) { out_mat.noalias() = op_spmat(sp_mat) * rhs_mat;};
 	mul_bsr_mat = [&op_bsrmat](BSRMat& bsr_mat, DenseMatMap& rhs_mat,  DenseMatMap& out_mat) { out_mat.noalias() = op_bsrmat(bsr_mat).mul(rhs_mat);};
-	tmp_buf1 = new FPP[max_nrows*A_ncols];
+	if(size() > 1)
+		tmp_buf1 = new FPP[max_nrows*A_ncols];
 	tmp_buf2 = new FPP[max_nrows*A_ncols];
 	for(i=0; i < this->size(); i++)
 	{
@@ -1725,7 +1726,8 @@ void Faust::Transform<FPP,Cpu>::multiply(const FPP* A, int A_ncols, FPP* C, cons
 		// rhs_ncols never changes
 		rhs_nrows = out_mat.rows();
 	}
-	delete [] tmp_buf1;
+	if(tmp_buf1 != nullptr)
+		delete [] tmp_buf1;
 	delete [] tmp_buf2;
 }
 

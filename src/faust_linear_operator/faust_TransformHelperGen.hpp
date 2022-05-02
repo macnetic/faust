@@ -505,8 +505,7 @@ namespace Faust
 				{
 					gen_fac = transform->get_fact(size-1, cloning_fact);
 					if(fancy_indices[id_right] != nullptr)
-						last_sub_fac = gen_fac->get_cols(fancy_indices[id_right], right_ind_size);	//		std::cout << "---" << std::endl;
-																									//		last_sub_fac->Display();
+						last_sub_fac = gen_fac->get_cols(fancy_indices[id_right], right_ind_size);
 					else
 						last_sub_fac = gen_fac;
 					if(cloning_fact)
