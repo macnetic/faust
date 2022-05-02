@@ -36,60 +36,85 @@
 
 #ifndef __FAUST_SCIPY__
 #define __FAUST_SCIPY__
-
-/*
- * Slice columns given as an array of indices (pass 1).
- * This pass counts idx entries and computes a new indptr.
- *
- * Input Arguments:
- *   I  n_idx           - number of indices to slice
- *   I  col_idxs[n_idx] - indices to slice
- *   I  n_row           - major axis dimension
- *   I  n_col           - minor axis dimension
- *   I  Ap[n_row+1]     - indptr
- *   I  Aj[nnz(A)]      - indices
- *
- * Output Arguments:
- *   I  col_offsets[n_col] - cumsum of index repeats
- *   I  Bp[n_row+1]        - new indptr
- *
- */
-template<class I, class J>
-void csr_column_index1(const J n_idx,
-                       const J col_idxs[],
-                       const J n_row,
-                       const J n_col,
-                       const I Ap[],
-                       const I Aj[],
-                       I col_offsets[],
-                       I Bp[]);
-
-
-/*
- * Slice columns given as an array of indices (pass 2).
- * This pass populates indices/data entries for selected columns.
- *
- * Input Arguments:
- *   I  col_order[n_idx]   - order of col indices
- *   I  col_offsets[n_col] - cumsum of col index counts
- *   I  nnz                - nnz(A)
- *   I  Aj[nnz(A)]         - column indices
- *   T  Ax[nnz(A)]         - data
- *
- * Output Arguments:
- *   I  Bj[nnz(B)] - new column indices
- *   T  Bx[nnz(B)] - new data
- *
- */
-template<class I, class J, class T>
-void csr_column_index2(const J col_order[],
-                       const I col_offsets[],
-                       const J nnz,
-                       const I Aj[],
-                       const T Ax[],
-                       I Bj[],
-                       T Bx[]);
+namespace scipy
+{
+	/*
+	 * Slice columns given as an array of indices (pass 1).
+	 * This pass counts idx entries and computes a new indptr.
+	 *
+	 * Input Arguments:
+	 *   I  n_idx           - number of indices to slice
+	 *   I  col_idxs[n_idx] - indices to slice
+	 *   I  n_row           - major axis dimension
+	 *   I  n_col           - minor axis dimension
+	 *   I  Ap[n_row+1]     - indptr
+	 *   I  Aj[nnz(A)]      - indices
+	 *
+	 * Output Arguments:
+	 *   I  col_offsets[n_col] - cumsum of index repeats
+	 *   I  Bp[n_row+1]        - new indptr
+	 *
+	 */
+	template<class I, class J>
+		void csr_column_index1(const J n_idx,
+				const J col_idxs[],
+				const J n_row,
+				const J n_col,
+				const I Ap[],
+				const I Aj[],
+				I col_offsets[],
+				I Bp[]);
 
 
+	/*
+	 * Slice columns given as an array of indices (pass 2).
+	 * This pass populates indices/data entries for selected columns.
+	 *
+	 * Input Arguments:
+	 *   I  col_order[n_idx]   - order of col indices
+	 *   I  col_offsets[n_col] - cumsum of col index counts
+	 *   I  nnz                - nnz(A)
+	 *   I  Aj[nnz(A)]         - column indices
+	 *   T  Ax[nnz(A)]         - data
+	 *
+	 * Output Arguments:
+	 *   I  Bj[nnz(B)] - new column indices
+	 *   T  Bx[nnz(B)] - new data
+	 *
+	 */
+	template<class I, class J, class T>
+		void csr_column_index2(const J col_order[],
+				const I col_offsets[],
+				const J nnz,
+				const I Aj[],
+				const T Ax[],
+				I Bj[],
+				T Bx[]);
+
+	/*
+	 * Slice rows given as an array of indices.
+	 *
+	 * Input Arguments:
+	 *   I  n_row_idx       - number of row indices
+	 *   I  rows[n_row_idx] - row indices for indexing
+	 *   I  Ap[n_row+1]     - row pointer
+	 *   I  Aj[nnz(A)]      - column indices
+	 *   T  Ax[nnz(A)]      - data
+	 *
+	 * Output Arguments:
+	 *   I  Bj - new column indices
+	 *   T  Bx - new data
+	 *
+	 */
+	template<class I, class J, class T>
+		void csr_row_index(const J n_row_idx,
+				const J rows[],
+				const I Ap[],
+				const I Aj[],
+				const T Ax[],
+				I Bj[],
+				T Bx[]);
+
+}
 #include "faust_scipy.hpp"
 #endif
