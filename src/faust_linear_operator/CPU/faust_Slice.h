@@ -19,6 +19,7 @@ namespace Faust
 		bool belong_to(faust_unsigned_int min_i, faust_unsigned_int max_i);
 		bool belong_to(Slice& s);
 		void copy(const Slice& s);
+		Slice& operator=(const Slice&);
 
 		void display();
 		static void swap(Slice& s1, Slice& s2);

@@ -63,4 +63,10 @@ namespace Faust {
 	{
 		return end_id - start_id;
 	}
+
+	Slice& Slice::operator=(const Slice& s)
+	{
+		copy(s);
+		return *this;
+	}
 }
