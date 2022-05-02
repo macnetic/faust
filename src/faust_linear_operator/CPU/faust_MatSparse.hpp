@@ -47,6 +47,7 @@
 #include <complex>
 #include <cstdlib>
 #include "faust_init_from_matio_mat.h"
+#include "faust_scipy.h"
 
 using namespace std;
 template<typename FPP>
@@ -966,7 +967,7 @@ void Faust::MatSparse<FPP,Cpu>::get_col(faust_unsigned_int id, Vect<FPP, Cpu>& o
 
 template<typename FPP>
 Faust::MatSparse<FPP,Cpu>* Faust::MatSparse<FPP,Cpu>::get_cols(faust_unsigned_int start_col_id, faust_unsigned_int num_cols) const
-{ 
+{
 	MatSparse<FPP, Cpu>* subMatrix = new MatSparse<FPP, Cpu>(this->getNbRow(), num_cols);
 	get_cols(start_col_id, num_cols, *subMatrix);
 	return subMatrix;
@@ -989,9 +990,10 @@ void Faust::MatSparse<FPP,Cpu>::get_cols(const faust_unsigned_int start_col_id, 
 				count++;
 			}
 	tripletList.resize(count);
-	out_cols.resize(nnz, this->getNbRow(), num_cols);
+//	out_cols.resize(count, this->getNbRow(), num_cols);
 	out_cols.mat.setFromTriplets(tripletList.begin(), tripletList.end());
-	out_cols.nnz = out_cols.mat.nonZeros();
+//	out_cols.nnz = out_cols.mat.nonZeros();
+	out_cols.update_dim();
 }
 
 template<typename FPP>
@@ -1005,6 +1007,30 @@ Faust::MatSparse<FPP,Cpu>* Faust::MatSparse<FPP,Cpu>::get_cols(const faust_unsig
 template<typename FPP>
 void Faust::MatSparse<FPP,Cpu>::get_cols(const faust_unsigned_int* orig_col_ids, faust_unsigned_int num_cols, MatSparse<FPP, Cpu>& out_cols) const
 {
+	//TODO: change the prototype, int for col_ids is consistent with eigen index type
+#define SCIPY_GET_COLS
+#ifdef SCIPY_GET_COLS // this impl. based on scipy is the fastest according to several benchmarks
+					  // https://github.com/scipy/scipy/blob/8a64c938ddf1ae4c02a08d2c5e38daeb8d061d38/scipy/sparse/_compressed.py, function _minor_index_fancy
+	auto col_ids = new faust_unsigned_int[num_cols];
+	std::iota(col_ids,  col_ids+num_cols, 0);
+	std::sort(col_ids, col_ids+num_cols, [orig_col_ids](faust_unsigned_int a, faust_unsigned_int b){return orig_col_ids[a] > orig_col_ids[b];});
+	auto col_offsets = new int[this->getNbCol()];
+	memset(col_offsets, 0, sizeof(int)*this->getNbCol());
+	auto res_indptr = new int[this->getNbRow()+1];
+	csr_column_index1(num_cols, orig_col_ids, this->getNbRow(), this->getNbCol(), getRowPtr(), getColInd(), col_offsets, res_indptr);
+	auto nnz = res_indptr[this->getNbRow()];
+	auto res_indices = new int[nnz];
+	auto res_data = new FPP[nnz];
+	csr_column_index2(col_ids, col_offsets, this->getNonZeros(), getColInd(), getValuePtr(), res_indices, res_data);
+	out_cols = MatSparse<FPP, Cpu>(nnz, this->getNbRow(), num_cols, res_data, res_indptr, res_indices);
+	//TODO: (optimization) initialize out_cols before calling csr_column_index2 and use its buffer directly in csr_column_index2, it would allow to copy only res_indptr
+#elif EIGEN_COL_MAJOR_GET_COLS // this implementation is not faster than the two other ones
+	Eigen::SparseMatrix<FPP, Eigen::ColMajor> cols_mat(this->getNbRow(), num_cols); // ColMajor to use cols() in write-access (for row-major it is only read-access)
+	for(int j=0;j<num_cols;j++)
+		cols_mat.col(j) = mat.col(orig_col_ids[j]);
+	out_cols.mat = cols_mat;
+	out_cols.update_dim();
+#else
 	typedef Eigen::Triplet<FPP> T;
 	std::vector<T> tripletList;
 	faust_unsigned_int count = 0; // nnz of the out_cols sp mat
@@ -1029,15 +1055,18 @@ void Faust::MatSparse<FPP,Cpu>::get_cols(const faust_unsigned_int* orig_col_ids,
 				for(auto j: inv_col_ids[it.col()])
 				{
 					// it.col() is in col_ids, add the entry in the corresponding column (given by the map)
-					tripletList.push_back(T(it.row(), j, it.value()));
+					if(it.value() != FPP(0))
+						tripletList.push_back(T(it.row(), j, it.value()));
 					count++;
 				}
 			}
 	tripletList.resize(count);
-	out_cols.resize(count, this->getNbRow(), num_cols);
+//	out_cols.resize(count, this->getNbRow(), num_cols);
 	out_cols.mat.setFromTriplets(tripletList.begin(), tripletList.end());
-	out_cols.nnz = out_cols.mat.nonZeros();
+//	out_cols.nnz = out_cols.mat.nonZeros();
+	out_cols.update_dim();
 	delete[] col_ids;
+#endif
 }
 
 template<typename FPP>

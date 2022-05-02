@@ -167,7 +167,7 @@ namespace Faust
 			MatSparse(const std::vector<int>& rowidx, const std::vector<int>& colidx, const std::vector<FPP>& values, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_);
 
 			//! \brief Constructor
-			//	WARNING: using this constructor is discounraged because rowidx, colidx, values are not necessarily safe, its the responsibility of the caller to check their allocation space according to values.size().
+			//	WARNING: using this constructor is discounraged because rowidx, colidx, values are not necessarily safe, it's the responsibility of the caller to check their allocation space according to values.size().
 			//!	\param rowidx : row indices with for all k < values.size(), M[rowidx[k]][colidx[k]] = values[k];
 			//!	\param colidx : column indices with for all k < values.size(), M[rowidx[k]][colidx[k]] = values[k];
 			//!	\param values : nonzeros of the matrix (should be nnz).
