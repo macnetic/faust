@@ -18,7 +18,8 @@
 [2.2. How to launch the demos with pyfaust?](#py_two)  
 [2.3. How to run the PALM4MSA algorithm in a step-by-step fashion?](#py_three)  
 [2.4. Why do I get the error 'Library not loaded: @rpath/libomp.dylib' when I use pyfaust on Mac OS X and How to fix it?](#py_four)  
-[2.5. Why this no_normalization parameter for PALM4MSA and hierarchical factorization?](#py_five)
+[2.5. Why this no_normalization parameter for PALM4MSA and hierarchical factorization?](#py_five)  
+[2.6. How to fix the Segmentation Fault issue when using Torch with pyfaust on Mac OS X?](#py_six)  
 
 
 **3. About CUDA (for GPU FAµST API support)**  
@@ -385,6 +386,65 @@ Fixed case:
 	Faust::hierarchical: 8/8
 	error: 3.3585222552295126e-05
 
+\anchor py_six
+
+## 2.6. How to fix the Segmentation Fault issue when using Torch with pyfaust on Mac OS X?
+
+A conflict issue has been identified between pyfaust and pytorch on Mac OS X. It is most likely due to different versions of OpenMP loaded on the fly after package imports. The reason has not been investigated properly yet but a workaround is easy to set in place for any user. The first extract of code below show a how to reproduce the error, which is in fact a Segmentation Fault, then a second block of code show how to workaround this error. In brief, importing pyfaust first will do the fix! 
+
+Reproducing the error:
+
+	(py_venv) ciosx:~ ci$ ipython
+	Python 3.9.12 (main, Mar 25 2022, 00:46:17) 
+	Type 'copyright', 'credits' or 'license' for more information
+	IPython 8.3.0 -- An enhanced Interactive Python. Type '?' for help.
+
+	In [1]: import torch
+	dyld: Registered code signature for /Users/ci/py_venv/lib/python3.9/site-packages/torch/lib/libtorch_cpu.dylib
+
+	In [2]: import pyfaust
+
+	In [3]: from pyfaust.fact import butterfly
+
+	In [4]: import torch
+
+	In [5]: import numpy as np
+
+	In [6]: F = butterfly(np.identity(1024), type='bbtree')
+
+	In [7]: Segmentation fault: 11
+
+Fixing the error by importing pyfaust first:
+
+	(py_venv) ciosx:~ ci$ ipython
+	Python 3.9.12 (main, Mar 25 2022, 00:46:17) 
+	Type 'copyright', 'credits' or 'license' for more information
+	IPython 8.3.0 -- An enhanced Interactive Python. Type '?' for help.
+
+	In [1]: import pyfaust
+
+	In [2]: from pyfaust.fact import butterfly
+
+	In [3]: import torch
+	dyld: Registered code signature for /Users/ci/py_venv/lib/python3.9/site-packages/torch/lib/libtorch_cpu.dylib
+
+	In [4]: import numpy as np
+
+	In [5]: F = butterfly(np.identity(1024), type='bbtree')
+
+	In [6]: F
+	Out[6]: 
+	Faust size 1024x1024, density 0.0195312, nnz_sum 20480, 10 factor(s): 
+	- FACTOR 0 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+	- FACTOR 1 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+	- FACTOR 2 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+	- FACTOR 3 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+	- FACTOR 4 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+	- FACTOR 5 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+	- FACTOR 6 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+	- FACTOR 7 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+	- FACTOR 8 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+	- FACTOR 9 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
 
 # 3. About CUDA (for GPU FAµST API support)
 
