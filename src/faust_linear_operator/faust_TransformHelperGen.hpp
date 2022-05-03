@@ -27,9 +27,8 @@ namespace Faust
 		this->transform = th->transform; //do not remove this line, necessary for eval*()
 		this->copy_transconj_state(*th);
 		//				handleError("Faust::TransformHelper::TransformHelper(TransformHelper,Slice)", "Fancy indexing overflows a Faust dimension.");
-		assert(num_rows == 0 && row_ids == nullptr);
-		assert(num_cols == 0 && row_ids == nullptr);
-		assert(row_ids != nullptr || col_ids != nullptr);
+		assert(num_rows == 0 && row_ids == nullptr || num_rows > 0 && row_ids != nullptr);
+		assert(num_cols == 0 && col_ids == nullptr || num_cols > 0 && col_ids != nullptr);
 		if(row_ids != nullptr)
 		{
 			this->fancy_num_rows = num_rows;
