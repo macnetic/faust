@@ -4,7 +4,7 @@ variables:
     # Warning: DURL is the base url without the filename
     DURL: "https://gitlab.inria.fr/faustgrp/gforge_files/-/raw/master/"
     DFILE: "faust_data-3.5.2.zip"
-    JOB_PYTHON: "python3" # if set again in job, it hides this one (precedence: https://docs.gitlab.com/13.6/ee/ci/variables/#priority-of-environment-variables)
+    JOB_PYTHON: "python3.9" # if set again in job, it hides this one (precedence: https://docs.gitlab.com/13.6/ee/ci/variables/#priority-of-environment-variables)
     WIN_PY_VER: '3.10' # default python version used to build python wrapper on windows (for both whl package and nsis .exe)
     NIX_PY_VER: '3.10' # default python version used to build python wrapper for "unix" system packages (pkg/macos, rpm/deb/linux)
     GEN_EGG: 'OFF'
@@ -494,7 +494,7 @@ pkg_linux_purepy_rev:
 
 pkg_macos_purepy_release:
     extends: .pkg_purepy_release
-    variables: {MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a", BUILD_MULTITHREAD: "ON", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", NOPY2: "ON", CMAKE_CXX_COMPILER: "/opt/local/bin/clang++-mp-8.0", PYTHON_PATH: '/opt/local/bin/python3.10', JOB_PYTHON: 'python3.10'}
+    variables: {MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a", BUILD_MULTITHREAD: "ON", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", NOPY2: "ON", CMAKE_CXX_COMPILER: "/opt/local/bin/clang++-mp-8.0", PYTHON_PATH: '/opt/local/bin/python3.9', JOB_PYTHON: 'python3.9'}
     before_script:
       - VERSION=$CI_COMMIT_TAG
       - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
@@ -505,7 +505,7 @@ pkg_macos_purepy_release:
 
 pkg_macos_purepy_release_extra_pyver:
     extends: pkg_macos_purepy_release
-    variables: {MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a", BUILD_MULTITHREAD: "ON", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", NOPY2: "ON", PYTHON_PATH: '/opt/local/bin/python3.9', JOB_PYTHON: 'python3.9', CMAKE_CXX_COMPILER: "/opt/local/bin/clang++-mp-8.0"}
+    variables: {MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a", BUILD_MULTITHREAD: "ON", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", NOPY2: "ON", PYTHON_PATH: '/opt/local/bin/python3.10', JOB_PYTHON: 'python3.10', CMAKE_CXX_COMPILER: "/opt/local/bin/clang++-mp-8.0"}
     tags:
         - macos
 
@@ -520,14 +520,14 @@ pkg_macos_purepy_release_torch_linked:
 
 pkg_linux_purepy_release:
     extends: .pkg_purepy_release
-    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a", BUILD_MULTITHREAD: "ON", NOPY2: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "../gpu_mod", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", CMAKE_CXX_COMPILER: "clang++"}
+    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a", BUILD_MULTITHREAD: "ON", NOPY2: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "../gpu_mod", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", CMAKE_CXX_COMPILER: "clang++", PYTHON_PATH: '/usr/local/bin/python3.9', JOB_PYTHON: 'python3.9'}
     tags:
         - linux
         - tux_packager
 
 pkg_linux_purepy_release_extra_pyver:
     extends: .pkg_purepy_release
-    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a", BUILD_MULTITHREAD: "ON", NOPY2: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "../gpu_mod", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", PYTHON_PATH: '/usr/local/bin/python3.9', JOB_PYTHON: 'python3.9', CMAKE_CXX_COMPILER: "clang++"}
+    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a", BUILD_MULTITHREAD: "ON", NOPY2: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "../gpu_mod", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", PYTHON_PATH: '/usr/local/bin/python3.10', JOB_PYTHON: 'python3.10', CMAKE_CXX_COMPILER: "clang++"}
     tags:
         - linux
         - tux_packager
@@ -541,7 +541,7 @@ pkg_linux_purepy_release_extra_pyver:
 
 pkg_linux_purepy_release_openblaso:
     extends: .pkg_purepy_release
-    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a", BUILD_MULTITHREAD: "ON", NOPY2: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "../gpu_mod", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", CMAKE_CXX_COMPILER: "clang++", USE_OPENBLASO: "ON"}
+    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a", BUILD_MULTITHREAD: "ON", NOPY2: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "../gpu_mod", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", CMAKE_CXX_COMPILER: "clang++", USE_OPENBLASO: "ON", PYTHON_PATH: '/usr/local/bin/python3.9', JOB_PYTHON: 'python3.9'}
     tags:
         - linux
         - tux_packager
@@ -631,7 +631,7 @@ pkg_win_purepy_rev:
 
 pkg_win_purepy_release:
     extends: .pkg_win_purepy
-    variables: {BUILD_CONFIG: "Release", GIT_SUBMODULE_STRATEGY: recursive, EXPERIMENTAL_PKG: "OFF"}
+    variables: {BUILD_CONFIG: "Release", GIT_SUBMODULE_STRATEGY: recursive, EXPERIMENTAL_PKG: "OFF", WIN_PY_VER: '3.9'}
     before_script:
         - 'set VERSION=%CI_COMMIT_TAG%'
     artifacts:
@@ -641,7 +641,7 @@ pkg_win_purepy_release:
 
 pkg_win_purepy_release_extra_pyver:
     extends: .pkg_win_purepy
-    variables: {BUILD_CONFIG: "Release", GIT_SUBMODULE_STRATEGY: recursive, EXPERIMENTAL_PKG: "OFF", WIN_PY_VER: '3.9'}
+    variables: {BUILD_CONFIG: "Release", GIT_SUBMODULE_STRATEGY: recursive, EXPERIMENTAL_PKG: "OFF", WIN_PY_VER: '3.10'}
     before_script:
         - 'set VERSION=%CI_COMMIT_TAG%'
     artifacts:
@@ -730,7 +730,7 @@ test_linux_pkg_release:
     - tags
 
 test_macos_purepy_release: # take care to keep this variable consistent with the version used in pkg_macos_purepy_release
-  variables: {JOB_PYTHON: 'python3.10'}
+  variables: {JOB_PYTHON: 'python3.9'}
   extends: .test_unix_purepy_pkg
   needs:
     - job: pkg_macos_purepy_release
@@ -740,7 +740,7 @@ test_macos_purepy_release: # take care to keep this variable consistent with the
     - macos_pkg_tester
 
 test_macos_purepy_release_extra_pyver:
-  variables: {JOB_PYTHON: 'python3.9'} # take care to keep this variable consistent with the version used in pkg_macos_purepy_release_extra_pyver
+  variables: {JOB_PYTHON: 'python3.10'} # take care to keep this variable consistent with the version used in pkg_macos_purepy_release_extra_pyver
   extends: .test_unix_purepy_pkg
   needs:
     - job: pkg_macos_purepy_release_extra_pyver
@@ -750,7 +750,7 @@ test_macos_purepy_release_extra_pyver:
     - macos_pkg_tester
 
 test_nux_purepy_release:
-  variables: {JOB_PYTHON: 'python3'}
+  variables: {JOB_PYTHON: 'python3.9'}
   extends: .test_unix_purepy_pkg
   needs:
     - job: pkg_linux_purepy_release
@@ -759,7 +759,7 @@ test_nux_purepy_release:
     - linux
 
 test_nux_purepy_release_extra_pyver:
-  variables: {JOB_PYTHON: 'python3.9'}
+  variables: {JOB_PYTHON: 'python3.10'}
   extends: .test_unix_purepy_pkg
   needs:
     - job: pkg_linux_purepy_release_extra_pyver
@@ -768,7 +768,7 @@ test_nux_purepy_release_extra_pyver:
     - linux
 
 test_nux_openblaso_purepy_release:
-  variables: {JOB_PYTHON: 'python3', PYFAUST_PKG_NAME: 'pyfaust_openblaso'}
+  variables: {JOB_PYTHON: 'python3.9', PYFAUST_PKG_NAME: 'pyfaust_openblaso'}
   extends: .test_unix_purepy_pkg
   needs:
     - job: pkg_linux_purepy_release_openblaso
@@ -777,7 +777,7 @@ test_nux_openblaso_purepy_release:
     - linux
 
 test_win_purepy_pkg:
-  variables: {JOB_PYTHON: 'py'}
+  variables: {JOB_PYTHON: 'py', WIN_PY_VER: '3.9'}
   stage: pkg_test
   script:
     - 'cd build\wrapper\python\dist'
@@ -799,7 +799,7 @@ test_win_purepy_pkg:
 
 test_win_purepy_pkg_extra_pyver:
   extends: test_win_purepy_pkg
-  variables: {JOB_PYTHON: 'py', WIN_PY_VER: '3.9'}
+  variables: {JOB_PYTHON: 'py', WIN_PY_VER: '3.10'}
   needs:
     - job: pkg_win_purepy_release_extra_pyver
       artifacts: true
