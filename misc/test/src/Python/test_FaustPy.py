@@ -482,6 +482,8 @@ class TestFaustPy(unittest.TestCase):
             J = list(range(0, 42, 5))
             I2 = list(range(0, len(I), 2))
             J2 = list(range(0, len(J), 2))
+            self.assertTrue(np.allclose(F[:,J].toarray(),
+                                        F.toarray()[:,J]))
             self.assertTrue(np.allclose(F[I][:,J][I2][:,J2].toarray(),
                                         F.toarray()[I][:,J][I2][:,J2]))
             # the same with a transpose between
@@ -498,6 +500,25 @@ class TestFaustPy(unittest.TestCase):
                                         F.toarray()[I][:,J][:len(I)//2, :len(J)//2]))
             self.assertTrue(np.allclose(F[I][:,J].T[:len(I)//2, :len(J)//2].toarray(),
                                         F.toarray()[I][:,J].T[:len(I)//2, :len(J)//2]))
+            # other cases
+            self.assertTrue(np.allclose(F[I,15:42].toarray(),
+                                        F.toarray()[I,15:42]))
+            self.assertTrue(np.allclose(F[15:42, J].toarray(),
+                                        F.toarray()[15:42, J]))
+            self.assertTrue(np.allclose(F.T[J,15:42].toarray(),
+                                        F.T.toarray()[J,15:42]))
+            self.assertTrue(np.allclose(F.T[15:42, I].toarray(),
+                                        F.T.toarray()[15:42, I]))
+            self.assertTrue(np.allclose(F[I,::2].toarray(),
+                                        F.toarray()[I,::2]))
+            self.assertTrue(np.allclose(F[::2, J].toarray(),
+                                        F.toarray()[::2, J]))
+            self.assertTrue(np.allclose(F.T[J,::2].toarray(),
+                                        F.T.toarray()[J,::2]))
+            self.assertTrue(np.allclose(F.T[::2, I].toarray(),
+                                        F.T.toarray()[::2, I]))
+
+
 
     def testToDense(self):
         print("testToDense()")
