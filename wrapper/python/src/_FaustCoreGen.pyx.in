@@ -635,9 +635,17 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
                                                          NULL,
                                                          0)
         else:
-            raise ValueError("Other cases like F[I, J] or F[:, :] can't happen here.")
-            # F[:, :] is handlded by slice and F[I, J] is not implemented, it
-            # is rather F[I][:,J]
+            row_indices = np.array(indices[0], dtype=dtype)
+            row_indices_view = row_indices
+            col_indices = np.array(indices[1], dtype=dtype)
+            col_indices_view = col_indices
+            core.@CORE_OBJ@ = \
+                    self.@CORE_OBJ@.fancy_idx(&row_indices_view[0],
+                                                     row_indices.size,
+                                                     &col_indices_view[0],
+                                                     col_indices.size)
+            # F[:, :] is handled by self.slice and F[I, J] is not implemented, it
+            # is rather F[I][:,J] (it is block un pyfaust.Faust.__getitem__)
         return core
 
     def save_mat_file(self,filepath):
