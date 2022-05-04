@@ -20,6 +20,7 @@
 [2.4. Why do I get the error 'Library not loaded: @rpath/libomp.dylib' when I use pyfaust on Mac OS X and How to fix it?](#py_four)  
 [2.5. Why this no_normalization parameter for PALM4MSA and hierarchical factorization?](#py_five)  
 [2.6. How to fix the Segmentation Fault issue when using Torch with pyfaust on Mac OS X?](#py_six)  
+[2.7 Why the Faust F[I, J] indexing operation is not implemented in pyfaust?](#py_seven)  
 
 
 **3. About CUDA (for GPU FAµST API support)**  
@@ -445,6 +446,71 @@ Fixing the error by importing pyfaust first:
 	- FACTOR 7 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
 	- FACTOR 8 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
 	- FACTOR 9 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+
+\anchor py_seven
+## 2.7 Why the Faust F[I, J] indexing operation is not implemented in pyfaust?
+
+You might have noticed that the F[I, J] indexing operation returns an error when F is a Faust and I, J are two lists of integers.
+
+	In [1]: import pyfaust as pf
+
+	In [2]: F = pf.rand(10, 10)
+
+	In [3]: I = [2, 3]
+
+	In [4]: J = [5, 2]
+
+	In [5]: F[I, J]
+	---------------------------------------------------------------------------
+	Exception                                 Traceback (most recent call last)
+	<ipython-input-5-8df82554232b> in <module>
+	----> 1 F[I, J]
+
+	~faust/wrapper/python/pyfaust/__init__.py in __getitem__(F, indices)
+	   1675                     out_indices[1] = indices[1]
+	   1676                 elif(isinstance(indices[1], list)):
+	-> 1677                     if(isinstance(indices[0],list)): raise \
+	   1678                     Exception("F[list1,list2] error: fancy indexing "
+	   1679                               "on both dimensions is not implemented "
+
+	Exception: F[list1,list2] error: fancy indexing on both dimensions is not implemented rather use F[list1][:,list2].
+
+To understand why this error is happening you have to reconsider the semantics of this operation in numpy.
+
+	In [6]: M = F.toarray()
+
+	In [7]: M[I,J]
+	Out[7]: array([20.67240127,  2.94551195])
+
+	In [8]: M
+	Out[8]:
+	array([[17.90487833, 27.12379778,  5.39551904, 15.89955699, 11.00241609,
+		27.59432236, 19.78570417, 19.13069802, 27.37147328,  7.72290147],
+	       [14.80316587, 22.86821899,  4.84070096, 12.94334063,  9.4843501 ,
+		22.66925664, 16.54982608, 16.66592289, 22.38216523,  5.96808832],
+	       [13.24941355, 20.39376798,  3.95375811, 11.56781968,  8.08354195,
+		20.67240127, 13.889102  , 14.135856  , 20.8617173 ,  5.68710658],
+	       [10.09700856, 15.55466917,  2.94551195,  9.14462562,  6.17430654,
+		15.76354282, 10.86911933, 10.8994256 , 16.05619013,  4.38006515],
+	       [15.59341136, 23.99711993,  4.89333899, 13.72176671,  9.80085375,
+		24.1952296 , 17.11168856, 16.70887072, 23.81469128,  6.59423473],
+	       [ 8.84679453, 13.28811366,  2.3878287 ,  7.82124871,  4.96229759,
+		13.57289693,  9.00585864,  9.42189303, 14.1050622 ,  3.91864366],
+	       [ 9.21812565, 13.75898807,  2.9382162 ,  7.71299471,  5.79531908,
+		13.97765518, 10.37499817, 10.17103417, 13.6208411 ,  3.81052436],
+	       [11.7407251 , 17.63200825,  3.56013283, 10.10756297,  7.0794955 ,
+		17.79069073, 12.68163621, 12.1540547 , 17.47823264,  5.15775148],
+	       [13.65486363, 20.6882994 ,  4.4918682 , 11.22321171,  8.64807158,
+		20.51835829, 14.92849385, 15.34545168, 20.193901  ,  5.47177391],
+	       [12.20464853, 18.61673079,  3.56754312, 10.82609474,  7.10124917,
+		18.83137495, 12.5277266 , 12.34828219, 18.76995746,  5.38920997]])
+
+As you can see in numpy the operation of indexing the array M with the expression M[I, J] implies first a broadcasting of the two lists I and J together and second to return the array [M[I[0], J[0]], M[I[1], J[1]], ..., M[I[-1], J[-1]]].
+Obviously, doing the same operation with a Faust would need to compute the full array (Faust.toarray()) which is an operation to avoid to spare calculation time. That's why this operation is not implemeted in pyfaust, but you can write it very quickly if needed (it is as simple as F.toarray()[I,J]).
+
+So now, let's explain why the error suggests to use rather F[I][:, J] instead of F[I, J] whereas they are not the same operation at all.
+The reason is because of Matlab! In Matlab M(I, J), with M a matrix, doesn't mean the same thing as in Python. It actually means to return the submatrix of M composed of the rows of M indexed in I (in the same order) and to keep in those rows only the entries whose the columns are indexed in J (in the same order again). More formally if subM = M(I, J) then subM is a matrix of size N = numel(I) x P = numel(J) such that for every pair (i,j) in {1, ..., N} x {1, ..., M}, subM(i, j) == M(I(i), J(j)).
+Back to numpy, you can write this Matlab way of indexing with the simple expression F[I][: J] which is totally feasible on a Faust, without having to compute the full array. Hence the error suggests to do that in case the user would confuse the semantics of Matlab (Faust-compatible) and Python (not Faust-compatible). In short, that's just an hint for using a supported operation which is near from an unsupported operation.
 
 # 3. About CUDA (for GPU FAµST API support)
 
