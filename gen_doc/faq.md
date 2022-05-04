@@ -390,7 +390,7 @@ Fixed case:
 
 ## 2.6. How to fix the Segmentation Fault issue when using Torch with pyfaust on Mac OS X?
 
-A conflict issue has been identified between pyfaust and pytorch on Mac OS X. It is most likely due to different versions of OpenMP loaded on the fly after package imports. The reason has not been investigated properly yet but a workaround is easy to set in place for any user. The first extract of code below show a how to reproduce the error, which is in fact a Segmentation Fault, then a second block of code show how to workaround this error. In brief, importing pyfaust first will do the fix! 
+A conflict issue has been identified between pyfaust and pytorch on Mac OS X. It is most likely due to different versions of OpenMP loaded on the fly after package imports. The reason has not been investigated properly yet but a workaround is easy to set in place for any user. The first extract of code below show how to reproduce the error, which is in fact a Segmentation Fault, then a second block of code show how to workaround this error. In brief, importing pyfaust first will do the fix! 
 
 Reproducing the error:
 
