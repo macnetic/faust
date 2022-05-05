@@ -73,12 +73,12 @@ namespace Faust
 			  \brief Returns the left hand side factors of this from index 0 to id included (as a new TransformHelper obj).
 
 */
-			virtual TransformHelper<FPP,DEV>* left(const faust_unsigned_int id, const bool copy=false) const;
+			virtual TransformHelper<FPP,DEV>* left(const faust_unsigned_int id, const bool copy=false, bool caller_is_right=false) const;
 			/**
 			  \brief Returns the right hand side factors of this from index id to the size()-1 (as a new TransformHelper obj).
 
 */
-			virtual TransformHelper<FPP,DEV>* right(const faust_unsigned_int id, const bool copy=false) const;
+			virtual TransformHelper<FPP,DEV>* right(const faust_unsigned_int id, const bool copy=false, bool caller_is_left=false) const;
 
 			void copy_slices(const TransformHelperGen<FPP,DEV>* th, const bool transpose = false);
 			void copy_slice_state(const TransformHelperGen<FPP,DEV>& th, bool transpose=false);
