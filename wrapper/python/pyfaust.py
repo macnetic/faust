@@ -7,9 +7,10 @@
 ## @package pyfaust @brief @b The @b FAuST @b Python @b Wrapper
 
 import numpy as np, scipy
+import scipy
 from scipy.io import loadmat
 from scipy.sparse import (csr_matrix, csc_matrix, dia_matrix, bsr_matrix,
-                          coo_matrix)
+                          coo_matrix, diags)
 import _FaustCorePy
 import pyfaust
 import pyfaust.factparams
@@ -3266,6 +3267,50 @@ def dft(n, normed=True, dev='cpu'):
     elif dev.startswith("gpu"):
         F = Faust(core_obj=_FaustCorePy.FaustAlgoCplxDblGenGPU.fourierFaust(log2n, normed))
     return F
+
+def circ(c, **kwargs):
+    """Constructs a circulant Faust G defined by the vector c (which is the first column of the G.toarray().
+
+    See also <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.linalg.circulant.html">scipy.linalg.circulant</a>, Faust.circ.
+    """
+    # hidden option
+    if isinstance(c, list):
+        c = np.array(c)
+    if 'diag_factor' in kwargs.keys():
+        diag_factor = kwargs['diag_factor']
+    else:
+        diag_factor = 'multiplied'
+    if diag_factor not in ['multiplied', 'csr']:
+        raise ValueError('option diag_factor must be \'csr\' or'
+                         ' \'multiplied\'')
+    log2c = np.log2(len(c))
+    if  log2c != np.floor(log2c):
+        raise ValueError('Only power of two length vector are supported right '
+                         'now')
+    if not isinstance(c, np.ndarray) or c.ndim != 1:
+        raise TypeError('c must be a vector of numpy array type')
+    n = len(c)
+    F = dft(n, normed=False)
+    FH = F.H
+    S = csr_matrix(diags(FH@(c/n)))
+#    S = csr_matrix(diags(np.sqrt(n)*FH@c)) # if it was normed==True
+    if diag_factor == 'csr':
+        C = F @ Faust(S) @ FH
+    elif diag_factor == 'multiplied':
+        C = F @ Faust(S@FH.factors(0)) @ FH.right(1)
+    return C
+
+def anticirc(c):
+    """Constructs an anti-circulant Faust G defined by the vector c (last column of G.toarray()).
+
+    See also Faust.circ.
+    """
+    G = circ(c)
+    P = np.zeros((len(c), len(c)))
+    I = np.arange(len(c)-1, -1, -1)
+    J = np.arange(0, len(c))
+    P[I, J] = 1
+    return G.left(len(G)-2)@Faust(G.factors(len(G)-1)@P)
 
 def eye(m, n=None, t='real', dev="cpu"):
     """

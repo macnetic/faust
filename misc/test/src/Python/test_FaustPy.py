@@ -876,6 +876,22 @@ class TestFaustPy(unittest.TestCase):
                         b = b.toarray()
                     self.assertTrue(np.allclose(a,b))
 
+    def test_circulant(self):
+        v = np.random.rand(1024)
+        from scipy.linalg import circulant
+        from pyfaust import circ
+        self.assertTrue(np.allclose(circulant(v), circ(v).toarray()))
+
+    def test_anticirculant(self):
+        v = np.random.rand(1024)
+        from scipy.linalg import circulant
+        from pyfaust import anticirc
+        P = np.zeros((len(v), len(v)))
+        I = np.arange(len(v)-1, -1, -1)
+        J = np.arange(0, len(v))
+        P[I, J] = 1
+        self.assertTrue(np.allclose(circulant(v), anticirc(v).toarray()@P))
+
     def test_bsr_get_fact(self):
         print("test_bsr_get_fact")
         from pyfaust import rand_bsr, Faust
@@ -1005,6 +1021,7 @@ class TestFaustPy(unittest.TestCase):
         param = ParamsHierarchical(fact_cons, res_cons, stop_crit1,
                                    stop_crit2)
         self.assertRaisesRegex(ValueError, err_msg, param.are_constraints_consistent, M)
+
 
 class TestFaustPyCplx(TestFaustPy):
 
