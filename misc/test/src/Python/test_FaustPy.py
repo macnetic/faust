@@ -892,6 +892,13 @@ class TestFaustPy(unittest.TestCase):
         P[I, J] = 1
         self.assertTrue(np.allclose(circulant(v), anticirc(v).toarray()@P))
 
+    def test_toeplitz(self):
+        r = np.random.rand(1024)
+        c = np.random.rand(2048)
+        from scipy.linalg import toeplitz
+        from pyfaust import toeplitz as ftoeplitz
+        self.assertTrue(np.allclose(toeplitz(c, r), ftoeplitz(c, r).toarray()))
+
     def test_bsr_get_fact(self):
         print("test_bsr_get_fact")
         from pyfaust import rand_bsr, Faust

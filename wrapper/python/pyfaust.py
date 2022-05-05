@@ -3312,6 +3312,27 @@ def anticirc(c):
     P[I, J] = 1
     return G.left(len(G)-2)@Faust(G.factors(len(G)-1)@P)
 
+def toeplitz(c, r=None):
+    """Constructs a toeplitz Faust whose the first column is c and the first row r.
+
+    Args:
+        c: the first column of the toeplitz Faust.
+        r: the first row of the toeplitz Faust. If none then r =
+        np.conjugate(c). r[0] is ignored, the first row is always [r[0],
+        r[1:]].
+
+    See also <a
+    href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.linalg.toeplitz.htm">scipy.linalg.toeplitz</a>
+    """
+    if r is None:
+        r = np.conjugate(c)
+    m = len(c)
+    n = len(r)
+    N = int(2**np.ceil(np.log2(max(m, n))))
+    c_ = np.hstack((c, np.zeros(N-m+1+N-n), r[:0:-1]))
+    C = circ(c_)
+    return C[:m, :n]
+
 def eye(m, n=None, t='real', dev="cpu"):
     """
         Faust identity.

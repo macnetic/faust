@@ -209,6 +209,7 @@ class TestFaust(unittest.TestCase):
 
     def test_normalize(self):
         print("Faust.normalize")
+        self.F.save('/tmp/test_normalize.mat')
         FA = self.F.toarray()
         for nt in ['fro', 1, 2, np.inf]:
             NF = self.F.normalize(nt)
