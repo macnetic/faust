@@ -842,37 +842,39 @@ class TestFaustPy(unittest.TestCase):
 
     def test_left(self):
         print("Test Faust.left()")
-        for i in range(len(self.F)):
-            lFt = self.F.left(i)
-            if i == 0:
-                lFt = Faust([lFt])
-            lFr = Faust([self.F.factors(j) for j in range(i+1)])
-            self.assertEqual(len(lFr), len(lFt))
-            for fid in range(i+1):
-                a = lFt.factors(fid)
-                b = lFr.factors(fid)
-                if(not isinstance(a, np.ndarray)):
-                    a = a.toarray()
-                if(not isinstance(b, np.ndarray)):
-                    b = b.toarray()
-                np.allclose(a,b)
+        for F in [self.F, self.F.T, self.F.H]:
+            for i in range(len(F)):
+                lFt = F.left(i)
+                if i == 0:
+                    lFt = Faust([lFt])
+                lFr = Faust([F.factors(j) for j in range(i+1)])
+                self.assertEqual(len(lFr), len(lFt))
+                for fid in range(i+1):
+                    a = lFt.factors(fid)
+                    b = lFr.factors(fid)
+                    if(not isinstance(a, np.ndarray)):
+                        a = a.toarray()
+                    if(not isinstance(b, np.ndarray)):
+                        b = b.toarray()
+                    self.assertTrue(np.allclose(a,b))
 
     def test_right(self):
         print("Test Faust.right()")
-        for i in range(len(self.F)):
-            rFt = self.F.right(i)
-            if i == len(self.F)-1:
-                rFt = Faust([rFt])
-            rFr = Faust([self.F.factors(j) for j in range(i, len(self.F))])
-            self.assertEqual(len(rFr), len(rFt))
-            for fid in range(len(rFr)):
-                a = rFt.factors(fid)
-                b = rFr.factors(fid)
-                if(not isinstance(a, np.ndarray)):
-                    a = a.toarray()
-                if(not isinstance(b, np.ndarray)):
-                    b = b.toarray()
-                np.allclose(a,b)
+        for F in [self.F, self.F.T, self.F.H]:
+            for i in range(len(F)):
+                rFt = F.right(i)
+                if i == len(F)-1:
+                    rFt = Faust([rFt])
+                rFr = Faust([F.factors(j) for j in range(i, len(F))])
+                self.assertEqual(len(rFr), len(rFt))
+                for fid in range(len(rFr)):
+                    a = rFt.factors(fid)
+                    b = rFr.factors(fid)
+                    if(not isinstance(a, np.ndarray)):
+                        a = a.toarray()
+                    if(not isinstance(b, np.ndarray)):
+                        b = b.toarray()
+                    self.assertTrue(np.allclose(a,b))
 
     def test_bsr_get_fact(self):
         print("test_bsr_get_fact")
