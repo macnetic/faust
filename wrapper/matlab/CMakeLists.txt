@@ -33,6 +33,8 @@ foreach(MATFAUST_FILE IN LISTS FAUST_MATLAB_MATFAUST_FILE_LIST)
 	string(REGEX REPLACE "[^+]*\\+matfaust\\/" "" MATFAUST_FILE ${MATFAUST_FILE})
 	get_filename_component(PARENT_DIR ${MATFAUST_FILE} DIRECTORY)
 	get_filename_component(MATFAUST_SHORT_FILE ${MATFAUST_FILE} NAME_WE )
+	set(MATFAUST_SHORT_FILE ${PARENT_DIR}_${MATFAUST_SHORT_FILE})
+	string(REGEX REPLACE "[@/+]" "" MATFAUST_SHORT_FILE ${MATFAUST_SHORT_FILE})
 	file(MAKE_DIRECTORY ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${PARENT_DIR})
 	file(MAKE_DIRECTORY ${FAUST_MATLAB_BIN_DIR}/expfiltered)
 	set_property(DIRECTORY PROPERTY ADDITIONAL_MAKE_CLEAN_FILES "${FAUST_MATLAB_BIN_DIR}/expfiltered" "${FAUST_MATLAB_BIN_DIR}/+matfaust")
@@ -254,6 +256,7 @@ install(DIRECTORY ${FAUST_MATLAB_BIN_DIR}/ DESTINATION ${CMAKE_INSTALL_MATLAB_PR
 	PATTERN gen_artificial_faust.m EXCLUDE
 	PATTERN TransStockhamFact.m EXCLUDE
 	PATTERN test_Givens.m EXCLUDE
-	PATTERN test_GivensDiag.m EXCLUDE
+	PATTERN test_GivensDiag.m
+	EXCLUDE PATTERN *m.bak
 	)#PATTERN faust_decompose.m EXCLUDE #TODO: uncomment later when
 #  matfaust.demo.hadamard will be updated to use hierarchical)
