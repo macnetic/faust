@@ -494,6 +494,32 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			this.assertEqual(full(dft(n, 'normed', false)), full(F), 'AbsTol', 10^-7)
 		end
 
+		function testCircAntiCirc(this)
+			c = [1 2 3 4];
+			C = [[1     4     3     2]
+			[2     1     4     3]
+			[3     2     1     4]
+			[4     3     2     1]];
+			self.assertEqual(C, real(full(matfaust.circ(c))))
+			A = [[2     3     4     1]
+			     [3     4     1     2]
+			     [4     1     2     3]
+			     [1     2     3     4]]
+			self.assertEqual(C, real(full(matfaust.anticirc(c))))
+		end
+
+		function testToeplitz(this)
+			c = [1 2 3 4]
+			r = [1 7 8]
+			T = [[1., 7., 8.]
+			[2., 1., 7.]
+			[3., 2., 1.]
+			[4., 3., 2.]]
+			self.assertEqual(T, real(full(matfaust.toeplitz(c, r))))
+			self.assertEqual(toeplitz(c, r), real(full(matfaust.toeplitz(c, r))))
+			self.assertEqual(toeplitz(c), real(full(matfaust.toeplitz(c))))
+		end
+
 		function test_sp(this)
 			import matfaust.proj.sp;
 			min_n = 5;

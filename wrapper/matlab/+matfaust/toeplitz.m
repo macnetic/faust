@@ -18,6 +18,7 @@ function T = toeplitz(c, varargin)
 		r = varargin{1};
 		if(~ ismatrix(r) || size(r, 1) ~= 1 && size(r, 2) ~= 1)
 			error('The second argument must be a vector')
+		end
 	else
 		r = c; % default r
 	end
