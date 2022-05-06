@@ -1,7 +1,7 @@
 %==========================================================================================
 %> @brief Returns a anticirculant Faust C defined by the vector c (which is the last column of the full(C)).
 %>
-%> @b See also matfaust.circ
+%> @b See also matfaust.circ, matfaust.toeplitz
 %==========================================================================================
 function C = anticirc(c)
 	C = matfaust.circ(c)

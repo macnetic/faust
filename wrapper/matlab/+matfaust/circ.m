@@ -1,7 +1,7 @@
 %==========================================================================================
 %> @brief Returns a circulant Faust C defined by the vector c (which is the first column of the full(C)).
 %>
-%> @b See also matfaust.anticirc
+%> @b See also matfaust.anticirc, matfaust.toeplitz
 %==========================================================================================
 function C = circ(c)
 	log2c = log2(numel(c));

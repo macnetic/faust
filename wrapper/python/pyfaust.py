@@ -3271,7 +3271,9 @@ def dft(n, normed=True, dev='cpu'):
 def circ(c, **kwargs):
     """Returns a circulant Faust G defined by the vector c (which is the first column of the G.toarray().
 
-    See also <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.linalg.circulant.html">scipy.linalg.circulant</a>, pyfaust.anticirc.
+    See also <a
+    href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.linalg.circulant.html">scipy.linalg.circulant</a>,
+    pyfaust.anticirc, pyfaust.toeplitz.
     """
     if isinstance(c, list):
         c = np.array(c)
@@ -3302,7 +3304,7 @@ def circ(c, **kwargs):
 def anticirc(c):
     """Returns an anti-circulant Faust G defined by the vector c (last column of G.toarray()).
 
-    See also pyfaust.circ.
+    See also pyfaust.circ, pyfaust.toeplitz.
     """
     G = circ(c)
     P = np.zeros((len(c), len(c)))
@@ -3321,7 +3323,8 @@ def toeplitz(c, r=None):
         r[1:]].
 
     See also <a
-    href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.linalg.toeplitz.htm">scipy.linalg.toeplitz</a>
+    href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.linalg.toeplitz.htm">scipy.linalg.toeplitz</a>,
+    pyfaust.circ, pyfaust.anticirc
     """
     if r is None:
         r = np.conjugate(c)
