@@ -3269,13 +3269,13 @@ def dft(n, normed=True, dev='cpu'):
     return F
 
 def circ(c, **kwargs):
-    """Constructs a circulant Faust G defined by the vector c (which is the first column of the G.toarray().
+    """Returns a circulant Faust G defined by the vector c (which is the first column of the G.toarray().
 
-    See also <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.linalg.circulant.html">scipy.linalg.circulant</a>, Faust.circ.
+    See also <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.linalg.circulant.html">scipy.linalg.circulant</a>, pyfaust.anticirc.
     """
-    # hidden option
     if isinstance(c, list):
         c = np.array(c)
+    # hidden option
     if 'diag_factor' in kwargs.keys():
         diag_factor = kwargs['diag_factor']
     else:
@@ -3285,8 +3285,7 @@ def circ(c, **kwargs):
                          ' \'multiplied\'')
     log2c = np.log2(len(c))
     if  log2c != np.floor(log2c):
-        raise ValueError('Only power of two length vector are supported right '
-                         'now')
+        raise ValueError('Only power of two length vectors are supported')
     if not isinstance(c, np.ndarray) or c.ndim != 1:
         raise TypeError('c must be a vector of numpy array type')
     n = len(c)
@@ -3301,9 +3300,9 @@ def circ(c, **kwargs):
     return C
 
 def anticirc(c):
-    """Constructs an anti-circulant Faust G defined by the vector c (last column of G.toarray()).
+    """Returns an anti-circulant Faust G defined by the vector c (last column of G.toarray()).
 
-    See also Faust.circ.
+    See also pyfaust.circ.
     """
     G = circ(c)
     P = np.zeros((len(c), len(c)))
