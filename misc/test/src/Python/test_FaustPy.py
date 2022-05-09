@@ -1384,6 +1384,18 @@ class TestFaustFactory(unittest.TestCase):
         assert(np.allclose(dft(n).toarray(),
                            dft(n, False).normalize().toarray()))
 
+    def testDCT(self):
+        print("Test pyfaust.dct()")
+        from pyfaust import dct
+        from scipy.fft import dct as sdct
+        from numpy.random import rand
+        n = 512
+        DCT = dct(n)
+        x = rand(n)
+        y1 = (DCT@x).astype('float')
+        y2 = sdct(x)
+        self.assertTrue(np.allclose(y1, y2))
+
     def testFGFTGivens(self):
         print("Test fact.fgft_givens()")
         print(sys.path)
