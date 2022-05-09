@@ -3268,6 +3268,24 @@ def dft(n, normed=True, dev='cpu'):
         F = Faust(core_obj=_FaustCorePy.FaustAlgoCplxDblGenGPU.fourierFaust(log2n, normed))
     return F
 
+def dct(n, dev='cpu'):
+    """Returns the Direct Cosine Transform (Type II) Faust of order n.
+    """
+    DFT = pyfaust.dft(n, dev='cpu', normed=False)
+    P_ = np.zeros((n, n))
+    P_[np.arange(0, n//2), np.arange(0, n, 2)] = 1
+    P_[np.arange(n//2, n), np.arange(1, n, 2)[::-1]] = 1
+    E = diags([2*np.exp(-1j*np.pi*k/2/n) for k in range(0, n)])
+    f0 = csr_matrix(E @ DFT.factors(0))
+    f_end = csr_matrix(DFT.factors(len(DFT)-1) @ P_)
+    mid_factors = DFT.factors(range(1, len(DFT)-1))
+    if pyfaust.isFaust(mid_factors):
+        mid_F = mid_factors
+    else:
+        mid_F = Faust(mid_factors)
+    DCT = Faust(f0) @ mid_F @ Faust(f_end)
+    return DCT
+
 def circ(c, **kwargs):
     """Returns a circulant Faust G defined by the vector c (which is the first column of the G.toarray().
 
