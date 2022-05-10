@@ -15850,7 +15850,7 @@ FG is a Faust too!</p>
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="2.3-Faust-Multiplication-by-a-Vector-or-a-Matrix">2.3 Faust Multiplication by a Vector or a Matrix<a class="anchor-link" href="#2.3-Faust-Multiplication-by-a-Vector-or-a-Matrix">&#182;</a></h3><p>When you multiply a Faust by a vector or a matrix (the number of nrows must match the number of Faust columns), you'll get respectively a vector or a matrix as result.</p>
+<h3 id="2.3-Faust-Multiplication-by-a-Vector-or-a-Matrix">2.3 Faust Multiplication by a Vector or a Matrix<a class="anchor-link" href="#2.3-Faust-Multiplication-by-a-Vector-or-a-Matrix">&#182;</a></h3><p>When you multiply a Faust by a vector or a matrix (the number of rows must match the number of Faust columns), you'll get respectively a vector or a matrix as result.</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
@@ -16775,7 +16775,7 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>What's interesting here is the fact that <code>Faust.normalize</code> returns a Faust object. Combined with slicing (that you will see soon), <code>normalize</code> is useful to write algorithms such as Orthonormal Matching Pursuit (OMP), which require matrices with L2-normalized columns, in a way that makes them able to leverage the acceleration offered by the FAµST API.</p>
+<p>What's interesting here is the fact that <code>Faust.normalize</code> returns a Faust object. Combined with slicing (that we will see soon), <code>normalize</code> is useful to write algorithms such as Orthonormal Matching Pursuit (OMP), which require matrices with L2-normalized columns, in a way that makes them able to leverage the acceleration offered by the FAµST API.</p>
 <p>The normalization coded in C++ is memory optimized (it never builds the dense matrix <code>F.toarray()</code> to compute the norms of the columns/rows). In the same goal the factors composing the Faust object NF are not duplicated in memory from same factors F, they're used as is with an additional factor giving the appropriate scaling.</p>
 
 </div>
