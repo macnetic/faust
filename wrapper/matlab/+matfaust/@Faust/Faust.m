@@ -1157,7 +1157,7 @@ classdef Faust
 		%>
 		%======================================================================
 		function F_conj = conj(F)
-			F_conj = matfaust.Faust(F, call_mex(F, 'conj'))
+			F_conj = matfaust.Faust(F, call_mex(F, 'conj'));
 		end
 
 		%======================================================================
