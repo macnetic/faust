@@ -1,0 +1,39 @@
+{% set PYFAUST_VERSION = "@PYFAUST_VERSION@" %}
+{% set WHL_URL = "@WHL_URL@" %}
+
+package:
+  name: "pyfaust"
+  version: "{{ PYFAUST_VERSION }}"
+
+build:
+  number: 0
+  script: "{{ PYTHON }} -m pip install {{ WHL_URL }} --no-deps -vv" # using the package url and not just the package name because it doesn't work (conda-build will fail on pip error it doesn't find the location of pyfaust)
+
+requirements:
+  host:
+    - pip
+    - python
+  run:
+    - python
+    - scipy
+    - numpy ==1.22
+    - matplotlib >=2.0.0
+
+test:
+  imports:
+    - pyfaust
+
+about:
+  home: https://faust.inria.fr
+  license: BSD-2
+  license_family: BSD
+  summary: 'FAµST python toolbox'
+  description: "The FAµST toolbox provides algorithms and data structures to decompose a given dense matrix into a product of sparse matrices in order to reduce its computational complexity (both for storage and manipulation).  FaµST can be used to:
+
+        - speedup / reduce the memory footprint of iterative algorithms commonly used for solving high dimensional linear inverse problems,
+
+        - learn dictionaries with an intrinsically efficient implementation,
+
+        - compute (approximate) fast Fourier transforms on graphs."
+
+
