@@ -249,8 +249,8 @@ install(DIRECTORY ${FAUST_MATLAB_BIN_DIR}/ DESTINATION ${CMAKE_INSTALL_MATLAB_PR
 	PATTERN CooleyTukeyFact.m EXCLUDE
 	PATTERN diagonalization_givens.m EXCLUDE
 	PATTERN diagonalization_givens_parall.m EXCLUDE
-	PATTERN dvp.m EXCLUDE
-	PATTERN normalizeCol.m EXCLUDE
+    #	PATTERN dvp.m EXCLUDE # needed for the BSL experiment
+    #	PATTERN normalizeCol.m EXCLUDE # needed for the BSL experiment
 	PATTERN hadamard_mat.m EXCLUDE
 	PATTERN generate_params.m EXCLUDE
 	PATTERN gen_artificial_faust.m EXCLUDE
