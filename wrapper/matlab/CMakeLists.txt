@@ -32,9 +32,14 @@ add_custom_target(PREPARE_MATFAUST_FOR_DOXYDOC ALL)
 foreach(MATFAUST_FILE IN LISTS FAUST_MATLAB_MATFAUST_FILE_LIST)
 	string(REGEX REPLACE "[^+]*\\+matfaust\\/" "" MATFAUST_FILE ${MATFAUST_FILE})
 	get_filename_component(PARENT_DIR ${MATFAUST_FILE} DIRECTORY)
-	get_filename_component(MATFAUST_SHORT_FILE ${MATFAUST_FILE} NAME_WE )
-	set(MATFAUST_SHORT_FILE ${PARENT_DIR}_${MATFAUST_SHORT_FILE})
-	string(REGEX REPLACE "[@/+]" "" MATFAUST_SHORT_FILE ${MATFAUST_SHORT_FILE})
+    get_filename_component(MATFAUST_NAME ${MATFAUST_FILE} NAME_WE)
+    set(MATFAUST_SHORT_FILE ${PARENT_DIR}_${MATFAUST_NAME})
+    # avoid to duplicate class name in MATFAUST_SHORT_FILE variable
+    # (@class_class is replaced by class), it maintains unicity of
+    # MATFAUST_SHORT_FILE and avoid a too long name (that might exceed the
+    # windows filepath limit)
+    string(REGEX REPLACE "[@]${MATFAUST_NAME}" "" MATFAUST_SHORT_FILE ${MATFAUST_SHORT_FILE})
+	string(REGEX REPLACE "[@/+\\]" "" MATFAUST_SHORT_FILE ${MATFAUST_SHORT_FILE})
 	file(MAKE_DIRECTORY ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${PARENT_DIR})
 	file(MAKE_DIRECTORY ${FAUST_MATLAB_BIN_DIR}/expfiltered)
 	set_property(DIRECTORY PROPERTY ADDITIONAL_MAKE_CLEAN_FILES "${FAUST_MATLAB_BIN_DIR}/expfiltered" "${FAUST_MATLAB_BIN_DIR}/+matfaust")
@@ -93,8 +98,8 @@ foreach(MATFAUST_FILE IN LISTS FAUST_MATLAB_MATFAUST_FILE_LIST)
 		add_custom_target(FILTER_OUT_MATLAB_DOXYBLOCKS_${MATFAUST_SHORT_FILE} ALL
 			COMMAND ${PROJECT_SOURCE_DIR}/gen_doc/filterout_matlab_doxy_blocks.sh ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE} DEPENDS doc COMMENT "Removing doxygen blocks from function file.")
 	endif()
-	add_custom_target(GEN_MATFAUST_INLINE_DOC_${MATFAUST_SHORT_FILE} ALL DEPENDS ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE})
-	add_dependencies(PREPARE_MATFAUST_FOR_DOXYDOC GEN_MATFAUST_INLINE_DOC_${MATFAUST_SHORT_FILE})
+    add_custom_target(GEN_INLINE_DOC_${MATFAUST_SHORT_FILE} ALL DEPENDS ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE})
+	add_dependencies(PREPARE_MATFAUST_FOR_DOXYDOC GEN_INLINE_DOC_${MATFAUST_SHORT_FILE})
 endforeach()
 
 file(GLOB CPP_MEXTOOLS_FILES "${FAUST_MATLAB_TOOLS_SRC_DIR}/*.cpp")
@@ -256,7 +261,7 @@ install(DIRECTORY ${FAUST_MATLAB_BIN_DIR}/ DESTINATION ${CMAKE_INSTALL_MATLAB_PR
 	PATTERN gen_artificial_faust.m EXCLUDE
 	PATTERN TransStockhamFact.m EXCLUDE
 	PATTERN test_Givens.m EXCLUDE
-	PATTERN test_GivensDiag.m
-	EXCLUDE PATTERN *m.bak
+	PATTERN test_GivensDiag.m EXCLUDE
+    PATTERN *m.bak
 	)#PATTERN faust_decompose.m EXCLUDE #TODO: uncomment later when
 #  matfaust.demo.hadamard will be updated to use hierarchical)
