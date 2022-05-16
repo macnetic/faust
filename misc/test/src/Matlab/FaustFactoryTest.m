@@ -707,6 +707,21 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			this.verifyLessThanOrEqual(err, 1e-3)
 		end
 
+        function test_dct(this)
+            n = 8;
+            % x = rand(n, 1);
+            x = ones(n, 1)
+            y_ref = zeros(n, 1);
+            for k=1:n
+                for i=1:n
+                    y_ref(k) = y_ref(k) + 2 * x(i) * cos(pi * (k-1) * (2 * (i-1) + 1) / 2 / n);
+                end
+            end
+            DCT = matfaust.dct(n);
+            y_test = real(DCT*x);
+            test.verifyEqual(y_ref, y_test, 'AbsTol', 1e-6);
+        end
+
 	end
 
 	methods
