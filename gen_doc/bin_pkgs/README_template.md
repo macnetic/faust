@@ -13,7 +13,7 @@
 
 ### 1.1 For Python
 
-@note  This section treats only of system packages/installers but note that some pip packages are also available and this is in fact the recommended way of installing pyfaust, in particular because of the easier weak dependency management. You might install them in virtual environments:
+@note  This section treats only of system packages/installers but note that some PIP and Anaconda packages are also available. They are recommended way of installing pyfaust, in particular because of the easier weak dependency management. You might install them in virtual environments:
 \ref install_pyfaust_in_venv.<br/> 
 
 FAµST is designed for the Python ecosystem which as usual relies on the numpy and scipy packages.
@@ -25,7 +25,7 @@ Please ensure these packages are installed on your system. One way to install th
 	pip install numpy scipy matplotlib # pygsp
 	# it could be pip3 instead of pip
 
-Note that you probably have to install those packages for all versions of Python you want to use (each one have normally its associated pip executable).<br/>
+Note that you probably have to install those packages for all versions of Python you want to use (each one has normally its associated pip executable).<br/>
 Note also that you can rely on your system package manager to install the Python packages (e.g. dnf/yum repositories on Fedora/Centos Linux systems).
 
 FAµST is compiled for Python @PY3_VER@.
@@ -105,9 +105,9 @@ OK! You can follow the [quick start usage](#usage) now.
 
 To test whether the FaµST Python wrapper has been setup properly, simply open a terminal and type:
 
-	python2 -c "import pyfaust; print('It works.')"
+	python3 -c "import pyfaust; print('It works.')"
 
-	# it could be python3, python@PY3_VER@ or just python,
+	# it could be python@PY3_VER@ or just python,
 	# depending on your configuration and the python version you want to use
 
 It goes without saying that if the wrapper is set up properly you'll see the message "It works." as a result of the command above.
@@ -122,15 +122,15 @@ indicates that you need to add the Python wrapper manually in your Python path a
 
 - For Linux and macOS in a Bash terminal:
 
-	$ export PYTHONPATH=$PYTHONPATH:@FAUST_INSTALL_PATH@/python
+	$ export PYTHONPATH=$PYTHONPATH:@FAUST_INSTALL_PATH@/python3
 	# and test again
-	$ python2 -c "import pyfaust; print('It works.')"
+	$ python3 -c "import pyfaust; print('It works.')"
 
 - For Windows in the command prompt:
 
-	set PYTHONPATH=%PYTHONPATH%;@FAUST_INSTALL_PATH@/python
+	set PYTHONPATH=%PYTHONPATH%;@FAUST_INSTALL_PATH@/python"
 	:: and test again
-	python -c "import pyfaust; print('It works.')"
+	python3 -c "import pyfaust; print('It works.')"
 
 If it fails again you are likely on a different version of Python or the auto-setup script failed for any reason during installation. Return to the [Prerequisites](#prerequisites) section and check your Python environment matches FAµST requirements.
 Otherwise it works but you'll need to set the `export' command manually in one of your startup scripts to have it set for once and for all (e.g. in ~/.bashrc if you are a Bash user).
