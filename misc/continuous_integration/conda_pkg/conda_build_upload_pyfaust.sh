@@ -18,6 +18,12 @@ function usage
 	echo "Note: the package must be available on pypi.org to be built and uploaded to conda repository."
 }
 
+function sanitize_path
+{
+	local P="$1"
+	echo $P | sed -e 's%C:\\%/c/%;s%\\%/%g'
+}
+
 function find_pkg
 {
 	local P OS
@@ -25,10 +31,17 @@ function find_pkg
 	then
 		OS=osx
 		P=$(dirname $CONDA_PATH_ENV_PREFIX)
+	elif [[ "$SYSTEM" = win ]]
+	then
+		OS=$SYSTEM
+		P=$(dirname $CONDA_PATH_ENV_PREFIX)
 	else
 		OS=$SYSTEM
 		P=$CONDA_PATH_ENV_PREFIX
 	fi
+	[[ -n "$DEBUG" ]] && echo "to sanitize path: $P" >&2
+	P=$(sanitize_path "$P")
+	[[ -n "$DEBUG" ]] && echo "sanitized path: $P" >&2
 	find $P -iname "*.tar.bz2" | grep conda-bld | grep pyfaust | grep $OS | grep $PYVER_NODOT | grep $PYFAUST_VERSION
 }
 
@@ -103,17 +116,21 @@ CONDA_ENV=build_upload_pyfaust_venv_$PYVER_NODOT
 if ! conda env list | grep $CONDA_ENV
 then
 	[[ -n "$DEBUG" ]] && echo Conda env name to create: $CONDA_ENV
-	conda create -y -n $CONDA_ENV python==$PYVER && conda run -n $CONDA_ENV conda install -y conda-build anaconda-client
+	conda create -y -n $CONDA_ENV python==$PYVER && conda run -n $CONDA_ENV conda install -y conda-build anaconda-client && conda config --add channels conda-forge # conda-forge used for numpy 1.22 on windows and macosx but maybe an update on anaconda channel will come soon
 	[[ ! "$?" = 0 ]] && echo "Error: failed to setup the conda environment" && exit 5
 	#conda init bash
 fi
 # conda-activate is only for interactive shell, so use run
 #conda activate $CONDA_ENV || echo "Error: failed to activate the conda env $ENV" && exit 6
-CONDA_PATH_ENV_PREFIX=$(conda info | grep "envs directories" | head -1 | cut -d: -f2)
+#CONDA_PATH_ENV_PREFIX=$(conda info | grep "envs directories" | head -1 | cut -d: -f2)
+CONDA_PATH_ENV_PREFIX=$(conda info | grep "envs directories" | head -1 | sed -e 's/[^:]*: \(.*\)/\1/')
 PKG=$(find_pkg)
 if [[ -z "$PKG" || ! -r "$PKG" ]]
 then
+	[[ -n "$DEBUG" ]] && echo "conda env used to build: $CONDA_ENV"
 	conda run -n $CONDA_ENV conda build pyfaust
+else
+	echo "pyfaust conda package already built: $PKG"
 fi
 [[ ! "$?" = 0 ]] && echo "Error: failed to build pyfaust conda package" && exit 7
 # find the package
