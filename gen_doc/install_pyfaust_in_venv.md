@@ -1,6 +1,11 @@
-\page install_pyfaust_in_venv Installing pyfaust in Python virtual environments
+\page install_pyfaust_in_venv Installing pyfaust in Python virtual environments (Python venv & Anaconda)
 
-Python @PY3_VER@
+## SUMMARY
+[1. Python @PY3_VER@](#python_venv)  
+[2. Anaconda](#anaconda)
+
+\anchor python_venv
+1. Python @PY3_VER@
 ================
 
 First, you need to create your virtual environment into a directory reserved to pyfaust:
@@ -37,13 +42,36 @@ As a result, you should see the version of pyfaust installed if all went properl
 
 \note On Mac OS X you might need to install OpenMP for pyfaust to work, for further information please look at this [FAQ entry](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/FAQ.html#py_four).
 
-Anaconda
-========
+\anchor anaconda
+2. Anaconda
+===========
 
-Within Anaconda you can also create virtual environments and use pyfaust into it. It's quite similar to the Python way described in previous sections. For that purpose you'll use the command conda create.
+Within Anaconda you can also create a virtual environment and install pyfaust there. It's quite similar to the Python way described in the previous section. In that purpose you'll need to use the command conda-create. Please type the following commands in an Anaconda prompt or a shell prompt:
 
-Please rely on the documentation here: https://docs.conda.io/en/latest/
+Create the virtual environment:
 
-Or for more details about this specific command please look here: [conda-create](https://docs.conda.io/projects/conda/en/latest/commands/create.html)
+    conda create -n pyfaust_venv python==3.9
 
-Please note that if you're using conda, you still need to install pyfaust (whl) package through pip. You can install pip with conda and then install pyfaust pip package as described above with a pip install command (in a conda virtual environment or not). And final point, don't forget to use the good version of python3: @PY3_VER@.x.
+Add conda-forge channel (it is necessary for pyfaust dependencies on Mac OS X and Windows):
+
+    conda config --add channels conda-forge
+
+Load the virtual environment created earlier and install pyfaust:
+
+    conda activate pyfaust_venv
+    conda install -c pyfaust pyfaust
+
+\note the -c flag specifies the channel from which to retrieve the pyfaust package.
+
+Try if it works:
+
+    python -c "import pyfaust as pf; print(pf.rand(5,5))"
+    Faust size 5x5, density 5, nnz_sum 125, 5 factor(s):
+    - FACTOR 0 (double) SPARSE, size 5x5, density 1, nnz 25
+    - FACTOR 1 (double) SPARSE, size 5x5, density 1, nnz 25
+    - FACTOR 2 (double) SPARSE, size 5x5, density 1, nnz 25
+    - FACTOR 3 (double) SPARSE, size 5x5, density 1, nnz 25
+    - FACTOR 4 (double) SPARSE, size 5x5, density 1, nnz 25
+
+
+Fore further information please rely on the documentation [here](https://docs.conda.io/en/latest/) or about the specific conda-create command please look here: [conda-create](https://docs.conda.io/projects/conda/en/latest/commands/create.html).
