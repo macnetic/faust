@@ -58,7 +58,6 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
     functions Faust.swap_rows, Faust.swap_cols, Faust.optimize_time).
 
     Other noticeable limitations are that one cannot:
-        - compute the real and imaginary parts of a Faust,
         - perform elementwise operations between two Fausts (e.g. elementwise
         multiplication), the addition and subtraction are available though,
         - reshape a Faust.
@@ -2249,12 +2248,34 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             raise TypeError("Faust supports only complex, double or float32 dtype-s")
         if dtype == F.dtype:
             return F.clone(dev=F.device)
-        elif F.dtype == np.complex and dtype == 'double':
-            # complex float (single precision) is not yet available in FAµST
-            return Faust(core_obj=F.m_faust.real())
+        if F.dtype == np.complex:
+            if dtype == np.float32:
+                raise ValueError("complex float in single precision is not yet"
+                                 " available in FAµST")
+            else:
+                # dtype is double
+                return F.real()
         else:
             return Faust([F.factors(i).astype(dtype) for i in
                           range(F.numfactors())], dev=F.device)
+
+    def real(F):
+        """
+        Returns the real part of F as a Faust.
+        """
+        if F.dtype != np.complex:
+            return F
+        else:
+            return 1/2 * (F + F.conj())
+
+    def imag(F):
+        """
+        Returns the imaginary part of F as a Faust.
+        """
+        if F.dtype != np.complex:
+            return F
+        else:
+            return 1/2 * (F + F.conj())
 
     def asarray(F, *args, **kwargs):
         return F
@@ -3284,7 +3305,7 @@ def dct(n, dev='cpu'):
         mid_F = mid_factors
     else:
         mid_F = Faust(mid_factors)
-    DCT = Faust(f0) @ mid_F @ Faust(f_end)
+    DCT = (Faust(f0) @ mid_F @ Faust(f_end)).real()
     return DCT
 
 # experimental block start
@@ -3334,7 +3355,7 @@ def dst3(n, dev='cpu'):
     F_odd = SD1 @ Faust(D2) @ DFT
     F = pyfaust.hstack((F_even, F_odd))
     F = F @ Faust(P_)
-    return F
+    return F.real()
 # experimental block end
 
 def dst(n, dev='cpu'):
@@ -3405,7 +3426,7 @@ def dst(n, dev='cpu'):
     F_odd = Faust(D1, dev=dev) @ Faust(D2) @ MDFT
     F = pyfaust.hstack((F_even, F_odd))
     F = F @ Faust(P_, dev=dev)
-    return F
+    return F.real()
 
 def circ(c, **kwargs):
     """Returns a circulant Faust G defined by the vector c (which is the first column of the G.toarray().

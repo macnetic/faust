@@ -1392,7 +1392,7 @@ class TestFaustFactory(unittest.TestCase):
         n = 512
         DCT = dct(n)
         x = rand(n)
-        y1 = (DCT@x).astype('float')
+        y1 = DCT@x
         y2 = sdct(x)
         self.assertTrue(np.allclose(y1, y2))
 
@@ -1404,7 +1404,7 @@ class TestFaustFactory(unittest.TestCase):
         n = 512
         DST = dst(n)
         x = rand(n)
-        y1 = (DST@x).astype('float')
+        y1 = DST@x
         y2 = sdst(x)
         self.assertTrue(np.allclose(y1, y2))
 
