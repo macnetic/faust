@@ -984,6 +984,27 @@ classdef Faust
 
 		end
 
+		%======================================================================
+		%> @brief Returns the real part of the Faust F.
+		%======================================================================
+		function rF = real(F)
+			if isreal(F)
+				rF = F;
+			else
+				rF = 1/2 * (F + conj(F));
+			end
+		end
+
+		%======================================================================
+		%> @brief Returns the imaginary part of the Faust F.
+		%======================================================================
+		function iF = imag(F)
+			if isreal(F)
+				iF = sparse(zeros(size(F))); % zero
+			else
+				iF = 1 / 2j * (F - conj(F));
+			end
+		end
 
 		%======================================================================
 		%> @brief Returns a new Faust whose class is single. It allows to convert all the factors to single precision.
