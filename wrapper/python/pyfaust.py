@@ -2275,7 +2275,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         if F.dtype != np.complex:
             return F
         else:
-            return 1/2 * (F + F.conj())
+            return 1/2j * (F + F.conj())
 
     def asarray(F, *args, **kwargs):
         return F
@@ -3386,7 +3386,7 @@ def dst(n, dev='cpu'):
     def omega(N):
         """
         Returns the list of n-th root of unity raised to the power of -(k+1) (instead of
-        k in the FFT, the purpose here is to write the DST).
+        k as in the FFT, the purpose here is to write the DST).
         """
         omega = np.exp(np.pi*1j/N) # exp(-i*2*pi/2N)
         return np.diag([omega**-(k+1) for k in range(0, N)])
@@ -3399,14 +3399,13 @@ def dst(n, dev='cpu'):
         O_N2 = omega(N//2)
         return np.vstack((np.hstack((I_N2, O_N2)), np.hstack((I_N2, - O_N2))))
 
-    def mod_fft(N):
+    def mod_fft(N, dev='cpu'):
         """
-        Modified FFT for DST computing (it would have been the standard FFT
+        Modified FFT for DST computation (it would have been the standard FFT
         if omega was raised to the power of -k instead of -(k+1)).
         """
         N_ = N
         Bs = []
-        Ps = []
         while N_ != 1:
             B_ = B(N_)
             diag_B = np.kron(np.eye(N//N_), B_)
@@ -3415,7 +3414,7 @@ def dst(n, dev='cpu'):
         return Faust(Bs+[bitrev_perm(N).astype(Bs[-1].dtype)], dev=dev)
 
 	# compute the DST (look at issue #265 for doc, S permutation was replaced by mod_fft to fix missing last frequency)
-    MDFT = mod_fft(n)
+    MDFT = mod_fft(n, dev=dev)
     D1 = csr_matrix(-2*diags([- 1j * np.exp(-1j * np.pi / 2 / n * (k+1)) for k in range(0,
                                                                             n)]))
     D2 = csr_matrix(diags([np.exp(-1j * np.pi / n * (k+1)) for k in range(0, n)]))
