@@ -10,7 +10,7 @@ import numpy as np, scipy
 import scipy
 from scipy.io import loadmat
 from scipy.sparse import (csr_matrix, csc_matrix, dia_matrix, bsr_matrix,
-                          coo_matrix, diags)
+                          coo_matrix, diags, eye as seye, kron)
 import _FaustCorePy
 import pyfaust
 import pyfaust.factparams
@@ -3272,6 +3272,7 @@ def dct(n, dev='cpu'):
     """Returns the Direct Cosine Transform (Type II) Faust of order n.
     """
     DFT = pyfaust.dft(n, dev='cpu', normed=False)
+    # TODO: P_ as sparse matrix
     P_ = np.zeros((n, n))
     P_[np.arange(0, n//2), np.arange(0, n, 2)] = 1
     P_[np.arange(n//2, n), np.arange(1, n, 2)[::-1]] = 1
@@ -3285,6 +3286,126 @@ def dct(n, dev='cpu'):
         mid_F = Faust(mid_factors)
     DCT = Faust(f0) @ mid_F @ Faust(f_end)
     return DCT
+
+# experimental block start
+def dst2(n, dev='cpu'):
+    """
+    See issue #265 paper
+    Learning_Fast_Algorithms_for_Linear_Transforms_Using_Butterfly.pdf
+    This implementation doesn't work! wasn't able to fix it.
+    """
+    DFT = pyfaust.dft(n, dev='cpu', normed=False)
+    P_ = np.zeros((n, n))
+    P_[np.arange(0, n//2), np.arange(0, n, 2)] = 1
+    P_[np.arange(n//2, n), np.arange(1, n, 2)[::-1]] = 1
+    I_N2 = seye(n//2, format='csr')
+    I_2 = np.array([ [1, 0], [0, -1]])
+    D = kron(I_2, I_N2, format='csr')
+    D = D @ diags([np.exp(-1j*2*np.pi*k/n) for k in range(n)])
+    E = diags([2*1j*np.exp(-1j*np.pi*k/2/n) for k in range(n)])
+#    E = diags([2*1j*np.exp(-1j*5*np.pi*k/2/n) for k in range(n)])
+    f0 = csr_matrix(E @ DFT.factors(0))
+    f_end = csr_matrix(DFT.factors(len(DFT)-1) @ D @ P_)
+    mid_factors = DFT.factors(range(1, len(DFT)-1))
+    if pyfaust.isFaust(mid_factors):
+        mid_F = mid_factors
+    else:
+        mid_F = Faust(mid_factors)
+    DST = Faust(f0) @ mid_F @ Faust(f_end)
+    return DST
+
+def dst3(n, dev='cpu'):
+    """
+    This one works (cf. DST.pdf issue #265) except for the last
+    frequency of the DST. dst function below fixes it rewriting the FFT
+    with shifting.
+    """
+    DFT = pyfaust.dft(n, normed=False)
+    D1 = csr_matrix(-2*diags([- 1j * np.exp(-1j * np.pi / 2 / n * k) for k in range(0,
+                                                                            n)]))
+    D2 = csr_matrix(diags([np.exp(-1j * np.pi / n * k) for k in range(0, n)]))
+    S = csr_matrix(diags(np.ones(n-1), 1)).astype('complex')
+#    S[-1, 0] = 1
+    P_ = np.zeros((n*2, n))
+    P_[np.arange(0, n//2), np.arange(0, n, 2)] = 1
+    P_[np.arange(n, n + n // 2), np.arange(1, n, 2)] = 1
+    SD1 = Faust([S, D1])
+    F_even = SD1 @ DFT
+    F_odd = SD1 @ Faust(D2) @ DFT
+    F = pyfaust.hstack((F_even, F_odd))
+    F = F @ Faust(P_)
+    return F
+# experimental block end
+
+def dst(n, dev='cpu'):
+    """
+    Returns the Direct Sine Transform (Type II) Faust of order n.
+    """
+    def bitrev(inds):
+        """
+        Bitreversal indices.
+        """
+        n = len(inds)
+        if n == 1:
+            return inds
+        else:
+            even = bitrev(inds[np.arange(0, n, 2, dtype='int')])
+            odd = bitrev(inds[np.arange(1, n, 2, dtype='int')])
+            return np.hstack((even, odd))
+
+    def bitrev_perm(N):
+        """
+        Bitreversal permutation.
+        """
+        row_inds = np.arange(0, N, dtype='int')
+        col_inds = bitrev(row_inds)
+        ones = np.ones((N), dtype='float')
+        return csr_matrix((ones, (row_inds, col_inds)), shape=(N, N))
+
+    def omega(N):
+        """
+        Returns the list of n-th root of unity raised to the power of -(k+1) (instead of
+        k in the FFT, the purpose here is to write the DST).
+        """
+        omega = np.exp(np.pi*1j/N) # exp(-i*2*pi/2N)
+        return np.diag([omega**-(k+1) for k in range(0, N)])
+
+    def B(N):
+        """
+        Butterfly factor of order N.
+        """
+        I_N2 = np.eye(N//2)
+        O_N2 = omega(N//2)
+        return np.vstack((np.hstack((I_N2, O_N2)), np.hstack((I_N2, - O_N2))))
+
+    def mod_fft(N):
+        """
+        Modified FFT for DST computing (it would have been the standard FFT
+        if omega was raised to the power of -k instead of -(k+1)).
+        """
+        N_ = N
+        Bs = []
+        Ps = []
+        while N_ != 1:
+            B_ = B(N_)
+            diag_B = np.kron(np.eye(N//N_), B_)
+            Bs += [diag_B]
+            N_ //= 2
+        return Faust(Bs+[bitrev_perm(N).astype(Bs[-1].dtype)], dev=dev)
+
+	# compute the DST (look at issue #265 for doc, S permutation was replaced by mod_fft to fix missing last frequency)
+    MDFT = mod_fft(n)
+    D1 = csr_matrix(-2*diags([- 1j * np.exp(-1j * np.pi / 2 / n * (k+1)) for k in range(0,
+                                                                            n)]))
+    D2 = csr_matrix(diags([np.exp(-1j * np.pi / n * (k+1)) for k in range(0, n)]))
+    P_ = np.zeros((n*2, n))
+    P_[np.arange(0, n//2), np.arange(0, n, 2)] = 1
+    P_[np.arange(n, n + n // 2), np.arange(1, n, 2)] = 1
+    F_even = Faust(D1, dev=dev) @ MDFT
+    F_odd = Faust(D1, dev=dev) @ Faust(D2) @ MDFT
+    F = pyfaust.hstack((F_even, F_odd))
+    F = F @ Faust(P_, dev=dev)
+    return F
 
 def circ(c, **kwargs):
     """Returns a circulant Faust G defined by the vector c (which is the first column of the G.toarray().

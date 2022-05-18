@@ -1396,6 +1396,18 @@ class TestFaustFactory(unittest.TestCase):
         y2 = sdct(x)
         self.assertTrue(np.allclose(y1, y2))
 
+    def testDST(self):
+        print("Test pyfaust.dst()")
+        from pyfaust import dst
+        from scipy.fft import dst as sdst
+        from numpy.random import rand
+        n = 512
+        DST = dst(n)
+        x = rand(n)
+        y1 = (DST@x).astype('float')
+        y2 = sdst(x)
+        self.assertTrue(np.allclose(y1, y2))
+
     def testFGFTGivens(self):
         print("Test fact.fgft_givens()")
         print(sys.path)
