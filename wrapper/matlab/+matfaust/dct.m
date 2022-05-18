@@ -2,6 +2,7 @@
 %> Returns the Direct Cosine Transform (Type II) Faust of order n.
 %=========================================
 function D = dct(n, varargin)
+	import matfaust.Faust
 	DFT = matfaust.dft(n, varargin{:}, 'normed', false);
 	P_ = zeros(n);
 	for i=1:n/2
@@ -17,7 +18,7 @@ function D = dct(n, varargin)
 	f_end = sparse(factors(DFT, numfactors(DFT)) * P_);
 	F_mid = factors(DFT, 2:numfactors(DFT)-1);
 	if ~ matfaust.isFaust(F_mid)
-		F_mid = matfaust.Faust(F_mid);
+		F_mid = Faust(F_mid);
 	end
-	D = matfaust.Faust(f0) * F_mid * Faust(f_end);
+	D = Faust(f0) * F_mid * Faust(f_end);
 end
