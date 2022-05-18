@@ -51,9 +51,22 @@ def inform_user_how_to_install_libomp():
                   - On Debian the package is libomp-11*.
                   """)
 
+def try_modify_wrapper_lib_on_macos():
+    from os.path import dirname, join
+    from os import system
+    from glob import glob
+    from sys import platform
+    if platform != 'darwin':
+        return
+    wrapper_path = glob(join(dirname(dirname(__file__)), '_Faust*so'))[0]
+    libomp_path = join(dirname(__file__), 'lib/libomp.dylib')
+    system('install_name_tool -change /opt/local/lib/libomp/libomp.dylib '+libomp_path+' '+wrapper_path)
+
+
 # load libomp pyfaust embedded library if found in pyfaust location
 # and if the code runs on macOS
 if _pf in ['darwin', 'linux']:
+    try_modify_wrapper_lib_on_macos()
     if internal_libomp_loading:
         load_lib_omp()
     else:
