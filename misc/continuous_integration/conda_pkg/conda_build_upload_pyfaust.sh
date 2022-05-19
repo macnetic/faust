@@ -90,7 +90,7 @@ fi
 
 ##### FIRST STEP: find the python wheel package URL on pypi.org
 
-WHL_URL=$(curl  $PYPI_FILES_URL | sed -ne 's/.*"\([^"]\{1,\}\.whl\)".*/\1/p' | grep $SYSTEM | grep $PYVER_NODOT)
+WHL_URL=$(curl  $PYPI_FILES_URL | sed -ne 's/.*"\([^"]\{1,\}\.whl\)".*/\1/p' | grep $SYSTEM | grep cp$PYVER_NODOT)
 
 [[ -z "$WHL_URL" ]] && echo "No wheel package found on pypi.org for the system $SYSTEM_ERROR and the python version $PYVER" && exit 3
 
