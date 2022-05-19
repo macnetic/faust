@@ -3291,6 +3291,29 @@ def dft(n, normed=True, dev='cpu'):
 
 def dct(n, dev='cpu'):
     """Returns the Direct Cosine Transform (Type II) Faust of order n.
+
+    Args:
+        n: the order of the DCT (must be a power of two).
+        dev: the device on which the Faust is created.
+
+    Example:
+        >>> from pyfaust import dct
+        >>> from scipy.fft import dct as scipy_dct
+        >>> import numpy as np
+        >>> DCT8 = dct(8)
+        >>> x = np.arange(8)
+        >>> np.real(DCT8@x)
+        array([ 56.        , -25.76929209,   0.        ,  -2.6938192 ,
+               0.        ,  -0.80361161,   0.        ,  -0.20280929])
+        >>> scipy_dct(x)
+        array([ 56.        , -25.76929209,   0.        ,  -2.6938192 ,
+               0.        ,  -0.80361161,   0.        ,  -0.20280929])
+        >>> np.allclose(DCT8@x, scipy_dct(x))
+        True
+
+    See also pyfaust.dft, pyfaust.dst, <a
+    href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.dct.html">
+    scipy.fft.dct</a>
     """
     DFT = pyfaust.dft(n, dev='cpu', normed=False)
     # TODO: P_ as sparse matrix
@@ -3306,7 +3329,7 @@ def dct(n, dev='cpu'):
     else:
         mid_F = Faust(mid_factors)
     DCT = (Faust(f0) @ mid_F @ Faust(f_end)).real()
-    return DCT
+   return DCT
 
 # experimental block start
 def dst2(n, dev='cpu'):
@@ -3361,6 +3384,30 @@ def dst3(n, dev='cpu'):
 def dst(n, dev='cpu'):
     """
     Returns the Direct Sine Transform (Type II) Faust of order n.
+
+    Args:
+        n: the order of the DST (must be a power of two).
+        dev: the device on which the Faust is created.
+
+    Example:
+        >>> from pyfaust import dst
+        >>> from scipy.fft import dst as scipy_dst
+        >>> import numpy as np
+        >>> DST8 = dst(8)
+        >>> x = np.ones(8)
+        >>> np.real(DST8@x)
+        array([1.02516618e+01, 4.93038066e-32, 3.59990489e+00, 1.97215226e-31,
+               2.40537955e+00, 9.86076132e-32, 2.03918232e+00,
+               0.00000000e+00])
+        >>> scipy_dst(x)
+        array([10.25166179,  0.        ,  3.59990489,  0.        ,  2.40537955,
+                       0.        ,  2.03918232,  0.        ])
+        >>> np.allclose(DST8@x, scipy_dst(x))
+        True
+
+    See also pyfaust.dft, pyfaust.dct, <a
+    href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.dst.html">
+    scipy.fft.dst</a>
     """
     def bitrev(inds):
         """

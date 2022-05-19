@@ -1,5 +1,31 @@
 %=========================================
-%> Returns the Direct Sine Transform (Type II) Faust of order n.
+%> @brief Returns the Direct Sine Transform (Type II) Faust of order n.
+%>
+%> @param n: the order of the DCT (it must be a power of two).
+%> @param 'dev', str: 'gpu' or 'cpu' to create the Faust on CPU or GPU ('cpu' is the default).
+%>
+%> @b Example
+%> @code
+%> % in a matlab terminal
+%> >> import matfaust.*
+%> >> F = dct(8);
+%> >> x = ones(8, 1);
+%> >> % apply the DCT to x
+%> >> real(F*x)
+%>
+%> ans =
+%>
+%>   10.2517
+%>    0.0000
+%>    3.5999
+%>    0.0000
+%>    2.4054
+%>    0.0000
+%>    2.0392
+%>    0.0000
+%> @endcode
+%>
+%>@b See also matfaust.dft, matfaust.dct
 %=========================================
 function D = dst(n, varargin)
     import matfaust.Faust

@@ -1,5 +1,33 @@
 %=========================================
-%> Returns the Direct Cosine Transform (Type II) Faust of order n.
+%> @brief Returns the Direct Cosine Transform (Type II) Faust of order n.
+%>
+%> @param n: the order of the DCT (it must be a power of two).
+%> @param 'dev', str: 'gpu' or 'cpu' to create the Faust on CPU or GPU ('cpu' is the default).
+%>
+%>
+%> @b Example
+%> @code
+%> % in a matlab terminal
+%> >> import matfaust.*
+%> >> F = dst(8);
+%> >> x = 1:8;
+%> >> % apply the DST to x
+%> >> real(F*x')
+%>
+%> ans =
+%>
+%>    72.0000
+%>   -25.7693
+%>          0
+%>    -2.6938
+%>          0
+%>    -0.8036
+%>          0
+%>    -0.2028
+%>
+%> @endcode
+%>
+%>@b See also matfaust.dft, matfaust.dst
 %=========================================
 function D = dct(n, varargin)
 	import matfaust.Faust
@@ -21,4 +49,5 @@ function D = dct(n, varargin)
 		F_mid = Faust(F_mid);
 	end
 	D = Faust(f0) * F_mid * Faust(f_end);
+	D = real(D);
 end
