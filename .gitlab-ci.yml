@@ -874,6 +874,9 @@ conda_linux_pub:
     - tags
   tags:
     - conda_linux
+  needs:
+    - job: pypi_pub
+      artifacts: false
 
 conda_win_pub:
   stage: conda_pkgs
@@ -884,6 +887,9 @@ conda_win_pub:
     - tags
   tags:
     - conda_win10
+  needs:
+    - job: pypi_pub
+      artifacts: false
 
 conda_macosx_pub:
   stage: conda_pkgs
@@ -894,3 +900,6 @@ conda_macosx_pub:
     - tags
   tags:
     - conda_macosx
+  needs:
+    - job: pypi_pub
+      artifacts: false
