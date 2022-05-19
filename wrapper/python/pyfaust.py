@@ -10,7 +10,8 @@ import numpy as np, scipy
 import scipy
 from scipy.io import loadmat
 from scipy.sparse import (csr_matrix, csc_matrix, dia_matrix, bsr_matrix,
-                          coo_matrix, diags, eye as seye, kron)
+                          coo_matrix, diags, eye as seye, kron, vstack as
+                          svstack, hstack as shstack)
 import _FaustCorePy
 import pyfaust
 import pyfaust.factparams
@@ -3316,10 +3317,13 @@ def dct(n, dev='cpu'):
     scipy.fft.dct</a>
     """
     DFT = pyfaust.dft(n, dev='cpu', normed=False)
-    # TODO: P_ as sparse matrix
-    P_ = np.zeros((n, n))
-    P_[np.arange(0, n//2), np.arange(0, n, 2)] = 1
-    P_[np.arange(n//2, n), np.arange(1, n, 2)[::-1]] = 1
+#    P_ = np.zeros((n, n))
+#    P_[np.arange(0, n//2), np.arange(0, n, 2)] = 1
+#    P_[np.arange(n//2, n), np.arange(1, n, 2)[::-1]] = 1
+    # P_ as sparse matrix
+    P_row_inds = np.arange(0, n)
+    P_col_inds = np.hstack((np.arange(0, n, 2), np.arange(1, n, 2)[::-1]))
+    P_ = csr_matrix((np.ones(n), (P_row_inds, P_col_inds)), shape=(n, n))
     E = diags([2*np.exp(-1j*np.pi*k/2/n) for k in range(0, n)])
     f0 = csr_matrix(E @ DFT.factors(0))
     f_end = csr_matrix(DFT.factors(len(DFT)-1) @ P_)
@@ -3329,7 +3333,7 @@ def dct(n, dev='cpu'):
     else:
         mid_F = Faust(mid_factors)
     DCT = (Faust(f0) @ mid_F @ Faust(f_end)).real()
-   return DCT
+    return DCT
 
 # experimental block start
 def dst2(n, dev='cpu'):
@@ -3436,15 +3440,15 @@ def dst(n, dev='cpu'):
         k as in the FFT, the purpose here is to write the DST).
         """
         omega = np.exp(np.pi*1j/N) # exp(-i*2*pi/2N)
-        return np.diag([omega**-(k+1) for k in range(0, N)])
+        return diags([omega**-(k+1) for k in range(0, N)]).tocsr()
 
     def B(N):
         """
         Butterfly factor of order N.
         """
-        I_N2 = np.eye(N//2)
+        I_N2 = seye(N//2, format='csr')
         O_N2 = omega(N//2)
-        return np.vstack((np.hstack((I_N2, O_N2)), np.hstack((I_N2, - O_N2))))
+        return svstack((shstack((I_N2, O_N2)), shstack((I_N2, - O_N2))))
 
     def mod_fft(N, dev='cpu'):
         """
@@ -3455,7 +3459,9 @@ def dst(n, dev='cpu'):
         Bs = []
         while N_ != 1:
             B_ = B(N_)
-            diag_B = np.kron(np.eye(N//N_), B_)
+            diag_B = kron(seye(N//N_, format='csr'), B_).tocsr() # to avoid BSR
+            # matrices because FAµST doesn't support BSR matrices concatenation
+            # TODO: let BSR format after concatenation is supported
             Bs += [diag_B]
             N_ //= 2
         return Faust(Bs+[bitrev_perm(N).astype(Bs[-1].dtype)], dev=dev)
@@ -3465,9 +3471,13 @@ def dst(n, dev='cpu'):
     D1 = csr_matrix(-2*diags([- 1j * np.exp(-1j * np.pi / 2 / n * (k+1)) for k in range(0,
                                                                             n)]))
     D2 = csr_matrix(diags([np.exp(-1j * np.pi / n * (k+1)) for k in range(0, n)]))
-    P_ = np.zeros((n*2, n))
-    P_[np.arange(0, n//2), np.arange(0, n, 2)] = 1
-    P_[np.arange(n, n + n // 2), np.arange(1, n, 2)] = 1
+    #    P_ = np.zeros((n*2, n))
+    #    P_[np.arange(0, n//2), np.arange(0, n, 2)] = 1
+    #    P_[np.arange(n, n + n // 2), np.arange(1, n, 2)] = 1
+    # P_ as as sparse matrix
+    P_row_inds = np.hstack((np.arange(0, n//2), np.arange(n, n + n // 2)))
+    P_col_inds = np.hstack((np.arange(0, n, 2), np.arange(1, n, 2)))
+    P_ = csr_matrix((np.ones(n), (P_row_inds, P_col_inds)), shape=(n*2, n))
     F_even = Faust(D1, dev=dev) @ MDFT
     F_odd = Faust(D1, dev=dev) @ Faust(D2) @ MDFT
     F = pyfaust.hstack((F_even, F_odd))
