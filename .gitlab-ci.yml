@@ -881,8 +881,8 @@ conda_linux_pub:
 conda_win_pub:
   stage: conda_pkgs
   script:
-    - git-bash misc\continuous_integration\conda_pkg\conda_build_upload_pyfaust.sh win 3.9 misc\continuous_integration\conda_pkg\meta.yaml.in
-    - git-bash misc\continuous_integration\conda_pkg\conda_build_upload_pyfaust.sh win 3.10 misc\continuous_integration\conda_pkg\meta.yaml.in
+    - start /wait git-bash -c "misc/continuous_integration/conda_pkg/conda_build_upload_pyfaust.sh win 3.9 misc/continuous_integration/conda_pkg/meta.yaml.in"
+    - start /wait git-bash -c "misc/continuous_integration/conda_pkg/conda_build_upload_pyfaust.sh win 3.10 misc/continuous_integration/conda_pkg/meta.yaml.in"
   only:
     - tags
   tags:
