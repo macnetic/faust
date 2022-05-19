@@ -22,6 +22,7 @@ stages:
     - pkg_test
     - pkg_pub
     - gitlab_pages
+    - conda_pkgs
 
 ctest:
     <<: *ctest_script
@@ -862,3 +863,34 @@ pypi_pub:
 #    - tags
 #  tags:
 #    - linux
+#
+
+conda_linux_pub:
+  stage: conda_pkgs
+  script:
+    - misc/continuous_integration/conda_pkg/conda_build_upload_pyfaust.sh linux 3.9 misc/continuous_integration/conda_pkg/meta.yaml.in
+    - misc/continuous_integration/conda_pkg/conda_build_upload_pyfaust.sh linux 3.10 misc/continuous_integration/conda_pkg/meta.yaml.in
+  only:
+    - tags
+  tags:
+    - conda_linux
+
+conda_win_pub:
+  stage: conda_pkgs
+  script:
+    - git-bash misc\continuous_integration\conda_pkg\conda_build_upload_pyfaust.sh win 3.9 misc\continuous_integration\conda_pkg\meta.yaml.in
+    - git-bash misc\continuous_integration\conda_pkg\conda_build_upload_pyfaust.sh win 3.10 misc\continuous_integration\conda_pkg\meta.yaml.in
+  only:
+    - tags
+  tags:
+    - conda_win10
+
+conda_macosx_pub:
+  stage: conda_pkgs
+  script:
+    - misc/continuous_integration/conda_pkg/conda_build_upload_pyfaust.sh macosx 3.9 misc/continuous_integration/conda_pkg/meta.yaml.in
+      # - misc/continuous_integration/conda_pkg/conda_build_upload_pyfaust.sh macosx 3.10 misc/continuous_integration/conda_pkg/meta.yaml.in # disabled (see issue #264)
+  only:
+    - tags
+  tags:
+    - conda_macosx
