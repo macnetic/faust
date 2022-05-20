@@ -1,5 +1,5 @@
 %==========================================================================================
-%> @brief Returns a circulant Faust C defined by the vector c (which is the first column of the full(C)).
+%> @brief Returns a circulant Faust C defined by the vector c (which is the first column of full(C)).
 %>
 %> @b Example:
 %>
@@ -51,20 +51,28 @@
 %>     0.2290    0.0838    0.4505    0.7482    0.6892    0.6541    0.2630    0.9133
 %>     0.9133    0.2290    0.0838    0.4505    0.7482    0.6892    0.6541    0.2630
 %> @endcode
-
+%>
 %> @b See also matfaust.anticirc, matfaust.toeplitz
 %==========================================================================================
 function C = circ(c)
-	log2c = log2(numel(c));
-	if(log2c ~= floor(log2c))
-		error('Only power of two length vectors are supported')
-	end
-	n = numel(c);
-	F = matfaust.dft(n, 'normed', false);
-	FH = F';
-	if (size(c, 1) < size(c, 2))
-		c = c.';
-	end
-	S = sparse(diag(FH*(c/n)));
-	C = F * matfaust.Faust(S*factors(FH, 1)) * right(FH, 2);
+    log2c = log2(numel(c));
+    if(log2c ~= floor(log2c))
+        error('Only power of two length vectors are supported')
+    end
+    if ~ ismatrix(c) || ~ isnumeric(c)
+        error('c must be numeric vector')
+    end
+    if size(c, 2) == 1
+        c = c.';
+    elseif size(c, 1) ~= 1
+        error('c must be a vector')
+    end
+    n = numel(c);
+    F = matfaust.dft(n, 'normed', false);
+    FH = F';
+    if (size(c, 1) < size(c, 2))
+        c = c.';
+    end
+    S = sparse(diag(FH*(c/n)));
+    C = F * matfaust.Faust(S*factors(FH, 1)) * right(FH, 2);
 end
