@@ -22,6 +22,9 @@ function T = toeplitz(c, varargin)
     else
         r = c; % default r
     end
+    if ~ ismatrix(r) || ~ ismatrix(c) || ~ isnumeric(c) || ~ isnumeric(r)
+        error('r and c must be numeric vectors')
+    end
     if size(c, 2) == 1
         c = c.';
     elseif size(c, 1) ~= 1
