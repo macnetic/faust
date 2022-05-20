@@ -326,9 +326,9 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		std::vector<Faust::MatSparse<FPP, Cpu>*> support_DFT(int nfactors)
+		std::vector<Faust::MatSparse<FPP, Cpu>*> butterfly_support(int nfactors, Faust::MatSparse<FPP, Cpu>* P/*=nullptr*/)
 		{
-			// WARNING: free the MatSparse of out after calling this function
+			// WARNING: free the MatSparse after calling this function
 			std::vector<Faust::MatSparse<FPP, Cpu>*> out;
 			auto size = 1 << nfactors;
 			Faust::MatDense<FPP, Cpu> kernel, id;
@@ -343,14 +343,46 @@ namespace Faust
 				sp_support = new Faust::MatSparse<FPP, Cpu>(support);
 				out.push_back(sp_support);
 			}
-			if(! std::is_same<FPP, Real<FPP>>::value)
+			if(P == nullptr)
 			{
-				bit_reversal_factor(nfactors, out);
+				if(! std::is_same<FPP, Real<FPP>>::value)
+					bit_reversal_factor(nfactors, out);
 			}
+			else
+				out.push_back(P);
 			return out;
 		}
 
 	// TODO: specializations should be in .cpp file
+	template<>
+		void bit_reversal_factor<double>(int nfactors, Faust::MatSparse<double, Cpu>*& out)
+		{
+			//nothing to do for double matrices
+		}
+
+	template<>
+		void bit_reversal_factor<float>(int nfactors, Faust::MatSparse<float, Cpu>*& out)
+		{
+			//nothing to do for float matrices
+		}
+
+	template<>
+		void bit_reversal_factor<std::complex<double>>(int nfactors, Faust::MatSparse<std::complex<double>, Cpu>*& out)
+		{
+			// bit reversal permutation factor
+			unsigned int dim_size = 1u << nfactors, L, r, L_over_2, L_times_2;
+			unsigned int* index = new unsigned int[dim_size];
+			unsigned int* new_index = new unsigned int[dim_size];
+			for(unsigned int i = 0; i < dim_size; i++)
+				index[i] = i;
+			memcpy(new_index, index, sizeof(unsigned int)*dim_size);
+			bit_rev_permu(nfactors, new_index, false);
+			std::vector<std::complex<Real<double>>> ones(dim_size);
+			for(typename std::vector<std::complex<double>>::iterator it=ones.begin(); it != ones.end(); it++)
+				*it = std::complex<double>(1.0);
+			out = new MatSparse<std::complex<double>,Cpu>(index, new_index, ones, dim_size, dim_size);
+		}
+
 	template<>
 		void bit_reversal_factor<double>(int nfactors, std::vector<Faust::MatSparse<double, Cpu>*> &out)
 		{
@@ -366,18 +398,8 @@ namespace Faust
 	template<>
 		void bit_reversal_factor<std::complex<double>>(int nfactors, std::vector<Faust::MatSparse<std::complex<double>, Cpu>*>& out)
 		{
-			// bit reversal permutation factor
-			unsigned int dim_size = 1u << nfactors, L, r, L_over_2, L_times_2;
-			unsigned int* index = new unsigned int[dim_size];
-			unsigned int* new_index = new unsigned int[dim_size];
-			for(unsigned int i = 0; i < dim_size; i++)
-				index[i] = i;
-			memcpy(new_index, index, sizeof(unsigned int)*dim_size);
-			bit_rev_permu(nfactors, new_index, false);
-			std::vector<std::complex<Real<double>>> ones(dim_size);
-			for(typename std::vector<std::complex<double>>::iterator it=ones.begin(); it != ones.end(); it++)
-				*it = std::complex<double>(1.0);
-			MatSparse<std::complex<double>,Cpu> *P = new MatSparse<std::complex<double>,Cpu>(index, new_index, ones, dim_size, dim_size);
+			MatSparse<std::complex<double>,Cpu> *P;
+			bit_reversal_factor(nfactors, P);
 			out.push_back(P);
 		}
 
@@ -648,7 +670,7 @@ namespace Faust
 				throw std::runtime_error("The matrix to factorize must be square.");
 			if(log2_size - int(log2_size) > std::numeric_limits<Real<FPP>>::epsilon())
 				throw std::runtime_error("The matrix to factorize must be of a size equal to a power of two.");
-			auto support = support_DFT<FPP>((int) log2_size);
+			auto support = butterfly_support<FPP>((int) log2_size);
 			//	std::cout << "support norms" << std::endl;
 			//	for(auto s: support)
 			//		std::cout << s->norm() << std::endl;

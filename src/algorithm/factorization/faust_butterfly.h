@@ -34,10 +34,13 @@ namespace Faust
 		void butterfly_support(int nfactors, std::vector<Faust::MatSparse<FPP, Cpu>*> out);
 
 	template<typename FPP>
-		std::vector<Faust::MatSparse<FPP, Cpu>*> support_DFT(int nfactors);
+		std::vector<Faust::MatSparse<FPP, Cpu>*> butterfly_support(int nfactors, Faust::MatSparse<FPP, Cpu>* P=nullptr);
 
 	template<typename FPP>
 		void bit_reversal_factor(int nfactors, std::vector<Faust::MatSparse<FPP, Cpu>*>& out);
+
+	template<typename FPP>
+		void bit_reversal_factor(int nfactors, Faust::MatSparse<FPP, Cpu>*& out);
 
 	template<typename FPP>
 		Faust::TransformHelper<FPP, Cpu>* butterfly_hierarchical(const Faust::MatDense<FPP, Cpu>& A, const std::vector<Faust::MatSparse<FPP, Cpu>*> &supports, const ButterflyFactDir& dir=RIGHT);
