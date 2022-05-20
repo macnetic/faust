@@ -24,14 +24,6 @@
 %>
 %> @code
 %> >> full_A = full(A);
-%> >> all(full_A(:, end).' - c < 1e-16)
-%>
-%> ans =
-%>
-%>   logical
-%>
-%>    0
-%>
 %> >> all(full_A(:, end).' - c < 1e-15)
 %>
 %> ans =
