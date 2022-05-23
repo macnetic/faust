@@ -692,7 +692,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 			- FACTOR 3 (double) SPARSE, size 21x21, density 0.238095, nnz 105
 			- FACTOR 4 (double) SPARSE, size 21x22, density 0.205628, nnz 95
 			- FACTOR 5 (double) SPARSE, size 22x24, density 0.166667, nnz 88
-			- FACTOR 6 (double) DENSE, size 24x12, density 0.0833333, nnz 24
+			- FACTOR 6 (double) SPARSE, size 24x12, density 0.0833333, nnz 24
 
 			>>> norm((F+G).toarray() - F.toarray() - G.toarray())
 			8.09693699147347e-15
@@ -704,7 +704,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 			- FACTOR 3 (double) SPARSE, size 20x21, density 0.142857, nnz 60
 			- FACTOR 4 (double) SPARSE, size 21x11, density 0.281385, nnz 65
 			- FACTOR 5 (double) SPARSE, size 11x24, density 0.19697, nnz 52
-			- FACTOR 6 (double) DENSE, size 24x12, density 0.0833333, nnz 24
+			- FACTOR 6 (double) SPARSE, size 24x12, density 0.0833333, nnz 24
 
 			>>> norm((F+2).toarray() - F.toarray() - 2)
 			3.580361673049448e-15
@@ -718,7 +718,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 			- FACTOR 5 (double) SPARSE, size 31x32, density 0.105847, nnz 105
 			- FACTOR 6 (double) SPARSE, size 32x25, density 0.1225, nnz 98
 			- FACTOR 7 (double) SPARSE, size 25x24, density 0.06, nnz 36
-			- FACTOR 8 (double) DENSE, size 24x12, density 0.0833333, nnz 24
+			- FACTOR 8 (double) SPARSE, size 24x12, density 0.0833333, nnz 24
 
 			>>> norm((F+G+2).toarray() - F.toarray() - G.toarray() - 2)
 			1.0082879011490611e-14
@@ -736,7 +736,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 			- FACTOR 9 (double) SPARSE, size 54x36, density 0.063786, nnz 124
 			- FACTOR 10 (double) SPARSE, size 36x34, density 0.0743464, nnz 91
 			- FACTOR 11 (double) SPARSE, size 34x24, density 0.0784314, nnz 64
-			- FACTOR 12 (double) DENSE, size 24x12, density 0.0833333, nnz 24
+			- FACTOR 12 (double) SPARSE, size 24x12, density 0.0833333, nnz 24
 
 			>>> norm((F+G+F+2+F).toarray() - 3*F.toarray() - G.toarray() - 2)
 			2.892210888531005e-14
@@ -804,9 +804,9 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                 G = scalar2Faust(G)
             largs.append(G)
 
-        id = np.eye(F.shape[1], dtype=F.dtype)
-        id_vstack = np.vstack([id for i in range(0,
-                                       len(largs)+1)])
+        id = seye(F.shape[1], dtype=F.dtype)
+        id_vstack = svstack([id for i in range(0,
+                                               len(largs)+1)])
         C = F.concatenate(*largs, axis=1)
         F = C@Faust(id_vstack, dev=F.device)
         return F
