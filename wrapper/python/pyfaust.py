@@ -3563,7 +3563,7 @@ def anticirc(c):
         - FACTOR 4 (complex) SPARSE, size 8x8, density 0.125, nnz 8
         - FACTOR 5 (complex) SPARSE, size 8x8, density 0.25, nnz 16
         - FACTOR 6 (complex) SPARSE, size 8x8, density 0.25, nnz 16
-        - FACTOR 7 (complex) DENSE, size 8x8, density 0.25, nnz 16
+        - FACTOR 7 (complex) SPARSE, size 8x8, density 0.25, nnz 16
 
         >>> np.allclose(A.toarray()[:, -1], c)
         True
@@ -3583,10 +3583,9 @@ def anticirc(c):
     See also pyfaust.circ, pyfaust.toeplitz.
     """
     G = circ(c)
-    P = np.zeros((len(c), len(c)))
     I = np.arange(len(c)-1, -1, -1)
     J = np.arange(0, len(c))
-    P[I, J] = 1
+    P = csr_matrix((np.ones(J.size), (I, J)))
     return G.left(len(G)-2)@Faust(G.factors(len(G)-1)@P)
 
 def toeplitz(c, r=None):

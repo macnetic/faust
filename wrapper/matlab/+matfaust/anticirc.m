@@ -20,7 +20,7 @@
 %> - FACTOR 4 (complex) SPARSE, size 8x8, density 0.125, nnz 8
 %> - FACTOR 5 (complex) SPARSE, size 8x8, density 0.25, nnz 16
 %> - FACTOR 6 (complex) SPARSE, size 8x8, density 0.25, nnz 16
-%> - FACTOR 7 (complex) DENSE, size 8x8, density 0.25, nnz 16
+%> - FACTOR 7 (complex) SPARSE, size 8x8, density 0.25, nnz 16
 %>
 %> @code
 %> >> full_A = full(A);
@@ -56,13 +56,10 @@
 %==========================================================================================
 function A = anticirc(c)
 	C = matfaust.circ(c);
-	P = zeros(numel(c));
 	n = numel(c);
 	I = n:-1:1;
 	J = 1:n;
-	for k=1:n
-		P(I(k), J(k)) = 1;
-	end
+	P = sparse(I, J, 1);
 	N = numfactors(C);
 	A = left(C, N-1) * matfaust.Faust(factors(C, N) * P);
 end
