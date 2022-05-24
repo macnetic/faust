@@ -583,7 +583,6 @@ cdef class FaustAlgoGen@TYPE_NAME@:
     @staticmethod
     def butterfly_hierarchical(M, dir, perm=None):
 
-        print("pyfaust.butterfly pyx")
         cdef unsigned int M_num_rows=M.shape[0]
         cdef unsigned int M_num_cols=M.shape[1]
         cdef int[:] perm_view
@@ -614,7 +613,7 @@ cdef class FaustAlgoGen@TYPE_NAME@:
                 if perm.ndim != 1:
                     raise ValueError('perm must be a vector')
             else: # perm is a list
-                perm = np.ndarray(perm)
+                perm = np.array(perm)
 
             if (perm >= M.shape[1]).any() or (perm < 0).any():
                 raise ValueError('perm contains an invalid index')
