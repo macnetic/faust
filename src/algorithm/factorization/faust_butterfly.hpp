@@ -349,7 +349,7 @@ namespace Faust
 					bit_reversal_factor(nfactors, out);
 			}
 			else
-				out.push_back(P);
+				out.push_back(P); // the caller is responsible to delete the matrix P
 			return out;
 		}
 
@@ -663,14 +663,14 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		Faust::TransformHelper<FPP, Cpu>* butterfly_hierarchical(const Faust::MatDense<FPP, Cpu>& A, const ButterflyFactDir &dir/*=RIGHT*/)
+		Faust::TransformHelper<FPP, Cpu>* butterfly_hierarchical(const Faust::MatDense<FPP, Cpu>& A, const ButterflyFactDir &dir/*=RIGHT*/, Faust::MatSparse<FPP, Cpu>* P/*=nullptr*/)
 		{
 			double log2_size = log2((double)A.getNbRow());
 			if(A.getNbRow() != A.getNbCol())
 				throw std::runtime_error("The matrix to factorize must be square.");
 			if(log2_size - int(log2_size) > std::numeric_limits<Real<FPP>>::epsilon())
 				throw std::runtime_error("The matrix to factorize must be of a size equal to a power of two.");
-			auto support = butterfly_support<FPP>((int) log2_size);
+			auto support = butterfly_support<FPP>((int) log2_size, P);
 			//	std::cout << "support norms" << std::endl;
 			//	for(auto s: support)
 			//		std::cout << s->norm() << std::endl;
@@ -679,8 +679,8 @@ namespace Faust
 				th = butterfly_hierarchical_balanced(A, support);
 			else
 				th = butterfly_hierarchical(A, support, dir);
-			for(auto s: support)
-				delete s;
+			for(int i = 0; i < (P == nullptr?support.size():support.size()-1);i++)
+				delete support[i];
 			return th;
 		}
 
