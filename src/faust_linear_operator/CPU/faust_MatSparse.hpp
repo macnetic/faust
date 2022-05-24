@@ -362,6 +362,7 @@ Faust::MatSparse<FPP,Cpu>::MatSparse(const unsigned int* rowidx, const unsigned 
 	mat.setFromTriplets(tripletList.begin(), tripletList.end());
 	mat.makeCompressed();
 	this->nnz = mat.nonZeros();
+	this->update_dim();
 }
 
 template<typename FPP>
