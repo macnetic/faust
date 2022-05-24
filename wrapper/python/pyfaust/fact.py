@@ -1326,7 +1326,7 @@ def fgft_palm(U, Lap, p, init_D=None, ret_lambda=False, ret_params=False):
 # experimental block end
 
 
-def butterfly(M, type="bbtree"):
+def butterfly(M, type="bbtree", perm=None):
     """
     Factorizes M according to a butterfly support.
 
@@ -1338,9 +1338,12 @@ def butterfly(M, type="bbtree"):
         factorization the most left factor (resp. the most right factor) is split in two.
         If 'bbtree' is used then the matrix is factorized according to a Balanced
         Binary Tree (which is faster as it allows parallelization).
+        perm: permutation column indices of the permutation P which is such that
+        the returned Faust F is the approximation of M@P and F@P.T the approximation of M.
+
 
     Returns:
-        The Faust which is an approximate of M according to a butterfly support.
+        The Faust which is an approximattion of M according to a butterfly support.
 
     Example:
         >>> from pyfaust import Faust, wht, dft
@@ -1358,11 +1361,12 @@ def butterfly(M, type="bbtree"):
     """
     is_real = np.empty((1,))
     M = _check_fact_mat('butterfly()', M, is_real)
+    args = (M, type, perm)
     if is_real:
         is_float = M.dtype == 'float32'
         if is_float:
-            return Faust(core_obj=_FaustCorePy.FaustAlgoGenFlt.butterfly_hierarchical(M, type))
+            return Faust(core_obj=_FaustCorePy.FaustAlgoGenFlt.butterfly_hierarchical(*args))
         else:
-            return Faust(core_obj=_FaustCorePy.FaustAlgoGenDbl.butterfly_hierarchical(M, type))
+            return Faust(core_obj=_FaustCorePy.FaustAlgoGenDbl.butterfly_hierarchical(*args))
     else:
-        return Faust(core_obj=_FaustCorePy.FaustAlgoGenCplxDbl.butterfly_hierarchical(M, type))
+        return Faust(core_obj=_FaustCorePy.FaustAlgoGenCplxDbl.butterfly_hierarchical(*args))

@@ -581,10 +581,12 @@ cdef class FaustAlgoGen@TYPE_NAME@:
         return core, _out_buf[0]
 
     @staticmethod
-    def butterfly_hierarchical(M, dir):
+    def butterfly_hierarchical(M, dir, perm=None):
 
+        print("pyfaust.butterfly pyx")
         cdef unsigned int M_num_rows=M.shape[0]
         cdef unsigned int M_num_cols=M.shape[1]
+        cdef int[:] perm_view
 
         cdef @TYPE@[:,:] Mview
 
@@ -597,13 +599,33 @@ cdef class FaustAlgoGen@TYPE_NAME@:
         else:
             raise ValueError("dir argument must be 'right' or 'left'.")
 
-
         core = @CORE_CLASS@(core=True)
         Mview = M
-        core.@CORE_OBJ@ = \
-        FaustCoreCy.butterfly_hierarchical[@TYPE@](&Mview[0,0], M_num_rows,
-                                                   M_num_cols, dir)
+        if perm is None:
+            core.@CORE_OBJ@ = \
+                    FaustCoreCy.butterfly_hierarchical[@TYPE@](&Mview[0,0], M_num_rows,
+                                                               M_num_cols, dir,
+                                                              NULL)
+        else:
+            if not isinstance(perm, (list, np.ndarray)) or len(perm) != M.shape[1]:
+                raise ValueError("perm must be a valid permutation list")
 
+            if isinstance(perm, np.ndarray):
+                if perm.ndim != 1:
+                    raise ValueError('perm must be a vector')
+            else: # perm is a list
+                perm = np.ndarray(perm)
+
+            if (perm >= M.shape[1]).any() or (perm < 0).any():
+                raise ValueError('perm contains an invalid index')
+
+            perm = perm.astype('int32')
+            perm_view = perm
+
+            core.@CORE_OBJ@ = \
+                    FaustCoreCy.butterfly_hierarchical[@TYPE@](&Mview[0,0], M_num_rows,
+                                                               M_num_cols, dir,
+                                                               &perm_view[0])
         return core
 
 

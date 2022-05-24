@@ -149,6 +149,9 @@ cdef extern from "FaustFact.h":
 
     cdef FaustCoreCppCPU[FPP]* butterfly_hierarchical[FPP](FPP* mat, unsigned int,
                                                         unsigned int, int dir)
+    cdef FaustCoreCppCPU[FPP]* butterfly_hierarchical[FPP](FPP* mat, unsigned int,
+                                                        unsigned int, int dir,
+                                                          int* perm)
 
 
 cdef extern from "FaustFactGivensFGFT.h":
