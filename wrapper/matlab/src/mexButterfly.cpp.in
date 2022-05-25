@@ -76,15 +76,65 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	}
 	try
 	{
+		TransformHelper<SCALAR, Cpu>* F = nullptr;
+		Faust::MatDense<SCALAR,Cpu> matrix;
+		MatSparse<SCALAR,Cpu> *perm_mat = nullptr;
+
+		mxArray2FaustMat(prhs[0], matrix);
+
 		ButterflyFactDir dir = RIGHT;
 		if(nrhs >= 2)
 			dir = static_cast<ButterflyFactDir>(static_cast<int>(mxGetScalar(prhs[1])));
-		TransformHelper<SCALAR, Cpu>* F = nullptr;
-		Faust::MatDense<SCALAR,Cpu> matrix;
-		mxArray2FaustMat(prhs[0], matrix);
+		if(nrhs >= 3)
+		{
+#ifndef MX_HAS_INTERLEAVED_COMPLEX
+	#error perm argument compiling isn't supported for Matlab versions prior to R2018a
+#endif
+			auto perm_inds = prhs[2];
+			if(mxIsSparse(perm_inds))
+				mexErrMsgTxt("The matrix of indices must be dense");
+			else
+			{
+				// build a MatSparse perm_mat from permutation column indices
+				const size_t pnrows = mxGetM(perm_inds);
+				const size_t pncols  = mxGetN(perm_inds);
+				const size_t perm_size = matrix.getNbCol();
 
-		F = Faust::butterfly_hierarchical(matrix, dir);
+				// if [] was passed for perm, it means no perm at all
+				if(pnrows != 0 && pncols != 0)
+				{
+
+
+					assert(perm_size == pnrows || perm_size == pncols);
+
+					if (mxGetNumberOfDimensions(perm_inds) != 2)
+						mexErrMsgTxt("The matrix of indices must be two-dimensional");
+
+					if(mxIsComplex(perm_inds))
+						mexErrMsgTxt("The permutionation indices can't be complex");
+
+					SCALAR* ptr_data = nullptr;
+					newMxGetData(ptr_data, perm_inds);
+
+					unsigned int *row_ids = new unsigned int[perm_size];
+					unsigned int *ucol_ids = new unsigned int[perm_size];
+					for(int i=0;i < perm_size;i++)
+						ucol_ids[i] = (unsigned int) ptr_data[i]-1; // matlab is one-base indexed
+					std::iota(row_ids, row_ids+perm_size, 0);
+					SCALAR *ones = new SCALAR[perm_size];
+					std::fill(ones, ones+perm_size, SCALAR(1));
+					perm_mat = new Faust::MatSparse<SCALAR, Cpu>((unsigned int*)row_ids, ucol_ids, ones, perm_size, perm_size, perm_size);
+					delete[] row_ids;
+					delete[] ucol_ids;
+					delete[] ones;
+				}
+			}
+
+		}
+		F = butterfly_hierarchical(matrix, dir, perm_mat);
 		plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR, Cpu>>(F);
+		if(perm_mat != nullptr)
+			delete perm_mat;
 	}
 	catch (const std::exception& e)
 	{
