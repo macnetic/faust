@@ -113,7 +113,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 					if(mxIsComplex(perm_inds))
 						mexErrMsgTxt("The permutionation indices can't be complex");
 
-					SCALAR* ptr_data = nullptr;
+					double* ptr_data = nullptr;
 					newMxGetData(ptr_data, perm_inds);
 
 					unsigned int *row_ids = new unsigned int[perm_size];
@@ -123,7 +123,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 					std::iota(row_ids, row_ids+perm_size, 0);
 					SCALAR *ones = new SCALAR[perm_size];
 					std::fill(ones, ones+perm_size, SCALAR(1));
-					perm_mat = new Faust::MatSparse<SCALAR, Cpu>((unsigned int*)row_ids, ucol_ids, ones, perm_size, perm_size, perm_size);
+					perm_mat = new Faust::MatSparse<SCALAR, Cpu>(row_ids, ucol_ids, ones, perm_size, perm_size, perm_size);
 					delete[] row_ids;
 					delete[] ucol_ids;
 					delete[] ones;
