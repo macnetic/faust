@@ -28,14 +28,21 @@ function F = butterfly(M, varargin)
         import matfaust.Faust
         nargin = length(varargin);
         type = 'right';
+		perm = [];
         if(nargin > 0)
-                for i=1:nargin
+                for i=1:2:nargin
                         switch(varargin{i})
                                 case 'type'
                                         if(nargin < i+1 || ~ any(strcmp(varargin{i+1}, {'right', 'left', 'bbtree'})))
                                                 error('keyword argument ''type'' must be followed by ''left'' or ''right'' or ''bbtree''')
                                         else
                                                 type = varargin{i+1};
+                                        end
+								case 'perm'
+									if(nargin < i+1 || ~ strcmp(varargin{i+1}, 'default_8') && ~ is_array_of_indices(varargin{i+1}, M) && ~ is_cell_arrays_of_indices(varargin{i+1}, M))
+                                                error('keyword argument ''perm'' must be followed by ''default_8'', an array of permutation indices or a cell array of arrays of permutation indices')
+                                        else
+                                                perm = varargin{i+1};
                                         end
                         end
                 end
@@ -48,14 +55,32 @@ function F = butterfly(M, varargin)
                 type = 2;
         end
 		if(strcmp(class(M), 'single'))
-				core_obj = mexButterflyRealFloat(M, type);
+				core_obj = mexButterflyRealFloat(M, type, perm);
 				F = Faust(core_obj, isreal(M), 'cpu', 'float');
 		else
 			if(isreal(M))
-				core_obj = mexButterflyReal(M, type);
+				core_obj = mexButterflyReal(M, type, perm);
 			else
-				core_obj = mexButterflyCplx(M, type);
+				core_obj = mexButterflyCplx(M, type, perm);
 			end
 			F = Faust(core_obj, isreal(M));
 		end
+end
+
+function b = is_array_of_indices(value, M)
+	s = size(M,2);
+	b = ismatrix(value) && isnumeric(value) && isreal(value);
+	b = b && all(value <= s);
+	b = b && all(value > 0);
+	b = b && length(value) == s;
+end
+
+function b = is_cell_arrays_of_indices(value, M)
+	b = iscell(value);
+	for i=1:length(value)
+		b = b && is_array_of_indices(value{i}, M);
+		if ~ b
+			break
+		end
+	end
 end
