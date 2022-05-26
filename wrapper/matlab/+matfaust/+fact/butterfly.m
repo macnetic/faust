@@ -39,7 +39,7 @@ function F = butterfly(M, varargin)
                                                 type = varargin{i+1};
                                         end
 								case 'perm'
-									if(nargin < i+1 || ~ strcmp(varargin{i+1}, 'default_8') && ~ is_array_of_indices(varargin{i+1}, M) && ~ is_cell_arrays_of_indices(varargin{i+1}, M))
+									if(nargin < i+1 ||  ~ is_array_of_indices(varargin{i+1}, M) && ~ is_cell_arrays_of_indices(varargin{i+1}, M) && ~ strcmp(varargin{i+1}, 'default_8'))
                                                 error('keyword argument ''perm'' must be followed by ''default_8'', an array of permutation indices or a cell array of arrays of permutation indices')
                                         else
                                                 perm = varargin{i+1};
@@ -47,6 +47,22 @@ function F = butterfly(M, varargin)
                         end
                 end
         end
+		if iscell(perm) % perm is a cell of arrays, each one defining a permutation to test
+			% evaluate butterfly factorisation using the permutations and
+			% keep the best Faust
+			min_err = inf;
+			nM = norm(M);
+			for i=1:length(perm)
+				F = matfaust.fact.butterfly(M, 'type', type, 'perm', perm{i});
+				err = norm(full(F)-M)/nM;
+				if err < min_err
+					min_err = err;
+					best_F = F;
+				end
+			end
+			F = best_F;
+			return;
+		end
         if(strcmp(type, 'right'))
                 type = 1;
         elseif(strcmp(type, 'left'))
