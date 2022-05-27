@@ -7,6 +7,14 @@
 %>        If 'bbtree' is used then the matrix is factorized according to a Balanced
 %>        Binary Tree (which is faster as it allows parallelization).
 %>
+%>
+%> @param 'perm', value	four kind of values are possible for this argument (Note that this argument is made only for the bbtree type of factorization).
+%>
+%> 1. perm is an array of column indices of the permutation matrix P which is such that the returned Faust F is the approximation of M*P and F*P.' the approximation of M.
+%> 2. perm is a cell array of arrays of permutation column indices as defined in 1. In that case, all permutations passed to the function are used as explained in 1, each one producing a Faust, the best one (that is the best approximation of M) is kept and returned by butterfly.
+%> 3. perm is 'default_8', this is a particular case of 2. Eight default permutations are used. For the definition of those permutations please refer to [1].
+%> 4. By default this argument is empty, no permutation is used.
+%>
 %> @retval F the Faust which is an approximate of M according to a butterfly support.
 %>
 %> @b Example:
@@ -22,7 +30,50 @@
 %>    1.4311e-15
 %> @endcode
 %>
-%> <b>Reference:</b> Leon Zheng, Elisa Riccietti, and Remi Gribonval, <a href="https://arxiv.org/pdf/2110.01230.pdf">Hierarchical Identifiability in Multi-layer Sparse Matrix Factorization</a>
+%> Use butterfly with a permutation factor defined by J:
+%> @code
+%> >> J = 32:-1:1;
+%> >> F = butterfly(H, 'type', 'bbtree', 'perm', J);
+%> F =
+%>
+%> Faust size 32x32, density 0.34375, nnz_sum 352, 6 factor(s):
+%> - FACTOR 0 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+%> - FACTOR 1 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+%> - FACTOR 2 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+%> - FACTOR 3 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+%> - FACTOR 4 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+%> - FACTOR 5 (double) SPARSE, size 32x32, density 0.03125, nnz 32
+%> @endcode
+%>
+%> Use butterfly with successive permutations J1 and J2
+%> and keep the best approximation:
+%>
+%> @code
+%> >> J1 = J;
+%> >> J2 = randperm(32);
+%> >> F = butterfly(H, 'type', 'bbtree', 'perm', {J1, J2})
+%>
+%> F =
+%>
+%> Faust size 32x32, density 0.34375, nnz_sum 352, 6 factor(s):
+%> - FACTOR 0 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+%> - FACTOR 1 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+%> - FACTOR 2 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+%> - FACTOR 3 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+%> - FACTOR 4 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+%> - FACTOR 5 (double) SPARSE, size 32x32, density 0.03125, nnz 32
+%> >> [Jbest, ~, ~] = find(factors(F, 6).');
+%> >> all(all(Jbest.' == J1))
+%>
+%> ans =
+%>
+%> 	logical
+%> 	1
+%> >> # here the J1 permutation is the best one
+%> @endcode
+%>
+%>
+%> <b>Reference: [1]</b> Leon Zheng, Elisa Riccietti, and Remi Gribonval, <a href="https://arxiv.org/pdf/2110.01230.pdf">Hierarchical Identifiability in Multi-layer Sparse Matrix Factorization</a>
 %==========================================================================
 function F = butterfly(M, varargin)
         import matfaust.Faust
@@ -63,9 +114,12 @@ function F = butterfly(M, varargin)
             min_err = inf;
             nM = norm(M, 'fro');
             for i=1:length(perm)
-                perm{i}
-                F = matfaust.fact.butterfly(M, 'type', type, 'perm', perm{i});
-                err = norm(full(F)-M, 'fro')/nM
+				%                perm{i}
+				m = numel(perm{i});
+				P = sparse(1:m, perm{i}, ones(1, m), m, m);
+				MP = M*P;
+				F = matfaust.fact.butterfly(MP, 'type', type, 'perm', perm{i});
+				err = norm(F*P'-M, 'fro')/nM;
                 if err < min_err
                     min_err = err;
                     best_F = F;
