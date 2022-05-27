@@ -1339,10 +1339,10 @@ def butterfly(M, type="bbtree", perm=None):
         Binary Tree (which is faster as it allows parallelization).
         perm: four kind of values are possible for this argument (Note that this argument is made only for the bbtree type of
         factorization).
-            1. perm is the list of column indices of the permutation P which is such that
+            1. perm is a list of column indices of the permutation matrix P which is such that
             the returned Faust F is the approximation of M@P and F@P.T the
             approximation of M.
-            2. perm is a list of list of permutation column indices as defined
+            2. perm is a list of lists of permutation column indices as defined
             in 1. In that case, all permutations passed to the function are
             used as explained in 1, each one producing a Faust, the best one
             (that is the best approximation of M) is kept and returned by butterfly.
@@ -1366,13 +1366,16 @@ def butterfly(M, type="bbtree", perm=None):
         # use butterfly with a permutation factor defined by J
         >>> J = np.arange(7, -1, -1)
         >>> F = butterfly(H, type='bbtree', perm=J)
-        # use butterfly with successive permutation factors J1 and J2
+        # use butterfly with successive permutations J1 and J2
         # and keep the best approximation
         >>> J1 = J
         >>> from itertools import permutations
         >>> permutations = list(permutations(J))
         >>> J2 = list(permutations[randint(0, len(permutations)-1)])
         >>> F = butterfly(H, type='bbtree', perm=[J1, J2])
+        >>> np.allclose(F.factors(3).indices, J1)
+        True
+        >>> # here the best permutation is J1
 
     Reference:
         [1] Quoc-Tung Le, Léon Zheng, Elisa Riccietti, Rémi Gribonval. Fast
@@ -1397,7 +1400,7 @@ def butterfly(M, type="bbtree", perm=None):
             size = 2 ** i
             if type == 0:
                 row_inds = np.hstack((np.arange(size//2), size//2 + np.arange(size//2)))
-                col_inds = np.hstack((np.arange(size//2),size - 1 - np.arange(size//2)))
+                col_inds = np.hstack((np.arange(size//2), size - 1 - np.arange(size//2)))
             elif type == 1:
                 row_inds = np.hstack((size // 2 - 1 - np.arange(size//2), size // 2 + np.arange(size//2)))
                 col_inds = np.hstack((np.arange(size//2), size//2 + np.arange(size//2)))
@@ -1440,6 +1443,10 @@ def butterfly(M, type="bbtree", perm=None):
                 raise TypeError("perm_name must be numeric")
             return p
 
+#        print(list(get_permutation_matrix(int(np.log2(M.shape[0])),
+#                                               perm_name).indices+1 \
+#                        for perm_name in  ["000", "001", "010", "011", "100",
+#                                           "101", "110", "111"]))
         permutations = [get_permutation_matrix(int(np.log2(M.shape[0])),
                                                perm_name).indices \
                         for perm_name in  ["000", "001", "010", "011", "100", "101", "110", "111"]]
@@ -1450,9 +1457,14 @@ def butterfly(M, type="bbtree", perm=None):
         best_err = np.inf
         best_F = None
         for p in perm:
-            F = butterfly(M, type, p)
+            # print(p)
+            row_inds = np.arange(len(p))
+            P = csr_matrix((np.ones(row_inds.size), (row_inds, p)))
+            MP = M@P
+            F = butterfly(MP, type, p)
             # compute error
-            error = (F-M).norm()/Faust(M).norm()
+            error = np.linalg.norm(F@P.T-M)/Faust(M).norm()
+            # print(error)
             if error < best_err:
                 best_err = error
                 best_F = F
