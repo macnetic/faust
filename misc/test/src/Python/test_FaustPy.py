@@ -840,6 +840,18 @@ class TestFaustPy(unittest.TestCase):
         test_Fct[test_Fct==0] = 1
         self.assertTrue(((((test_Fct-ref_Fct)/ref_Fct) < 0.01)).all())
 
+    def test_real(self):
+        print("test Faust.real")
+        rF = self.F.real
+        rF_ref = self.mulFactors().real
+        self.assertTrue(np.allclose(rF.toarray(), rF_ref))
+
+    def test_imag(self):
+        print("test Faust.imag")
+        iF = self.F.imag
+        iF_ref = self.mulFactors().imag
+        self.assertTrue(np.allclose(iF.toarray(), iF_ref))
+
     def test_left(self):
         print("Test Faust.left()")
         for F in [self.F, self.F.T, self.F.H]:
@@ -1028,7 +1040,6 @@ class TestFaustPy(unittest.TestCase):
         param = ParamsHierarchical(fact_cons, res_cons, stop_crit1,
                                    stop_crit2)
         self.assertRaisesRegex(ValueError, err_msg, param.are_constraints_consistent, M)
-
 
 class TestFaustPyCplx(TestFaustPy):
 
