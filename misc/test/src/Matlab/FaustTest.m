@@ -640,7 +640,30 @@ classdef FaustTest < matlab.unittest.TestCase
             this.verifyEqual(size(tFaust), [size(this.factors{this.num_factors},2), size(this.factors{1},1)])
         end
 
+    function testReal(this)
+        F = matfaust.rand(15, 22);
+        G = matfaust.rand(32, 12, 'field', 'complex');
+        fausts = {F, G};
+        for i=1:length(fausts)
+            F = fausts{i};
+            rF = real(F);
+            this.verifyTrue(norm(full(rF)-imag(full(F)))/norm(full(F)) < 1e-6)
+        end
     end
+
+    function testImag(this)
+        F = matfaust.rand(15, 22);
+        G = matfaust.rand(32, 12, 'field', 'complex');
+        fausts = {F, G};
+        for i=1:length(fausts)
+            F = fausts{i};
+            iF = imag(F);
+            this.verifyTrue(norm(full(iF)-imag(full(F)))/norm(full(F)) < 1e-6)
+        end
+    end
+
+    end
+
 
 	methods
 		function faust_test = FaustTest(varargin)
