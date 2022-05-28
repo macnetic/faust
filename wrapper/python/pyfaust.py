@@ -2251,8 +2251,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             return F.clone(dev=F.device)
         if F.dtype == np.complex:
             if dtype == np.float32:
-                raise ValueError("complex float in single precision is not yet"
-                                 " available in FAµST")
+                return F.real.astype('float32')
             else:
                 # dtype is double
                 return F.real
