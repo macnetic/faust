@@ -981,30 +981,44 @@ classdef Faust
 		function bool = isreal(F)
 			%%
 			bool=F.is_real;
-
 		end
 
 		%======================================================================
 		%> @brief Returns the real part of the Faust F.
 		%======================================================================
-		function rF = real(F)
-			if isreal(F)
-				rF = F;
-			else
-				rF = 1/2 * (F + conj(F));
-			end
-		end
+        function rF = real(F)
+            import matfaust.Faust
+            if isreal(F)
+                rF = F;
+            else
+                %	rF = 1/2 * (F + conj(F));
+                rF = cplx2real_op(F);
+                [Fnrows, Fncols] = size(F);
+                S = struct('type','()', 'subs', {{1:Fnrows, 1:2*Fncols}});
+                % TODO: fix strange bug, rF(1:Fnrows, 1:2*Fncols) doesn't work here
+                rF = subsref(rF, S);
+                rF = rF * Faust([ speye(Fncols) ; sparse([], [], [], Fncols, Fncols)]);
+            end
+
+        end
 
 		%======================================================================
 		%> @brief Returns the imaginary part of the Faust F.
 		%======================================================================
-		function iF = imag(F)
-			if isreal(F)
-				iF = sparse(zeros(size(F))); % zero
-			else
-				iF = 1 / 2j * (F - conj(F));
-			end
-		end
+        function iF = imag(F)
+            import matfaust.Faust
+            if isreal(F)
+                iF = matfaust.Faust(sparse([], [], [], size(F, 1), size(F, 2))); % zero
+            else
+                % iF = 1 / 2j * (F - conj(F));
+                iF = cplx2real_op(F);
+                [Fnrows, Fncols] = size(F);
+                S = struct('type','()', 'subs', {{Fnrows+1:2*Fnrows, 1:2*Fncols}});
+                iF = subsref(iF, S);
+                % TODO: fix strange bug, cf. real TODO
+                iF = iF * Faust([speye(Fncols) ; sparse([], [], [], Fncols, Fncols)]);
+            end
+        end
 
 		%======================================================================
 		%> @brief Returns a new Faust whose class is single. It allows to convert all the factors to single precision.
@@ -3536,3 +3550,19 @@ classdef Faust
 	end
 end
 
+function real_op = cplx2real_op(op)
+    % this function is for Faust.real and Faust.imag
+	if matfaust.isFaust(op)
+		facts = cell(1, numfactors(op));
+		for i=1:numfactors(op)
+			facts{1, i} = cplx2real_op(factors(op, i));
+		end
+		real_op = matfaust.Faust(facts);
+	else
+		rop = real(op);
+		iop = imag(op);
+		real_part = [rop, -iop];
+		imag_part = [iop, rop];
+		real_op = [ real_part ; imag_part ];
+	end
+end
