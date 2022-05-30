@@ -790,8 +790,54 @@ classdef Faust
 		%> <p>@b See @b also Faust.Faust, Faust.rcg, Faust.ctranspose, Faust.complex
 		%>
 		%======================================================================
-		function G = mtimes(F,A)
-			G = mtimes_trans(F, A, 0);
+		function C = mtimes(F,A)
+            trans = false;
+			if(isa(A, 'matfaust.Faust') && ~ isa(F, 'matfaust.Faust'))
+				if(ismatrix(F))
+					C = mtimes(A', F')';
+				else
+					C = mtimes(A, F); % F is scalar or something else (in which case it'll fail later)
+				end
+			elseif(isa(A,'matfaust.Faust'))
+				if (F.is_real)
+					if(isreal(A))
+						C = matfaust.Faust(F, call_mex(F, 'mul_faust', A.matrix.objectHandle));
+					else
+						C = mtimes(complex(F), A);
+					end
+				else
+					if(A.is_real)
+						A = complex(A);
+					end
+					C = matfaust.Faust(F, call_mex(F, 'mul_faust', A.matrix.objectHandle));
+				end
+			elseif(isscalar(A))
+				if (F.is_real)
+					if(isreal(A))
+						C = matfaust.Faust(F, call_mex(F, 'mul_scalar', A));
+					else
+						C = mtimes(complex(F), A);
+					end
+				else
+					C = matfaust.Faust(F, call_mex(F, 'mul_scalar', A));
+				end
+			elseif (F.is_real) % A is not a Faust, not a scalar (should be a matrix)
+				if (isreal(A))
+					C = call_mex(F, 'multiply', A);
+				else
+					C_real = call_mex(F, 'multiply', real(A));
+					C_imag = call_mex(F, 'multiply', imag(A));
+					C = C_real + 1i * C_imag;
+				end
+			else % F is complex and A is most likely a matrix
+				if(isreal(A))
+					C = call_mex(F, 'multiply', F.convertFactorToComplex(A));
+				else
+					% A is not necessarily a complex array, it could be a bsr matrix (a cell)
+					C = call_mex(F, 'multiply', F.convertFactorToComplex(A));
+				end
+			end
+
 		end
 
 
@@ -814,65 +860,12 @@ classdef Faust
 		%>
 		%> <p> @b See @b also mtimes.
 		%======================================================================
-		function C = mtimes_trans(F,A,trans)
+		function C = mtimes_trans(F, A, trans)
 			%%
-
-			if ~isreal(trans)
-				error('invalid argument trans, must be equal to 0 or 1');
-			end
-
-			if (trans ~= 1) && (trans ~= 0)
-				error('invalid argument trans, must be equal to 0 or 1');
-			end
-			% TODO: take trans into account when mul F to a scal or a Faust
-			% it's not a serious issue because mtimes_trans() shouldn't be called by final user
-			% (func's doc is filtered out in doxydoc)
-
-			if(isa(A, 'matfaust.Faust') && ~ isa(F, 'matfaust.Faust'))
-				if(ismatrix(F))
-					C = mtimes_trans(A', F', 0)';
-				else
-					C = mtimes_trans(A, F, 0); % F is scalar or something else (in which case it'll fail later)
-				end
-			elseif(isa(A,'matfaust.Faust'))
-				if (F.is_real)
-					if(isreal(A))
-						C = matfaust.Faust(F, call_mex(F, 'mul_faust', A.matrix.objectHandle));
-					else
-						C = mtimes_trans(complex(F), A, trans);
-					end
-				else
-					if(A.is_real)
-						A = complex(A);
-					end
-					C = matfaust.Faust(F, call_mex(F, 'mul_faust', A.matrix.objectHandle));
-				end
-			elseif(isscalar(A))
-				if (F.is_real)
-					if(isreal(A))
-						C = matfaust.Faust(F, call_mex(F, 'mul_scalar', A));
-					else
-						C = mtimes_trans(complex(F), A, trans);
-					end
-				else
-					C = matfaust.Faust(F, call_mex(F, 'mul_scalar', A));
-				end
-			elseif (F.is_real) % A is not a Faust, not a scalar (should be a matrix)
-				if (isreal(A))
-					C = call_mex(F, 'multiply', A, trans);
-				else
-					C_real = call_mex(F, 'multiply', real(A), trans);
-					C_imag = call_mex(F, 'multiply', imag(A), trans);
-					C = C_real + 1i * C_imag;
-				end
-			else % F is complex and A is most likely a matrix
-				if(isreal(A))
-					C = call_mex(F, 'multiply', F.convertFactorToComplex(A), trans);
-				else
-					% A is not necessarily a complex array, it could be a bsr matrix (a cell)
-					C = call_mex(F, 'multiply', F.convertFactorToComplex(A), trans);
-				end
-			end
+            if trans
+                F = F.'
+            end
+            mtimes(F, A)
 		end
 
 		%======================================================================
