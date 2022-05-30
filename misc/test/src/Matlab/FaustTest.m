@@ -647,7 +647,7 @@ classdef FaustTest < matlab.unittest.TestCase
         for i=1:length(fausts)
             F = fausts{i};
             rF = real(F);
-            this.verifyTrue(norm(full(rF)-imag(full(F)))/norm(full(F)) < 1e-6)
+            this.verifyTrue(norm(full(rF)-real(full(F)))/norm(full(F)) < 1e-6)
         end
     end
 
