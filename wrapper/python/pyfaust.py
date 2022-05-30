@@ -2268,11 +2268,9 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             return F
         else:
             #  return 1/2 * (F + F.conj())
-            return (_cplx2real_op(F)[:F.shape[0],
-                                     :2*F.shape[1]]@Faust(svstack((seye(F.shape[1]),
-                                                                   csr_matrix((F.shape[1],
-                                                                               F.shape[1])))))).pruneout()
-            #return 1/2 * (F + F.conj())
+            return _cplx2real_op(F)[:F.shape[0],
+                                     :F.shape[1]].pruneout()
+        #return 1/2 * (F + F.conj())
 
     @property
     def imag(F):
@@ -2285,10 +2283,9 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                                      ([0],[0])), (F.shape)))
         else:
             # return 1/2j * (F + F.conj())
-            return (_cplx2real_op(F)[F.shape[0]:2*F.shape[0],
-                                     :2*F.shape[1]]@Faust(svstack((seye(F.shape[1]),
-                                                                   csr_matrix((F.shape[1],
-                                                                               F.shape[1])))))).pruneout()
+            return _cplx2real_op(F)[F.shape[0]:2*F.shape[0],
+                                     :2*F.shape[1]].pruneout()
+
 
     def asarray(F, *args, **kwargs):
         return F

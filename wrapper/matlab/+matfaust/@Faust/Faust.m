@@ -994,10 +994,9 @@ classdef Faust
                 %	rF = 1/2 * (F + conj(F));
                 rF = cplx2real_op(F);
                 [Fnrows, Fncols] = size(F);
-                S = struct('type','()', 'subs', {{1:Fnrows, 1:2*Fncols}});
+                S = struct('type','()', 'subs', {{1:Fnrows, 1:Fncols}});
                 % TODO: fix strange bug, rF(1:Fnrows, 1:2*Fncols) doesn't work here
                 rF = subsref(rF, S);
-                rF = rF * Faust([ speye(Fncols) ; sparse([], [], [], Fncols, Fncols)]);
             end
 
         end
@@ -1013,10 +1012,9 @@ classdef Faust
                 % iF = 1 / 2j * (F - conj(F));
                 iF = cplx2real_op(F);
                 [Fnrows, Fncols] = size(F);
-                S = struct('type','()', 'subs', {{Fnrows+1:2*Fnrows, 1:2*Fncols}});
+                S = struct('type','()', 'subs', {{Fnrows+1:2*Fnrows, 1:Fncols}});
                 iF = subsref(iF, S);
                 % TODO: fix strange bug, cf. real TODO
-                iF = iF * Faust([speye(Fncols) ; sparse([], [], [], Fncols, Fncols)]);
             end
         end
 
