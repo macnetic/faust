@@ -1,6 +1,9 @@
 %=========================================
 %> @brief Returns the Direct Cosine Transform (Type II) Faust of order n.
 %>
+%> The analytical formula of DCT II used here is:
+%> \f$2 \sum_{n=0}^{N-1} x_n cos \left( {\pi k (2n + 1)} \over {2N} \right)\f$
+%>
 %> @param n: the order of the DCT (it must be a power of two).
 %> @param 'dev', str: 'gpu' or 'cpu' to create the Faust on CPU or GPU ('cpu' is the default).
 %>
