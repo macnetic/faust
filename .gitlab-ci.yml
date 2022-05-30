@@ -871,7 +871,9 @@ conda_linux_pub:
   stage: conda_pkgs
   script:
     - misc/continuous_integration/conda_pkg/conda_build_upload_pyfaust.sh linux 3.9 misc/continuous_integration/conda_pkg/meta.yaml.in
+    - conda env remove -n build_upload_pyfaust_venv_39
     - misc/continuous_integration/conda_pkg/conda_build_upload_pyfaust.sh linux 3.10 misc/continuous_integration/conda_pkg/meta.yaml.in
+    - conda env remove -n build_upload_pyfaust_venv_310
   only:
     - tags
   tags:
@@ -898,6 +900,7 @@ conda_macosx_pub:
   script:
     - misc/continuous_integration/conda_pkg/conda_build_upload_pyfaust.sh macosx 3.9 misc/continuous_integration/conda_pkg/meta.yaml.in
       # - misc/continuous_integration/conda_pkg/conda_build_upload_pyfaust.sh macosx 3.10 misc/continuous_integration/conda_pkg/meta.yaml.in # disabled (see issue #264)
+    - conda env remove -n build_upload_pyfaust_venv_39
   only:
     - tags
   tags:
