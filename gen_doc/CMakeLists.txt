@@ -184,8 +184,7 @@ if(BUILD_DOCUMENTATION)
 endif(BUILD_DOCUMENTATION)
 
 
-
-
+include("${PROJECT_SOURCE_DIR}/CMake/zip_data_archive.cmake")
 
 #IF (DOXYGEN_FOUND)
 #    IF (NOT DOXY_IN_FILE_UPDATED)
