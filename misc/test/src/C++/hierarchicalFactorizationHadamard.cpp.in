@@ -45,8 +45,6 @@
 #include "faust_init_from_matio_core.h"
 #include <string>
 #include <sstream>
-#include "faust_BlasHandle.h"
-#include "faust_SpBlasHandle.h"
 #include "faust_HierarchicalFact.h"
 #include "faust_hierarchical.h"
 #include "faust_ConstraintGeneric.h"
@@ -133,12 +131,10 @@ int main(int argc, char* argv[])
         params.norm2_max_iter = std::atoi(str_norm2_max_iter);
     params.Display();
     // useless for CPU but use for compatibility with GPU
-	Faust::BlasHandle<Cpu> blasHandle;
-	Faust::SpBlasHandle<Cpu> spblasHandle;
 
 //    auto th = Faust::hierarchical(whtmat, 30, fac_cons, res_cons, lambda, isUpdateWayR2L,
 //            isFactSideLeft, use_csr);
-    Faust::HierarchicalFact<FPP,Cpu,FPP2> hierFact(whtmat,params, blasHandle, spblasHandle);
+    Faust::HierarchicalFact<FPP,Cpu,FPP2> hierFact(whtmat,params);
     hierFact.compute_facts();
 
     Faust::Transform<FPP,Cpu> t;

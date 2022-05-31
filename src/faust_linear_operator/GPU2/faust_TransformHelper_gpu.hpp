@@ -355,57 +355,39 @@ namespace Faust
         }
 
     template<typename FPP>
-        MatDense<FPP,GPU2> TransformHelper<FPP,GPU2>::multiply(const Faust::MatDense<FPP,GPU2> &A, const bool transpose /* deft to false */, const bool conjugate/*=false*/)
+        MatDense<FPP,GPU2> TransformHelper<FPP,GPU2>::multiply(const Faust::MatDense<FPP,GPU2> &A)
         {
-            this->is_transposed ^= transpose;
-            this->is_conjugate ^= conjugate;
             MatDense<FPP,GPU2> M = this->transform->multiply(A, this->isTransposed2char());
-            this->is_transposed ^= transpose;
-            this->is_conjugate ^= conjugate;
             return M;
         }
 
     template<typename FPP>
-        MatDense<FPP,Cpu> TransformHelper<FPP,GPU2>::multiply(const Faust::MatDense<FPP,Cpu> &A, const bool transpose/*=false*/, const bool conjugate/*=false*/)
+        MatDense<FPP,Cpu> TransformHelper<FPP,GPU2>::multiply(const Faust::MatDense<FPP,Cpu> &A)
         {
-            this->is_transposed ^= transpose;
-            this->is_conjugate ^= conjugate;
             MatDense<FPP,GPU2> M = this->multiply(MatDense<FPP,GPU2>(A), transpose, conjugate);
-            this->is_conjugate ^= conjugate;
-            this->is_transposed ^= transpose;
             return M.tocpu();
         }
 
     template<typename FPP>
-        Vect<FPP,Cpu> TransformHelper<FPP,GPU2>::multiply(const Faust::Vect<FPP,Cpu> &A, const bool transpose /* deft to false */, const bool conjugate/*=false*/)
+        Vect<FPP,Cpu> TransformHelper<FPP,GPU2>::multiply(const Faust::Vect<FPP,Cpu> &A)
         {
-            this->is_transposed ^= transpose;
-            this->is_conjugate ^= conjugate;
             Vect<FPP,GPU2> gpu_A(A.size(), A.getData());
             Vect<FPP,GPU2> v = this->multiply(gpu_A , transpose, conjugate); //TODO: handle transpose and conjugate
-            this->is_transposed ^= transpose;
-            this->is_conjugate ^= conjugate;
             return v.tocpu();
         }
 
     template<typename FPP>
-        void TransformHelper<FPP,GPU2>::multiply(const FPP* cpu_in_buf, FPP* cpu_out_buf, const bool transpose /* deft to false */, const bool conjugate/*=false*/)
+        void TransformHelper<FPP,GPU2>::multiply(const FPP* cpu_in_buf, FPP* cpu_out_buf)
         {
-            this->is_transposed ^= transpose;
-            this->is_conjugate ^= conjugate;
             int32_t in_vec_size = this->getNbCol();
             Vect<FPP,GPU2> gpu_A(in_vec_size, cpu_in_buf);
             Vect<FPP,GPU2> v = this->multiply(gpu_A , transpose, conjugate); //TODO: handle transpose and conjugate
-            this->is_transposed ^= transpose;
-            this->is_conjugate ^= conjugate;
             v.tocpu(cpu_out_buf);
         }
 
     template<typename FPP>
-        void TransformHelper<FPP,GPU2>::multiply(const FPP* cpu_x_buf, int x_ncols, FPP* cpu_out_buf, const bool transpose /* deft to false */, const bool conjugate/*=false*/)
+        void TransformHelper<FPP,GPU2>::multiply(const FPP* cpu_x_buf, int x_ncols, FPP* cpu_out_buf)
         {
-            this->is_transposed ^= transpose;
-            this->is_conjugate ^= conjugate;
             int32_t x_nrows;
             if(this->is_transposed)
                 x_nrows = this->transform->getNbRow();
@@ -414,8 +396,6 @@ namespace Faust
             MatDense<FPP,GPU2> gpu_x(x_nrows, x_ncols, cpu_x_buf, false);
             MatDense<FPP,GPU2> gpu_M = this->multiply(gpu_x, transpose, conjugate); //TODO: handle transpose and conjugate
                                                                                     // TODO: fix this function, it works until here then it segfaults or gives a cuda error with tocpu (even if I use a cpu matdense set locally)
-            this->is_transposed ^= transpose;
-            this->is_conjugate ^= conjugate;
             gpu_M.tocpu(cpu_out_buf, nullptr);
         }
 
@@ -430,13 +410,9 @@ namespace Faust
         }
 
     template<typename FPP>
-        Vect<FPP,GPU2> TransformHelper<FPP,GPU2>::multiply(const Faust::Vect<FPP,GPU2>& a, const bool transpose/*=false*/, const bool conjugate/*=false*/)
+        Vect<FPP,GPU2> TransformHelper<FPP,GPU2>::multiply(const Faust::Vect<FPP,GPU2>& a)
         {
-            this->is_transposed ^= transpose;
-            this->is_conjugate ^= conjugate;
             Vect<FPP,GPU2> v = this->transform->multiply(a, this->isTransposed2char());
-            this->is_transposed ^= transpose;
-            this->is_conjugate ^= conjugate;
             return v;
         }
 

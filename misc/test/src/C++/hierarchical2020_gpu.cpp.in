@@ -45,8 +45,6 @@
 #include "faust_init_from_matio_core.h"
 #include <string>
 #include <sstream>
-#include "faust_BlasHandle.h"
-#include "faust_SpBlasHandle.h"
 #include "faust_HierarchicalFact.h"
 #include "faust_hierarchical.h"
 #include "faust_MHTP.h"
@@ -163,10 +161,6 @@ int main(int argc, char* argv[])
 
 
 
-    // useless for CPU but use for compatibility with GPU
-    Faust::BlasHandle<Cpu> blasHandle;
-    Faust::SpBlasHandle<Cpu> spblasHandle;
-
     // parameter setting
     Faust::Params<FPP,Cpu,Real<FPP>> params;
     init_params_from_matiofile<FPP,Cpu,FPP2>(params,configFilename.c_str(),"params");
@@ -205,10 +199,6 @@ int main(int argc, char* argv[])
     std::cout<<std::endl;
     std::cout<<"**************** RELATIVE ERROR BETWEEN FAUST AND DATA MATRIX **************** "<<std::endl;
     std::cout<<"		"<<relativeError<<std::endl<<std::endl;
-
-
-    blasHandle.Destroy();
-    spblasHandle.Destroy();
 
 
     return 0;

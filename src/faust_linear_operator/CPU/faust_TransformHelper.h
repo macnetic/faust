@@ -94,9 +94,9 @@ namespace Faust
 #endif
 
 			void copy_mul_mode_state(const TransformHelper<FPP,Cpu>& th);
-			virtual Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> &x, const bool transpose=false, const bool conjugate=false);
-			virtual Vect<FPP,Cpu> multiply(const FPP* x, const bool transpose=false, const bool conjugate=false);
-			virtual void multiply(const FPP* x, FPP* y, const bool transpose=false, const bool conjugate=false);
+			virtual Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> &x);
+			virtual Vect<FPP,Cpu> multiply(const FPP* x);
+			virtual void multiply(const FPP* x, FPP* y);
 			// Multiplies the slice s of this by the vector x corresponding elements (x size is this->getNbCol())
 			FPP* sliceMultiply(const Slice s[2], const FPP* X, FPP* out=nullptr, int X_ncols=1) const;
 			// Note: Prefers the prototype above as it avoids copies
@@ -107,12 +107,12 @@ namespace Faust
 			FPP* indexMultiply(faust_unsigned_int* ids[2], size_t ids_len[2], const FPP* x, FPP* out) const;
 			FPP* indexMultiply(faust_unsigned_int* ids[2], size_t ids_len[2], const FPP* X, int ncols, FPP* out) const;
 			// \brief multiply this by A (of size: this->getNbCol()*A_ncols) into C (buffers must be properly allocated from the callee).
-			virtual void multiply(const FPP* A, int A_ncols, FPP* C, const bool transpose=false, const bool conjugate=false);
+			virtual void multiply(const FPP* A, int A_ncols, FPP* C);
 			//			MatDense<FPP,Cpu> multiply(const MatDense<FPP,Cpu> A) const;
-			virtual MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> &A, const bool transpose=false, const bool conjugate=false);
+			virtual MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> &A);
 			virtual void update_total_nnz();
 			void set_FM_mul_mode(const int mul_order_opt_mode, const bool silent=true);
-			virtual MatDense<FPP, Cpu> multiply(const MatSparse<FPP,Cpu> &A, const bool transpose=false, const bool conjugate=false);
+			virtual MatDense<FPP, Cpu> multiply(const MatSparse<FPP,Cpu> &A);
 
 			virtual TransformHelper<FPP, Cpu>* multiply(const TransformHelper<FPP, Cpu>*) const;
 			virtual TransformHelper<FPP, Cpu>* multiply(FPP& scalar);

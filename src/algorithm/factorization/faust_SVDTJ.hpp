@@ -12,8 +12,6 @@ void Faust::svdtj(MatDense<FPP, DEVICE> & dM, int J, int t, FPP2 tol, unsigned i
 {
 	MatGeneric<FPP,DEVICE>* M;
 	MatDense<FPP, DEVICE> dM_M, dMM_; // M'*M, M*M'
-	BlasHandle<DEVICE> blas_handle;
-	SpBlasHandle<DEVICE> spblas_handle;
 
 
 	gemm(dM, dM, dM_M, FPP(1.0), FPP(0.0), 'T', 'N');
@@ -30,8 +28,6 @@ void Faust::svdtj(MatSparse<FPP, DEVICE> & sM, int J, int t, FPP2 tol, unsigned 
 	MatDense<FPP,DEVICE> dM;
 	MatDense<FPP, DEVICE> dM_M, dMM_; // M'*M, M*M'
 //	MatDense<FPP, DEVICE> sM_M, sMM_; // M'*M, M*M'
-	BlasHandle<DEVICE> blas_handle;
-	SpBlasHandle<DEVICE> spblas_handle;
 
 	GivensFGFT<FPP, DEVICE, FPP2>* algoW1;
 	GivensFGFT<FPP, DEVICE, FPP2>* algoW2;
@@ -48,8 +44,6 @@ void Faust::svdtj_cplx(MatDense<FPP, DEVICE> & dM, int J, int t, FPP2 tol, unsig
 {
 	MatGeneric<FPP,DEVICE>* M;
 	MatDense<FPP, DEVICE> dM_M, dMM_; // M'*M, M*M'
-	BlasHandle<DEVICE> blas_handle;
-	SpBlasHandle<DEVICE> spblas_handle;
 
 
 	gemm(dM, dM, dM_M, FPP(1.0), FPP(0.0), 'H', 'N');
@@ -68,8 +62,6 @@ void Faust::svdtj_cplx(MatSparse<FPP, DEVICE> & sM, int J, int t, FPP2 tol, unsi
 	MatDense<FPP,DEVICE> dM;
 	MatDense<FPP, DEVICE> dM_M, dMM_; // M'*M, M*M'
 //	MatDense<FPP, DEVICE> sM_M, sMM_; // M'*M, M*M'
-	BlasHandle<DEVICE> blas_handle;
-	SpBlasHandle<DEVICE> spblas_handle;
 
 
 	dM = sM;
@@ -107,9 +99,9 @@ void Faust::svdtj_core_gen(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM, 
 
 		// compute S = W1'*M*W2 = W1'*(W2^T*M)^T
 		dM.transpose();
-		Faust::MatDense<FPP,DEVICE> MW2 = thW2->multiply(dM, /* transpose */ true);
+		Faust::MatDense<FPP,DEVICE> MW2 = transW2.multiply(dM, /* transpose */ 'T');
 		MW2.transpose();
-		Faust::MatDense<FPP,DEVICE> W1_MW2 = thW1->multiply(MW2, /* transpose */ true);
+		Faust::MatDense<FPP,DEVICE> W1_MW2 = transW1.multiply(MW2, /* transpose */ 'T');
 
 		// create diagonal vector
 		for(int i=0;i<S.size();i++){

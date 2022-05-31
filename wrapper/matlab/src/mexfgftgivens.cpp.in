@@ -104,8 +104,6 @@ void fgft_givens(const mxArray* matlab_matrix, int J, int t, Real<SCALAR> tol, u
 	Faust::MatGeneric<SCALAR,Cpu>* Lap;
 	Faust::MatDense<SCALAR,Cpu> dLap;
 	Faust::MatSparse<SCALAR,Cpu> sLap;
-	Faust::BlasHandle<Cpu> blas_handle;
-	Faust::SpBlasHandle<Cpu> spblas_handle;
 
 	Faust::GivensFGFT<SCALAR, Cpu, FPP2>* algo;
 
@@ -114,7 +112,6 @@ void fgft_givens(const mxArray* matlab_matrix, int J, int t, Real<SCALAR> tol, u
 		{
 			mxArray2FaustspMat(matlab_matrix,sLap);
 			Lap = &sLap;
-			//TODO: blas handles to pass later ? (if you want to do the calculation with blas instead of eigen)
 			if(t <= 1)
 				algo = new GivensFGFT<SCALAR,Cpu,FPP2>(sLap, J, verbosity, tol, rel_err, enable_large_Faust);
 			else
@@ -162,8 +159,6 @@ void fgft_givens_cplx(const mxArray* matlab_matrix, int J, int t, double tol, un
 	Faust::MatGeneric<complex<SCALAR>,Cpu>* Lap;
 	Faust::MatDense<complex<SCALAR>,Cpu> dLap;
 	Faust::MatSparse<complex<SCALAR>,Cpu> sLap;
-	Faust::BlasHandle<Cpu> blas_handle;
-	Faust::SpBlasHandle<Cpu> spblas_handle;
 
 	Faust::GivensFGFTComplex<complex<SCALAR>, Cpu, FPP2>* algo = nullptr;
 
@@ -172,7 +167,6 @@ void fgft_givens_cplx(const mxArray* matlab_matrix, int J, int t, double tol, un
 		{
 			mxArray2FaustspMat(matlab_matrix,sLap);
 			Lap = &sLap;
-			//TODO: blas handles to pass later ? (if you want to do the calculation with blas instead of eigen)
 			if(t <= 1)
 				algo = new GivensFGFTComplex<complex<SCALAR>,Cpu,FPP2>(sLap, J, verbosity, tol, rel_err, enable_large_Faust);
 			else

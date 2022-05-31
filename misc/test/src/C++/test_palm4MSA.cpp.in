@@ -44,7 +44,6 @@
 #include "faust_init_from_matio.h"
 #include "faust_init_from_matio_mat.h"
 #include "faust_Palm4MSA.h"
-#include "faust_BlasHandle.h"
 
 #include <iostream>
 
@@ -127,9 +126,8 @@ int main()
 	Faust::StoppingCriterion<FPP2> crit(niter);
 
 	Faust::ParamsPalm<FPP,Cpu,FPP2> params(data, nfacts, cons, initFact, crit, verbose, updateWay, initLambda);
-	Faust::BlasHandle<Cpu> blasHandle;
 
-	Faust::Palm4MSA<FPP,Cpu,FPP2> palm2(params,blasHandle,true);
+	Faust::Palm4MSA<FPP,Cpu,FPP2> palm2(params, true);
 
 //	palm2.next_step();
 	palm2.compute_facts();

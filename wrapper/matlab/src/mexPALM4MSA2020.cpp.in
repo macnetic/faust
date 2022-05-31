@@ -100,7 +100,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		Faust::MHTPParams<Real<SCALAR>> mhtp_params;
 		mxArray2FaustMHTPParams<Real<SCALAR>>(prhs[0], mhtp_params);
 		if(params->isVerbose) params->Display();
-//		Faust::BlasHandle<Cpu> blas_handle;
 		FPP2 lambda = params->init_lambda;
 
 		TransformHelper<SCALAR, Cpu>* F = nullptr, *F_lambda = nullptr;

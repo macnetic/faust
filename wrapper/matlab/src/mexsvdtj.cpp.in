@@ -109,8 +109,6 @@ void svdtj(const mxArray* matlab_matrix, int J, int t, Real<SCALAR> tol, unsigne
 	TransformHelper<CPLX_SCALAR,Cpu> *U_cplx = nullptr, *V_cplx = nullptr;
 	Faust::Vect<CPLX_SCALAR,Cpu>* S_cplx;
 
-	Faust::BlasHandle<Cpu> blas_handle;
-	Faust::SpBlasHandle<Cpu> spblas_handle;
 
 
 	bool M_is_cplx = mxIsComplex(matlab_matrix);

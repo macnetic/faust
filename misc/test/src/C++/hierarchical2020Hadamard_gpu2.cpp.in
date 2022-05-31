@@ -48,8 +48,6 @@
 #include "faust_init_from_matio_core.h"
 #include <string>
 #include <sstream>
-#include "faust_BlasHandle.h"
-#include "faust_SpBlasHandle.h"
 #include "faust_HierarchicalFact.h"
 #include "faust_hierarchical.h"
 #include "faust_ConstraintGeneric.h"

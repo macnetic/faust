@@ -45,7 +45,6 @@
 #include "faust_init_from_matio.h"
 #include "faust_init_from_matio_mat.h"
 #include "faust_Palm4MSAFGFT.h"
-#include "faust_BlasHandle.h"
 
 #include <iostream>
 
@@ -133,9 +132,8 @@ int main()
 	init_facts2.Display();
 #endif
 
-	Faust::BlasHandle<Cpu> blasHandle;
 
-	Faust::Palm4MSAFGFT<FPP,Cpu,FPP2> palm2(params,blasHandle,true);
+	Faust::Palm4MSAFGFT<FPP,Cpu,FPP2> palm2(params, true);
 
 
 

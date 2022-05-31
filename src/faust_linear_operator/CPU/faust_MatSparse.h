@@ -50,7 +50,6 @@
 #include <vector>
 #include "faust_MatGeneric.h"
 #include "faust_Vect.h"
-#include "faust_SpBlasHandle.h"
 #include <iostream>
 
 
@@ -82,7 +81,6 @@ namespace Faust
 
 	template<typename FPP,FDevice DEVICE> class Transform;
 
-	template<FDevice DEVICE> class SpBlasHandle;
 
 
 
@@ -214,13 +212,13 @@ namespace Faust
 			typename Eigen::NumTraits<FPP>::Real norm() const {return mat.norm();}
 			void operator= (const MatSparse<FPP,Cpu>& M);
 			void operator= (const MatDense<FPP,Cpu>& Mdense);
-			void init (const MatDense<FPP,Cpu>& Mdense,SpBlasHandle<Cpu> spblas_handle)
+			void init (const MatDense<FPP,Cpu>& Mdense)
 			{(*this)=Mdense;}
 			void operator*=(const FPP alpha);
 			void operator/=(const FPP alpha);
 			void setCoeff(const int& i, const int& j, const FPP & val);
 
-			//! \brief check if the dimension and number of nonzeros of the MatSparse are coherent */
+			//! \brief check if the dimension and number of nonzeros of the MatSparse are coherent
 			void check_dim_validity() const;
 
 			template <typename FPP1>

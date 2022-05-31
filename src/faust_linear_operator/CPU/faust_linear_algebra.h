@@ -42,7 +42,6 @@
 #define LINALGEBRA_H
 
 #include "faust_constant.h"
-#include "faust_BlasHandle.h"
 #include "faust_LinearOperator.h"
 #include "faust_MatSparse.h"
 #include <complex>
@@ -92,9 +91,6 @@ namespace Faust
 	 */
 	template<typename FPP>
 		void gemm(const MatDense<FPP,Cpu> & A,const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP  alpha, const FPP  beta, char  typeA, char  typeB);
-	template<typename FPP>
-		void gemm(const MatDense<FPP,Cpu> & A,const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP  alpha, const FPP  beta, char  typeA, char  typeB, BlasHandle<Cpu> const blas_handle)
-		{gemm(A,B,C,alpha,beta,typeA,typeB);}
 
 
 	//////////FONCTION MatDense<FPP,Cpu> - MatDense<FPP,Cpu> ////////////////////
@@ -106,9 +102,6 @@ namespace Faust
 	template<typename FPP>
 		void multiply(const MatDense<FPP,Cpu> & A, const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C)
 		{gemm(A,B,C,(FPP) 1.0,(FPP)0.0,'N','N');}
-	template<typename FPP>
-		void multiply(const MatDense<FPP,Cpu> & A, const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C, BlasHandle<Cpu> const handle)
-		{multiply(A,B,C);}
 
 	// modif AL AL
 	//modif AL AL
@@ -136,10 +129,6 @@ namespace Faust
 	 */
 	template<typename FPP>
 		void gemv(const MatDense<FPP,Cpu> & A,const Vect<FPP,Cpu> & x,Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);
-	template<typename FPP>
-		void gemv(const MatDense<FPP,Cpu> & A,const Vect<FPP,Cpu> & x,Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA,BlasHandle<Cpu> & handle)
-		{gemv(A,x,y,alpha,beta,typeA);}
-
 
 
 	/*!
@@ -149,16 +138,9 @@ namespace Faust
 	 *	\param [in] nbr_iter_max : maximum number of iteration
 	 *	\param [in] threshold : threshold until convergence
 	 *	\param [in,out] flag : convergence flag
-	 *	\return	the the biggest eigenvalue of A
-	 */
-	//    template<typename FPP, typename FPP2 = double>
-	//    FPP power_iteration(const MatDense<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max,FPP2 threshold,faust_int & flag);
-	template<typename FPP, typename FPP2 = double>
-		FPP power_iteration(const MatDense<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max,FPP2 threshold,faust_int & flag,BlasHandle<Cpu> & handle)
-		{power_iteration(A,nbr_iter_max,threshold,flag);}
-	/**
 	 * \param out_vec_data: output buffer for the eigenvector approximate.
 	 * \param rand_init: true for random initialization (else the vector is full of ones).
+	 *	\return	the the biggest eigenvalue of A
 	 */
 	template<typename FPP, typename FPP2 = double>
 		FPP power_iteration(const LinearOperator<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max,FPP2 threshold,int & flag, FPP* out_vec_data=nullptr, bool rand_init=true);

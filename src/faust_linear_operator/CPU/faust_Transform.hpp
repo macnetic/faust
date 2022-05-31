@@ -51,8 +51,6 @@
 #include <iostream>
 #include "faust_exception.h"
 #include <fstream>
-#include "faust_BlasHandle.h"
-#include "faust_SpBlasHandle.h"
 #include "matio.h"
 #include "faust_init_from_matio.h"
 #include "faust_MatBSR.h"
@@ -645,13 +643,6 @@ void Faust::Transform<FPP,Cpu>::get_product(Faust::MatDense<FPP,Cpu> &mat, const
 	if(isConj && opThis != 'H') mat.conjugate();
 
 }
-
-template<typename FPP>
-Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::get_product(Faust::BlasHandle<Cpu> blas_handle, Faust::SpBlasHandle<Cpu> spblas_handle)const
-{
-	return (*this).get_product();
-}
-
 
 template<typename FPP>
 faust_unsigned_int Faust::Transform<FPP,Cpu>::getNbRow() const

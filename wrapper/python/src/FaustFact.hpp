@@ -9,7 +9,6 @@
 #include "faust_Palm4MSAFGFT.h"
 #include "faust_HierarchicalFact.h"
 #include "faust_HierarchicalFactFGFT.h"
-#include "faust_BlasHandle.h"
 #include "faust_ConstraintGeneric.h"
 #include "faust_hierarchical.h" // 2020
 #include "faust_palm4msa2020.h"
@@ -327,7 +326,6 @@ FaustCoreCpp<FPP>* fact_palm4MSA_gen(FPP* mat, unsigned int num_rows, unsigned i
     vector<Faust::MatDense<FPP,Cpu> > initFacts;
     Faust::Palm4MSA<FPP,Cpu,FPP2>* palm;
     PyxParamsFactPalm4MSAFFT<FPP,FPP2> *p_fft = nullptr;
-    Faust::BlasHandle<Cpu> blasHandle;
 
 //    if(p->is_verbose) {
 //        cout << "stop_crit.is_criterion_error: " << p->stop_crit.is_criterion_error << endl;
@@ -355,7 +353,7 @@ FaustCoreCpp<FPP>* fact_palm4MSA_gen(FPP* mat, unsigned int num_rows, unsigned i
             params->norm2_max_iter = p->norm2_max_iter;
         if(p->norm2_threshold != 0)
             params->norm2_threshold = p->norm2_threshold;
-        palm = new Palm4MSAFGFT<FPP,Cpu,FPP2>(*static_cast<ParamsPalmFGFT<FPP,Cpu,FPP2>*>(params),blasHandle,true);
+        palm = new Palm4MSAFGFT<FPP,Cpu,FPP2>(*static_cast<ParamsPalmFGFT<FPP,Cpu,FPP2>*>(params), true);
     }
     else {
         params = new ParamsPalm<FPP,Cpu,FPP2>(inMat, p->num_facts, cons, initFacts, crit, p->is_verbose, p->is_update_way_R2L, p->init_lambda, p->constant_step_size, p->step_size, static_cast<Faust::GradientCalcOptMode>(p->grad_calc_opt_mode));
@@ -363,7 +361,7 @@ FaustCoreCpp<FPP>* fact_palm4MSA_gen(FPP* mat, unsigned int num_rows, unsigned i
             params->norm2_max_iter = p->norm2_max_iter;
         if(p->norm2_threshold != 0)
             params->norm2_threshold = p->norm2_threshold;
-        palm = new Palm4MSA<FPP,Cpu,FPP2>(*params,blasHandle,true);
+        palm = new Palm4MSA<FPP,Cpu,FPP2>(*params, true);
     }
 
     if(p->is_verbose) params->Display();
@@ -403,8 +401,6 @@ FaustCoreCpp<FPP>* fact_palm4MSA_gen(FPP* mat, unsigned int num_rows, unsigned i
     if(p->is_verbose) th->display();
 
     core = new FaustCoreCpp<FPP>(th);
-
-    blasHandle.Destroy();
 
     for (typename std::vector<const Faust::ConstraintGeneric*>::iterator it = cons.begin() ; it != cons.end(); ++it)
         delete *it;
@@ -452,8 +448,6 @@ FaustCoreCpp<FPP>* fact_hierarchical_gen(FPP* mat, FPP* mat2, unsigned int num_r
     Faust::HierarchicalFact<FPP,Cpu,FPP2>* hierFact;
     Faust::Params<FPP,Cpu,FPP2>* params;
     PyxParamsHierarchicalFactFFT<FPP,FPP2>* p_fft = nullptr;
-    Faust::BlasHandle<Cpu> blasHandle;
-    Faust::SpBlasHandle<Cpu> spblasHandle;
     Faust::MatDense<FPP,Cpu>* inMat2;
 
 //    if(p->is_verbose)
@@ -496,7 +490,7 @@ FaustCoreCpp<FPP>* fact_hierarchical_gen(FPP* mat, FPP* mat2, unsigned int num_r
             params->norm2_max_iter = p->norm2_max_iter;
         if(p->norm2_threshold != 0)
             params->norm2_threshold = p->norm2_threshold;
-        hierFact = new HierarchicalFactFGFT<FPP,Cpu,FPP2>(inMat, *inMat2, *(static_cast<ParamsFGFT<FPP,Cpu,FPP2>*>(params)), blasHandle, spblasHandle);
+        hierFact = new HierarchicalFactFGFT<FPP,Cpu,FPP2>(inMat, *inMat2, *(static_cast<ParamsFGFT<FPP,Cpu,FPP2>*>(params)));
     }
     else
     {
@@ -505,7 +499,7 @@ FaustCoreCpp<FPP>* fact_hierarchical_gen(FPP* mat, FPP* mat2, unsigned int num_r
             params->norm2_max_iter = p->norm2_max_iter;
         if(p->norm2_threshold != 0)
             params->norm2_threshold = p->norm2_threshold;
-        hierFact = new HierarchicalFact<FPP,Cpu,FPP2>(inMat, *params, blasHandle, spblasHandle);
+        hierFact = new HierarchicalFact<FPP,Cpu,FPP2>(inMat, *params);
     }
 
     if(p->is_verbose) params->Display();
@@ -541,9 +535,6 @@ FaustCoreCpp<FPP>* fact_hierarchical_gen(FPP* mat, FPP* mat2, unsigned int num_r
 
     if(p->is_verbose) th->display();
     core = new FaustCoreCpp<FPP>(th);
-
-    blasHandle.Destroy();
-    spblasHandle.Destroy();
 
     for (typename std::vector<const Faust::ConstraintGeneric*>::iterator it = cons.begin() ; it != cons.end(); ++it)
         delete *it;

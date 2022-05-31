@@ -55,7 +55,7 @@
 //#include "faust_MatSparse.h"
 
 //! \class Faust::Transform
-//! \brief contains the data of the FAUST method (sparses matrix, lambda, number of non-zeros...) */
+//! \brief contains the data of the FAUST method (sparses matrix, lambda, number of non-zeros...)
 
 
 //! \namespace Faust
@@ -69,8 +69,6 @@ namespace Faust
 	template<typename FPP,FDevice DEVICE> class Vect;
 	template<typename FPP,FDevice DEVICE> class MatDense;
 	template<typename FPP,FDevice DEVICE> class MatSparse;
-	template<FDevice DEVICE> class BlasHandle;
-	template<FDevice DEVICE> class SpBlasHandle;
 	template<typename FPP, FDevice DEVICE> class TransformHelper;
 	template<typename FPP, FDevice DEVICE> class TransformHelperGen;
 
@@ -129,12 +127,9 @@ namespace Faust
 				void size(int size_)const{ data.resize(size_);}
 
 
-				//template<FDevice DEVICE> class BlasHandle;
-				//template<FDevice DEVICE> class SpBlasHandle;
 				/** \brief Perform the product of all factorized matrix. */
 				MatDense<FPP,Cpu> get_product(const char opThis='N', const bool isConj=false)const;
 				void get_product(MatDense<FPP,Cpu> &, const char opThis='N', const bool isConj=false)const;
-				MatDense<FPP,Cpu> get_product(BlasHandle<Cpu> blas_handle,SpBlasHandle<Cpu> spblas_handle)const;
 
 
 				/** \brief return a copy of the factor of index id

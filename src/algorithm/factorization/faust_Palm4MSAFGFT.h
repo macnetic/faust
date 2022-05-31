@@ -16,8 +16,8 @@ namespace Faust
 		MatSparse<FPP, DEVICE> D;
 		MatDense<FPP,DEVICE> D_grad_over_c;
 		public:
-			Palm4MSAFGFT(const ParamsPalmFGFT<FPP, DEVICE, FPP2>& params, const BlasHandle<DEVICE> blasHandle, const bool isGlobal=false);
-			Palm4MSAFGFT(const MatDense<FPP,DEVICE>& Lap, const ParamsFGFT<FPP,DEVICE,FPP2> & params, const BlasHandle<DEVICE> blasHandle, const bool isGlobal);
+			Palm4MSAFGFT(const ParamsPalmFGFT<FPP, DEVICE, FPP2>& params, const bool isGlobal=false);
+			Palm4MSAFGFT(const MatDense<FPP,DEVICE>& Lap, const ParamsFGFT<FPP,DEVICE,FPP2> & params, const bool isGlobal);
 			void next_step();
 			const MatSparse<FPP, DEVICE>& get_D();
 			void get_D(FPP* diag_data);

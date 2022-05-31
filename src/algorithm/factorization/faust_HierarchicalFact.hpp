@@ -63,7 +63,7 @@ template<typename FPP,FDevice DEVICE,typename FPP2>
 const char * Faust::HierarchicalFact<FPP,DEVICE,FPP2>::m_className="Faust::HierarchicalFact";
 
 template<typename FPP,FDevice DEVICE,typename FPP2>
-Faust::HierarchicalFact<FPP,DEVICE,FPP2>::HierarchicalFact(const Faust::MatDense<FPP,DEVICE>& M,const Faust::Params<FPP,DEVICE,FPP2>& params_, Faust::BlasHandle<DEVICE> cublasHandle, Faust::SpBlasHandle<DEVICE> cusparseHandle):
+Faust::HierarchicalFact<FPP,DEVICE,FPP2>::HierarchicalFact(const Faust::MatDense<FPP,DEVICE>& M,const Faust::Params<FPP,DEVICE,FPP2>& params_):
    cons(params_.cons),
    norm2_threshold(params_.norm2_threshold),
    norm2_max_iter(params_.norm2_max_iter),
@@ -72,14 +72,12 @@ Faust::HierarchicalFact<FPP,DEVICE,FPP2>::HierarchicalFact(const Faust::MatDense
    m_isVerbose(params_.isVerbose),
    m_indFact(0),
    nbFact(params_.m_nbFact-1),
-   palm_2(Palm4MSA<FPP,DEVICE,FPP2>(M,params_, cublasHandle, false)),
-   palm_global(new Palm4MSA<FPP,DEVICE,FPP2>(M,params_, cublasHandle, true)),
+   palm_2(Palm4MSA<FPP,DEVICE,FPP2>(M,params_, false)),
+   palm_global(new Palm4MSA<FPP,DEVICE,FPP2>(M,params_, true)),
    default_lambda(params_.init_lambda),
    cons_tmp_global(vector<const Faust::ConstraintGeneric*>()),
    isFactorizationComputed(false),
-   errors(std::vector<std::vector<FPP> >(2,std::vector<FPP >(params_.m_nbFact-1,0.0))),
-   cublas_handle(cublasHandle),
-   cusparse_handle(cusparseHandle)
+   errors(std::vector<std::vector<FPP> >(2,std::vector<FPP >(params_.m_nbFact-1,0.0)))
 {
 	   // check if the params and M are compatible
    if ((M.getNbRow() != params_.m_nbRow) |  (M.getNbCol() != params_.m_nbCol))
@@ -254,7 +252,7 @@ void Faust::HierarchicalFact<FPP,DEVICE,FPP2>::get_facts(std::vector<Faust::MatS
    sparse_facts.resize(full_facts.size());
    for (int i=0 ; i<sparse_facts.size() ; i++)
    {
-	   sparse_facts[i].init(full_facts[i],cusparse_handle);
+	   sparse_facts[i].init(full_facts[i]);
    }
 }
 
@@ -308,7 +306,7 @@ void Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_errors()
    for (int i=0; i < nb_factor;i++)
 	delete 	Transform_facts[i];
   
-   const Faust::MatDense<FPP,DEVICE> estimate_mat = faust_Transform_tmp.get_product(cublas_handle, cusparse_handle);
+   const Faust::MatDense<FPP,DEVICE> estimate_mat = faust_Transform_tmp.get_product();
    Faust::MatDense<FPP,DEVICE> data(palm_global->get_data());
    	
    FPP2 data_norm = Faust::fabs(data.norm());

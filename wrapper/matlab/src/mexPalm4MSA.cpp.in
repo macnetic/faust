@@ -94,8 +94,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		//	// creation des parametres
 		auto params = mxArray2FaustParamsPALM4MSA<SCALAR,FPP2>(prhs[0], presentFields);
 		if(params->isVerbose) params->Display();
-		Faust::BlasHandle<Cpu> blas_handle;
-		Faust::Palm4MSA<SCALAR,Cpu, FPP2> palm(*params,blas_handle,false);
+		Faust::Palm4MSA<SCALAR,Cpu, FPP2> palm(*params,false);
 		palm.compute_facts();
 
 

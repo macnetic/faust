@@ -154,13 +154,11 @@ namespace Faust {
 		}
 #endif
 	template<typename FPP>
-		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const MatSparse<FPP,Cpu> &A, const bool transpose /* deft to false */, const bool conjugate)
+		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const MatSparse<FPP,Cpu> &A)
 		{
 			this->eval_sliced_Transform();
 			this->eval_fancy_idx_Transform();
 			//TODO: refactor with multiply(MatDense)
-			this->is_transposed ^= transpose;
-			this->is_conjugate ^= conjugate;
 			Faust::MatDense<FPP,Cpu> M;
 #ifdef FAUST_TORCH
 			if(this->mul_order_opt_mode >= TORCH_CPU_L2R && this->mul_order_opt_mode <= TORCH_CPU_DENSE_DYNPROG_SPARSE_L2R && !tensor_data.size())
@@ -218,41 +216,38 @@ namespace Faust {
 					M = this->transform->multiply(A, this->isTransposed2char());
 					break;
 			}
-			this->is_conjugate ^= conjugate;
-			this->is_transposed ^= transpose;
 			return std::move(M);
 		}
 
 
 	template<typename FPP>
-		Vect<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const Vect<FPP,Cpu> &x, const bool transpose, const bool conjugate)
+		Vect<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const Vect<FPP,Cpu> &x)
 		{
 			// the prototypes below use this function
 			Vect<FPP,Cpu> v;
 			if(this->is_sliced)
-				return this->multiply(x.getData(), transpose, conjugate); // this->is_sliced will be checked twice but it doesn't really matter (it is more important to factorize the code)
+				return this->multiply(x.getData()); // this->is_sliced will be checked twice but it doesn't really matter (it is more important to factorize the code)
 			else
 				v = std::move(this->transform->multiply(x,
-							this->transposed2char(this->is_transposed ^ transpose, this->is_conjugate ^ conjugate)));
+							this->transposed2char(this->is_transposed, this->is_conjugate)));
 				//NOTE: the function below depends on this one for the non-sliced case
 			return v;
 		}
 
 	template<typename FPP>
-		Vect<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const FPP *x, const bool transpose/*=false*/, const bool conjugate/*=false*/)
+		Vect<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const FPP *x)
 		{
 			int x_size;
 			// assuming that x size is valid, infer it from this size
-			if(this->is_transposed ^ transpose)
+			if(this->is_transposed)
 				x_size = this->transform->getNbRow();
 			else
 				x_size = this->transform->getNbCol();
 			if(this->is_sliced)
 			{
-				//TODO: manage transpose and conjugate or remove transpose and conjugate arguments
 				Vect<FPP, Cpu> v;
 //				int v_size;
-//				if(this->is_transposed ^ transpose)
+//				if(this->is_transposed)
 //					v_size = this->transform->getNbCol();
 //				else
 //					v_size = this->transform->getNbRow();
@@ -262,7 +257,7 @@ namespace Faust {
 				return v;
 #else
 				this->eval_sliced_Transform();
-				return this->multiply(x, transpose, conjugate);
+				return this->multiply(x);
 #endif
 			}
 			else if(this->is_fancy_indexed && this->is_all_dense()) // benchmarks have shown that indexMultiply worths it only if the Faust is dense
@@ -273,34 +268,32 @@ namespace Faust {
 				return v;
 #else
 				this->eval_fancy_idx_Transform();
-				return this->multiply(x, transpose, conjugate);
+				return this->multiply(x);
 #endif
 			}
 			else
 			{
 				this->eval_fancy_idx_Transform();
 				Vect<FPP, Cpu> vx(x_size, x);
-				return std::move(this->multiply(vx, transpose, conjugate));
+				return std::move(this->multiply(vx));
 				// do not use the prototype below because it results in fact in a larger number of copies
 			}
 		}
 
 	template<typename FPP>
-		void TransformHelper<FPP,Cpu>::multiply(const FPP *x, FPP* y, const bool transpose, const bool conjugate)
+		void TransformHelper<FPP,Cpu>::multiply(const FPP *x, FPP* y)
 		{
 			if(this->is_sliced)
 			{
-				//TODO: manage transpose and conjugate (or remove args) // is_transposed and is_conjugate are already managed
 #if (EIGEN_WORLD_VERSION >= 3 && EIGEN_MAJOR_VERSION >= 4)
 				sliceMultiply(this->slices, x, y, 1);
 #else
 				this->eval_sliced_Transform();
-				return this->multiply(x, y, transpose, conjugate);
+				return this->multiply(x, y);
 #endif
 			}
 			else if(this->is_fancy_indexed && this->is_all_dense()) // benchmarks have shown that indexMultiply worths it only if the Faust is dense
 			{
-				//TODO: manage transpose and conjugate (or remove args) // is_transposed and is_conjugate are already managed
 				size_t id_lens[2] = {this->fancy_num_rows, this->fancy_num_cols};
 				auto y_vec = indexMultiply(this->fancy_indices, id_lens, x);
 				memcpy(y, y_vec.getData(), sizeof(FPP)*y_vec.size()); // TODO: avoid this copy
@@ -310,24 +303,21 @@ namespace Faust {
 				this->eval_fancy_idx_Transform();
 				int x_size;
 				// assuming that x size is valid, infer it from this size
-				if(this->is_transposed ^ transpose)
+				if(this->is_transposed)
 					x_size = this->transform->getNbRow();
 				else
 					x_size = this->transform->getNbCol();
 				Vect<FPP, Cpu> vx(x_size, x);
-				auto y_vec = std::move(this->multiply(vx, transpose, conjugate));
+				auto y_vec = std::move(this->multiply(vx));
 				memcpy(y, y_vec.getData(), sizeof(FPP)*y_vec.size());
 				// this alternative call is commented out because even if it avoids all copies made above, it is slower because the method above keeps only one Eigen vector to compute the whole product contrary to the following function that uses two vectors (output and operand vectors), which is slower
-//				this->transform->multiply(x, y, this->transposed2char(this->is_transposed ^ transpose, this->is_conjugate ^ conjugate));
+//				this->transform->multiply(x, y, this->transposed2char(this->is_transposed, this->is_conjugate));
 			}
 		}
 
 	template<typename FPP>
-		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const MatDense<FPP,Cpu> &A, const bool transpose, const bool conjugate)
+		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const MatDense<FPP,Cpu> &A)
 		{
-			//TODO: don't alter this state to multiply
-			this->is_transposed ^= transpose;
-			this->is_conjugate ^= conjugate;
 			Faust::MatDense<FPP,Cpu> M;
 #ifdef FAUST_TORCH
 			if(this->mul_order_opt_mode >= TORCH_CPU_L2R && this->mul_order_opt_mode <= TORCH_CPU_DENSE_DYNPROG_SPARSE_L2R && !tensor_data.size())
@@ -387,23 +377,19 @@ namespace Faust {
 					M = this->transform->multiply(A, this->isTransposed2char());
 					break;
 			}
-			this->is_conjugate ^= conjugate;
-			this->is_transposed ^= transpose;
 			return std::move(M);
 		}
 
 	template<typename FPP>
-		void TransformHelper<FPP,Cpu>::multiply(const FPP* A, int A_ncols, FPP* C, const bool transpose/*=false*/, const bool conjugate/*=false*/)
+		void TransformHelper<FPP,Cpu>::multiply(const FPP* A, int A_ncols, FPP* C)
 		{
-			this->is_transposed ^= transpose; //TODO: don't alter this state to multiply // or remove args
-			this->is_conjugate ^= conjugate;
 			if(this->is_sliced && (A_ncols == 1 || this->size() > 1)) // benchmarks have shown that a single factor Faust is less efficient to multiply a marix (A_ncols > 1) with sliceMultiply than using eval_sliced_Transform and multiply
 			{
 #if (EIGEN_WORLD_VERSION >= 3 && EIGEN_MAJOR_VERSION >= 4)
 				this->sliceMultiply(this->slices, A, C, A_ncols);
 #else
 				this->eval_sliced_Transform();
-				return multiply(A, A_ncols, C, transpose, conjugate);
+				return multiply(A, A_ncols, C);
 #endif
 			}
 			else if(this->is_fancy_indexed && this->is_all_dense()) // benchmarks have shown that indexMultiply worths it only if the Faust is dense
@@ -418,8 +404,6 @@ namespace Faust {
 				this->eval_fancy_idx_Transform();
 				this->transform->multiply(A, A_ncols, C, this->isTransposed2char());
 			}
-			this->is_conjugate ^= conjugate;
-			this->is_transposed ^= transpose;
 		}
 
 	template<typename FPP>
@@ -1810,6 +1794,7 @@ Faust::MatDense<FPP, Cpu> Faust::TransformHelper<FPP,Cpu>::indexMultiply(faust_u
 template<typename FPP>
 FPP* Faust::TransformHelper<FPP,Cpu>::indexMultiply(faust_unsigned_int* ids[2], size_t ids_len[2], const FPP* X, int ncols, FPP* out) const
 {
+	std::cout << "indexMultiply" << std::endl;
 #if (EIGEN_WORLD_VERSION >= 3 && EIGEN_MAJOR_VERSION >= 4)
 	//TODO: refactor with sliceMultiply if it applies
 	using Mat = Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>;

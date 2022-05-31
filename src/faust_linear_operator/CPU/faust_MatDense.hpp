@@ -634,7 +634,7 @@ t_mult_left.stop();
 
 
 template<typename FPP>
-Real<FPP> MatDense<FPP,Cpu>::spectralNorm(const faust_unsigned_int nbr_iter_max,FPP threshold, int & flag,BlasHandle<Cpu> blas_handle/*=BlasHandle<Cpu>()*/) const
+Real<FPP> MatDense<FPP,Cpu>::spectralNorm(const faust_unsigned_int nbr_iter_max,FPP threshold, int & flag) const
 {
 #ifdef __COMPILE_FPPIMERS__
 	t_spectral_norm2.start();

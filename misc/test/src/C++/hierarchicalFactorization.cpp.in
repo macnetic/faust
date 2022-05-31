@@ -45,8 +45,6 @@
 #include "faust_init_from_matio_core.h"
 #include <string>
 #include <sstream>
-#include "faust_BlasHandle.h"
-#include "faust_SpBlasHandle.h"
 
 
 #include <iostream>
@@ -159,10 +157,6 @@ int main(int argc, char* argv[])
 
 
 
-	// useless for CPU but use for compatibility with GPU
-	Faust::BlasHandle<Cpu> blasHandle;
-	Faust::SpBlasHandle<Cpu> spblasHandle;
-
 	// parameter setting
 	Faust::Params<FPP,Cpu,FPP2> params;
 	init_params_from_matiofile<FPP,Cpu,FPP2>(params,configFilename.c_str(),"params");
@@ -178,7 +172,7 @@ int main(int argc, char* argv[])
 		matrix.transpose();
 	
 	//algorithm
-	Faust::HierarchicalFact<FPP,Cpu,FPP2> hierFact(matrix,params,blasHandle,spblasHandle);
+	Faust::HierarchicalFact<FPP,Cpu,FPP2> hierFact(matrix,params);
 	Faust::Timer t1;
 	t1.start();
 
@@ -281,9 +275,6 @@ int main(int argc, char* argv[])
 		std::cout<<"	MEAN TIME faust : "<<tfaust.get_time()/((float) niterTimeComp)<<std::endl;
 		cout<<"lambda="<<std::setprecision(20)<<hierFact.get_lambda()<<endl;
 	}
-
-	blasHandle.Destroy();
-	spblasHandle.Destroy();
 
 
 	return 0;

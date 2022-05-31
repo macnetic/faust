@@ -16,7 +16,7 @@ namespace Faust
 
 		public:
 		//TODO: move def. code in .hpp
-		HierarchicalFactFGFT(const MatDense<FPP,DEVICE>& U, const MatDense<FPP,DEVICE>& Lap, const ParamsFGFT<FPP,DEVICE,FPP2>& params, BlasHandle<DEVICE> cublasHandle, SpBlasHandle<DEVICE> cusparseHandle): HierarchicalFact<FPP, DEVICE, FPP2>(U, params, cublasHandle, cusparseHandle)
+		HierarchicalFactFGFT(const MatDense<FPP,DEVICE>& U, const MatDense<FPP,DEVICE>& Lap, const ParamsFGFT<FPP,DEVICE,FPP2>& params): HierarchicalFact<FPP, DEVICE, FPP2>(U, params)
 		{
             if(params.isVerbose)
             {
@@ -28,7 +28,7 @@ namespace Faust
 			if((Lap.getNbRow() != params.m_nbRow) |  (Lap.getNbCol() != params.m_nbCol))
 				handleError(m_className,"constructor : params and Laplacian matrix Lap haven't compatible size");
 			delete this->palm_global;
-			this->palm_global = new Palm4MSAFGFT<FPP,DEVICE,FPP2>(Lap, params, cublasHandle, true);
+			this->palm_global = new Palm4MSAFGFT<FPP,DEVICE,FPP2>(Lap, params, true);
 		}
 
 

@@ -60,7 +60,6 @@
 #include "faust_Transform.h"
 
 #include "faust_linear_algebra.h"
-#include "faust_BlasHandle.h"
 #include "matio.h"
 #include <random>
 /*! \class Faust::MatDense MatDenseDense.h
@@ -126,7 +125,6 @@ namespace Faust
 
 	template<typename FPP, FDevice DEVICE>
 		class Transform;
-	//template<FDevice DEVICE> class BlasHandle;
 
 	template<typename FPP>
 		class MatDiag;
@@ -328,7 +326,7 @@ namespace Faust
 			//! \param flag : convergence flag
 			//! \return Return the estimated spectral norm (maximum singular value in absolute value) using power iteration algorithm
 			//! See also, template<typename FPP> FPP power_iteration(const MatDense<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max,FPP threshold,faust_int & flag);
-			Real<FPP> spectralNorm(const faust_unsigned_int nbr_iter_max,FPP threshold, int & flag,BlasHandle<Cpu>  blas_handle=BlasHandle<Cpu>()) const;
+			Real<FPP> spectralNorm(const faust_unsigned_int nbr_iter_max,FPP threshold, int & flag) const;
 
 			//! \brief Compute the trace of the MatDense
 			//! \return  the trace

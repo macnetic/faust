@@ -82,7 +82,7 @@ const FPP2 Faust::Palm4MSA<FPP,DEVICE,FPP2>::lipschitz_multiplicator=1.001;
 
 
 template<typename FPP,FDevice DEVICE,typename FPP2>
-Faust::Palm4MSA<FPP,DEVICE,FPP2>::Palm4MSA(const Faust::MatDense<FPP,DEVICE>& M, const Faust::Params<FPP,DEVICE,FPP2> & params_,const Faust::BlasHandle<DEVICE> blasHandle, const bool isGlobal_) :
+Faust::Palm4MSA<FPP,DEVICE,FPP2>::Palm4MSA(const Faust::MatDense<FPP,DEVICE>& M, const Faust::Params<FPP,DEVICE,FPP2> & params_, const bool isGlobal_) :
     data(M),
     m_lambda(params_.init_lambda),
     m_nbFact(0),
@@ -103,7 +103,6 @@ Faust::Palm4MSA<FPP,DEVICE,FPP2>::Palm4MSA(const Faust::MatDense<FPP,DEVICE>& M,
     c(FPP2(1)/params_.step_size),
 	norm2_threshold(params_.norm2_threshold),
     norm2_max_iter(params_.norm2_max_iter),
-    blas_handle(blasHandle),
 	is_complex(typeid(data.getData()[0]) == typeid(complex<float>) || typeid(data.getData()[0]) == typeid(complex<double>)),
 	TorH(is_complex?'H':'T')
 {
@@ -127,7 +126,7 @@ Faust::Palm4MSA<FPP,DEVICE,FPP2>::Palm4MSA(const Faust::MatDense<FPP,DEVICE>& M,
 }
 
 template<typename FPP,FDevice DEVICE,typename FPP2>
-Faust::Palm4MSA<FPP,DEVICE,FPP2>::Palm4MSA(const Faust::ParamsPalm<FPP,DEVICE,FPP2>& params_palm_,const Faust::BlasHandle<DEVICE> blasHandle,const bool isGlobal_/*=false*/) :
+Faust::Palm4MSA<FPP,DEVICE,FPP2>::Palm4MSA(const Faust::ParamsPalm<FPP,DEVICE,FPP2>& params_palm_, const bool isGlobal_/*=false*/) :
 	stop_crit(params_palm_.stop_crit),
 	data(params_palm_.data),
 	m_lambda(params_palm_.init_lambda),
@@ -150,7 +149,6 @@ Faust::Palm4MSA<FPP,DEVICE,FPP2>::Palm4MSA(const Faust::ParamsPalm<FPP,DEVICE,FP
 	c(FPP2(1)/params_palm_.step_size),
     norm2_threshold(params_palm_.norm2_threshold),
     norm2_max_iter(params_palm_.norm2_max_iter),
-	blas_handle(blasHandle),
 	is_complex(typeid(data.getData()[0]) == typeid(complex<float>) || typeid(data.getData()[0]) == typeid(complex<double>)
 ),
 	TorH(is_complex?'H':'T')
@@ -313,7 +311,7 @@ t_local_compute_grad_over_c.start();
       if (!isUpdateWayR2L)
       {
          // tmp1 = L*S
-         multiply(LorR, S[m_indFact], tmp1, blas_handle);
+         multiply(LorR, S[m_indFact], tmp1);
 /*sprintf(nomFichier,"LorR_0_%d_device.tmp",cmpt);
 LorR.print_file(nomFichier);
 sprintf(nomFichier,"RorL%d_0_%d_host.tmp",m_indFact,cmpt);
@@ -326,7 +324,7 @@ sprintf(nomFichier,"error_0_%d_host.tmp",cmpt);
 error.print_file(nomFichier);
 cout << "appel " << cmpt<<" : lambda0 = "<< m_lambda<<endl;*/
          // error = m_lambda*tmp1*R - error (= m_lambda*L*S*R - data )
-         gemm(tmp1, RorL[m_indFact], error, FPP(m_lambda), (FPP)-1.0, 'N', 'N', blas_handle);
+         gemm(tmp1, RorL[m_indFact], error, FPP(m_lambda), (FPP)-1.0, 'N', 'N');
 /*sprintf(nomFichier,"LorR_1_%d_device.tmp",cmpt);
 LorR.print_file(nomFichier);
 sprintf(nomFichier,"S%d_1_%d_host.tmp",m_indFact,cmpt);
@@ -340,9 +338,9 @@ sprintf(nomFichier,"error_1_%d_device.tmp",cmpt);*/
       else
       {
          // tmp1 = L*S
-         multiply(RorL[m_indFact], S[m_indFact], tmp1, blas_handle);
+         multiply(RorL[m_indFact], S[m_indFact], tmp1);
          // error = m_lambda*tmp1*R - error (= m_lambda*L*S*R - data )
-         gemm(tmp1, LorR, error, FPP(m_lambda),(FPP) -1.0, 'N', 'N', blas_handle);
+         gemm(tmp1, LorR, error, FPP(m_lambda),(FPP) -1.0, 'N', 'N');
       }
    }
    else // computing S*R first, then L*(S*R)
@@ -350,7 +348,7 @@ sprintf(nomFichier,"error_1_%d_device.tmp",cmpt);*/
       if (!isUpdateWayR2L)
       {
          // tmp1 = S*R
-         multiply(S[m_indFact], RorL[m_indFact], tmp1, blas_handle);
+         multiply(S[m_indFact], RorL[m_indFact], tmp1);
 /*sprintf(nomFichier,"LorR_0_%d_device.tmp",cmpt);
 LorR.print_file(nomFichier);
 sprintf(nomFichier,"RorL%d_0_%d_device.tmp",m_indFact,cmpt);
@@ -364,7 +362,7 @@ error.print_file(nomFichier);
 cout << "appel " << cmpt<<" : lambda0 = "<< m_lambda<<endl;*/
 
          // error = m_lambda*L*tmp1 - error (= m_lambda*L*S*R - data )
-         gemm(LorR, tmp1, error, FPP(m_lambda),(FPP) -1.0, 'N', 'N', blas_handle);
+         gemm(LorR, tmp1, error, FPP(m_lambda),(FPP) -1.0, 'N', 'N');
 /*sprintf(nomFichier,"LorR_1_%d_device.tmp",cmpt);
 LorR.print_file(nomFichier);
 sprintf(nomFichier,"S%d_1_%d_device.tmp",m_indFact,cmpt);
@@ -379,9 +377,9 @@ sprintf(nomFichier,"error_1_%d_device.tmp",cmpt);*/
       else
       {
          // tmp1 = S*R
-         multiply(S[m_indFact], LorR, tmp1, blas_handle);
+         multiply(S[m_indFact], LorR, tmp1);
          // error = m_lambda*L*tmp1 - error (= m_lambda*L*S*R - data )
-         gemm(RorL[m_indFact], tmp1, error, FPP(m_lambda),(FPP) -1.0, 'N', 'N', blas_handle);
+         gemm(RorL[m_indFact], tmp1, error, FPP(m_lambda),(FPP) -1.0, 'N', 'N');
       }
    }
 
@@ -390,16 +388,16 @@ sprintf(nomFichier,"error_1_%d_device.tmp",cmpt);*/
       if (!isUpdateWayR2L)
       {
          // tmp3 = m_lambda*L'*error (= m_lambda*L' * (m_lambda*L*S*R - data) )
-         gemm(LorR, error, tmp3, FPP(m_lambda),(FPP) 0.0, TorH, 'N', blas_handle);
+         gemm(LorR, error, tmp3, FPP(m_lambda),(FPP) 0.0, TorH, 'N');
          // grad_over_c = 1/c*tmp3*R' (= 1/c*m_lambda*L' * (m_lambda*L*S*R - data) * R' )
-         gemm(tmp3, RorL[m_indFact], grad_over_c, FPP(1.0/c),(FPP) 0.0,'N',TorH, blas_handle);
+         gemm(tmp3, RorL[m_indFact], grad_over_c, FPP(1.0/c),(FPP) 0.0,'N',TorH);
       }
       else
       {
          // tmp3 = m_lambda*L'*error (= m_lambda*L' * (m_lambda*L*S*R - data) )
-         gemm(RorL[m_indFact], error, tmp3, FPP(m_lambda), (FPP) 0.0, TorH, 'N', blas_handle);
+         gemm(RorL[m_indFact], error, tmp3, FPP(m_lambda), (FPP) 0.0, TorH, 'N');
          // grad_over_c = 1/c*tmp3*R' (= 1/c*m_lambda*L' * (m_lambda*L*S*R - data) * R' )
-         gemm(tmp3, LorR, grad_over_c, FPP(1.0/c), (FPP) (FPP) 0.0,'N',TorH, blas_handle);
+         gemm(tmp3, LorR, grad_over_c, FPP(1.0/c), (FPP) (FPP) 0.0,'N',TorH);
       }
    }
    else // computing error*R' first, then L'*(error*R')
@@ -407,16 +405,16 @@ sprintf(nomFichier,"error_1_%d_device.tmp",cmpt);*/
       if (!isUpdateWayR2L)
       {
          // tmp3 = m_lambda*error*R' (= m_lambda*(m_lambda*L*S*R - data) * R' )
-         gemm(error, RorL[m_indFact], tmp3, FPP(m_lambda), (FPP) 0.0, 'N', TorH, blas_handle);
+         gemm(error, RorL[m_indFact], tmp3, FPP(m_lambda), (FPP) 0.0, 'N', TorH);
          // grad_over_c = 1/c*L'*tmp3 (= 1/c*L' * m_lambda*(m_lambda*L*S*R - data) * R' )
-         gemm(LorR, tmp3, grad_over_c, FPP(1.0/c), (FPP) 0.0,TorH,'N', blas_handle);
+         gemm(LorR, tmp3, grad_over_c, FPP(1.0/c), (FPP) 0.0,TorH,'N');
       }
       else
       {
          // tmp3 = m_lambda*error*R' (= m_lambda * (m_lambda*L*S*R - data) * R' )
-         gemm(error, LorR, tmp3, FPP(m_lambda), (FPP) 0.0, 'N', TorH, blas_handle);
+         gemm(error, LorR, tmp3, FPP(m_lambda), (FPP) 0.0, 'N', TorH);
          // grad_over_c = 1/c*L'*tmp3 (= 1/c*L' * m_lambda*(m_lambda*L*S*R - data) * R' )
-         gemm(RorL[m_indFact], tmp3, grad_over_c, FPP(1.0/c), (FPP) 0.0,TorH,'N', blas_handle);
+         gemm(RorL[m_indFact], tmp3, grad_over_c, FPP(1.0/c), (FPP) 0.0,TorH,'N');
       }
 
     }
@@ -451,10 +449,10 @@ t_local_compute_lambda.start();
    // As LorR has also been updated at the end of the last iteration over the facts, LorR matches X_hat, which the product of all factors, including the last one.
    // Xt_Xhat = data'*X_hat
    Faust::MatDense<FPP,DEVICE> Xt_Xhat;
-   gemm(data, LorR, Xt_Xhat, (FPP) 1.0, (FPP) 0.0, TorH,'N', blas_handle);
+   gemm(data, LorR, Xt_Xhat, (FPP) 1.0, (FPP) 0.0, TorH,'N');
    // Xhatt_Xhat = X_hat'*X_hat
    Faust::MatDense<FPP,DEVICE> Xhatt_Xhat;
-   gemm(LorR, LorR, Xhatt_Xhat, (FPP) 1.0, (FPP) 0.0, TorH,'N',blas_handle);
+   gemm(LorR, LorR, Xhatt_Xhat, (FPP) 1.0, (FPP) 0.0, TorH,'N');
 
    FPP Xhatt_Xhat_tr = (FPP) Xhatt_Xhat.trace();
 
@@ -497,7 +495,7 @@ t_local_update_R.start();
 
       for (int i=m_nbFact-2 ; i>-1 ; i--)
          //  R[i] = S[i+1] * R[i+1]
-         multiply(S[i+1], RorL[i+1], RorL[i],blas_handle);
+         multiply(S[i+1], RorL[i+1], RorL[i]);
 
    }
    else
@@ -508,9 +506,9 @@ t_local_update_R.start();
       }
 	   // FORMER VERSION //
 	   //Faust::MatDense<FPP,DEVICE> LorR_tmp(LorR);
-	   //multiply(S[m_indFact],LorR_tmp,LorR,blas_handle);
+	   //multiply(S[m_indFact],LorR_tmp,LorR);
 	   //END FORMER VERSION//
-	   multiply(S[m_indFact], LorR, LorR,blas_handle);
+	   multiply(S[m_indFact], LorR, LorR);
 
       //LorR.multiplyLeft(S[m_indFact]);
    }
@@ -544,9 +542,9 @@ t_local_update_L.start();
 
        // FORMER VERSION //
 	   //Faust::MatDense<FPP,DEVICE> LorR_tmp(LorR);
-	   //multiply(LorR_tmp,S[m_indFact],LorR,blas_handle);
+	   //multiply(LorR_tmp,S[m_indFact],LorR);
    	   // END FORMER VERSION //
-	   multiply(LorR, S[m_indFact], LorR,blas_handle);
+	   multiply(LorR, S[m_indFact], LorR);
 	}
    else
    {
@@ -555,7 +553,7 @@ t_local_update_L.start();
       RorL[0].setEyes();
       for (int i=0 ; i<m_nbFact-1 ; i++)
          //  R[i] = S[i+1] * R[i+1]
-         multiply(RorL[i] , S[i], RorL[i+1],blas_handle);
+         multiply(RorL[i] , S[i], RorL[i+1]);
    }
 #ifdef __COMPILE_TIMERS__
 t_global_update_L.stop();
@@ -598,8 +596,8 @@ void Faust::Palm4MSA<FPP,DEVICE,FPP2>::compute_c()
 	   int flag1,flag2;
 	   if(verbose)
 		   spectral_start = std::chrono::high_resolution_clock::now();
-	   FPP2 nL1=LorR.spectralNorm(norm2_max_iter,norm2_threshold,flag1,blas_handle);
-	   FPP2 nR1=RorL[m_indFact].spectralNorm(norm2_max_iter,norm2_threshold,flag2,blas_handle);
+	   FPP2 nL1=LorR.spectralNorm(norm2_max_iter,norm2_threshold,flag1);
+	   FPP2 nR1=RorL[m_indFact].spectralNorm(norm2_max_iter,norm2_threshold,flag2);
 	   if(verbose)
 		   spectral_stop = std::chrono::high_resolution_clock::now();
 	   c=lipschitz_multiplicator*nR1*nR1*nL1*nL1*m_lambda*m_lambda;

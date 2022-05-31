@@ -98,8 +98,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 		//DisplayParams(params);
 		//creation de hierarchical fact
-		Faust::BlasHandle<Cpu> blas_handle;
-		Faust::SpBlasHandle<Cpu> spblas_handle;
 
 		Faust::HierarchicalFact<SCALAR,Cpu, FPP2>* hier_fact;
 
@@ -111,10 +109,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			const mxArray* matlab_lap_mat = prhs[2];
 			mxArray2FaustMat(matlab_lap_mat,laplacian_mat);
 			// params->Display();
-			hier_fact = new Faust::HierarchicalFactFGFT<SCALAR,Cpu,FPP2>(matrix,laplacian_mat,*dynamic_cast<const ParamsFGFT<SCALAR,Cpu,FPP2>*>(params),blas_handle,spblas_handle);
+			hier_fact = new Faust::HierarchicalFactFGFT<SCALAR,Cpu,FPP2>(matrix,laplacian_mat,*dynamic_cast<const ParamsFGFT<SCALAR,Cpu,FPP2>*>(params));
 		}
 		else
-			hier_fact = new Faust::HierarchicalFact<SCALAR,Cpu,FPP2>(matrix,*params,blas_handle,spblas_handle);
+			hier_fact = new Faust::HierarchicalFact<SCALAR,Cpu,FPP2>(matrix,*params);
 
 		hier_fact->compute_facts();
 

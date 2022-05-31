@@ -95,8 +95,6 @@ int main(int argc, const char** argv)
 	Faust::StoppingCriterion<double> glob_opt_stop(num_its);
 	Faust::Params<double, dev> params(MEG.getNbRow(), MEG.getNbCol(), 9, constraints, {}, loc_opt_stop, glob_opt_stop, /*verbosity*/ true, /* isUpdateWayR2L_ */ true, /* isFactSideLeft_ */ true, /* init_lambda_ = */1.0, /*constant_step_size_=*/false,
 			/*step_size_=*/1e-16, /*INTERNAL_OPT*/EXTERNAL_OPT);
-	Faust::BlasHandle<Cpu> cublasHandle;
-	Faust::SpBlasHandle<Cpu> cusparseHandle;
 	double lambda2020;
 
 	char* str_factors_format = getenv("FACTOR_FORMAT");
@@ -126,7 +124,7 @@ int main(int argc, const char** argv)
 	// the 2016 impl. is not GPU2 ready
 	if(impl == 2016 || argc < 2)
 	{
-		Faust::HierarchicalFact<double, dev> algo(MEG, params, cublasHandle, cusparseHandle);
+		Faust::HierarchicalFact<double, dev> algo(MEG, params);
 		algo.compute_facts();
 	}
 	else

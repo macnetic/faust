@@ -63,7 +63,6 @@ namespace Faust
     template<typename FPP,FDevice DEVICE, typename FPP2> class Params;
     //template<typename FPP,FDevice DEVICE> class ParamsPalm;
     template<typename FPP2> class StoppingCriterion;
-    //template<FDevice DEVICE> class BlasHandle;
 
     /*! \class Palm4MSA
        * \brief template class implementing Palm4MSA (PALM for Multi-layer Sparse Approximation) factorization algorithm
@@ -85,8 +84,8 @@ namespace Faust
 			 * initialize Palm4MSA from Faust::Params (HierarchicalFact parameter)
 			 *\tparam isGlobal_ : if true, the Palm4MSA StoppingCriterion stop_crit attribute is initialize from params_.stop_crit_global <br> and if false, it is initialize from stop_crit_2facts
 			 */
-			Palm4MSA(const Faust::MatDense<FPP,DEVICE>& M,const Faust::Params<FPP,DEVICE,FPP2>& params_, const Faust::BlasHandle<DEVICE> blasHandle, const bool isGlobal_);
-			Palm4MSA(const Faust::ParamsPalm<FPP,DEVICE,FPP2>& params_palm_, const Faust::BlasHandle<DEVICE> blasHandle, const bool isGlobal_=false);
+			Palm4MSA(const Faust::MatDense<FPP,DEVICE>& M,const Faust::Params<FPP,DEVICE,FPP2>& params_, const bool isGlobal_);
+			Palm4MSA(const Faust::ParamsPalm<FPP,DEVICE,FPP2>& params_palm_, const bool isGlobal_=false);
 
 			void set_constraint(const std::vector<const Faust::ConstraintGeneric*> const_vec_){const_vec=const_vec_;isConstraintSet=true;}
 			void set_data(const Faust::MatDense<FPP,DEVICE>& data_){data=data_;}
@@ -206,7 +205,6 @@ namespace Faust
 			Real<FPP> norm2_threshold;
 			int norm2_max_iter;
 			Faust::MatDense<FPP,DEVICE> error; // error = lambda*L*S*R - data
-			Faust::BlasHandle<DEVICE> blas_handle;
 			/** is_complex == true if the algorithm is running on a complex matrix (to approximate) */
 			bool is_complex;
 			/** TorH == 'T' if this->is_complex == false otherwise it's 'H'. T designates the transposition and H the hermitian matrix, it intervenes in Palm4MSA algorithms for the computation of the gradient and lambda so that the algo. uses the hermitian when working on complex matrices (i.e. the matrix to approx. is complex) */
