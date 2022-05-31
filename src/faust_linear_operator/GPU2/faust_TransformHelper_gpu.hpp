@@ -364,7 +364,7 @@ namespace Faust
     template<typename FPP>
         MatDense<FPP,Cpu> TransformHelper<FPP,GPU2>::multiply(const Faust::MatDense<FPP,Cpu> &A)
         {
-            MatDense<FPP,GPU2> M = this->multiply(MatDense<FPP,GPU2>(A), transpose, conjugate);
+            MatDense<FPP,GPU2> M = this->multiply(MatDense<FPP,GPU2>(A));
             return M.tocpu();
         }
 
@@ -372,7 +372,7 @@ namespace Faust
         Vect<FPP,Cpu> TransformHelper<FPP,GPU2>::multiply(const Faust::Vect<FPP,Cpu> &A)
         {
             Vect<FPP,GPU2> gpu_A(A.size(), A.getData());
-            Vect<FPP,GPU2> v = this->multiply(gpu_A , transpose, conjugate); //TODO: handle transpose and conjugate
+            Vect<FPP,GPU2> v = this->multiply(gpu_A); //TODO: handle transpose and conjugate
             return v.tocpu();
         }
 
@@ -381,7 +381,7 @@ namespace Faust
         {
             int32_t in_vec_size = this->getNbCol();
             Vect<FPP,GPU2> gpu_A(in_vec_size, cpu_in_buf);
-            Vect<FPP,GPU2> v = this->multiply(gpu_A , transpose, conjugate); //TODO: handle transpose and conjugate
+            Vect<FPP,GPU2> v = this->multiply(gpu_A); //TODO: handle transpose and conjugate
             v.tocpu(cpu_out_buf);
         }
 
@@ -394,7 +394,7 @@ namespace Faust
             else
                 x_nrows = this->transform->getNbCol();
             MatDense<FPP,GPU2> gpu_x(x_nrows, x_ncols, cpu_x_buf, false);
-            MatDense<FPP,GPU2> gpu_M = this->multiply(gpu_x, transpose, conjugate); //TODO: handle transpose and conjugate
+            MatDense<FPP,GPU2> gpu_M = this->multiply(gpu_x); //TODO: handle transpose and conjugate
                                                                                     // TODO: fix this function, it works until here then it segfaults or gives a cuda error with tocpu (even if I use a cpu matdense set locally)
             gpu_M.tocpu(cpu_out_buf, nullptr);
         }
@@ -853,6 +853,18 @@ namespace Faust
 			TransformHelperGen<FPP, GPU2>::init_fancy_idx_transform(th, row_ids, num_rows, col_ids, num_cols);
 			//TODO: lazy indexing for GPU2 as for CPU (it needs to implement indexMultiply too)
 			this->eval_fancy_idx_Transform();
+		}
+
+	template<typename FPP>
+		FPP* Faust::TransformHelper<FPP,GPU2>::sliceMultiply(const Slice s[2], const FPP* cpu_X, FPP* cpu_out/*=nullptr*/, int X_ncols/*=1*/) const
+		{
+			//TODO: take care of eval_sliced_Transform calls
+            int32_t X_nrows;
+			X_nrows = this->getNbCol(); // transpose and slice aware and not evaluating the slice
+            MatDense<FPP,GPU2> gpu_X(X_nrows, X_ncols, cpu_X, false);
+            MatDense<FPP,GPU2> gpu_M = this->transform->sliceMultiply(s, gpu_X);
+            gpu_M.tocpu(cpu_out, nullptr);
+			return cpu_out;
 		}
 
 }

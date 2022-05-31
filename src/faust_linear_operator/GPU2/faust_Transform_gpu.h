@@ -7,6 +7,7 @@
 #include "faust_MatSparse_gpu.h"
 #include "faust_MatDense_gpu.h"
 #include "faust_RefManager.h"
+#include "faust_Slice.h"
 #include <vector>
 
 namespace Faust
@@ -66,6 +67,7 @@ namespace Faust
 			void get_product(MatDense<FPP,GPU2>& M, const char opThis='N', const bool isConj=false) const;
 			MatDense<FPP,GPU2> multiply(const MatDense<FPP,GPU2> &A, const char opThis);
 			void multiply(const Transform<FPP,GPU2> & A);
+			MatDense<FPP, GPU2> sliceMultiply(const Slice s[2], MatDense<FPP, GPU2>& gpu_X, const char opThis) const;
 			void multiplyLeft(const Transform<FPP,GPU2> & A);
 			void multiply(const FPP& a, const int32_t id=-1);
 			Vect<FPP,GPU2> multiply(const Vect<FPP,GPU2>& x, const char opThis='N');
