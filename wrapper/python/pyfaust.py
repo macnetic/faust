@@ -2284,7 +2284,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         else:
             # return 1/2j * (F + F.conj())
             return _cplx2real_op(F)[F.shape[0]:2*F.shape[0],
-                                     :2*F.shape[1]].pruneout()
+                                     :F.shape[1]].pruneout()
 
 
     def asarray(F, *args, **kwargs):
