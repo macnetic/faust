@@ -53,7 +53,17 @@ int main()
 	auto M_cpu = th2_cpu.multiply(*cpu_mat6);
 	cout << "M_cpu.norm() " << M_cpu.norm() << endl;
 	cout << "M_gpu.norm() " << M_gpu.norm() << endl;
-	return EXIT_FAILURE;
+	cout << "========== sliceMultiply" << endl;
+//			MatDense<FPP, Cpu> sliceMultiply(const Slice s[2], const FPP* X, int X_ncols=1) const;
+	auto cpu_mat7 = Faust::MatDense<double,Cpu>::randMat(11, 32);
+	Slice s[2];
+	s[0] = Slice(0, th2_cpu.getNbRow());
+	s[1] = Slice(0, 11);
+	auto M_cpu8 = th2_cpu.sliceMultiply(s, cpu_mat7->getData(), nullptr, cpu_mat7->getNbCol());
+	auto M_gpu8 = th2.sliceMultiply(s, cpu_mat7->getData(), nullptr, cpu_mat7->getNbCol());
+	cout << "M_cpu.norm() " << M_cpu.norm() << endl;
+	cout << "M_gpu.norm() " << M_gpu.norm() << endl;
+	return EXIT_SUCCESS;
 }
 
 
