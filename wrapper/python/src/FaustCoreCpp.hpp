@@ -712,3 +712,11 @@ FPP FaustCoreCpp<FPP,DEV>::get_item(unsigned long int i, unsigned long int j)
     return transform->get_item(i, j);
 }
 
+template<typename FPP, FDevice DEV>
+void FaustCoreCpp<FPP, DEV>::colSliceMultiply(unsigned long int j1, unsigned long int j2, const FPP* data, unsigned long int data_ncols, FPP* out) const
+{
+    Faust::Slice s[2];
+    s[0] = Faust::Slice(0, this->transform->getNbRow());
+    s[1] = Faust::Slice(j1, j2);
+    this->transform->sliceMultiply(s, data, out, data_ncols);
+}

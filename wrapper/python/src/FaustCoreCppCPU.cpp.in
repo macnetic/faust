@@ -139,16 +139,6 @@ FaustCoreCpp<@TYPE@,Cpu>* FaustCoreCpp<@TYPE@,Cpu>::read_from_mat_file(const cha
 }
 
 template<>
-void FaustCoreCpp<@TYPE@,Cpu>::colSliceMultiply(unsigned long int j1, unsigned long int j2, const @TYPE@* data, unsigned long int data_ncols, @TYPE@* out) const
-{
-    Faust::MatDense<@TYPE@, Cpu> y;
-    Faust::Slice s[2];
-    s[0] = Faust::Slice(0, this->transform->getNbRow());
-    s[1] = Faust::Slice(j1, j2);
-    this->transform->sliceMultiply(s, data, out, data_ncols);
-}
-
-template<>
 void FaustCoreCpp<@TYPE@,Cpu>::indexMultiply(unsigned long int* d0_ids, size_t d0_ids_len, unsigned long int* d1_ids, size_t d1_ids_len, const @TYPE@* mat_data, int mat_ncols, @TYPE@* mat_out) const
 {
     unsigned long int* ids_[2];
