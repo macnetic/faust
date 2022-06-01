@@ -2162,7 +2162,7 @@ FPP* Faust::TransformHelper<FPP,Cpu>::sliceMultiply(const Slice s[2], const FPP*
 		delete [] tmp_ptr;
 	}
 #else
-	throw std::runtime_error("TransformHelper::sliceMultiply is not supported with eigen version < 3.9");
+	throw std::runtime_error("TransformHelper::sliceMultiply is not supported with eigen version < 3.4");
 #endif
 	return out;
 }

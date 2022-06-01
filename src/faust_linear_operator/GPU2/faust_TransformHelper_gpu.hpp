@@ -858,9 +858,12 @@ namespace Faust
 	template<typename FPP>
 		FPP* Faust::TransformHelper<FPP,GPU2>::sliceMultiply(const Slice s[2], const FPP* cpu_X, FPP* cpu_out/*=nullptr*/, int X_ncols/*=1*/) const
 		{
-			//TODO: take care of eval_sliced_Transform calls
+			//TODO: take care of eval_sliced_Transform indirect calls
             int32_t X_nrows;
-			X_nrows = this->getNbCol(); // transpose and slice aware and not evaluating the slice
+			if(s[1].end_id != this->getNbCol() || s[1].start_id != 0)
+				X_nrows = s[1].end_id-s[1].start_id;
+			else
+				X_nrows = this->getNbCol();
             MatDense<FPP,GPU2> gpu_X(X_nrows, X_ncols, cpu_X, false);
             MatDense<FPP,GPU2> gpu_M = this->transform->sliceMultiply(s, gpu_X, this->isTransposed2char());
 			if(cpu_out == nullptr)
