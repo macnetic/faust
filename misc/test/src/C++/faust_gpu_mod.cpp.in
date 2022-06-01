@@ -1,0 +1,44 @@
+#include "matio.h"
+
+#include "faust_TransformHelper.h"
+#include "faust_gpu_mod_utils.h"
+using namespace std;
+using namespace Faust;
+typedef @TEST_FPP@ FPP;
+
+int main(int argc, char** argv)
+{
+	int min_size = 128;
+	int max_size = 1024;
+	unsigned int min_nfacts = 10;
+	unsigned int max_nfacts = 20;
+	MatDense<FPP,Cpu> M_from_tensor, Maux;
+	MatDense<FPP,Cpu> out, ref, aux;
+	std::srand(std::time(0));
+	max_nfacts = static_cast<unsigned int>(std::rand()*(float)max_nfacts/RAND_MAX)+min_nfacts;
+	RandFaustType rt = MIXED;
+	int nsamples = 1;
+	if(argc > 1)
+	{
+		string arg(argv[1]);
+		if(! arg.compare("dense") || ! arg.compare("DENSE"))
+			rt = DENSE;
+		else if(! arg.compare("sparse") || ! arg.compare("SPARSE"))
+			rt = SPARSE;
+		else if(! arg.compare("mixed") || ! arg.compare("MIXED"))
+			rt = MIXED;
+		else
+			cerr << "WARNING: invalid argument 1: must be sparse, dense or mixed (switch to mixed types)." << endl;
+		if(argc > 2)
+		{
+			nsamples = std::atoi(argv[2]);
+		}
+	}
+	Faust::enable_gpu_mod();
+	TransformHelper<FPP,Cpu> *F = TransformHelper<FPP,Cpu>::randFaust(rt, min_nfacts, max_nfacts, min_size, max_size, rt==SPARSE?.1f:1.f);;
+	auto M = Faust::MatDense<FPP,Cpu>::randMat(F->getNbCol(), F->getNbRow());
+	ref = F->multiply(*M);
+	F->set_FM_mul_mode(10);
+	aux = F->multiply(*M);
+	std::cout << "F ref norm: "<< ref.norm() << " F aux norm:" << aux.norm() << std::endl;
+}
