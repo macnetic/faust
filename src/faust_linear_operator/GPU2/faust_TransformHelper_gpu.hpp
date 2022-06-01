@@ -862,7 +862,13 @@ namespace Faust
             int32_t X_nrows;
 			X_nrows = this->getNbCol(); // transpose and slice aware and not evaluating the slice
             MatDense<FPP,GPU2> gpu_X(X_nrows, X_ncols, cpu_X, false);
-            MatDense<FPP,GPU2> gpu_M = this->transform->sliceMultiply(s, gpu_X);
+            MatDense<FPP,GPU2> gpu_M = this->transform->sliceMultiply(s, gpu_X, this->isTransposed2char());
+			if(cpu_out == nullptr)
+			{
+				auto out_nrows = this->is_row_sliced()?s[0].end_id-s[0].start_id:this->getNbRow();
+				auto out_ncols = X_ncols;
+				cpu_out = new FPP[out_nrows*out_ncols*sizeof(FPP)];
+			}
             gpu_M.tocpu(cpu_out, nullptr);
 			return cpu_out;
 		}
