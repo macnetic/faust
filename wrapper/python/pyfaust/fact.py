@@ -1340,8 +1340,7 @@ def butterfly(M, type="bbtree", perm=None):
         perm: four kind of values are possible for this argument (Note that this argument is made only for the bbtree type of
         factorization).
             1. perm is a list of column indices of the permutation matrix P which is such that
-            the returned Faust F is the approximation of M@P and F@P.T the
-            approximation of M.
+            the returned Faust is F = G@P.T where G is the Faust butterfly approximation of M@P.
             2. perm is a list of lists of permutation column indices as defined
             in 1. In that case, all permutations passed to the function are
             used as explained in 1, each one producing a Faust, the best one
@@ -1373,9 +1372,8 @@ def butterfly(M, type="bbtree", perm=None):
         >>> permutations = list(permutations(J))
         >>> J2 = list(permutations[randint(0, len(permutations)-1)])
         >>> F = butterfly(H, type='bbtree', perm=[J1, J2])
-        >>> np.allclose(F.factors(3).indices, J1)
-        True
-        >>> # here the best permutation is J1
+        >>> # or to to use the 8 default permutations (keeping the best approximation resulting Faust)
+        >>> F = butterfly(H, type='bbtree', perm='default_8')
 
     Reference:
         [1] Quoc-Tung Le, Léon Zheng, Elisa Riccietti, Rémi Gribonval. Fast
@@ -1460,10 +1458,9 @@ def butterfly(M, type="bbtree", perm=None):
             # print(p)
             row_inds = np.arange(len(p))
             P = csr_matrix((np.ones(row_inds.size), (row_inds, p)))
-            MP = M@P
-            F = butterfly(MP, type, p)
+            F = butterfly(M, type, p)
             # compute error
-            error = np.linalg.norm(F@P.T-M)/Faust(M).norm()
+            error = np.linalg.norm(F-M)/Faust(M).norm()
             # print(error)
             if error < best_err:
                 best_err = error

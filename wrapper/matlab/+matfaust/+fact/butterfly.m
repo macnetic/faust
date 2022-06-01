@@ -1,6 +1,5 @@
 %==========================================================================
 %> @brief Factorizes the matrix M according to a butterfly support.
-
 %>        @param 'type', str: the type of factorization 'right'ward, 'left'ward or 'bbtree'.
 %>        More precisely: if 'left' (resp. 'right') is used then at each stage of the
 %>        factorization the most left factor (resp. the most right factor) is split in two.
@@ -10,7 +9,7 @@
 %>
 %> @param 'perm', value	four kind of values are possible for this argument (Note that this argument is made only for the bbtree type of factorization).
 %>
-%> 1. perm is an array of column indices of the permutation matrix P which is such that the returned Faust F is the approximation of M*P and F*P.' the approximation of M.
+%> 1. perm is an array of column indices of the permutation matrix P which is such that the returned Faust is F = G * P.' where G is the Faust butterfly approximation of M*P.
 %> 2. perm is a cell array of arrays of permutation column indices as defined in 1. In that case, all permutations passed to the function are used as explained in 1, each one producing a Faust, the best one (that is the best approximation of M) is kept and returned by butterfly.
 %> 3. perm is 'default_8', this is a particular case of 2. Eight default permutations are used. For the definition of those permutations please refer to [1].
 %> 4. By default this argument is empty, no permutation is used.
@@ -62,15 +61,8 @@
 %> - FACTOR 3 (double) SPARSE, size 32x32, density 0.0625, nnz 64
 %> - FACTOR 4 (double) SPARSE, size 32x32, density 0.0625, nnz 64
 %> - FACTOR 5 (double) SPARSE, size 32x32, density 0.03125, nnz 32
-%> >> [Jbest, ~, ~] = find(factors(F, 6).');
-%> >> all(all(Jbest.' == J1))
-%>
-%> ans =
-%>
-%> 	logical
-%> 	1
-%> >> # here the J1 permutation is the best one
 %> @endcode
+%>
 %>
 %>
 %> <b>Reference: [1]</b> Leon Zheng, Elisa Riccietti, and Remi Gribonval, <a href="https://arxiv.org/pdf/2110.01230.pdf">Hierarchical Identifiability in Multi-layer Sparse Matrix Factorization</a>
@@ -116,10 +108,8 @@ function F = butterfly(M, varargin)
             for i=1:length(perm)
 				%                perm{i}
 				m = numel(perm{i});
-				P = sparse(1:m, perm{i}, ones(1, m), m, m);
-				MP = M*P;
-				F = matfaust.fact.butterfly(MP, 'type', type, 'perm', perm{i});
-				err = norm(F*P'-M, 'fro')/nM;
+				F = matfaust.fact.butterfly(M, 'type', type, 'perm', perm{i});
+				err = norm(F-M, 'fro')/nM;
                 if err < min_err
                     min_err = err;
                     best_F = F;

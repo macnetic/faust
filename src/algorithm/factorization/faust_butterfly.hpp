@@ -681,6 +681,15 @@ namespace Faust
 				th = butterfly_hierarchical(A, support, dir);
 			for(int i = 0; i < (P == nullptr?support.size():support.size()-1);i++)
 				delete support[i];
+			if(P != nullptr)
+			{
+				//TODO: maybe a swapcols on th would be wiser/quicker
+				MatSparse<FPP, Cpu> Pt(*P);
+				Pt.transpose();
+				auto last_fac = dynamic_cast<const MatSparse<FPP, Cpu>*>(th->get_gen_fact(th->size()-1));
+				Pt.multiplyRight(*last_fac);
+				th->replace(new MatSparse<FPP, Cpu>(Pt), th->size()-1);
+			}
 			return th;
 		}
 
