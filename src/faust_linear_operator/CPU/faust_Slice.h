@@ -9,8 +9,8 @@ namespace Faust
 	struct Slice
 	{
 
-		faust_unsigned_int start_id;
-		faust_unsigned_int end_id;
+		faust_unsigned_int start_id; // first index of slice
+		faust_unsigned_int end_id; // end index of slice (excluded)
 
 		Slice(faust_unsigned_int start_id, faust_unsigned_int end_id);
 		Slice(const Slice&);
@@ -21,7 +21,7 @@ namespace Faust
 		void copy(const Slice& s);
 		Slice& operator=(const Slice&);
 
-		void display();
+		void display() const;
 		static void swap(Slice& s1, Slice& s2);
 		size_t size() const;
 

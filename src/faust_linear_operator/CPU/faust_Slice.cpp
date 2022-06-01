@@ -53,7 +53,7 @@ namespace Faust {
 		s2.end_id = tmp.end_id;
 	}
 
-	void Slice::display()
+	void Slice::display() const
 	{
 		cout << "start_id:" << start_id << endl;
 		cout << "end_id:" << end_id << endl;
