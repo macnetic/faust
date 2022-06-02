@@ -914,7 +914,8 @@ namespace Faust
             MatDense<FPP,GPU2> gpu_M = this->transform->sliceMultiply(s, gpu_X, this->isTransposed2char());
 			if(cpu_out == nullptr)
 			{
-				auto out_nrows = this->is_row_sliced()?s[0].end_id-s[0].start_id:this->getNbRow();
+				auto is_row_sliced = s[0].end_id != this->getNbRow() || s[0].start_id != 0;
+				auto out_nrows = is_row_sliced?s[0].end_id-s[0].start_id:this->getNbRow();
 				auto out_ncols = X_ncols;
 				cpu_out = new FPP[out_nrows*out_ncols*sizeof(FPP)];
 			}
