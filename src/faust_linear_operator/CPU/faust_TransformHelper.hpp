@@ -374,6 +374,7 @@ namespace Faust {
 					break;
 #endif
 				default:
+					//TODO: replace by multiply(A.getData(), A.getNbCol(), M.getData() and a M.resize() to the proper size before
 					M = this->transform->multiply(A, this->isTransposed2char());
 					break;
 			}
@@ -827,6 +828,8 @@ namespace Faust {
 	template<typename FPP>
 		faust_unsigned_int TransformHelper<FPP,Cpu>::get_total_nnz() const
 		{
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
 			return this->transform->get_total_nnz();
 		}
 
@@ -878,6 +881,8 @@ template<typename FPP>
 template<typename FPP>
 	void TransformHelper<FPP,Cpu>::update(const MatGeneric<FPP,Cpu>& M, const faust_unsigned_int fact_id)
 	{
+		this->eval_fancy_idx_Transform();
+		this->eval_sliced_Transform();
 		MatGeneric<FPP,Cpu>& M_ = const_cast<MatGeneric<FPP,Cpu>&>(M);
 		// I promise I won't change M
 		MatSparse<FPP,Cpu> *sp_mat, *sp_fact;
