@@ -73,6 +73,7 @@ namespace Faust
     template<typename FPP>
         void TransformHelper<FPP,GPU2>::push_back(const MatGeneric<FPP,GPU2>* M, const bool optimizedCopy/*=false*/, const bool copying/*=true*/, const bool transpose/*=false*/, const bool conjugate/*=false*/)
         {
+			this->eval_sliced_Transform();
             //optimizedCopy is ignored because not handled yet by Transform<FPP,GPU2> // TODO ? (it's not used by wrappers anyway)
             this->transform->push_back(M, copying, transpose, conjugate);
         }
@@ -80,7 +81,7 @@ namespace Faust
     template<typename FPP>
         void TransformHelper<FPP,GPU2>::push_back(const MatGeneric<FPP,Cpu>* M, const bool optimizedCopy/*=false*/, const int32_t dev_id/*=-1*/, const void* stream/*=nullptr*/)
         {
-
+			this->eval_sliced_Transform();
             MatGeneric<FPP,GPU2>* gpu_M = nullptr;
             const MatDense<FPP,Cpu>* cpu_dM = nullptr;
             const MatSparse<FPP,Cpu>* cpu_sM = nullptr;
@@ -106,6 +107,7 @@ namespace Faust
     template<typename FPP>
         void TransformHelper<FPP,GPU2>::push_back(const FPP* data, const int nrows, const int ncols, const bool optimizedCopy/*=false*/, const bool transpose/*=false*/, const bool conjugate/*=false*/)
         {
+			this->eval_sliced_Transform();
             auto dense_mat = new MatDense<FPP,GPU2>(nrows, ncols, data, /* no_alloc */ false);
             auto copying = transpose || conjugate || optimizedCopy;
             this->push_back(dense_mat, optimizedCopy, copying, transpose, conjugate); // optimizedCopy not supported on GPU2
@@ -115,6 +117,7 @@ namespace Faust
     template<typename FPP>
         void TransformHelper<FPP,GPU2>::push_back(const FPP* data, const int* row_ptr, const int* id_col, const int nnz, const int nrows, const int ncols, const bool optimizedCopy/*=false*/, const bool transpose/*=false*/, const bool conjugate/*=false*/)
         {
+			this->eval_sliced_Transform();
             auto sparse_mat = new MatSparse<FPP,GPU2>(nrows, ncols, nnz, data, row_ptr, id_col);
             auto copying = transpose || conjugate || optimizedCopy;
             this->push_back(sparse_mat, optimizedCopy, copying, transpose, conjugate); // optimizedCopy not supported on GPU2
@@ -124,7 +127,7 @@ namespace Faust
     template<typename FPP>
         void TransformHelper<FPP,GPU2>::push_back(const FPP* bdata, const int* brow_ptr, const int* bcol_inds, const int nrows, const int ncols, const int bnnz, const int bnrows, const int bncols, const bool optimizedCopy/*=false*/, const bool transpose/*=false*/, const bool conjugate/*=false*/)
         {
-
+			this->eval_sliced_Transform();
 			auto bsr_mat = new MatBSR<FPP, GPU2>(nrows, ncols, bnrows, bncols, bnnz, bdata, brow_ptr, bcol_inds);
 			auto copying = optimizedCopy || transpose || conjugate;
 			this->push_back(bsr_mat, copying, transpose, conjugate);
@@ -134,18 +137,21 @@ namespace Faust
     template<typename FPP>
         void TransformHelper<FPP,GPU2>::push_first(const MatGeneric<FPP,GPU2>* M, const bool optimizedCopy/*=false*/, const bool copying/*=true*/)
         {
+			this->eval_sliced_Transform();
             return this->transform->push_first(M, copying);
         }
 
     template<typename FPP>
         void TransformHelper<FPP,GPU2>::display() const
         {
+			const_cast<Faust::TransformHelper<FPP, GPU2>*>(this)->eval_sliced_Transform();
             this->transform->Display(this->is_transposed);
         }
 
     template<typename FPP>
         std::string TransformHelper<FPP,GPU2>::to_string() const
         {
+			const_cast<Faust::TransformHelper<FPP, GPU2>*>(this)->eval_sliced_Transform();
             return this->transform->to_string(this->is_transposed);
         }
 
@@ -153,6 +159,7 @@ namespace Faust
         template<typename Head, typename ... Tail>
         void TransformHelper<FPP,GPU2>::push_back_(Head& h, Tail&... t)
         {
+			this->eval_sliced_Transform();
             for(auto it=h.begin(); it < h.end(); it++)
             {
                 auto f = *it;
@@ -170,18 +177,21 @@ namespace Faust
     template<typename FPP>
         MatDense<FPP,GPU2> TransformHelper<FPP,GPU2>::get_product(int prod_mod/*=-1*/)
         {
+			this->eval_sliced_Transform();
             return this->transform->get_product(this->isTransposed2char(), this->is_conjugate);
         }
 
     template<typename FPP>
         void TransformHelper<FPP,GPU2>::get_product(MatDense<FPP,GPU2>& M, int prod_mod/*=-1*/)
         {
+			this->eval_sliced_Transform();
             this->transform->get_product(M, this->isTransposed2char(), this->is_conjugate);
         }
 
     template<typename FPP>
         void TransformHelper<FPP,GPU2>::get_product(MatDense<FPP,Cpu>& M, int prod_mod/*=-1*/)
         {
+			this->eval_sliced_Transform();
             MatDense<FPP,GPU2> gpuM;
             this->get_product(gpuM, prod_mod);
             M = gpuM.tocpu();
@@ -190,18 +200,21 @@ namespace Faust
     template<typename FPP>
         Real<FPP> TransformHelper<FPP,GPU2>::normFro(const bool full_array/*=true*/, const int batch_size/*=1*/) const
         {
+			const_cast<Faust::TransformHelper<FPP, GPU2>*>(this)->eval_sliced_Transform();
             return this->transform->get_product().norm();
         }
 
     template<typename FPP>
         Real<FPP> TransformHelper<FPP,GPU2>::normL1(const bool full_array/*=true*/, const int batch_size/*=1*/) const
         {
+			const_cast<Faust::TransformHelper<FPP, GPU2>*>(this)->eval_sliced_Transform();
             return this->transform->normL1(this->is_transposed, full_array, batch_size);
         }
 
     template<typename FPP>
         Real<FPP> TransformHelper<FPP,GPU2>::normInf(const bool full_array/*=true*/, const int batch_size/*=1*/) const
         {
+			const_cast<Faust::TransformHelper<FPP, GPU2>*>(this)->eval_sliced_Transform();
             return this->transform->normL1(!this->is_transposed, full_array, batch_size);
         }
 
@@ -214,47 +227,55 @@ namespace Faust
     template<typename FPP>
         void TransformHelper<FPP,GPU2>::update_total_nnz() const
         {
+			const_cast<Faust::TransformHelper<FPP, GPU2>*>(this)->eval_sliced_Transform();
             this->transform->update_total_nnz();
         }
 
     template<typename FPP>
         Real<FPP> TransformHelper<FPP,GPU2>::spectralNorm(int32_t nb_iter_max, float threshold, int& flag)
         {
+			const_cast<Faust::TransformHelper<FPP, GPU2>*>(this)->eval_sliced_Transform();
             return this->transform->spectralNorm(nb_iter_max, threshold, flag);
         }
     template<typename FPP>
         FPP TransformHelper<FPP,GPU2>::power_iteration(const faust_unsigned_int nb_iter_max, const Real<FPP>& threshold, int& flag)
         {
+			const_cast<Faust::TransformHelper<FPP, GPU2>*>(this)->eval_sliced_Transform();
             return this->transform->power_iteration(nb_iter_max, threshold, flag);
         }
 
     template<typename FPP>
         const MatGeneric<FPP,GPU2>* TransformHelper<FPP,GPU2>::get_gen_fact(const faust_unsigned_int id) const
         {
+			const_cast<Faust::TransformHelper<FPP, GPU2>*>(this)->eval_sliced_Transform();
             return this->transform->get_fact(id, false);
         }
 
     template<typename FPP>
         MatGeneric<FPP,GPU2>* TransformHelper<FPP,GPU2>::get_gen_fact_nonconst(const faust_unsigned_int id) const
         {
+			const_cast<Faust::TransformHelper<FPP, GPU2>*>(this)->eval_sliced_Transform();
             return this->transform->get_fact(id, false);
         }
 
     template<typename FPP>
         void TransformHelper<FPP,GPU2>::update(const MatGeneric<FPP, GPU2>& M,const faust_unsigned_int id)
         {
+			this->eval_sliced_Transform();
             return this->transform->update(M, id);
         }
 
     template<typename FPP>
         void TransformHelper<FPP,GPU2>::replace(const MatGeneric<FPP, GPU2>* M,const faust_unsigned_int id)
         {
+			this->eval_sliced_Transform();
             return this->transform->replace(M, id);
         }
 
     template<typename FPP>
         void TransformHelper<FPP, GPU2>::convertToSparse()
         {
+			this->eval_sliced_Transform();
             const MatDense<FPP,GPU2> * mat_dense;
             const MatSparse<FPP,GPU2> * mat_sparse;
             for(int i=0;i<this->size();i++)
@@ -270,6 +291,7 @@ namespace Faust
     template<typename FPP>
         void TransformHelper<FPP, GPU2>::convertToDense()
         {
+			this->eval_sliced_Transform();
             const MatDense<FPP,GPU2> * mat_dense;
             const MatSparse<FPP,GPU2> * mat_sparse;
             for(int i=0;i<this->size();i++)
@@ -285,6 +307,8 @@ namespace Faust
     template<typename FPP>
         TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::multiply(const TransformHelper<FPP,GPU2>* right)
         {
+			this->eval_sliced_Transform();
+			const_cast<Faust::TransformHelper<FPP, GPU2>*>(right)->eval_sliced_Transform();
             // The goal is to minimize the number of factors copied (but maybe the criterion should be the sum of the size of these factors rather than their number)
             //			std::cout << "===" << this->is_transposed << std::endl;
             //			this->display();
@@ -371,32 +395,47 @@ namespace Faust
     template<typename FPP>
         Vect<FPP,Cpu> TransformHelper<FPP,GPU2>::multiply(const Faust::Vect<FPP,Cpu> &A)
         {
+			//TODO: delegate to function below
             Vect<FPP,GPU2> gpu_A(A.size(), A.getData());
-            Vect<FPP,GPU2> v = this->multiply(gpu_A); //TODO: handle transpose and conjugate
+            Vect<FPP,GPU2> v = this->multiply(gpu_A);
             return v.tocpu();
         }
 
     template<typename FPP>
         void TransformHelper<FPP,GPU2>::multiply(const FPP* cpu_in_buf, FPP* cpu_out_buf)
         {
-            int32_t in_vec_size = this->getNbCol();
-            Vect<FPP,GPU2> gpu_A(in_vec_size, cpu_in_buf);
-            Vect<FPP,GPU2> v = this->multiply(gpu_A); //TODO: handle transpose and conjugate
-            v.tocpu(cpu_out_buf);
+			if(this->is_sliced)
+			{
+				this->sliceMultiply(this->slices, cpu_in_buf, cpu_out_buf, 1);
+			}
+			else
+			{
+				int32_t in_vec_size = this->getNbCol();
+				Vect<FPP,GPU2> gpu_A(in_vec_size, cpu_in_buf);
+				Vect<FPP,GPU2> v = this->multiply(gpu_A); //TODO: handle transpose and conjugate
+				v.tocpu(cpu_out_buf);
+			}
         }
 
     template<typename FPP>
         void TransformHelper<FPP,GPU2>::multiply(const FPP* cpu_x_buf, int x_ncols, FPP* cpu_out_buf)
         {
-            int32_t x_nrows;
-            if(this->is_transposed)
-                x_nrows = this->transform->getNbRow();
-            else
-                x_nrows = this->transform->getNbCol();
-            MatDense<FPP,GPU2> gpu_x(x_nrows, x_ncols, cpu_x_buf, false);
-            MatDense<FPP,GPU2> gpu_M = this->multiply(gpu_x); //TODO: handle transpose and conjugate
-                                                                                    // TODO: fix this function, it works until here then it segfaults or gives a cuda error with tocpu (even if I use a cpu matdense set locally)
-            gpu_M.tocpu(cpu_out_buf, nullptr);
+			if(this->is_sliced)
+			{
+				this->sliceMultiply(this->slices, cpu_x_buf, cpu_out_buf, x_ncols);
+			}
+			else
+			{
+				int32_t x_nrows;
+				if(this->is_transposed)
+					x_nrows = this->transform->getNbRow();
+				else
+					x_nrows = this->transform->getNbCol();
+				MatDense<FPP,GPU2> gpu_x(x_nrows, x_ncols, cpu_x_buf, false);
+				MatDense<FPP,GPU2> gpu_M = this->multiply(gpu_x); //TODO: handle transpose and conjugate
+																  // TODO: fix this function, it works until here then it segfaults or gives a cuda error with tocpu (even if I use a cpu matdense set locally)
+				gpu_M.tocpu(cpu_out_buf, nullptr);
+			}
         }
 
     template<typename FPP>
@@ -431,18 +470,21 @@ namespace Faust
     template<typename FPP>
         void TransformHelper<FPP,GPU2>::pop_front()
         {
+			this->eval_sliced_Transform();
             return this->transform->pop_front();
         }
 
     template<typename FPP>
         void TransformHelper<FPP,GPU2>::pop_back()
         {
+			this->eval_sliced_Transform();
             return this->transform->pop_back();
         }
 
     template<typename FPP>
         void Faust::TransformHelper<FPP,GPU2>::pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id,const int mul_order_opt_mode/*=DEFAULT*/)
         {
+			this->eval_sliced_Transform();
             if(start_id < 0 || start_id >= size())
                 throw out_of_range("start_id is out of range.");
             if(end_id < 0 || end_id >= size())
@@ -493,12 +535,14 @@ namespace Faust
     template<typename FPP>
         typename Transform<FPP,GPU2>::iterator TransformHelper<FPP,GPU2>::begin() const
         {
+			const_cast<Faust::TransformHelper<FPP, GPU2>*>(this)->eval_sliced_Transform();
             return this->transform->begin();
         }
 
     template<typename FPP>
         typename Transform<FPP,GPU2>::iterator TransformHelper<FPP,GPU2>::end() const
         {
+			const_cast<Faust::TransformHelper<FPP, GPU2>*>(this)->eval_sliced_Transform();
             return this->transform->end();
         }
 
@@ -506,12 +550,13 @@ namespace Faust
     template<typename FPP>
         void TransformHelper<FPP,GPU2>::operator=(TransformHelper<FPP,GPU2>& th)
         {
-            copy_state(th);
+            copy_state(th); // it copies the underlying Transform object too
         }
 
     template<typename FPP>
         void TransformHelper<FPP,GPU2>::save_mat_file(const char* filepath) const
         {
+			const_cast<Faust::TransformHelper<FPP, GPU2>*>(this)->eval_sliced_Transform();
             this->transform->save_mat_file(filepath, this->is_transposed, this->is_conjugate);
         }
 
@@ -530,6 +575,7 @@ namespace Faust
     template<typename FPP>
         void TransformHelper<FPP,GPU2>::tocpu(TransformHelper<FPP,Cpu>& cpu_transf) const
         {
+			const_cast<Faust::TransformHelper<FPP, GPU2>*>(this)->eval_sliced_Transform();
             //TODO: tocpu support of arguments transpose and conjugate
             auto t = this->transform->tocpu();
             for(auto fac: t)
@@ -549,6 +595,7 @@ namespace Faust
     template<typename FPP>
         TransformHelper<FPP,Cpu>* TransformHelper<FPP,GPU2>::tocpu() const
         {
+			const_cast<Faust::TransformHelper<FPP, GPU2>*>(this)->eval_sliced_Transform();
             auto cpu_t = new TransformHelper<FPP,Cpu>();
             tocpu(*cpu_t);
             return cpu_t;
@@ -558,6 +605,7 @@ namespace Faust
     template<typename FPP>
         faust_unsigned_int TransformHelper<FPP,GPU2>::get_total_nnz() const
         {
+			const_cast<Faust::TransformHelper<FPP, GPU2>*>(this)->eval_sliced_Transform();
             return this->transform->get_total_nnz();
         }
 
@@ -565,6 +613,7 @@ namespace Faust
     template<typename FPP>
         TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::normalize(const int meth /* 1 for 1-norm, 2 for 2-norm (2-norm), -1 for inf-norm */) const
         {
+			const_cast<Faust::TransformHelper<FPP, GPU2>*>(this)->eval_sliced_Transform();
             TransformHelper<FPP,Cpu> th;
             this->tocpu(th);
             auto thn = th.normalize(meth);
@@ -576,7 +625,7 @@ namespace Faust
     template<typename FPP>
         TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::transpose()
         {
-
+			//TODO: factor with CPU function in parent class
             auto t = new TransformHelper<FPP,GPU2>(*this, true, false);
             return t;
         }
@@ -584,6 +633,7 @@ namespace Faust
     template<typename FPP>
         TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::conjugate()
         {
+			//TODO: factor with CPU function in parent class
             auto t = new TransformHelper<FPP,GPU2>(*this, false, true);
             return t;
         }
@@ -591,6 +641,7 @@ namespace Faust
     template<typename FPP>
         TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::adjoint()
         {
+			//TODO: factor with CPU function in parent class
             auto t = new TransformHelper<FPP,GPU2>(*this, true, true);
             return t;
         }
@@ -598,6 +649,7 @@ namespace Faust
     template<typename FPP>
         faust_unsigned_int TransformHelper<FPP,GPU2>::getNBytes() const
         {
+			const_cast<Faust::TransformHelper<FPP, GPU2>*>(this)->eval_sliced_Transform();
             faust_unsigned_int nbytes = 0;
             for(auto fac : *this)
             {
@@ -762,6 +814,7 @@ namespace Faust
                 faust_unsigned_int* num_cols,
                 const bool transpose /* = false*/) const
         {
+			const_cast<Faust::TransformHelper<FPP, GPU2>*>(this)->eval_sliced_Transform();
             this->transform->get_fact(this->is_transposed?this->size()-id-1:id, rowptr, col_ids, elts, nnz, num_rows, num_cols, this->is_transposed ^ transpose);
             if(this->is_conjugate)
                 Faust::conjugate(elts, *nnz);
@@ -782,6 +835,7 @@ namespace Faust
         template<typename FPP2>
         TransformHelper<Real<FPP2>,GPU2>* TransformHelper<FPP,GPU2>::real()
         {
+			this->eval_sliced_Transform();
             std::vector<MatGeneric<Real<FPP2>,GPU2>*> real_data;
             MatSparse<FPP, GPU2> *curfac_sp;
             MatDense<FPP, GPU2> *curfac_ds;
@@ -838,14 +892,6 @@ namespace Faust
 
             throw std::runtime_error("TransformHelper<FPP,GPU2>::get_fact error: GPU2 doesn't support the BSR matrix yet.");
         }
-
-	template<typename FPP>
-		void TransformHelper<FPP,GPU2>::init_sliced_transform(TransformHelper<FPP,GPU2>* th, Slice s[2])
-		{
-			TransformHelperGen<FPP, GPU2>::init_sliced_transform(th, s);
-			//TODO: lazy slicing for GPU2 as for CPU (it needs to implement sliceMultiply too)
-			this->eval_sliced_Transform();
-		}
 
 	template<typename FPP>
 		void TransformHelper<FPP,GPU2>::init_fancy_idx_transform(TransformHelper<FPP,GPU2>* th, faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols)
