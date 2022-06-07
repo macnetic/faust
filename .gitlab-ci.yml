@@ -728,7 +728,7 @@ test_linux_pkg_release:
     - $JOB_PYTHON -m pip install --upgrade build/wrapper/python/dist/${PYFAUST_PKG_NAME}-$CI_COMMIT_TAG-*$PYVER*$SYS*.whl
     - $JOB_PYTHON -c "import pyfaust; print(pyfaust.version()); print(pyfaust.rand(5,5).toarray());"
     - $JOB_PYTHON -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'double')"
-    - $JOB_PYTHON -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'float')"
+    - $JOB_PYTHON -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'float32')"
   only:
     - tags
 
@@ -791,7 +791,7 @@ test_win_purepy_pkg:
     - python -m pip install %PKG_NAME%
     - python -c "import pyfaust; print(pyfaust.version()); print(pyfaust.rand(5,5).toarray());"
     - python -c "import pyfaust.tests; pyfaust.tests.run_tests(\"cpu\", \"double\")"
-    - python -c "import pyfaust.tests; pyfaust.tests.run_tests(\"cpu\", \"float\")"
+    - python -c "import pyfaust.tests; pyfaust.tests.run_tests(\"cpu\", \"float32\")"
   needs:
     - job: pkg_win_purepy_release
       artifacts: true

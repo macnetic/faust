@@ -37,7 +37,12 @@ class TestFaust(unittest.TestCase):
                         TestFaust.MAX_DIM_SIZE+1)
         nfacts = randint(TestFaust.MIN_NUM_FACTORS,
                          TestFaust.MAX_NUM_FACTORS+1)
-        self.F = frand(nrows, ncols, num_factors=nfacts, dev=self.dev, field=self.field)
+        dtype = 'double'
+        if self.field not in ['real', 'complex']:
+            dtype = self.field
+            self.field = 'real'
+        self.F = frand(nrows, ncols, num_factors=nfacts, dev=self.dev,
+                       field=self.field, dtype=dtype)
         self.nrows = nrows
         self.ncols = ncols
         self.nfacts = nfacts
