@@ -927,7 +927,7 @@ namespace Faust
 		FPP* Faust::TransformHelper<FPP,GPU2>::indexMultiply(faust_unsigned_int* ids[2], size_t id_lens[2], const FPP* cpu_X, int X_ncols/*=1*/, FPP* cpu_out/*=nullptr*/) const
 		{
             int32_t X_nrows;
-			if(id_lens[0] > 0)
+			if(id_lens[1] > 0)
 				X_nrows = id_lens[1];
 			else
 				X_nrows = this->getNbCol();
