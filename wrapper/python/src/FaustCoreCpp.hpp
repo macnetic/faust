@@ -720,3 +720,15 @@ void FaustCoreCpp<FPP, DEV>::colSliceMultiply(unsigned long int j1, unsigned lon
     s[1] = Faust::Slice(j1, j2);
     this->transform->sliceMultiply(s, data, out, data_ncols);
 }
+
+template<typename FPP, FDevice DEV>
+void FaustCoreCpp<FPP,DEV>::indexMultiply(unsigned long int* d0_ids, size_t d0_ids_len, unsigned long int* d1_ids, size_t d1_ids_len, const FPP* mat_data, int mat_ncols, FPP* mat_out) const
+{
+    unsigned long int* ids_[2];
+    ids_[0] = d0_ids;
+    ids_[1] = d1_ids;
+    size_t lens[2];
+    lens[0] = d0_ids_len;
+    lens[1] = d1_ids_len;
+    this->transform->indexMultiply(ids_, lens, mat_data, mat_ncols, mat_out);
+}

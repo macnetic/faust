@@ -137,15 +137,3 @@ FaustCoreCpp<@TYPE@,Cpu>* FaustCoreCpp<@TYPE@,Cpu>::read_from_mat_file(const cha
     }
     return core;
 }
-
-template<>
-void FaustCoreCpp<@TYPE@,Cpu>::indexMultiply(unsigned long int* d0_ids, size_t d0_ids_len, unsigned long int* d1_ids, size_t d1_ids_len, const @TYPE@* mat_data, int mat_ncols, @TYPE@* mat_out) const
-{
-    unsigned long int* ids_[2];
-    ids_[0] = d0_ids;
-    ids_[1] = d1_ids;
-    size_t lens[2];
-    lens[0] = d0_ids_len;
-    lens[1] = d1_ids_len;
-    this->transform->indexMultiply(ids_, lens, mat_data, mat_ncols, mat_out);
-}
