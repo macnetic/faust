@@ -49,7 +49,8 @@ namespace Faust
 				Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> &x);
 				void multiply(const FPP* cpu_x, FPP* cpu_y);
 				void multiply(const FPP* cpu_x, int x_ncols, FPP* cpu_y);
-				FPP* sliceMultiply(const Slice s[2], const FPP* cpu_X, FPP* cpu_out/*=nullptr*/, int X_ncols/*=1*/) const;
+				FPP* sliceMultiply(const Slice s[2], const FPP* cpu_X, FPP* cpu_out=nullptr, int X_ncols=1) const;
+				FPP* indexMultiply(faust_unsigned_int* ids[2], size_t id_lens[2], const FPP* X, int ncols=1, FPP* out=nullptr) const;
 				Real<FPP> normFro(const bool full_array=true, const int batch_size=1) const;
 				Real<FPP> normL1(const bool full_array=true, const int batch_size=1) const;
 				Real<FPP> normInf(const bool full_array=true, const int batch_size=1) const;

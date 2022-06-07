@@ -923,6 +923,26 @@ namespace Faust
 			return cpu_out;
 		}
 
+	template<typename FPP>
+		FPP* Faust::TransformHelper<FPP,GPU2>::indexMultiply(faust_unsigned_int* ids[2], size_t id_lens[2], const FPP* cpu_X, int X_ncols/*=1*/, FPP* cpu_out/*=nullptr*/) const
+		{
+            int32_t X_nrows;
+			if(id_lens[0] > 0)
+				X_nrows = id_lens[1];
+			else
+				X_nrows = this->getNbCol();
+            MatDense<FPP,GPU2> gpu_X(X_nrows, X_ncols, cpu_X, false);
+            MatDense<FPP,GPU2> gpu_M = this->transform->indexMultiply(ids, id_lens, gpu_X, this->isTransposed2char());
+			if(cpu_out == nullptr)
+			{
+				auto out_nrows = id_lens[0]>0?id_lens[0]:this->getNbRow();
+				auto out_ncols = X_ncols;
+				cpu_out = new FPP[out_nrows*out_ncols*sizeof(FPP)];
+			}
+            gpu_M.tocpu(cpu_out, nullptr);
+			return cpu_out;
+		}
+
 }
 
 #include "faust_TransformHelper_cat_gpu.hpp"

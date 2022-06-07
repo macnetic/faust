@@ -388,7 +388,7 @@ namespace Faust
 		{
 			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 			if(gpu_mat_arr == nullptr) throw std::runtime_error("gpu_mat_arr is nullptr");
-			//TODO: refactor this code with other functions doing the same
+			//TODO: refactor this code with other functions doing the same about op
 			gm_Op op;
 			faust_unsigned_int out_nrows, out_ncols;
 			if(opThis == 'N')
@@ -413,8 +413,35 @@ namespace Faust
 			else
 				cs_size = 0;
 			MatDense<@FAUST_SCALAR_FOR_GM@,GPU2> out(out_nrows, out_ncols, nullptr, /*no_alloc*/true);
-			// TODO: call chain_matmul_by_dsm_one if both cs_size and rs_size are null
+			// if both cs_size and rs_size are null the following call will call chain_matmul_by_dsm_one
 			out.gpu_mat = marr_funcs->sliced_chain_matmul_by_dsm_one(this->gpu_mat_arr, (int) s[0].start_id, (int) rs_size, (int) s[1].start_id, (int) cs_size, op, gpu_X.gpu_mat);
+			return out;
+		}
+
+	template<>
+		MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> Faust::Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::indexMultiply(faust_unsigned_int* ids[2], size_t id_lens[2], MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>& gpu_X, const char opThis) const
+		{
+			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			if(gpu_mat_arr == nullptr) throw std::runtime_error("gpu_mat_arr is nullptr");
+			//TODO: refactor this code with other functions doing the same about op
+			gm_Op op;
+			faust_unsigned_int out_nrows, out_ncols;
+			if(opThis == 'N')
+			{
+				op = OP_NOTRANSP;
+				out_nrows = getNbRow();
+				out_ncols = getNbCol();
+			}
+			else if(opThis == 'T')
+				op = OP_TRANSP;
+			else if(opThis == 'H')
+				op = OP_CONJTRANSP;
+			else
+				throw std::runtime_error("Invalid opThis");
+
+			MatDense<@FAUST_SCALAR_FOR_GM@,GPU2> out(out_nrows, out_ncols, nullptr, /*no_alloc*/true);
+			// if both cs_size and rs_size are null the following call will call chain_matmul_by_dsm_one
+			out.gpu_mat = marr_funcs->indexed_chain_matmul_by_dsm_one(this->gpu_mat_arr, ids, id_lens, op, gpu_X.gpu_mat);
 			return out;
 		}
 
