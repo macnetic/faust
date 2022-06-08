@@ -441,7 +441,8 @@ namespace Faust
 
 			MatDense<@FAUST_SCALAR_FOR_GM@,GPU2> out(out_nrows, out_ncols, nullptr, /*no_alloc*/true);
 			// if both cs_size and rs_size are null the following call will call chain_matmul_by_dsm_one
-			out.gpu_mat = marr_funcs->indexed_chain_matmul_by_dsm_one(this->gpu_mat_arr, ids, id_lens, op, gpu_X.gpu_mat);
+			//TODO: change ids faust_unsigned_int type to size_t to avoid the casting
+			out.gpu_mat = marr_funcs->indexed_chain_matmul_by_dsm_one(this->gpu_mat_arr, (size_t **)ids, id_lens, op, gpu_X.gpu_mat);
 			return out;
 		}
 
