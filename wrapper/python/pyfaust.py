@@ -3429,27 +3429,7 @@ def dst(n, dev='cpu'):
     href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.dst.html">
     scipy.fft.dst</a>
     """
-    def bitrev(inds):
-        """
-        Bitreversal indices.
-        """
-        n = len(inds)
-        if n == 1:
-            return inds
-        else:
-            even = bitrev(inds[np.arange(0, n, 2, dtype='int')])
-            odd = bitrev(inds[np.arange(1, n, 2, dtype='int')])
-            return np.hstack((even, odd))
-
-    def bitrev_perm(N):
-        """
-        Bitreversal permutation.
-        """
-        row_inds = np.arange(0, N, dtype='int')
-        col_inds = bitrev(row_inds)
-        ones = np.ones((N), dtype='float')
-        return csr_matrix((ones, (row_inds, col_inds)), shape=(N, N))
-
+    from pyfaust.tools import bitrev_perm
     def omega(N):
         """
         Returns the list of n-th root of unity raised to the power of -(k+1) (instead of

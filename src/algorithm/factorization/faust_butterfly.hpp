@@ -346,7 +346,11 @@ namespace Faust
 			if(P == nullptr)
 			{
 				if(! std::is_same<FPP, Real<FPP>>::value)
-					bit_reversal_factor(nfactors, out);
+				{
+					auto out_ = new MatSparse<FPP, Cpu>();
+					bit_reversal_factor(nfactors, out_);
+					out.push_back(out_);
+				}
 			}
 			else
 				out.push_back(P); // the caller is responsible to delete the matrix P
@@ -670,15 +674,18 @@ namespace Faust
 				throw std::runtime_error("The matrix to factorize must be square.");
 			if(log2_size - int(log2_size) > std::numeric_limits<Real<FPP>>::epsilon())
 				throw std::runtime_error("The matrix to factorize must be of a size equal to a power of two.");
-			auto support = butterfly_support<FPP>((int) log2_size, P);
-			//	std::cout << "support norms" << std::endl;
-			//	for(auto s: support)
-			//		std::cout << s->norm() << std::endl;
+			// let the permutation P argument to nullptr (default value) because we don't want to add it to the factorization supports
+			// we rather multiply the matrix by P in the next of the function
+			auto support = butterfly_support<FPP>((int) log2_size);
+
 			TransformHelper<FPP, Cpu>* th = nullptr;
+			auto A_ = A;
+			if (P != nullptr)
+				A_.multiplyRight(*P);
 			if(dir == BALANCED)
-				th = butterfly_hierarchical_balanced(A, support);
+				th = butterfly_hierarchical_balanced(A_, support);
 			else
-				th = butterfly_hierarchical(A, support, dir);
+				th = butterfly_hierarchical(A_, support, dir);
 			for(int i = 0; i < (P == nullptr?support.size():support.size()-1);i++)
 				delete support[i];
 			if(P != nullptr)

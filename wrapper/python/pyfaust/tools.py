@@ -233,5 +233,25 @@ def UpdateCholeskySparse(R,P,Pt,index,m):
 
 greed_omp_chol = omp
 
+def bitrev(inds):
+    """
+    Bitreversal indices.
+    """
+    n = len(inds)
+    if n == 1:
+        return inds
+    else:
+        even = bitrev(inds[np.arange(0, n, 2, dtype='int')])
+        odd = bitrev(inds[np.arange(1, n, 2, dtype='int')])
+        return np.hstack((even, odd))
 
-
+def bitrev_perm(N):
+    """
+    Bitreversal permutation.
+    """
+    if np.log2(N) > np.log2(np.floor(N)):
+        raise ValueError('N must be a power of two')
+    row_inds = np.arange(0, N, dtype='int')
+    col_inds = bitrev(row_inds)
+    ones = np.ones((N), dtype='float')
+    return csr_matrix((ones, (row_inds, col_inds)), shape=(N, N))
