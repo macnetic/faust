@@ -62,12 +62,6 @@ function D = dst(n, varargin)
     D = real(F);
 end
 
-function P = bitrev_perm(N)
-    index = 1:N;
-    new_index = BitReversalPermutation(index);
-    P = sparse(index, new_index, ones(1, N), N, N);
-end
-
 function O = omega(N)
     %% List of n-th root of unit raised to the power of -(k+1) (instead of k as
     %in FFT, the purpose is to write the DST).
