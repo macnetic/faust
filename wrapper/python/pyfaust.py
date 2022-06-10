@@ -3976,6 +3976,39 @@ def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
                                                                            min_dim_size, max_dim_size, density, per_row))
     return rF
 
+def rand_butterfly(n, dtype='double', dev='cpu'):
+    """
+    Returns F, a random butterfly support Faust. Each factor is a butterfly factor.
+
+    Args:
+        n: the power of two exponent, that is F.shape[0] == F.shape[1] == 2**n.
+        dtype: 'float32', 'double' or 'complex', the dtype of the random Faust.
+        dev: 'cpu' or 'gpu', the device where the Faust is created.
+
+    Returns:
+        F, a random butterfly support Faust.
+    """
+    from numpy.random import randn
+    if dtype not in ['float32', 'double', 'float', 'complex']:
+        raise ValueError('dtype '+str(dtype)+' is not handled (only float32, '
+                         'double, float, complex are)')
+    DFT = dft(n)
+    # ignore the bitreversal permutation
+    B = DFT.factors(range(0, DFT.numfactors()-1))
+    if n == 2:
+        # B is a csr mat
+        B = Faust(B)
+    RB_factors = []
+    for i in range(len(B)):
+        rb = B.factors(i).astype(dtype)
+        if dtype != 'complex':
+            rb[rb!=0] = randn(rb.size)
+        else:
+            rb[rb!=0] = randn(rb.size) + 1j * randn(rb.size)
+        RB_factors.append(rb)
+    return Faust(RB_factors)
+
+
 def enable_gpu_mod(libpaths=None, backend='cuda', silent=False, fatal=False):
     """
     This function loads explicitly the gpu_mod library in memory.
