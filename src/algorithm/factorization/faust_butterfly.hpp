@@ -343,16 +343,7 @@ namespace Faust
 				sp_support = new Faust::MatSparse<FPP, Cpu>(support);
 				out.push_back(sp_support);
 			}
-			if(P == nullptr)
-			{
-				if(! std::is_same<FPP, Real<FPP>>::value)
-				{
-					auto out_ = new MatSparse<FPP, Cpu>();
-					bit_reversal_factor(nfactors, out_);
-					out.push_back(out_);
-				}
-			}
-			else
+			if(P != nullptr)
 				out.push_back(P); // the caller is responsible to delete the matrix P
 			return out;
 		}
@@ -679,23 +670,40 @@ namespace Faust
 			auto support = butterfly_support<FPP>((int) log2_size);
 
 			TransformHelper<FPP, Cpu>* th = nullptr;
+			MatSparse<FPP, Cpu> *Pt = nullptr;
 			auto A_ = A;
 			if (P != nullptr)
-				A_.multiplyRight(*P);
+			{
+				Pt = new MatSparse<FPP, Cpu>(*P);
+				Pt->transpose();
+				A_.multiplyRight(*Pt);
+			}
 			if(dir == BALANCED)
 				th = butterfly_hierarchical_balanced(A_, support);
 			else
 				th = butterfly_hierarchical(A_, support, dir);
-			for(int i = 0; i < (P == nullptr?support.size():support.size()-1);i++)
+			for(int i = 0; i < support.size();i++)
 				delete support[i];
 			if(P != nullptr)
 			{
 				//TODO: maybe a swapcols on th would be wiser/quicker
-				MatSparse<FPP, Cpu> Pt(*P);
-				Pt.transpose();
-				auto last_fac = dynamic_cast<const MatSparse<FPP, Cpu>*>(th->get_gen_fact(th->size()-1));
-				Pt.multiplyRight(*last_fac);
-				th->replace(new MatSparse<FPP, Cpu>(Pt), th->size()-1);
+				const MatSparse<FPP, Cpu>* sp_last_fac;
+				const MatDense<FPP, Cpu>* ds_last_fac;
+				auto new_last_fac = new MatSparse<FPP, Cpu>(*P);
+				if(sp_last_fac = dynamic_cast<const MatSparse<FPP, Cpu>*>(th->get_gen_fact(th->size()-1)))
+				{
+					sp_last_fac->multiply(*new_last_fac, 'N');
+				}
+				else if(ds_last_fac = dynamic_cast<const MatDense<FPP, Cpu>*>(th->get_gen_fact(th->size()-1)))
+				{
+					ds_last_fac->multiply(*new_last_fac, 'N');
+				}
+				else
+					// it can't happen but still
+					throw std::runtime_error("butterfly supports only MatSparse and MatDense matrix");
+				th->replace(new_last_fac, th->size()-1);
+				if(Pt != nullptr)
+					delete Pt;
 			}
 			return th;
 		}
