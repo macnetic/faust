@@ -7,12 +7,13 @@
 %>        Binary Tree (which is faster as it allows parallelization).
 %>
 %>
-%> @param 'perm', value	four kind of values are possible for this argument (Note that this argument is made only for the bbtree type of factorization).
+%> @param 'perm', value	five kinds of values are possible for this argument.
 %>
-%> 1. perm is an array of column indices of the permutation matrix P which is such that the returned Faust is F = G * P.' where G is the Faust butterfly approximation of M*P.
+%> 1. perm is an array of column indices of the permutation matrix P which is such that the returned Faust is F = G * P where G is the Faust butterfly approximation of M*P.'.  If the array of indices is not a valid permutation the behaviour is undefined (however an invalid size or an out of bound index raise an exception).
 %> 2. perm is a cell array of arrays of permutation column indices as defined in 1. In that case, all permutations passed to the function are used as explained in 1, each one producing a Faust, the best one (that is the best approximation of M) is kept and returned by butterfly.
 %> 3. perm is 'default_8', this is a particular case of 2. Eight default permutations are used. For the definition of those permutations please refer to [1].
-%> 4. By default this argument is empty, no permutation is used.
+%> 4. perm is 'bitrev': in that case the permutation is the bit-reversal permutation (cf. matfaust.tools.bitrev_perm).
+%> 5. By default this argument is empty, no permutation is used.
 %>
 %> @retval F the Faust which is an approximate of M according to a butterfly support.
 %>
@@ -21,12 +22,25 @@
 %> >> import matfaust.wht
 %> >> import matfaust.dft
 %> >> import matfaust.fact.butterfly
-%> >> M = full(wht(32)); % it works with dft too!
-%> >> F = butterfly(M, 'type', 'bbtree');
-%> >> err = norm(full(F)-M)/norm(M)
+%> >> H = full(wht(32)); % it works with dft too!
+%> >> F = butterfly(H, 'type', 'bbtree');
+%> >> err = norm(full(F)-H)/norm(M)
 %> err =
 %>
 %>    1.4311e-15
+%> @endcode
+%>
+%> Use butterfly with simple permutations:
+%> @code
+%> >> M = rand(4, 4);
+%> >> % without any permutation
+%> >> F1 = butterfly(M, 'type', 'bbtree');
+%> >> % which is equivalent to identity permutation
+%> >> p = 1:4;
+%> >> F2 = butterfly(M, 'type', 'bbtree', 'perm', p);
+%> >> % then try another permutation
+%> >> p2 = [2, 1, 4, 3];
+%> >> F3 = butterfly(M, 'type', 'bbtree', 'perm', p2);
 %> @endcode
 %>
 %> Use butterfly with a permutation factor defined by J:
@@ -41,7 +55,6 @@
 %> - FACTOR 2 (double) SPARSE, size 32x32, density 0.0625, nnz 64
 %> - FACTOR 3 (double) SPARSE, size 32x32, density 0.0625, nnz 64
 %> - FACTOR 4 (double) SPARSE, size 32x32, density 0.0625, nnz 64
-%> - FACTOR 5 (double) SPARSE, size 32x32, density 0.03125, nnz 32
 %> @endcode
 %>
 %> Use butterfly with successive permutations J1 and J2
@@ -60,9 +73,21 @@
 %> - FACTOR 2 (double) SPARSE, size 32x32, density 0.0625, nnz 64
 %> - FACTOR 3 (double) SPARSE, size 32x32, density 0.0625, nnz 64
 %> - FACTOR 4 (double) SPARSE, size 32x32, density 0.0625, nnz 64
-%> - FACTOR 5 (double) SPARSE, size 32x32, density 0.03125, nnz 32
 %> @endcode
 %>
+%>
+%> Or to to use the 8 default permutations (keeping the best approximation resulting Faust)
+%> @code
+%> >> F = butterfly(H, 'type', 'bbtree', 'perm', 'default_8')
+%> F =
+%>
+%> Faust size 32x32, density 0.3125, nnz_sum 320, 5 factor(s):
+%> - FACTOR 0 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+%> - FACTOR 1 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+%> - FACTOR 2 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+%> - FACTOR 3 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+%> - FACTOR 4 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+%> @endcode
 %>
 %>
 %> <b>Reference: [1]</b> Leon Zheng, Elisa Riccietti, and Remi Gribonval, <a href="https://arxiv.org/pdf/2110.01230.pdf">Hierarchical Identifiability in Multi-layer Sparse Matrix Factorization</a>
@@ -82,8 +107,8 @@ function F = butterfly(M, varargin)
                                                 type = varargin{i+1};
                                         end
 								case 'perm'
-									if(nargin < i+1 ||  ~ is_array_of_indices(varargin{i+1}, M) && ~ is_cell_arrays_of_indices(varargin{i+1}, M) && ~ strcmp(varargin{i+1}, 'default_8'))
-                                                error('keyword argument ''perm'' must be followed by ''default_8'', an array of permutation indices or a cell array of arrays of permutation indices')
+									if(nargin < i+1 ||  ~ is_array_of_indices(varargin{i+1}, M) && ~ is_cell_arrays_of_indices(varargin{i+1}, M) && ~ strcmp(varargin{i+1}, 'default_8') && ~ strcmp(varargin{i+1}, 'bitrev'))
+                                                error('keyword argument ''perm'' must be followed by ''default_8'', ''bitrev'', an array of permutation indices or a cell array of arrays of permutation indices')
                                         else
                                                 perm = varargin{i+1};
                                         end
@@ -100,6 +125,12 @@ function F = butterfly(M, varargin)
             end
             F = matfaust.fact.butterfly(M, 'type', type, 'perm', permutations);
             return;
+		elseif strcmp(perm, 'bitrev')
+			P = bitrev_perm(size(M, 2));
+			[perm, ~, ~] = find(P.'); % cf. comments above
+			perm = perm.';
+			F = matfaust.fact.butterfly(M, 'type', type, 'perm', perm);
+			return;
         elseif iscell(perm) % perm is a cell of arrays, each one defining a permutation to test
             % evaluate butterfly factorisation using the permutations and
             % keep the best Faust
@@ -109,7 +140,7 @@ function F = butterfly(M, varargin)
 				%                perm{i}
 				m = numel(perm{i});
 				F = matfaust.fact.butterfly(M, 'type', type, 'perm', perm{i});
-				err = norm(F-M, 'fro')/nM;
+				err = norm(full(F)-M, 'fro')/nM;
                 if err < min_err
                     min_err = err;
                     best_F = F;
