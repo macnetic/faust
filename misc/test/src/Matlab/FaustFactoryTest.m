@@ -678,7 +678,11 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 				end
 				for i=1:3
 					type = types{i};
-					F = butterfly(M, 'type', type);
+                    args = {M, 'type', type};
+                    if ~ isreal(M)
+                        args = [args, {'perm', 'bitrev'}];
+                    end
+					F = butterfly(args{:});
 					this.verifyEqual(norm(full(F)-M)/norm(M), 0, 'AbsTol', 1e-6);
 				end
 			end

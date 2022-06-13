@@ -1996,7 +1996,7 @@ class TestFaustFactory(unittest.TestCase):
             self.assertAlmostEqual((FH-H).norm()/norm(H), 0)
         D = dft(64).toarray()
         for dir in ['right', 'left', 'bbtree']:
-            FD = butterfly(D, type=dir)
+            FD = butterfly(D, type=dir, perm='bitrev')
             self.assertAlmostEqual((FD-D).norm()/norm(D), 0)
 
     def test_palm4msa_mhtp(self):
