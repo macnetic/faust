@@ -494,6 +494,30 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			this.assertEqual(full(dft(n, 'normed', false)), full(F), 'AbsTol', 10^-7)
 		end
 
+        function testRandButterfly(this)
+            import matfaust.wht
+            import matfaust.rand_butterfly
+            H = full(wht(32));
+            classes = {'single', 'double'};
+            fields = {'real', 'complex'};
+            for i=1:2
+                for j=1:2
+                    field = fields{j}
+                    if strcmp(field, 'real')
+                        class = classes{i};
+                    else % field == complex
+                        class = classes{2};
+                    end
+                    F = rand_butterfly(32, 'class', class, 'field', field);
+                    this.assertNotEqual(full(F), H);
+                    [ref_I, ref_J, ~] = find(H);
+                    [I, J, ~] = find(full(F));
+                    this.assertEqual(ref_I, I);
+                    this.assertEqual(ref_J, J);
+                end
+            end
+        end
+
 		function testCircAntiCirc(this)
 			c = [1 2 3 4];
 			C = [[1     4     3     2]

@@ -1395,6 +1395,19 @@ class TestFaustFactory(unittest.TestCase):
         assert(np.allclose(dft(n).toarray(),
                            dft(n, False).normalize().toarray()))
 
+    def testRandButterfly(self):
+        print("Test pyfaust.rand_butterfly")
+        from pyfaust import wht, rand_butterfly
+        H = wht(32).toarray()
+        for dtype in ['float32', 'double', 'complex']:
+            F = rand_butterfly(32, dtype=dtype)
+            self.assertTrue(not np.allclose(F.toarray(), H))
+            ref_I, ref_J = np.nonzero(H)
+            I, J, = np.nonzero(F.toarray())
+            self.assertTrue((I == ref_I).all())
+            self.assertTrue((J == ref_J).all())
+            self.assertTrue(F.dtype == np.dtype(dtype))
+
     def testDCT(self):
         print("Test pyfaust.dct()")
         from pyfaust import dct
