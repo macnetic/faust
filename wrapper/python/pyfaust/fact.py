@@ -1351,7 +1351,7 @@ def butterfly(M, type="bbtree", perm=None):
             (that is the best approximation of M) is kept and returned by butterfly.
             3. perm is 'default_8', this is a particular case of 2. Eight
             default permutations are used. For the definition of those
-            permutations please refer to [1].
+            permutations please refer to [2].
             4. perm is 'bitrev': in that case the permutation is the
             bit-reversal permutation (cf. pyfaust.tools.bitrev_perm).
             5. By default this argument is None, no permutation is used.
@@ -1396,11 +1396,16 @@ def butterfly(M, type="bbtree", perm=None):
         >>> # or to to use the 8 default permutations (keeping the best approximation resulting Faust)
         >>> F = butterfly(H, type='bbtree', perm='default_8')
 
-    Reference:
+    References:
         [1] Quoc-Tung Le, Léon Zheng, Elisa Riccietti, Rémi Gribonval. Fast
         learning of fast transforms, with guarantees. ICASSP, IEEE
         International Conference on Acoustics, Speech and Signal Processing,
-        May 2022, Singapore, Singapore. (<a href="https://hal.inria.fr/hal-03438881">hal-03438881</a>)
+        May 2022, Singapore, Singapore. (<a href="https://hal.inria.fr/hal-03438881">hal-03438881</a>) <br/>
+		[2] T. Dao, A. Gu, M. Eichhorn, A. Rudra, and C. Re,
+		“Learning Fast Algorithms for Linear Transforms Us-
+		ing Butterfly Factorizations,” in Proceedings of the 36th
+		International Conference on Machine Learning. June
+		2019, pp. 1517–1527, PMLR
     """
     from pyfaust.tools import bitrev_perm
     is_real = np.empty((1,))

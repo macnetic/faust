@@ -11,7 +11,7 @@
 %>
 %> 1. perm is an array of column indices of the permutation matrix P which is such that the returned Faust is F = G * P where G is the Faust butterfly approximation of M*P.'.  If the array of indices is not a valid permutation the behaviour is undefined (however an invalid size or an out of bound index raise an exception).
 %> 2. perm is a cell array of arrays of permutation column indices as defined in 1. In that case, all permutations passed to the function are used as explained in 1, each one producing a Faust, the best one (that is the best approximation of M) is kept and returned by butterfly.
-%> 3. perm is 'default_8', this is a particular case of 2. Eight default permutations are used. For the definition of those permutations please refer to [1].
+%> 3. perm is 'default_8', this is a particular case of 2. Eight default permutations are used. For the definition of those permutations please refer to [2].
 %> 4. perm is 'bitrev': in that case the permutation is the bit-reversal permutation (cf. matfaust.tools.bitrev_perm).
 %> 5. By default this argument is empty, no permutation is used.
 %>
@@ -90,7 +90,12 @@
 %> @endcode
 %>
 %>
-%> <b>Reference: [1]</b> Leon Zheng, Elisa Riccietti, and Remi Gribonval, <a href="https://arxiv.org/pdf/2110.01230.pdf">Hierarchical Identifiability in Multi-layer Sparse Matrix Factorization</a>
+%> <b>References: [1]</b> Leon Zheng, Elisa Riccietti, and Remi Gribonval, <a href="https://arxiv.org/pdf/2110.01230.pdf">Hierarchical Identifiability in Multi-layer Sparse Matrix Factorization</a> <br/>
+%> <b>[2]</b> T. Dao, A. Gu, M. Eichhorn, A. Rudra, and C. Re,
+%> “Learning Fast Algorithms for Linear Transforms Us-
+%> ing Butterfly Factorizations,” in Proceedings of the 36th
+%> International Conference on Machine Learning. June
+%> 2019, pp. 1517–1527, PMLR
 %==========================================================================
 function F = butterfly(M, varargin)
         import matfaust.Faust
