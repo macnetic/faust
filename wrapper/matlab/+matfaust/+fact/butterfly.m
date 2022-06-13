@@ -1,19 +1,19 @@
 %==========================================================================
 %> @brief Factorizes the matrix M according to a butterfly support.
-%>        @param 'type', str: the type of factorization 'right'ward, 'left'ward or 'bbtree'.
+%>
+%> @param M: the matrix to factorize. It can be real (single or double, the class might have a large impact on performance) or complex. The dimension must be a power of two.
+%>@param 'type', str: the type of factorization 'right'ward, 'left'ward or 'bbtree'.
 %>        More precisely: if 'left' (resp. 'right') is used then at each stage of the
 %>        factorization the most left factor (resp. the most right factor) is split in two.
 %>        If 'bbtree' is used then the matrix is factorized according to a Balanced
 %>        Binary Tree (which is faster as it allows parallelization).
-%>
-%>
 %> @param 'perm', value	five kinds of values are possible for this argument.
 %>
 %> 1. perm is an array of column indices of the permutation matrix P which is such that the returned Faust is F = G * P where G is the Faust butterfly approximation of M*P.'.  If the array of indices is not a valid permutation the behaviour is undefined (however an invalid size or an out of bound index raise an exception).
 %> 2. perm is a cell array of arrays of permutation column indices as defined in 1. In that case, all permutations passed to the function are used as explained in 1, each one producing a Faust, the best one (that is the best approximation of M) is kept and returned by butterfly.
 %> 3. perm is 'default_8', this is a particular case of 2. Eight default permutations are used. For the definition of those permutations please refer to [2].
 %> 4. perm is 'bitrev': in that case the permutation is the bit-reversal permutation (cf. matfaust.tools.bitrev_perm).
-%> 5. By default this argument is empty, no permutation is used.
+%> 5. By default this argument is empty, no permutation is used (this is equivalent to using the identity permutation matrix in 1).
 %>
 %> @retval F the Faust which is an approximate of M according to a butterfly support.
 %>
@@ -22,12 +22,19 @@
 %> >> import matfaust.wht
 %> >> import matfaust.dft
 %> >> import matfaust.fact.butterfly
-%> >> H = full(wht(32)); % it works with dft too!
+%> >> H = full(wht(32));
 %> >> F = butterfly(H, 'type', 'bbtree');
-%> >> err = norm(full(F)-H)/norm(M)
+%> >> err = norm(full(F)-H)/norm(H)
 %> err =
 %>
 %>    1.4311e-15
+%> >> % it works with dft too!
+%> >> % all you need is to specify the bit-reversal permutation
+%> >> DFT = full(dft(32));
+%> >> F = butterfly(DFT, 'type', 'bbtree', 'perm', 'bitrev');
+%> >> err = norm(full(F)-DFT)/norm(DFT)
+%> err =
+%> 	  2.8471e-15
 %> @endcode
 %>
 %> Use butterfly with simple permutations:
@@ -35,15 +42,19 @@
 %> >> M = rand(4, 4);
 %> >> % without any permutation
 %> >> F1 = butterfly(M, 'type', 'bbtree');
-%> >> % which is equivalent to identity permutation
+%> >> % which is equivalent to using identity permutation
 %> >> p = 1:4;
 %> >> F2 = butterfly(M, 'type', 'bbtree', 'perm', p);
+%> >> % compute the relative diff
+%> >> norm(full(F2)-full(F1))/norm(full(F1))
+%> ans =
+%>         0
 %> >> % then try another permutation
 %> >> p2 = [2, 1, 4, 3];
 %> >> F3 = butterfly(M, 'type', 'bbtree', 'perm', p2);
 %> @endcode
 %>
-%> Use butterfly with a permutation factor defined by J:
+%> Use butterfly with a permutation defined by J:
 %> @code
 %> >> J = 32:-1:1;
 %> >> F = butterfly(H, 'type', 'bbtree', 'perm', J);
@@ -55,6 +66,9 @@
 %> - FACTOR 2 (double) SPARSE, size 32x32, density 0.0625, nnz 64
 %> - FACTOR 3 (double) SPARSE, size 32x32, density 0.0625, nnz 64
 %> - FACTOR 4 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+%>
+%> >> % this is equivalent to passing a list of a single permutation :
+%> >> % F = butterfly(H, 'type', 'bbtree', 'perm', {J})
 %> @endcode
 %>
 %> Use butterfly with successive permutations J1 and J2
@@ -90,7 +104,8 @@
 %> @endcode
 %>
 %>
-%> <b>References: [1]</b> Leon Zheng, Elisa Riccietti, and Remi Gribonval, <a href="https://arxiv.org/pdf/2110.01230.pdf">Hierarchical Identifiability in Multi-layer Sparse Matrix Factorization</a> <br/>
+%> <b>References:</b>
+%> <br/> <b>[1]</b> Leon Zheng, Elisa Riccietti, and Remi Gribonval, <a href="https://arxiv.org/pdf/2110.01230.pdf">Hierarchical Identifiability in Multi-layer Sparse Matrix Factorization</a> <br/>
 %> <b>[2]</b> T. Dao, A. Gu, M. Eichhorn, A. Rudra, and C. Re,
 %> “Learning Fast Algorithms for Linear Transforms Us-
 %> ing Butterfly Factorizations,” in Proceedings of the 36th

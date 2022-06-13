@@ -1332,7 +1332,8 @@ def butterfly(M, type="bbtree", perm=None):
 
     Args:
         M: the numpy ndarray. The dtype must be float32, float64
-        or complex128 (the dtype might have a large impact on performance).
+        or complex128 (the dtype might have a large impact on performance). The
+        dimension must a power of two.
         type: (str) the type of factorization 'right'ward, 'left'ward or
         'bbtree'. More precisely: if 'left' (resp. 'right') is used then at each stage of the
         factorization the most left factor (resp. the most right factor) is split in two.
@@ -1354,7 +1355,8 @@ def butterfly(M, type="bbtree", perm=None):
             permutations please refer to [2].
             4. perm is 'bitrev': in that case the permutation is the
             bit-reversal permutation (cf. pyfaust.tools.bitrev_perm).
-            5. By default this argument is None, no permutation is used.
+            5. By default this argument is None, no permutation is used (this
+            is equivalent to using the identity permutation matrix in 1).
 
     Returns:
         The Faust which is an approximattion of M according to a butterfly support.
@@ -1364,10 +1366,18 @@ def butterfly(M, type="bbtree", perm=None):
         >>> from random import randint
         >>> from pyfaust.fact import butterfly
         >>> from pyfaust import Faust, wht, dft
-        >>> H = wht(8).toarray() # it works with dft too!
+        >>> H = wht(8).toarray()
         >>> F = butterfly(H, type='bbtree')
+        >>> # compute the error
         >>> (F-H).norm()/Faust(H).norm()
         1.0272844187006565e-15
+        >>> # the same can be done with the dft in place of wht
+        >>> # all you need is to specify the bit-reversal permutation
+        >>> DFT = dft(8).toarray()
+        >>> F = butterfly(DFT, type='bbtree', perm='bitrev')
+        >>> # compute the error
+        >>> (F-DFT).norm()/Faust(DFT).norm()
+        1.1427230601405052e-15
 
         Use simple permutations:
         >>> import numpy as np
@@ -1376,16 +1386,21 @@ def butterfly(M, type="bbtree", perm=None):
         >>> M = np.random.rand(4, 4)
         >>> # without any permutation
         >>> F1 = butterfly(M, type='bbtree')
-        >>> # which is equivalent to identity permutation
+        >>> # which is equivalent to using identity permutation
         >>> p = np.arange(0, 4)
         >>> F2 = butterfly(M, type='bbtree', perm=p)
+        >>> # compute the relative diff
+        >>> (F2-F1).norm()/F1.norm()
+        0.0
         >>> # then try another permutation
         >>> p2 = [1, 0, 3, 2]
         >>> F3 = butterfly(M, type='bbtree', perm=p2)
 
-        Use butterfly with a permutation factor defined by J:
+        Use butterfly with a permutation defined by J:
         >>> J = np.arange(7, -1, -1)
         >>> F = butterfly(H, type='bbtree', perm=J)
+        >>> # this is equivalent to passing a list of a single permutation :
+        >>> # F = butterfly(H, type='bbtree', perm=[J])
         # use butterfly with successive permutations J1 and J2
         # and keep the best approximation
         >>> J1 = J
