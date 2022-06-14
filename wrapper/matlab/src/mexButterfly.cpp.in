@@ -117,15 +117,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 					newMxGetData(ptr_data, perm_inds);
 
 					unsigned int *row_ids = new unsigned int[perm_size];
-					unsigned int *ucol_ids = new unsigned int[perm_size];
+					unsigned int *col_ids = new unsigned int[perm_size];
 					for(int i=0;i < perm_size;i++)
-						ucol_ids[i] = (unsigned int) ptr_data[i]-1; // matlab is one-base indexed
-					std::iota(row_ids, row_ids+perm_size, 0);
+						row_ids[i] = (unsigned int) ptr_data[i]-1; // matlab is one-base indexed
+					std::iota(col_ids, col_ids+perm_size, 0);
 					SCALAR *ones = new SCALAR[perm_size];
 					std::fill(ones, ones+perm_size, SCALAR(1));
-					perm_mat = new Faust::MatSparse<SCALAR, Cpu>(row_ids, ucol_ids, ones, perm_size, perm_size, perm_size);
+					perm_mat = new Faust::MatSparse<SCALAR, Cpu>(row_ids, col_ids, ones, perm_size, perm_size, perm_size);
 					delete[] row_ids;
-					delete[] ucol_ids;
+					delete[] col_ids;
 					delete[] ones;
 				}
 			}

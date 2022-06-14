@@ -1423,12 +1423,14 @@ def butterfly(M, type="bbtree", perm=None):
 		2019, pp. 1517–1527, PMLR
     """
     from pyfaust.tools import bitrev_perm
+    def perm2indices(P):
+            return P.T.nonzero()[1]
     is_real = np.empty((1,))
     M = _check_fact_mat('butterfly()', M, is_real)
     if isinstance(perm, str):
         if perm == 'bitrev':
             P = bitrev_perm(M.shape[1])
-            return butterfly(M, type, perm=P.indices)
+            return butterfly(M, type, perm=perm2indices(P))
         elif perm == 'default_8':
             # the three modified functions below were originally extracted from the 3 clause-BSD code hosted here: https://github.com/leonzheng2/butterfly
             # please look the header license here https://github.com/leonzheng2/butterfly/blob/main/src/utils.py
@@ -1485,12 +1487,12 @@ def butterfly(M, type="bbtree", perm=None):
                     raise TypeError("perm_name must be numeric")
                 return p
 
-    #        print(list(get_permutation_matrix(int(np.log2(M.shape[0])),
-    #                                               perm_name).indices+1 \
+    #        print(list(perm2indices(get_permutation_matrix(int(np.log2(M.shape[0])),
+    #                                               perm_name))+1 \
     #                        for perm_name in  ["000", "001", "010", "011", "100",
     #                                           "101", "110", "111"]))
-            permutations = [get_permutation_matrix(int(np.log2(M.shape[0])),
-                                                   perm_name).indices \
+            permutations = [perm2indices(get_permutation_matrix(int(np.log2(M.shape[0])),
+                                                   perm_name)) \
                             for perm_name in  ["000", "001", "010", "011", "100", "101", "110", "111"]]
             return butterfly(M, type, permutations)
     elif isinstance(perm, (list, tuple)) and isinstance(perm[0], (list, tuple,

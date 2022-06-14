@@ -140,14 +140,14 @@ function F = butterfly(M, varargin)
             pchoices = {'000', '001', '010', '011', '100', '101', '110', '111'};
             for i=1:8
                  P = get_permutation_matrix(floor(log2(size(M, 1))), pchoices{i});
-                 [permutations{i}, ~, ~] = find(P.'); % don't get the column indices directly because it would always 1 to size(P, 1) (indeed P is in CSC format), rather get them in the proper order (row 0 to size(P, 1)) by getting the row indices of P transpose
+                 [permutations{i}, ~, ~] = find(P);
                  permutations{i} = permutations{i}.'; % just for readibility in case of printing
             end
             F = matfaust.fact.butterfly(M, 'type', type, 'perm', permutations);
             return;
 		elseif strcmp(perm, 'bitrev')
 			P = bitrev_perm(size(M, 2));
-			[perm, ~, ~] = find(P.'); % cf. comments above
+			[perm, ~, ~] = find(P);
 			perm = perm.';
 			F = matfaust.fact.butterfly(M, 'type', type, 'perm', perm);
 			return;

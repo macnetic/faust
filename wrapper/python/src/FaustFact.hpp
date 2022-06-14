@@ -891,13 +891,12 @@ FaustCoreCpp<FPP>* butterfly_hierarchical(FPP* mat, unsigned int num_rows, unsig
     if(perm != nullptr)
     {
         //Faust::MatSparse<FPP,Cpu>::MatSparse(const unsigned int* rowidx, const unsigned int* colidx, const FPP* values, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_, faust_unsigned_int nnz)
-        unsigned int *row_ids = new unsigned int[num_cols];
-        unsigned int *ucol_ids = (unsigned int*) perm;
-        std::iota(row_ids, row_ids+num_cols, 0);
+        unsigned int *col_ids = new unsigned int[num_cols];
+        std::iota(col_ids, col_ids+num_cols, 0);
         FPP *ones = new FPP[num_cols];
         std::fill(ones, ones+num_cols, FPP(1));
-        perm_mat = new Faust::MatSparse<FPP, Cpu>((unsigned int*)row_ids, (unsigned int*)perm, ones, num_cols, num_cols, num_cols);
-        delete[] row_ids;
+        perm_mat = new Faust::MatSparse<FPP, Cpu>((unsigned int*) perm, (unsigned int*) col_ids, ones, num_cols, num_cols, num_cols);
+        delete[] col_ids;
         delete[] ones;
     }
     FaustCoreCpp<FPP>* core = nullptr;
