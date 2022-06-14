@@ -524,12 +524,12 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			[2     1     4     3]
 			[3     2     1     4]
 			[4     3     2     1]];
-			self.assertEqual(C, real(full(matfaust.circ(c))))
+			this.assertEqual(C, real(full(matfaust.circ(c))))
 			A = [[2     3     4     1]
 			     [3     4     1     2]
 			     [4     1     2     3]
 			     [1     2     3     4]]
-			self.assertEqual(C, real(full(matfaust.anticirc(c))))
+			this.assertEqual(A, real(full(matfaust.anticirc(c))))
 		end
 
 		function testToeplitz(this)
@@ -539,9 +539,9 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			[2., 1., 7.]
 			[3., 2., 1.]
 			[4., 3., 2.]]
-			self.assertEqual(T, real(full(matfaust.toeplitz(c, r))))
-			self.assertEqual(toeplitz(c, r), real(full(matfaust.toeplitz(c, r))))
-			self.assertEqual(toeplitz(c), real(full(matfaust.toeplitz(c))))
+			this.verifyEqual(T, real(full(matfaust.toeplitz(c, r))), 'AbsTol', 1e-6)
+			this.verifyEqual(toeplitz(c, r), real(full(matfaust.toeplitz(c, r))), 'AbsTol', 1e-6)
+			this.verifyEqual(toeplitz(c), real(full(matfaust.toeplitz(c))), 'AbsTol', 1e-6)
 		end
 
 		function test_sp(this)
@@ -747,7 +747,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
             end
             DCT = matfaust.dct(n);
             y_test = real(DCT*x);
-            test.verifyEqual(y_ref, y_test, 'AbsTol', 1e-6);
+            this.verifyEqual(y_ref, y_test, 'AbsTol', 1e-6);
         end
 
         function test_dst(this)
@@ -763,7 +763,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
             y_ref = y_ref * 2;
             DST = matfaust.dst(n);
             y_test = real(DST*x);
-            test.verifyEqual(y_ref, y_test, 'AbsTol', 1e-6);
+            this.verifyEqual(y_ref, y_test, 'AbsTol', 1e-6);
         end
 
 	end
