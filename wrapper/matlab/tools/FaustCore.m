@@ -63,6 +63,21 @@ classdef FaustCore < handle
 				this.isRealFlag = varargin{2};
 				this.dev = varargin{3};
 				this.dtype = varargin{4};
+                onGPU = startsWith(this.dev, 'gpu');
+                % TODO: the copy of factors shouldn't be necessary
+                % it's here to fix a bug when for instance calling
+                % matfaust.fact.hierarchical/butterfly, the returned Faust is
+                % ok but F-M (for example) leads to a crash
+                % (it's probably because of matrix reference manager that is
+                % duplicated in static memory of different shared
+                % libraries/mexs -- still to verify. All Faust object must be
+                % managed by mexFaustReal/Cplx/Float, hence the copy)
+                nf = call_mex(this, 'numfactors');
+                facts = cell(1, nf);
+                for i=1:nf
+                    facts{i} = call_mex(this, 'factors', i);
+                end
+                this = FaustCore(facts, 1.0, false, this.isRealFlag, this.dev, this.dtype);
 			elseif(nargin >= 1)
 				factors = varargin{1};
 				scale = varargin{2};
@@ -141,6 +156,32 @@ classdef FaustCore < handle
 				else
 					mexFaustCplx('set_FM_mul_mode', this.objectHandle, mode);
 				end
+			end
+		end
+
+		function varargout = call_mex(this, func_name, varargin)
+			if (strcmp(this.dev, 'cpu'))
+				if(this.isRealFlag)
+					if(strcmp(this.dtype, 'double'))
+						[varargout{1:nargout}] = mexFaustReal(func_name, this.objectHandle, varargin{:});
+					else % float
+						[varargout{1:nargout}] = mexFaustRealFloat(func_name, this.objectHandle, varargin{:});
+					end
+				else
+					[varargout{1:nargout}] = mexFaustCplx(func_name, this.objectHandle, varargin{:});
+				end
+			elseif(startsWith(this.dev, 'gpu'))
+				if(this.isRealFlag)
+					if(strcmp(this.dtype, 'double'))
+						[varargout{1:nargout}] = mexFaustGPUReal(func_name, this.objectHandle, varargin{:});
+					else % float
+						[varargout{1:nargout}] = mexFaustGPURealFloat(func_name, this.objectHandle, varargin{:});
+					end
+				else
+					[varargout{1:nargout}] = mexFaustGPUCplx(func_name, this.objectHandle, varargin{:});
+				end
+			else
+				error('The Faust F has an invalid dev attribute (must be cpu or gpu)')
 			end
 		end
 
