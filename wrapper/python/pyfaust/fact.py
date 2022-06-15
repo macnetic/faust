@@ -1362,10 +1362,39 @@ def butterfly(M, type="bbtree", perm=None):
             5. By default this argument is None, no permutation is used (this
             is equivalent to using the identity permutation matrix in 1).
 
+    Note: Below is an example of how to create a permutation scipy CSR matrix from a permutation list
+    of indices (as defined by the perm argument) and conversely how to convert
+    a permutation matrix to a list of indices of permutation.
+    >>> from scipy.sparse import random, csr_matrix
+    >>> from numpy.random import permutation
+    >>> import numpy as np
+    >>> I = permutation(8)  # random permutaiton as indices
+    >>> I
+    array([2, 5, 6, 7, 1, 4, 0, 3])
+    >>> n = len(I)
+    >>> # convert a permutation as indices to a csr_matrix
+    >>> P = csr_matrix((np.ones(n), (I, np.arange(n))))
+    >>> P.toarray()
+    array([[0., 0., 0., 0., 0., 0., 1., 0.],
+           [0., 0., 0., 0., 1., 0., 0., 0.],
+           [1., 0., 0., 0., 0., 0., 0., 0.],
+           [0., 0., 0., 0., 0., 0., 0., 1.],
+           [0., 0., 0., 0., 0., 1., 0., 0.],
+           [0., 1., 0., 0., 0., 0., 0., 0.],
+           [0., 0., 1., 0., 0., 0., 0., 0.],
+           [0., 0., 0., 1., 0., 0., 0., 0.]])
+    >>> # convert P to a list of indices
+    >>> I_ = P.T.nonzero()[1]
+    >>> I_
+    array([2, 5, 6, 7, 1, 4, 0, 3], dtype=int32)
+    >>> np.allclose(I_, I)
+    True
+
+
     Returns:
         The Faust F which is an approximation of M according to a butterfly support.
 
-    Example:
+    Examples:
         >>> import numpy as np
         >>> from random import randint
         >>> from pyfaust.fact import butterfly

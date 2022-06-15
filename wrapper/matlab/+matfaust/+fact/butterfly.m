@@ -17,9 +17,47 @@
 %> 4. perm is 'bitrev': in that case the permutation is the bit-reversal permutation (cf. matfaust.tools.bitrev_perm).
 %> 5. By default this argument is empty, no permutation is used (this is equivalent to using the identity permutation matrix in 1).
 %>
+%> @note Below is an example of how to create a permutation matrix from a permutation list
+%> of indices (as defined by the perm argument) and conversely how to convert
+%> a permutation matrix to a list of indices of permutation.
+%> @code
+%> >> I = randperm(8) % random permutation as indices
+%> I =
+%>
+%>      6     1     5     3     7     2     8     4
+%>
+%> >> n = numel(I);
+%> >> P = sparse(I, 1:n, 1);
+%> >> full(P)
+%>
+%> ans =
+%>
+%>      0     1     0     0     0     0     0     0
+%>      0     0     0     0     0     1     0     0
+%>      0     0     0     1     0     0     0     0
+%>      0     0     0     0     0     0     0     1
+%>      0     0     1     0     0     0     0     0
+%>      1     0     0     0     0     0     0     0
+%>      0     0     0     0     1     0     0     0
+%>      0     0     0     0     0     0     1     0
+%>
+%> >> [I_, ~, ~] = find(P);
+%> >> I_ = I_.'
+%> I_ =
+%>
+%>      6     1     5     3     7     2     8     4
+%> >> all(I_ == I)
+%>
+%> ans =
+%>
+%>   logical
+%>
+%>      1
+%> @endcode
+%>
 %> @retval F the Faust which is an approximation of M according to a butterfly support.
 %>
-%> @b Example:
+%> @b Examples:
 %> @code
 %> >> import matfaust.wht
 %> >> import matfaust.dft
