@@ -1328,15 +1328,15 @@ def fgft_palm(U, Lap, p, init_D=None, ret_lambda=False, ret_params=False):
 
 def butterfly(M, type="bbtree", perm=None):
     """
-    Factorizes M according to a butterfly support and optionally a permutation.
+    Factorizes M according to a butterfly support and optionally a permutation using the algorithms described in [1].
 
     The result is a Faust F of the form BP where B has a butterfly structure
     and P is a permutation matrix determined by the optional parameter perm.
 
     Args:
         M: the numpy ndarray. The dtype must be float32, float64
-        or complex128 (the dtype might have a large impact on performance). The
-        dimension must a power of two.
+        or complex128 (the dtype might have a large impact on performance). M
+        must be square and its dimension must be a power of two.
         type: (str) the type of factorization 'right'ward, 'left'ward or
         'bbtree'. More precisely: if 'left' (resp. 'right') is used then at each stage of the
         factorization the most left factor (resp. the most right factor) is split in two.
@@ -1352,8 +1352,7 @@ def butterfly(M, type="bbtree", perm=None):
             2. perm is a list of lists of permutation column indices as defined
             in 1. In that case, all permutations passed to the function are
             used as explained in 1, each one producing a Faust, the best one
-            (that is the best approximation of M of the form BP with P a in the
-            prescribed list) is kept and returned by butterfly.
+            (that is the best approximation of M in the Frobenius norm) is kept and returned by butterfly.
             3. perm is 'default_8', this is a particular case of 2. Eight
             default permutations are used. For the definition of those
             permutations please refer to [2].
@@ -1419,7 +1418,7 @@ def butterfly(M, type="bbtree", perm=None):
         >>> M = np.random.rand(4, 4)
         >>> # without any permutation
         >>> F1 = butterfly(M, type='bbtree')
-        >>> # which is equivalent to using identity permutation
+        >>> # which is equivalent to using the identity permutation
         >>> p = np.arange(0, 4)
         >>> F2 = butterfly(M, type='bbtree', perm=p)
         >>> # compute the relative diff

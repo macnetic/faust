@@ -1,9 +1,9 @@
 %==========================================================================
-%> @brief Factorizes the matrix M according to a butterfly support and optionally a permutation.
+%> @brief Factorizes the matrix M according to a butterfly support and optionally a permutation using the algorithms described in [1].
 %>
 %> The result is a Faust F of the form BP where B has a butterfly structure and P is a permutation matrix determined by the optional parameter ‘perm'.
 %>
-%> @param M: the matrix to factorize. It can be real (single or double, the class might have a large impact on performance) or complex. The dimension must be a power of two.
+%> @param M: the matrix to factorize. It can be real (single or double, the class might have a large impact on performance) or complex. M must be square and its dimension must be a power of two.
 %>@param 'type', str: the type of factorization 'right'ward, 'left'ward or 'bbtree'.
 %>        More precisely: if 'left' (resp. 'right') is used then at each stage of the
 %>        factorization the most left factor (resp. the most right factor) is split in two.
@@ -12,7 +12,7 @@
 %> @param 'perm', value	five kinds of values are possible for this argument.
 %>
 %> 1. perm is an array of column indices of the permutation matrix P which is such that the returned Faust is F = B * P where B is the Faust butterfly approximation of M*P.'.  If the array of indices is not a valid permutation the behaviour is undefined (however an invalid size or an out of bound index raise an exception).
-%> 2. perm is a cell array of arrays of permutation column indices as defined in 1. In that case, all permutations passed to the function are used as explained in 1, each one producing a Faust, the best one (that is the best approximation of M of the form BP with P in the prescribed list) is kept and returned by butterfly.
+%> 2. perm is a cell array of arrays of permutation column indices as defined in 1. In that case, all permutations passed to the function are used as explained in 1, each one producing a Faust, the best one (that is the best approximation of M in the Frobenius norm) is kept and returned by butterfly.
 %> 3. perm is 'default_8', this is a particular case of 2. Eight default permutations are used. For the definition of those permutations please refer to [2].
 %> 4. perm is 'bitrev': in that case the permutation is the bit-reversal permutation (cf. matfaust.tools.bitrev_perm).
 %> 5. By default this argument is empty, no permutation is used (this is equivalent to using the identity permutation matrix in 1).
@@ -64,17 +64,17 @@
 %> >> import matfaust.fact.butterfly
 %> >> H = full(wht(32));
 %> >> F = butterfly(H, 'type', 'bbtree');
-%> >> err = norm(full(F)-H)/norm(H)
+%> >> err = norm(F-H)/norm(H)
 %> err =
 %>
-%>    1.4311e-15
+%>    1.3947e-15
 %> >> % it works with dft too!
 %> >> % all you need is to specify the bit-reversal permutation
 %> >> DFT = full(dft(32));
 %> >> F = butterfly(DFT, 'type', 'bbtree', 'perm', 'bitrev');
 %> >> err = norm(full(F)-DFT)/norm(DFT)
 %> err =
-%> 	  2.8471e-15
+%> 	  2.9339e-15
 %> @endcode
 %>
 %> Use butterfly with simple permutations:
@@ -82,11 +82,11 @@
 %> >> M = rand(4, 4);
 %> >> % without any permutation
 %> >> F1 = butterfly(M, 'type', 'bbtree');
-%> >> % which is equivalent to using identity permutation
+%> >> % which is equivalent to using the identity permutation
 %> >> p = 1:4;
 %> >> F2 = butterfly(M, 'type', 'bbtree', 'perm', p);
 %> >> % compute the relative diff
-%> >> norm(full(F2)-full(F1))/norm(full(F1))
+%> >> norm(F2-F1)/norm(F1)
 %> ans =
 %>         0
 %> >> % then try another permutation
