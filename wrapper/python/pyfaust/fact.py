@@ -1367,7 +1367,7 @@ def butterfly(M, type="bbtree", perm=None):
     >>> from scipy.sparse import random, csr_matrix
     >>> from numpy.random import permutation
     >>> import numpy as np
-    >>> I = permutation(8)  # random permutaiton as indices
+    >>> I = permutation(8)  # random permutation as a list of indices
     >>> I
     array([2, 5, 6, 7, 1, 4, 0, 3])
     >>> n = len(I)
@@ -1382,7 +1382,7 @@ def butterfly(M, type="bbtree", perm=None):
            [0., 1., 0., 0., 0., 0., 0., 0.],
            [0., 0., 1., 0., 0., 0., 0., 0.],
            [0., 0., 0., 1., 0., 0., 0., 0.]])
-    >>> # convert P to a list of indices
+    >>> # convert a permutation as a list of indices to a permutation matrix P as a csr_matrix
     >>> I_ = P.T.nonzero()[1]
     >>> I_
     array([2, 5, 6, 7, 1, 4, 0, 3], dtype=int32)
@@ -1403,8 +1403,9 @@ def butterfly(M, type="bbtree", perm=None):
         >>> # compute the error
         >>> (F-H).norm()/Faust(H).norm()
         1.0272844187006565e-15
-        >>> # the same can be done with the dft in place of wht
+        >>> # the same can be done with dft in place of wht
         >>> # all you need is to specify the bit-reversal permutation
+        >>> # since the Discrete Fourier Transform is the product of a butterfly factors with this particular permutation
         >>> DFT = dft(8).toarray()
         >>> F = butterfly(DFT, type='bbtree', perm='bitrev')
         >>> # compute the error
@@ -1428,17 +1429,17 @@ def butterfly(M, type="bbtree", perm=None):
         >>> p2 = [1, 0, 3, 2]
         >>> F3 = butterfly(M, type='bbtree', perm=p2)
 
-        Use butterfly with a permutation defined by J:
+        Use butterfly with a permutation defined by a list of indices J:
+        >>> import numpy as np
         >>> J = np.arange(7, -1, -1)
         >>> F = butterfly(H, type='bbtree', perm=J)
-        >>> # this is equivalent to passing a list of a single permutation :
+        >>> # this is equivalent to passing a list containing a single permutation :
         >>> # F = butterfly(H, type='bbtree', perm=[J])
         # use butterfly with successive permutations J1 and J2
         # and keep the best approximation
         >>> J1 = J
-        >>> from itertools import permutations
-        >>> permutations = list(permutations(J))
-        >>> J2 = list(permutations[randint(0, len(permutations)-1)])
+        >>> from numpy.random import permutation
+        >>> J2 = permutation(len(J)) # another random permutation
         >>> F = butterfly(H, type='bbtree', perm=[J1, J2])
         >>> # or to to use the 8 default permutations (keeping the best approximation resulting Faust)
         >>> F = butterfly(H, type='bbtree', perm='default_8')
@@ -1453,6 +1454,9 @@ def butterfly(M, type="bbtree", perm=None):
 		Butterfly Factorizations,” in Proceedings of the 36th
 		International Conference on Machine Learning. June
 		2019, pp. 1517–1527, PMLR
+
+     See also:
+         pyfaust.wht, pyfaust.dft, pyfaust.rand_butterfly
     """
     from pyfaust.tools import bitrev_perm
     def perm2indices(P):

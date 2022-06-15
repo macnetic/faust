@@ -21,11 +21,12 @@
 %> of indices (as defined by the perm argument) and conversely how to convert
 %> a permutation matrix to a list of indices of permutation.
 %> @code
-%> >> I = randperm(8) % random permutation as indices
+%> >> I = randperm(8) % random permutation as a list indices
 %> I =
 %>
 %>      6     1     5     3     7     2     8     4
 %>
+%> >> % convert a permutation as a list of indices to a permutation matrix P as a csr_matrix
 %> >> n = numel(I);
 %> >> P = sparse(I, 1:n, 1);
 %> >> full(P)
@@ -70,6 +71,7 @@
 %>    1.3947e-15
 %> >> % it works with dft too!
 %> >> % all you need is to specify the bit-reversal permutation
+%> >> % since the Discrete Fourier Transform is the product of a butterfly factors with this particular permutation
 %> >> DFT = full(dft(32));
 %> >> F = butterfly(DFT, 'type', 'bbtree', 'perm', 'bitrev');
 %> >> err = norm(full(F)-DFT)/norm(DFT)
@@ -94,7 +96,7 @@
 %> >> F3 = butterfly(M, 'type', 'bbtree', 'perm', p2);
 %> @endcode
 %>
-%> Use butterfly with a permutation defined by J:
+%> Use butterfly with a permutation defined by a list of indices J:
 %> @code
 %> >> J = 32:-1:1;
 %> >> F = butterfly(H, 'type', 'bbtree', 'perm', J);
@@ -107,7 +109,7 @@
 %> - FACTOR 3 (double) SPARSE, size 32x32, density 0.0625, nnz 64
 %> - FACTOR 4 (double) SPARSE, size 32x32, density 0.0625, nnz 64
 %>
-%> >> % this is equivalent to passing a list of a single permutation :
+%> >> % this is equivalent to passing a list containing a single permutation:
 %> >> % F = butterfly(H, 'type', 'bbtree', 'perm', {J})
 %> @endcode
 %>
@@ -151,6 +153,8 @@
 %> Butterfly Factorizations,” in Proceedings of the 36th
 %> International Conference on Machine Learning. June
 %> 2019, pp. 1517–1527, PMLR
+%>
+%> @b See also: matfaust.wht, matfaust.dft, matfaust.rand_butterfly
 %==========================================================================
 function F = butterfly(M, varargin)
         import matfaust.Faust
