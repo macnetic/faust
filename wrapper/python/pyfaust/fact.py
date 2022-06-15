@@ -1328,7 +1328,10 @@ def fgft_palm(U, Lap, p, init_D=None, ret_lambda=False, ret_params=False):
 
 def butterfly(M, type="bbtree", perm=None):
     """
-    Factorizes M according to a butterfly support.
+    Factorizes M according to a butterfly support and optionally a permutation.
+
+    The result is a Faust F of the form BP where B has a butterfly structure
+    and P is a permutation matrix determined by the optional parameter perm.
 
     Args:
         M: the numpy ndarray. The dtype must be float32, float64
@@ -1341,7 +1344,7 @@ def butterfly(M, type="bbtree", perm=None):
         Binary Tree (which is faster as it allows parallelization).
         perm: five kinds of values are possible for this argument.
             1. perm is a list of column indices of the permutation matrix P which is such that
-            the returned Faust is F = G@P where G is the Faust butterfly
+            the returned Faust is F = B@P where B is the Faust butterfly
             approximation of M@P.T.
             If the list of indices is not a valid permutation the behaviour
             is undefined (however an invalid size or an out of bound index raise
@@ -1349,7 +1352,8 @@ def butterfly(M, type="bbtree", perm=None):
             2. perm is a list of lists of permutation column indices as defined
             in 1. In that case, all permutations passed to the function are
             used as explained in 1, each one producing a Faust, the best one
-            (that is the best approximation of M) is kept and returned by butterfly.
+            (that is the best approximation of M of the form BP with P a in the
+            prescribed list) is kept and returned by butterfly.
             3. perm is 'default_8', this is a particular case of 2. Eight
             default permutations are used. For the definition of those
             permutations please refer to [2].
@@ -1359,7 +1363,7 @@ def butterfly(M, type="bbtree", perm=None):
             is equivalent to using the identity permutation matrix in 1).
 
     Returns:
-        The Faust which is an approximattion of M according to a butterfly support.
+        The Faust F which is an approximation of M according to a butterfly support.
 
     Example:
         >>> import numpy as np
@@ -1417,8 +1421,8 @@ def butterfly(M, type="bbtree", perm=None):
         International Conference on Acoustics, Speech and Signal Processing,
         May 2022, Singapore, Singapore. (<a href="https://hal.inria.fr/hal-03438881">hal-03438881</a>) <br/>
 		[2] T. Dao, A. Gu, M. Eichhorn, A. Rudra, and C. Re,
-		“Learning Fast Algorithms for Linear Transforms Us-
-		ing Butterfly Factorizations,” in Proceedings of the 36th
+		“Learning Fast Algorithms for Linear Transforms Using
+		Butterfly Factorizations,” in Proceedings of the 36th
 		International Conference on Machine Learning. June
 		2019, pp. 1517–1527, PMLR
     """
