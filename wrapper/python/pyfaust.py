@@ -3195,14 +3195,13 @@ def isFaust(obj):
 
 def wht(n, normed=True, dev="cpu", dtype='double'):
     """
-    Constructs a Faust implementing the Walsh-Hadamard transform of order n.
+    Constructs a Faust implementing the Walsh-Hadamard Transform (WHT) of order n.
 
     The resulting Faust has log2(n) sparse factors of order n, each one having
-    2 nonzero per row and per column.
+    2 nonzeros per row and per column.
 
     Args:
-       n: the power of two exponent for a Hadamard matrix of order n
-       and a factorization in log2(n) factors.
+       n: order of the WHT (must be a power of two).
        normed: default to True to normalize the Hadamard Faust as if you called
        Faust.normalize() and False otherwise.
        dev: device on which to create the Faust ('cpu' or 'gpu').
@@ -3227,6 +3226,8 @@ def wht(n, normed=True, dev="cpu", dtype='double'):
           - FACTOR 9 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
       >>> wht(1024, normed=True) # is equiv. to next call
       >>> wht(1024, normed=False).normalize() # which is less optimized though
+
+    <b>See also:</b> scipy.linalg.hadamard, pyfaust.dft, pyfaust.fact.butterfly
     """
     if dtype not in ['double', 'complex', 'float']:
         raise ValueError('dtype argument must be double or complex')
@@ -3253,17 +3254,16 @@ def wht(n, normed=True, dev="cpu", dtype='double'):
 
 def dft(n, normed=True, dev='cpu'):
     """
-    Constructs a Faust F such that F.toarray() is the Discrete Fourier Transform square matrix of order n.
+    Constructs a Faust F implementing the Discrete Fourier Transform (DFT) order n.
 
-    The factorization algorithm used is Cooley-Tukey.
-
+    The factorization corresponds to the butterfly structure of the
+    Cooley-Tukey FFT algorithm.
     The resulting Faust is complex and has (log2(n)+1) sparse factors
     whose the log2(n) first has 2 nonzeros per row and per column.
-    The last factor is a permutation matrix.
+    The last factor is a bit-reversal permutation matrix.
 
     Args:
-        n: the power of two exponent for a DFT of order n and a
-        factorization in log2(n)+1 factors.
+        n: order of the Discrete Fourier Transform (must be a power of two).
         normed: default to True to normalize the DFT Faust as if you called
         Faust.normalize() and False otherwise.
         dev: device to create the Faust on ('cpu' or 'gpu').
@@ -3286,8 +3286,12 @@ def dft(n, normed=True, dev='cpu'):
         - FACTOR 8 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
         - FACTOR 9 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
         - FACTOR 10 (complex) SPARSE, size 1024x1024, density 0.000976562, nnz 1024
+
         >>> dft(1024, normed=True) # is equiv. to next call
         >>> dft(1024, normed=False).normalize() # which is less optimized though
+
+    <b>See also:</b> pyfaust.tools.bitrev, pyfaust.wht, pyfaust.dct,
+    pyfaust.dst, scipy.fft.fft, pyfaust.fact.butterfly, pyfaust.rand_butterfly.
     """
     log2n = np.floor(np.log2(n))
     if(n > 2**log2n): raise ValueError("n must be a power of 2.")
@@ -3300,10 +3304,10 @@ def dft(n, normed=True, dev='cpu'):
     return F
 
 def dct(n, dev='cpu'):
-    """Returns the Direct Cosine Transform (Type II) Faust of order n.
+    """Constructs a Faust implementing the Direct Cosine Transform (Type II) Faust of order n.
 
     The analytical formula of DCT II used here is:
-        \f$2 \sum_{n=0}^{N-1} x_n cos \left( {\pi k (2n + 1)} \over {2N} \right)\f$
+        \f$2 \sum_{i=0}^{n-1} x_i cos \left( {\pi k (2i + 1)} \over {2n} \right)\f$
 
 
     Args:
@@ -3327,7 +3331,7 @@ def dct(n, dev='cpu'):
 
     See also pyfaust.dft, pyfaust.dst, <a
     href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.dct.html">
-    scipy.fft.dct</a>
+    scipy.fft.dct</a>, pyfaust.fact.butterfly, pyfaust.rand_butterfly
     """
     DFT = pyfaust.dft(n, dev='cpu', normed=False)
 #    P_ = np.zeros((n, n))
@@ -3400,10 +3404,10 @@ def dst3(n, dev='cpu'):
 
 def dst(n, dev='cpu'):
     """
-    Returns the Direct Sine Transform (Type II) Faust of order n.
+    Constructs a Faust implementing the Direct Sine Transform (Type II) Faust of order n.
 
     The analytical formula of DST II used here is:
-        \f$2 \sum_{n=0}^{N-1} x_n sin \left( {\pi (k+1) (2n + 1)} \over {2N} \right)\f$
+        \f$2 \sum_{i=0}^{n-1} x_i sin \left( {\pi (k+1) (2i + 1)} \over {2n} \right)\f$
 
     Args:
         n: the order of the DST (must be a power of two).
@@ -3427,7 +3431,7 @@ def dst(n, dev='cpu'):
 
     See also pyfaust.dft, pyfaust.dct, <a
     href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.dst.html">
-    scipy.fft.dst</a>
+    scipy.fft.dst</a>, pyfaust.fact.butterfly, pyfaust.rand_butterfly
     """
     from pyfaust.tools import bitrev_perm
     def omega(N):
@@ -3978,15 +3982,21 @@ def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
 
 def rand_butterfly(n, dtype='double', dev='cpu'):
     """
-    Returns F, a random butterfly support Faust. Each factor is a butterfly factor.
+    Constructs a Faust corresponding to the product of log2(n) square factors of
+    size n with butterfly supports and random nonzero coefficients.
+
+    The random coefficients are drawn i.i.d. according to a standard Gaussian
+    (real or complex circular according to the type).
 
     Args:
-        n: the power of two exponent, that is F.shape[0] == F.shape[1] == 2**n.
+        n: order of the butterfly (must be a power of two).
         dtype: 'float32', 'double' or 'complex', the dtype of the random Faust.
         dev: 'cpu' or 'gpu', the device where the Faust is created.
 
     Returns:
         F, a random butterfly support Faust.
+
+    <b>See also</b>: pyfaust.fact.butterfly, pyfaust.rand_butterfly, pyfaust.dft.
     """
     from numpy.random import randn
     if dtype not in ['float32', 'double', 'float', 'complex']:

@@ -1,13 +1,18 @@
 %====================================
-%> @brief Returns F, a random butterfly support Faust. Each factor is a butterfly factor.
+%> @brief Constructs a Faust corresponding to the product of log2(n) square factors of size n with butterfly supports and random nonzero coefficients.
 %>
-%> @param n: the power of two exponent, that is size(F, 2) == size(F, 1) == 2^n.
+%>    The random coefficients are drawn i.i.d. according to a standard Gaussian
+%>    (real or complex circular according to the type).
+%>
+%> @param n: order of the butterfly (must be a power of two).
 %> @param 'dev', str: 'gpu or 'cpu' to create the Faust on CPU or GPU ('cpu' by default).
 %> @param 'field', str	str is either 'real' or 'complex' (the Faust field).
 %>                      The default value is 'real'.
 %> @param 'class', str 'double' (by default) or 'single' to select the scalar type used for the Faust generated.
 %>
 %> @retval F a random butterfly support Faust.
+%>
+%> @b See also: matfaust.fact.butterfly, matfaust.rand_butterfly, matfaust.dft.
 %====================================
 function F = rand_butterfly(n, varargin)
     import matfaust.dft

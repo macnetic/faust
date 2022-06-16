@@ -1,5 +1,5 @@
 %==========================================================================================
-%> @brief Constructs a Faust implementing the Walsh-Hadamard Transform of order n.
+%> @brief Constructs a Faust implementing the Walsh-Hadamard Transform (WHT) of order n.
 %>
 %> The resulting Faust has log2(n) sparse factors of order n, each one having 2 nonzeros
 %> per row and per column.
@@ -10,7 +10,7 @@
 %> &nbsp;&nbsp;&nbsp; @b H = wht(n, 'normed', bool) <br/>
 %> &nbsp;&nbsp;&nbsp; @b H = wht(n, 'normed', bool, 'dev', str) str might be 'cpu' or 'gpu'.
 %>
-%> @param n the power of two exponent for a Hadamard matrix of order n and a factorization into log2(n) factors.
+%> @param n order of the WHT (must be a power of two).
 %> @param 'normed',bool: (optional) true (by default) to normalize the returned Faust as if Faust.normalize() was called, false otherwise.
 %> @param 'dev',str: (optional) 'cpu' to create a CPU Faust (default choice) and 'gpu' for a GPU Faust.
 %> @param 'dtype', str: (optional) 'double' (default choice) or 'float' to select the scalar type of the generated Faust.
@@ -40,6 +40,7 @@
 %>- FACTOR 8 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
 %>- FACTOR 9 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
 %>
+%> @b See also: hadamard, matfaust.dft, matfaust.rand_butterfly, matfaust.fact.butterfly
 %==========================================================================================
 function H = wht(n, varargin)
 	% check n (must be integer > 0)

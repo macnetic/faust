@@ -1,11 +1,12 @@
 %==========================================================================================
-%> @brief Constructs a Faust whose the full matrix is the Discrete Fourier Transform square matrix of order n.
+%> @brief Constructs a Faust F implementing the Discrete Fourier Transform (DFT) order n.
 %>
 %> The factorization algorithm used is Cooley-Tukey (FFT).
 %>
-%> The resulting Faust is complex and has log2(n)+1 sparse factors whose the log2(n) first
-%> have 2 nonzeros per row and per column. The last factor is a permutation matrix.
-%>
+%> The factorization corresponds to the butterfly structure of the Cooley-Tukey
+%> FFT algorithm. The resulting Faust is complex and has (log2(n)+1) sparse
+%> factors whose the log2(n) first has 2 nonzeros per row and per column. The
+%> last factor is a bit-reversal permutation matrix.
 %>
 %> @b Usage
 %>
@@ -42,6 +43,8 @@
 %> - FACTOR 8 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
 %> - FACTOR 9 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
 %> - FACTOR 10 (complex) SPARSE, size 1024x1024, density 0.000976562, nnz 1024
+%>
+%> @b see also: bitrev_perm, matfaust.wht, matfaust.dct, matfaust.dst, fft, matfaust.rand_butterfly, matfaust.fact.butterfly
 %==========================================================================================
 function F = dft(n, varargin)
 	% check n (must be integer > 0)
