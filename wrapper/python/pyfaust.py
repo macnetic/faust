@@ -3982,8 +3982,7 @@ def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
 
 def rand_butterfly(n, dtype='double', dev='cpu'):
     """
-    Constructs a Faust corresponding to the product of log2(n) square factors of
-    size n with butterfly supports and random nonzero coefficients.
+    Constructs a Faust corresponding to the product of log2(n) square factors of size n with butterfly supports and random nonzero coefficients.
 
     The random coefficients are drawn i.i.d. according to a standard Gaussian
     (real or complex circular according to the type).
