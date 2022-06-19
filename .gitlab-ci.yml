@@ -288,7 +288,7 @@ pkg_macos_release:
       - job: pkg_macos_purepy_release
         artifacts: true
 
-pkg_win_release:
+.pkg_win_release:
     variables: {BUILD_CONFIG: "Release", GIT_SUBMODULE_STRATEGY: recursive}
     stage: pkg
     <<: *win_build_gpu_mod
@@ -386,12 +386,13 @@ pages:
         - mkdir -p ../public/packages
         - ../gen_doc/gen_pkg_dl_page.sh $CI_COMMIT_TAG # download.html generated
         - mv download.html ../public/packages/
-        - mv *.pkg *.rpm *.deb *.exe ../public/packages/
+          #- mv *.pkg *.rpm *.deb *.exe ../public/packages/
+        - mv *.pkg *.rpm *.deb  ../public/packages/
     needs:
       - job: pkg_macos_release
         artifacts: true
-      - job: pkg_win_release
-        artifacts: true
+        #- job: pkg_win_release
+        #artifacts: true
       - job: pkg_linux_release
         artifacts: true
       - job: pkg_linux_release_static
@@ -632,7 +633,7 @@ pkg_win_purepy_rev:
     needs:
         - job: ctest_python
 
-pkg_win_purepy_release:
+.pkg_win_purepy_release:
     extends: .pkg_win_purepy
     variables: {BUILD_CONFIG: "Release", GIT_SUBMODULE_STRATEGY: recursive, EXPERIMENTAL_PKG: "OFF", WIN_PY_VER: '3.9'}
     before_script:
@@ -642,7 +643,7 @@ pkg_win_purepy_release:
     only:
         - tags
 
-pkg_win_purepy_release_extra_pyver:
+.pkg_win_purepy_release_extra_pyver:
     extends: .pkg_win_purepy
     variables: {BUILD_CONFIG: "Release", GIT_SUBMODULE_STRATEGY: recursive, EXPERIMENTAL_PKG: "OFF", WIN_PY_VER: '3.10'}
     before_script:
@@ -779,33 +780,33 @@ test_nux_openblaso_purepy_release:
   tags:
     - linux
 
-test_win_purepy_pkg:
-  variables: {JOB_PYTHON: 'py', WIN_PY_VER: '3.9'}
-  stage: pkg_test
-  script:
-    - 'cd build\wrapper\python\dist'
-    - 'dir /B pyfaust*.whl > pkg_name.txt'
-    - 'set /p PKG_NAME=<pkg_name.txt'
-    - '%JOB_PYTHON% -%WIN_PY_VER% -m venv test_pyfaust-%CI_COMMIT_TAG%'
-    - 'call test_pyfaust-%CI_COMMIT_TAG%\Scripts\activate'
-    - python -m pip install %PKG_NAME%
-    - python -c "import pyfaust; print(pyfaust.version()); print(pyfaust.rand(5,5).toarray());"
-    - python -c "import pyfaust.tests; pyfaust.tests.run_tests(\"cpu\", \"double\")"
-    - python -c "import pyfaust.tests; pyfaust.tests.run_tests(\"cpu\", \"float32\")"
-  needs:
-    - job: pkg_win_purepy_release
-      artifacts: true
-  only:
-    - tags
-  tags:
-    - win10
-
-test_win_purepy_pkg_extra_pyver:
-  extends: test_win_purepy_pkg
-  variables: {JOB_PYTHON: 'py', WIN_PY_VER: '3.10'}
-  needs:
-    - job: pkg_win_purepy_release_extra_pyver
-      artifacts: true
+#.test_win_purepy_pkg:
+#  variables: {JOB_PYTHON: 'py', WIN_PY_VER: '3.9'}
+#  stage: pkg_test
+#  script:
+#    - 'cd build\wrapper\python\dist'
+#    - 'dir /B pyfaust*.whl > pkg_name.txt'
+#    - 'set /p PKG_NAME=<pkg_name.txt'
+#    - '%JOB_PYTHON% -%WIN_PY_VER% -m venv test_pyfaust-%CI_COMMIT_TAG%'
+#    - 'call test_pyfaust-%CI_COMMIT_TAG%\Scripts\activate'
+#    - python -m pip install %PKG_NAME%
+#    - python -c "import pyfaust; print(pyfaust.version()); print(pyfaust.rand(5,5).toarray());"
+#    - python -c "import pyfaust.tests; pyfaust.tests.run_tests(\"cpu\", \"double\")"
+#    - python -c "import pyfaust.tests; pyfaust.tests.run_tests(\"cpu\", \"float32\")"
+#  needs:
+#    - job: pkg_win_purepy_release
+#      artifacts: true
+#  only:
+#    - tags
+#  tags:
+#    - win10
+#
+#.test_win_purepy_pkg_extra_pyver:
+#  extends: test_win_purepy_pkg
+#  variables: {JOB_PYTHON: 'py', WIN_PY_VER: '3.10'}
+#  needs:
+#    - job: pkg_win_purepy_release_extra_pyver
+#      artifacts: true
 
 pypi_pub:
   stage: pkg_pub
@@ -830,18 +831,18 @@ pypi_pub:
       artifacts: true
     - job: pkg_linux_purepy_release_openblaso
       artifacts: true
-    - job: pkg_win_purepy_release
-      artifacts: true
-    - job: pkg_win_purepy_release_extra_pyver
-      artifacts: true
+#    - job: pkg_win_purepy_release
+#      artifacts: true
+#    - job: pkg_win_purepy_release_extra_pyver
+#      artifacts: true
     - job: pkg_macos_purepy_release_extra_pyver
       artifacts: true
     - job: test_nux_purepy_release
     - job: test_nux_purepy_release_extra_pyver
-    - job: test_win_purepy_pkg
+      #    - job: test_win_purepy_pkg
     - job: test_macos_purepy_release
     - job: test_macos_purepy_release_extra_pyver
-    - job: test_win_purepy_pkg_extra_pyver
+      #- job: test_win_purepy_pkg_extra_pyver
     - job: test_linux_pkg_release # all the packages for this version must be OK to have a go on pypi upload
     - job: test_macos_pkg_release
     - job: test_nux_openblaso_purepy_release
@@ -882,7 +883,7 @@ conda_linux_pub:
     - job: pypi_pub
       artifacts: false
 
-conda_win_pub:
+.conda_win_pub:
   stage: conda_pkgs
   script:
     - start /wait git-bash -c "misc/continuous_integration/conda_pkg/conda_build_upload_pyfaust.sh win 3.9 misc/continuous_integration/conda_pkg/meta.yaml.in"
