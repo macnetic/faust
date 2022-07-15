@@ -331,6 +331,7 @@ configure_file(${PROJECT_SOURCE_DIR}/license.txt ${FAUST_PYTHON_BIN_DIR}/pyfaust
 configure_file(${PROJECT_SOURCE_DIR}/license_matio.txt ${FAUST_PYTHON_BIN_DIR}/pyfaust/license_matio.txt COPYONLY)
 configure_file(${PROJECT_SOURCE_DIR}/license_hdf5.txt ${FAUST_PYTHON_BIN_DIR}/pyfaust/license_hdf5.txt COPYONLY)
 configure_file(${PROJECT_SOURCE_DIR}/license_zlib.txt ${FAUST_PYTHON_BIN_DIR}/pyfaust/license_zlib.txt COPYONLY)
+configure_file(${PROJECT_SOURCE_DIR}/license_scipy.txt ${FAUST_PYTHON_BIN_DIR}/pyfaust/license_scipy.txt COPYONLY)
 if(USE_OPENBLASO)
 	configure_file(${PROJECT_SOURCE_DIR}/license_openblas.txt ${FAUST_PYTHON_BIN_DIR}/pyfaust/license_openblas.txt COPYONLY)
 endif()
