@@ -1,0 +1,36 @@
+#include "faust_TransformHelper.h"
+#include "faust_prod_opt.h"
+#include <cstdlib>
+#include <ctime>
+
+typedef @TEST_FPP@ FPP;
+using namespace Faust;
+
+int main()
+{
+	srand(time(NULL));
+	unsigned int min_num_factors = 2;
+	unsigned int max_num_factors = 10;
+	unsigned int min_dim_size = 10;
+	unsigned int max_dim_size = 1024;
+	float density = .5f;
+	bool per_row = true;
+	auto F = TransformHelper<FPP, Cpu>::randFaust(MIXED, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
+	//TODO: fix always two factors
+	F->display();
+	// convert the Faust to a vector of matrices
+	std::vector<MatGeneric<FPP, Cpu>*> data(F->begin(), F->end());
+//	for(auto f: data)
+//		f->Display();
+//		MatDense<FPP, Cpu> dynprog_multiply(std::vector<MatGeneric<FPP, Cpu>*>& factors, const char op/*='N'*/, const MatGeneric<FPP, Cpu>* A/*=nullptr*/)
+	auto res_mat = dynprog_multiply(data);
+	auto ref_mat = F->get_product();
+
+	auto test_mat = ref_mat;
+	test_mat -= res_mat;
+	auto re = test_mat.norm() / ref_mat.norm();
+	std::cout << "rel. err of test_mat vs ref_mat: " <<  re << std::endl;
+	assert(re < 1e-4);
+
+	return EXIT_SUCCESS;
+}
