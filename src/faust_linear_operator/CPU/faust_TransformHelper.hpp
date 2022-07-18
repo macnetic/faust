@@ -1437,7 +1437,7 @@ template<typename FPP>
 			TransformHelper<FPP,Cpu>::seed_init = true;
 		}
 		// pick randomly the number of factors into {min_num_factors, ..., max_num_factors}
-		std::uniform_int_distribution<int> num_fac_distr(min_num_factors, max_num_factors);
+		std::uniform_int_distribution<unsigned int> num_fac_distr(min_num_factors, max_num_factors);
 		if(min_dim_size > max_dim_size)
 		{
 			tmp = min_dim_size;
@@ -1446,6 +1446,7 @@ template<typename FPP>
 		}
 		std::uniform_int_distribution<int> dim_distr(min_dim_size, max_dim_size);
 		std::uniform_int_distribution<int> bin_distr(0,1);
+		num_fac_distr(generator); // workaround to always the same first number of factors even if srand is called before
 		unsigned int num_factors = num_fac_distr(generator);
 		// create factors randomly respecting the RandFaustType asked and dims interval
 		std::vector<MatGeneric<FPP,Cpu>*> factors((size_t) num_factors);
