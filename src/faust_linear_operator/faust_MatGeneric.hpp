@@ -200,6 +200,7 @@ std::string Faust::MatGeneric<FPP,DEVICE>::to_string(int32_t nrows, int32_t ncol
 	str << ", density "<< density <<", nnz "<< nnz; 
 	if(type == BSR)
 		str <<  " (nnz blocks: " << dynamic_cast<const MatBSR<FPP, Cpu>*>(this)->getNBlocks() << ")";
+	str << ", addr: " << this;
 	str <<std::endl;
 	if (is_identity)
 		str <<" identity matrix flag" << std::endl;
