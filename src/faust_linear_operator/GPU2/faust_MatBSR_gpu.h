@@ -51,7 +51,10 @@ namespace Faust
 
 			/*********** MatGeneric member functions **************/
 			void setZeros();
+			size_t getNbBlockRow() const;
+			size_t getNbBlockCol() const;
 			size_t getNBytes() const;
+			size_t getNBlocks() const;
 			MatType getType() const;
 			int32_t getNbRow() const;
 			int32_t getNbCol() const;

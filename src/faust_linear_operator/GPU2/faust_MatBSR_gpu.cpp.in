@@ -77,6 +77,28 @@ namespace Faust
 		}
 
 	template<>
+		size_t MatBSR<@FAUST_SCALAR_FOR_GM@, GPU2>::getNbBlockRow() const
+		{
+			auto bsr_funcs = GPUModHandler::get_singleton()->bsr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			return bsr_funcs->get_bnrows(gpu_mat);
+		}
+
+	template<>
+		size_t MatBSR<@FAUST_SCALAR_FOR_GM@, GPU2>::getNbBlockCol() const
+		{
+			auto bsr_funcs = GPUModHandler::get_singleton()->bsr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			return bsr_funcs->get_bncols(gpu_mat);
+		}
+
+	template<>
+		size_t MatBSR<@FAUST_SCALAR_FOR_GM@, GPU2>::getNBlocks() const
+		{
+			auto bsr_funcs = GPUModHandler::get_singleton()->bsr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			return bsr_funcs->get_bnnz(gpu_mat);
+		}
+
+
+	template<>
 		int32_t MatBSR<@FAUST_SCALAR_FOR_GM@, GPU2>::getDevice() const
 		{
 			auto bsr_funcs = GPUModHandler::get_singleton()->bsr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
