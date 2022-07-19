@@ -9,6 +9,7 @@ using namespace Faust;
 
 int main()
 {
+	Faust::enable_gpu_mod();
 	unsigned int min_num_factors = 2;
 	unsigned int max_num_factors = 10;
 	unsigned int min_dim_size = 10;
