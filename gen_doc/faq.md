@@ -522,15 +522,17 @@ FAµST wrappers GPU API needs CUDA 9 (or 11) to work. To install this toolkit yo
 
 **Note**: it's recommended to install the most recent version of CUDA 11 (instead of CUDA 9).
 
+\anchor cuda_two
+
 ## 3.2 How do I need to configure the CUDA 9 / 11 installer on Windows 10?
 
-After downloading the installer throug one link given in question 3.1, you can launch it to start the install. You shall see several panels during the process, they are listed below with the options you should select.
+After downloading the installer through one link given in 3.1, you can launch it to start the install. You shall see several panels during the process, they are listed below with the options you should select.
 
 Of course the CUDA 9 / 11 will work only if you have a NVIDIA card fully installed with its approriate driver compatible to CUDA 9 / 11 (however the CUDA installer proposes to install the driver).
 
-Panel 1: system verification (nothing special to do).
-Panel 2: user license (you must accept to continue).
-Panel 3: Installation Options: choose "advanced"/"personalised".
+Panel 1: System Check (nothing special to do).  
+Panel 2: License Agreement (you must accept to continue).  
+Panel 3: Installation Options: choose "custom (Advanced)".  
 
 In the option panel:
 - Disable ``Driver components`` and ``Other components`` (however note that you must have installed/updated your NVIDIA card driver).
@@ -538,7 +540,7 @@ In the option panel:
 - In ``CUDA > Runtime`` disable ``Demo Suite`` and keep ``CUDART``, ``CUBLAS`` and ``CUSPARSE`` in ``Libraries``.
 - In ``CUDA > Development > Compiler > Libraries``: keep enabled ``CUBLAS`` and ``CUSPARSE``.
 - In ``CUDA > Development > Complier``: keep ``nvcc`` disable others.
-- In ``CUDA > Tools``: disable all.
+- In ``CUDA > Development > Tools``: disable all.
 
 Continue to the last panel and finish the install.
 
