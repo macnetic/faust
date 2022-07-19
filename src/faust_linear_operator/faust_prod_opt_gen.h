@@ -5,8 +5,8 @@ namespace Faust
 	/**
 	 * Multipy the matrix chain "factors" using the dynamic programming method to determine the order (parenthesis positions) in the product (reducing the computation cost).
 	 */
-	template<typename FPP>
-		MatDense<FPP, Cpu> dynprog_multiply(std::vector<MatGeneric<FPP, Cpu>*>& factors, const char op='N', const MatGeneric<FPP, Cpu>* A=nullptr);
+	template<typename FPP, FDevice DEV>
+		MatDense<FPP, DEV> dynprog_multiply(std::vector<MatGeneric<FPP, DEV>*>& factors, const char op='N', const MatGeneric<FPP, DEV>* A=nullptr);
 
 
 	int cost_bsr_dense(int A_bnnz, int A_bm, int A_bn, int B_nrows, int B_ncols, bool B_transp);

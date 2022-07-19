@@ -1,7 +1,10 @@
+#ifdef USE_GPU_MOD
+#include "faust_linear_algebra_gpu.h"
+#endif
 namespace Faust
 {
-	template<typename FPP>
-		MatGeneric<FPP, Cpu>* dynprog_multiply_rec(const std::vector<MatGeneric<FPP, Cpu>*>& factors, int** inds, int i, int j, const char op='N', const char last_op='N')
+	template<typename FPP, FDevice DEV>
+		MatGeneric<FPP, DEV>* dynprog_multiply_rec(const std::vector<MatGeneric<FPP, DEV>*>& factors, int** inds, int i, int j, const char op='N', const char last_op='N')
 		{
 			int j_minus_i = j-i;
 			int p_nrows, p_ncols; // prod numbers rows, cols
@@ -24,7 +27,7 @@ namespace Faust
 					p_ncols = factors[j]->getNbCol();
 				else
 					p_ncols = factors[j]->getNbRow();
-				auto prod = new MatDense<FPP, Cpu>(p_nrows, p_ncols);
+				auto prod = new MatDense<FPP, DEV>(p_nrows, p_ncols);
 //				std::cout << factors[i]->getNbRow() << "x" << factors[i]->getNbCol() << "*" << factors[j]->getNbRow() << "x" << factors[j]->getNbCol() << std::endl;
 				gemm_gen(*factors[i], *factors[j], *prod, (FPP)1.0, (FPP)0.0, op_left, op_right);
 				return prod;
@@ -59,7 +62,7 @@ namespace Faust
 				else
 					p_ncols = prod2->getNbRow();
 
-				auto prod12 = new MatDense<FPP, Cpu>(p_nrows, p_ncols);
+				auto prod12 = new MatDense<FPP, DEV>(p_nrows, p_ncols);
 //				std::cout << prod1->getNbRow() << "x" << prod1->getNbCol() << "*" << prod2->getNbRow() << "x" << prod2->getNbCol() << std::endl;
 				gemm_gen(*prod1, *prod2, *prod12, FPP(1.0), FPP(0.0), op_left, op_right);
 				//TODO/ verify if a memory leak exists
@@ -73,13 +76,13 @@ namespace Faust
 		}
 
 
-	template<typename FPP>
-		MatDense<FPP, Cpu> dynprog_multiply(std::vector<MatGeneric<FPP, Cpu>*>& factors, const char op/*='N'*/, const MatGeneric<FPP, Cpu>* A/*=nullptr*/)
+	template<typename FPP, FDevice DEV>
+		MatDense<FPP, DEV> dynprog_multiply(std::vector<MatGeneric<FPP, DEV>*>& factors, const char op/*='N'*/, const MatGeneric<FPP, DEV>* A/*=nullptr*/)
 		{
 			// manage useless cases when factors.size is too small
 			if(factors.size() == 1)
 			{
-				MatDense<FPP, Cpu> P;
+				MatDense<FPP, DEV> P;
 				if(A != nullptr)
 				{
 					gemm_gen(*factors[0], *A, P, (FPP)1.0, (FPP)0.0, op, 'N');
@@ -87,27 +90,27 @@ namespace Faust
 				}
 				else
 				{
-					auto sp_mat = dynamic_cast<MatSparse<FPP, Cpu>*>(factors[0]);
+					auto sp_mat = dynamic_cast<MatSparse<FPP, DEV>*>(factors[0]);
 					if(sp_mat)
-						return MatDense<FPP,Cpu>(*sp_mat);
+						return MatDense<FPP,DEV>(*sp_mat);
 					else
-						*dynamic_cast<MatDense<FPP, Cpu>*>(factors[0]);
+						*dynamic_cast<MatDense<FPP, DEV>*>(factors[0]);
 				}
 			}
 			char last_op = op;
 			if(A != nullptr)
 			{
-				factors.push_back(const_cast<MatGeneric<FPP, Cpu>*>(A)); // A won't be touched
+				factors.push_back(const_cast<MatGeneric<FPP, DEV>*>(A)); // A won't be touched
 				last_op = 'N';
 			}
 			// this function initializes a triplet of boolean depending on fac concrete type (MatDense, MatSparse or MatBSR)
-			auto init_fac_type_bools = [](const MatGeneric<FPP, Cpu>* fac, bool& fac_dense, bool &fac_sparse, bool &fac_bsr)
+			auto init_fac_type_bools = [](const MatGeneric<FPP, DEV>* fac, bool& fac_dense, bool &fac_sparse, bool &fac_bsr)
 			{
 				fac_dense = fac_sparse = fac_bsr = false;
 				std::runtime_error et("dynprog_multiply error: non-supported matrix type (only MatDense, MatSparse, MatBSR are)");
-				if(! (fac_dense = dynamic_cast<const MatDense<FPP, Cpu>*>(fac)))
-					if(! (fac_sparse = dynamic_cast<const MatSparse<FPP, Cpu>*>(fac)))
-						if(! (fac_bsr = dynamic_cast<const MatBSR<FPP, Cpu>*>(fac)))
+				if(! (fac_dense = dynamic_cast<const MatDense<FPP, DEV>*>(fac)))
+					if(! (fac_sparse = dynamic_cast<const MatSparse<FPP, DEV>*>(fac)))
+						if(! (fac_bsr = dynamic_cast<const MatBSR<FPP, DEV>*>(fac)))
 							throw et;
 			};
 			const int n = factors.size();
@@ -115,7 +118,7 @@ namespace Faust
 			int** inds = new int*[n]; // TODO: idem
 			int j, k, cost;
 			int c_i, c_j;
-			MatBSR<FPP, Cpu> *lf_bsr_mat, *rf_bsr_mat;
+			MatBSR<FPP, DEV> *lf_bsr_mat, *rf_bsr_mat;
 			for(int i=0;i<n;i++)
 			{
 				c[i] = new int[n];
@@ -148,8 +151,8 @@ namespace Faust
 						auto mf_nrows = factors[k]->getNbRow();
 						auto mf_ncols = factors[k]->getNbCol();
 
-						if(lf_bsr) lf_bsr_mat = dynamic_cast<MatBSR<FPP,Cpu>*>(factors[i]);
-						if(rf_bsr) rf_bsr_mat = dynamic_cast<MatBSR<FPP,Cpu>*>(factors[j]);
+						if(lf_bsr) lf_bsr_mat = dynamic_cast<MatBSR<FPP,DEV>*>(factors[i]);
+						if(rf_bsr) rf_bsr_mat = dynamic_cast<MatBSR<FPP,DEV>*>(factors[j]);
 						if(lf_dense && rf_dense)
 							// left and right factors are dense matrices
 							cost += cost_dense_dense(lf_nrows, mf_ncols, rf_nrows, rf_ncols, op != 'N' && rf_init); // no need to consider op for product resulting dense matrices
@@ -182,7 +185,7 @@ namespace Faust
 						k++;
 					}
 				}
-			auto prod = dynamic_cast<MatDense<FPP, Cpu>*>(dynprog_multiply_rec(factors, inds, 0, n-1, op, last_op));
+			auto prod = dynamic_cast<MatDense<FPP, DEV>*>(dynprog_multiply_rec(factors, inds, 0, n-1, op, last_op));
 			for(int i=0;i<n;i++)
 			{
 				delete[] c[i];
