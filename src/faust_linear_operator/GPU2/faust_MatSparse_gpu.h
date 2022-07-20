@@ -101,6 +101,7 @@ namespace Faust
 				MatType getType() const;
 				void multiply(Vect<FPP,GPU2>& vec, char opThis='N') const;
 				void multiply(MatDense<FPP,GPU2>& vec, char opThis='N') const;
+				static void spgemm(const MatSparse<FPP,GPU2> & A, const MatDense<FPP,GPU2> & B, MatDense<FPP,GPU2> & C, const FPP & alpha, const FPP & beta, const char opA, const char opB);
 				MatBSR<FPP, GPU2> to_bsr(int bsize) const;
 				~MatSparse();
 

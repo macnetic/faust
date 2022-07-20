@@ -262,9 +262,9 @@ template<typename FPP>
 void Faust::spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB)
 {
 	//TODO: refactoring should be done to avoid repeating similar block of code for different cases (typeA,typeB,alpha,beta)
-//#ifdef __COMPILE_TIMERS__
-//	A.t_gemm.start();
-//#endif
+	//#ifdef __COMPILE_TIMERS__
+	//	A.t_gemm.start();
+	//#endif
 	faust_unsigned_int nbRowOpA,nbRowOpB,nbColOpA,nbColOpB;
 
 	if (((&(C.mat)) == (&(B.mat))))
@@ -309,7 +309,7 @@ void Faust::spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP
 		handleError("linear_algebra", "Faust::spgemm : invalid dimension for output matrix C");
 	}
 
-        C.resize(nbRowOpA,nbColOpB);
+	C.resize(nbRowOpA,nbColOpB);
 
 
 
@@ -453,9 +453,9 @@ void Faust::spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP
 	}
 	C.isZeros = false;
 	C.set_id(false);
-//#ifdef __COMPILE_TIMERS__
-//A.t_gemm.stop();
-//#endif
+	//#ifdef __COMPILE_TIMERS__
+	//A.t_gemm.stop();
+	//#endif
 }
 
 template<typename FPP>
@@ -905,6 +905,7 @@ namespace Faust
 {
 	template<typename FPP> void gemm_gen(const MatGeneric<FPP, Cpu>& A, const MatGeneric<FPP, Cpu>& B, MatDense<FPP, Cpu>& out, const FPP alpha/*=FPP(1.0)*/, const FPP beta/*=(0.0)*/, const char opA/*='N'*/, const char opB/*='N'*/)
 	{
+		//TODO: refactor this function with at least 3 new functions gemm_spA, gemm_dsA, gemm_bsrA
 		std::runtime_error type_err("faust_linear_algebra mul function doesn't handle other type of factors than MatDense, MatSparse or MatBSR.");
 		if(opA != 'N' && opA != 'T' && opA != 'H')
 			throw std::runtime_error("opA must be among 'N', 'T', 'H'");

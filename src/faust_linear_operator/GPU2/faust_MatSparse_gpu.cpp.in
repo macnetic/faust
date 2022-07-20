@@ -485,6 +485,22 @@ namespace Faust
 			mat.gpu_mat = gpu_dmat;
 		}
 
+
+	template<>
+	void MatSparse<FSFG, GPU2>::spgemm(const MatSparse<FSFG,GPU2> & A, const MatDense<FSFG,GPU2> & B, MatDense<FSFG,GPU2> & C, const FSFG & alpha, const FSFG & beta, char opA, char opB)
+	{
+		gm_Op gop_A;
+		gm_Op gop_B;
+		char2gm_Op(opA, gop_A);
+		char2gm_Op(opB, gop_B);
+		auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+		auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+		spm_funcs->gemm(A.gpu_mat, B.gpu_mat, C.gpu_mat,
+				(const @GM_SCALAR@*) reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&alpha),
+				(const @GM_SCALAR@*) reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&beta),
+				gop_A, gop_B);
+	}
+
 	template<>
 		size_t Faust::MatSparse<FSFG,GPU2>::getNBytes() const
 		{
