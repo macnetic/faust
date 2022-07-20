@@ -112,9 +112,22 @@ namespace Faust
 			char2gm_Op(opThis, gop_this);
 			auto bsr_funcs = GPUModHandler::get_singleton()->bsr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
-			auto gpu_dmat = bsr_funcs->mul_gpu_dsm_ext(gpu_mat, M.gpu_mat, nullptr, gop_this, OP_NOTRANSP);
+			auto gpu_dmat = bsr_funcs->mul_gpu_dsm_ext(gpu_mat, M.gpu_mat, nullptr, gop_this, OP_NOTRANSP, /*alpha*/ nullptr, /*beta*/ nullptr);
 			dsm_funcs->free(M.get_gpu_mat_ptr());
 			M.gpu_mat = gpu_dmat;
+		}
+
+	template<>
+		void MatBSR<@FAUST_SCALAR_FOR_GM@,GPU2>::bsrgemm(const MatBSR<@FAUST_SCALAR_FOR_GM@,GPU2>& A, const MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>& B, MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>& C, const @FAUST_SCALAR_FOR_GM@& alpha, const @FAUST_SCALAR_FOR_GM@& beta, const char opA/*='N'*/, const char opB /*= 'N'*/)
+		{
+			gm_Op gop_A;
+			gm_Op gop_B;
+			char2gm_Op(opA, gop_A);
+			char2gm_Op(opB, gop_B);
+			auto bsr_funcs = GPUModHandler::get_singleton()->bsr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			auto gpu_dmat = bsr_funcs->mul_gpu_dsm_ext(A.gpu_mat, B.gpu_mat, C.gpu_mat, gop_A, gop_B, (const @GM_SCALAR@*) reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&alpha), (const @GM_SCALAR@*) reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&beta));
+			dsm_funcs->free(C.get_gpu_mat_ptr());
 		}
 
 	template<>
@@ -125,7 +138,7 @@ namespace Faust
 			auto bsr_funcs = GPUModHandler::get_singleton()->bsr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 			// the backend code is specialized for vector (the number of columns is tested to call another function, see gpu_mod)
-			auto gpu_dmat = bsr_funcs->mul_gpu_dsm_ext(gpu_mat, vec.gpu_mat, nullptr, gop_this, OP_NOTRANSP);
+			auto gpu_dmat = bsr_funcs->mul_gpu_dsm_ext(gpu_mat, vec.gpu_mat, nullptr, gop_this, OP_NOTRANSP, nullptr, nullptr);
 			dsm_funcs->free(vec.get_gpu_mat_ptr());
 			vec.gpu_mat = gpu_dmat;
 		}
