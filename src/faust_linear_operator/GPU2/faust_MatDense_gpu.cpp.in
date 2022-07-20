@@ -626,14 +626,9 @@ namespace Faust
 		MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::MatDense(MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>&& mat)
 		{
 			int32_t dev_id = 0;
-			if(this->gpu_mat != nullptr)
-			{
-
-				auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
-				dsm_funcs->free(this->gpu_mat);
-			}
 //			dev_id = mat.getDevice();
 //			auto gp_funcs = GPUModHandler::get_singleton()->gp_funcs();
+			// no need to free this->gpu_mat before assignment, this is not initialized
 			this->gpu_mat = mat.gpu_mat;
 			mat.gpu_mat = nullptr;
 		}
