@@ -17,23 +17,29 @@ int main()
 	float density = .5f;
 	bool per_row = true;
 	auto F = TransformHelper<FPP, GPU2>::randFaust(MIXED, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
-	//TODO: fix always two factors
-	F->display();
-	// convert the Faust to a vector of matrices
-	std::vector<MatGeneric<FPP, GPU2>*> data;
-	for(auto f: *F)
+	auto bF = TransformHelper<FPP, GPU2>::randBSRFaust(/*faust_nrows*/max_dim_size, /*faust_ncols*/max_dim_size, min_num_factors, max_num_factors, /*bnrows*/ min_dim_size/2, /*bncols*/ min_dim_size/2);
+	auto vF = {F, bF};
+	for(auto F: vF)
 	{
-		f->Display();
-		data.push_back(f);
-	}
-	auto res_mat = dynprog_multiply(data);
-	auto ref_mat = F->get_product();
+		//TODO: fix always two factors
+		F->display();
+		// convert the Faust to a vector of matrices
+		std::vector<MatGeneric<FPP, GPU2>*> data;
+		for(auto f: *F)
+		{
+			f->Display();
+			data.push_back(f);
+		}
+		MatDense<FPP, GPU2> res_mat;
+		res_mat = dynprog_multiply(data);
+		auto ref_mat = F->get_product();
 
-	auto test_mat = ref_mat;
-	test_mat -= res_mat;
-	auto re = test_mat.norm() / ref_mat.norm();
-	std::cout << "rel. err of test_mat vs ref_mat: " <<  re << std::endl;
-	assert(re < 1e-4);
+		auto test_mat = ref_mat;
+		test_mat -= res_mat;
+		auto re = test_mat.norm() / ref_mat.norm();
+		std::cout << "rel. err of test_mat vs ref_mat: " <<  re << std::endl;
+		assert(re < 1e-4);
+	}
 
 	return EXIT_SUCCESS;
 }
