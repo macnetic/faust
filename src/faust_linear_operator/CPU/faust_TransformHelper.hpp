@@ -678,20 +678,6 @@ namespace Faust {
 		}
 
 	template<typename FPP>
-		void TransformHelper<FPP,Cpu>::set_FM_mul_mode(const int mul_order_opt_mode, const bool silent /* = true */)
-		{
-			this->mul_order_opt_mode = mul_order_opt_mode;
-			if(! silent)
-			{
-				std::cout << "changed mul. optimization mode to: " << this->mul_order_opt_mode;
-				if(! this->mul_order_opt_mode)
-					std::cout << " (opt. disabled, default mul.)";
-				std::cout << std::endl;
-			}
-
-		}
-
-	template<typename FPP>
 		TransformHelper<FPP, Cpu>* TransformHelper<FPP,Cpu>::multiply(const TransformHelper<FPP, Cpu>* th_right) const
 		{
 			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();

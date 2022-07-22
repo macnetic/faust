@@ -105,6 +105,7 @@ namespace Faust
 			bool is_col_fancy_indexed() {return is_fancy_indexed && fancy_indices[1] != nullptr;}
 			bool is_row_sliced() const {return is_sliced && (slices[0].start_id != 0 || slices[0].end_id != this->getNbRow());}
 			bool is_col_sliced() const {return is_sliced && (slices[1].start_id != 0 || slices[1].end_id != this->getNbCol());}
+			void set_FM_mul_mode(const int mul_order_opt_mode, const bool silent=true);
 			virtual ~TransformHelperGen();
 
 		protected:

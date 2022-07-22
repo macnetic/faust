@@ -111,7 +111,6 @@ namespace Faust
 			//			MatDense<FPP,Cpu> multiply(const MatDense<FPP,Cpu> A) const;
 			virtual MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> &A);
 			virtual void update_total_nnz();
-			void set_FM_mul_mode(const int mul_order_opt_mode, const bool silent=true);
 			virtual MatDense<FPP, Cpu> multiply(const MatSparse<FPP,Cpu> &A);
 
 			virtual TransformHelper<FPP, Cpu>* multiply(const TransformHelper<FPP, Cpu>*) const;

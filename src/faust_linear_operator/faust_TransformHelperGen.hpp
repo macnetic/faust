@@ -727,6 +727,20 @@ namespace Faust
 		}
 
 	template<typename FPP, FDevice DEV>
+		void TransformHelperGen<FPP, DEV>::set_FM_mul_mode(const int mul_order_opt_mode, const bool silent /* = true */)
+		{
+			this->mul_order_opt_mode = mul_order_opt_mode;
+			if(! silent)
+			{
+				std::cout << "changed mul. optimization mode to: " << this->mul_order_opt_mode;
+				if(! this->mul_order_opt_mode)
+					std::cout << " (opt. disabled, default mul.)";
+				std::cout << std::endl;
+			}
+
+		}
+
+	template<typename FPP, FDevice DEV>
 		TransformHelperGen<FPP, DEV>::~TransformHelperGen()
 		{
 			if(fancy_indices[0] != nullptr)
