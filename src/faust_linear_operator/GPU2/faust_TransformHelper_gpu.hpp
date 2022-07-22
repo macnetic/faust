@@ -188,7 +188,16 @@ namespace Faust
         {
 			this->eval_sliced_Transform();
 			this->eval_fancy_idx_Transform();
-            return this->transform->get_product(this->isTransposed2char(), this->is_conjugate);
+			if(this->mul_order_opt_mode == DYNPROG)
+			{
+				std::vector<Faust::MatGeneric<FPP,GPU2>*> data = this->transform->data;
+				if(this->is_transposed)
+					std::reverse(data.begin(), data.end());
+				auto P = std::move(dynprog_multiply(data, this->isTransposed2char()));
+				return P;
+			}
+			else
+				return this->transform->get_product(this->isTransposed2char(), this->is_conjugate);
         }
 
     template<typename FPP>
