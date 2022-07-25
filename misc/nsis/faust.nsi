@@ -107,7 +107,6 @@ Section "" ; no component so name not needed
   ; install gpu mod lib
   CreateDirectory $INSTDIR\lib
   SetOutPath $INSTDIR\lib
-  File @PROJECT_BINARY_DIR@\..\gpu_mod\build-cu9.2\gm-cu9.2.dll
   File @PROJECT_BINARY_DIR@\..\gpu_mod\build-cu11.4\gm-cu11.4.dll
 
   ; install python wrapper
@@ -158,7 +157,6 @@ Section "" ; no component so name not needed
   SetOutPath $2\pyfaust
   File /r @PROJECT_BINARY_DIR@\wrapper\python\pyfaust\*py
   SetOutPath $2\pyfaust\lib
-  File @PROJECT_BINARY_DIR@\..\gpu_mod\build-cu9.2\gm-cu9.2.dll
   File @PROJECT_BINARY_DIR@\..\gpu_mod\build-cu11.4\gm-cu11.4.dll
   ; CreateShortCut pyfaust @PROJECT_BINARY_DIR@\wrapper\python\pyfaust ; tested and it can't be like a linux symlink
   SetOutPath $2
