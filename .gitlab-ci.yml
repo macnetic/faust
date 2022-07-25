@@ -144,15 +144,6 @@ pkg_macos:
           #- cmake -G "MinGW Makefiles" -DCMAKE_CUDA_COMPILER="E:/NVIDIA GPU Computing Toolkit/CUDA/v9.2/bin/nvcc.exe" .. #-DCUDA_HOST_COMPILER="E:/TDM-GCC-64/bin/g++.exe" ..
         - cmake --build . --config %BUILD_CONFIG%
         - move %BUILD_CONFIG%\gm.dll .
-        - cd ..
-        - set CUDA_PATH=%CUDA_PATH_V9_2%
-        - set CUDA_PATH_V11_4=
-        - if NOT EXIST build-cu9.2 (mkdir build-cu9.2) else (rmdir /S /Q build-cu9.2 & mkdir build-cu9.2)
-        - cd build-cu9.2
-        - cmake -G "Visual Studio 14 Win64" ..
-          #- cmake -G "MinGW Makefiles" -DCMAKE_CUDA_COMPILER="E:/NVIDIA GPU Computing Toolkit/CUDA/v9.2/bin/nvcc.exe" .. #-DCUDA_HOST_COMPILER="E:/TDM-GCC-64/bin/g++.exe" ..
-        - cmake --build . --config %BUILD_CONFIG%
-        - move %BUILD_CONFIG%\gm.dll .
         - cd ..\..
 
 pkg_win:
@@ -585,20 +576,11 @@ pkg_linux_purepy_release_openblaso:
           #- cmake -G "MinGW Makefiles" -DCMAKE_CUDA_COMPILER="E:/NVIDIA GPU Computing Toolkit/CUDA/v9.2/bin/nvcc.exe" .. #-DCUDA_HOST_COMPILER="E:/TDM-GCC-64/bin/g++.exe" ..
         - cmake --build . --config %BUILD_CONFIG%
         - move %BUILD_CONFIG%\gm.dll .
-        - cd ..
-        - set CUDA_PATH=%CUDA_PATH_V9_2%
-        - set CUDA_PATH_V11_4=
-        - if NOT EXIST build-cu9.2 (mkdir build-cu9.2) else (rmdir /S /Q build-cu9.2 & mkdir build-cu9.2)
-        - cd build-cu9.2
-        - cmake -G "Visual Studio 14 Win64" ..
-          #- cmake -G "MinGW Makefiles" -DCMAKE_CUDA_COMPILER="E:/NVIDIA GPU Computing Toolkit/CUDA/v9.2/bin/nvcc.exe" .. #-DCUDA_HOST_COMPILER="E:/TDM-GCC-64/bin/g++.exe" ..
-        - cmake --build . --config %BUILD_CONFIG%
-        - move %BUILD_CONFIG%\gm.dll .
         - cd ..\..
         - if NOT EXIST build (mkdir build) else (rmdir /S /Q build & mkdir build)
         - cd build
         - 'cmake -G "Visual Studio 14 2015" -DBUILD_WRAPPER_MATLAB=OFF -DBUILD_WRAPPER_PYTHON=ON -DSLOW_TESTS=OFF -DCPACK_PACKAGE_VERSION=%VERSION% -DCMAKE_INSTALL_PREFIX=win_pkg_build -DBUILD_TESTING=OFF  -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH="C:/Users/faust/Downloads/matio-1.5.13/visual_studio/x64/Release/libmatio.lib" -DZ_STATIC_LIB_PATH="C:/Users/faust/Downloads/zlib-1.2.11/contrib/vstudio/vc14/x64/ZlibStatDebug/zlibstat.lib" -DHDF5_STATIC_LIB_PATH="C:/Users/faust/Downloads/hdf5-1.10.3/build/bin/Release/libhdf5.lib" -DREMOTE_DATA_URL="%DURL%" -DREMOTE_DATA_FILE="%DFILE%" -DEXPERIMENTAL_PKG=%EXPERIMENTAL_PKG% -DUSE_GPU_MOD=ON  -DCMAKE_PREFIX_PATH=../gpu_mod -DBUILD_MULTITHREAD=ON -DBUILD_FLOAT_PYX=ON ..'
-          # explicitely configure distutils (to use the VS configuration we'll tell in next bat script) because by default it uses the most recent VS version but we need to use VS 2015 (because libmatio etc. are compiled with this version)
+          # explicitly configure distutils (to use the VS configuration we'll tell in next bat script) because by default it uses the most recent VS version but we need to use VS 2015 (because libmatio etc. are compiled with this version)
         - set DISTUTILS_USE_SDK=1
         - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\vcvarsx86_amd64.bat"
         #- make

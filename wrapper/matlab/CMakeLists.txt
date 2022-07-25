@@ -105,7 +105,7 @@ endforeach()
 file(GLOB CPP_MEXTOOLS_FILES "${FAUST_MATLAB_TOOLS_SRC_DIR}/*.cpp")
 include_directories(${FAUST_MATLAB_TOOLS_SRC_DIR} ${MATLAB_INCLUDE_DIR})
 if(USE_GPU_MOD)
-	include_directories(${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR} ${GPU_MOD_INCLUDE_DIR} ${GPU_MOD_INCLUDE_DIR}/../build-cu9.2)
+	include_directories(${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR} ${GPU_MOD_INCLUDE_DIR} ${GPU_MOD_INCLUDE_DIR}/../build-cu11.4)
 endif()
 add_library(${FAUST_MEXTOOLS_TARGET} OBJECT ${CPP_MEXTOOLS_FILES})
 target_compile_definitions(${FAUST_MEXTOOLS_TARGET} PRIVATE MATLAB_DEFAULT_RELEASE=R2018a) #R2017b) # for complex (deprecated) separate complex API

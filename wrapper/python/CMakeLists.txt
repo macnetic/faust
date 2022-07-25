@@ -57,7 +57,6 @@ else() # in fact this is only for WIN32 MINGW
 	string(REGEX REPLACE "^lib" "" MATIO_LIB_NAME ${MATIO_LIB_NAME})
 	set(FAUST_PYTHON_LIBS "${FAUST_PYTHON_LIBS},'${MATIO_LIB_NAME}'")
 	set(FAUST_PYTHON_LIB_DIR "${FAUST_PYTHON_LIB_DIR},'${MATIO_LIB_DIR}'")
-
 endif()
 
 set(PROC_LIST CPU)
@@ -187,13 +186,20 @@ if(USE_OPENBLASO AND UNIX)
 endif()
 
 if(USE_GPU_MOD)
-	set(FAUST_PYTHON_INCLUDE_DIR "${FAUST_PYTHON_INCLUDE_DIR}, '${GPU_MOD_INCLUDE_DIR}', '${GPU_MOD_INCLUDE_DIR}/../build-cu9.2/', '${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR}'")
+	set(FAUST_PYTHON_INCLUDE_DIR "${FAUST_PYTHON_INCLUDE_DIR}, '${GPU_MOD_INCLUDE_DIR}', '${GPU_MOD_INCLUDE_DIR}/../build-cu11.4/', '${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR}'")
 	set(FAUST_SETUP_PY_CFLAGS "${FAUST_SETUP_PY_CFLAGS}, '-DUSE_GPU_MOD'")
 
 	set(GPU_MOD_LIB_PPATH ${FAUST_PYTHON_BIN_DIR}/pyfaust/lib)
 	get_filename_component(GPU_MOD_EXT ${GPU_MOD_LIB} LAST_EXT)
 	get_filename_component(GPU_MOD_NAME ${GPU_MOD_LIB} NAME_WLE)
-	foreach(CUDA_CONF IN ITEMS 9.2 11.4)
+	# TODO: used versions of CUDA and include dir should be CMake variables
+	if(WIN32)
+		# do not support CUDA 9.2 on Windows (require too old version VS <= 2017)
+		CUDA_VERSIONS=11.4
+	else()
+		CUDA_VERSIONS=9.2;11.4
+	endif()
+	foreach(CUDA_CONF IN LISTS CUDA_VERSIONS)
 		set(GPU_MOD_BUILD_DIR ${GPU_MOD_INCLUDE_DIR}/../build-cu${CUDA_CONF})
 		if(NOT EXISTS ${GPU_MOD_BUILD_DIR})
 			message(WARNING "the gpu_mod build directory ${GPU_MOD_BUILD_DIR} must exist and the library compiled in order to support CUDA ${CUDA_CONF} in the pyfaust wrapper.")
