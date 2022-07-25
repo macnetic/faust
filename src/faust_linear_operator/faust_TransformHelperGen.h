@@ -92,7 +92,18 @@ namespace Faust
 			virtual TransformHelper<FPP, DEV>* slice(faust_unsigned_int start_row_id, faust_unsigned_int end_row_id,
 					faust_unsigned_int start_col_id, faust_unsigned_int end_col_id);
 			TransformHelper<FPP, DEV>* fancy_index(faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols);
+
+			virtual MatDense<FPP,DEV> get_product(const int mul_order_opt_mode=-1)=0;
+			virtual MatDense<FPP, DEV> multiply(const MatDense<FPP,DEV> &A) =0;
+			virtual MatDense<FPP, DEV> multiply(const MatSparse<FPP,DEV> &A) =0;
+			virtual TransformHelper<FPP,DEV>* pruneout(const int nnz_tres, const int npasses=-1, const bool only_forward=false)=0;
 			virtual TransformHelper<FPP,DEV>* optimize_storage(const bool time=false);
+			virtual TransformHelper<FPP,DEV>* optimize_multiply(std::function<void()> f, const bool transp=false, const bool inplace=false, const int nsamples=1, const char* op_name="unamed_op")=0;
+			virtual TransformHelper<FPP,DEV>* optimize_time(const bool transp=false, const bool inplace=false, const int nsamples=1);
+			virtual TransformHelper<FPP,DEV>* optimize_time_full(const bool transp=false, const bool inplace=false, const int nsamples=1);
+			virtual TransformHelper<FPP,DEV>* optimize_time_prod(const MatGeneric<FPP, DEV>* test_mat, const bool transp=false, const bool inplace=false, const int nsamples=1);
+			TransformHelper<FPP,DEV>* optimize(const bool transp=false);
+
 			virtual TransformHelper<FPP,DEV>* clone();
 			virtual void convertToSparse()=0;
 			virtual void convertToDense()=0;

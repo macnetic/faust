@@ -42,7 +42,8 @@ namespace Faust
 				void get_product(MatDense<FPP,GPU2>& M, int prod_mod=-1);
 				void get_product(MatDense<FPP,Cpu>& M, int prod_mod=-1);
 				MatDense<FPP,GPU2> multiply(const MatDense<FPP,GPU2> &A);
-				MatDense<FPP,Cpu> multiply(const Faust::MatDense<FPP,Cpu> &A);
+				MatDense<FPP,GPU2> multiply(const MatSparse<FPP,GPU2> &A) { return multiply(MatDense<FPP,GPU2>(A));}
+				MatDense<FPP,Cpu> multiply(const MatDense<FPP,Cpu> &A);
 				TransformHelper<FPP,GPU2>* multiply(const FPP& a);
 				TransformHelper<FPP,GPU2>* multiply(const TransformHelper<FPP,GPU2>*);
 				Vect<FPP,GPU2> multiply(const Faust::Vect<FPP,GPU2>& a);
@@ -86,18 +87,13 @@ namespace Faust
 						const bool permutation=false,
 						const bool inplace=false,
 						const bool check_transpose=true);
-				void set_FM_mul_mode(const int mul_order_opt_mode, const bool silent=false) const;
-				void set_Fv_mul_mode(const int Fv_mul_mode) const;
 				faust_unsigned_int get_total_nnz() const;
 				//				faust_unsigned_int get_fact_nnz(const faust_unsigned_int id) const;
 				TransformHelper<FPP,GPU2>* normalize(const int meth /* 1 for 1-norm, 2 for 2-norm (2-norm), -1 for inf-norm */) const;
 				TransformHelper<FPP,GPU2>* transpose();
 				TransformHelper<FPP,GPU2>* conjugate();
 				TransformHelper<FPP,GPU2>* adjoint();
-				TransformHelper<FPP,GPU2>* optimize_time(const bool transp=false, const bool inplace=false, const int nsamples=1);
-
-				TransformHelper<FPP,GPU2>* optimize_time_prod(const MatGeneric<FPP, Cpu>* test_mat, const bool transp/*=false*/, const bool inplace/*=false*/, const int nsamples/*=1*/);
-				TransformHelper<FPP,GPU2>* optimize(const bool transp=false);
+				TransformHelper<FPP,GPU2>* optimize_multiply(std::function<void()> f, const bool transp=false, const bool inplace=false, const int nsamples=1, const char* op_name="unamed_op");
 				TransformHelper<FPP,GPU2>* clone(int32_t dev_id=-1, void* stream=nullptr);
 				void get_fact(const faust_unsigned_int id,
 						int* rowptr,

@@ -438,7 +438,7 @@ FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::optimize_time(const FPP* x_data, i
 #ifdef FAUST_VERBOSE
     std::cout << "FaustCoreCpp::optimize_time() th=" << th << "core=" << core << std::endl;
 #endif
-    Faust::MatSparse<FPP, Cpu> X(x_nnz, x_nrows, x_ncols, x_data, x_row_ptr, x_id_col);
+    Faust::MatSparse<FPP, DEV> X(x_nnz, x_nrows, x_ncols, x_data, x_row_ptr, x_id_col);
     if(inplace)
     {
         this->transform->optimize_time_prod(&X, transp, inplace, nsamples);
@@ -455,7 +455,7 @@ FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::optimize_time(const FPP* x_data, i
 #ifdef FAUST_VERBOSE
     std::cout << "FaustCoreCpp::optimize_time() th=" << th << "core=" << core << std::endl;
 #endif
-    Faust::MatDense<FPP, Cpu> X(x_data, x_nrows, x_ncols);
+    Faust::MatDense<FPP, DEV> X(x_nrows, x_ncols, x_data);
     if(inplace)
     {
         this->transform->optimize_time_prod(&X, transp, inplace, nsamples);

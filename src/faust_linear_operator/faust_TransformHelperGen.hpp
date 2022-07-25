@@ -741,6 +741,55 @@ namespace Faust
 		}
 
 	template<typename FPP, FDevice DEV>
+		TransformHelper<FPP,DEV>* TransformHelperGen<FPP,DEV>::optimize_time(const bool transp /* deft to false */, const bool inplace, /* deft to 1 */ const int nsamples)
+		{
+			this->eval_sliced_Transform();
+			this->eval_fancy_idx_Transform();
+			// choose the quickest method for the Faust "toarray"
+			auto t = this->optimize_time_full(transp, inplace, nsamples);
+			return t;
+		}
+
+	template<typename FPP, FDevice DEV>
+		TransformHelper<FPP,DEV>* TransformHelperGen<FPP,DEV>::optimize_time_full(const bool transp /* deft to false */, const bool inplace, /* deft to 1 */ const int nsamples)
+		{
+			this->eval_sliced_Transform();
+			this->eval_fancy_idx_Transform();
+			return this->optimize_multiply([this](){this->get_product();}, transp, inplace, nsamples, "Faust-toarray");
+		}
+
+	template<typename FPP, FDevice DEV>
+		TransformHelper<FPP,DEV>* TransformHelperGen<FPP,DEV>::optimize_time_prod(const MatGeneric<FPP, DEV>* test_mat, const bool transp /* deft to false */, const bool inplace, /* deft to 1 */ const int nsamples)
+		{
+			this->eval_sliced_Transform();
+			this->eval_fancy_idx_Transform();
+			std::function<void(void)> benchmark_func;
+			auto md = dynamic_cast<const MatDense<FPP,DEV>*>(test_mat);
+			auto ms = dynamic_cast<const MatSparse<FPP,DEV>*>(test_mat);
+			if(! md && ! ms)
+				throw std::runtime_error("optimize_time_prod supports only MatDense or MatSparse benchmarking.");
+			return this->optimize_multiply([this, ms, md]()
+					{
+					if(md) this->multiply(*md);
+					else /* ms != nullptr */ this->multiply(*ms);
+					}, transp, inplace, nsamples, "Faust-matrix product");
+		}
+
+	template<typename FPP, FDevice DEV>
+		TransformHelper<FPP,DEV>* TransformHelperGen<FPP,DEV>::optimize(const bool transp /* deft to false */)
+		{
+			this->eval_sliced_Transform();
+			this->eval_fancy_idx_Transform();
+			//TODO: need a nsamples argument to feed optimize_time*
+			Faust::TransformHelper<FPP,DEV> *th = this->pruneout(/*nnz_tres=*/0), *th2;
+			th2 = th->optimize_storage(false);
+			delete th;
+			th = th2;
+			th->optimize_time(transp, true);
+			return th;
+		}
+
+	template<typename FPP, FDevice DEV>
 		TransformHelperGen<FPP, DEV>::~TransformHelperGen()
 		{
 			if(fancy_indices[0] != nullptr)

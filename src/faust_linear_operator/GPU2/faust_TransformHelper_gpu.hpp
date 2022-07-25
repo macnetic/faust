@@ -502,18 +502,6 @@ namespace Faust
         }
 
     template<typename FPP>
-        void TransformHelper<FPP,GPU2>::set_FM_mul_mode(const int mul_order_opt_mode, const bool silent/*=false*/) const
-        {
-            throw std::runtime_error("set_FM_mul_mode is yet to implement in Faust C++ core for GPU.");
-        }
-
-    template<typename FPP>
-        void TransformHelper<FPP,GPU2>::set_Fv_mul_mode(const int Fv_mul_mode) const
-        {
-            throw std::runtime_error("set_Fv_mul_mode is yet to implement in Faust C++ core for GPU.");
-        }
-
-    template<typename FPP>
         void TransformHelper<FPP,GPU2>::pop_front()
         {
 			this->eval_sliced_Transform();
@@ -714,38 +702,58 @@ namespace Faust
             }
             return nbytes;
         }
-
-    template<typename FPP>
-        TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::optimize_time(const bool transp/*=false*/, const bool inplace/*=false*/, const int nsamples/*=1*/)
+	template<typename FPP>
+		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::optimize_multiply(std::function<void()> f, const bool transp /* deft to false */, const bool inplace, /* deft to 1 */ const int nsamples, const char* op_name)
         {
-            throw std::runtime_error("optimize_time is yet to implement in Faust C++ core for GPU.");
-            return nullptr;
-            //			TransformHelper<FPP,Cpu> th;
-            //			this->tocpu(th);
-            //			auto thn = th.optimize_time(transp, /*inplace*/ true, nsamples);
-            //			auto gpu_thn = new TransformHelper<FPP,GPU2>(*thn, -1, nullptr);
-            //			delete thn;
-            //			return gpu_thn;
-        }
-
-    template<typename FPP>
-        TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::optimize_time_prod(const MatGeneric<FPP, Cpu>* test_mat, const bool transp/*=false*/, const bool inplace/*=false*/, const int nsamples/*=1*/)
-        {
-            throw std::runtime_error("optimize_time_prod is yet to implement in Faust C++ core for GPU.");
-            return nullptr;
-        }
-
-    template<typename FPP>
-        TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::optimize(const bool transp/*=false*/)
-        {
-            throw std::runtime_error("optimize is yet to implement in Faust C++ core for GPU.");
-            return nullptr;
-            //			TransformHelper<FPP,Cpu> th;
-            //			this->tocpu(th);
-            //			auto thn = th.optimize(transp);
-            //			auto gpu_thn = new TransformHelper<FPP,GPU2>(*thn, -1, nullptr);
-            //			delete thn;
-            //			return gpu_thn;
+   			this->eval_sliced_Transform();
+			this->eval_fancy_idx_Transform();
+			std::vector<string> meth_names = {"DEFAULT_L2R", "DYNPROG"}; //TODO: it should be a function of faust_prod_opt module
+			std::vector<int> meth_ids = {DEFAULT_L2R, DYNPROG};
+			TransformHelper<FPP,GPU2>* t_opt = nullptr;
+			int NMETS = 2;
+			std::chrono::duration<double> * times = new std::chrono::duration<double>[NMETS]; //use heap because of VS14 (error C3863)
+			int old_meth = this->get_mul_order_opt_mode();
+			int nmuls = nsamples, opt_meth=0;
+#if DEBUG_OPT_MUL
+			cout << "nsamples used to measure time: " << nmuls << endl;
+#endif
+			for(int i=0; i < NMETS; i++)
+			{
+				this->set_FM_mul_mode(meth_ids[i]);
+				auto start = std::chrono::system_clock::now();
+				for(int j=0;j < nmuls; j++)
+				{
+					f();
+				}
+				auto end = std::chrono::system_clock::now();
+				times[i] = end-start;
+			}
+			for(int i=0; i < NMETS-1; i++)
+			{
+				opt_meth = times[opt_meth]<times[i+1]?opt_meth:i+1;
+			}
+			if(inplace)
+			{
+				this->set_FM_mul_mode(meth_ids[opt_meth]);
+				t_opt = this;
+			}
+			else
+			{
+				t_opt = new TransformHelper<FPP, GPU2>(this->transform->data, 1.0, false, false, true);
+				cout << "best method measured in time on operation "<< op_name << " is: " << meth_names[opt_meth] << endl;
+#if DEBUG_OPT_MUL
+				cout << "all times: ";
+				for(int i = 0; i < NMETS; i ++)
+					cout << times[i].count() << " ";
+				cout << endl;
+#endif
+				t_opt->set_FM_mul_mode(meth_ids[opt_meth]);
+				// leave the current Faust unchanged
+				this->set_FM_mul_mode(old_meth);
+			}
+			delete [] times;
+			t_opt->copy_transconj_state(*this);
+			return t_opt;
         }
 
     template<typename FPP>
