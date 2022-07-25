@@ -479,15 +479,12 @@ set(CMAKE_CXX_FLAGS "")
 #Add the c++11 flag, whatever it is
 include(CheckCXXCompilerFlag)
 check_cxx_compiler_flag(-std=c++11 COMPILER_SUPPORTS_CXX11)
-check_cxx_compiler_flag(-std=c++0x COMPILER_SUPPORTS_CXX0X)
 #set(CMAKE_CXX_FLAGS)
 if(COMPILER_SUPPORTS_CXX11)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11" CACHE STRING "compile flags" FORCE)
 	message(STATUS "C++ compiler supprt c++11")
-elseif(COMPILER_SUPPORTS_CXX0X)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x" CACHE STRING "compile flags" FORCE)
 else()
-	message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has neither C++11 nor c++0x support.")
+	message(STATUS "Failed to determine the compiler ${CMAKE_CXX_COMPILER} C++11 flag.")
 endif()
 
 
