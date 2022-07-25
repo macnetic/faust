@@ -195,9 +195,9 @@ if(USE_GPU_MOD)
 	# TODO: used versions of CUDA and include dir should be CMake variables
 	if(WIN32)
 		# do not support CUDA 9.2 on Windows (require too old version VS <= 2017)
-		CUDA_VERSIONS=11.4
+		set(CUDA_VERSIONS 11.4)
 	else()
-		CUDA_VERSIONS=9.2;11.4
+		set(CUDA_VERSIONS 9.2;11.4)
 	endif()
 	foreach(CUDA_CONF IN LISTS CUDA_VERSIONS)
 		set(GPU_MOD_BUILD_DIR ${GPU_MOD_INCLUDE_DIR}/../build-cu${CUDA_CONF})
