@@ -3,6 +3,12 @@
 from sys import argv
 from glob import glob
 from os.path import join
+try:
+    from chardet import detect
+    chardet_ok = True
+except:
+    chardet_ok = False
+    encoding = 'utf8'
 
 
 html_tags = [ '<br>', '<br/>', '<b>', '<b/>', '</b>', '<code>', '</code>' ]
@@ -10,7 +16,12 @@ html_tags = [ '<br>', '<br/>', '<b>', '<b/>', '</b>', '<code>', '</code>' ]
 if __name__ == "__main__":
     py_mods = glob(join(argv[1], '**.py'))
     for script2filter in py_mods:
-        f = open(script2filter, encoding='utf8')
+        if chardet_ok:
+            f = open(script2filter, 'rb')
+            encoding = detect(f.read())['encoding']
+            f.close()
+        f = open(script2filter,
+                 encoding=encoding)
         lines = f.readlines()
         filtered_lines = []
         for line in lines:
