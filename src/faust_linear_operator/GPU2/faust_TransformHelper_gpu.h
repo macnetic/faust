@@ -41,8 +41,9 @@ namespace Faust
 				MatDense<FPP,GPU2> get_product(int prod_mod=-1);
 				void get_product(MatDense<FPP,GPU2>& M, int prod_mod=-1);
 				void get_product(MatDense<FPP,Cpu>& M, int prod_mod=-1);
-				MatDense<FPP,GPU2> multiply(const MatDense<FPP,GPU2> &A);
-				MatDense<FPP,GPU2> multiply(const MatSparse<FPP,GPU2> &A) { return multiply(MatDense<FPP,GPU2>(A));}
+				MatDense<FPP, GPU2> multiply(const MatDense<FPP,GPU2> &A);
+				MatDense<FPP, GPU2> multiply(const MatSparse<FPP,GPU2> &A) { return multiply(MatDense<FPP,GPU2>(A));}
+				MatDense<FPP, Cpu> multiply(const MatSparse<FPP,Cpu> &A) { return multiply(MatDense<FPP, Cpu>(A));} // TODO: avoid CPU copy to dense
 				MatDense<FPP,Cpu> multiply(const MatDense<FPP,Cpu> &A);
 				TransformHelper<FPP,GPU2>* multiply(const FPP& a);
 				TransformHelper<FPP,GPU2>* multiply(const TransformHelper<FPP,GPU2>*);

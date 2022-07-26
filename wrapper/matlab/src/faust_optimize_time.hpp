@@ -29,14 +29,23 @@ void faust_optimize_time_prod(const mxArray **prhs, const int nrhs, mxArray **pl
 	bool inplace = (bool) mxGetScalar(prhs[3]);
 	int nsamples = (int) mxGetScalar(prhs[4]);
     const mxArray *mat = nullptr;
-    const MatGeneric<SCALAR, Cpu>* matGen = nullptr;
+    const MatGeneric<SCALAR, DEV>* matGen = nullptr;
     Faust::MatSparse<SCALAR,Cpu> sp_mat;
     Faust::MatDense<SCALAR,Cpu> ds_mat;
+    Faust::MatSparse<SCALAR,DEV> dsp_mat;
+    Faust::MatDense<SCALAR,DEV> dds_mat;
     mat = prhs[5];
 	if(mxIsSparse(mat))
 	{
 		mxArray2FaustspMat<SCALAR>(mat, sp_mat);
-        matGen = &sp_mat;
+		if(DEV != Cpu)
+		{
+			// GPU mat
+			dsp_mat = sp_mat;
+			matGen =  &dsp_mat;
+		}
+		else
+			matGen = (Faust::MatSparse<SCALAR, DEV>*) &sp_mat; // cast to avoid compil error but the bad case (DEV == GPU2) will never occur
     }
     else
     {
@@ -47,7 +56,13 @@ void faust_optimize_time_prod(const mxArray **prhs, const int nrhs, mxArray **pl
         ds_mat.resize(mat_nrows, mat_ncols);
         memcpy(ds_mat.getData(), ptr_data, mat_ncols*mat_ncols*sizeof(SCALAR));
         delete [] ptr_data;
-        matGen = &ds_mat;
+		if(DEV == Cpu)
+			matGen = (Faust::MatDense<SCALAR, DEV>*) &ds_mat; // cast to avoid compil error but the bad case (DEV == GPU2) will never occur
+		else
+		{
+			dds_mat = ds_mat;
+			matGen = &dds_mat;
+		}
     }
 	Faust::TransformHelper<SCALAR,DEV>* th = core_ptr->optimize_time_prod(matGen, transp, inplace, nsamples);
 	if(inplace /*th == nullptr*/)
