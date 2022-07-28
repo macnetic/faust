@@ -210,8 +210,6 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 		# previous call is not necessary, to verify, you can check the build file generated for msbuild
 		# for example wrapper/matlab/mex/mexFaustReal.vcxproj (it should contain a tag OpenMPSupport to True)
 		target_compile_options(${mex_target} PRIVATE "/VERBOSE") # doesn't work at least with MSVC
-		# complete static libs (linked later) by objects of libs if needed (fallback solution from environment)
-		target_link_options(${mex_target} PRIVATE $ENV{WIN_HDF5_OBJS_DIR}/*.obj  $ENV{WIN_SZIP_OBJS_DIR}/*.obj)
 		target_compile_definitions(${mex_target} PRIVATE NOMINMAX)
 	else()
 		target_link_options(${mex_target} PRIVATE ${OpenMP_CXX_LIBRARIES}) # do nothing if BUILD_MULTITHREAD is OFF
