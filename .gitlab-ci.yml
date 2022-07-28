@@ -148,7 +148,7 @@ pkg_macos:
 
 pkg_win:
     stage: pkg
-    variables: {BUILD_CONFIG: "Debug", GIT_SUBMODULE_STRATEGY: recursive}
+    variables: {BUILD_CONFIG: "Release", GIT_SUBMODULE_STRATEGY: recursive} # Not using Debug config to handle a compiliation issue (#279)
     <<: *win_build_gpu_mod
     script:
         - 'set SHA_START=%CI_COMMIT_SHA:~0,8%'
@@ -156,8 +156,8 @@ pkg_win:
         - cd build
           #- 'cmake -G "MinGW Makefiles" -DBUILD_WRAPPER_MATLAB=ON -DBUILD_WRAPPER_PYTHON=ON -DSLOW_TESTS=OFF -DCPACK_PACKAGE_VERSION=%SHA_START% -DBUILD_DOCUMENTATION=ON -DEXCLUDE_FAUST_LIB_INSTALL=ON -DCMAKE_INSTALL_PREFIX=win_pkg_build -DBUILD_TESTING=OFF -DAPI_DOC_BASE_URL="file:///C:/Program Files/Faust/doc/" -DREMOTE_DATA_URL="%DURL%" -DREMOTE_DATA_FILE="%DFILE%" -DEXPERIMENTAL_PKG=ON -DUSE_GPU_MOD=ON -DCMAKE_PREFIX_PATH=../gpu_mod ..'
           #- make
-        - 'cmake -G "Visual Studio 16 2019" -DBUILD_WRAPPER_MATLAB=ON -DBUILD_WRAPPER_PYTHON=ON -DSLOW_TESTS=OFF -DCPACK_PACKAGE_VERSION=%SHA_START% -DBUILD_DOCUMENTATION=ON -DEXCLUDE_FAUST_LIB_INSTALL=ON -DCMAKE_INSTALL_PREFIX=win_pkg_build -DBUILD_TESTING=OFF -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=C:/faust_libs/libmatio.lib -DZ_STATIC_LIB_PATH=C:/faust_libs/zlib.lib -DHDF5_STATIC_LIB_PATH=C:/faust_libs/hdf5.lib -DAPI_DOC_BASE_URL="file:///C:/Program Files/Faust/doc/" -DREMOTE_DATA_URL="%DURL%" -DREMOTE_DATA_FILE="%DFILE%" -DEXPERIMENTAL_PKG=ON -DUSE_GPU_MOD=ON -DCMAKE_PREFIX_PATH=../gpu_mod -DPYTHON_ENCODING=windows-1252 -DBUILD_MULTITHREAD=ON -DBUILD_FLOAT_PYX=ON ..'
-        - cmake --build . --config Release # Debug is avoided because of debug symbols missing for at least one library (inconsistency of config mode across libraries)
+        - 'cmake -G "Visual Studio 16 2019" -DBUILD_WRAPPER_MATLAB=ON -DBUILD_WRAPPER_PYTHON=ON -DSLOW_TESTS=OFF -DCPACK_PACKAGE_VERSION=%SHA_START% -DBUILD_DOCUMENTATION=ON -DEXCLUDE_FAUST_LIB_INSTALL=ON -DCMAKE_INSTALL_PREFIX=win_pkg_build -DBUILD_TESTING=OFF -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=C:/faust_libs/libmatio.lib -DZ_STATIC_LIB_PATH=C:/faust_libs/zlib.lib -DHDF5_STATIC_LIB_PATH=C:/faust_libs/hdf5.lib -DAPI_DOC_BASE_URL="file:///C:/Program Files/Faust/doc/" -DREMOTE_DATA_URL="%DURL%" -DREMOTE_DATA_FILE="%DFILE%" -DEXPERIMENTAL_PKG=ON -DUSE_GPU_MOD=ON -DCMAKE_PREFIX_PATH=../gpu_mod -DPYTHON_ENCODING=windows-1252 -DBUILD_MULTITHREAD=ON -DBUILD_FLOAT_PYX=ON -DCMAKE_BUILD_TYPE=%BUILD_CONFIG% ..'
+        - cmake --build . --config %BUILD_CONFIG%
         - makensis faust.nsi
     artifacts:
         paths:
@@ -285,7 +285,7 @@ pkg_macos_release:
         - cd build
           #- 'cmake -G "MinGW Makefiles" -DBUILD_WRAPPER_MATLAB=ON -DBUILD_WRAPPER_PYTHON=ON -DSLOW_TESTS=OFF -DCPACK_PACKAGE_VERSION=%CI_COMMIT_TAG% -DBUILD_DOCUMENTATION=ON -DEXCLUDE_FAUST_LIB_INSTALL=ON -DCMAKE_INSTALL_PREFIX=win_pkg_build -DBUILD_TESTING=OFF -DAPI_DOC_BASE_URL="file:///C:/Program Files/Faust/doc/" -DREMOTE_DATA_URL="%DURL%" -DREMOTE_DATA_FILE="%DFILE%" -DUSE_GPU_MOD=ON -DCMAKE_PREFIX_PATH=../gpu_mod ..'
           # - make
-        - 'cmake -G "Visual Studio 16 2019" -DBUILD_WRAPPER_MATLAB=ON -DBUILD_WRAPPER_PYTHON=ON -DSLOW_TESTS=OFF -DCPACK_PACKAGE_VERSION=%CI_COMMIT_TAG% -DBUILD_DOCUMENTATION=ON -DEXCLUDE_FAUST_LIB_INSTALL=ON -DCMAKE_INSTALL_PREFIX=win_pkg_build -DBUILD_TESTING=OFF -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=C:/faust_libs/libmatio.lib -DZ_STATIC_LIB_PATH=C:/faust_libs/zlib.lib -DHDF5_STATIC_LIB_PATH=C:/faust_libs/hdf5.lib -DAPI_DOC_BASE_URL="file:///C:/Program Files/Faust/doc/" -DREMOTE_DATA_URL="%DURL%" -DREMOTE_DATA_FILE="%DFILE%" -DEXPERIMENTAL_PKG=OFF -DUSE_GPU_MOD=ON -DCMAKE_PREFIX_PATH=../gpu_mod -DPYTHON_ENCODING=windows-1252 -DBUILD_MULTITHREAD=ON -DBUILD_FLOAT_PYX=ON -DBUILD_FLOAT_MEX=ON ..'
+        - 'cmake -G "Visual Studio 16 2019" -DBUILD_WRAPPER_MATLAB=ON -DBUILD_WRAPPER_PYTHON=ON -DSLOW_TESTS=OFF -DCPACK_PACKAGE_VERSION=%CI_COMMIT_TAG% -DBUILD_DOCUMENTATION=ON -DEXCLUDE_FAUST_LIB_INSTALL=ON -DCMAKE_INSTALL_PREFIX=win_pkg_build -DBUILD_TESTING=OFF -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=C:/faust_libs/libmatio.lib -DZ_STATIC_LIB_PATH=C:/faust_libs/zlib.lib -DHDF5_STATIC_LIB_PATH=C:/faust_libs/hdf5.lib -DAPI_DOC_BASE_URL="file:///C:/Program Files/Faust/doc/" -DREMOTE_DATA_URL="%DURL%" -DREMOTE_DATA_FILE="%DFILE%" -DEXPERIMENTAL_PKG=OFF -DUSE_GPU_MOD=ON -DCMAKE_PREFIX_PATH=../gpu_mod -DPYTHON_ENCODING=windows-1252 -DBUILD_MULTITHREAD=ON -DBUILD_FLOAT_PYX=ON -DBUILD_FLOAT_MEX=ON -DCMAKE_BUILD_TYPE=%BUILD_CONFIG% ..'
         - cmake --build . --config Release
         - makensis faust.nsi
     artifacts:
@@ -573,8 +573,8 @@ pkg_linux_purepy_release_openblaso:
         - cd ..\..
         - if NOT EXIST build (mkdir build) else (rmdir /S /Q build & mkdir build)
         - cd build
-        - 'cmake -G "Visual Studio 16 2019" -DBUILD_WRAPPER_MATLAB=OFF -DBUILD_WRAPPER_PYTHON=ON -DSLOW_TESTS=OFF -DCPACK_PACKAGE_VERSION=%VERSION% -DCMAKE_INSTALL_PREFIX=win_pkg_build -DBUILD_TESTING=OFF  -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=C:/faust_libs/libmatio.lib -DZ_STATIC_LIB_PATH=C:/faust_libs/zlib.lib -DHDF5_STATIC_LIB_PATH=C:/faust_libs/hdf5.lib -DREMOTE_DATA_URL="%DURL%" -DREMOTE_DATA_FILE="%DFILE%" -DEXPERIMENTAL_PKG=%EXPERIMENTAL_PKG% -DUSE_GPU_MOD=ON  -DCMAKE_PREFIX_PATH=../gpu_mod -DBUILD_MULTITHREAD=ON -DBUILD_FLOAT_PYX=ON ..'
-        - cmake --build . --target FAUST
+        - 'cmake -G "Visual Studio 16 2019" -DBUILD_WRAPPER_MATLAB=OFF -DBUILD_WRAPPER_PYTHON=ON -DSLOW_TESTS=OFF -DCPACK_PACKAGE_VERSION=%VERSION% -DCMAKE_INSTALL_PREFIX=win_pkg_build -DBUILD_TESTING=OFF  -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=C:/faust_libs/libmatio.lib -DZ_STATIC_LIB_PATH=C:/faust_libs/zlib.lib -DHDF5_STATIC_LIB_PATH=C:/faust_libs/hdf5.lib -DREMOTE_DATA_URL="%DURL%" -DREMOTE_DATA_FILE="%DFILE%" -DEXPERIMENTAL_PKG=%EXPERIMENTAL_PKG% -DUSE_GPU_MOD=ON  -DCMAKE_PREFIX_PATH=../gpu_mod -DBUILD_MULTITHREAD=ON -DBUILD_FLOAT_PYX=ON -DCMAKE_BUILD_TYPE=%BUILD_CONFIG% ..'
+        - cmake --build . --target FAUST --config %BUILD_CONFIG%
         - cd wrapper/python
           # only python3 for windows
           #- 'start %PYTHON2_PATH% setup.py bdist_wheel'
@@ -593,7 +593,7 @@ pkg_linux_purepy_release_openblaso:
 
 pkg_win_purepy_rev:
     extends: .pkg_win_purepy
-    variables: {BUILD_CONFIG: "Debug", GIT_SUBMODULE_STRATEGY: recursive}
+    variables: {BUILD_CONFIG: "Release", GIT_SUBMODULE_STRATEGY: recursive}
     before_script:
         - 'set VERSION=%CI_COMMIT_SHA:~0,8%'
         - 'set EXPERIMENTAL_PKG=ON'
