@@ -4,6 +4,11 @@ endif()
 
 set(FAUST_PYTHON_LIB_DIR "'${FAUST_BIN_DIR}'")
 
+if(${CMAKE_GENERATOR} MATCHES "Visual")
+	# needed because depending on the configuration the faust.lib is put in subfolder Release, Debug, etc.
+	set(FAUST_PYTHON_LIB_DIR "${FAUST_PYTHON_LIB_DIR}, '${FAUST_BIN_DIR}/${CMAKE_BUILD_TYPE}'")
+endif()
+
 # set the variable for cython extension sources
 set(PY_EXT_SOURCES "['${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.pyx']")
 
@@ -14,47 +19,39 @@ string(REGEX REPLACE " " "', '" PYFAUST_PYTHON_REQUIREMENTS_AS_PYLIST ${PYFAUST_
 set(PYFAUST_PYTHON_REQUIREMENTS_AS_PYLIST "'${PYFAUST_PYTHON_REQUIREMENTS_AS_PYLIST}'")
 
 if(${USE_MATIO_STATIC_LIBS})
+	# Build using matio static library and dependencies
 	if(NOT WIN32)
 		set(PYTHON_EXT_EXTRA_OBJECTS "[ '${MATIO_STATIC_LIB_PATH}', '${HDF5_STATIC_LIB_PATH}', '${Z_STATIC_LIB_PATH}']") # the order matters for compilation
-	else() # WIN32 # intended for Visual Studio!
+	else() # WIN32 (tested on Visual Studio)
 		# compile the pyx and all faust .cpp needed (instead to link to faust.lib)
-		set(PY_EXT_SOURCES "${PY_EXT_SOURCES}+glob('${FAUST_PYTHON_SRC_SRC_DIR}/*.cpp')+glob('${FAUST_SRC_LINEAR_OPERATOR_DIR}/*.cpp')+glob('${FAUST_ALGORITHM_CONSTRAINT_SRC_DIR}/*.cpp')+glob('${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR}/*.cpp')+glob('${FAUST_UTILS_SRC_DIR}/*.cpp')+glob('${FAUST_UTILS_SRC_DIR}/matio/*.cpp')")
-		if(USE_GPU_MOD)
-			set(PY_EXT_SOURCES "${PY_EXT_SOURCES}+glob('${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR}/*.cpp')")
-		endif()
-		if(FAUST_TORCH)
-			set(PY_EXT_SOURCES "${PY_EXT_SOURCES}+glob('${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}/*.cpp')")
-		else()
-			# add all cpp files except faust_torch.cpp
-			file(GLOB LIN_OP_CPP_FILES ${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}/*.cpp)
-			foreach(CPP_FILE IN LISTS LIN_OP_CPP_FILES)
-				if(NOT ${CPP_FILE} MATCHES .*faust_torch.cpp)
-					message(STATUS "OK to add:" ${CPP_FILE})
-					set(PY_EXT_SOURCES "${PY_EXT_SOURCES}+['${CPP_FILE}']")
-				endif()
-			endforeach()
-		endif()
-		# extract the name (without .lib suffix) and the path of each libs:
+		set(PY_EXT_SOURCES "${PY_EXT_SOURCES}+glob('${FAUST_PYTHON_SRC_SRC_DIR}/*.cpp')")
+		# extract the name (without .lib suffix) and the path of each lib
 		# 1/ matio
 		get_filename_component(MATIO_LIB_DIR ${MATIO_STATIC_LIB_PATH} DIRECTORY)
 		get_filename_component(MATIO_LIB_NAME ${MATIO_STATIC_LIB_PATH} NAME_WE)
-		set(FAUST_PYTHON_LIBS "'${MATIO_LIB_NAME}'") # override variable (ignoring faust lib., recompiling from code)
+		#set(FAUST_PYTHON_LIBS "'${MATIO_LIB_NAME}'") # override variable (ignoring faust lib., recompiling from code)
+		set(FAUST_PYTHON_LIBS "${FAUST_PYTHON_LIBS},'${MATIO_LIB_NAME}'") # override variable (ignoring faust lib., recompiling from code)
 		set(FAUST_PYTHON_LIB_DIR "${FAUST_PYTHON_LIB_DIR},'${MATIO_LIB_DIR}'")
 		# 2/ zlib
 		get_filename_component(Z_LIB_DIR ${Z_STATIC_LIB_PATH} DIRECTORY)
 		get_filename_component(Z_LIB_NAME ${Z_STATIC_LIB_PATH} NAME_WE)
 		set(FAUST_PYTHON_LIBS "${FAUST_PYTHON_LIBS},'${Z_LIB_NAME}'")
 		set(FAUST_PYTHON_LIB_DIR "${FAUST_PYTHON_LIB_DIR},'${Z_LIB_DIR}'")
-		# 3/ for HDF5 we get directly objects files (not the static lib because of linking errors) # temporary solution
-		# the paths must be set in environment
-		# SZIP is a dependency of HDF5
-		set(PYTHON_EXT_EXTRA_OBJECTS "glob('$ENV{WIN_HDF5_OBJS_DIR}/*.obj')+glob('$ENV{WIN_SZIP_OBJS_DIR}/*.obj')")
+		# 3/ hdf5
+		get_filename_component(HDF5_LIB_DIR ${HDF5_STATIC_LIB_PATH} DIRECTORY)
+		get_filename_component(HDF5_LIB_NAME ${HDF5_STATIC_LIB_PATH} NAME_WE)
+		set(FAUST_PYTHON_LIBS "${FAUST_PYTHON_LIBS},'${HDF5_LIB_NAME}'")
+		set(FAUST_PYTHON_LIB_DIR "${FAUST_PYTHON_LIB_DIR},'${HDF5_LIB_DIR}'")
+		set(PYTHON_EXT_EXTRA_OBJECTS "None")
 	endif()
-else() # in fact this is only for WIN32 MINGW
+else()
+	# Build using matio dynamic library or static standalone library (including defs for zlib, hdf5 and szip -- which is normally in hdf5 static lib)
 	set(PYTHON_EXT_EXTRA_OBJECTS "None")
 	get_filename_component(MATIO_LIB_DIR ${MATIO_LIB_FILE} DIRECTORY)
 	get_filename_component(MATIO_LIB_NAME ${MATIO_LIB_FILE} NAME_WE)
-	string(REGEX REPLACE "^lib" "" MATIO_LIB_NAME ${MATIO_LIB_NAME})
+	if((NOT WIN32 OR ${CMAKE_GENERATOR} MATCHES "MinGW Makefiles") AND NOT ${MATIO_LIB_FILE} MATCHES ".*\\.a")
+		string(REGEX REPLACE "^lib" "" MATIO_LIB_NAME ${MATIO_LIB_NAME})
+	endif()
 	set(FAUST_PYTHON_LIBS "${FAUST_PYTHON_LIBS},'${MATIO_LIB_NAME}'")
 	set(FAUST_PYTHON_LIB_DIR "${FAUST_PYTHON_LIB_DIR},'${MATIO_LIB_DIR}'")
 endif()
@@ -126,9 +123,9 @@ if(BUILD_OPENBLAS)
 	get_filename_component(OPENBLAS_LIB_DIR ${OPENBLAS_LIB_FILE} PATH)
 
 	set(FAUST_PYTHON_INCLUDE_DIR "${FAUST_PYTHON_INCLUDE_DIR},
-			'${OPENBLAS_INC_DIR}'")
+	'${OPENBLAS_INC_DIR}'")
 	set(FAUST_PYTHON_LIB_DIR "${FAUST_PYTHON_LIB_DIR},
-			'${OPENBLAS_LIB_DIR}'")
+	'${OPENBLAS_LIB_DIR}'")
 	set(FAUST_PYTHON_LIBS "${FAUST_PYTHON_LIBS},'openblas'")
 endif(BUILD_OPENBLAS)
 
@@ -448,11 +445,11 @@ endif()
 
 #install the python wrapper
 install(DIRECTORY ${FAUST_PYTHON_BIN_DIR}/ DESTINATION
-    ${CMAKE_INSTALL_PYTHON_PREFIX} FILE_PERMISSIONS  ${INSTALL_FILE_PERMISSION}
-    DIRECTORY_PERMISSIONS ${INSTALL_DIR_PERMISSION} FILES_MATCHING PATTERN
-    "pyfaust/*.py" PATTERN "pyfaust/tests/*.py" PATTERN "*.so" PATTERN "*.pyd"
-    PATTERN "libomp.*"
-    PATTERN "build" EXCLUDE PATTERN "dist" EXCLUDE PATTERN "setup*" EXCLUDE PATTERN "CMakeFiles*" EXCLUDE)
+	${CMAKE_INSTALL_PYTHON_PREFIX} FILE_PERMISSIONS  ${INSTALL_FILE_PERMISSION}
+	DIRECTORY_PERMISSIONS ${INSTALL_DIR_PERMISSION} FILES_MATCHING PATTERN
+	"pyfaust/*.py" PATTERN "pyfaust/tests/*.py" PATTERN "*.so" PATTERN "*.pyd"
+	PATTERN "libomp.*"
+	PATTERN "build" EXCLUDE PATTERN "dist" EXCLUDE PATTERN "setup*" EXCLUDE PATTERN "CMakeFiles*" EXCLUDE)
 
 
 
