@@ -158,6 +158,7 @@ Section "" ; no component so name not needed
   File /r @PROJECT_BINARY_DIR@\wrapper\python\pyfaust\*py
   SetOutPath $2\pyfaust\lib
   File @PROJECT_BINARY_DIR@\..\gpu_mod\build-cu11.4\gm-cu11.4.dll
+  File @VCOMPLIB_PATH@ # normally the OpenMP lib is already in @PROJECT_BINARY_DIR@\wrapper\python\pyfaust\lib (moved here by the wrapper\python\CMakeLists.txtscript), but it's simpler to rely on CMAKE VARIABLE (which the original location of the library)
   ; CreateShortCut pyfaust @PROJECT_BINARY_DIR@\wrapper\python\pyfaust ; tested and it can't be like a linux symlink
   SetOutPath $2
   File @PROJECT_BINARY_DIR@\wrapper\python\*pyd

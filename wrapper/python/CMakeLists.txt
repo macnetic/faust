@@ -170,7 +170,7 @@ if(FAUST_TORCH)
 endif()
 
 
-if(APPLE AND BUILD_MULTITHREAD OR ${CMAKE_CXX_COMPILER} MATCHES .*clang.*)
+if(BUILD_MULTITHREAD AND (APPLE  OR ${CMAKE_CXX_COMPILER} MATCHES .*clang.* OR ${CMAKE_GENERATOR} MATCHES "Visual"))
 	# insert the libomp py code loader
 	file(READ ${FAUST_PYTHON_SRC_DIR}/libomp_loading.py OMP_LIB_LOADING)
 endif()
@@ -427,7 +427,7 @@ elseif(WIN32)
 			#message(STATUS "PY_VER=${PY_VER}")
 			string(REGEX REPLACE "Python ([0-9]\\.[0-9]+).*$" "\\1" PY_VER_WITH_POINTS ${PY_VER_})
 			string(REGEX REPLACE "Python ([0-9])\\.([0-9]+).*$" "\\1\\2" PY_VER ${PY_VER_})
-			# ONLY Python 3 for Faust built with Visual Studio
+			# ONLY Python 3 for Faust builds with Visual Studio
 			if(PY_VER MATCHES 3)
 				set(PY3_VER ${PY_VER_WITH_POINTS} PARENT_SCOPE)
 				add_custom_command(TARGET ${FAUST_PYTHON_TARGET}
@@ -436,6 +436,14 @@ elseif(WIN32)
 					COMMENT   "Creating pyfaust${PY_VER}")
 				string(REGEX REPLACE "Python ([0-9])\\.([0-9]+).*$" "\\1\\2" PY3_MINOR_VER ${PY_VER_})
 				set(PY3_MINOR_VER ${PY3_MINOR_VER} PARENT_SCOPE)
+			endif()
+			if(BUILD_MULTITHREAD)
+				# embed openmp dll in pyfaust
+				if(NOT VCOMPLIB_PATH)
+					message(FATAL_ERROR "The CMake option VCOMPLIB_PATH must have been set to the vcomp*.dll lib to embed in pyfaust")
+				endif()
+				# we do not use embed_sys_libomp_into_pyfaust because it doesn't indicate full paths for all libraries on Windows with VS
+				configure_file(${VCOMPLIB_PATH} ${FAUST_PYTHON_BIN_DIR}/pyfaust/lib COPYONLY)
 			endif()
 		endforeach()
 	endif()

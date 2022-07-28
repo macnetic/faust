@@ -1,5 +1,6 @@
 
 from sys import platform as _pf
+from os.path import basename
 libomp_loading_verbose = False
 internal_libomp_loading = True
 
@@ -12,14 +13,16 @@ def load_lib_omp():
     import sys
     import ctypes
     import ctypes.util
+    name = 'libomp'
     if _pf == 'darwin':
         ext = 'dylib'
     elif _pf == 'linux':
         ext = 'so'
     elif _pf == 'win32':
+        name = 'vcomp140'
         ext = 'dll'
     for p in sys.path:
-        lib_path = join(p, 'pyfaust/lib/libomp.'+ext)
+        lib_path = join(p, 'pyfaust', 'lib', name+'.'+ext)
         if exists(lib_path):
             ctypes.CDLL(lib_path)
             if libomp_loading_verbose:
@@ -50,6 +53,12 @@ def inform_user_how_to_install_libomp():
                   - On Fedora the package is libomp-11*,
                   - On Debian the package is libomp-11*.
                   """)
+    elif _pf == 'win32':
+        print("""ERROR: OpenMP for Visual Studio is not properly installed on your system.
+              You need to install \"Visual Studio C++ Redistribuable
+              Binaries\". It works also by copying vcomp140.dll in the
+              appropriate python site-packages path"""+basename(__file__)+""".
+              """)
 
 def try_modify_wrapper_lib_on_macos():
     from os.path import dirname, join
@@ -64,8 +73,7 @@ def try_modify_wrapper_lib_on_macos():
 
 
 # load libomp pyfaust embedded library if found in pyfaust location
-# and if the code runs on macOS
-if _pf in ['darwin', 'linux']:
+if _pf in ['darwin', 'linux', 'win32']:
     try_modify_wrapper_lib_on_macos()
     if internal_libomp_loading:
         load_lib_omp()
