@@ -226,7 +226,7 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 	target_compile_definitions(${mex_target} PRIVATE $<TARGET_PROPERTY:${FAUST_TARGET},COMPILE_DEFINITIONS>)
 	target_compile_options(${mex_target} PUBLIC $<TARGET_PROPERTY:${FAUST_TARGET},COMPILE_OPTIONS>)
 	target_link_libraries(${mex_target} ${FAUST_TARGET})
-	if(USE_MATIO_STATIC_LIBS OR WIN32)
+	if(USE_MATIO_STATIC_LIBS)
 		# Windows version must use static lib of matio anyway # TODO: FATAL_ERROR if MATIO_STATIC_LIB_PATH is undefined
 		target_link_libraries(${mex_target} "${MATIO_STATIC_LIB_PATH}" "${HDF5_STATIC_LIB_PATH}" "${Z_STATIC_LIB_PATH}")
 	else()
