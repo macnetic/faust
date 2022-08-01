@@ -359,9 +359,58 @@ void test_transform_rand_bsr()
 	delete F;
 }
 
+void test_bsrgemm()
+{
+	std::cout << "test_bsrgemm" << std::endl;
+
+	char A_ops[3] = {'N', 'T', 'H'};
+	for(int i=0; i < sizeof(A_ops); i++)
+	{
+		auto A_op = A_ops[i];
+		auto B_op = A_op;
+		// gen a cpu random dense matrix
+		MatDense<FPP, Cpu> *cpu_dmat = MatDense<FPP, Cpu>::randMat(10, 15);
+		//cpu_dmat->multiply(*cpu_dmat, 'T');
+		//cpu_dmat->setOnes();
+		// convert it to gpu
+		MatDense<FPP, GPU2> gpu_dmat(*cpu_dmat);
+		MatDense<FPP, GPU2> gpu_outmat;
+		MatDense<FPP, GPU2> cpu_outmat(*cpu_dmat);
+		// idem for bsr mats
+		auto cpu_bmat = MatBSR<FPP, Cpu>::randMat(15, 10, 5, 5, 2);
+		auto cpu_bmat_dmat = cpu_bmat->to_dense();
+
+		MatBSR<FPP, GPU2> gpu_bmat(*cpu_bmat);
+
+		if(B_op == 'T')
+			cpu_dmat->transpose();
+		else if(B_op == 'H')
+			cpu_dmat->adjoint();
+		// multiply on cpu
+		cpu_bmat->multiply(*cpu_dmat, A_op);
+
+		// if(A_op == 'T') gpu_bmat.transpose();
+		std::cout << "brsgemm(bsr, dense, '"<< A_op<<"', '"<< A_op<<"')" << std::endl;
+		bsrgemm(gpu_bmat, gpu_dmat, gpu_outmat, FPP(1.0), FPP(0), A_op, B_op);
+
+		MatDense<FPP, Cpu> diff_mat;
+		gpu_outmat.tocpu(diff_mat);
+		diff_mat -= *cpu_dmat;
+		assert(diff_mat.norm() < 1e-3);
+		std::cout << "OK" << std::endl;
+
+		delete cpu_bmat;
+		delete cpu_dmat;
+	}
+
+
+
+}
+
 int main()
 {
 	Faust::enable_gpu_mod();
+	test_bsrgemm();
 	test_gpu_ctor_and_tocpu();
 	test_gpu_mul_dense();
 	test_gpu_mul_vec();
