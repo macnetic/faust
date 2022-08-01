@@ -388,8 +388,8 @@ pages:
     needs:
       - job: pkg_macos_release
         artifacts: true
-        #- job: pkg_win_release
-        #artifacts: true
+      - job: pkg_win_release
+        artifacts: true
       - job: pkg_linux_release
         artifacts: true
       - job: pkg_linux_release_static
