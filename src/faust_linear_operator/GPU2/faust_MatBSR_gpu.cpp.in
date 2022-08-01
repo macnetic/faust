@@ -126,8 +126,17 @@ namespace Faust
 			char2gm_Op(opB, gop_B);
 			auto bsr_funcs = GPUModHandler::get_singleton()->bsr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			int C_nrows, C_ncols;
+			if(opA == 'N')
+				C_nrows = A.getNbRow();
+			else
+				C_nrows = A.getNbCol();
+			if(opB == 'N')
+				C_ncols = B.getNbCol();
+			else
+				C_ncols = B.getNbRow();
+			C.resize(C_nrows, C_ncols);
 			auto gpu_dmat = bsr_funcs->mul_gpu_dsm_ext(A.gpu_mat, B.gpu_mat, C.gpu_mat, gop_A, gop_B, (const @GM_SCALAR@*) reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&alpha), (const @GM_SCALAR@*) reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&beta));
-			dsm_funcs->free(C.get_gpu_mat_ptr());
 		}
 
 	template<>
