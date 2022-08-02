@@ -677,7 +677,7 @@ test_linux_pkg_release:
     - matlab
 
 # the windows NSIS installer test is disabled because "call .exe" is hanging down indefinitely
-test_win_pkg_release:
+.test_win_pkg_release:
   stage: pkg_test
   needs:
     - job: pkg_win_release
