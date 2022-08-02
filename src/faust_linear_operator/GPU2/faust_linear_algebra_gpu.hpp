@@ -27,72 +27,72 @@ namespace Faust
 			{
 				// transpose / adjoint the product to rely on other signature of spgemm (MatSparse B as lhs matrix -- i.e. A)
 				char nopA, nopB;
-				MatDense<FPP, GPU2> nA(A);
-				MatSparse<FPP, GPU2> nB(B);
 				if(opA == 'N' && opB == 'N')
 				{
 					nopA = 'T';
 					nopB = 'T';
-					C.resize(nB.getNbCol(), nA.getNbRow());
-					spgemm(nB, nA, C, alpha, beta, nopB, nopA);
+					C.resize(B.getNbCol(), A.getNbRow());
+					spgemm(B, A, C, alpha, beta, nopB, nopA);
 					C.transpose();
 				}
 				else if(opA == 'N' && opB == 'T')
 				{
 					nopA = 'T';
-					C.resize(nB.getNbRow(), nA.getNbRow());
-					spgemm(nB, nA, C, alpha, beta, opB, nopA);
+					C.resize(B.getNbRow(), A.getNbRow());
+					spgemm(B, A, C, alpha, beta, opB, nopA);
 					C.transpose();
 				}
 				else if(opA == 'T' && opB == 'N')
 				{
 					nopB = 'T';
-					C.resize(nB.getNbCol(), nA.getNbCol());
-					spgemm(nB, nA, C, alpha, beta, nopB, opA);
+					C.resize(B.getNbCol(), A.getNbCol());
+					spgemm(B, A, C, alpha, beta, nopB, opA);
 					C.transpose();
 				}
 				else if(opA == 'T' && opB == 'T')
 				{
-					C.resize(nB.getNbRow(), nA.getNbCol());
-					spgemm(nB, nA, C, alpha, beta, opB, opA);
+					C.resize(B.getNbRow(), A.getNbCol());
+					spgemm(B, A, C, alpha, beta, opB, opA);
 					C.transpose();
 				}
 				else if(opA == 'N' && opB == 'H')
 				{
 					nopA = 'H';
-					C.resize(nB.getNbRow(), nA.getNbRow());
-					spgemm(nB, nA, C, alpha, beta, opB, nopA);
+					C.resize(B.getNbRow(), A.getNbRow());
+					spgemm(B, A, C, alpha, beta, opB, nopA);
 					C.adjoint();
 				}
 				else if(opA == 'H' && opB == 'N')
 				{
 					nopB = 'H';
-					C.resize(nB.getNbCol(), nA.getNbCol());
-					spgemm(nB, nA, C, alpha, beta, nopB, opA);
+					C.resize(B.getNbCol(), A.getNbCol());
+					spgemm(B, A, C, alpha, beta, nopB, opA);
 					C.adjoint();
 				}
 				else if(opA == 'H' && opB == 'H')
 				{
-					C.resize(nB.getNbRow(), nA.getNbCol());
-					spgemm(nB, nA, C, alpha, beta, opB, opA);
+					C.resize(B.getNbRow(), A.getNbCol());
+					spgemm(B, A, C, alpha, beta, opB, opA);
 					C.adjoint();
 				}
 				else if(opA == 'H' && opB == 'T')
 				{
 					nopA = 'N';
+					MatSparse<FPP, GPU2> nB(B);
 					nB.conjugate();
 					nopB = 'N';
-					C.resize(nB.getNbRow(), nA.getNbCol());
-					spgemm(nB, nA, C, alpha, beta, nopB, nopA);
+					C.resize(nB.getNbRow(), A.getNbCol());
+					spgemm(nB, A, C, alpha, beta, nopB, nopA);
 					C.adjoint();
 				}
 				else if(opA == 'T' && opB == 'H')
 				{
+					MatDense<FPP, GPU2> nA(A);
 					nA.conjugate();
 					nopA = 'N';
 					nopB = 'N';
-					C.resize(nB.getNbRow(), nA.getNbCol());
-					spgemm(nB, nA, C, alpha, beta, nopB, nopA);
+					C.resize(B.getNbRow(), nA.getNbCol());
+					spgemm(B, nA, C, alpha, beta, nopB, nopA);
 					C.adjoint();
 				}
 			}
@@ -163,72 +163,73 @@ namespace Faust
 			{
 				// transpose / adjoint the product to rely on other signature of bsrgemm (MatSparse B as lhs matrix -- i.e. A)
 				char nopA, nopB;
-				MatDense<FPP, GPU2> nA(A);
-				MatBSR<FPP, GPU2> nB(B);
 				if(opA == 'N' && opB == 'N')
 				{
 					nopA = 'T';
 					nopB = 'T';
-					C.resize(nB.getNbCol(), nA.getNbRow());
-					bsrgemm(nB, nA, C, alpha, beta, nopB, nopA);
+					C.resize(B.getNbCol(), A.getNbRow());
+					bsrgemm(B, A, C, alpha, beta, nopB, nopA);
 					C.transpose();
 				}
 				else if(opA == 'N' && opB == 'T')
 				{
 					nopA = 'T';
-					C.resize(nB.getNbRow(), nA.getNbRow());
-					bsrgemm(nB, nA, C, alpha, beta, opB, nopA);
+					C.resize(B.getNbRow(), A.getNbRow());
+					bsrgemm(B, A, C, alpha, beta, opB, nopA);
 					C.transpose();
 				}
 				else if(opA == 'T' && opB == 'N')
 				{
 					nopB = 'T';
-					C.resize(nB.getNbCol(), nA.getNbCol());
-					bsrgemm(nB, nA, C, alpha, beta, nopB, opA);
+					C.resize(B.getNbCol(), A.getNbCol());
+					bsrgemm(B, A, C, alpha, beta, nopB, opA);
 					C.transpose();
 				}
 				else if(opA == 'T' && opB == 'T')
 				{
-					C.resize(nB.getNbRow(), nA.getNbCol());
-					bsrgemm(nB, nA, C, alpha, beta, opB, opA);
+					C.resize(B.getNbRow(), A.getNbCol());
+					bsrgemm(B, A, C, alpha, beta, opB, opA);
 					C.transpose();
 				}
 				else if(opA == 'N' && opB == 'H')
 				{
 					nopA = 'H';
-					C.resize(nB.getNbRow(), nA.getNbRow());
-					bsrgemm(nB, nA, C, alpha, beta, opB, nopA);
+					C.resize(B.getNbRow(), A.getNbRow());
+					bsrgemm(B, A, C, alpha, beta, opB, nopA);
 					C.adjoint();
 				}
 				else if(opA == 'H' && opB == 'N')
 				{
 					nopB = 'H';
-					C.resize(nB.getNbCol(), nA.getNbCol());
-					bsrgemm(nB, nA, C, alpha, beta, nopB, opA);
+					C.resize(B.getNbCol(), A.getNbCol());
+					bsrgemm(B, A, C, alpha, beta, nopB, opA);
 					C.adjoint();
 				}
 				else if(opA == 'H' && opB == 'H')
 				{
-					C.resize(nB.getNbRow(), nA.getNbCol());
-					bsrgemm(nB, nA, C, alpha, beta, opB, opA);
+					C.resize(B.getNbRow(), A.getNbCol());
+					bsrgemm(B, A, C, alpha, beta, opB, opA);
 					C.adjoint();
 				}
 				else if(opA == 'H' && opB == 'T')
 				{
 					nopA = 'N';
+					MatBSR<FPP, GPU2> nB(B);
 					nB.conjugate();
 					nopB = 'N';
-					C.resize(nB.getNbRow(), nA.getNbCol());
-					bsrgemm(nB, nA, C, alpha, beta, nopB, nopA);
+					C.resize(nB.getNbRow(), A.getNbCol());
+					bsrgemm(nB, A, C, alpha, beta, nopB, nopA);
 					C.adjoint();
 				}
 				else if(opA == 'T' && opB == 'H')
 				{
+
+					MatDense<FPP, GPU2> nA(A);
 					nA.conjugate();
 					nopA = 'N';
 					nopB = 'N';
-					C.resize(nB.getNbRow(), nA.getNbCol());
-					bsrgemm(nB, nA, C, alpha, beta, nopB, nopA);
+					C.resize(B.getNbRow(), nA.getNbCol());
+					bsrgemm(B, nA, C, alpha, beta, nopB, nopA);
 					C.adjoint();
 				}
 			}
