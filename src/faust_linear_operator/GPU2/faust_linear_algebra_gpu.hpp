@@ -105,12 +105,12 @@ namespace Faust
 	template<typename FPP>
 		void gemm_gen(const MatGeneric<FPP,GPU2> & A, const MatGeneric<FPP,GPU2> & B, MatDense<FPP,GPU2> & C, const FPP  alpha, const FPP  beta, char  typeA, char  typeB)
 		{
-			const MatSparse<FPP, GPU2>* spA;
-			const MatSparse<FPP, GPU2>* spB;
-			const MatDense<FPP, GPU2>* dsA;
-			const MatDense<FPP, GPU2>* dsB;
-			const MatBSR<FPP, GPU2>* bsrA;
-			const MatBSR<FPP, GPU2>* bsrB;
+			const MatSparse<FPP, GPU2>* spA = nullptr;
+			const MatSparse<FPP, GPU2>* spB = nullptr;
+			const MatDense<FPP, GPU2>* dsA = nullptr;
+			const MatDense<FPP, GPU2>* dsB = nullptr;
+			const MatBSR<FPP, GPU2>* bsrA = nullptr;
+			const MatBSR<FPP, GPU2>* bsrB = nullptr;
 			// downcast and call the proper function
 			spA = dynamic_cast<const Faust::MatSparse<FPP,GPU2>*>(&A);
 			if(! spA)
