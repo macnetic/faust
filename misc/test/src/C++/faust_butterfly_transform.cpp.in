@@ -66,8 +66,13 @@ class ButterflyMat
 
 	Vec<FPP> multiply(Vec<FPP>& x) const
 	{
-		Vec<FPP> z;
-		z = d1.array() * x.array() + d2.array() * x(subdiag_ids, Eigen::placeholders::all).array();
+		Vec<FPP> z(x.rows());
+		//auto y = x(subdiag_ids, Eigen::placeholders::all).array();
+		#pragma omp parallel for
+		for(int i=0;i < x.rows(); i++)
+			z[i] = d1[i] * x[i] + d2[i] * x[subdiag_ids[i]];
+//			z[i] = d1[i] * x[i] + d2[i] * y[i];
+//		z = d1.array() * x.array() + d2.array() * x(subdiag_ids, Eigen::placeholders::all).array();
 		return z;
 	}
 
@@ -104,8 +109,12 @@ class ButterflyPermFaust
 
 	Vec<FPP> multiply(Vec<FPP>& x) const
 	{
-		Vec<FPP> y = x(bitrev_perm, Eigen::placeholders::all).array();
-		y = perm_d.array() * y.array();
+//		Vec<FPP> y = x(bitrev_perm, Eigen::placeholders::all).array();
+//		y = perm_d.array() * y.array();
+		Vec<FPP> y(x.rows());
+		#pragma omp parallel for
+		for(int i=0;i < x.rows(); i++)
+			y[i] = perm_d[i] * x[bitrev_perm[i]];
 		int i = csr_faust.size()-2;
 		for(auto fac: opt_factors)
 		{
