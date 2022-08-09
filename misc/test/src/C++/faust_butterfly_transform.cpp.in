@@ -1,0 +1,162 @@
+#include "faust_TransformHelper.h"
+#include <cstdlib>
+#include "faust_bit_rev_permu.h"
+#include <vector>
+#include <ctime>
+#include <chrono>
+typedef @TEST_FPP@ FPP;
+
+using namespace Faust;
+using namespace std;
+using namespace Eigen;
+
+template<typename T>
+using DenseMat = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>;
+
+template<typename T>
+using Vec = Eigen::Matrix<T, Eigen::Dynamic, 1>;
+
+template<typename T>
+using DenseMatMap = Eigen::Map<DenseMat<T>>;
+
+class ButterflyMat
+{
+
+	Vec<FPP> d1;
+	Vec<FPP> d2;
+	vector<int> subdiag_ids;
+	int level;
+
+	// \param level: is a 0-base index.
+	public:
+	ButterflyMat(const MatSparse<FPP, Cpu> &factor, int level)
+	{
+		// build a d1, d2 pair from the butterfly factor
+		auto size = factor.getNbRow();
+		d1 = Vec<FPP>(size);
+		d2 = Vec<FPP>(size);
+		auto d_offset = size >> (level+1);
+		auto data = factor.getValuePtr();
+		auto rowptr = factor.getRowPtr();
+		for(int i=0;i < size; i++)
+		{
+			if((i / d_offset) % 2)
+			{
+				// d2 coeff is the first elt of row i
+				d2[i] = data[rowptr[i]];
+				d1[i] = data[rowptr[i]+1]; // diag elt is just after
+			}
+			else
+			{
+				// d2 coeff is the last elt of row i
+				d2[i] = data[rowptr[i+1]-1];
+				d1[i] = data[rowptr[i+1]-2]; // diag elt is just before
+			}
+		}
+		vector<int> seq(size);
+		iota(seq.begin(), seq.end(), 0);
+		subdiag_ids.resize(size);
+		for(int i = 0;i < size; i += d_offset * 2)
+		{
+			copy(seq.begin()+i+d_offset, seq.begin()+i+2*d_offset, subdiag_ids.begin()+i);
+			copy(seq.begin()+i, seq.begin()+i+d_offset, subdiag_ids.begin()+i+d_offset);
+		}
+		this->level = level;
+	}
+
+	Vec<FPP> multiply(Vec<FPP>& x) const
+	{
+		Vec<FPP> z;
+		z = d1.array() * x.array() + d2.array() * x(subdiag_ids, Eigen::placeholders::all).array();
+		return z;
+	}
+
+};
+
+class ButterflyPermFaust
+{
+	vector<ButterflyMat> opt_factors;
+	Vec<FPP> perm_d;
+	vector<unsigned int> bitrev_perm;
+	TransformHelper<FPP, Cpu>& csr_faust;
+
+	public:
+	ButterflyPermFaust(TransformHelper<FPP, Cpu>& csr_faust) : csr_faust(csr_faust)
+	{
+		int i = 0;
+		for(auto csr_fac: csr_faust)
+		{
+			if(i < csr_faust.size()-1)
+				opt_factors.insert(opt_factors.begin(), ButterflyMat(*dynamic_cast<const MatSparse<FPP, Cpu>*>(csr_fac), i++));
+		}
+		// set the permutation factor
+		auto csr_fac = *(csr_faust.end()-1);
+		auto size = csr_fac->getNbRow();
+		perm_d = Vec<FPP>(size);
+		memcpy(perm_d.data(), dynamic_cast<const MatSparse<FPP, Cpu>*>(csr_fac)->getValuePtr(), size*sizeof(FPP));
+		auto bitrev_perm_ids = new unsigned int[size];
+		iota(bitrev_perm_ids, bitrev_perm_ids+size, 0);
+		bit_rev_permu(csr_faust.size()-1, bitrev_perm_ids);
+		bitrev_perm.resize(size);
+		copy(bitrev_perm_ids, bitrev_perm_ids+size, bitrev_perm.begin());
+		delete[] bitrev_perm_ids;
+	}
+
+	Vec<FPP> multiply(Vec<FPP>& x) const
+	{
+		Vec<FPP> y = x(bitrev_perm, Eigen::placeholders::all).array();
+		y = perm_d.array() * y.array();
+		int i = csr_faust.size()-2;
+		for(auto fac: opt_factors)
+		{
+			y = fac.multiply(y);
+			i--;
+		}
+		return y;
+	}
+};
+
+int main(int argc, char** argv)
+{
+	int nsamples = 100;
+	int log2size = 19;
+	if(argc > 1)
+	{
+		log2size = atoi(argv[1]);
+		if(argc > 2)
+			nsamples = atoi(argv[2]);
+	}
+	cout << "nsamples: " << nsamples << endl;
+	cout << "log2size: " << log2size << endl;
+	srand(time(NULL));
+	auto DFT = TransformHelper<FPP, Cpu>::fourierFaust(log2size);
+//	DFT->display();
+	auto size = DFT->getNbRow();
+	ButterflyPermFaust opt_DFT(*DFT);
+	Vec<FPP> x1 = Vec<FPP>::Random(size);
+//	Vec<FPP> x1 = Vec<FPP>::Ones(size);
+	Vect<FPP, Cpu> x1_(size, x1.data());
+	Vec<FPP> y1;
+	auto start = std::chrono::steady_clock::now();
+	for(int i=0;i<nsamples; i++)
+		y1 = opt_DFT.multiply(x1);
+	auto end = std::chrono::steady_clock::now();
+	std::chrono::duration<double> elapsed_seconds = end-start;
+	std::cout << "Optimized DFT product time:" << elapsed_seconds.count() << std::endl;
+	Vect<FPP, Cpu> y1_ref;
+	start = std::chrono::steady_clock::now();
+	for(int i=0;i<nsamples; i++)
+		y1_ref = DFT->multiply(x1_);
+	end = std::chrono::steady_clock::now();
+	elapsed_seconds = end-start;
+	std::cout << "Faust DFT product time:" << elapsed_seconds.count() << std::endl;
+	Vect<FPP, Cpu> y1_test(size, y1.data());
+//	std::cout << y1_ref.norm() << std::endl;
+//	std::cout << y1_test.norm() << std::endl;
+//	y1_ref.Display();
+//	std::cout << y1 << std::endl;
+	y1_ref -= y1_test;
+	assert(y1_ref.norm() < 1e-6);
+	std::cout << "prod tested OK" << std::endl;
+	return EXIT_SUCCESS;
+}
