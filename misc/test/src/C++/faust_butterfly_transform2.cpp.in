@@ -1,0 +1,29 @@
+#include "faust_TransformHelperButterfly.h"
+#include <cstdio>
+
+typedef @TEST_FPP@ FPP;
+
+using namespace Faust;
+
+int main()
+{
+	int log2size = 5;
+	int size = 1 << log2size;
+	auto oF = TransformHelperButterfly<FPP, Cpu>::fourierFaust(5, false);
+	auto F = TransformHelper<FPP, Cpu>::fourierFaust(5, false);
+
+	Vect<FPP, Cpu> x(size);
+	x.setRand();
+//	x.setOnes();
+
+	auto ref_v = F->multiply(x);
+	auto test_v = oF->multiply(x);
+
+	ref_v.Display();
+	test_v.Display();
+	auto err = test_v;
+	err -= ref_v;
+	assert(err.norm() <= 1e-6);
+
+	return EXIT_SUCCESS;
+}
