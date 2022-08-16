@@ -9,7 +9,7 @@ namespace Faust {
 	 * Ref.: http://www.cs.cornell.edu/~bindel/class/cs5220-s10/slides/FFT.pdf
 	 */
 	template<typename FPP>
-	void fft_factors(unsigned int n, vector<MatGeneric<FPP,Cpu>*>&  v);
+	void fft_factors(unsigned int n, std::vector<MatGeneric<FPP,Cpu>*>&  v);
 
 }
 #include "faust_FFT.hpp"

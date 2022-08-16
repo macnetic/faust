@@ -4,7 +4,7 @@
 
 namespace Faust {
 	template<typename FPP>
-void fft_factors(unsigned int n, vector<MatGeneric<complex<FPP>,Cpu>*>&  v)
+void fft_factors(unsigned int n, std::vector<MatGeneric<complex<FPP>,Cpu>*>&  v)
 {
 	//TODO: clean this code
 	//Cooley-Tukey
