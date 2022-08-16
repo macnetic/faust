@@ -1454,7 +1454,7 @@ template<typename FPP>
 	}
 
 template<typename FPP>
-	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::fourierFaust(unsigned int n, const bool norma)
+	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::fourierFaust(unsigned int n, const bool norma/*=true*/)
 	{
 
 		vector<MatGeneric<FPP,Cpu>*> factors(n+1);

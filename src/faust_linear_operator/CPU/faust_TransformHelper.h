@@ -94,9 +94,9 @@ namespace Faust
 #endif
 
 			void copy_mul_mode_state(const TransformHelper<FPP,Cpu>& th);
-			virtual Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> &x);
-			virtual Vect<FPP,Cpu> multiply(const FPP* x);
-			virtual void multiply(const FPP* x, FPP* y);
+			virtual Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> &x);//TODO: should be const and child redefs too
+			virtual Vect<FPP,Cpu> multiply(const FPP* x);//TODO: should be const and child redefs too
+			virtual void multiply(const FPP* x, FPP* y); //TODO: should be const and child redefs too
 			// Multiplies the slice s of this by the vector x corresponding elements (x size is this->getNbCol())
 			FPP* sliceMultiply(const Slice s[2], const FPP* X, FPP* out=nullptr, int X_ncols=1) const;
 			// Note: Prefers the prototype above as it avoids copies
