@@ -245,6 +245,16 @@ class ButterflyMat
 		return z;
 	}
 
+	void Display() const
+	{
+		cout << "d1: " << d1.transpose() << std::endl;
+		cout << "d2: " << d2.transpose()<< std::endl;
+		cout << "subdiag_ids: ";
+		for(int i=0;i < subdiag_ids.size();i++)
+			cout << subdiag_ids[i] << " ";
+		cout << std::endl;
+	}
+
 };
 
 #ifdef USE_AVX
@@ -304,6 +314,8 @@ class ButterflyPermFaust
 	{
 		int i = 0;
 		assert(!avx || !eigen);
+		assert(!avx || !omp);
+		assert(!eigen || !omp);
 		for(auto csr_fac: csr_faust)
 		{
 			if(i < csr_faust.size()-1)
@@ -348,11 +360,9 @@ class ButterflyPermFaust
 		for(int i=0;i < x.rows(); i++)
 			y[i] = x[bitrev_perm[i]];
 		y = perm_d.array() * y.array();
-		int i = csr_faust.size()-2;
 		for(auto fac: opt_factors)
 		{
 			y = std::move(fac.multiply(y));
-			i--;
 		}
 		return y;
 	}
@@ -372,7 +382,7 @@ int main(int argc, char** argv)
 	cout << "nsamples: " << nsamples << endl;
 	cout << "log2size: " << log2size << endl;
 	srand(time(NULL));
-	auto DFT = TransformHelper<FPP, Cpu>::fourierFaust(log2size);
+	auto DFT = TransformHelper<FPP, Cpu>::fourierFaust(log2size, false);
 //	DFT->display();
 	auto size = DFT->getNbRow();
 	ButterflyPermFaust opt_DFT(*DFT);
