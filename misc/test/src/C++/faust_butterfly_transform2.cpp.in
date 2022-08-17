@@ -5,12 +5,16 @@ typedef @TEST_FPP@ FPP;
 
 using namespace Faust;
 
-int main()
+int main(int argc, char** argv)
 {
-	int log2size = 5;
+	int log2size = 4;
+	if(argc > 1)
+		log2size = std::atoi(argv[1]);
+	std::cout << "log2size: " << log2size << std::endl;
+
 	int size = 1 << log2size;
-	auto oF = TransformHelperButterfly<FPP, Cpu>::fourierFaust(5, false);
-	auto F = TransformHelper<FPP, Cpu>::fourierFaust(5, false);
+	auto oF = TransformHelperButterfly<FPP, Cpu>::fourierFaust(log2size, false);
+	auto F = TransformHelper<FPP, Cpu>::fourierFaust(log2size, false);
 
 	Vect<FPP, Cpu> x(size);
 	x.setRand();
@@ -24,6 +28,22 @@ int main()
 	auto err = test_v;
 	err -= ref_v;
 	assert(err.norm() <= 1e-6);
+	std::cout << "Faust-vector product OK" << std::endl;
+
+
+	// test multiplying a MatDense
+	auto X = MatDense<FPP, Cpu>::randMat(size, size);
+	//	 X->setOnes();
+
+	auto refY = F->multiply(*X);
+	auto testY = oF->multiply(*X);
+
+
+	auto errY = testY;
+	errY -= refY;
+	assert(errY.norm() <= 1e-6);
+
+	std::cout << "Faust-dense matrix product OK" << std::endl;
 
 	return EXIT_SUCCESS;
 }

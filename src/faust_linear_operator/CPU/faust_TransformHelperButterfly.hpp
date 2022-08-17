@@ -96,6 +96,32 @@ namespace Faust
 			multiply(x, y.getData());
 			return y;
 		}
+
+	template<typename FPP>
+			void  TransformHelperButterfly<FPP,Cpu>::multiply(const FPP* X, int X_ncols, FPP* Y)
+			{
+				using MatMap = Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>>;
+				MatMap X_mat(const_cast<FPP*>(X) /* harmless, no modification*/, this->getNbCol(), X_ncols);
+				MatMap Y_mat(Y, this->getNbRow(), X_ncols);
+				for(int i=0;i < this->getNbRow(); i ++)
+					Y_mat.row(i) = X_mat.row(bitrev_perm[i]) * perm_d.getData()[i];
+				auto Z = new FPP[this->getNbRow()*X_ncols];
+				for(auto fac: opt_factors)
+				{
+					fac.multiply(Y, Y_mat.cols(), Z, this->getNbRow());
+					memcpy(Y, Z, sizeof(FPP)*this->getNbRow()*X_ncols);
+				}
+				delete[] Z;
+			}
+
+	template<typename FPP>
+			MatDense<FPP, Cpu>  TransformHelperButterfly<FPP,Cpu>::multiply(const MatDense<FPP,Cpu> &A)
+			{
+				MatDense<FPP, Cpu> Y(this->getNbRow(), A.getNbCol());
+				multiply(A.getData(), A.getNbCol(), Y.getData());
+				return Y;
+			}
+
 }
 
 
@@ -173,4 +199,23 @@ namespace Faust
 		for(int i=0;i < size; i++)
 			y[i] = d1_ptr[i] * x[i] + d2_ptr[i] * x[subdiag_ids[i]];
 	}
+
+	template<typename FPP>
+		void  ButterflyMat<FPP>::multiply(const FPP* X, int X_ncols, FPP* Y, size_t Y_nrows)
+		{
+			using MatMap = Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>>;
+			MatMap X_mat(const_cast<FPP*>(X) /* harmless, no modification*/, Y_nrows, X_ncols);
+			MatMap Y_mat(Y, Y_nrows, X_ncols);
+			const FPP *d1_ptr = d1.getData(), *d2_ptr = d2.getData();
+			for(int i=0;i < Y_nrows; i++)
+				Y_mat.row(i) = d1_ptr[i] * X_mat.row(i) + d2_ptr[i] * X_mat.row(subdiag_ids[i]);
+		}
+
+	template<typename FPP>
+		MatDense<FPP, Cpu>  ButterflyMat<FPP>::multiply(const MatDense<FPP,Cpu> &A)
+		{
+			MatDense<FPP, Cpu> Y(A.getNbrow(), A.getNbCol());
+			multiply(A.getData(), A.getNbCol(), Y.getData(), A.getNbRow());
+			return Y;
+		}
 }

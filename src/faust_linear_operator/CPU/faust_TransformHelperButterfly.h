@@ -27,6 +27,9 @@ namespace Faust
 			Vect<FPP, Cpu> multiply(const Vect<FPP, Cpu>& x);
 			void multiply(const FPP* x, FPP* y);
 			Vect<FPP,Cpu> multiply(const FPP* x);
+			void multiply(const FPP* A, int A_ncols, FPP* C);
+			MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> &A);
+
 		};
 
 	template<typename FPP>
@@ -45,6 +48,9 @@ namespace Faust
 		Vect<FPP, Cpu> multiply(const Vect<FPP, Cpu>& x) const;
 		void multiply(const FPP* x, FPP* y, size_t size) const;
 		void Display() const;
+
+		void multiply(const FPP* A, int A_ncols, FPP* C, size_t size);
+		MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> &A);
 
 	};
 }
