@@ -45,5 +45,20 @@ int main(int argc, char** argv)
 
 	std::cout << "Faust-dense matrix product OK" << std::endl;
 
+	// test multiplying a MatDense
+	auto spX = MatSparse<FPP, Cpu>::randMat(size, size, .2);
+	//	 X->setOnes();
+
+	auto refYsp = F->multiply(*spX);
+	auto testYsp = oF->multiply(*spX);
+
+
+	auto errYsp = testYsp;
+	errYsp -= refYsp;
+	assert(errYsp.norm() <= 1e-6);
+
+	std::cout << "Faust-sparse matrix product OK" << std::endl;
+
+
 	return EXIT_SUCCESS;
 }

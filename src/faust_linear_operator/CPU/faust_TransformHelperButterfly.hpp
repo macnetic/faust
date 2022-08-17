@@ -115,10 +115,30 @@ namespace Faust
 			}
 
 	template<typename FPP>
-			MatDense<FPP, Cpu>  TransformHelperButterfly<FPP,Cpu>::multiply(const MatDense<FPP,Cpu> &A)
+			MatDense<FPP, Cpu>  TransformHelperButterfly<FPP,Cpu>::multiply(const MatDense<FPP,Cpu> &X)
 			{
-				MatDense<FPP, Cpu> Y(this->getNbRow(), A.getNbCol());
-				multiply(A.getData(), A.getNbCol(), Y.getData());
+				MatDense<FPP, Cpu> Y(this->getNbRow(), X.getNbCol());
+				multiply(X.getData(), X.getNbCol(), Y.getData());
+				return Y;
+			}
+
+	template<typename FPP>
+			MatDense<FPP, Cpu>  TransformHelperButterfly<FPP,Cpu>::multiply(const MatSparse<FPP,Cpu> &X)
+			{
+				MatDense<FPP, Cpu> Y(this->getNbRow(), X.getNbCol());
+				for(int i=0;i < this->getNbRow(); i ++)
+					Y.mat.row(i) = X.mat.row(bitrev_perm[i]) * perm_d.getData()[i];
+//				auto Z = new FPP[this->getNbRow()*X.getNbCol()];
+//				for(auto fac: opt_factors)
+//				{
+//					fac.multiply(Y.getData(), Y.mat.cols(), Z, this->getNbRow());
+//					memcpy(Y.getData(), Z, sizeof(FPP)*this->getNbRow()*X.getNbCol());
+//				}
+//				delete[] Z;
+				for(auto fac: opt_factors)
+				{
+					Y = fac.multiply(Y);
+				}
 				return Y;
 			}
 
@@ -212,10 +232,10 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		MatDense<FPP, Cpu>  ButterflyMat<FPP>::multiply(const MatDense<FPP,Cpu> &A)
+		MatDense<FPP, Cpu>  ButterflyMat<FPP>::multiply(const MatDense<FPP,Cpu> &X)
 		{
-			MatDense<FPP, Cpu> Y(A.getNbrow(), A.getNbCol());
-			multiply(A.getData(), A.getNbCol(), Y.getData(), A.getNbRow());
+			MatDense<FPP, Cpu> Y(X.getNbRow(), X.getNbCol());
+			multiply(X.getData(), X.getNbCol(), Y.getData(), X.getNbRow());
 			return Y;
 		}
 }

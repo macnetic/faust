@@ -132,6 +132,9 @@ namespace Faust
 	template<typename FPP,FDevice DEVICE>
 		class MatBSR;
 
+	template<typename FPP, FDevice DEV> class TransformHelperButterfly;
+	template<typename FPP> class ButterflyMat;
+
 	template<typename FPP>
 		class MatDense<FPP,Cpu> : public MatGeneric<FPP,Cpu>
 		{
@@ -141,6 +144,8 @@ namespace Faust
 			friend TransformHelper<FPP,Cpu>; // TODO: limit to needed member functions only
 			friend Transform<FPP,Cpu>; //TODO: limit to needed member functions only (multiply)
 			friend void  MatDiag<FPP>::multiply(MatDense<FPP,Cpu> & M, char opThis) const;
+			friend TransformHelperButterfly<FPP, Cpu>;
+			friend ButterflyMat<FPP>;
 
 			/// All derived class template of MatDense are considered as friends
 			template<class,FDevice> friend class MatDense;
