@@ -3256,12 +3256,12 @@ def wht(n, normed=True, dev="cpu", dtype='double'):
 
 def dft(n, normed=True, dev='cpu', diag_opt=False):
     """
-    Constructs a Faust F implementing the Discrete Fourier Transform (DFT) order n.
+    Constructs a Faust F implementing the Discrete Fourier Transform (DFT) of order n.
 
     The factorization corresponds to the butterfly structure of the
     Cooley-Tukey FFT algorithm.
-    The resulting Faust is complex and has (log2(n)+1) sparse factors
-    whose the log2(n) first has 2 nonzeros per row and per column.
+    The resulting Faust is complex and has (log2(n)+1) sparse factors.
+    The log2(n) first has 2 nonzeros per row and per column.
     The last factor is a bit-reversal permutation matrix.
 
     Args:
@@ -3296,8 +3296,7 @@ def dft(n, normed=True, dev='cpu', diag_opt=False):
         >>> dft(1024, normed=True) # is equiv. to next call
         >>> dft(1024, normed=False).normalize() # which is less optimized though
 
-    <b>See also:</b> pyfaust.tools.bitrev, pyfaust.wht, pyfaust.dct,
-    pyfaust.dst, scipy.fft.fft, pyfaust.fact.butterfly, pyfaust.rand_butterfly.
+    <b>See also:</b> pyfaust.tools.bitrev, pyfaust.wht, pyfaust.dct, pyfaust.dst, scipy.fft.fft, pyfaust.fact.butterfly, pyfaust.rand_butterfly.
     """
     log2n = np.floor(np.log2(n))
     if(n > 2**log2n): raise ValueError("n must be a power of 2.")

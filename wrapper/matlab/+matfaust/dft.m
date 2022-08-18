@@ -1,11 +1,11 @@
 %==========================================================================================
-%> @brief Constructs a Faust F implementing the Discrete Fourier Transform (DFT) order n.
+%> @brief Constructs a Faust F implementing the Discrete Fourier Transform (DFT) of order n.
 %>
 %> The factorization algorithm used is Cooley-Tukey (FFT).
 %>
 %> The factorization corresponds to the butterfly structure of the Cooley-Tukey
 %> FFT algorithm. The resulting Faust is complex and has (log2(n)+1) sparse
-%> factors whose the log2(n) first has 2 nonzeros per row and per column. The
+%> factors. The log2(n) first has 2 nonzeros per row and per column. The
 %> last factor is a bit-reversal permutation matrix.
 %>
 %> @b Usage
