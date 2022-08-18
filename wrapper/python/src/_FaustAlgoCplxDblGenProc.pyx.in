@@ -1,13 +1,14 @@
 cdef class FaustAlgoCplxDblGen@PROC@:
 
     @staticmethod
-    def fourierFaust(n, norma):
+    def fourierFaust(n, norma, diag_opt):
         if(n>31):
             raise ValueError("Faust doesn't handle a DFT of order larger than "
                              "2**31")
         core = FaustCoreGenCplxDbl@PROC@(core=True)
         core.core_faust_cplx = \
-                FaustCoreCy.FaustCoreCpp@PROC@[complex].fourierFaust(n, norma)
+                FaustCoreCy.FaustCoreCpp@PROC@[complex].fourierFaust(n, norma,
+                                                                    diag_opt)
         if(core.core_faust_cplx == NULL):
             raise MemoryError()
         # fourier is always a complex Faust

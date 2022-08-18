@@ -138,7 +138,8 @@ cdef extern from "FaustCoreCpp.h":
                                          FPP* T0_vals, unsigned int T0_nnz,
                                          unsigned int T0_ncols, bool on_gpu);
         @staticmethod
-        @CPP_CORE_CLASS@[FPP]* fourierFaust(unsigned int n, const bool norma)
+        @CPP_CORE_CLASS@[FPP]* fourierFaust(unsigned int n, const bool norma,
+                                            const bool diag_opt)
         @staticmethod
         @CPP_CORE_CLASS@[FPP]* eyeFaust(unsigned int n, unsigned int m)
 

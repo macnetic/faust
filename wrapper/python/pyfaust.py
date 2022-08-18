@@ -3254,7 +3254,7 @@ def wht(n, normed=True, dev="cpu", dtype='double'):
             H = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUCplxDbl.hadamardFaust(log2n, normed))
     return H
 
-def dft(n, normed=True, dev='cpu'):
+def dft(n, normed=True, dev='cpu', diag_opt=False):
     """
     Constructs a Faust F implementing the Discrete Fourier Transform (DFT) order n.
 
@@ -3269,6 +3269,10 @@ def dft(n, normed=True, dev='cpu'):
         normed: default to True to normalize the DFT Faust as if you called
         Faust.normalize() and False otherwise.
         dev: device to create the Faust on ('cpu' or 'gpu').
+        diag_opt: enable the diagonal optimization of Butterfly and permutation
+        factors. Basically, it consists to simplify the product of Faust-vector
+        and Faust-matrix to vector elementwise multiplications of factor
+        diagonals with a the vector/matrix.
 
     Returns:
         The Faust implementing the DFT of dimension n.
@@ -3300,9 +3304,15 @@ def dft(n, normed=True, dev='cpu'):
     if(not isinstance(normed, bool)):
         raise TypeError("normed must be True of False.")
     if dev == "cpu":
-        F = Faust(core_obj=_FaustCorePy.FaustAlgoCplxDblGenCPU.fourierFaust(log2n, normed))
+        F = \
+        Faust(core_obj=_FaustCorePy.FaustAlgoCplxDblGenCPU.fourierFaust(log2n,
+                                                                        normed,
+                                                                        diag_opt))
     elif dev.startswith("gpu"):
-        F = Faust(core_obj=_FaustCorePy.FaustAlgoCplxDblGenGPU.fourierFaust(log2n, normed))
+        F = \
+        Faust(core_obj=_FaustCorePy.FaustAlgoCplxDblGenGPU.fourierFaust(log2n,
+                                                                        normed,
+                                                                        diag_opt))
     return F
 
 def dct(n, dev='cpu'):

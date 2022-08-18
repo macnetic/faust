@@ -190,7 +190,7 @@ class FaustCoreCpp
             unsigned int bnrows, unsigned int bncols, float density);
 
     static FaustCoreCpp<FPP,DEV>* hadamardFaust(unsigned int n, const bool norma);
-    static FaustCoreCpp<FPP,DEV>* fourierFaust(unsigned int n, const bool norma);
+    static FaustCoreCpp<FPP,DEV>* fourierFaust(unsigned int n, const bool norma, const bool diag_opt);
     static FaustCoreCpp<FPP,DEV>* eyeFaust(unsigned int n, unsigned int m);
     static FaustCoreCpp<FPP, DEV>* polyBasis(
             unsigned int L_nrows,
