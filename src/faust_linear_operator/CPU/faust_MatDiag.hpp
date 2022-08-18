@@ -43,23 +43,19 @@ Faust::Vect<FPP,Cpu> Faust::MatDiag<FPP>::multiply(const Vect<FPP,Cpu> &v) const
 template<typename FPP>
 void  Faust::MatDiag<FPP>::multiply(Faust::Vect<FPP,Cpu> & vec, char opThis) const
 {
-	if(opThis == 'T')
-	{
-		Faust::MatDiag<FPP> tmat(this->getNbCol(), this->getNbRow(), this->getData());
-		vec.vec = tmat.mat * vec.vec;
-	}
-	else vec.vec = mat * vec.vec;
+	if(opThis = 'H')
+		vec.vec = mat.conjugate() * vec.vec;
+	else //if (opThis == 'N' || opThis == 'T')
+		vec.vec = mat * vec.vec;
 }
 
 template<typename FPP>
 void  Faust::MatDiag<FPP>::multiply(MatDense<FPP,Cpu> & M, char opThis) const
 {
-	if (opThis == 'N')
-		M.mat = this->mat * M.mat;
-	else {
-		Faust::MatDiag<FPP> tmat(this->getNbCol(), this->getNbRow(), this->getData());
-		M.mat = tmat.mat * M.mat;
-	}
+	if(opThis = 'H')
+		M.mat = mat.conjugate() * M.mat;
+	else //if (opThis == 'N' || opThis == 'T')
+		M.mat = mat * M.mat;
 }
 
 template<typename FPP>
