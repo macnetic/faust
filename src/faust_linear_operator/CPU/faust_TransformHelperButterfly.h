@@ -13,10 +13,13 @@ namespace Faust
 	template<typename FPP>
 		class TransformHelperButterfly<FPP, Cpu> : public TransformHelper<FPP, Cpu>
 		{
-			Vect<FPP, Cpu> perm_d;
+			using VecMap = Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>>;
+			using DiagMat = Eigen::DiagonalMatrix<FPP, Eigen::Dynamic>;
 			FPP *perm_d_ptr;
+			DiagMat D;
 			std::vector<unsigned int> bitrev_perm;
 			std::vector<ButterflyMat<FPP>> opt_factors;
+
 
 			// private ctor
 			TransformHelperButterfly<FPP, Cpu>(const std::vector<MatGeneric<FPP,Cpu> *>& facts, const FPP lambda_ = (FPP)1.0, const bool optimizedCopy=false, const bool cloning_fact = true, const bool internal_call=false);
@@ -37,8 +40,10 @@ namespace Faust
 	class ButterflyMat
 	{
 
-		Vect<FPP, Cpu> d1;
-		Vect<FPP, Cpu> d2;
+		using VecMap = Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>>;
+		using DiagMat = Eigen::DiagonalMatrix<FPP, Eigen::Dynamic>;
+		DiagMat D1;
+		DiagMat D2;
 		std::vector<int> subdiag_ids;
 		int level;
 
@@ -53,7 +58,9 @@ namespace Faust
 		void multiply(const FPP* A, int A_ncols, FPP* C, size_t size);
 		MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> &A);
 //		MatDense<FPP, Cpu> multiply(const MatSparse<FPP,Cpu> &A);
-
+		public:
+			const DiagMat& getD1() {return D1;};
+			const DiagMat& getD2() {return D2;};
 	};
 }
 #include "faust_TransformHelperButterfly.hpp"

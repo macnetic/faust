@@ -5,15 +5,15 @@ namespace Faust
 		TransformHelperButterfly<FPP,Cpu>::TransformHelperButterfly(const std::vector<MatGeneric<FPP,Cpu> *>& facts, const FPP lambda_ /*= (FPP)1.0*/, const bool optimizedCopy/*=false*/, const bool cloning_fact /*= true*/, const bool internal_call/*=false*/) : TransformHelper<FPP, Cpu>(facts, lambda_, optimizedCopy, cloning_fact, internal_call)
 	{
 		int i = 0;
+		auto size = this->getNbRow();
+		D.resize(size);
 		for(auto csr_fac: facts)
 			if(i < facts.size()-1)
 				opt_factors.insert(opt_factors.begin(), ButterflyMat<FPP>(*dynamic_cast<const MatSparse<FPP, Cpu>*>(csr_fac), i++));
 		// set the permutation factor
 		auto csr_fac = *(facts.end()-1);
-		auto size = csr_fac->getNbRow();
-		perm_d = Vect<FPP, Cpu>(size);
-		perm_d_ptr = perm_d.getData();
-		//TODO: only a setOnes should be enough, this is a permutation matrix
+		perm_d_ptr = D.diagonal().data();
+		// only a setOnes should be enough because this is a permutation matrix (but it could be normalized)
 		memcpy(perm_d_ptr, dynamic_cast<const MatSparse<FPP, Cpu>*>(csr_fac)->getValuePtr(), size*sizeof(FPP));
 		auto bitrev_perm_ids = new unsigned int[size];
 		iota(bitrev_perm_ids, bitrev_perm_ids+size, 0);
@@ -47,12 +47,6 @@ namespace Faust
 		Vect<FPP, Cpu> TransformHelperButterfly<FPP,Cpu>::multiply(const Vect<FPP, Cpu>& x)
 		{
 			Vect<FPP, Cpu> y(this->getNbRow());
-//			for(int i=0;i < this->getNbRow(); i++)
-//				y.getData()[i] = perm_d_ptr[i] * x.getData()[bitrev_perm[i]];
-//
-//			int i = 0;
-//			for(auto fac: opt_factors)
-//				y = fac.multiply(y);
 			multiply(x.getData(), y.getData());
 			return y;
 		}
@@ -61,19 +55,30 @@ namespace Faust
 		void TransformHelperButterfly<FPP,Cpu>::multiply(const FPP* x, FPP* y)
 		{
 			auto size = this->getNbRow();
+			VecMap x_vec(const_cast<FPP*>(x), size); // const_cast is harmless
+			VecMap y_vec(y, size);
 			if(x == y)
 			{
 				// an intermediate vector is needed to index x
 				auto x_ = new FPP[size];
+				#pragma omp parallel for
 				for(int i=0;i < size; i++)
 					x_[i] = x[bitrev_perm[i]];
+				#pragma omp parallel for
 				for(int i=0;i < size; i++)
 					y[i] = perm_d_ptr[i] * x_[i];
 				delete[] x_;
 			}
 			else
+#define BUTTERFLY_MUL_VEC_OMP_LOOP
+#ifdef BUTTERFLY_MUL_VEC_OMP_LOOP
+				// faster
+				#pragma omp parallel for
 				for(int i=0;i < this->getNbRow(); i++)
-					y[i] = perm_d.getData()[i] * x[bitrev_perm[i]];
+					y[i] = perm_d_ptr[i] * x[bitrev_perm[i]];
+#else
+			y_vec = D * x_vec(bitrev_perm);
+#endif
 
 			Vect<FPP, Cpu> z(size);
 			int i = 0;
@@ -103,14 +108,26 @@ namespace Faust
 				using MatMap = Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>>;
 				MatMap X_mat(const_cast<FPP*>(X) /* harmless, no modification*/, this->getNbCol(), X_ncols);
 				MatMap Y_mat(Y, this->getNbRow(), X_ncols);
+#ifdef BUTTERFLY_MUL_MAT_OMP_LOOP
+				// this is slower
+				#pragma parallel omp for
 				for(int i=0;i < this->getNbRow(); i ++)
-					Y_mat.row(i) = X_mat.row(bitrev_perm[i]) * perm_d.getData()[i];
+					Y_mat.row(i) = X_mat.row(bitrev_perm[i]) * perm_d_ptr[i];
+#else
+				Y_mat = D * X_mat(bitrev_perm, Eigen::placeholders::all);
+#endif
 				auto Z = new FPP[this->getNbRow()*X_ncols];
+				int i = 0;
 				for(auto fac: opt_factors)
 				{
-					fac.multiply(Y, Y_mat.cols(), Z, this->getNbRow());
-					memcpy(Y, Z, sizeof(FPP)*this->getNbRow()*X_ncols);
+					if(i & 1)
+						fac.multiply(Z, Y_mat.cols(), Y, this->getNbRow());
+					else
+						fac.multiply(Y, Y_mat.cols(), Z, this->getNbRow());
+					i++;
 				}
+				if(i & 1)
+					memcpy(Y, Z, sizeof(FPP)*this->getNbRow()*X_ncols);
 				delete[] Z;
 			}
 
@@ -126,19 +143,32 @@ namespace Faust
 			MatDense<FPP, Cpu>  TransformHelperButterfly<FPP,Cpu>::multiply(const MatSparse<FPP,Cpu> &X)
 			{
 				MatDense<FPP, Cpu> Y(this->getNbRow(), X.getNbCol());
+				#pragma omp parallel for
 				for(int i=0;i < this->getNbRow(); i ++)
-					Y.mat.row(i) = X.mat.row(bitrev_perm[i]) * perm_d.getData()[i];
-//				auto Z = new FPP[this->getNbRow()*X.getNbCol()];
-//				for(auto fac: opt_factors)
-//				{
-//					fac.multiply(Y.getData(), Y.mat.cols(), Z, this->getNbRow());
-//					memcpy(Y.getData(), Z, sizeof(FPP)*this->getNbRow()*X.getNbCol());
-//				}
-//				delete[] Z;
+					Y.mat.row(i) = X.mat.row(bitrev_perm[i]) * perm_d_ptr[i];
+#ifdef FAUST_BUTTERFLY_MULTILPY_SINGLE_BUFFER
+				// consume less memory but with more copies
 				for(auto fac: opt_factors)
 				{
 					Y = fac.multiply(Y);
 				}
+#else
+				// consume more memory but spare copies (faster if enough memory)
+				auto Z = new FPP[this->getNbRow()*X.getNbCol()];
+				int i = 0;
+				for(auto fac: opt_factors)
+				{
+					if(i & 1)
+						fac.multiply(Z, Y.mat.cols(), Y.getData(), this->getNbRow());
+					else
+						fac.multiply(Y.getData(), Y.mat.cols(), Z, this->getNbRow());
+					i++;
+				}
+
+				if(i & 1)
+					memcpy(Y.getData(), Z, sizeof(FPP)*this->getNbRow()*X.getNbCol());
+				delete[] Z;
+#endif
 				return Y;
 			}
 
@@ -152,11 +182,11 @@ namespace Faust
 	{
 		// build a d1, d2 pair from the butterfly factor
 		auto size = factor.getNbRow();
-		d1 = Vect<FPP, Cpu>(size);
-		d2 = Vect<FPP, Cpu>(size);
+		D1.resize(size);
+		D2.resize(size);
 		FPP *d1_ptr, *d2_ptr;
-		d1_ptr = d1.getData();
-		d2_ptr = d2.getData();
+		d1_ptr = D1.diagonal().data();
+		d2_ptr = D2.diagonal().data();
 		auto d_offset = size >> (level+1);
 		auto data = factor.getValuePtr();
 		auto rowptr = factor.getRowPtr();
@@ -189,10 +219,10 @@ namespace Faust
 	template<typename FPP>
 	void ButterflyMat<FPP>::Display() const
 	{
-		std::cout << "d1: ";
-		d1.Display();
-		std::cout << "d2: ";
-		d2.Display();
+		std::cout << "D1: ";
+		std::cout << D1.diagonal() << std::endl;
+		std::cout << "D2: ";
+		std::cout << D2.diagonal() << std::endl;
 		cout << "subdiag_ids: ";
 		for(int i=0;i < subdiag_ids.size();i++)
 			cout << subdiag_ids[i] << " ";
@@ -203,11 +233,6 @@ namespace Faust
 	Vect<FPP, Cpu> ButterflyMat<FPP>::multiply(const Vect<FPP, Cpu>& x) const
 	{
 		Vect<FPP, Cpu> z(x.size());
-//		const FPP *x_ptr = x.getData(), *d1_ptr = d1.getData(), *d2_ptr = d2.getData();
-//		for(int i=0;i < x.size(); i++)
-//		{
-//			z[i] = d1_ptr[i] * x[i] + d2_ptr[i] * x_ptr[subdiag_ids[i]];
-//		}
 		multiply(x.getData(), z.getData(), x.size());
 		return z;
 	}
@@ -215,9 +240,18 @@ namespace Faust
 	template<typename FPP>
 	void ButterflyMat<FPP>::multiply(const FPP* x, FPP* y, size_t size) const
 	{
-		const FPP *d1_ptr = d1.getData(), *d2_ptr = d2.getData();
+		const FPP *d1_ptr = D1.diagonal().data(), *d2_ptr = D2.diagonal().data();
+#define BMAT_MULTIPLY_VEC_OMP_LOOP
+#ifdef BMAT_MULTIPLY_VEC_OMP_LOOP
+		#pragma omp parallel for
 		for(int i=0;i < size; i++)
 			y[i] = d1_ptr[i] * x[i] + d2_ptr[i] * x[subdiag_ids[i]];
+#else
+		// this is slower
+		VecMap x_vec(const_cast<FPP*>(x), size); // const_cast is harmless
+		VecMap y_vec(y, size); // const_cast is harmless
+		y_vec = D1 * x_vec + D2 * x_vec(subdiag_ids);
+#endif
 	}
 
 	template<typename FPP>
@@ -226,9 +260,15 @@ namespace Faust
 			using MatMap = Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>>;
 			MatMap X_mat(const_cast<FPP*>(X) /* harmless, no modification*/, Y_nrows, X_ncols);
 			MatMap Y_mat(Y, Y_nrows, X_ncols);
-			const FPP *d1_ptr = d1.getData(), *d2_ptr = d2.getData();
+			const FPP *d1_ptr = D1.diagonal().data(), *d2_ptr = D2.diagonal().data();
+#ifdef BMAT_MULTIPLY_MAT_OMP_LOOP
+			// this is slower
+			#pragma omp parallel for
 			for(int i=0;i < Y_nrows; i++)
 				Y_mat.row(i) = d1_ptr[i] * X_mat.row(i) + d2_ptr[i] * X_mat.row(subdiag_ids[i]);
+#else
+			Y_mat = D1 * X_mat + D2 * X_mat(subdiag_ids, Eigen::placeholders::all);
+#endif
 		}
 
 	template<typename FPP>
