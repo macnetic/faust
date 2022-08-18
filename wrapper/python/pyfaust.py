@@ -3314,7 +3314,7 @@ def dft(n, normed=True, dev='cpu', diag_opt=False):
                                                                         diag_opt))
     return F
 
-def dct(n, dev='cpu'):
+def dct(n, normed=True, dev='cpu'):
     """Constructs a Faust implementing the Direct Cosine Transform (Type II) Faust of order n.
 
     The analytical formula of DCT II used here is:
@@ -3323,6 +3323,9 @@ def dct(n, dev='cpu'):
 
     Args:
         n: the order of the DCT (must be a power of two).
+        normed: default to True to normalize the DFT Faust as if you called
+        Faust.normalize() and False otherwise.
+
         dev: the device on which the Faust is created.
 
     Example:
@@ -3361,6 +3364,10 @@ def dct(n, dev='cpu'):
     else:
         mid_F = Faust(mid_factors)
     DCT = (Faust(f0) @ mid_F @ Faust(f_end)).real
+    if normed:
+        DCT = DCT.normalize()
+    if dev.startswith('gpu'):
+        DCT = DCT.clone(dev='gpu')
     return DCT
 
 # experimental block start
@@ -3413,7 +3420,7 @@ def dst3(n, dev='cpu'):
     return F.real
 # experimental block end
 
-def dst(n, dev='cpu'):
+def dst(n, normed=True, dev='cpu'):
     """
     Constructs a Faust implementing the Direct Sine Transform (Type II) Faust of order n.
 
@@ -3423,6 +3430,8 @@ def dst(n, dev='cpu'):
     Args:
         n: the order of the DST (must be a power of two).
         dev: the device on which the Faust is created.
+        normed: default to True to normalize the Hadamard Faust as if you called
+        Faust.normalize() and False otherwise.
 
     Example:
         >>> from pyfaust import dst
@@ -3493,7 +3502,12 @@ def dst(n, dev='cpu'):
     F_odd = Faust(D1, dev=dev) @ Faust(D2) @ MDFT
     F = pyfaust.hstack((F_even, F_odd))
     F = F @ Faust(P_, dev=dev)
-    return F.real
+    F = F.real
+    if normed:
+        F = F.normalize()
+    if dev.startswith('gpu'):
+        F = F.clone(dev='gpu')
+    return F
 
 def circ(c, **kwargs):
     """Returns a circulant Faust C defined by the vector c (which is the first column of C.toarray()).

@@ -1414,11 +1414,13 @@ class TestFaustFactory(unittest.TestCase):
         from scipy.fft import dct as sdct
         from numpy.random import rand
         n = 512
-        DCT = dct(n)
+        DCT = dct(n, normed=False)
         x = rand(n)
         y1 = DCT@x
         y2 = sdct(x)
         self.assertTrue(np.allclose(y1, y2))
+        DCTn = dct(n, normed=True)
+        self.assertTrue(np.allclose(DCTn@x, DCT.normalize()@x))
 
     def testDST(self):
         print("Test pyfaust.dst()")
@@ -1426,11 +1428,13 @@ class TestFaustFactory(unittest.TestCase):
         from scipy.fft import dst as sdst
         from numpy.random import rand
         n = 512
-        DST = dst(n)
+        DST = dst(n, normed=False)
         x = rand(n)
         y1 = DST@x
         y2 = sdst(x)
         self.assertTrue(np.allclose(y1, y2))
+        DSTn = dst(n, normed=True)
+        self.assertTrue(np.allclose(DSTn@x, DST.normalize()@x))
 
     def testFGFTGivens(self):
         print("Test fact.fgft_givens()")
@@ -2169,8 +2173,15 @@ if __name__ == "__main__":
     from pyfaust import Faust
     if(len(sys.argv) > 1):
         #ENOTE: test only a single test if name passed on command line
-        singleton = unittest.TestSuite()
-        singleton.addTest(TestFaustPy(sys.argv[1]))
-        unittest.TextTestRunner().run(singleton)
+        try:
+            singleton = unittest.TestSuite()
+            singleton.addTest(TestFaustPy(sys.argv[1]))
+            unittest.TextTestRunner().run(singleton)
+        except:
+            # if TestFaustPy failed to launch the unit test
+            # maybe it exists in TestFaustFactory
+            singleton = unittest.TestSuite()
+            singleton.addTest(TestFaustFactory(sys.argv[1]))
+            unittest.TextTestRunner().run(singleton)
     else:
         unittest.main()
