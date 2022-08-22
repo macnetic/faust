@@ -235,7 +235,21 @@ greed_omp_chol = omp
 
 def bitrev(inds):
     """
-    Bitreversal indices.
+    Bitreversal permutation.
+
+    Args:
+        inds: the list of indices to bit-reverse.
+
+    Returns:
+        The bit-reversal permutation of inds.
+
+    Example:
+        >>> import numpy as np
+        >>> from pyfaust.tools import bitrev
+        >>> bitrev(np.arange(4))
+        >>> array([0, 2, 1, 3])
+
+    See also: https://en.wikipedia.org/wiki/Bit-reversal_permutation.
     """
     n = len(inds)
     if n == 1:
@@ -248,6 +262,11 @@ def bitrev(inds):
 def bitrev_perm(N):
     """
     Bitreversal permutation.
+
+    Returns:
+        B: a scipy csr_matrix defining the bit-reversal permutation.
+
+    See also: bitrev.
     """
     if np.log2(N) > np.log2(np.floor(N)):
         raise ValueError('N must be a power of two')
