@@ -63,21 +63,28 @@ classdef FaustCore < handle
 				this.isRealFlag = varargin{2};
 				this.dev = varargin{3};
 				this.dtype = varargin{4};
-                onGPU = startsWith(this.dev, 'gpu');
-                % TODO: the copy of factors shouldn't be necessary
-                % it's here to fix a bug when for instance calling
-                % matfaust.fact.hierarchical/butterfly, the returned Faust is
-                % ok but F-M (for example) leads to a crash
-                % (it's probably because of matrix reference manager that is
-                % duplicated in static memory of different shared
-                % libraries/mexs -- still to verify. All Faust object must be
-                % managed by mexFaustReal/Cplx/Float, hence the copy)
-                nf = call_mex(this, 'numfactors');
-                facts = cell(1, nf);
-                for i=1:nf
-                    facts{i} = call_mex(this, 'factors', i);
-                end
-                this = FaustCore(facts, 1.0, false, this.isRealFlag, this.dev, this.dtype);
+				if ~ strcmp(this.dtype, 'float')
+					onGPU = startsWith(this.dev, 'gpu');
+					% TODO: the copy of factors shouldn't be necessary
+					% it's here to fix a bug when for instance calling
+					% matfaust.fact.hierarchical/butterfly, the returned Faust is
+					% ok but F-M (for example) leads to a crash
+					% (it's probably because of matrix reference manager that is
+					% duplicated in static memory of different shared
+					% libraries/mexs -- still to verify. All Faust object must be
+					% managed by mexFaustReal/Cplx/Float, hence the copy)
+
+					% we don't use this workaround for single precision Faust
+					% because sparse matrices in single precision aren't supported
+					% by matlab which lead to buffer type error
+					% (double instead of float in the cpp mexcode)
+					nf = call_mex(this, 'numfactors');
+					facts = cell(1, nf);
+					for i=1:nf
+						facts{i} = call_mex(this, 'factors', i);
+					end
+					this = FaustCore(facts, 1.0, false, this.isRealFlag, this.dev, this.dtype);
+				end
 			elseif(nargin >= 1)
 				factors = varargin{1};
 				scale = varargin{2};
