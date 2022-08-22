@@ -118,7 +118,7 @@ function O = omega(N)
     O = sparse(1:N, 1:N, vo, N, N, N);
 end
 
-function  B = butterfly(N)
+function  B = butterfly_(N)
     %% Butterfly factor of order N.
     I_N2 = speye(N/2);
     O_N2 = omega(N/2);
@@ -132,7 +132,7 @@ function F = mod_fft(N, varargin)
     Bs = cell(1, log2(N));
     i = 1;
     while N_ ~= 1
-        B = butterfly(N_);
+        B = butterfly_(N_);
         Bs{i} = kron(speye(N/N_), B);
         i = i + 1;
         N_ = N_ / 2;
