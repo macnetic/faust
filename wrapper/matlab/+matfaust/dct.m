@@ -6,28 +6,28 @@
 %>
 %> @param n: the order of the DCT (it must be a power of two).
 %> @param 'dev', str: 'gpu' or 'cpu' to create the Faust on CPU or GPU ('cpu' is the default).
+%> @param 'normed',bool: true (by default) to normalize the returned Faust as if Faust.normalize() was called, false otherwise.
 %>
 %>
 %> @b Example
 %> @code
 %> % in a matlab terminal
 %> >> import matfaust.*
-%> >> F = dst(8);
-%> >> x = 1:8;
-%> >> % apply the DST to x
-%> >> real(F*x')
+%> >> F = dct(8);
+%> >> x = ones(8, 1);
+%> >> % apply the DCT to x
+%> >> real(F*x)
 %>
 %> ans =
 %>
-%>    72.0000
-%>   -25.7693
-%>          0
-%>    -2.6938
-%>          0
-%>    -0.8036
-%>          0
-%>    -0.2028
-%>
+%>   10.2517
+%>    0.0000
+%>    3.5999
+%>    0.0000
+%>    2.4054
+%>    0.0000
+%>    2.0392
+%>    0.0000
 %> @endcode
 %>
 %>@b See also matfaust.dft, matfaust.dst
@@ -35,6 +35,35 @@
 function D = dct(n, varargin)
 	import matfaust.Faust
 	DFT = matfaust.dft(n, varargin{:}, 'normed', false);
+	normed = true; % normalization by default
+	dev = 'cpu';
+	argc = length(varargin);
+	if(argc > 0)
+		for i=1:2:argc
+			if(argc > i)
+				% next arg (value corresponding to the key varargin{i})
+				tmparg = varargin{i+1};
+			end
+			switch(varargin{i})
+				case 'normed'
+					if(argc == i || ~ islogical(tmparg))
+						error('normed keyword argument is not followed by a logical')
+					else
+						normed = tmparg;
+					end
+				case 'dev'
+					if(argc == i || ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu'))
+						error('dev keyword argument is not followed by a valid value: cpu, gpu*.')
+					else
+						dev = tmparg;
+					end
+				otherwise
+					if((isstr(varargin{i}) || ischar(varargin{i}))  && ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu'))
+						error([ tmparg ' unrecognized argument'])
+					end
+			end
+		end
+	end
 	%	P_ = zeros(n);
 	%	for i=1:n/2
 	%		P_(i, (i-1) * 2 + 1) = 1;
@@ -59,4 +88,10 @@ function D = dct(n, varargin)
 	end
 	D = Faust(f0) * F_mid * Faust(f_end);
 	D = real(D);
+	if(normed)
+		D = normalize(D)
+	end
+	if(strcmp(dev, 'gpu'))
+		D = clone(D, 'dev', 'gpu')
+	end
 end

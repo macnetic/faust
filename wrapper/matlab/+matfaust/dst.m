@@ -6,34 +6,64 @@
 %>
 %> @param n: the order of the DST (it must be a power of two).
 %> @param 'dev', str: 'gpu' or 'cpu' to create the Faust on CPU or GPU ('cpu' is the default).
-%>
+%> @param 'normed',bool: true (by default) to normalize the returned Faust as if Faust.normalize() was called, false otherwise.
 %> @b Example
 %> @code
 %> % in a matlab terminal
 %> >> import matfaust.*
-%> >> F = dct(8);
-%> >> x = ones(8, 1);
-%> >> % apply the DCT to x
-%> >> real(F*x)
+%> >> F = dst(8);
+%> >> x = 1:8;
+%> >> % apply the DST to x
+%> >> real(F*x')
 %>
 %> ans =
 %>
-%>   10.2517
-%>    0.0000
-%>    3.5999
-%>    0.0000
-%>    2.4054
-%>    0.0000
-%>    2.0392
-%>    0.0000
+%>    72.0000
+%>   -25.7693
+%>          0
+%>    -2.6938
+%>          0
+%>    -0.8036
+%>          0
+%>    -0.2028
+%>
 %> @endcode
 %>
 %>@b See also matfaust.dft, matfaust.dct
 %=========================================
 function D = dst(n, varargin)
     import matfaust.Faust
+	normed = true; % normalization by default
+	dev = 'cpu';
+	argc = length(varargin);
+	if(argc > 0)
+		for i=1:2:argc
+			if(argc > i)
+				% next arg (value corresponding to the key varargin{i})
+				tmparg = varargin{i+1};
+			end
+			switch(varargin{i})
+				case 'normed'
+					if(argc == i || ~ islogical(tmparg))
+						error('normed keyword argument is not followed by a logical')
+					else
+						normed = tmparg;
+					end
+				case 'dev'
+					if(argc == i || ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu'))
+						error('dev keyword argument is not followed by a valid value: cpu, gpu*.')
+					else
+						dev = tmparg;
+					end
+				otherwise
+					if((isstr(varargin{i}) || ischar(varargin{i}))  && ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu'))
+						error([ tmparg ' unrecognized argument'])
+					end
+			end
+		end
+	end
     % bit reversal permutation
-    MDFT = mod_fft(n, varargin{:});
+    MDFT = mod_fft(n, 'dev', dev);
     d1 = zeros(1, n);
     for k=1:n
         d1(k) = -1j * exp(-1j * pi / 2 / n * k);
@@ -55,11 +85,17 @@ function D = dst(n, varargin)
     P_row_inds = [ 1:n/2, 1+n:n/2+n ];
     P_col_inds = [ 1:2:n-1, 2:2:n ];
     P_ = sparse(P_row_inds, P_col_inds, ones(n, 1), n*2, n, n);
-    F_even = Faust(D1, varargin{:}) * MDFT;
-    F_odd = Faust(D1, varargin{:}) * Faust(D2, varargin{:}) * MDFT;
+    F_even = Faust(D1, 'dev', dev) * MDFT;
+    F_odd = Faust(D1, 'dev', dev) * Faust(D2, 'dev', dev) * MDFT;
     F = [F_even, F_odd];
     F = F * Faust(P_);
     D = real(F);
+	if(normed)
+		D = normalize(D)
+	end
+	if(strcmp(dev, 'gpu'))
+		D = clone(D, 'dev', 'gpu')
+	end
 end
 
 function O = omega(N)
