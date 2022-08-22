@@ -4029,7 +4029,7 @@ def rand_butterfly(n, dtype='double', dev='cpu'):
     Returns:
         F, a random butterfly support Faust.
 
-    <b>See also</b>: pyfaust.fact.butterfly, pyfaust.rand_butterfly, pyfaust.dft.
+    <b>See also</b>: pyfaust.fact.butterfly, pyfaust.dft.
     """
     from numpy.random import randn
     if dtype not in ['float32', 'double', 'float', 'complex']:
