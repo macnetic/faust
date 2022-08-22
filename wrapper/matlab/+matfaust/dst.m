@@ -7,6 +7,7 @@
 %> @param n: the order of the DST (it must be a power of two).
 %> @param 'dev', str: 'gpu' or 'cpu' to create the Faust on CPU or GPU ('cpu' is the default).
 %> @param 'normed',bool: true (by default) to normalize the returned Faust as if Faust.normalize() was called, false otherwise.
+%>
 %> @b Example
 %> @code
 %> % in a matlab terminal
@@ -14,7 +15,7 @@
 %> >> F = dst(8);
 %> >> x = 1:8;
 %> >> % apply the DST to x
-%> >> real(F*x')
+%> >> F*x'
 %>
 %> ans =
 %>
@@ -27,9 +28,16 @@
 %>          0
 %>    -0.2028
 %>
+%> >> % check the density with a larger DST Faust of size 1024
+%> >> density(dst(1024))
+%>
+%> ans =
+%>
+%>     0.1581
+%> >> % it is smaller than 1
 %> @endcode
 %>
-%>@b See also matfaust.dft, matfaust.dct
+%>@b See also matfaust.dft, matfaust.dct, matfaust.Faust.density
 %=========================================
 function D = dst(n, varargin)
     import matfaust.Faust
@@ -91,10 +99,10 @@ function D = dst(n, varargin)
     F = F * Faust(P_);
     D = real(F);
 	if(normed)
-		D = normalize(D)
+		D = normalize(D);
 	end
 	if(strcmp(dev, 'gpu'))
-		D = clone(D, 'dev', 'gpu')
+		D = clone(D, 'dev', 'gpu');
 	end
 end
 

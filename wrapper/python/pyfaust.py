@@ -3342,10 +3342,12 @@ def dct(n, normed=True, dev='cpu'):
                0.        ,  -0.80361161,   0.        ,  -0.20280929])
         >>> np.allclose(DCT8@x, scipy_dct(x))
         True
+        >>> # check the density with a larger DCT Faust of size 1024
+        >>> dct(1024).density()
+        0.076171875
+        >>> # it is smaller than 1
 
-    See also pyfaust.dft, pyfaust.dst, <a
-    href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.dct.html">
-    scipy.fft.dct</a>, pyfaust.fact.butterfly, pyfaust.rand_butterfly
+    See also pyfaust.dft, pyfaust.dst, <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.dct.html"> scipy.fft.dct</a>, pyfaust.fact.butterfly, pyfaust.rand_butterfly, pyfaust.Faust.density
     """
     DFT = pyfaust.dft(n, dev='cpu', normed=False)
 #    P_ = np.zeros((n, n))
@@ -3448,10 +3450,12 @@ def dst(n, normed=True, dev='cpu'):
                        0.        ,  2.03918232,  0.        ])
         >>> np.allclose(DST8@x, scipy_dst(x))
         True
+        >>> # check the density with a larger DST Faust of size 1024
+        >>> dst(1024).density()
+        0.201171875
+        >>> # it is smaller than 1
 
-    See also pyfaust.dft, pyfaust.dct, <a
-    href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.dst.html">
-    scipy.fft.dst</a>, pyfaust.fact.butterfly, pyfaust.rand_butterfly
+    See also pyfaust.dft, pyfaust.dct, <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.dst.html"> scipy.fft.dst</a>, pyfaust.fact.butterfly, pyfaust.rand_butterfly, pyfaust.Faust.density
     """
     from pyfaust.tools import bitrev_perm
     def omega(N):

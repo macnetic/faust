@@ -16,7 +16,7 @@
 %> >> F = dct(8);
 %> >> x = ones(8, 1);
 %> >> % apply the DCT to x
-%> >> real(F*x)
+%> >> F*x
 %>
 %> ans =
 %>
@@ -28,9 +28,16 @@
 %>    0.0000
 %>    2.0392
 %>    0.0000
+%>
+%> >> % check the density with a larger DCT Faust of size 1024
+%> >> dct(1024).density()
+%> ans =
+%>
+%>     0.0610
+%> >> % it is smaller than 1
 %> @endcode
 %>
-%>@b See also matfaust.dft, matfaust.dst
+%>@b See also matfaust.dft, matfaust.dst, matfaust.Faust.density
 %=========================================
 function D = dct(n, varargin)
 	import matfaust.Faust
@@ -89,9 +96,9 @@ function D = dct(n, varargin)
 	D = Faust(f0) * F_mid * Faust(f_end);
 	D = real(D);
 	if(normed)
-		D = normalize(D)
+		D = normalize(D);
 	end
 	if(strcmp(dev, 'gpu'))
-		D = clone(D, 'dev', 'gpu')
+		D = clone(D, 'dev', 'gpu');
 	end
 end
