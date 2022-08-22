@@ -745,9 +745,12 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
                     y_ref(k) = y_ref(k) + 2 * x(i) * cos(pi * (k-1) * (2 * (i-1) + 1) / 2 / n);
                 end
             end
-            DCT = matfaust.dct(n);
+            DCT = matfaust.dct(n, 'normed', false);
             y_test = real(DCT*x);
             this.verifyEqual(y_ref, y_test, 'AbsTol', 1e-6);
+			DCT_normed = matfaust.dct(n)
+			DCT_normalized = normalize(DCT)
+            this.verifyEqual(DCT_normed*x, DCT_normalized*x, 'AbsTol', 1e-6);
         end
 
         function test_dst(this)
@@ -761,9 +764,12 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
                 end
             end
             y_ref = y_ref * 2;
-            DST = matfaust.dst(n);
+            DST = matfaust.dst(n, 'normed', false);
             y_test = real(DST*x);
             this.verifyEqual(y_ref, y_test, 'AbsTol', 1e-6);
+			DST_normed = matfaust.dst(n)
+			DST_normalized = normalize(DST)
+            this.verifyEqual(DST_normed*x, DST_normalized*x, 'AbsTol', 1e-6);
         end
 
 	end
