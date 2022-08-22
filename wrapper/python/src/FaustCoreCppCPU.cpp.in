@@ -137,3 +137,16 @@ FaustCoreCpp<@TYPE@,Cpu>* FaustCoreCpp<@TYPE@,Cpu>::read_from_mat_file(const cha
     }
     return core;
 }
+
+template<>
+  FaustCoreCpp<@TYPE@, Cpu>* FaustCoreCpp<@TYPE@,Cpu>::fourierFaust(unsigned int n, const bool norma, const bool diag_opt)
+{
+    Faust::TransformHelper<@TYPE@,Cpu>* th;
+    if(diag_opt)
+        th = Faust::TransformHelperButterfly<@TYPE@,Cpu>::fourierFaust(n, norma);
+    else
+        th = Faust::TransformHelper<@TYPE@,Cpu>::fourierFaust(n, norma);
+      if(!th) return NULL;
+      FaustCoreCpp<@TYPE@,Cpu>* core = new FaustCoreCpp<@TYPE@,Cpu>(th);
+      return core;
+}

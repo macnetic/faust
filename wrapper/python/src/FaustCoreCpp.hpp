@@ -554,19 +554,6 @@ template<typename FPP, FDevice DEV>
 }
 
 template<typename FPP, FDevice DEV>
-  FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::fourierFaust(unsigned int n, const bool norma, const bool diag_opt)
-{
-    Faust::TransformHelper<FPP,DEV>* th;
-    if(diag_opt)
-        th = Faust::TransformHelperButterfly<FPP,DEV>::fourierFaust(n, norma);
-    else
-        th = Faust::TransformHelper<FPP,DEV>::fourierFaust(n, norma);
-      if(!th) return NULL;
-      FaustCoreCpp<FPP,DEV>* core = new FaustCoreCpp<FPP,DEV>(th);
-      return core;
-}
-
-template<typename FPP, FDevice DEV>
   FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::eyeFaust(unsigned int n, unsigned int m)
 {
       Faust::TransformHelper<FPP,DEV>* th = Faust::TransformHelper<FPP,DEV>::eyeFaust(n, m);

@@ -104,3 +104,16 @@ FaustCoreCpp<@TYPE@,GPU2>* FaustCoreCpp<@TYPE@,GPU2>::read_from_mat_file(const c
     throw std::runtime_error("A .mat file is always read from CPU code not GPU's.");
     return nullptr;
 }
+
+template<>
+  FaustCoreCpp<@TYPE@, GPU2>* FaustCoreCpp<@TYPE@,GPU2>::fourierFaust(unsigned int n, const bool norma, const bool diag_opt)
+{
+    Faust::TransformHelper<@TYPE@,GPU2>* th;
+    if(diag_opt)
+        throw std::runtime_error("Diagonal Optimization of DFT isn't yet supported on GPU.");
+    else
+        th = Faust::TransformHelper<@TYPE@,GPU2>::fourierFaust(n, norma);
+    if(!th) return NULL;
+    FaustCoreCpp<@TYPE@,GPU2>* core = new FaustCoreCpp<@TYPE@,GPU2>(th);
+    return core;
+}
