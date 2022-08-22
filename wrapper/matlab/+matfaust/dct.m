@@ -7,6 +7,7 @@
 %> @param n: the order of the DCT (it must be a power of two).
 %> @param 'dev', str: 'gpu' or 'cpu' to create the Faust on CPU or GPU ('cpu' is the default).
 %> @param 'normed',bool: true (by default) to normalize the returned Faust as if Faust.normalize() was called, false otherwise.
+%> @param 'class', str: 'single' or 'double'.
 %>
 %>
 %> @b Example
@@ -41,10 +42,11 @@
 %=========================================
 function D = dct(n, varargin)
 	import matfaust.Faust
-	DFT = matfaust.dft(n, varargin{:}, 'normed', false);
+	DFT = matfaust.dft(n, 'normed', false);
 	normed = true; % normalization by default
 	dev = 'cpu';
 	argc = length(varargin);
+	class = 'double';
 	if(argc > 0)
 		for i=1:2:argc
 			if(argc > i)
@@ -64,8 +66,14 @@ function D = dct(n, varargin)
 					else
 						dev = tmparg;
 					end
+				case 'class'
+					if(argc == i || ~ strcmp(tmparg, 'double') && ~ startsWith(tmparg, 'single'))
+						error('class keyword argument is not followed by a valid value: single or double.')
+					else
+						class = tmparg;
+					end
 				otherwise
-					if((isstr(varargin{i}) || ischar(varargin{i}))  && ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu'))
+					if((isstr(varargin{i}) || ischar(varargin{i}))  && ~ any(strcmp(tmparg, {'cpu'})) && ~ startsWith(tmparg, 'gpu'))
 						error([ tmparg ' unrecognized argument'])
 					end
 			end
@@ -100,5 +108,8 @@ function D = dct(n, varargin)
 	end
 	if(strcmp(dev, 'gpu'))
 		D = clone(D, 'dev', 'gpu');
+	end
+	if(strcmp(class, 'single'))
+		D = single(D);
 	end
 end

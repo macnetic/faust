@@ -44,6 +44,7 @@ function D = dst(n, varargin)
 	normed = true; % normalization by default
 	dev = 'cpu';
 	argc = length(varargin);
+	class = 'double';
 	if(argc > 0)
 		for i=1:2:argc
 			if(argc > i)
@@ -62,6 +63,12 @@ function D = dst(n, varargin)
 						error('dev keyword argument is not followed by a valid value: cpu, gpu*.')
 					else
 						dev = tmparg;
+					end
+				case 'class'
+					if(argc == i || ~ strcmp(tmparg, 'double') && ~ startsWith(tmparg, 'single'))
+						error('class keyword argument is not followed by a valid value: single or double.')
+					else
+						class = tmparg;
 					end
 				otherwise
 					if((isstr(varargin{i}) || ischar(varargin{i}))  && ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu'))
@@ -103,6 +110,9 @@ function D = dst(n, varargin)
 	end
 	if(strcmp(dev, 'gpu'))
 		D = clone(D, 'dev', 'gpu');
+	end
+	if(strcmp(class, 'single'))
+		D = single(D);
 	end
 end
 
