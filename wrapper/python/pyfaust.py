@@ -3314,7 +3314,7 @@ def dft(n, normed=True, dev='cpu', diag_opt=False):
                                                                         diag_opt))
     return F
 
-def dct(n, normed=True, dev='cpu'):
+def dct(n, normed=True, dev='cpu', dtype='double'):
     """Constructs a Faust implementing the Direct Cosine Transform (Type II) Faust of order n.
 
     The analytical formula of DCT II used here is:
@@ -3325,8 +3325,8 @@ def dct(n, normed=True, dev='cpu'):
         n: the order of the DCT (must be a power of two).
         normed: default to True to normalize the DFT Faust as if you called
         Faust.normalize() and False otherwise.
-
         dev: the device on which the Faust is created.
+        dtype: double (default) or float32.
 
     Example:
         >>> from pyfaust import dct
@@ -3370,6 +3370,8 @@ def dct(n, normed=True, dev='cpu'):
         DCT = DCT.normalize()
     if dev.startswith('gpu'):
         DCT = DCT.clone(dev='gpu')
+    if dtype not in ['double', 'float64']:
+        DCT = DCT.astype(dtype)
     return DCT
 
 # experimental block start
@@ -3422,7 +3424,7 @@ def dst3(n, dev='cpu'):
     return F.real
 # experimental block end
 
-def dst(n, normed=True, dev='cpu'):
+def dst(n, normed=True, dev='cpu', dtype='double'):
     """
     Constructs a Faust implementing the Direct Sine Transform (Type II) Faust of order n.
 
@@ -3431,9 +3433,10 @@ def dst(n, normed=True, dev='cpu'):
 
     Args:
         n: the order of the DST (must be a power of two).
-        dev: the device on which the Faust is created.
         normed: default to True to normalize the Hadamard Faust as if you called
         Faust.normalize() and False otherwise.
+        dev: the device on which the Faust is created.
+        dtype: double (default) or float32.
 
     Example:
         >>> from pyfaust import dst
@@ -3511,6 +3514,8 @@ def dst(n, normed=True, dev='cpu'):
         F = F.normalize()
     if dev.startswith('gpu'):
         F = F.clone(dev='gpu')
+    if dtype not in ['double', 'float64']:
+        F = F.astype(dtype)
     return F
 
 def circ(c, **kwargs):
