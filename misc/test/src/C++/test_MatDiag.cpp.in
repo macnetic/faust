@@ -31,9 +31,33 @@ void display_all_elts(MatDiag<FPP> matdiag)
 	display_all_elts(Faust::MatSparse<FPP,Cpu>(matdiag));
 }
 
+void test_mul_adjoint()
+{
+	cout  << "test_mul_adjoint" << endl;
+	Vect<FPP, Cpu> v(10);
+	v.setRand();
+	MatDiag<FPP> dmat(10, v.getData());
+
+
+	Vect<FPP, Cpu> v2(10);
+	Vect<FPP, Cpu> test_vec(10);
+	v2.setRand();
+	test_vec = v2;
+	dmat.multiply(test_vec, 'H');
+
+	Vect<FPP, Cpu> ref_vec(10);
+	for(int i = 0; i < 10; i++)
+		ref_vec.getData()[i] = conj(v(i)) * v2(i);
+
+	test_vec -= ref_vec;
+	assert(test_vec.norm() < 1e-6);
+	cout  << "OK" << endl;
+}
+
 int main()
 {
 	cout << "start of test_MatDiag" << endl;
+	test_mul_adjoint();
 	FPP data[10];
 	for(int i=0; i < 10; i++)
 #if(@TEST_IS_COMPLEX@==1)

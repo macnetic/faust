@@ -44,7 +44,7 @@ template<typename FPP>
 void  Faust::MatDiag<FPP>::multiply(Faust::Vect<FPP,Cpu> & vec, char opThis) const
 {
 	if(opThis = 'H')
-		vec.vec = mat.conjugate() * vec.vec;
+		vec.vec = mat.diagonal().conjugate().array() * vec.vec.array();
 	else //if (opThis == 'N' || opThis == 'T')
 		vec.vec = mat * vec.vec;
 }
@@ -53,7 +53,7 @@ template<typename FPP>
 void  Faust::MatDiag<FPP>::multiply(MatDense<FPP,Cpu> & M, char opThis) const
 {
 	if(opThis = 'H')
-		M.mat = mat.conjugate() * M.mat;
+		M.mat = mat.diagonal().conjugate().asDiagonal() * M.mat;
 	else //if (opThis == 'N' || opThis == 'T')
 		M.mat = mat * M.mat;
 }
