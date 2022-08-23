@@ -3525,33 +3525,33 @@ def circ(c):
     Example:
         >>> from pyfaust import circ
         >>> import numpy as np
-        >>> c = np.random.rand(8)
+        >>> c = [1, 2, 3, 4, 5, 6, 7, 8]
         >>> C = circ(c)
         >>> C
-            Faust size 8x8, density 1.75, nnz_sum 112, 8 factor(s):
-            - FACTOR 0 (complex) SPARSE, size 8x8, density 0.25, nnz 16
-            - FACTOR 1 (complex) SPARSE, size 8x8, density 0.25, nnz 16
-            - FACTOR 2 (complex) SPARSE, size 8x8, density 0.25, nnz 16
-            - FACTOR 3 (complex) SPARSE, size 8x8, density 0.125, nnz 8
-            - FACTOR 4 (complex) SPARSE, size 8x8, density 0.125, nnz 8
-            - FACTOR 5 (complex) SPARSE, size 8x8, density 0.25, nnz 16
-            - FACTOR 6 (complex) SPARSE, size 8x8, density 0.25, nnz 16
-            - FACTOR 7 (complex) SPARSE, size 8x8, density 0.25, nnz 16
+        Faust size 8x8, density 1.75, nnz_sum 112, 8 factor(s):
+        - FACTOR 0 (complex) SPARSE, size 8x8, density 0.25, nnz 16, addr: 0x55d65e391e00
+        - FACTOR 1 (complex) SPARSE, size 8x8, density 0.25, nnz 16, addr: 0x55d65e2f2030
+        - FACTOR 2 (complex) SPARSE, size 8x8, density 0.25, nnz 16, addr: 0x55d65d7e8920
+        - FACTOR 3 (complex) SPARSE, size 8x8, density 0.125, nnz 8, addr: 0x55d65e512030
+        - FACTOR 4 (complex) SPARSE, size 8x8, density 0.125, nnz 8, addr: 0x55d65dfa9840
+        - FACTOR 5 (complex) SPARSE, size 8x8, density 0.25, nnz 16, addr: 0x55d65e0a10b0
+        - FACTOR 6 (complex) SPARSE, size 8x8, density 0.25, nnz 16, addr: 0x55d65e09ff40
+        - FACTOR 7 (complex) SPARSE, size 8x8, density 0.25, nnz 16, addr: 0x55d65e278dc0
 
         >>> np.allclose(C.toarray()[:, 0], c)
         True
-        >>> c
-        array([0.98193782, 0.08954973, 0.48411884, 0.71426712, 0.25681982,
-                      0.32582343, 0.91189492, 0.77211408])
         >>> np.real(C.toarray())
-		array([[0.98193782, 0.77211408, 0.91189492, 0.32582343, 0.25681982, 0.71426712, 0.48411884, 0.08954973],
-       [0.08954973, 0.98193782, 0.77211408, 0.91189492, 0.32582343, 0.25681982, 0.71426712, 0.48411884],
-       [0.48411884, 0.08954973, 0.98193782, 0.77211408, 0.91189492, 0.32582343, 0.25681982, 0.71426712],
-       [0.71426712, 0.48411884, 0.08954973, 0.98193782, 0.77211408, 0.91189492, 0.32582343, 0.25681982],
-       [0.25681982, 0.71426712, 0.48411884, 0.08954973, 0.98193782, 0.77211408, 0.91189492, 0.32582343],
-       [0.32582343, 0.25681982, 0.71426712, 0.48411884, 0.08954973, 0.98193782, 0.77211408, 0.91189492],
-       [0.91189492, 0.32582343, 0.25681982, 0.71426712, 0.48411884, 0.08954973, 0.98193782, 0.77211408],
-       [0.77211408, 0.91189492, 0.32582343, 0.25681982, 0.71426712, 0.48411884, 0.08954973, 0.98193782]])
+        array([[1., 8., 7., 6., 5., 4., 3., 2.],
+               [2., 1., 8., 7., 6., 5., 4., 3.],
+               [3., 2., 1., 8., 7., 6., 5., 4.],
+               [4., 3., 2., 1., 8., 7., 6., 5.],
+               [5., 4., 3., 2., 1., 8., 7., 6.],
+               [6., 5., 4., 3., 2., 1., 8., 7.],
+               [7., 6., 5., 4., 3., 2., 1., 8.],
+               [8., 7., 6., 5., 4., 3., 2., 1.]])
+        >>> # Look at the density of a larger circulant Faust
+        >>> circ(np.random.rand(1024)).density()
+        0.041015625
 
     See also <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.linalg.circulant.html">scipy.linalg.circulant</a>, pyfaust.anticirc, pyfaust.toeplitz.
     """
@@ -3587,33 +3587,33 @@ def anticirc(c):
     Example:
         >>> from pyfaust import anticirc
         >>> import numpy as np
-        >>> c = np.random.rand(8)
+        >>> c = [1, 2, 3, 4, 5, 6, 7, 8]
         >>> A = anticirc(c)
         >>> A
-        Faust size 8x8, density 1.75, nnz_sum 112, 8 factor(s):
-        - FACTOR 0 (complex) SPARSE, size 8x8, density 0.25, nnz 16
-        - FACTOR 1 (complex) SPARSE, size 8x8, density 0.25, nnz 16
-        - FACTOR 2 (complex) SPARSE, size 8x8, density 0.25, nnz 16
-        - FACTOR 3 (complex) SPARSE, size 8x8, density 0.125, nnz 8
-        - FACTOR 4 (complex) SPARSE, size 8x8, density 0.125, nnz 8
-        - FACTOR 5 (complex) SPARSE, size 8x8, density 0.25, nnz 16
-        - FACTOR 6 (complex) SPARSE, size 8x8, density 0.25, nnz 16
-        - FACTOR 7 (complex) SPARSE, size 8x8, density 0.25, nnz 16
+		Faust size 8x8, density 1.75, nnz_sum 112, 8 factor(s):
+		- FACTOR 0 (complex) SPARSE, size 8x8, density 0.25, nnz 16, addr: 0x55cc8b57c9a0
+		- FACTOR 1 (complex) SPARSE, size 8x8, density 0.25, nnz 16, addr: 0x55cc8be86d70
+		- FACTOR 2 (complex) SPARSE, size 8x8, density 0.25, nnz 16, addr: 0x55cc8bd33400
+		- FACTOR 3 (complex) SPARSE, size 8x8, density 0.125, nnz 8, addr: 0x55cc8bb849e0
+		- FACTOR 4 (complex) SPARSE, size 8x8, density 0.125, nnz 8, addr: 0x55cc8bf56600
+		- FACTOR 5 (complex) SPARSE, size 8x8, density 0.25, nnz 16, addr: 0x55cc8bef01d0
+		- FACTOR 6 (complex) SPARSE, size 8x8, density 0.25, nnz 16, addr: 0x55cc8bf63e50
+		- FACTOR 7 (complex) SPARSE, size 8x8, density 0.25, nnz 16, addr: 0x55cc8bf64ba0
 
         >>> np.allclose(A.toarray()[:, -1], c)
         True
-        >>> c
-        array([0.62656024, 0.19827102, 0.54318481, 0.59119001, 0.28540344,
-               0.00098907, 0.14192036, 0.35979329])
         >>> np.real(A.toarray())
-        array([[0.19827102, 0.54318481, 0.59119001, 0.28540344, 0.00098907, 0.14192036, 0.35979329, 0.62656024],
-               [0.54318481, 0.59119001, 0.28540344, 0.00098907, 0.14192036, 0.35979329, 0.62656024, 0.19827102],
-               [0.59119001, 0.28540344, 0.00098907, 0.14192036, 0.35979329, 0.62656024, 0.19827102, 0.54318481],
-               [0.28540344, 0.00098907, 0.14192036, 0.35979329, 0.62656024, 0.19827102, 0.54318481, 0.59119001],
-               [0.00098907, 0.14192036, 0.35979329, 0.62656024, 0.19827102, 0.54318481, 0.59119001, 0.28540344],
-               [0.14192036, 0.35979329, 0.62656024, 0.19827102, 0.54318481, 0.59119001, 0.28540344, 0.00098907],
-               [0.35979329, 0.62656024, 0.19827102, 0.54318481, 0.59119001, 0.28540344, 0.00098907, 0.14192036],
-               [0.62656024, 0.19827102, 0.54318481, 0.59119001, 0.28540344, 0.00098907, 0.14192036, 0.35979329]])
+        array([[2., 3., 4., 5., 6., 7., 8., 1.],
+               [3., 4., 5., 6., 7., 8., 1., 2.],
+               [4., 5., 6., 7., 8., 1., 2., 3.],
+               [5., 6., 7., 8., 1., 2., 3., 4.],
+               [6., 7., 8., 1., 2., 3., 4., 5.],
+               [7., 8., 1., 2., 3., 4., 5., 6.],
+               [8., 1., 2., 3., 4., 5., 6., 7.],
+               [1., 2., 3., 4., 5., 6., 7., 8.]])
+        >>> # Look at the density of a larger anticirculant Faust
+        >>> anticirc(np.random.rand(1024)).density()
+        0.041015625
 
     See also pyfaust.circ, pyfaust.toeplitz.
     """
@@ -3624,18 +3624,18 @@ def anticirc(c):
     return G.left(len(G)-2)@Faust(G.factors(len(G)-1)@P)
 
 def toeplitz(c, r=None):
-    """Constructs a toeplitz Faust whose the first column is c and the first row r.
+    """Constructs a toeplitz Faust whose first column is c and first row r.
 
     Args:
         c: the first column of the toeplitz Faust.
         r: the first row of the toeplitz Faust. If none then r =
-        np.conjugate(c). r[0] is ignored, the first row is always [r[0],
+        np.conjugate(c). r[0] is ignored, the first row is always [c[0],
         r[1:]].
 
     Example:
         >>> from pyfaust import toeplitz
         >>> import numpy as np
-        >>> c = np.random.rand(10)
+        >>> c = [1, 2, 3, 4, 5, 6, 7, 8, 10]
         >>> T = toeplitz(c)
         >>> T
             Faust size 10x10, density 6.16, nnz_sum 616, 12 factor(s):
@@ -3656,7 +3656,19 @@ def toeplitz(c, r=None):
         True
         >>> np.allclose(T.toarray()[0, :], c)
         True
-        >>> r = np.random.rand(10)
+        >>> np.real(T.toarray())
+        array([[ 1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9., 10.],
+               [ 2.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.],
+               [ 3.,  2.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.],
+               [ 4.,  3.,  2.,  1.,  2.,  3.,  4.,  5.,  6.,  7.],
+               [ 5.,  4.,  3.,  2.,  1.,  2.,  3.,  4.,  5.,  6.],
+               [ 6.,  5.,  4.,  3.,  2.,  1.,  2.,  3.,  4.,  5.],
+               [ 7.,  6.,  5.,  4.,  3.,  2.,  1.,  2.,  3.,  4.],
+               [ 8.,  7.,  6.,  5.,  4.,  3.,  2.,  1.,  2.,  3.],
+               [ 9.,  8.,  7.,  6.,  5.,  4.,  3.,  2.,  1.,  2.],
+               [10.,  9.,  8.,  7.,  6.,  5.,  4.,  3.,  2.,  1.]])
+
+        >>> r = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
         >>> T2 = toeplitz(c, r)
         >>> T2
         Faust size 10x10, density 6.16, nnz_sum 616, 12 factor(s):
@@ -3677,6 +3689,20 @@ def toeplitz(c, r=None):
         True
         >>> np.allclose(T2.toarray()[:, 0], c)
         True
+        >>> np.real(T2.toarray())
+        array([[ 1., 12., 13., 14., 15., 16., 17., 18., 19., 20.],
+               [ 2.,  1., 12., 13., 14., 15., 16., 17., 18., 19.],
+               [ 3.,  2.,  1., 12., 13., 14., 15., 16., 17., 18.],
+               [ 4.,  3.,  2.,  1., 12., 13., 14., 15., 16., 17.],
+               [ 5.,  4.,  3.,  2.,  1., 12., 13., 14., 15., 16.],
+               [ 6.,  5.,  4.,  3.,  2.,  1., 12., 13., 14., 15.],
+               [ 7.,  6.,  5.,  4.,  3.,  2.,  1., 12., 13., 14.],
+               [ 8.,  7.,  6.,  5.,  4.,  3.,  2.,  1., 12., 13.],
+               [ 9.,  8.,  7.,  6.,  5.,  4.,  3.,  2.,  1., 12.],
+               [10.,  9.,  8.,  7.,  6.,  5.,  4.,  3.,  2.,  1.]])
+        >>> # Look at the density of a larger Toeplitz Faust
+        >>> toeplitz(np.random.rand(1024), np.random.rand(1024)).density()
+        0.0859375
 
     See also <a
     href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.linalg.toeplitz.htm">scipy.linalg.toeplitz</a>, pyfaust.circ, pyfaust.anticirc
