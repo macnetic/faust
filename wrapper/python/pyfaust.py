@@ -3272,7 +3272,8 @@ def dft(n, normed=True, dev='cpu', diag_opt=False):
         diag_opt: enable the diagonal optimization of Butterfly and permutation
         factors. Basically, it consists to simplify the product of Faust-vector
         and Faust-matrix to vector elementwise multiplications of factor
-        diagonals with a the vector/matrix.
+        diagonals with a the vector/matrix. It is particularly more efficient
+        when the DFT is multiplied by a matrix.
 
     Returns:
         The Faust implementing the DFT of dimension n.
@@ -3518,7 +3519,7 @@ def dst(n, normed=True, dev='cpu', dtype='double'):
         F = F.astype(dtype)
     return F
 
-def circ(c, **kwargs):
+def circ(c):
     """Returns a circulant Faust C defined by the vector c (which is the first column of C.toarray()).
 
     Example:
@@ -3557,10 +3558,10 @@ def circ(c, **kwargs):
     if isinstance(c, list):
         c = np.array(c)
     # hidden option
-    if 'diag_factor' in kwargs.keys():
-        diag_factor = kwargs['diag_factor']
-    else:
-        diag_factor = 'multiplied'
+#    if 'diag_factor' in kwargs.keys():
+#        diag_factor = kwargs['diag_factor']
+#    else:
+    diag_factor = 'multiplied'
     if diag_factor not in ['multiplied', 'csr']:
         raise ValueError('option diag_factor must be \'csr\' or'
                          ' \'multiplied\'')
