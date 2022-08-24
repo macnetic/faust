@@ -108,7 +108,7 @@ namespace Faust
 				using MatMap = Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>>;
 				MatMap X_mat(const_cast<FPP*>(X) /* harmless, no modification*/, this->getNbCol(), X_ncols);
 				MatMap Y_mat(Y, this->getNbRow(), X_ncols);
-#ifdef BUTTERFLY_MUL_MAT_OMP_LOOP || ! (EIGEN_WORLD_VERSION > 3 || EIGEN_WORLD_VERSION >= 4 && EIGEN_MAJOR_VERSION >= 0)
+#if defined(BUTTERFLY_MUL_MAT_OMP_LOOP) || ! EIGEN_VERSION_AT_LEAST(3, 4, 0)
 				// this is slower
 				#pragma parallel omp for
 				for(int i=0;i < this->getNbRow(); i ++)
@@ -275,7 +275,7 @@ namespace Faust
 			MatMap X_mat(const_cast<FPP*>(X) /* harmless, no modification*/, Y_nrows, X_ncols);
 			MatMap Y_mat(Y, Y_nrows, X_ncols);
 			const FPP *d1_ptr = D1.diagonal().data(), *d2_ptr = D2.diagonal().data();
-#ifdef BMAT_MULTIPLY_MAT_OMP_LOOP || ! (EIGEN_WORLD_VERSION > 3 || EIGEN_WORLD_VERSION >= 4 && EIGEN_MAJOR_VERSION >= 0)
+#if defined(BUTTERFLY_MUL_MAT_OMP_LOOP) || ! EIGEN_VERSION_AT_LEAST(3, 4, 0)
 			// this is slower
 			#pragma omp parallel for
 			for(int i=0;i < Y_nrows; i++)
