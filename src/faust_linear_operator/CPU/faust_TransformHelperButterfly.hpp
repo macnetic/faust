@@ -108,7 +108,7 @@ namespace Faust
 				using MatMap = Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>>;
 				MatMap X_mat(const_cast<FPP*>(X) /* harmless, no modification*/, this->getNbCol(), X_ncols);
 				MatMap Y_mat(Y, this->getNbRow(), X_ncols);
-#ifdef BUTTERFLY_MUL_MAT_OMP_LOOP
+#ifdef BUTTERFLY_MUL_MAT_OMP_LOOP || ! (EIGEN_WORLD_VERSION > 3 || EIGEN_WORLD_VERSION >= 4 && EIGEN_MAJOR_VERSION >= 0)
 				// this is slower
 				#pragma parallel omp for
 				for(int i=0;i < this->getNbRow(); i ++)
@@ -213,6 +213,10 @@ namespace Faust
 			copy(seq.begin()+i+d_offset, seq.begin()+i+2*d_offset, subdiag_ids.begin()+i);
 			copy(seq.begin()+i, seq.begin()+i+d_offset, subdiag_ids.begin()+i+d_offset);
 		}
+#ifdef USE_PYTHONIC
+		subdiag_ids_ptr = new long[size];
+		copy(subdiag_ids.begin(), subdiag_ids.end(),subdiag_ids_ptr);
+#endif
 		this->level = level;
 	}
 
@@ -241,6 +245,16 @@ namespace Faust
 	void ButterflyMat<FPP>::multiply(const FPP* x, FPP* y, size_t size) const
 	{
 		const FPP *d1_ptr = D1.diagonal().data(), *d2_ptr = D2.diagonal().data();
+#ifdef USE_PYTHONIC
+		auto xArray = arrayFromBuf1D(x, size);
+		auto d1Array = arrayFromBuf1D(d1_ptr, size);
+		auto d2Array = arrayFromBuf1D(d2_ptr, size);
+		auto x_ids = arrayFromBuf1D(subdiag_ids_ptr, size);
+//		auto yArray = __pythran_ButFactor_matmul::__matmul__()(d1Array, d2Array, xArray, x_ids);
+		auto yArray = arrayFromBuf1D(y, size);
+		yArray = pythonic::operator_::add(pythonic::operator_::mul(d1Array, xArray), pythonic::operator_::mul(d2Array, xArray[x_ids]));
+		memcpy(y, yArray.buffer, sizeof(FPP)*size);
+#endif
 #define BMAT_MULTIPLY_VEC_OMP_LOOP
 #ifdef BMAT_MULTIPLY_VEC_OMP_LOOP
 		#pragma omp parallel for
@@ -261,7 +275,7 @@ namespace Faust
 			MatMap X_mat(const_cast<FPP*>(X) /* harmless, no modification*/, Y_nrows, X_ncols);
 			MatMap Y_mat(Y, Y_nrows, X_ncols);
 			const FPP *d1_ptr = D1.diagonal().data(), *d2_ptr = D2.diagonal().data();
-#ifdef BMAT_MULTIPLY_MAT_OMP_LOOP
+#ifdef BMAT_MULTIPLY_MAT_OMP_LOOP || ! (EIGEN_WORLD_VERSION > 3 || EIGEN_WORLD_VERSION >= 4 && EIGEN_MAJOR_VERSION >= 0)
 			// this is slower
 			#pragma omp parallel for
 			for(int i=0;i < Y_nrows; i++)

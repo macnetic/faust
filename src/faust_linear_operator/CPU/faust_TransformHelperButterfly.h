@@ -2,6 +2,25 @@
 #define __FAUST_TRANSFORM_HELPER_DFT__
 #include "faust_TransformHelper.h"
 
+#ifdef USE_PYTHONIC
+#include "numpy/_numpyconfig.h"
+#include "ButFactor_matmul.hpp"
+#include <pythonic/include/numpy/array.hpp>
+#include <pythonic/numpy/array.hpp>
+#include "pythonic/include/utils/array_helper.hpp"
+#include "pythonic/include/types/ndarray.hpp"
+
+using namespace pythonic;
+
+// Helper to create a float 1D array from a pointer
+	template <typename T>
+types::ndarray<T, types::pshape<long>> arrayFromBuf1D(T* fPtr, long size)
+{
+	auto shape = types::pshape<long>(size);
+	return types::ndarray<T, types::pshape<long>>(fPtr,shape,types::ownership::external);
+}
+#endif
+
 namespace Faust
 {
 	template<typename FPP, FDevice DEV>
@@ -45,6 +64,9 @@ namespace Faust
 		DiagMat D1;
 		DiagMat D2;
 		std::vector<int> subdiag_ids;
+#ifdef USE_PYTHONIC
+		long *subdiag_ids_ptr;
+#endif
 		int level;
 
 		// \param level: is a 0-base index.
