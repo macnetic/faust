@@ -20,7 +20,7 @@ void fft_factors(unsigned int n, std::vector<MatGeneric<complex<FPP>,Cpu>*>&  v)
 	int* fac_col_ind = new int[dim_size*2];
 	complex<FPP> wL;
 	const FPP pi = std::acos(-1);
-	const std::complex<double> cplx_i(0, 1); //TODO: rename to i (np for loop vars because they have their own scope)
+	const std::complex<FPP> cplx_i(0, 1); //TODO: rename to i (np for loop vars because they have their own scope)
 	for(unsigned int i = 0; i < dim_size; i++)
 		index[i] = i;
 	memcpy(new_index, index, sizeof(unsigned int)*dim_size);
