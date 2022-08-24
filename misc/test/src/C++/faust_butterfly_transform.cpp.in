@@ -187,7 +187,7 @@ CplxVec eigen_cplx_diag_prod(const CplxVec &d1, const CplxVec &d2, const CplxVec
 	return z;
 }
 
-class ButterflyMat
+class ButterMat
 {
 
 	protected:
@@ -198,7 +198,7 @@ class ButterflyMat
 
 	// \param level: is a 0-base index.
 	public:
-	ButterflyMat(const MatSparse<FPP, Cpu> &factor, int level)
+	ButterMat(const MatSparse<FPP, Cpu> &factor, int level)
 	{
 		// build a d1, d2 pair from the butterfly factor
 		auto size = factor.getNbRow();
@@ -258,7 +258,7 @@ class ButterflyMat
 };
 
 #ifdef USE_AVX
-class ButterflyMatAVX: public ButterflyMat
+class ButterMatAVX: public ButterMat
 {
 
 
@@ -268,11 +268,11 @@ class ButterflyMatAVX: public ButterflyMat
 	}
 
 	public:
-	ButterflyMatAVX(const MatSparse<FPP, Cpu> &factor, int level) : ButterflyMat(factor, level) {}
+	ButterMatAVX(const MatSparse<FPP, Cpu> &factor, int level) : ButterMat(factor, level) {}
 };
 #endif
 
-class ButterflyMatEig: public ButterflyMat
+class ButterMatEig: public ButterMat
 {
 
 
@@ -282,10 +282,10 @@ class ButterflyMatEig: public ButterflyMat
 	}
 
 	public:
-	ButterflyMatEig(const MatSparse<FPP, Cpu> &factor, int level) : ButterflyMat(factor, level) {}
+	ButterMatEig(const MatSparse<FPP, Cpu> &factor, int level) : ButterMat(factor, level) {}
 };
 
-class ButterflyMatOMPSIMD: public ButterflyMat
+class ButterMatOMPSIMD: public ButterMat
 {
 
 
@@ -299,12 +299,12 @@ class ButterflyMatOMPSIMD: public ButterflyMat
 	}
 
 	public:
-	ButterflyMatOMPSIMD(const MatSparse<FPP, Cpu> &factor, int level) : ButterflyMat(factor, level) {}
+	ButterMatOMPSIMD(const MatSparse<FPP, Cpu> &factor, int level) : ButterMat(factor, level) {}
 };
 
 class ButterflyPermFaust
 {
-	vector<ButterflyMat> opt_factors;
+	vector<ButterMat> opt_factors;
 	Vec<FPP> perm_d;
 	vector<unsigned int> bitrev_perm;
 	TransformHelper<FPP, Cpu>& csr_faust;
@@ -321,15 +321,15 @@ class ButterflyPermFaust
 			if(i < csr_faust.size()-1)
 #ifdef USE_AVX
 				if(avx)
-					opt_factors.insert(opt_factors.begin(), ButterflyMatAVX(*dynamic_cast<const MatSparse<FPP, Cpu>*>(csr_fac), i++));
+					opt_factors.insert(opt_factors.begin(), ButterMatAVX(*dynamic_cast<const MatSparse<FPP, Cpu>*>(csr_fac), i++));
 				else
 #endif
 					if(omp)
-						opt_factors.insert(opt_factors.begin(), ButterflyMatOMPSIMD(*dynamic_cast<const MatSparse<FPP, Cpu>*>(csr_fac), i++));
+						opt_factors.insert(opt_factors.begin(), ButterMatOMPSIMD(*dynamic_cast<const MatSparse<FPP, Cpu>*>(csr_fac), i++));
 					else if(eigen)
-						opt_factors.insert(opt_factors.begin(), ButterflyMatEig(*dynamic_cast<const MatSparse<FPP, Cpu>*>(csr_fac), i++));
+						opt_factors.insert(opt_factors.begin(), ButterMatEig(*dynamic_cast<const MatSparse<FPP, Cpu>*>(csr_fac), i++));
 					else
-						opt_factors.insert(opt_factors.begin(), ButterflyMat(*dynamic_cast<const MatSparse<FPP, Cpu>*>(csr_fac), i++));
+						opt_factors.insert(opt_factors.begin(), ButterMat(*dynamic_cast<const MatSparse<FPP, Cpu>*>(csr_fac), i++));
 		}
 		// set the permutation factor
 		auto csr_fac = *(csr_faust.end()-1);
