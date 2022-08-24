@@ -16,7 +16,11 @@
 %> @param n: the power of two for a FFT of order n and a factorization in log2(n)+1 factors.
 %> @param 'normed',bool: true (by default) to normalize the returned Faust as if Faust.normalize() was called, false otherwise.
 %> @param 'dev', str: 'gpu or 'cpu' to create the Faust on CPU or GPU ('cpu' by default).
-%>
+%> @param 'diag_opt', bool: enable the diagonal optimization of Butterfly and permutation
+%>        factors. Basically, it consists to simplify the product of Faust-vector
+%>        F*x and Faust-matrix F*M to multiplications of factor
+%>        diagonals by the vector x/matrix M. It is particularly more efficient
+%>        when the DFT is multiplied by a matrix.
 %>
 %> @retval F the Faust implementing the FFT transform of dimension n.
 %>
@@ -60,6 +64,7 @@ function F = dft(n, varargin)
 	end
 	normed = true; % normalization by default
 	dev = 'cpu';
+	diag_opt = false;
 	argc = length(varargin);
 	if(argc > 0)
 		for i=1:2:argc
@@ -68,6 +73,12 @@ function F = dft(n, varargin)
 				tmparg = varargin{i+1};
 			end
 			switch(varargin{i})
+				case 'diag_opt'
+					if(argc == i || ~ islogical(tmparg))
+						error('diag_opt keyword argument is not followed by a logical')
+					else
+						diag_opt = tmparg;
+					end
 				case 'normed'
 					if(argc == i || ~ islogical(tmparg))
 						error('normed keyword argument is not followed by a logical')
@@ -88,9 +99,9 @@ function F = dft(n, varargin)
 		end
 	end
 	if(strcmp(dev, 'cpu'))
-		core_obj = mexFaustCplx('fourier', log2n, normed);
+		core_obj = mexFaustCplx('fourier', log2n, normed, diag_opt);
 	else
-		core_obj = mexFaustGPUCplx('fourier', log2n, normed);
+		core_obj = mexFaustGPUCplx('fourier', log2n, normed, diag_opt);
 	end
 	is_real = false;
 	e = MException('FAUST:OOM', 'Out of Memory');
