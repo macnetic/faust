@@ -205,7 +205,10 @@ if(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE AND NOT NOCPPTESTS) 
 
 	foreach(TEST_FPP float double complex<float> complex<double>)
 		foreach(testin IN LISTS tests)
-
+			if( ${TEST_FPP} MATCHES ^float$ OR ${TEST_FPP} MATCHES ^double$ OR ${TEST_FPP} MATCHES complex<float> AND ${testin} MATCHES faust_butterfly_transform)
+				# this test is written only for complex<double>
+				continue()
+			endif()
 			if(USE_GPU_MOD AND (${testin} MATCHES gpu|hierarchical2020Hadamard|palm4msa_2020|hierarchical2020|hierarchicalFactorizationHadamard|MEG_factorization) AND ${TEST_FPP} MATCHES float ) # gpu_mod handles float but not FaustGPU
 				message(STATUS "${testin}_${TEST_FPP} skipped")
 				continue()
