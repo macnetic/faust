@@ -43,6 +43,9 @@
 /****************************************************************************/
 
 #include "faust_Transform.h"
+#if USE_GPU_MOD
+#include "faust_TransformHelperButterfly_gpu.h"
+#endif
 #include "faust_TransformHelperButterfly.h"
 #include <iostream>
 #include <exception>
@@ -142,6 +145,18 @@ FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::mul_scal(FPP scal)
 }
 
 
+template<typename FPP, FDevice DEV>
+  FaustCoreCpp<FPP, DEV>* FaustCoreCpp<FPP, DEV>::fourierFaust(unsigned int n, const bool norma, const bool diag_opt)
+{
+    Faust::TransformHelper<FPP, DEV>* th;
+    if(diag_opt)
+        th = Faust::TransformHelperButterfly<FPP,DEV>::fourierFaust(n, norma);
+    else
+        th = Faust::TransformHelper<FPP,DEV>::fourierFaust(n, norma);
+      if(!th) return NULL;
+      FaustCoreCpp<FPP,DEV>* core = new FaustCoreCpp<FPP,DEV>(th);
+      return core;
+}
 
 
 template<typename FPP, FDevice DEV>
