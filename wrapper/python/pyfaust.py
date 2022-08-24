@@ -3271,8 +3271,8 @@ def dft(n, normed=True, dev='cpu', diag_opt=False):
         dev: device to create the Faust on ('cpu' or 'gpu').
         diag_opt: enable the diagonal optimization of Butterfly and permutation
         factors. Basically, it consists to simplify the product of Faust-vector
-        and Faust-matrix to vector elementwise multiplications of factor
-        diagonals with a the vector/matrix. It is particularly more efficient
+        F@x and Faust-matrix F@M to multiplications of factor
+        diagonals by the vector x/matrix M. It is particularly more efficient
         when the DFT is multiplied by a matrix.
 
     Returns:
