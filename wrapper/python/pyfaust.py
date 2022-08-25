@@ -3209,6 +3209,7 @@ def wht(n, normed=True, dev="cpu", dtype='double'):
        dev: device on which to create the Faust ('cpu' or 'gpu').
        dtype: the Faust dtype, it must be 'double' or 'complex'.
 
+
     Returns:
        The Faust implementing the Hadamard transform of dimension n.
 
@@ -3249,7 +3250,7 @@ def wht(n, normed=True, dev="cpu", dtype='double'):
         if dtype == 'double':
             H = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUDbl.hadamardFaust(log2n, normed))
         elif dtype == 'float':
-            raise TypeError("float is not yet supported by GPU wht")
+            H = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUFlt.hadamardFaust(log2n, normed))
         else: # dtype == 'complex'
             H = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUCplxDbl.hadamardFaust(log2n, normed))
     return H
@@ -3761,7 +3762,7 @@ def eye(m, n=None, dtype='double',  dev="cpu"):
         if dtype in ['float', 'double', 'float64']:
             rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUDbl.eyeFaust(m, n))
         elif dtype == 'float32':
-            raise TypeError("float is not yet supported by GPU wht")
+            rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUFlt.eyeFaust(m, n))
         elif dtype in ['complex', 'complex128']:
             rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUCplxDbl.eyeFaust(m, n))
         else:
