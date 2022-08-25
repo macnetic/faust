@@ -3548,6 +3548,7 @@ def circ(c):
                [7., 6., 5., 4., 3., 2., 1., 8.],
                [8., 7., 6., 5., 4., 3., 2., 1.]])
         >>> # Look at the density of a larger circulant Faust
+        >>> # it indicates a speedup of the Faust-matrix/vector product
         >>> circ(np.random.rand(1024)).density()
         0.0390625
 
@@ -3578,8 +3579,15 @@ def circ(c):
         C = F @ Faust(S) @ FH
     elif diag_factor == 'multiplied':
         nf = F.numfactors()
-        C = F.left(nf-2) @ Faust(F.factors(nf-1) @ S @ FH.factors(0) @
-                                 FH.factors(1)) @ FH.right(2)
+        if nf > 3:
+            C = F.left(nf-2) @ Faust(F.factors(nf-1) @ S @ FH.factors(0) @
+                                     FH.factors(1)) @ FH.right(2)
+        elif nf > 2:
+            C = F.left(nf-2) @ Faust(F.factors(nf-1) @ S @ FH.factors(0) @
+                                     FH.factors(1)) @ Faust(FH.right(2))
+        else:
+            C = Faust(F.left(nf-2)) @ Faust(F.factors(nf-1) @ S @ FH.factors(0) @
+                                     FH.factors(1))
     return C
 
 def anticirc(c):
@@ -3611,6 +3619,7 @@ def anticirc(c):
                [8., 1., 2., 3., 4., 5., 6., 7.],
                [1., 2., 3., 4., 5., 6., 7., 8.]])
         >>> # Look at the density of a larger anticirculant Faust
+        >>> # it indicates a speedup of the Faust-matrix/vector product
         >>> anticirc(np.random.rand(1024)).density()
         0.0390625
 
@@ -3698,6 +3707,7 @@ def toeplitz(c, r=None):
                [ 9.,  8.,  7.,  6.,  5.,  4.,  3.,  2.,  1., 12.],
                [10.,  9.,  8.,  7.,  6.,  5.,  4.,  3.,  2.,  1.]])
         >>> # Look at the density of a larger Toeplitz Faust
+        >>> # it indicates a speedup of the Faust-matrix/vector product
         >>> toeplitz(np.random.rand(1024), np.random.rand(1024)).density()
         0.08203125
 
