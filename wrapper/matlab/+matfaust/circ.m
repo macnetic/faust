@@ -5,21 +5,19 @@
 %>
 %> @code
 %> >> import matfaust.circ
-%> >> c = rand(1, 8);
+%> >> c = 1:8;
 %> >> C = circ(c)
 %> @endcode
 %>
 %> C =
 %>
-%> Faust size 8x8, density 1.75, nnz_sum 112, 8 factor(s):
+%> Faust size 8x8, density 1.5, nnz_sum 96, 6 factor(s):
 %> - FACTOR 0 (complex) SPARSE, size 8x8, density 0.25, nnz 16
 %> - FACTOR 1 (complex) SPARSE, size 8x8, density 0.25, nnz 16
 %> - FACTOR 2 (complex) SPARSE, size 8x8, density 0.25, nnz 16
-%> - FACTOR 3 (complex) SPARSE, size 8x8, density 0.125, nnz 8
-%> - FACTOR 4 (complex) SPARSE, size 8x8, density 0.125, nnz 8
+%> - FACTOR 3 (complex) SPARSE, size 8x8, density 0.25, nnz 16
+%> - FACTOR 4 (complex) SPARSE, size 8x8, density 0.25, nnz 16
 %> - FACTOR 5 (complex) SPARSE, size 8x8, density 0.25, nnz 16
-%> - FACTOR 6 (complex) SPARSE, size 8x8, density 0.25, nnz 16
-%> - FACTOR 7 (complex) SPARSE, size 8x8, density 0.25, nnz 16
 %>
 %> @code
 %> >> full_C = full(C);
@@ -31,26 +29,25 @@
 %>
 %>    1
 %>
-%> >> c
-%>
-%> c =
-%>
-%>     0.2630    0.6541    0.6892    0.7482    0.4505    0.0838    0.2290
-%>     0.9133
-%>
 %> >> real(full_C)
 %>
 %> ans =
 %>
-%>     0.2630    0.9133    0.2290    0.0838    0.4505    0.7482    0.6892    0.6541
-%>     0.6541    0.2630    0.9133    0.2290    0.0838    0.4505    0.7482    0.6892
-%>     0.6892    0.6541    0.2630    0.9133    0.2290    0.0838    0.4505    0.7482
-%>     0.7482    0.6892    0.6541    0.2630    0.9133    0.2290    0.0838    0.4505
-%>     0.4505    0.7482    0.6892    0.6541    0.2630    0.9133    0.2290    0.0838
-%>     0.0838    0.4505    0.7482    0.6892    0.6541    0.2630    0.9133    0.2290
-%>     0.2290    0.0838    0.4505    0.7482    0.6892    0.6541    0.2630    0.9133
-%>     0.9133    0.2290    0.0838    0.4505    0.7482    0.6892    0.6541    0.2630
+%>     1.0000    8.0000    7.0000    6.0000    5.0000    4.0000    3.0000    2.0000
+%>     2.0000    1.0000    8.0000    7.0000    6.0000    5.0000    4.0000    3.0000
+%>     3.0000    2.0000    1.0000    8.0000    7.0000    6.0000    5.0000    4.0000
+%>     4.0000    3.0000    2.0000    1.0000    8.0000    7.0000    6.0000    5.0000
+%>     5.0000    4.0000    3.0000    2.0000    1.0000    8.0000    7.0000    6.0000
+%>     6.0000    5.0000    4.0000    3.0000    2.0000    1.0000    8.0000    7.0000
+%>     7.0000    6.0000    5.0000    4.0000    3.0000    2.0000    1.0000    8.0000
+%>     8.0000    7.0000    6.0000    5.0000    4.0000    3.0000    2.0000    1.0000
+%>
+%> >> % Look at the density of a larger circulant Faust
+%> >> % it indicates a speedup of the Faust-matrix/vector product
+%> >> density(circ(rand(1, 1024)))
+%> 0.0391
 %> @endcode
+%>
 %>
 %> @b See also matfaust.anticirc, matfaust.toeplitz
 %==========================================================================================
