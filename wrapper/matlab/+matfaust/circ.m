@@ -55,6 +55,7 @@
 %> @b See also matfaust.anticirc, matfaust.toeplitz
 %==========================================================================================
 function C = circ(c)
+	import matfaust.Faust
     log2c = log2(numel(c));
     if(log2c ~= floor(log2c))
         error('Only power of two length vectors are supported')
@@ -74,5 +75,13 @@ function C = circ(c)
         c = c.';
     end
     S = sparse(diag(FH*(c/n)));
-    C = F * matfaust.Faust(S*factors(FH, 1)) * right(FH, 2);
+%    C = F * matfaust.Faust(S*factors(FH, 1)) * right(FH, 2);
+	nf = numfactors(F);
+	if(nf > 3)
+		C = left(F, nf-1) * Faust(factors(F, nf) * S * factors(FH, 1) * factors(FH, 2)) * right(FH, 3);
+	elseif(nf > 2)
+		C = left(F, nf-1) * Faust(factors(F, nf) * S * factors(FH, 1) * factors(FH, 2)) * Faust(right(FH, 3));
+	else
+		C = Faust(left(F, nf-1)) * Faust(factors(F, nf) * S * factors(FH, 1) * factors(FH, 2));
+	end
 end
