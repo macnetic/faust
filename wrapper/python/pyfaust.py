@@ -3723,14 +3723,15 @@ def toeplitz(c, r=None):
     C = circ(c_)
     return C[:m, :n]
 
-def eye(m, n=None, t='real', dev="cpu"):
+def eye(m, n=None, dtype='double',  dev="cpu"):
     """
         Faust identity.
 
         Args:
           m: number of rows,
           n: number of columns, set to m by default.
-          t: 'complex' to return a complex Faust, otherwise it's a real Faust.
+          dtype: the dtype of the identity ('float32', the default 'float64'/'double',
+          or 'complex'/'complex128').
 
         Examples:
             >>> from pyfaust import eye
@@ -3740,28 +3741,31 @@ def eye(m, n=None, t='real', dev="cpu"):
             >>> eye(5, 4)
             Faust size 5x4, density 0.2, nnz_sum 4, 1 factor(s):<br/>
             FACTOR 0 (real) SPARSE, size 5x4, density 0.2, nnz 4<br/>
-            >>> eye(5, t='complex')
+            >>> eye(5, dtype='complex')
             Faust size 5x4, density 0.2, nnz_sum 4, 1 factor(s):<br/>
             FACTOR 0 (complex) SPARSE, size 5x4, density 0.2, nnz 4<br/>
     """
     check_dev(dev)
-    if(t not in ['complex', 'real', 'double', 'float']):
-        raise ValueError("t must be 'real' (or 'double', 'float') or 'complex'")
     if(n == None): n = m
+    unknown_dtype_err = ValueError('Unknown dtype has been used')
     if dev == "cpu":
-        if t in ['real', 'double']:
+        if dtype in ['float', 'double', 'float64']:
             rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUDbl.eyeFaust(m, n))
-        elif t == 'float':
+        elif dtype == 'float32':
             rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUFlt.eyeFaust(m, n))
-        else:
+        elif dtype in ['complex', 'complex128']:
             rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUCplxDbl.eyeFaust(m, n))
-    elif dev.startswith("gpu"):
-        if t in ['real', 'double']:
-            rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUDbl.eyeFaust(m, n))
-        elif t == 'float':
-            raise TypeError("float is not yet supported by GPU wht")
         else:
+            raise unknown_dtype_err
+    elif dev.startswith("gpu"):
+        if dtype in ['float', 'double', 'float64']:
+            rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUDbl.eyeFaust(m, n))
+        elif dtype == 'float32':
+            raise TypeError("float is not yet supported by GPU wht")
+        elif dtype in ['complex', 'complex128']:
             rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUCplxDbl.eyeFaust(m, n))
+        else:
+            raise unknown_dtype_err
     return rF
 #    from scipy.sparse import eye
 #    if(not n):
