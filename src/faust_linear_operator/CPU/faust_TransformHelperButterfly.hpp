@@ -7,11 +7,16 @@ namespace Faust
 		int i = 0;
 		auto size = this->getNbRow();
 		D.resize(size);
-		for(auto csr_fac: facts)
+//		for(auto csr_fac: facts)
+		// use rather recorded factors in the Faust::Transform because one might have been multiplied with lambda_
+		for(auto csr_fac_it = this->begin(); csr_fac_it != this->end(); csr_fac_it++)
+		{
+			auto csr_fac = *csr_fac_it;
 			if(i < facts.size()-1)
 				opt_factors.insert(opt_factors.begin(), ButterflyMat<FPP>(*dynamic_cast<const MatSparse<FPP, Cpu>*>(csr_fac), i++));
+		}
 		// set the permutation factor
-		auto csr_fac = *(facts.end()-1);
+		auto csr_fac = *(this->end()-1);
 		perm_d_ptr = D.diagonal().data();
 		// only a setOnes should be enough because this is a permutation matrix (but it could be normalized)
 		memcpy(perm_d_ptr, dynamic_cast<const MatSparse<FPP, Cpu>*>(csr_fac)->getValuePtr(), size*sizeof(FPP));
