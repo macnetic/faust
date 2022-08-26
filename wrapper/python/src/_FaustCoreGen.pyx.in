@@ -1,4 +1,7 @@
 def type2dtype(type):
+    """
+    Returns dtype('float32'), dtype('float64') or dtype('complex128')
+    """
     return np.dtype('float32') if type == 'float' else np.dtype(type)
 
 cdef class FaustCoreGen@TYPE_NAME@@PROC@:

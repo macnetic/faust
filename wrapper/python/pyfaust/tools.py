@@ -9,7 +9,6 @@ from numpy.linalg import solve, lstsq
 from scipy.sparse import hstack, vstack, csr_matrix
 from numpy import concatenate as cat
 from numpy import zeros, argmax, empty, ndarray
-from pyfaust import Faust
 
 
 def omp(y, D, maxiter=None, tol=0, relerr=True, verbose=False):
@@ -37,6 +36,7 @@ def omp(y, D, maxiter=None, tol=0, relerr=True, verbose=False):
         >>> # omp() runs at most maxiter iterations until the error tolerance is
         >>> # reached
     """
+    from pyfaust import Faust
     # check y is a numpy.ndarray (or a matrix_csr ?)
     m = D.shape[1]
     sp = y.shape
@@ -274,3 +274,21 @@ def bitrev_perm(N):
     col_inds = bitrev(row_inds)
     ones = np.ones((N), dtype='float')
     return csr_matrix((ones, (row_inds, col_inds)), shape=(N, N))
+
+def _sanitize_dtype(dtype):
+    """
+    Verifies the dtype is pyfaust-compatible and returns it as str.
+
+    Returns:
+        one of the str of the dtype (float32, float64, complex).
+    """
+    if dtype in [np.float, np.float64, np.double, float, 'float',
+                 'double', 'float64']:
+        return 'float64'
+    elif dtype in [np.float32, 'float32']:
+        return 'float32'
+    elif dtype in [np.complex, np.complex128, 'complex', 'complex128']:
+        return 'complex'
+    else:
+        raise TypeError(str(dtype)+' is not a dtype compatible with pyfaust'
+                        ' (float32, float64/double/float, complex128/complex)')

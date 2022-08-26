@@ -1413,7 +1413,7 @@ class ParamsHierarchicalDFT(ParamsHierarchical):
             fac_cons += [ConstraintMat("supp", supports[i])]
         res_cons = []
         for j in range(n-1):
-            supp = np.eye(*supports[0].shape, dtype=np.complex)
+            supp = np.eye(*supports[0].shape, dtype='complex')
             for i in range(j+1, n+1):
                 fi = supports[i]
                 supp = supp@fi
@@ -1449,11 +1449,11 @@ class ParamsHierarchicalDFT(ParamsHierarchical):
         supports = []
         for i in range(n):
             supp_bf = np.kron(np.ones((2,2)), np.eye(2 ** ((n-i)-1)))
-            supports += [np.kron(np.eye(2**i), supp_bf).astype(np.complex)]
+            supports += [np.kron(np.eye(2**i), supp_bf).astype('complex')]
         # bit-reversal permutation
         row_ids = np.arange(size)
         col_ids = self.bit_rev_permu(n)
-        br_permu = np.zeros((size,size)).astype(np.complex)
+        br_permu = np.zeros((size,size)).astype('complex')
         br_permu[row_ids, col_ids] = 1
         supports += [br_permu]
         return supports

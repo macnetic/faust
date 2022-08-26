@@ -35,6 +35,7 @@ from pyfaust import Faust
 from pyfaust.tools import bitrev_perm
 import _FaustCorePy
 import warnings
+from pyfaust.tools import _sanitize_dtype
 
 # experimental block start
 def svdtj2(M, nGivens, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
@@ -292,23 +293,21 @@ def eigtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
     See also:
         svdtj
     """
-    is_real = np.empty((1,))
     if not isinstance(M, scipy.sparse.csr_matrix):
-        M = _check_fact_mat('eigtj()', M, is_real)
-    else:
-        is_real = (M.dtype == np.float)
+        M = _check_fact_mat('eigtj()', M)
 
-    if is_real:
-        if M.dtype == 'float32':
-            D, core_obj = _FaustCorePy.FaustAlgoGenGivensFlt.eigtj(M, nGivens, tol, relerr,
-                                                             nGivens_per_fac, verbosity, order,
-                                                             enable_large_Faust)
+    M_dtype = _sanitize_dtype(M.dtype)
 
-        else:
-            D, core_obj = _FaustCorePy.FaustAlgoGenGivensDbl.eigtj(M, nGivens, tol, relerr,
-                                                             nGivens_per_fac, verbosity, order,
-                                                             enable_large_Faust)
-    else:
+    if M_dtype == 'float32':
+        D, core_obj = _FaustCorePy.FaustAlgoGenGivensFlt.eigtj(M, nGivens, tol, relerr,
+                                                         nGivens_per_fac, verbosity, order,
+                                                         enable_large_Faust)
+
+    elif M_dtype == 'float64':
+        D, core_obj = _FaustCorePy.FaustAlgoGenGivensDbl.eigtj(M, nGivens, tol, relerr,
+                                                         nGivens_per_fac, verbosity, order,
+                                                         enable_large_Faust)
+    else: # M_dtype == 'complex'
         D, core_obj = _FaustCorePy.FaustAlgoGenGivensCplxDbl.eigtj(M, nGivens, tol, relerr,
                                                    nGivens_per_fac, verbosity, order,
                                                    enable_large_Faust)
@@ -319,15 +318,13 @@ def _check_fact_mat(funcname, M, is_real=None):
         raise Exception(funcname+" 1st argument must be a numpy ndarray.")
 
     use_is_real = isinstance(is_real, (list, np.ndarray))
-    if M.dtype in ['float64', 'float32']:
+    M_dtype = _sanitize_dtype(M.dtype)
+    if M_dtype in ['float64', 'float32']:
         if use_is_real:
             is_real[0] = True
-    elif M.dtype in ['complex128']:
+    else: #M_dtype == 'complex':
         if use_is_real:
             is_real[0] = False
-    else:
-        raise TypeError("The np.ndarray dtype is neither np.float64 nor"
-                        " np.complex128")
 
     ndim_M=M.ndim;
 
@@ -351,7 +348,7 @@ def hierarchical_py(A, J, N, res_proxs, fac_proxs, is_update_way_R2L=False,
     PALM4MSA-hierarchical factorization.
 
     Args:
-        A: (np.ndarray) the matrix to factorize. The dtype can be np.float32 or np.float64 (it might change the performance).
+        A: (np.ndarray) the matrix to factorize. The dtype can be float32 or float64 (it might change the performance).
         J: number of factors.
         N: number of iterations of PALM4MSA calls.
         res_proxs: the residual factor proximity operators.
@@ -425,7 +422,7 @@ def palm4msa_py(A, J, N, proxs, is_update_way_R2L=False, S=None, _lambda=1,
     PALM4MSA factorization.
 
     Args:
-        A: (np.ndarray) the matrix to factorize. The dtype can be np.float32 or np.float64 (it might change the performance).
+        A: (np.ndarray) the matrix to factorize. The dtype can be float32 or float64 (it might change the performance).
         J: number of factors.
         N: number of iterations of PALM4MSA.
         proxs: the factor proximity operators.

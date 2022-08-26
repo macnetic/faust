@@ -19,6 +19,7 @@ import warnings
 import decimal
 import numpy.lib.mixins
 from os import environ
+from pyfaust.tools import _sanitize_dtype
 
 HANDLED_FUNCTIONS = {}
 
@@ -176,7 +177,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         if("scale" in kwargs.keys()):
             # scale hidden argument
             scale = kwargs['scale']
-            if(not isinstance(scale, (float, int, np.complex))):
+            if(not isinstance(scale, (float, int, complex))):
                 raise Exception("Scale must be a number.")
         else:
             scale = 1.0
@@ -209,24 +210,23 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             if len(factors) == 0:
                 raise ValueError("Empty list of matrices.")
             for f in factors:
-                F._is_real = f.dtype != np.complex
+                F._is_real = f.dtype != 'complex'
                 if dtype is None:
                     dtype = f.dtype
                 elif dtype != f.dtype:
                     raise TypeError('All Faust factors must have the same dtype.')
-            if dtype not in ['double', 'float32', 'complex128']:
-                raise TypeError('Unmanaged factor dtype:'+str(dtype)+' (must be float32, double or complex128')
+            dtype = _sanitize_dtype(dtype)
             if(factors is not None and len(factors) > 0):
                 if(is_on_gpu):
                     if F._is_real:
-                        if dtype == 'double':
+                        if dtype == 'float64':
                             F.m_faust = _FaustCorePy.FaustCoreGenDblGPU(factors, scale)
                         else: # if dtype == 'float32':
                             F.m_faust = _FaustCorePy.FaustCoreGenFltGPU(factors, scale)
                     else:
                         F.m_faust = _FaustCorePy.FaustCoreGenCplxDblGPU(factors, scale)
                 elif F._is_real:
-                    if dtype == 'double':
+                    if dtype == 'float64':
                         F.m_faust = _FaustCorePy.FaustCoreGenDblCPU(factors, scale)
                     else: # if dtype == 'float32':
                         F.m_faust = _FaustCorePy.FaustCoreGenFltCPU(factors, scale)
@@ -765,10 +765,10 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         def scalar2Faust(G):
             if isinstance(G, int):
                 G = float(G)
-            elif not isinstance(G, (np.float, np.complex)):
+            elif not isinstance(G, (float, complex)):
                 raise TypeError("scalar must be int, float or complex")
             G, Gdtype = (float(G), np.float) if (isinstance(G, np.float) and
-                                                 F.dtype != 'complex') else (complex(G), np.complex)
+                                                 F.dtype != 'complex') else (complex(G), 'complex')
             return Faust([np.ones((F.shape[0], 1), dtype=F.dtype)*G,
                           np.ones((1, F.shape[1]), dtype=F.dtype).astype(Gdtype)],
                          dev=F.device)
@@ -800,7 +800,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                     G = Faust([np.ones((F.shape[0], 1), dtype=F.dtype), G.reshape(1, G.size)], dev=F.device)
                 else:
                     G = broadcast_to_F(Faust(G, dev=F.device))
-            elif isinstance(G,(int, float, np.complex)):
+            elif isinstance(G,(int, float, complex)):
                 G = scalar2Faust(G)
             largs.append(G)
 
@@ -923,7 +923,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         """
         return F.__mul__(-1).__radd__(lhs_op)
 
-    def __truediv__(F,s):
+    def __truediv__(F, s):
         """Divides F by the scalar s.
         This method overloads the Python function/operator `/' (whether s is a float or an integer).
 
@@ -936,7 +936,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         <b>See also</b> Faust.__mul__, Faust.__itruediv__
         """
-        if isinstance(s, (float, np.complex, int)) or isinstance(s, np.ndarray):
+        if isinstance(s, (float, complex, int)) or isinstance(s, np.ndarray):
             return F*(1./s)
         else:
             raise Exception("unsupported operand type(s) for /: a Faust can only be "
@@ -1049,12 +1049,12 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             if(F.shape[1] != A.shape[0]): raise ValueError("The dimensions of "
                                                           "the two Fausts must "
                                                           "agree.")
-            if F.dtype == np.complex and A.dtype != np.complex:
-                A = A.astype(np.complex)
-            elif F.dtype != np.complex and A.dtype == np.complex:
-                F = F.astype(np.complex)
+            if F.dtype == 'complex' and A.dtype != 'complex':
+                A = A.astype('complex')
+            elif F.dtype != 'complex' and A.dtype == 'complex':
+                F = F.astype('complex')
             return Faust(core_obj=F.m_faust.multiply_faust(A.m_faust))
-        elif(isinstance(A, (float, int, np.complex))):
+        elif(isinstance(A, (float, int, complex))):
             raise ValueError("Scalar operands are not allowed, use '*'"
                              " instead")
         elif isinstance(A, np.ndarray):
@@ -1062,7 +1062,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                                       "F_CONTIGUOUS, costly conversion on the "
                                       "fly. Please use np.asfortranarray by "
                                       "yourself.")
-            if A.dtype == np.complex and F.dtype != np.complex:
+            if A.dtype == 'complex' and F.dtype != 'complex':
                 A_r = np.asfortranarray(A.real)
                 A_i = np.asfortranarray(A.imag)
                 if not A.imag.flags['F_CONTIGUOUS']:
@@ -1079,9 +1079,9 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                     A = A.astype('complex')
                 return F.m_faust.multiply(A)
         elif(isinstance(A, scipy.sparse.csr_matrix)):
-            if(A.dtype == np.complex and F.dtype != np.complex):
-                j = np.complex(0,1)
-                return (F.__matmul__(A.real))*np.complex(1,0) + \
+            if(A.dtype == 'complex' and F.dtype != 'complex'):
+                j = 1j
+                return (F.__matmul__(A.real))*(1+0j) + \
                         (F.__matmul__(A.imag))*j
             else:
                 return F.m_faust.multiply_csr_mat(A.astype(F.dtype))
@@ -1098,7 +1098,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         <b>See also</b> Faust.__init__, Faust.rcg, Faust.__mul__, Faust.__matmul__, Faust.dot
         """
-        if(isinstance(A, (float, int, np.complex))):
+        if(isinstance(A, (float, int, complex))):
             return F*A
         return F.__matmul__(A)
 
@@ -1155,21 +1155,21 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         <b>See also</b> Faust.__rmul__
         """
-        if(isinstance(A, (float, int, np.complex))):
+        if(isinstance(A, (float, int, complex))):
             if isinstance(A, int):
                 A = float(A)
-            elif isinstance(A, np.complex):
-                if F.dtype != np.complex:
-                    F = F.astype(np.complex)
+            elif isinstance(A, complex):
+                if F.dtype != 'complex':
+                    F = F.astype('complex')
             else:
                 # A is a float
-                if F.dtype == np.complex:
-                    A = np.complex(A)
+                if F.dtype == 'complex':
+                    A = complex(A)
             return Faust(core_obj=F.m_faust.multiply_scal(A))
         elif(isinstance(A, np.ndarray)):
             if(A.size == 1):
-                if A.dtype == np.complex:
-                    return F*(np.complex(A.squeeze()))
+                if A.dtype == 'complex':
+                    return F*(A.squeeze().astype('complex'))
                 else:
                     return F*(float(A.squeeze()))
             if A.ndim == 1 and A.size == F.shape[1] \
@@ -1184,13 +1184,13 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         """ lhs_op*F
         <b>See also</b> Faust.__mul__
         """
-        if isinstance(lhs_op, (float, int, np.complex)):
+        if isinstance(lhs_op, (float, int, complex)):
             return F.__mul__(lhs_op)
         elif(isinstance(lhs_op, np.ndarray)):
             #TODO: refactor with __mul__
             if(lhs_op.size == 1):
-                if lhs_op.dtype == np.complex:
-                    return F*(np.complex(lhs_op.squeeze()))
+                if lhs_op.dtype == 'complex':
+                    return F*(lhs_op.squeeze().astype('complex'))
                 else:
                     return F*(float(lhs_op.squeeze()))
             if lhs_op.ndim == 1 and lhs_op.size == F.shape[1] \
@@ -1215,7 +1215,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         """
         if(isinstance(lhs_op, (np.ndarray, csr_matrix, dia_matrix))):
-            if(F.dtype == np.complex or lhs_op.dtype == np.complex):
+            if(F.dtype == 'complex' or lhs_op.dtype == 'complex'):
                 return (F.T.conj().__matmul__(lhs_op.T.conj())).T.conj()
             else: # real Faust and real lhs_op
                 return (F.T.__matmul__(lhs_op.T)).T
@@ -1330,7 +1330,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             raise ValueError("Axis must be 0 or 1.")
 
         largs = []
-        any_G_is_cplx = F.dtype == np.complex
+        any_G_is_cplx = F.dtype == 'complex'
         for i,G in enumerate(args):
             if(isinstance(G, (np.ndarray, csr_matrix, csc_matrix))):
                 G = Faust(G, dev=F.device)
@@ -1339,7 +1339,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                                                            "that is not a Faust, "
                                                            "a numpy array or scipy "
                                                            "sparse matrix.")
-            any_G_is_cplx |= G.dtype == np.complex
+            any_G_is_cplx |= G.dtype == 'complex'
             largs.append(G)
 
             if(axis == 0 and F.shape[1] != G.shape[1] or axis == 1 and F.shape[0]
@@ -1351,10 +1351,10 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         if any_G_is_cplx:
             # one Faust is complex convert all real Faust to complex
             for i in range(len(largs)):
-                if largs[i].dtype != np.complex:
-                    largs[i] = largs[i].astype(np.complex)
-            if F.dtype != np.complex:
-                F = F.astype(np.complex)
+                if largs[i].dtype != 'complex':
+                    largs[i] = largs[i].astype('complex')
+            if F.dtype != 'complex':
+                F = F.astype('complex')
 
 
         if all([isFaust(G) for G in largs]) and not "iterative" in kwargs.keys() or kwargs['iterative']:
@@ -2219,14 +2219,14 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Converts F to the dtype passed as argument in a new Faust.
 
         Args:
-            dtype: np.float or np.complex.
+            dtype: 'float32', 'float64' or 'complex'.
 
         Returns:
             A Faust copy of F converted to dtype.
 
         Example:
             >>> from pyfaust import rand
-            >>> F = rand(10, 10, dtype='double')
+            >>> F = rand(10, 10, dtype='float64')
             >>> F.astype('float32')
             Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
                 - FACTOR 0 (float) SPARSE, size 10x10, density 0.5, nnz 50
@@ -2245,15 +2245,14 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         """
         #TODO: full list of numpy args or **kw_unknown
-        if np.dtype(dtype) not in [np.complex, np.float32, np.double]:
-            raise TypeError("Faust supports only complex, double or float32 dtype-s")
+        dtype = _sanitize_dtype(dtype)
         if dtype == F.dtype:
             return F.clone(dev=F.device)
-        if F.dtype == np.complex:
-            if dtype == np.float32:
+        if F.dtype == 'complex':
+            if dtype == 'float32':
                 return F.real.astype('float32')
             else:
-                # dtype is double
+                # dtype is float64
                 return F.real
         else:
             return Faust([F.factors(i).astype(dtype) for i in
@@ -2264,7 +2263,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         """
         Returns the real part of F as a Faust.
         """
-        if F.dtype != np.complex:
+        if F.dtype != 'complex':
             return F
         else:
             #  return 1/2 * (F + F.conj())
@@ -2278,7 +2277,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         """
         Returns the imaginary part of F as a Faust.
         """
-        if F.dtype != np.complex:
+        if F.dtype != 'complex':
             # return Faust(csr_matrix(F.shape)) # TODO: debug pyx code
             return Faust(csr_matrix((np.array([0.]).astype(F.dtype),
                                      ([0],[0])), (F.shape)))
@@ -2348,7 +2347,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         nrows = int(nf/ncols)+1
         plt.subplot(nrows,ncols,nrows*ncols)
         plt.title(name+'.toarray()')
-        if(F.dtype == np.complex):
+        if F.dtype == 'complex':
             plt.imshow(abs(F.toarray()), aspect='equal')
         else:
             plt.imshow(F.toarray(), aspect='equal')
@@ -2361,7 +2360,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                 fac = fac.toarray()
             plt.xticks([]); plt.yticks([])
             plt.suptitle('Factors of the Faust '+ name)
-            if(fac.dtype == np.complex):
+            if fac.dtype == 'complex':
                 plt.imshow(abs(fac),aspect='equal')
             else:
                 plt.imshow(fac, aspect='equal')
@@ -2846,11 +2845,11 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         check_dev(dev)
         # dev is 'gpu[:id]' or 'cpu'
         if F.device.startswith('gpu'):
-            if F.dtype == 'double':
+            if F.dtype == 'float64':
                 clone_F = \
                         Faust(core_obj=_FaustCorePy.FaustCoreGenNonMemberFuncsDblGPU.clone(F.m_faust,
                                                                                            dev))
-            else: # F.dtype == np.complex
+            else: # F.dtype == 'complex'
                 clone_F = \
                         Faust(core_obj=_FaustCorePy.FaustCoreGenNonMemberFuncsCplxDblGPU.clone(F.m_faust,
                                                                                             dev))
@@ -2859,7 +2858,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             if dev == 'cpu':
                 clone_F = Faust(core_obj=F.m_faust.clone(-1))
             else:
-                if F.dtype == 'double':
+                if F.dtype == 'float64':
                     clone_F = \
                             Faust(core_obj=_FaustCorePy.FaustCoreGenNonMemberFuncsDblCPU.clone(F.m_faust, dev))
                 else:
@@ -3195,7 +3194,7 @@ def isFaust(obj):
     """
     return Faust.isFaust(obj)
 
-def wht(n, normed=True, dev="cpu", dtype='double'):
+def wht(n, normed=True, dev="cpu", dtype='float64'):
     """
     Constructs a Faust implementing the Walsh-Hadamard Transform (WHT) of order n.
 
@@ -3207,7 +3206,7 @@ def wht(n, normed=True, dev="cpu", dtype='double'):
        normed: default to True to normalize the Hadamard Faust as if you called
        Faust.normalize() and False otherwise.
        dev: device on which to create the Faust ('cpu' or 'gpu').
-       dtype: the Faust dtype, it must be 'double' or 'complex'.
+       dtype: the Faust dtype, it must be 'float32', 'float64' or 'complex'.
 
 
     Returns:
@@ -3232,24 +3231,23 @@ def wht(n, normed=True, dev="cpu", dtype='double'):
 
     <b>See also:</b> scipy.linalg.hadamard, pyfaust.dft, pyfaust.fact.butterfly
     """
-    if dtype not in ['double', 'complex', 'float']:
-        raise ValueError('dtype argument must be double or complex')
+    dtype = _sanitize_dtype(dtype)
     check_dev(dev)
     log2n = np.floor(np.log2(n))
     if(n > 2**log2n): raise ValueError("n must be a power of 2.")
     if(not isinstance(normed, bool)):
         raise TypeError("normed must be True of False.")
     if dev == "cpu":
-        if dtype == 'double':
+        if dtype == 'float64':
             H = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUDbl.hadamardFaust(log2n, normed))
-        elif dtype == 'float':
+        elif dtype == 'float32':
             H = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUFlt.hadamardFaust(log2n, normed))
         else: # dtype == 'complex'
             H = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUCplxDbl.hadamardFaust(log2n, normed))
     elif dev.startswith("gpu"):
-        if dtype == 'double':
+        if dtype == 'float64':
             H = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUDbl.hadamardFaust(log2n, normed))
-        elif dtype == 'float':
+        elif dtype == 'float32':
             H = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUFlt.hadamardFaust(log2n, normed))
         else: # dtype == 'complex'
             H = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUCplxDbl.hadamardFaust(log2n, normed))
@@ -3316,7 +3314,7 @@ def dft(n, normed=True, dev='cpu', diag_opt=False):
                                                                         diag_opt))
     return F
 
-def dct(n, normed=True, dev='cpu', dtype='double'):
+def dct(n, normed=True, dev='cpu', dtype='float64'):
     """Constructs a Faust implementing the Direct Cosine Transform (Type II) Faust of order n.
 
     The analytical formula of DCT II used here is:
@@ -3328,7 +3326,7 @@ def dct(n, normed=True, dev='cpu', dtype='double'):
         normed: default to True to normalize the DFT Faust as if you called
         Faust.normalize() and False otherwise.
         dev: the device on which the Faust is created.
-        dtype: double (default) or float32.
+        dtype: 'float64' (default) or 'float32'.
 
     Example:
         >>> from pyfaust import dct
@@ -3351,6 +3349,7 @@ def dct(n, normed=True, dev='cpu', dtype='double'):
 
     See also pyfaust.dft, pyfaust.dst, <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.dct.html"> scipy.fft.dct</a>, pyfaust.fact.butterfly, pyfaust.rand_butterfly, pyfaust.Faust.density
     """
+    dtype = _sanitize_dtype(dtype)
     DFT = pyfaust.dft(n, dev='cpu', normed=False)
 #    P_ = np.zeros((n, n))
 #    P_[np.arange(0, n//2), np.arange(0, n, 2)] = 1
@@ -3372,7 +3371,7 @@ def dct(n, normed=True, dev='cpu', dtype='double'):
         DCT = DCT.normalize()
     if dev.startswith('gpu'):
         DCT = DCT.clone(dev='gpu')
-    if dtype not in ['double', 'float64']:
+    if dtype != 'float64':
         DCT = DCT.astype(dtype)
     return DCT
 
@@ -3426,7 +3425,7 @@ def dst3(n, dev='cpu'):
     return F.real
 # experimental block end
 
-def dst(n, normed=True, dev='cpu', dtype='double'):
+def dst(n, normed=True, dev='cpu', dtype='float64'):
     """
     Constructs a Faust implementing the Direct Sine Transform (Type II) Faust of order n.
 
@@ -3438,7 +3437,7 @@ def dst(n, normed=True, dev='cpu', dtype='double'):
         normed: default to True to normalize the Hadamard Faust as if you called
         Faust.normalize() and False otherwise.
         dev: the device on which the Faust is created.
-        dtype: double (default) or float32.
+        dtype: 'float64' (default) or 'float32'.
 
     Example:
         >>> from pyfaust import dst
@@ -3495,6 +3494,7 @@ def dst(n, normed=True, dev='cpu', dtype='double'):
             N_ //= 2
         return Faust(Bs+[bitrev_perm(N).astype(Bs[-1].dtype)], dev=dev)
 
+    dtype = _sanitize_dtype(dtype)
 	# compute the DST (look at issue #265 for doc, S permutation was replaced by mod_fft to fix missing last frequency)
     MDFT = mod_fft(n, dev=dev)
     D1 = csr_matrix(-2*diags([- 1j * np.exp(-1j * np.pi / 2 / n * (k+1)) for k in range(0,
@@ -3516,7 +3516,7 @@ def dst(n, normed=True, dev='cpu', dtype='double'):
         F = F.normalize()
     if dev.startswith('gpu'):
         F = F.clone(dev='gpu')
-    if dtype not in ['double', 'float64']:
+    if dtype != 'float64':
         F = F.astype(dtype)
     return F
 
@@ -3724,7 +3724,7 @@ def toeplitz(c, r=None):
     C = circ(c_)
     return C[:m, :n]
 
-def eye(m, n=None, dtype='double',  dev="cpu"):
+def eye(m, n=None, dtype='float64',  dev="cpu"):
     """
         Faust identity.
 
@@ -3749,21 +3749,22 @@ def eye(m, n=None, dtype='double',  dev="cpu"):
     check_dev(dev)
     if(n == None): n = m
     unknown_dtype_err = ValueError('Unknown dtype has been used')
+    dtype = _sanitize_dtype(dtype)
     if dev == "cpu":
-        if dtype in ['float', 'double', 'float64']:
+        if dtype == 'float64':
             rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUDbl.eyeFaust(m, n))
         elif dtype == 'float32':
             rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUFlt.eyeFaust(m, n))
-        elif dtype in ['complex', 'complex128']:
+        elif dtype == 'complex':
             rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUCplxDbl.eyeFaust(m, n))
         else:
             raise unknown_dtype_err
     elif dev.startswith("gpu"):
-        if dtype in ['float', 'double', 'float64']:
+        if dtype == 'float64':
             rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUDbl.eyeFaust(m, n))
         elif dtype == 'float32':
             rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUFlt.eyeFaust(m, n))
-        elif dtype in ['complex', 'complex128']:
+        elif dtype == 'complex':
             rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUCplxDbl.eyeFaust(m, n))
         else:
             raise unknown_dtype_err
@@ -3773,13 +3774,13 @@ def eye(m, n=None, dtype='double',  dev="cpu"):
 #        n = m
 #    e = eye(m,n).tocsr()
 #    if(t == 'complex'):
-#        e = e.astype(np.complex)
+#        e = e.astype('complex')
 #    elif(t != 'real'):
 #        raise ValueError("t must be 'real' or 'complex'")
 #    return Faust(e)
 
 def rand_bsr(num_rows, num_cols, bnrows, bncols, num_factors=None, density=.1,
-            dev='cpu', dtype='double'):
+            dev='cpu', dtype='float64'):
     """
     Generates a random Faust composed only of BSR matrices.
 
@@ -3811,6 +3812,7 @@ def rand_bsr(num_rows, num_cols, bnrows, bncols, num_factors=None, density=.1,
     <b>See also:</b> <a
     href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.bsr_matrix.html">bsr_matrix</a>, Faust.__init__, pyfaust.rand
     """
+    dtype = _sanitize_dtype(dtype)
     if num_factors is None:
         min_num_factors = max_num_factors = 5
     elif isinstance(num_factors, int):
@@ -3829,7 +3831,7 @@ def rand_bsr(num_rows, num_cols, bnrows, bncols, num_factors=None, density=.1,
     if dev.startswith('gpu') and bnrows != bncols:
         raise ValueError('currently only square blocks are supported on GPU.')
     if dev == "cpu":
-        if dtype in ['float64', 'double']:
+        if dtype == 'float64':
             rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUDbl.randBSRFaust(num_rows,
                                                                              num_cols,
                                                                              min_num_factors,
@@ -3837,7 +3839,7 @@ def rand_bsr(num_rows, num_cols, bnrows, bncols, num_factors=None, density=.1,
                                                                              bnrows,
                                                                              bncols,
                                                                              density))
-        elif dtype in ['float32', 'float']: # type == 'float'
+        elif dtype == 'float32': # type == 'float'
             rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUFlt.randBSRFaust(num_rows,
                                                                              num_cols,
                                                                              min_num_factors,
@@ -3845,7 +3847,7 @@ def rand_bsr(num_rows, num_cols, bnrows, bncols, num_factors=None, density=.1,
                                                                              bnrows,
                                                                              bncols,
                                                                              density))
-        elif dtype in ['complex', 'complex128']:
+        elif dtype == 'complex':
             rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUCplxDbl.randBSRFaust(num_rows,
                                                                                  num_cols,
                                                                                  min_num_factors,
@@ -3854,7 +3856,7 @@ def rand_bsr(num_rows, num_cols, bnrows, bncols, num_factors=None, density=.1,
                                                                                  bncols,
                                                                                  density))
     elif dev.startswith("gpu"):
-        if dtype in ['float64', 'double']:
+        if dtype == 'float64':
             rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUDbl.randBSRFaust(num_rows,
                                                                              num_cols,
                                                                              min_num_factors,
@@ -3862,7 +3864,7 @@ def rand_bsr(num_rows, num_cols, bnrows, bncols, num_factors=None, density=.1,
                                                                              bnrows,
                                                                              bncols,
                                                                              density))
-        elif dtype in ['float32', 'float']: # type == 'float'
+        elif dtype == 'float32': # type == 'float'
             rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUFlt.randBSRFaust(num_rows,
                                                                              num_cols,
                                                                              min_num_factors,
@@ -3870,7 +3872,7 @@ def rand_bsr(num_rows, num_cols, bnrows, bncols, num_factors=None, density=.1,
                                                                              bnrows,
                                                                              bncols,
                                                                              density))
-        elif dtype in ['complex', 'complex128']:
+        elif dtype == 'complex':
             rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUCplxDbl.randBSRFaust(num_rows,
                                                                                  num_cols,
                                                                                  min_num_factors,
@@ -3885,7 +3887,7 @@ def rand_bsr(num_rows, num_cols, bnrows, bncols, num_factors=None, density=.1,
 
 def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
          density=None, fac_type='sparse',
-         field='real', per_row=True, dev='cpu', dtype='double'):
+         field='real', per_row=True, dev='cpu', dtype='float64'):
     """
     Generates a random Faust.
 
@@ -3926,9 +3928,9 @@ def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
                     applying the density to each row. If False the construction is
                     made with the density applied on each column.
             dev: the device on which to create the Faust ('cpu' or 'gpu').
-            dtype: the dtype of the Faust ('float32' and 'float128' == 'double'
-                   are supported for fiel == 'real', only 'double' for field ==
-                   'complex'.
+            dtype: the dtype of the Faust ('float32' and 'float64'
+                   are supported for field == 'real', only 'float64' for field ==
+                   'complex').
 
     Returns:
         the random Faust.
@@ -3952,14 +3954,17 @@ def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
     """
     check_dev(dev)
     field = field.lower()
+    dtype = _sanitize_dtype(dtype)
     if field == 'real':
         is_real = True
-        if dtype in [np.float64, 'float', 'double']:
+        if dtype == 'float64':
             type = 'double'
-        elif dtype in [np.float32, 'float32']:
+        elif dtype == 'float32':
             type = 'float'
     elif field == 'complex':
-        if not dtype in [np.float64, 'float', 'double']:
+        if dtype == 'complex':
+            dtype= 'float64'
+        if dtype != 'float64':
             raise TypeError('Invalid dtype: only double are handled for for'
                             ' complex field')
         is_real = False
@@ -4053,7 +4058,7 @@ def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
                                                                            min_dim_size, max_dim_size, density, per_row))
     return rF
 
-def rand_butterfly(n, dtype='double', dev='cpu'):
+def rand_butterfly(n, dtype='float64', dev='cpu'):
     """
     Constructs a Faust corresponding to the product of log2(n) square factors of size n with butterfly supports and random nonzero coefficients.
 
@@ -4062,7 +4067,7 @@ def rand_butterfly(n, dtype='double', dev='cpu'):
 
     Args:
         n: order of the butterfly (must be a power of two).
-        dtype: 'float32', 'double' or 'complex', the dtype of the random Faust.
+        dtype: 'float32', 'float64' or 'complex', the dtype of the random Faust.
         dev: 'cpu' or 'gpu', the device where the Faust is created.
 
     Returns:
@@ -4071,9 +4076,7 @@ def rand_butterfly(n, dtype='double', dev='cpu'):
     <b>See also</b>: pyfaust.fact.butterfly, pyfaust.dft.
     """
     from numpy.random import randn
-    if dtype not in ['float32', 'double', 'float', 'complex']:
-        raise ValueError('dtype '+str(dtype)+' is not handled (only float32, '
-                         'double, float, complex are)')
+    dtype = _sanitize_dtype(dtype)
     DFT = dft(n)
     # ignore the bitreversal permutation
     B = DFT.factors(range(0, DFT.numfactors()-1))
@@ -4084,7 +4087,7 @@ def rand_butterfly(n, dtype='double', dev='cpu'):
     for i in range(len(B)):
         rb = B.factors(i).astype(dtype)
         if dtype != 'complex':
-            rb[rb!=0] = randn(rb.size)
+            rb[rb!=0] = randn(rb.size).astype(dtype)
         else:
             rb[rb!=0] = randn(rb.size) + 1j * randn(rb.size)
         RB_factors.append(rb)
