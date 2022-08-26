@@ -9,7 +9,7 @@
 %> &nbsp;&nbsp;&nbsp; @b eye(S, 'complex', 'dev', 'gpu') or eye(S, 'dev', 'gpu') same as above but creates the Faust on GPU.<br/>
 %>
 %> @param 'dev',str 'gpu or 'cpu' to create the Faust on CPU or GPU (by default on CPU).
-%> @param 'dtype',str 'double' (by default) or 'float' to select the scalar type used for the Faust generated.
+%> @param 'class',str 'double' (by default) or 'single' to select the scalar type used for the Faust generated.
 %>
 %> @b Example
 %>
@@ -104,7 +104,7 @@ function F = eye(varargin)
 	dev = 'cpu';
 	argc = length(varargin);
 	is_real = true;
-	dtype = 'double';
+	class = 'double';
 	if(argc > 0)
 		i = 2;
 		while(i <= argc)
@@ -124,24 +124,30 @@ function F = eye(varargin)
 						dev = tmparg;
 					end
 					i = i + 1;
-				case 'dtype'
-					if(argc == i || ~ strcmp(tmparg, 'float') && ~ strcmp(tmparg, 'double'))
-						error('dtype keyword argument is not followed by a valid value: float, double.')
+				case {'class', 'dtype'}
+					if(argc == i || ~ any(strcmp(tmparg, {'single', 'float'})) && ~ strcmp(tmparg, 'double'))
+						error('class keyword argument is not followed by a valid value: single, double.')
 					else
-						dtype = tmparg;
+						class = tmparg;
 					end
 					i = i + 1;
 				otherwise
-					if((isstr(varargin{i}) || ischar(varargin{i}))  && ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu') && ~ strcmp(tmparg, 'complex') && ~ strcmp(tmparg, 'float') && ~ strcmp(tmparg, 'double'))
+					if((isstr(varargin{i}) || ischar(varargin{i}))  && ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu') && ~ strcmp(tmparg, 'complex') && ~ strcmp(tmparg, 'single') && ~ strcmp(tmparg, 'double'))
 						error([ tmparg ' unrecognized argument'])
 					end
 			end
 			i = i + 1;
 		end
 	end
+	if strcmp(class, 'single')
+		class = 'float';
+	end
+	if strcmp(class, 'float') && ~ is_real
+		error('complex Fausts only support double class/precision')
+	end
 	if(strcmp(dev, 'cpu'))
 		if(is_real)
-			if(strcmp(dtype, 'float'))
+			if(strcmp(class, 'float'))
 				core_obj = mexFaustRealFloat('eye', m, n);
 			else
 				core_obj = mexFaustReal('eye', m, n);
@@ -151,7 +157,7 @@ function F = eye(varargin)
 		end
 	else
 		if(is_real)
-			if(strcmp(dtype, 'float'))
+			if(strcmp(class, 'float'))
 				core_obj = mexFaustGPURealFloat('eye', m, n);
 			else
 				core_obj = mexFaustGPUReal('eye', m, n);
@@ -164,5 +170,5 @@ function F = eye(varargin)
 	if(core_obj == 0)
 		throw(e)
 	end
-	F = matfaust.Faust(core_obj, is_real, dev, dtype);
+	F = matfaust.Faust(core_obj, is_real, dev, class);
 end
