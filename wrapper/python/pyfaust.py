@@ -3887,7 +3887,7 @@ def rand_bsr(num_rows, num_cols, bnrows, bncols, num_factors=None, density=.1,
 
 def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
          density=None, fac_type='sparse',
-         field='real', per_row=True, dev='cpu', dtype='float64'):
+         per_row=True, dev='cpu', dtype='float64', field=None):
     """
     Generates a random Faust.
 
@@ -3923,21 +3923,20 @@ def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
                     'sparse', 'dense' or 'mixed'. The latter designates a mix of dense and
                     sparse matrices in the generated Faust (the choice is made according
                     to a uniform distribution).
-            field:  a str to set the Faust field: 'real' or 'complex'.
+            dtype: the dtype of the Faust ('float32', 'float64' or 'complex').
             per_row: if True the factor matrix is constructed per row
                     applying the density to each row. If False the construction is
                     made with the density applied on each column.
             dev: the device on which to create the Faust ('cpu' or 'gpu').
-            dtype: the dtype of the Faust ('float32' and 'float64'
-                   are supported for field == 'real', only 'float64' for field ==
-                   'complex').
+            field: (DEPRECATED, use dtype) a str to set the Faust field: 'real' or 'complex'.
+
 
     Returns:
         the random Faust.
 
     Examples:
         >>> from pyfaust import rand
-        >>> F = rand(2, 10, .5, field='complex')
+        >>> F = rand(2, 10, .5, dtype='complex')
         >>> G = rand([2, 5], [10, 20], .5, fac_type="dense")
         >>> F
         Faust size 10x10, density 0.99, nnz_sum 99, 2 factors:<br/>
@@ -3953,23 +3952,33 @@ def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
     <b>See also</b> Faust.__init__, pyfaust.rand_bsr
     """
     check_dev(dev)
-    field = field.lower()
     dtype = _sanitize_dtype(dtype)
+    if field is not None:
+        field = field.lower()
+        warnings.warn("pyfaust.rand field argument is deprecated, please use"
+                      " dtype to remove this warning.")
+        if field == 'complex' and dtype != 'complex'\
+           or field != 'complex' and dtype == 'complex':
+            warnings.warn('one of field or dtype argument is complex, the'
+                          ' other is not: enforcing complex for both.')
+            # necessary conversion for backward compatibility with field
+            field = dtype = 'complex'
+        elif field == 'real' and dtype not in ['float32', 'float64']:
+            raise ValueError('field and dtype arguments aren\'t consistent, one'
+                             'is real the other not.')
+    else:
+        field = 'real' if dtype in ['float32', 'float64'] else 'complex'
+    if field not in ['real', 'complex']:
+        raise ValueError('field argument must be either \'real\' or \'complex\'.')
     if field == 'real':
         is_real = True
         if dtype == 'float64':
             type = 'double'
         elif dtype == 'float32':
             type = 'float'
-    elif field == 'complex':
-        if dtype == 'complex':
-            dtype= 'float64'
-        if dtype != 'float64':
-            raise TypeError('Invalid dtype: only double are handled for for'
-                            ' complex field')
+    elif field == 'complex' or dtype == 'complex':
+        type = 'complex'
         is_real = False
-    else:
-        raise ValueError('field argument must be either \'real\' or \'complex\'.')
     DENSE=0
     SPARSE=1
     MIXED=2
