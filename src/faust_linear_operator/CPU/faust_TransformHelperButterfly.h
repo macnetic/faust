@@ -34,6 +34,7 @@ namespace Faust
 		{
 			using VecMap = Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>>;
 			using DiagMat = Eigen::DiagonalMatrix<FPP, Eigen::Dynamic>;
+			bool has_permutation;
 			FPP *perm_d_ptr;
 			DiagMat D;
 			std::vector<unsigned int> bitrev_perm;
@@ -52,6 +53,7 @@ namespace Faust
 			MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> &A);
 			MatDense<FPP, Cpu> multiply(const MatSparse<FPP,Cpu> &A);
 			static TransformHelper<FPP,Cpu>* fourierFaust(unsigned int n, const bool norma=true);
+			static TransformHelper<FPP, Cpu>* optFaust(const TransformHelper<FPP, Cpu>* F);
 
 		};
 
