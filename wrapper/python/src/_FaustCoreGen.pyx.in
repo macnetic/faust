@@ -820,6 +820,12 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
     def get_item(self, i, j):
         return self.@CORE_OBJ@.get_item(i,j)
 
+    def optimizeButterfly(F):
+        core = @CORE_CLASS@(core=True)
+        core.@CORE_OBJ@ = \
+                F.@CORE_OBJ@.optimizeButterfly()
+        return core
+
     def __dealloc__(self):
         del self.@CORE_OBJ@
 

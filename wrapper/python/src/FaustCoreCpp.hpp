@@ -569,6 +569,15 @@ template<typename FPP, FDevice DEV>
 }
 
 template<typename FPP, FDevice DEV>
+  FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::optimizeButterfly() const
+{
+      Faust::TransformHelper<FPP,DEV>* th = Faust::TransformHelperButterfly<FPP,DEV>::optFaust(this->transform);
+      if(!th) return NULL;
+      FaustCoreCpp<FPP,DEV>* core = new FaustCoreCpp<FPP,DEV>(th);
+      return core;
+}
+
+template<typename FPP, FDevice DEV>
   FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::eyeFaust(unsigned int n, unsigned int m)
 {
       Faust::TransformHelper<FPP,DEV>* th = Faust::TransformHelper<FPP,DEV>::eyeFaust(n, m);

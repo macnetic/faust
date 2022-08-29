@@ -175,6 +175,7 @@ class FaustCoreCpp
     FPP get_item(unsigned long int i, unsigned long int j);
     void colSliceMultiply(unsigned long int j1, unsigned long int j2, const FPP* data, unsigned long int data_ncols, FPP* out) const;
     void indexMultiply(unsigned long int* d0_ids, size_t d0_ids_len, unsigned long int* d1_ids, size_t d1_ids_len, const FPP* mat_data, int mat_ncols, FPP* mat_out) const;
+    FaustCoreCpp<FPP,DEV>* optimizeButterfly() const;
     ~FaustCoreCpp();
     static FaustCoreCpp<FPP,DEV>* randFaust(unsigned int t,
             unsigned int min_num_factors, unsigned int max_num_factors,

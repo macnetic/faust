@@ -125,6 +125,7 @@ cdef extern from "FaustCoreCpp.h":
 
         @staticmethod
         @CPP_CORE_CLASS@[FPP]* hadamardFaust(unsigned int n, const bool norma)
+        @CPP_CORE_CLASS@[FPP]* optimizeButterfly()
         @staticmethod
         @CPP_CORE_CLASS@[FPP]* polyBasis(unsigned int L_nrows, unsigned int
                                      L_ncols, int* L_rowptr, int* L_colind,

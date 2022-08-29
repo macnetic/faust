@@ -3800,8 +3800,8 @@ def rand_bsr(num_rows, num_cols, bnrows, bncols, num_factors=None, density=.1,
 
     Example:
         >>> from pyfaust import rand_bsr
-        >>> rand_bsr(100,100, 20, 10, num_factors=6) 
-        Faust size 100x100, density 0.6, nnz_sum 6000, 6 factor(s): 
+        >>> rand_bsr(100,100, 20, 10, num_factors=6)
+        Faust size 100x100, density 0.6, nnz_sum 6000, 6 factor(s):
             - FACTOR 0 (double) BSR, size 100x100, density 0.1, nnz 1000
             - FACTOR 1 (double) BSR, size 100x100, density 0.1, nnz 1000
             - FACTOR 2 (double) BSR, size 100x100, density 0.1, nnz 1000
@@ -4102,6 +4102,28 @@ def rand_butterfly(n, dtype='float64', dev='cpu'):
         RB_factors.append(rb)
     return Faust(RB_factors)
 
+def opt_butterfly_faust(F):
+    """
+    Optimizes any Faust composed of butterfly factors.
+
+    The returned Faust will be more efficient if multiplied by a vector or a
+    matrix.
+    This optimization is based on the diagonals of each butterfly factor.
+    Multiplying a butterfly factor B by a vector x (y = B@x) is equivalent to forming
+    two diagonals D1 and D2 from B and compute y' = D1@x + D2 @ x[I] where I is
+    set in the proper order to obtain y' = y.
+
+    Args:
+        F: The Faust to optimize. If the factors of F are not set according to
+        a butterfly structure, the result is not defined.
+
+    Returns:
+        The optimized Faust.
+
+    <b>See also</b>: pyfaust.fact.butterfly, pyfaust.dft, pyfaust.rand_butterfly.
+    """
+    oF = Faust(core_obj=F.m_faust.optimizeButterfly())
+    return oF
 
 def enable_gpu_mod(libpaths=None, backend='cuda', silent=False, fatal=False):
     """
