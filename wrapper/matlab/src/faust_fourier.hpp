@@ -15,20 +15,21 @@ void faust_fourier(const mxArray **prhs, const int nrhs, mxArray **plhs, const i
 	unsigned int n  = (unsigned int) mxGetScalar(prhs[1]);
 	bool norma = (bool) mxGetScalar(prhs[2]);
 	bool diag_prod = (bool) mxGetScalar(prhs[3]);
-	Faust::TransformHelper<complex<double>,DEV>* F = nullptr;
+	Faust::TransformHelper<std::complex<double>,DEV> * F = nullptr;
 	if(diag_prod)
-	{
-		F = Faust::TransformHelperButterfly<complex<double>,DEV>::fourierFaust(n, norma);
-	}
+		F = Faust::TransformHelperButterfly<std::complex<double>,DEV>::fourierFaust(n, norma);
 	else
-		F = Faust::TransformHelper<complex<double>,DEV>::fourierFaust(n, norma);
+		F = Faust::TransformHelper<std::complex<double>,DEV>::fourierFaust(n, norma);
+
 	if(F) //not NULL
-		plhs[0]=convertPtr2Mat<Faust::TransformHelper<complex<double>,DEV> >(F);
-	else
 	{
-		plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
-		double* ptr_out = (double*) mxGetData(plhs[0]);
-		ptr_out[0]=(double) 0;
+		plhs[0]=convertPtr2Mat<Faust::TransformHelper<std::complex<double>,DEV> >(F);
+		return;
 	}
+
+	// (F == nullptr)
+	plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
+	double* ptr_out = (double*) mxGetData(plhs[0]);
+	ptr_out[0]=(double) 0;
 }
 
