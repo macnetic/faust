@@ -321,7 +321,7 @@ function varargout = hierarchical(M, p, varargin)
 		else
 			[lambda, core_obj] = mexHierarchical_factCplx(M, mex_params);
 		end
-		F = Faust(core_obj, isreal(M), 'cpu', dtype);
+		F = Faust(core_obj, isreal(M), 'cpu', dtype, true); % 4th arg to copy factors
 	elseif(backend == 2020)
 		if(isreal(M))
 			if(gpu)
@@ -344,7 +344,7 @@ function varargout = hierarchical(M, p, varargin)
 				[lambda, core_obj] = mexHierarchical2020Cplx(M, mex_params);
 			end
 		end
-		F = Faust(core_obj, isreal(M), 'cpu', dtype);
+		F = Faust(core_obj, isreal(M), 'cpu', dtype, true); % 4th arg to copy factors
 	end
 	varargout = {F, lambda, p};
 end

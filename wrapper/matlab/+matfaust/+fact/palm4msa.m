@@ -121,5 +121,5 @@ function  [F,lambda] = palm4msa(M, p, varargin)
 			end
 		end
 	end
-	F = Faust(core_obj, isreal(M), 'cpu', dtype);
+	F = Faust(core_obj, isreal(M), 'cpu', dtype, true); % 4 args to copy factors
 end

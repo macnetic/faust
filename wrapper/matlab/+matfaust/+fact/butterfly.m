@@ -222,14 +222,14 @@ function F = butterfly(M, varargin)
         end
 		if(strcmp(class(M), 'single'))
 				core_obj = mexButterflyRealFloat(M, type, perm);
-				F = Faust(core_obj, isreal(M), 'cpu', 'float');
+				F = Faust(core_obj, isreal(M), 'cpu', 'float', true); % 4th arg is for copying
 		else
 			if(isreal(M))
 				core_obj = mexButterflyReal(M, type, perm);
 			else
 				core_obj = mexButterflyCplx(M, type, perm);
 			end
-			F = Faust(core_obj, isreal(M));
+			F = Faust(core_obj, isreal(M), 'cpu', 'double', true); % 4th arg is for copying
 		end
 end
 

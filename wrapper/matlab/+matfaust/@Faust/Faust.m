@@ -307,7 +307,12 @@ classdef Faust
 				else
 					F.dtype = 'double';
 				end
-				F.matrix = FaustCore(varargin{1}, F.is_real, F.dev, F.dtype);
+				if(nargin >= 5)
+					F.matrix = FaustCore(varargin{1}, F.is_real, F.dev, F.dtype, varargin{5});
+				else
+					% default copy value is false
+					F.matrix = FaustCore(varargin{1}, F.is_real, F.dev, F.dtype);
+				end
 				% hack to raise an error in case of non-consistent handle and is_real arg.
 				try
 					n = numfactors(F);

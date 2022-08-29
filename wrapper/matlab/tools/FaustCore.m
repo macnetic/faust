@@ -52,7 +52,7 @@ classdef FaustCore < handle
 	methods
 		%% Constructor - Create a new C++ class instance
 		function this = FaustCore(varargin)
-			if(nargin == 4) && ~iscell(varargin{1}) %&& isa(varargin{1}, 'handle'))
+			if(nargin >= 4) && ~iscell(varargin{1}) %&& isa(varargin{1}, 'handle'))
 				%if(~ isvalid(varargin{1}))
 				%    error('FaustCore: invalid handle to copy passed to the constructor.')
 				%end
@@ -63,21 +63,21 @@ classdef FaustCore < handle
 				this.isRealFlag = varargin{2};
 				this.dev = varargin{3};
 				this.dtype = varargin{4};
-				if ~ strcmp(this.dtype, 'float')
-					onGPU = startsWith(this.dev, 'gpu');
-					% TODO: the copy of factors shouldn't be necessary
-					% it's here to fix a bug when for instance calling
-					% matfaust.fact.hierarchical/butterfly, the returned Faust is
-					% ok but F-M (for example) leads to a crash
-					% (it's probably because of matrix reference manager that is
-					% duplicated in static memory of different shared
-					% libraries/mexs -- still to verify. All Faust object must be
-					% managed by mexFaustReal/Cplx/Float, hence the copy)
-
-					% we don't use this workaround for single precision Faust
-					% because sparse matrices in single precision aren't supported
-					% by matlab which lead to buffer type error
-					% (double instead of float in the cpp mexcode)
+				if nargin > 4
+					if ~ islogical(varargin{5})
+						error('FaustCore arg. 5 must be a logical')
+					end
+					copy = varargin{5};
+				else
+					copy = false;
+				end
+				if copy && strcmp(this.dtype, 'float')
+					warning('FaustCore: even if copy is true, it won''t be used because the factors are in single precision and matlab does''nt support single sparse matrices.')
+				end
+				if copy && ~ strcmp(this.dtype, 'float')
+					% don't use the copy for 'float' because matlab doesn't support
+					% single precision sparse matrices
+					onGPU = startsWith(this.dev, 'gpu')
 					nf = call_mex(this, 'numfactors');
 					facts = cell(1, nf);
 					for i=1:nf
