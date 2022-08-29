@@ -45,13 +45,13 @@ namespace Faust
 
 
 			public:
-			static TransformHelperButterfly<FPP,Cpu>* fourierFaust(unsigned int n, const bool norma=true);
 			Vect<FPP, Cpu> multiply(const Vect<FPP, Cpu>& x);
 			void multiply(const FPP* x, FPP* y);
 			Vect<FPP,Cpu> multiply(const FPP* x);
 			void multiply(const FPP* A, int A_ncols, FPP* C);
 			MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> &A);
 			MatDense<FPP, Cpu> multiply(const MatSparse<FPP,Cpu> &A);
+			static TransformHelper<FPP,Cpu>* fourierFaust(unsigned int n, const bool norma=true);
 
 		};
 

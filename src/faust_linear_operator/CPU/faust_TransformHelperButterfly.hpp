@@ -29,16 +29,17 @@ namespace Faust
 	}
 
 	template<typename FPP>
-		TransformHelperButterfly<FPP,Cpu>* TransformHelperButterfly<FPP,Cpu>::fourierFaust(unsigned int n, const bool norma)
+		TransformHelper<FPP,Cpu>* TransformHelperButterfly<FPP,Cpu>::fourierFaust(unsigned int n, const bool norma)
 		{
 
 			std::vector<MatGeneric<FPP,Cpu>*> factors(n+1);
-			TransformHelperButterfly<FPP,Cpu>* fourierFaust = nullptr;
+			TransformHelper<FPP,Cpu>* fourierFaust = nullptr;
 			try
 			{
 				fft_factors(n, factors);
 				FPP alpha = norma?FPP(1/sqrt((double)(1 << n))):FPP(1.0);
 				fourierFaust = new TransformHelperButterfly<FPP, Cpu>(factors, alpha, false, false, /* internal call */ true);
+
 			}
 			catch(std::bad_alloc e)
 			{
