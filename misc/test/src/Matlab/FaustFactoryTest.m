@@ -494,6 +494,21 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			this.assertEqual(full(dft(n, 'normed', false)), full(F), 'AbsTol', 10^-7)
 		end
 
+		function testFourierDiagOpt(this)
+			disp('Test matfaust.dftDiagOpt()')
+			import matfaust.dft
+			log2n = randi([1,10]);
+			n = 2^log2n;
+			normed_vals = {true, false};
+			for i=1:2
+				normed = normed_vals{i}
+				F = dft(n, 'normed', normed, 'diag_opt', true);
+				fF = full(F);
+				frefF = full(dft(n, 'normed', normed, 'diag_opt', false));
+				this.verifyEqual(norm(fF-frefF), 0, 'AbsTol', 10^-12);
+			end
+		end
+
         function testRandButterfly(this)
             import matfaust.wht
             import matfaust.rand_butterfly
