@@ -1395,6 +1395,18 @@ class TestFaustFactory(unittest.TestCase):
         assert(np.allclose(dft(n).toarray(),
                            dft(n, False).normalize().toarray()))
 
+    def testFourierDiagOpt(self):
+        print("Test pyfaust.dft(diag_opt=True)")
+        from pyfaust import dft
+        pow2_exp = random.Random().randint(1,10)
+        n = 2**pow2_exp
+        for normed in [True, False]:
+            F = dft(n, normed=normed, diag_opt=False)
+            oF = dft(n, normed=normed, diag_opt=True)
+            fF = oF.toarray()
+            ref_fft = F.toarray()
+            self.assertAlmostEqual(norm(ref_fft-fF)/norm(ref_fft),0)
+
     def testRandButterfly(self):
         print("Test pyfaust.rand_butterfly")
         from pyfaust import wht, rand_butterfly
