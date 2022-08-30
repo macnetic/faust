@@ -26,7 +26,8 @@ namespace Faust
 //
 
 			public:
-			static TransformHelperButterfly<FPP,GPU2>* fourierFaust(unsigned int n, const bool norma=true) { throw std::runtime_error("Not yet implemented on GPU");};
+			static TransformHelper<FPP,GPU2>* fourierFaust(unsigned int n, const bool norma=true) { throw std::runtime_error("Not yet implemented on GPU");};
+			static TransformHelper<FPP,GPU2>* optFaust(const TransformHelper<FPP, GPU2>* F) { throw std::runtime_error("Not yet implemented on GPU");};
 //			Vect<FPP, GPU2> multiply(const Vect<FPP, GPU2>& x);
 //			void multiply(const FPP* x, FPP* y);
 //			Vect<FPP,GPU2> multiply(const FPP* x);
