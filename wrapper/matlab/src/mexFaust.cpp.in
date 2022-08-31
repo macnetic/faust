@@ -102,6 +102,7 @@
 #include "faust_double.h"
 #include "faust_fourier.h"
 #include "faust_hadamard.h"
+#include "faust_opt_butterfly.h"
 #include "faust_eye.h"
 #cmakedefine DEV @DEV@
 #cmakedefine DEV_IS_CPU
@@ -244,6 +245,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			faust_fourier<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
 		else if(!strcmp("hadamard", cmd))
 			faust_hadamard<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
+		else if(!strcmp("opt_butterfly", cmd))
+			faust_opt_butterfly<SCALAR, DEV>(prhs, nrhs, plhs, nlhs);
 		else if(!strcmp("eye", cmd))
 			faust_eye<SCALAR,DEV>(prhs, nrhs, plhs, nlhs);
 #ifdef DEV_IS_CPU

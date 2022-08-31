@@ -3423,6 +3423,32 @@ classdef Faust
 
 	end
 	methods(Static)
+
+		%================================================================
+		%> Optimizes any Faust composed of butterfly factors.
+		%===
+		%>    The returned Faust will be more efficient if multiplied by a vector or a
+		%>    matrix.
+		%>    This optimization is based on the diagonals of each butterfly factor.
+		%>    Multiplying a butterfly factor B by a vector x (y = B*x) is equivalent to forming
+		%>    two diagonals D1 and D2 from B and compute y' = D1*x + D2*x(I) where I is
+		%>    set in the proper order to obtain y' = y.
+		%>
+		%>    @param F: The Faust to optimize. If the factors of F are not set according to
+		%>        a butterfly structure, the result is not defined.
+		%>
+		%>    @retval G the optimized Faust.
+		%>
+		%>   @b See @b also: matfaust.fact.butterfly, matfaust.dft, matfaust.rand_butterfly.
+		%>
+		%================================================================
+		function G = opt_butterfly(F)
+			if ~ matfaust.isFaust(F)
+				error('F must be a Faust.')
+			end
+			G = matfaust.Faust(F, call_mex(F, 'opt_butterfly'));
+		end
+
 		%================================================================
 		%> Returns true if obj is a Faust object, false otherwise.
 		%===
