@@ -5,6 +5,7 @@
 %>    (real or complex circular according to the type).
 %>
 %> @param n: order of the butterfly (must be a power of two).
+%> @param diag_opt, logical: if true then the returned Faust is optimized using matfaust.opt_butterfly_faust.
 %> @param 'dev', str: 'gpu or 'cpu' to create the Faust on CPU or GPU ('cpu' by default).
 %> @param 'field', str	str is either 'real' or 'complex' (the Faust field).
 %>                      The default value is 'real'.
@@ -12,7 +13,7 @@
 %>
 %> @retval F a random butterfly support Faust.
 %>
-%> @b See also: matfaust.fact.butterfly, matfaust.rand_butterfly, matfaust.dft.
+%> @b See also: matfaust.fact.butterfly, matfaust.rand_butterfly, matfaust.dft, matfaust.opt_butterfly_faust
 %====================================
 function F = rand_butterfly(n, varargin)
     import matfaust.dft
@@ -20,6 +21,7 @@ function F = rand_butterfly(n, varargin)
 	dev = 'cpu';
 	class = 'double';
     field = 'real';
+	diag_opt = false;
 	if(argc > 0)
 		for i=1:2:argc
 			if(argc > i)
@@ -44,6 +46,12 @@ function F = rand_butterfly(n, varargin)
 						error('class keyword argument is not followed by a valid value: single, double.')
 					else
 						class = tmparg;
+					end
+				case 'diag_opt'
+					if argc == i || ~ islogical(tmparg)
+						error('diag_opt keyword argument is not followed by a logical value')
+					else
+						diag_opt = tmparg;
 					end
 				otherwise
 					if((isstr(varargin{i}) || ischar(varargin{i}))  && ~ strcmp(tmparg, 'cpu') && ...
@@ -83,4 +91,7 @@ function F = rand_butterfly(n, varargin)
         RB_factors{1, k} = rb;
     end
     F = matfaust.Faust(RB_factors);
+	if diag_opt
+		F = matfaust.opt_butterfly_faust(F);
+	end
 end

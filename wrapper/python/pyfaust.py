@@ -3268,11 +3268,8 @@ def dft(n, normed=True, dev='cpu', diag_opt=False):
         normed: default to True to normalize the DFT Faust as if you called
         Faust.normalize() and False otherwise.
         dev: device to create the Faust on ('cpu' or 'gpu').
-        diag_opt: enable the diagonal optimization of Butterfly and permutation
-        factors. Basically, it consists to simplify the product of Faust-vector
-        F@x and Faust-matrix F@M to multiplications of factor
-        diagonals by the vector x/matrix M. It is particularly more efficient
-        when the DFT is multiplied by a matrix.
+        diag_opt: if True then the returned Faust is optimized using
+        pyfaust.opt_butterfly_faust.
 
     Returns:
         The Faust implementing the DFT of dimension n.
@@ -4067,7 +4064,7 @@ def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
                                                                            min_dim_size, max_dim_size, density, per_row))
     return rF
 
-def rand_butterfly(n, dtype='float64', dev='cpu'):
+def rand_butterfly(n, dtype='float64', dev='cpu', diag_opt=False):
     """
     Constructs a Faust corresponding to the product of log2(n) square factors of size n with butterfly supports and random nonzero coefficients.
 
@@ -4076,13 +4073,16 @@ def rand_butterfly(n, dtype='float64', dev='cpu'):
 
     Args:
         n: order of the butterfly (must be a power of two).
+        diag_opt: if True then the returned Faust is optimized using
+        pyfaust.opt_butterfly_faust.
         dtype: 'float32', 'float64' or 'complex', the dtype of the random Faust.
         dev: 'cpu' or 'gpu', the device where the Faust is created.
+
 
     Returns:
         F, a random butterfly support Faust.
 
-    <b>See also</b>: pyfaust.fact.butterfly, pyfaust.dft.
+    <b>See also</b>: pyfaust.fact.butterfly, pyfaust.dft, pyfaust.opt_butterfly_faust.
     """
     from numpy.random import randn
     dtype = _sanitize_dtype(dtype)
@@ -4100,7 +4100,10 @@ def rand_butterfly(n, dtype='float64', dev='cpu'):
         else:
             rb[rb!=0] = randn(rb.size) + 1j * randn(rb.size)
         RB_factors.append(rb)
-    return Faust(RB_factors)
+    F = Faust(RB_factors)
+    if diag_opt:
+        F = opt_butterfly_faust(F)
+    return F
 
 def opt_butterfly_faust(F):
     """
@@ -4110,7 +4113,7 @@ def opt_butterfly_faust(F):
     matrix.
     This optimization is based on the diagonals of each butterfly factor.
     Multiplying a butterfly factor B by a vector x (y = B@x) is equivalent to forming
-    two diagonals D1 and D2 from B and compute y' = D1@x + D2 @ x[I] where I is
+    two diagonal matrices D1 and D2 from B and compute y' = D1@x + D2 @ x[I] where I is
     set in the proper order to obtain y' = y.
 
     Args:
