@@ -37,6 +37,15 @@ namespace Faust
 	}
 
 	template<typename FPP>
+		std::string TransformHelperButterfly<FPP,Cpu>::to_string() const
+		{
+			auto str = TransformHelper<FPP,Cpu>::to_string();
+			str += "- Butterfly structure optimized\r\n";
+			return str;
+		}
+
+
+	template<typename FPP>
 		TransformHelper<FPP,Cpu>* TransformHelperButterfly<FPP,Cpu>::fourierFaust(unsigned int n, const bool norma)
 		{
 

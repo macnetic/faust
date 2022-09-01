@@ -46,6 +46,7 @@ namespace Faust
 
 
 			public:
+			std::string to_string() const;
 			Vect<FPP, Cpu> multiply(const Vect<FPP, Cpu>& x);
 			void multiply(const FPP* x, FPP* y);
 			Vect<FPP,Cpu> multiply(const FPP* x);
