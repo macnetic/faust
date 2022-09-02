@@ -140,3 +140,5 @@ PKG=$(find_pkg)
 [[ ! -r $TOKEN_FILE ]] && echo "Error: the anaconda token file $TOKEN wasn't found." && exit 9
 conda run -n $CONDA_ENV anaconda -t $TOKEN_FILE upload -u pyfaust $PKG
 # removing the package: conda run -n $CONDA_ENV anaconda -t ~/conda_pyfaust_token remove
+# clean the cache and unused package after uploading
+conda clean -a -y
