@@ -145,7 +145,7 @@ function varargout = fgft_palm(U, Lap, p, varargin)
 		[lambda, core_obj, Ddiag] = mexHierarchical_factCplx(U, mex_params, Lap);
 	end
 	D = sparse(diag(Ddiag));
-	F = Faust(core_obj, isreal(U));
+	F = Faust(core_obj, isreal(U), 'cpu', 'double', true); % 4th arg to copy factors
 	varargout = {F, D, lambda, p};
 end
 % experimental block end
