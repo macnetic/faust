@@ -259,22 +259,6 @@ def bitrev(inds):
         odd = bitrev(inds[np.arange(1, n, 2, dtype='int')])
         return np.hstack((even, odd))
 
-def bitrev_perm(N):
-    """
-    Bitreversal permutation.
-
-    Returns:
-        B: a scipy csr_matrix defining the bit-reversal permutation.
-
-    See also: bitrev.
-    """
-    if np.log2(N) > np.log2(np.floor(N)):
-        raise ValueError('N must be a power of two')
-    row_inds = np.arange(0, N, dtype='int')
-    col_inds = bitrev(row_inds)
-    ones = np.ones((N), dtype='float')
-    return csr_matrix((ones, (row_inds, col_inds)), shape=(N, N))
-
 def _sanitize_dtype(dtype):
     """
     Verifies the dtype is pyfaust-compatible and returns it as str.

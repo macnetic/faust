@@ -136,6 +136,7 @@ function  B = butterfly_(N)
 end
 
 function F = mod_fft(N, varargin)
+	import matfaust.bitrev_perm
     %% Modified FFT for DST computation (it would have been the standard FFT
     %% if omega was raised to the power of -k instead of -(k+1)).
     N_ = N;

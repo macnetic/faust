@@ -3253,6 +3253,25 @@ def wht(n, normed=True, dev="cpu", dtype='float64'):
             H = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUCplxDbl.hadamardFaust(log2n, normed))
     return H
 
+def bitrev_perm(n):
+    """
+    Bitreversal permutation.
+
+    Args:
+        n: the size of the permutation, it must be a power of two. P dimensions will be n x n
+
+    Returns:
+        P: a scipy csr_matrix defining the bit-reversal permutation.
+
+    <b>See also:</b> pyfaust.dft
+    """
+    if np.log2(n) > np.log2(np.floor(n)):
+        raise ValueError('n must be a power of two')
+    row_inds = np.arange(0, n, dtype='int')
+    col_inds = bitrev(row_inds)
+    ones = np.ones((n), dtype='float')
+    return csr_matrix((ones, (row_inds, col_inds)), shape=(n, n))
+
 def dft(n, normed=True, dev='cpu', diag_opt=False):
     """
     Constructs a Faust F implementing the Discrete Fourier Transform (DFT) of order n.
@@ -3458,7 +3477,6 @@ def dst(n, normed=True, dev='cpu', dtype='float64'):
 
     See also pyfaust.dft, pyfaust.dct, <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.dst.html"> scipy.fft.dst</a>, pyfaust.fact.butterfly, pyfaust.rand_butterfly, pyfaust.Faust.density
     """
-    from pyfaust.tools import bitrev_perm
     def omega(N):
         """
         Returns the list of n-th root of unity raised to the power of -(k+1) (instead of
