@@ -85,12 +85,16 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		ButterflyFactDir dir = RIGHT;
 		if(nrhs >= 2)
 			dir = static_cast<ButterflyFactDir>(static_cast<int>(mxGetScalar(prhs[1])));
+		bool mul_perm = true;
 		if(nrhs >= 3)
 		{
 #ifndef MX_HAS_INTERLEAVED_COMPLEX
 	#error perm argument compiling isn't supported for Matlab versions prior to R2018a
 #endif
 			auto perm_inds = prhs[2];
+			if(nrhs >= 4)
+				mul_perm = (bool) mxGetScalar(prhs[3]);
+
 			if(mxIsSparse(perm_inds))
 				mexErrMsgTxt("The matrix of indices must be dense");
 			else
@@ -131,7 +135,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			}
 
 		}
-		F = butterfly_hierarchical(matrix, dir, perm_mat);
+		F = butterfly_hierarchical(matrix, dir, perm_mat, mul_perm);
 		plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR, Cpu>>(F);
 		if(perm_mat != nullptr)
 			delete perm_mat;

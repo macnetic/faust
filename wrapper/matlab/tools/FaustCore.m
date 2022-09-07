@@ -77,7 +77,7 @@ classdef FaustCore < handle
 				if copy && ~ strcmp(this.dtype, 'float')
 					% don't use the copy for 'float' because matlab doesn't support
 					% single precision sparse matrices
-					onGPU = startsWith(this.dev, 'gpu')
+					onGPU = startsWith(this.dev, 'gpu');
 					nf = call_mex(this, 'numfactors');
 					facts = cell(1, nf);
 					for i=1:nf
