@@ -233,32 +233,6 @@ def UpdateCholeskySparse(R,P,Pt,index,m):
 
 greed_omp_chol = omp
 
-def bitrev(inds):
-    """
-    Bitreversal permutation.
-
-    Args:
-        inds: the list of indices to bit-reverse.
-
-    Returns:
-        The bit-reversal permutation of inds.
-
-    Example:
-        >>> import numpy as np
-        >>> from pyfaust.tools import bitrev
-        >>> bitrev(np.arange(4))
-        >>> array([0, 2, 1, 3])
-
-    See also: https://en.wikipedia.org/wiki/Bit-reversal_permutation.
-    """
-    n = len(inds)
-    if n == 1:
-        return inds
-    else:
-        even = bitrev(inds[np.arange(0, n, 2, dtype='int')])
-        odd = bitrev(inds[np.arange(1, n, 2, dtype='int')])
-        return np.hstack((even, odd))
-
 def _sanitize_dtype(dtype):
     """
     Verifies the dtype is pyfaust-compatible and returns it as str.
