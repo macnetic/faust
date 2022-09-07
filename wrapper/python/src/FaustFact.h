@@ -189,7 +189,7 @@ template<typename FPP>
 FaustCoreCpp<FPP>* butterfly_hierarchical(FPP* mat, unsigned int num_rows, unsigned int num_cols, int dir);
 
 template<typename FPP>
-FaustCoreCpp<FPP>* butterfly_hierarchical(FPP* mat, unsigned int num_rows, unsigned int num_cols, int dir, int* perm);
+FaustCoreCpp<FPP>* butterfly_hierarchical(FPP* mat, unsigned int num_rows, unsigned int num_cols, int dir, int* perm, bool mul_perm);
 
 template<typename FPP>
 MHTPParams<Real<FPP>> convPyxMHTPParams2FaustMHTPParams(const PyxMHTPParams<Real<FPP>>& MHTPParams);

@@ -32,7 +32,7 @@ from scipy.sparse import csr_matrix, csc_matrix, eye as seye, kron as skron
 import pyfaust
 import pyfaust.factparams
 from pyfaust import Faust
-from pyfaust.tools import bitrev_perm
+from pyfaust import bitrev_perm
 import _FaustCorePy
 import warnings
 from pyfaust.tools import _sanitize_dtype
@@ -1323,7 +1323,7 @@ def fgft_palm(U, Lap, p, init_D=None, ret_lambda=False, ret_params=False):
 # experimental block end
 
 
-def butterfly(M, type="bbtree", perm=None):
+def butterfly(M, type="bbtree", perm=None, diag_opt=False):
     """
     Factorizes M according to a butterfly support and optionally a permutation using the algorithms described in [1].
 
@@ -1354,9 +1354,11 @@ def butterfly(M, type="bbtree", perm=None):
             default permutations are used. For the definition of those
             permutations please refer to [2].
             4. perm is 'bitrev': in that case the permutation is the
-            bit-reversal permutation (cf. pyfaust.tools.bitrev_perm).
+            bit-reversal permutation (cf. pyfaust.bitrev_perm).
             5. By default this argument is None, no permutation is used (this
             is equivalent to using the identity permutation matrix in 1).
+        diag_opt: if True then the returned Faust is optimized using
+        pyfaust.opt_butterfly_faust.
 
     Note: Below is an example of how to create a permutation scipy CSR matrix from a permutation list
     of indices (as defined by the perm argument) and conversely how to convert
@@ -1455,7 +1457,6 @@ def butterfly(M, type="bbtree", perm=None):
      See also:
          pyfaust.wht, pyfaust.dft, pyfaust.rand_butterfly
     """
-    from pyfaust.tools import bitrev_perm
     def perm2indices(P):
             return P.T.nonzero()[1]
     is_real = np.empty((1,))
@@ -1463,7 +1464,7 @@ def butterfly(M, type="bbtree", perm=None):
     if isinstance(perm, str):
         if perm == 'bitrev':
             P = bitrev_perm(M.shape[1])
-            return butterfly(M, type, perm=perm2indices(P))
+            return butterfly(M, type, perm=perm2indices(P), diag_opt=diag_opt)
         elif perm == 'default_8':
             # the three modified functions below were originally extracted from the 3 clause-BSD code hosted here: https://github.com/leonzheng2/butterfly
             # please look the header license here https://github.com/leonzheng2/butterfly/blob/main/src/utils.py
@@ -1527,7 +1528,7 @@ def butterfly(M, type="bbtree", perm=None):
             permutations = [perm2indices(get_permutation_matrix(int(np.log2(M.shape[0])),
                                                    perm_name)) \
                             for perm_name in  ["000", "001", "010", "011", "100", "101", "110", "111"]]
-            return butterfly(M, type, permutations)
+            return butterfly(M, type, permutations, diag_opt=diag_opt)
     elif isinstance(perm, (list, tuple)) and isinstance(perm[0], (list, tuple,
                                                                  np.ndarray)):
         # loop on each perm and keep the best approximation
@@ -1545,12 +1546,15 @@ def butterfly(M, type="bbtree", perm=None):
                 best_err = error
                 best_F = F
         return best_F
-    args = (M, type, perm)
+    args = (M, type, perm, not diag_opt)
     if is_real:
         is_float = M.dtype == 'float32'
         if is_float:
-            return Faust(core_obj=_FaustCorePy.FaustAlgoGenFlt.butterfly_hierarchical(*args))
+            F = Faust(core_obj=_FaustCorePy.FaustAlgoGenFlt.butterfly_hierarchical(*args))
         else:
-            return Faust(core_obj=_FaustCorePy.FaustAlgoGenDbl.butterfly_hierarchical(*args))
+            F = Faust(core_obj=_FaustCorePy.FaustAlgoGenDbl.butterfly_hierarchical(*args))
     else:
-        return Faust(core_obj=_FaustCorePy.FaustAlgoGenCplxDbl.butterfly_hierarchical(*args))
+        F = Faust(core_obj=_FaustCorePy.FaustAlgoGenCplxDbl.butterfly_hierarchical(*args))
+    if diag_opt:
+        F = pyfaust.opt_butterfly_faust(F)
+    return F

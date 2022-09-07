@@ -581,7 +581,7 @@ cdef class FaustAlgoGen@TYPE_NAME@:
         return core, _out_buf[0]
 
     @staticmethod
-    def butterfly_hierarchical(M, dir, perm=None):
+    def butterfly_hierarchical(M, dir, perm=None, mul_perm=False):
 
         cdef unsigned int M_num_rows=M.shape[0]
         cdef unsigned int M_num_cols=M.shape[1]
@@ -604,7 +604,7 @@ cdef class FaustAlgoGen@TYPE_NAME@:
             core.@CORE_OBJ@ = \
                     FaustCoreCy.butterfly_hierarchical[@TYPE@](&Mview[0,0], M_num_rows,
                                                                M_num_cols, dir,
-                                                              NULL)
+                                                              NULL, mul_perm)
         else:
             if not isinstance(perm, (list, np.ndarray)) or len(perm) != M.shape[1]:
                 raise ValueError("perm must be a valid permutation list")
@@ -624,7 +624,8 @@ cdef class FaustAlgoGen@TYPE_NAME@:
             core.@CORE_OBJ@ = \
                     FaustCoreCy.butterfly_hierarchical[@TYPE@](&Mview[0,0], M_num_rows,
                                                                M_num_cols, dir,
-                                                               &perm_view[0])
+                                                               &perm_view[0],
+                                                               mul_perm)
         return core
 
 

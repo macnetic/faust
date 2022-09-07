@@ -885,7 +885,7 @@ FaustCoreCpp<FPP>* butterfly_hierarchical(FPP* mat, unsigned int num_rows, unsig
 }
 
 template<typename FPP>
-FaustCoreCpp<FPP>* butterfly_hierarchical(FPP* mat, unsigned int num_rows, unsigned int num_cols, int dir, int* perm)
+FaustCoreCpp<FPP>* butterfly_hierarchical(FPP* mat, unsigned int num_rows, unsigned int num_cols, int dir, int* perm, bool mul_perm)
 {
     Faust::MatSparse<FPP, Cpu>* perm_mat = nullptr;
     if(perm != nullptr)
@@ -902,7 +902,7 @@ FaustCoreCpp<FPP>* butterfly_hierarchical(FPP* mat, unsigned int num_rows, unsig
     FaustCoreCpp<FPP>* core = nullptr;
     TransformHelper<FPP, Cpu> * th = nullptr;
     Faust::MatDense<FPP, Cpu> inMat(num_rows, num_cols, mat);
-    th = Faust::butterfly_hierarchical(inMat, static_cast<Faust::ButterflyFactDir>(dir), perm_mat);
+    th = Faust::butterfly_hierarchical(inMat, static_cast<Faust::ButterflyFactDir>(dir), perm_mat, mul_perm);
     core = new FaustCoreCpp<FPP>(th);
     if(nullptr != perm_mat)
         delete perm_mat;
