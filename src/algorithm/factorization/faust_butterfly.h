@@ -49,7 +49,7 @@ namespace Faust
 		Faust::TransformHelper<FPP, Cpu>* butterfly_hierarchical_balanced(const Faust::MatDense<FPP, Cpu>& A, const std::vector<Faust::MatSparse<FPP, Cpu>*> &supports, FactMeth meth = LIFTING);
 
 	template<typename FPP>
-		Faust::TransformHelper<FPP, Cpu>* butterfly_hierarchical(const Faust::MatDense<FPP, Cpu>& A, const ButterflyFactDir &dir=RIGHT, Faust::MatSparse<FPP, Cpu>* P=nullptr);
+		Faust::TransformHelper<FPP, Cpu>* butterfly_hierarchical(const Faust::MatDense<FPP, Cpu>& A, const ButterflyFactDir &dir=RIGHT, Faust::MatSparse<FPP, Cpu>* P=nullptr, const bool mul_perm=true);
 
 
 };

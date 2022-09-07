@@ -658,7 +658,7 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		Faust::TransformHelper<FPP, Cpu>* butterfly_hierarchical(const Faust::MatDense<FPP, Cpu>& A, const ButterflyFactDir &dir/*=RIGHT*/, Faust::MatSparse<FPP, Cpu>* P/*=nullptr*/)
+		Faust::TransformHelper<FPP, Cpu>* butterfly_hierarchical(const Faust::MatDense<FPP, Cpu>& A, const ButterflyFactDir &dir/*=RIGHT*/, Faust::MatSparse<FPP, Cpu>* P/*=nullptr*/, const bool mul_perm /*= true*/)
 		{
 			double log2_size = log2((double)A.getNbRow());
 			if(A.getNbRow() != A.getNbCol())
@@ -690,18 +690,26 @@ namespace Faust
 				const MatSparse<FPP, Cpu>* sp_last_fac;
 				const MatDense<FPP, Cpu>* ds_last_fac;
 				auto new_last_fac = new MatSparse<FPP, Cpu>(*P);
-				if(sp_last_fac = dynamic_cast<const MatSparse<FPP, Cpu>*>(th->get_gen_fact(th->size()-1)))
+				if(mul_perm)
 				{
-					sp_last_fac->multiply(*new_last_fac, 'N');
-				}
-				else if(ds_last_fac = dynamic_cast<const MatDense<FPP, Cpu>*>(th->get_gen_fact(th->size()-1)))
-				{
-					ds_last_fac->multiply(*new_last_fac, 'N');
+					if(sp_last_fac = dynamic_cast<const MatSparse<FPP, Cpu>*>(th->get_gen_fact(th->size()-1)))
+					{
+						sp_last_fac->multiply(*new_last_fac, 'N');
+					}
+					else if(ds_last_fac = dynamic_cast<const MatDense<FPP, Cpu>*>(th->get_gen_fact(th->size()-1)))
+					{
+						ds_last_fac->multiply(*new_last_fac, 'N');
+					}
+					else
+						// it can't happen but still
+						throw std::runtime_error("butterfly supports only MatSparse and MatDense matrix");
+					th->replace(new_last_fac, th->size()-1);
 				}
 				else
-					// it can't happen but still
-					throw std::runtime_error("butterfly supports only MatSparse and MatDense matrix");
-				th->replace(new_last_fac, th->size()-1);
+				{
+					// the permutation is not multiplied
+					th->push_back(new_last_fac);
+				}
 				if(Pt != nullptr)
 					delete Pt;
 			}
