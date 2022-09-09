@@ -466,9 +466,9 @@ void test_eltwise_mul_vec()
 	auto size = 2048;
 	auto nrows = 1024;
 	auto ncols = size;
-	auto vec_mat = MatDense<FPP, Cpu>::randMat(size, 1);
-	Faust::Vect<FPP, Cpu> v_cpu(size, vec_mat->getData());
-	Faust::Vect<FPP, GPU2> v_gpu(size, vec_mat->getData());
+	auto vec_mat = MatDense<FPP, Cpu>::randMat(nrows, 1);
+	Faust::Vect<FPP, Cpu> v_cpu(nrows, vec_mat->getData());
+	Faust::Vect<FPP, GPU2> v_gpu(nrows, vec_mat->getData());
 	auto cpu_mat = Faust::MatDense<FPP,Cpu>::randMat(nrows,ncols);
 	MatDense<FPP,GPU2> gpu_mat(nrows, ncols, cpu_mat->getData());
 	gpu_mat.eltwise_mul(v_gpu);
