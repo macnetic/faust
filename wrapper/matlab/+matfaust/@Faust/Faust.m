@@ -356,6 +356,19 @@ classdef Faust
 			delete(F.matrix)
 		end
 
+		%======================================================
+		%> @brief Returns + F.
+		%>
+		%>===
+		%>
+		%> This function overloads a Matlab built-in function.
+		%>
+		%> <p>@b See @b also Faust.plus</p>
+		%======================================================
+		function G = uplus(F) 
+			G = F;
+		end
+
 		%======================================================================
 		%> @brief Plus
 		%>

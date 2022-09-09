@@ -647,6 +647,17 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         print(F.__repr__())
         #F.m_faust.display()
 
+    def __pos__(F):
+        """
+        Returns + F (unary operator).
+
+        NOTE: This method overloads the Python unary operator +.
+
+
+        <b>See also</b> Faust.__add__
+        """
+        return F
+
     def __add__(F, *args, **kwargs):
         """
         Sums F to one or a sequence of variables (Faust objects, arrays or scalars).
