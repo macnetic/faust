@@ -460,6 +460,32 @@ void test_mul_vec()
 	assert(err < 1e-3);
 }
 
+void test_eltwise_mul_vec()
+{
+	cout << "test MatDense<FPP,GPU2>::eltwise_mul(const Vect<FPP,GPU2> &vec)" << endl;
+	auto size = 2048;
+	auto nrows = 1024;
+	auto ncols = size;
+	auto vec_mat = MatDense<FPP, Cpu>::randMat(size, 1);
+	Faust::Vect<FPP, Cpu> v_cpu(size, vec_mat->getData());
+	Faust::Vect<FPP, GPU2> v_gpu(size, vec_mat->getData());
+	auto cpu_mat = Faust::MatDense<FPP,Cpu>::randMat(nrows,ncols);
+	MatDense<FPP,GPU2> gpu_mat(nrows, ncols, cpu_mat->getData());
+	gpu_mat.eltwise_mul(v_gpu);
+	auto cpu_mat_out = gpu_mat.tocpu();
+	cpu_mat_out.Display();
+	// test each element
+	for(int i=0; i < cpu_mat->getNbRow();i++)
+		for(int j=0; j < cpu_mat->getNbCol(); j++)
+		{
+			auto test_elt = cpu_mat_out.getData()[j*cpu_mat_out.getNbRow()+i];
+			auto ref_elt = cpu_mat->getData()[j*cpu_mat_out.getNbRow()+i] * v_cpu[i];
+			assert(std::abs(test_elt - ref_elt) < 1e-6);
+		}
+	delete cpu_mat;
+	delete vec_mat;
+}
+
 void test_gpu_matsparse2matdense()
 {
 	cout << "test MatDense<FPP,GPU2>::MatDense<FPP,GPU2>(MatSparse<FPP,GPU2>&)" << endl;
@@ -504,6 +530,7 @@ void test_real()
 int main(int argc, char** argv)
 {
 	Faust::enable_gpu_mod();
+	test_eltwise_mul_vec();
 	test_real();
 	test_mul_gpu_dense();
 	test_resize();

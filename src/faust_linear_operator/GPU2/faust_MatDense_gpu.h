@@ -65,6 +65,11 @@ namespace Faust
 				//TODO: void add(MatSparse<FPP,GPU2> const& A);
 				// vec = this * vec
 				Vect<FPP, Cpu> multiply(const Vect<FPP, Cpu> &vec);
+				/**
+				 * *this = *this * vec (element-wise multiplication)
+				 * possible broadcasting
+				 */
+				void eltwise_mul(const Vect<FPP, GPU2> &vec);
 				//  other = (*this) * other
 				void multiply(const MatDense<FPP, GPU2> &other, const char op_this='N');
 				//  other = (*this) * other
