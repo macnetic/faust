@@ -9,6 +9,14 @@
 #include <cstdlib>
 #include <cmath>
 
+#include <algorithm>
+#include <iomanip>
+#include <iostream>
+#include <list>
+#include <numeric>
+#include <random>
+#include <vector>
+
 typedef @TEST_FPP@ FPP;
 
 using namespace std;
@@ -484,6 +492,43 @@ void test_eltwise_mul_vec()
 		}
 	delete cpu_mat;
 	delete vec_mat;
+	cout  << "OK" << endl;
+}
+
+void test_eltwise_mul_ids_vec()
+{
+	cout << "test MatDense<FPP,GPU2>::eltwise_mul(const Vect<FPP,GPU2> &vec)" << endl;
+	auto size = 2048;
+	auto nrows = 1024;
+	auto ncols = size;
+	auto vec_mat = MatDense<FPP, Cpu>::randMat(nrows, 1);
+	vector<int> ids(nrows);
+	iota(ids.begin(), ids.end(), 0);
+	shuffle(ids.begin(), ids.end(), std::mt19937{std::random_device{}()});
+	int *ids_buf = new int[nrows];
+//	for(int i=0;i<nrows;i++)
+//		cout << ids_buf[i] << " ";
+//	cout << endl;
+	copy(ids.begin(), ids.end(), ids_buf);
+	Faust::Vect<FPP, Cpu> v_cpu(nrows, vec_mat->getData());
+	Faust::Vect<FPP, GPU2> v_gpu(nrows, vec_mat->getData());
+	auto cpu_mat = Faust::MatDense<FPP,Cpu>::randMat(nrows,ncols);
+	MatDense<FPP,GPU2> gpu_mat(nrows, ncols, cpu_mat->getData());
+	gpu_mat.eltwise_mul(v_gpu, ids_buf);
+	auto cpu_mat_out = gpu_mat.tocpu();
+	cpu_mat_out.Display();
+	// test each element
+	for(int i=0; i < cpu_mat->getNbRow();i++)
+		for(int j=0; j < cpu_mat->getNbCol(); j++)
+		{
+			auto test_elt = cpu_mat_out.getData()[j*cpu_mat_out.getNbRow()+i];
+			auto ref_elt = cpu_mat->getData()[j*cpu_mat->getNbRow()+i] * v_cpu[ids[i]];
+			assert(std::abs(test_elt - ref_elt) < 1e-6);
+		}
+	delete cpu_mat;
+	delete vec_mat;
+	delete[] ids_buf;
+	cout  << "OK" << endl;
 }
 
 void test_gpu_matsparse2matdense()
@@ -531,6 +576,7 @@ int main(int argc, char** argv)
 {
 	Faust::enable_gpu_mod();
 	test_eltwise_mul_vec();
+	test_eltwise_mul_ids_vec();
 	test_real();
 	test_mul_gpu_dense();
 	test_resize();

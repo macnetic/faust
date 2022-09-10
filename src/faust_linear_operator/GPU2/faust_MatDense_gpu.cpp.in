@@ -104,10 +104,13 @@ namespace Faust
 		}
 
 	template<>
-	void Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::eltwise_mul(const Vect<@FAUST_SCALAR_FOR_GM@, GPU2> &gpu_vec)
+	void Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::eltwise_mul(const Vect<@FAUST_SCALAR_FOR_GM@, GPU2> &gpu_vec, const int *ids/*=nullptr*/)
 	{
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
-			dsm_funcs->elt_wise_mul(this->gpu_mat, gpu_vec.gpu_mat);
+			if(ids == nullptr)
+				dsm_funcs->elt_wise_mul(this->gpu_mat, gpu_vec.gpu_mat);
+			else
+				dsm_funcs->elt_wise_mul_ids(this->gpu_mat, gpu_vec.gpu_mat, ids);
 	}
 
 	template<>
