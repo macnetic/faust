@@ -15,7 +15,7 @@ namespace Faust
 		for(auto csr_fac_it = this->begin(); csr_fac_it != end_it; csr_fac_it++)
 		{
 			auto csr_fac = *csr_fac_it;
-			opt_factors.insert(opt_factors.begin(), ButterflyMat<FPP>(*dynamic_cast<const MatSparse<FPP, Cpu>*>(csr_fac), i++));
+			opt_factors.insert(opt_factors.begin(), ButterflyMat<FPP, Cpu>(*dynamic_cast<const MatSparse<FPP, Cpu>*>(csr_fac), i++));
 		}
 		if(has_permutation)
 		{
@@ -119,7 +119,7 @@ namespace Faust
 			}
 			else
 			{
-				ButterflyMat<FPP>& fac = opt_factors[0];
+				ButterflyMat<FPP, Cpu>& fac = opt_factors[0];
 				fac.multiply(x, z.getData(), this->getNbRow());
 				i = 1;
 			}
@@ -127,7 +127,7 @@ namespace Faust
 			while(i < opt_factors.size())
 //			for(auto fac: opt_factors)
 			{
-				ButterflyMat<FPP>& fac = opt_factors[i];
+				ButterflyMat<FPP, Cpu>& fac = opt_factors[i];
 				if(i & 1)
 					fac.multiply(z.getData(), y, this->getNbRow());
 				else
@@ -167,7 +167,7 @@ namespace Faust
 				}
 				else
 				{
-					ButterflyMat<FPP>& fac = opt_factors[0];
+					ButterflyMat<FPP, Cpu>& fac = opt_factors[0];
 					fac.multiply(X, X_mat.cols(), Z, this->getNbRow());
 					i = 1;
 				}
@@ -175,7 +175,7 @@ namespace Faust
 				while(i < opt_factors.size())
 					//			for(auto fac: opt_factors)
 				{
-					ButterflyMat<FPP>& fac = opt_factors[i];
+					ButterflyMat<FPP, Cpu>& fac = opt_factors[i];
 
 					if(i & 1)
 						fac.multiply(Z, Y_mat.cols(), Y, this->getNbRow());
@@ -218,7 +218,7 @@ namespace Faust
 				//					for(auto fac: opt_factors)
 				while(i < opt_factors.size())
 				{
-					ButterflyMat<FPP>& fac = opt_factors[i];
+					ButterflyMat<FPP, Cpu>& fac = opt_factors[i];
 					Y = fac.multiply(Y);
 					i++;
 				}
@@ -227,7 +227,7 @@ namespace Faust
 				//TODO: factorize with MatDense product
 				while(i < opt_factors.size())
 				{
-					ButterflyMat<FPP>& fac = opt_factors[i];
+					ButterflyMat<FPP, Cpu>& fac = opt_factors[i];
 					if(i & 1)
 						fac.multiply(Z, Y.mat.cols(), Y.getData(), this->getNbRow());
 					else
@@ -248,7 +248,7 @@ namespace Faust
 namespace Faust
 {
 	template<typename FPP>
-	ButterflyMat<FPP>::ButterflyMat(const MatSparse<FPP, Cpu> &factor, int level)
+	ButterflyMat<FPP, Cpu>::ButterflyMat(const MatSparse<FPP, Cpu> &factor, int level)
 	{
 		// build a d1, d2 pair from the butterfly factor
 		auto size = factor.getNbRow();
@@ -291,8 +291,9 @@ namespace Faust
 	}
 
 	template<typename FPP>
-	void ButterflyMat<FPP>::Display() const
+	void ButterflyMat<FPP, Cpu>::Display() const
 	{
+		std::cout << "ButterflyMat on CPU: ";
 		std::cout << "D1: ";
 		std::cout << D1.diagonal() << std::endl;
 		std::cout << "D2: ";
@@ -304,7 +305,7 @@ namespace Faust
 	}
 
 	template<typename FPP>
-	Vect<FPP, Cpu> ButterflyMat<FPP>::multiply(const Vect<FPP, Cpu>& x) const
+	Vect<FPP, Cpu> ButterflyMat<FPP, Cpu>::multiply(const Vect<FPP, Cpu>& x) const
 	{
 		Vect<FPP, Cpu> z(x.size());
 		multiply(x.getData(), z.getData(), x.size());
@@ -312,7 +313,7 @@ namespace Faust
 	}
 
 	template<typename FPP>
-	void ButterflyMat<FPP>::multiply(const FPP* x, FPP* y, size_t size) const
+	void ButterflyMat<FPP, Cpu>::multiply(const FPP* x, FPP* y, size_t size) const
 	{
 		const FPP *d1_ptr = D1.diagonal().data(), *d2_ptr = D2.diagonal().data();
 #ifdef USE_PYTHONIC
@@ -339,7 +340,7 @@ namespace Faust
 	}
 
 	template<typename FPP>
-		void  ButterflyMat<FPP>::multiply(const FPP* X, int X_ncols, FPP* Y, size_t Y_nrows)
+		void  ButterflyMat<FPP, Cpu>::multiply(const FPP* X, int X_ncols, FPP* Y, size_t Y_nrows)
 		{
 			using MatMap = Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>>;
 			MatMap X_mat(const_cast<FPP*>(X) /* harmless, no modification*/, Y_nrows, X_ncols);
@@ -356,7 +357,7 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		MatDense<FPP, Cpu>  ButterflyMat<FPP>::multiply(const MatDense<FPP,Cpu> &X)
+		MatDense<FPP, Cpu> ButterflyMat<FPP, Cpu>::multiply(const MatDense<FPP,Cpu> &X)
 		{
 			MatDense<FPP, Cpu> Y(X.getNbRow(), X.getNbCol());
 			multiply(X.getData(), X.getNbCol(), Y.getData(), X.getNbRow());

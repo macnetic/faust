@@ -26,7 +26,7 @@ namespace Faust
 	template<typename FPP, FDevice DEV>
 		class TransformHelperButterfly;
 
-	template<typename FPP>
+	template<typename FPP, FDevice DEV>
 	class ButterflyMat;
 
 	template<typename FPP>
@@ -38,7 +38,7 @@ namespace Faust
 			FPP *perm_d_ptr;
 			DiagMat D;
 			std::vector<unsigned int> bitrev_perm;
-			std::vector<ButterflyMat<FPP>> opt_factors;
+			std::vector<ButterflyMat<FPP, Cpu>> opt_factors;
 
 
 			// private ctor
@@ -59,7 +59,7 @@ namespace Faust
 		};
 
 	template<typename FPP>
-	class ButterflyMat
+	class ButterflyMat<FPP, Cpu>
 	{
 
 		using VecMap = Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>>;
@@ -74,7 +74,7 @@ namespace Faust
 
 		// \param level: is a 0-base index.
 		public:
-		ButterflyMat<FPP>(const MatSparse<FPP, Cpu> &factor, int level);
+		ButterflyMat<FPP, Cpu>(const MatSparse<FPP, Cpu> &factor, int level);
 
 		Vect<FPP, Cpu> multiply(const Vect<FPP, Cpu>& x) const;
 		void multiply(const FPP* x, FPP* y, size_t size) const;
@@ -86,6 +86,7 @@ namespace Faust
 		public:
 			const DiagMat& getD1() {return D1;};
 			const DiagMat& getD2() {return D2;};
+			const std::vector<int>& get_subdiag_ids() {return subdiag_ids;}
 	};
 }
 #include "faust_TransformHelperButterfly.hpp"
