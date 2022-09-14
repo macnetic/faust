@@ -41,16 +41,16 @@ namespace Faust
 				MatDense<FPP,GPU2> get_product(int prod_mod=-1);
 				void get_product(MatDense<FPP,GPU2>& M, int prod_mod=-1);
 				void get_product(MatDense<FPP,Cpu>& M, int prod_mod=-1);
-				MatDense<FPP, GPU2> multiply(const MatDense<FPP,GPU2> &A);
-				MatDense<FPP, GPU2> multiply(const MatSparse<FPP,GPU2> &A) { return multiply(MatDense<FPP,GPU2>(A));}
-				MatDense<FPP, Cpu> multiply(const MatSparse<FPP,Cpu> &A) { return multiply(MatDense<FPP, Cpu>(A));} // TODO: avoid CPU copy to dense
-				MatDense<FPP,Cpu> multiply(const MatDense<FPP,Cpu> &A);
+				virtual MatDense<FPP, GPU2> multiply(const MatDense<FPP,GPU2> &A);
+				virtual MatDense<FPP, GPU2> multiply(const MatSparse<FPP,GPU2> &A) { return multiply(MatDense<FPP,GPU2>(A));}
+				virtual MatDense<FPP, Cpu> multiply(const MatSparse<FPP,Cpu> &A) { return multiply(MatDense<FPP, Cpu>(A));} // TODO: avoid CPU copy to dense
+				virtual MatDense<FPP,Cpu> multiply(const MatDense<FPP,Cpu> &A);
 				TransformHelper<FPP,GPU2>* multiply(const FPP& a);
 				TransformHelper<FPP,GPU2>* multiply(const TransformHelper<FPP,GPU2>*);
-				Vect<FPP,GPU2> multiply(const Faust::Vect<FPP,GPU2>& a);
-				Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> &x);
-				void multiply(const FPP* cpu_x, FPP* cpu_y);
-				void multiply(const FPP* cpu_x, int x_ncols, FPP* cpu_y);
+				virtual Vect<FPP,GPU2> multiply(const Faust::Vect<FPP,GPU2>& a);
+				virtual Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> &x);
+				virtual void multiply(const FPP* cpu_x, FPP* cpu_y);
+				virtual void multiply(const FPP* cpu_x, int x_ncols, FPP* cpu_y);
 				FPP* sliceMultiply(const Slice s[2], const FPP* cpu_X, FPP* cpu_out=nullptr, int X_ncols=1) const;
 				FPP* indexMultiply(faust_unsigned_int* ids[2], size_t id_lens[2], const FPP* X, int ncols=1, FPP* out=nullptr) const;
 				Real<FPP> normFro(const bool full_array=true, const int batch_size=1) const;
