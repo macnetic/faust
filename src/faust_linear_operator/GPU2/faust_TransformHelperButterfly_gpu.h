@@ -23,8 +23,8 @@ namespace Faust
 			// private ctor
 			TransformHelperButterfly(const std::vector<MatGeneric<FPP, Cpu> *>& facts, const FPP lambda_ = (FPP)1.0, const bool optimizedCopy=false, const bool cloning_fact = true, const bool internal_call=false);
 
-			~TransformHelperButterfly() { delete[] perm_ids;}
 			public:
+			~TransformHelperButterfly() { if(perm_ids != nullptr) delete[] perm_ids;}
 			static TransformHelper<FPP,GPU2>* fourierFaust(unsigned int n, const bool norma=true);
 			static TransformHelper<FPP,GPU2>* optFaust(const TransformHelper<FPP, GPU2>* F) { throw std::runtime_error("Not yet implemented on GPU");};
 			Vect<FPP, Cpu> multiply(const Vect<FPP, Cpu>& x);
@@ -43,14 +43,31 @@ namespace Faust
 		Vect<FPP, GPU2> d1;
 		Vect<FPP, GPU2> d2;
 		int* subdiag_ids;
-#ifdef USE_PYTHONIC
-		long *subdiag_ids_ptr;
-#endif
 		int level;
 
 		// \param level: is a 0-base index.
 		public:
 		ButterflyMat(const MatSparse<FPP, Cpu> &factor, int level);
+
+		//TODO: move defs in hpp
+		ButterflyMat(const ButterflyMat<FPP, GPU2>& bmat)
+		{
+			*this = bmat;
+		}
+
+		ButterflyMat& operator=(const ButterflyMat<FPP, GPU2>& bmat)
+		{
+			this->d1 = bmat.d1;
+			this->d2 = bmat.d2;
+			this->level = bmat.level;
+			this->subdiag_ids = new int[d1.size()];
+			std::copy(bmat.subdiag_ids, bmat.subdiag_ids+d1.size(), this->subdiag_ids);
+			return *this;
+		}
+
+		ButterflyMat() : level(-1), subdiag_ids(nullptr), d1(), d2()
+		{
+		}
 
 		//TODO: constness of multiply member functions
 		MatDense<FPP, GPU2> multiply(const FPP* x);
@@ -63,7 +80,7 @@ namespace Faust
 		const Vect<FPP, GPU2>& getD1() {return d1;};
 		const Vect<FPP, GPU2>& getD2() {return d2;};
 
-		~ButterflyMat() { delete[] subdiag_ids;}
+		~ButterflyMat() {if (subdiag_ids != nullptr) delete[] subdiag_ids;}
 	};
 }
 #include "faust_TransformHelperButterfly_gpu.hpp" //TODO
