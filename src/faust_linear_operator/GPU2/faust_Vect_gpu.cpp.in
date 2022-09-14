@@ -36,30 +36,23 @@ namespace Faust
 	template<>
 		void Vect<FSFG,GPU2>::resize(const faust_unsigned_int size)
 		{
-			MatDense<FSFG, GPU2>::resize(size, 1);
+			MatDense<FSFG, GPU2>::resize(size, 1); 
 		}
 
 	template<>
 		void Vect<FSFG,GPU2>::operator=(const Vect<FSFG,GPU2> & v)
 		{
-			if(size() == v.size())
-				MatDense<FSFG, GPU2>::operator=(v);
-			else
-				throw std::runtime_error("Dimensions must agree.");
+			MatDense<FSFG, GPU2>::operator=(v); // TODO: remove it (in fact the function should be redefined because it does nothing more than the parent)
 		}
 
 	template<>
 		void Vect<FSFG,GPU2>::operator=(const Vect<FSFG,Cpu> & v)
 		{
-			if(size() == v.size())
-			{
-				auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
-				auto gpu_mat = dsm_funcs->togpu(this->getNbRow(), 1, (@GM_SCALAR@*) reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(v.getData()));
+			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
+			auto gpu_mat = dsm_funcs->togpu(this->getNbRow(), 1, (@GM_SCALAR@*) reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(v.getData()));
+			if(this->gpu_mat != nullptr)
 				dsm_funcs->free(this->gpu_mat);
-				this->gpu_mat = gpu_mat;
-			}
-			else
-				throw std::runtime_error("Dimensions must agree.");
+			this->gpu_mat = gpu_mat;
 		}
 
 	template<>
