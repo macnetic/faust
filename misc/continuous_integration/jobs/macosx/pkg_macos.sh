@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 
 # Needed environment variables: FAUST_VERSION, NIX_PY_VER, DURL, DFILE, EXPERIMENTAL_PKG, MACOS_PKG_STORE_PATH (optional)
 
