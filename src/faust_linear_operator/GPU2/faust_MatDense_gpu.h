@@ -15,6 +15,10 @@ namespace Faust
 
 	template<typename FPP, FDevice DEVICE>
 		class MatDense;
+	//TODO: move in a specific module
+	template<typename FPP>
+		void butterfly_diag_prod(MatDense<FPP, GPU2>& X, const Vect<FPP, GPU2>& d1, const Vect<FPP, GPU2>& d2, const int* ids);
+
 	template<typename FPP>
 		class MatDense<FPP, GPU2> : public MatGeneric<FPP,GPU2>
 		{
@@ -22,6 +26,7 @@ namespace Faust
 			friend MatSparse<FPP,GPU2>;
 			friend MatBSR<FPP,GPU2>;
 			friend MatDense<std::complex<double>,GPU2>; // TODO limit to real function
+			friend void butterfly_diag_prod<>(MatDense<FPP, GPU2>& X, const Vect<FPP, GPU2>& d1, const Vect<FPP, GPU2>& d2, const int* ids);
 //			friend void gemm<>(const MatDense<FPP, GPU2> &A, const MatDense<FPP, GPU2> &B, MatDense<FPP, GPU2> &C, const FPP& alpha, const FPP& beta, const char opA, const char opB);
 //
 //			friend void gemv<>(const MatDense<FPP, GPU2> &A, const Vect<FPP, GPU2> &B, Vect<FPP, GPU2> &C, const FPP& alpha, const FPP& beta, const char opA, const char opB);

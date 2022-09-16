@@ -172,10 +172,11 @@ namespace Faust
 	template<typename FPP>
 		MatDense<FPP, GPU2> ButterflyMat<FPP, GPU2>::multiply(MatDense<FPP, GPU2> &gpu_X)
 		{
-			MatDense<FPP, GPU2> gpu_X2(gpu_X);
+			/*MatDense<FPP, GPU2> gpu_X2(gpu_X);
 			gpu_X.eltwise_mul(d2, subdiag_ids);
 			gpu_X2.eltwise_mul(d1);
-			gpu_X += gpu_X2;
+			gpu_X += gpu_X2;*/
+			butterfly_diag_prod(gpu_X, d1, d2, subdiag_ids);
 			return gpu_X;
 		}
 
