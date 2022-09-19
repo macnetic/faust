@@ -11,7 +11,7 @@ import scipy
 from scipy.io import loadmat
 from scipy.sparse import (csr_matrix, csc_matrix, dia_matrix, bsr_matrix,
                           coo_matrix, diags, eye as seye, kron, vstack as
-                          svstack, hstack as shstack)
+                          svstack, hstack as shstack, issparse)
 import _FaustCorePy
 import pyfaust
 import pyfaust.factparams
@@ -1555,7 +1555,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             indices = list(indices)
         if(indices == Ellipsis): # F[...]
             out_indices = [slice(0,F.shape[0]), slice(0, F.shape[1])]
-        elif(isinstance(indices,int)): # F[i] # a line
+        elif(isinstance(indices,int)): # F[i] # a row
             out_indices = [slice(indices, indices+1), slice(0, F.shape[1])]
         elif(isinstance(indices,slice)):
             #F[i:j] a group of contiguous lines
@@ -3168,7 +3168,7 @@ def pinv(F):
 
 
 @implements(np.concatenate)
-def concatenate(F, *args, axis=0, **kwargs):
+def concatenate(_tuple, *args, axis=0, **kwargs):
     """
     A package function alias for the member function Faust.concatenate.
 
@@ -3180,12 +3180,24 @@ def concatenate(F, *args, axis=0, **kwargs):
 
     <b>See also</b> numpy.concatenate
     """
-    if not isinstance(F, tuple):
+    if not isinstance(_tuple, tuple):
         raise TypeError("first arg must be a tuple")
-    _tuple = F
-    if(Faust.isFaust(_tuple[0])):
+    if isFaust(_tuple[0]):
         return _tuple[0].concatenate(*_tuple[1:], axis=axis)
+    elif np.array([isFaust(_tuple[i]) for i in range(len(_tuple))]).any():
+        return Faust(_tuple[0]).concatenate(*_tuple[1:], axis=axis)
+    elif np.array([issparse(_tuple[i]) for i in range(len(_tuple))]).all():
+        if axis == 0:
+            return svstack(_tuple)
+        elif axis == 1:
+            return hstack(_tuple)
+        else:
+            raise ValueError("Invalid axis")
     else:
+        # convert any _tuple element to np.ndarray if possible (it has a
+        # toarray func)
+        _tuple = tuple(t if isinstance(t, np.ndarray) else t.toarray() for t in
+                  _tuple)
         return np.concatenate(_tuple, axis=axis)
 
 def hstack(_tuple):
@@ -4302,3 +4314,5 @@ class FaustMulMode:
     ## https://pytorch.org/docs/stable/generated/torch.chain_matmul.html?highlight=chain_matmul#torch.chain_matmul
     ## This method is only available for the specific packages pyfaust_torch.
     TORCH_CPU_DENSE_DYNPROG_SPARSE_L2R=10
+
+
