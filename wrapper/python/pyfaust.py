@@ -975,28 +975,50 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         """
         Inplace operation: F = F @ A
         """
-        F = F@A
+        if F.isFaust(A):
+            F = F@A
+        elif isinstance(A, (csr_matrix, csc_matrix, coo_matrix, bsr_matrix,
+                            ndarray)) and A.ndim == 2:
+            F = F@Faust(A)
+        else:
+            raise TypeError('Type of A is not supported')
         return F
 
     def __imul__(F, A):
         """
         Inplace operation: F = F * A
         """
-        F = F*A
+        if isinstance(A, ndarray) and A.ndim == 2 or isinstance(A, (float,
+                                                                    complex)):
+            F = F*Faust(A)
+        else:
+            raise TypeError('Type of A is not supported')
         return F
 
     def __iadd__(F, A):
         """
         Inplace operation: F = F + A
         """
-        F = F+A
+        if F.isFaust(A):
+            F = F+A
+        elif isinstance(A, (csr_matrix, csc_matrix, coo_matrix, bsr_matrix,
+                            ndarray)) and A.ndim == 2:
+            F = F+Faust(A)
+        else:
+            raise TypeError('Type of A is not supported')
         return F
 
     def __isub__(F, A):
         """
         Inplace operation: F = F - A
         """
-        F = F-A
+        if F.isFaust(A):
+            F = F-A
+        elif isinstance(A, (csr_matrix, csc_matrix, coo_matrix, bsr_matrix,
+                            ndarray)) and A.ndim == 2:
+            F = F-Faust(A)
+        else:
+            raise TypeError('Type of A is not supported')
         return F
 
     def __matmul__(F, A):
