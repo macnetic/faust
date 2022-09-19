@@ -4315,4 +4315,6 @@ class FaustMulMode:
     ## This method is only available for the specific packages pyfaust_torch.
     TORCH_CPU_DENSE_DYNPROG_SPARSE_L2R=10
 
-
+# experimental block start
+from pyfaust.lazylinop import LazyLinearOp, LazyFaust
+# experimental block end
