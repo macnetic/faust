@@ -971,15 +971,23 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         F = F/s
         return F
 
+    def __floordiv__(F, s):
+        """
+        F // s.
+
+        Warning: this operation is not supported, it raises an exception.
+        """
+        raise Exception("Not supported operation")
+
     def __imatmul__(F, A):
         """
         Inplace operation: F = F @ A
         """
         if F.isFaust(A):
-            F = F@A
+            F = F @ A
         elif isinstance(A, (csr_matrix, csc_matrix, coo_matrix, bsr_matrix,
-                            ndarray)) and A.ndim == 2:
-            F = F@Faust(A)
+                            np.ndarray)) and A.ndim == 2:
+            F = F @ Faust(A)
         else:
             raise TypeError('Type of A is not supported')
         return F
@@ -988,9 +996,10 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         """
         Inplace operation: F = F * A
         """
-        if isinstance(A, ndarray) and A.ndim == 2 or isinstance(A, (float,
-                                                                    complex)):
-            F = F*Faust(A)
+        if isinstance(A, np.ndarray) and A.ndim == 2:
+            F = F * Faust(A)
+        elif isinstance(A, (float, complex, int)):
+            F = F * A
         else:
             raise TypeError('Type of A is not supported')
         return F
@@ -1002,8 +1011,10 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         if F.isFaust(A):
             F = F+A
         elif isinstance(A, (csr_matrix, csc_matrix, coo_matrix, bsr_matrix,
-                            ndarray)) and A.ndim == 2:
+                            np.ndarray)) and A.ndim == 2:
             F = F+Faust(A)
+        elif isinstance(A, (float, complex, int)):
+            F = F + A
         else:
             raise TypeError('Type of A is not supported')
         return F
@@ -1015,8 +1026,10 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         if F.isFaust(A):
             F = F-A
         elif isinstance(A, (csr_matrix, csc_matrix, coo_matrix, bsr_matrix,
-                            ndarray)) and A.ndim == 2:
+                            np.ndarray)) and A.ndim == 2:
             F = F-Faust(A)
+        elif isinstance(A, (float, complex, int)):
+            F = F - A
         else:
             raise TypeError('Type of A is not supported')
         return F
