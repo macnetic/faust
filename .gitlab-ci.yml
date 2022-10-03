@@ -434,14 +434,14 @@ pkg_macos_purepy_release_torch_linked:
 
 pkg_linux_purepy_release:
     extends: .pkg_purepy_release
-    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: $LINUX_ZLIB_SLIB_PATH, Z_STATIC_LIB_PATH: $LINUX_ZLIB_SLIB_PATH, HDF5_STATIC_LIB_PATH: $LINUX_HDF5_SLIB_PATH, BUILD_MULTITHREAD: "ON", NOPY2: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "../gpu_mod", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", CMAKE_CXX_COMPILER: "clang++", PYTHON_PATH: '/usr/local/bin/python3.9', JOB_PYTHON: 'python3.9'}
+    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: $LINUX_MATIO_SLIB_PATH, Z_STATIC_LIB_PATH: $LINUX_ZLIB_SLIB_PATH, HDF5_STATIC_LIB_PATH: $LINUX_HDF5_SLIB_PATH, BUILD_MULTITHREAD: "ON", NOPY2: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "../gpu_mod", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", CMAKE_CXX_COMPILER: "clang++", PYTHON_PATH: '/usr/local/bin/python3.9', JOB_PYTHON: 'python3.9'}
     tags:
         - linux
         - tux_packager
 
 pkg_linux_purepy_release_extra_pyver:
     extends: .pkg_purepy_release
-    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: $LINUX_ZLIB_SLIB_PATH, Z_STATIC_LIB_PATH: $LINUX_ZLIB_SLIB_PATH, HDF5_STATIC_LIB_PATH: $LINUX_HDF5_SLIB_PATH, BUILD_MULTITHREAD: "ON", NOPY2: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "../gpu_mod", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", PYTHON_PATH: '/usr/local/bin/python3.10', JOB_PYTHON: 'python3.10', CMAKE_CXX_COMPILER: "clang++"}
+    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: $LINUX_MATIO_SLIB_PATH, Z_STATIC_LIB_PATH: $LINUX_ZLIB_SLIB_PATH, HDF5_STATIC_LIB_PATH: $LINUX_HDF5_SLIB_PATH, BUILD_MULTITHREAD: "ON", NOPY2: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "../gpu_mod", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", PYTHON_PATH: '/usr/local/bin/python3.10', JOB_PYTHON: 'python3.10', CMAKE_CXX_COMPILER: "clang++"}
     tags:
         - linux
         - tux_packager
@@ -449,13 +449,13 @@ pkg_linux_purepy_release_extra_pyver:
 
 .pkg_linux_purepy_release_torch_linked:
     extends: pkg_linux_purepy_release
-    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: $LINUX_ZLIB_SLIB_PATH, Z_STATIC_LIB_PATH: $LINUX_ZLIB_SLIB_PATH, HDF5_STATIC_LIB_PATH: $LINUX_HDF5_SLIB_PATH, BUILD_MULTITHREAD: "ON", NOPY2: "ON", FAUST_TORCH: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "/opt/local/libtorch/share/cmake/Torch;../gpu_mod", EXPERIMENTAL_PKG: "OFF", CMAKE_CXX_COMPILER: "clang++"}
+    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: $LINUX_MATIO_SLIB_PATH, Z_STATIC_LIB_PATH: $LINUX_ZLIB_SLIB_PATH, HDF5_STATIC_LIB_PATH: $LINUX_HDF5_SLIB_PATH, BUILD_MULTITHREAD: "ON", NOPY2: "ON", FAUST_TORCH: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "/opt/local/libtorch/share/cmake/Torch;../gpu_mod", EXPERIMENTAL_PKG: "OFF", CMAKE_CXX_COMPILER: "clang++"}
     tags:
       - torch
 
 pkg_linux_purepy_release_openblaso:
     extends: .pkg_purepy_release
-    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: $LINUX_ZLIB_SLIB_PATH, Z_STATIC_LIB_PATH: $LINUX_ZLIB_SLIB_PATH, HDF5_STATIC_LIB_PATH: $LINUX_HDF5_SLIB_PATH, BUILD_MULTITHREAD: "ON", NOPY2: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "../gpu_mod", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", CMAKE_CXX_COMPILER: "clang++", USE_OPENBLASO: "ON", PYTHON_PATH: '/usr/local/bin/python3.9', JOB_PYTHON: 'python3.9'}
+    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: $LINUX_MATIO_SLIB_PATH, Z_STATIC_LIB_PATH: $LINUX_ZLIB_SLIB_PATH, HDF5_STATIC_LIB_PATH: $LINUX_HDF5_SLIB_PATH, BUILD_MULTITHREAD: "ON", NOPY2: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "../gpu_mod", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", CMAKE_CXX_COMPILER: "clang++", USE_OPENBLASO: "ON", PYTHON_PATH: '/usr/local/bin/python3.9', JOB_PYTHON: 'python3.9'}
     tags:
         - linux
         - tux_packager
