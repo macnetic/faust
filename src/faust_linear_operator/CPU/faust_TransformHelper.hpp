@@ -1974,7 +1974,7 @@ FPP* Faust::TransformHelper<FPP,Cpu>::sliceMultiply(const Slice s[2], const FPP*
 		if(s0.start_id != 0 || s0.end_id != gen_last_fac->getNbCol())
 		{
 			other_facs.assign(this->transform->begin()+1, this->transform->end()-1);
-			left_sliced_factor = gen_first_fac;
+			left_sliced_factor = gen_last_fac;
 			tmp_nrows = (*(this->transform->end()-2))->getNbCol();
 			// the following sub_th product is not ensured to fit out buffer, so use another one
 			tmp_ptr = new FPP[tmp_nrows*X_ncols];
