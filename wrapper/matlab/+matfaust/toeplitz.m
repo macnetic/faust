@@ -1,14 +1,16 @@
 %=========================================
-%> @brief Returns a toeplitz Faust whose first column is c and first row r.
+%> @brief Constructs a toeplitz Faust whose first column is c and first row r.
 %>
 %> @b Usage
 %>
 %> &nbsp;&nbsp;&nbsp; @b T = toeplitz(c), T is a symmetric Toeplitz Faust whose the first column is c. <br/>
 %> &nbsp;&nbsp;&nbsp; @b T = toeplitz(c, r), T is a Toeplitz Faust whose the first column is c and the first row is [c(1), r(2:)] <br/>
 %> @param c: the first column of the toeplitz Faust.
-%> @param r: (2nd argument) the first row of the toeplitz Faust. Defaulty r = c.
+%> @param r: (2nd argument) the first row of the toeplitz Faust. Defaulty r = conj(c).
 %> r(1) is ignored, the first row is always [c(1), r(2:)].
 %>
+%>
+%> @retval T the toeplitz Faust.
 %>
 %> @b Example
 %>
@@ -104,7 +106,7 @@ function T = toeplitz(c, varargin)
             error('The second argument must be a vector')
         end
     else
-        r = c; % default r
+        r = conj(c); % default r
     end
     if ~ ismatrix(r) || ~ ismatrix(c) || ~ isnumeric(c) || ~ isnumeric(r)
         error('r and c must be numeric vectors')

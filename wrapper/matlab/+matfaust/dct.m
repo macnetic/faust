@@ -1,5 +1,5 @@
 %=========================================
-%> @brief Returns the Direct Cosine Transform (Type II) Faust of order n.
+%> @brief Constructs a Faust implementing the Direct Cosine Transform (Type II) Faust of order n.
 %>
 %> The analytical formula of DCT II used here is:
 %> \f$2 \sum_{i=0}^{n-1} x_i cos \left( {\pi k (2i + 1)} \over {2n} \right)\f$
@@ -9,6 +9,7 @@
 %> @param 'normed',bool: true (by default) to normalize the returned Faust as if Faust.normalize() was called, false otherwise.
 %> @param 'class', str: 'single' or 'double'.
 %>
+%> @retval D the DCT Faust.
 %>
 %> @b Example
 %> @code

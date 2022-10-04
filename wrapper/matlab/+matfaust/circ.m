@@ -1,6 +1,8 @@
 %==========================================================================================
 %> @brief Returns a circulant Faust C defined by the vector c (which is the first column of full(C)).
 %>
+%> @param c: the vector to define the circulant Faust. Its length must be a power of two.
+%>
 %> @b Example:
 %>
 %> @code

@@ -3371,8 +3371,7 @@ def dft(n, normed=True, dev='cpu', diag_opt=False):
         normed: default to True to normalize the DFT Faust as if you called
         Faust.normalize() and False otherwise.
         dev: device to create the Faust on ('cpu' or 'gpu').
-        diag_opt: if True then the returned Faust is optimized using
-        pyfaust.opt_butterfly_faust.
+        diag_opt: if True then the returned Faust is optimized using pyfaust.opt_butterfly_faust.
 
     Returns:
         The Faust implementing the DFT of dimension n.
@@ -3394,7 +3393,7 @@ def dft(n, normed=True, dev='cpu', diag_opt=False):
         - FACTOR 10 (complex) SPARSE, size 1024x1024, density 0.000976562, nnz 1024
 
         >>> dft(1024, normed=True) # is equiv. to next call
-        >>> dft(1024, normed=False).normalize() # which is less optimized though
+        >>> dft(1024, normed=False).normalize()
 
     <b>See also:</b> pyfaust.tools.bitrev, pyfaust.wht, pyfaust.dct, pyfaust.dst, scipy.fft.fft, pyfaust.fact.butterfly, pyfaust.rand_butterfly.
     """
@@ -3427,6 +3426,9 @@ def dct(n, normed=True, dev='cpu', dtype='float64'):
         Faust.normalize() and False otherwise.
         dev: the device on which the Faust is created.
         dtype: 'float64' (default) or 'float32'.
+
+    Returns:
+        The DCT Faust.
 
     Example:
         >>> from pyfaust import dct
@@ -3539,6 +3541,9 @@ def dst(n, normed=True, dev='cpu', dtype='float64'):
         dev: the device on which the Faust is created.
         dtype: 'float64' (default) or 'float32'.
 
+    Returns:
+        The DST Faust.
+
     Example:
         >>> from pyfaust import dst
         >>> from scipy.fft import dst as scipy_dst
@@ -3623,7 +3628,11 @@ def dst(n, normed=True, dev='cpu', dtype='float64'):
     return F
 
 def circ(c):
-    """Returns a circulant Faust C defined by the vector c (which is the first column of C.toarray()).
+    """Returns a circulant Faust C defined by the vector c (which is the first
+    column of C.toarray()).
+
+    Args:
+        c: the vector to define the circulant Faust. Its length must be a power of two.
 
     Example:
         >>> from pyfaust import circ
@@ -3696,6 +3705,9 @@ def circ(c):
 def anticirc(c):
     """Returns an anti-circulant Faust A defined by the vector c (which is the last column of A.toarray()).
 
+    Args:
+        c: the vector to define the circulant Faust. Its length must be a power of two.
+
     Example:
         >>> from pyfaust import anticirc
         >>> import numpy as np
@@ -3742,6 +3754,9 @@ def toeplitz(c, r=None):
         r: the first row of the toeplitz Faust. If none then r =
         np.conjugate(c). r[0] is ignored, the first row is always [c[0],
         r[1:]].
+
+    Returns:
+        The toeplitz Faust.
 
     Example:
         >>> from pyfaust import toeplitz

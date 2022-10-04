@@ -1,12 +1,15 @@
 %=========================================
-%> @brief Returns the Direct Sine Transform (Type II) Faust of order n.
+%> @brief Constructs a Faust implementing the Direct Sine Transform (Type II) Faust of order n.
 %>
-%> The aialytical formula of DST II used here is:
+%> The analytical formula of DST II used here is:
 %> \f$2 \sum_{i=0}^{n-1} x_i sin \left( {\pi (k+1) (2i + 1)} \over {2n} \right)\f$
 %>
 %> @param n: the order of the DST (it must be a power of two).
 %> @param 'dev', str: 'gpu' or 'cpu' to create the Faust on CPU or GPU ('cpu' is the default).
 %> @param 'normed',bool: true (by default) to normalize the returned Faust as if Faust.normalize() was called, false otherwise.
+%> @param 'class', str: 'single' or 'double'.
+%>
+%> @retval D the DST Faust.
 %>
 %> @b Example
 %> @code

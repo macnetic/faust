@@ -1,8 +1,6 @@
 %==========================================================================================
 %> @brief Constructs a Faust F implementing the Discrete Fourier Transform (DFT) of order n.
 %>
-%> The factorization algorithm used is Cooley-Tukey (FFT).
-%>
 %> The factorization corresponds to the butterfly structure of the Cooley-Tukey
 %> FFT algorithm. The resulting Faust is complex and has (log2(n)+1) sparse
 %> factors. The log2(n) first has 2 nonzeros per row and per column. The
@@ -16,11 +14,7 @@
 %> @param n: the power of two for a FFT of order n and a factorization in log2(n)+1 factors.
 %> @param 'normed',bool: true (by default) to normalize the returned Faust as if Faust.normalize() was called, false otherwise.
 %> @param 'dev', str: 'gpu or 'cpu' to create the Faust on CPU or GPU ('cpu' by default).
-%> @param 'diag_opt', bool: enable the diagonal optimization of Butterfly and permutation
-%>        factors. Basically, it consists to simplify the product of Faust-vector
-%>        F*x and Faust-matrix F*M to multiplications of factor
-%>        diagonals by the vector x/matrix M. It is particularly more efficient
-%>        when the DFT is multiplied by a matrix.
+%> @param 'diag_opt', bool: if true then the returned Faust is optimized using matfaust.opt_butterfly_faust.
 %>
 %> @retval F the Faust implementing the FFT transform of dimension n.
 %>
@@ -28,8 +22,7 @@
 %> @code
 %> % in a matlab terminal
 %> >> import matfaust.*
-%> >> F = dft(1024) % is equal to
-%> >> F = normalize(dft(1024))
+%> >> F = dft(1024)
 %> @endcode
 %>
 %>
@@ -48,7 +41,12 @@
 %> - FACTOR 9 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
 %> - FACTOR 10 (complex) SPARSE, size 1024x1024, density 0.000976562, nnz 1024
 %>
-%> @b see also: bitrev_perm, matfaust.wht, matfaust.dct, matfaust.dst, fft, matfaust.rand_butterfly, matfaust.fact.butterfly
+%> @code
+%> >> dft(1024, 'normed', true) % is equiv. to next call
+%> >> normalize(dft(1024, 'normed', false))
+%> @endcode
+%>
+%> @b See @b also: bitrev_perm, matfaust.wht, matfaust.dct, matfaust.dst, fft, matfaust.rand_butterfly, matfaust.fact.butterfly
 %==========================================================================================
 function F = dft(n, varargin)
 	% check n (must be integer > 0)

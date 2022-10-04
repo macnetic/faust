@@ -1,6 +1,8 @@
 %==========================================================================================
 %> @brief Returns an anticirculant Faust A defined by the vector c (which is the last column of full(A)).
 %>
+%> @param c: the vector to define the circulant Faust. Its length must be a power of two.
+%>
 %> @b Example
 %>
 %> @code
