@@ -157,5 +157,12 @@ class TestLazyLinearOpFaust(unittest.TestCase):
         self.assertAlmostEqual(LA.norm(lchain.toarray() - mat_ref),
                                0)
 
+    def test_get_item(self):
+        n1 = self.lop.shape[0]//2
+        n2 = self.lop.shape[1]//2
+        lslice = self.lop[3:n1, 3:n2]
+        lsliceA = self.lopA[3:n1, 3:n2]
+        self.assertAlmostEqual(LA.norm(lslice.toarray()-lsliceA), 0)
+
 if '__main__' == __name__:
     unittest.main()

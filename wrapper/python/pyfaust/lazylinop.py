@@ -409,12 +409,11 @@ class LazyLinearOp:
         if isinstance(indices, tuple) and len(indices) == 2 and isinstance(indices[0], int) and isinstance(indices[1], int):
             return self.eval().__getitem__(indices)
         else:
-            self = self.__class__(init_lambda=lambda:
+            return self.__class__(init_lambda=lambda:
                                   (self._lambda_stack()).\
                                   __getitem__(indices),
                                   shape=(tuple(self.shape)),
                                   root_obj=self._root_obj)
-            return self
 
     def concatenate(self, op, axis=0):
         """
