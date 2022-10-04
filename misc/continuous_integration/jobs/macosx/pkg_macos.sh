@@ -23,7 +23,7 @@ otool -L wrapper/python/_FaustCorePy.cpython-*-darwin.so
 for f in wrapper/python/_FaustCorePy.cpython-*-darwin.so; do sudo install_name_tool -change @rpath/libiomp5.dylib /opt/local/lib/libomp/libomp.dylib $f;done
 otool -L wrapper/python/_FaustCorePy.cpython-*-darwin.so
 sudo rm -Rf /opt/local/faust # install dir
-'sudo make install LANG=en_GB.UTF-8'
+sudo make install LANG=en_GB.UTF-8
 # ensure libomp path also in install path
 #TODO: why doing it two times?
 for f in wrapper/python/_FaustCorePy.cpython-*-darwin.so;do sudo install_name_tool -change @rpath/libiomp5.dylib /opt/local/lib/libomp/libomp.dylib $f;done
