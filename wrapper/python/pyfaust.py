@@ -267,7 +267,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         if func not in HANDLED_FUNCTIONS:
             return NotImplemented
         # Note: this allows subclasses that don't override
-        # __array_function__ to handle MyArray objects
+        # __array_function__ to handle Faust objects
         if not all(issubclass(t, Faust) for t in types):
             return NotImplemented
         return HANDLED_FUNCTIONS[func](*args, **kwargs)
@@ -4328,6 +4328,4 @@ class FaustMulMode:
     ## This method is only available for the specific packages pyfaust_torch.
     TORCH_CPU_DENSE_DYNPROG_SPARSE_L2R=10
 
-# experimental block start
-from pyfaust.lazylinop import LazyLinearOp, LazyFaust
-# experimental block end
+from pyfaust.lazylinop import LazyLinearOp
