@@ -41,6 +41,14 @@
 %=========================================
 function D = dst(n, varargin)
     import matfaust.Faust
+	% check n (must be integer > 0)
+	if(~ isreal(n) || n < 0 || abs(n-floor(n)) > 0)
+		error('n must be an integer greater than zero')
+	end
+	log2n = floor(log2(n));
+	if(2^log2n < n)
+		error('n must be a power of 2')
+	end
 	normed = true; % normalization by default
 	dev = 'cpu';
 	argc = length(varargin);

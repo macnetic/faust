@@ -3593,6 +3593,9 @@ def dst(n, normed=True, dev='cpu', dtype='float64'):
             N_ //= 2
         return Faust(Bs+[bitrev_perm(N).astype(Bs[-1].dtype)], dev=dev)
 
+    log2n = np.floor(np.log2(n))
+    if(n > 2**log2n): raise ValueError("n must be a power of 2.")
+
     dtype = _sanitize_dtype(dtype)
 	# compute the DST (look at issue #265 for doc, S permutation was replaced by mod_fft to fix missing last frequency)
     MDFT = mod_fft(n, dev=dev)
