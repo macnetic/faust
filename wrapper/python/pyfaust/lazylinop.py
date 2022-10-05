@@ -423,10 +423,12 @@ class LazyLinearOp:
             axis: axis of concatenation (0 for rows, 1 for columns).
         """
         from pyfaust import concatenate as cat
+        new_shape = (self.shape[0] + op.shape[0] if axis == 0 else self.shape[0],
+                     self.shape[1] + op.shape[1] if axis == 1 else self.shape[1])
         new_op = self.__class__(init_lambda=lambda:
                                 cat((self._lambda_stack(),
                                      LazyLinearOp._eval_if_lazy(op)), axis=axis),
-                                shape=(tuple(self.shape)),
+                                shape=(new_shape),
                                 root_obj=self._root_obj)
         return new_op
 

@@ -140,10 +140,19 @@ class TestLazyLinearOpFaust(unittest.TestCase):
         self.assertAlmostEqual(LA.norm(lcat.toarray() - np.vstack((self.lopA,
                                                                    self.lop2A))),
                                0)
+        self.assertEqual(lcat.shape[0], self.lop.shape[0] + self.lop2.shape[0])
         lcat = self.lop.concatenate(self.lop2, axis=1)
         self.assertAlmostEqual(LA.norm(lcat.toarray() - np.hstack((self.lopA,
                                                                    self.lop2A))),
                                0)
+        self.assertEqual(lcat.shape[1], self.lop.shape[1] + self.lop2.shape[1])
+        # auto concat
+        lcat = self.lop.concatenate(self.lop, axis=0)
+        self.assertAlmostEqual(LA.norm(lcat.toarray() - np.vstack((self.lopA,
+                                                                   self.lopA))),
+                               0)
+        self.assertEqual(lcat.shape[0], self.lop.shape[0] + self.lop.shape[0])
+
 
     def test_chain_ops(self):
         lchain = self.lop + self.lop2
