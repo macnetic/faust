@@ -173,5 +173,11 @@ class TestLazyLinearOpFaust(unittest.TestCase):
         lsliceA = self.lopA[3:n1, 3:n2]
         self.assertAlmostEqual(LA.norm(lslice.toarray()-lsliceA), 0)
 
+    def test_real(self):
+        cF = pf.rand(10, 15, field='complex')
+        lcF = LazyLinearOp.create(cF)
+        lcF = lcF.real
+        self.assertAlmostEqual(LA.norm(lcF.toarray()-cF.real.toarray()), 0)
+
 if '__main__' == __name__:
     unittest.main()

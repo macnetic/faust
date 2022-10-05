@@ -119,7 +119,7 @@ class LazyLinearOp:
         self._checkattr('transpose')
         new_op = self.__class__(init_lambda=lambda:
                                 (self._lambda_stack()).transpose(),
-                                shape=(self.shape[1], self.shape[0]),
+                                shape=self.shape,
                                 root_obj=self._root_obj)
         return new_op
 
@@ -431,6 +431,20 @@ class LazyLinearOp:
                                 shape=(new_shape),
                                 root_obj=self._root_obj)
         return new_op
+
+
+    @property
+    def real(self):
+        """
+        Returns the LazyLinearOp for real.
+        """
+        self._checkattr('real')
+        new_op = self.__class__(init_lambda=lambda:
+                                (self._lambda_stack()).real,
+                                shape=self.shape,
+                                root_obj=self._root_obj)
+        return new_op
+
 
     @staticmethod
     def isLazyLinearOp(obj):
