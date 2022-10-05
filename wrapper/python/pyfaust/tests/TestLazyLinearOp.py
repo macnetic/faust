@@ -185,5 +185,12 @@ class TestLazyLinearOpFaust(unittest.TestCase):
         lcF = lcF.imag
         self.assertAlmostEqual(LA.norm(lcF.toarray()-cF.imag.toarray()), 0)
 
+    def test_aslazylinop(self):
+        from pyfaust.lazylinop import asLazyLinearOp
+        cF = pf.rand(10, 15, field='complex')
+        lcF = asLazyLinearOp(cF)
+        self.assertTrue(pf.lazylinop.isLazyLinearOp(lcF))
+        self.assertEqual(cF.shape, lcF.shape)
+
 if '__main__' == __name__:
     unittest.main()

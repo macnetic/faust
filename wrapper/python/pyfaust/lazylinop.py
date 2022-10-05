@@ -507,3 +507,9 @@ def isLazyLinearOp(obj):
     Returns True if obj is a LazyLinearOp, False otherwise.
     """
     return LazyLinearOp.isLazyLinearOp(obj)
+
+def asLazyLinearOp(obj):
+    """
+    Creates a LazyLinearOp based on the object obj which must be of a linear operator compatible type.
+    """
+    return LazyLinearOp.create(obj)
