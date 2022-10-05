@@ -445,6 +445,18 @@ class LazyLinearOp:
                                 root_obj=self._root_obj)
         return new_op
 
+    @property
+    def imag(self):
+        """
+        Returns the LazyLinearOp for imag.
+        """
+        self._checkattr('imag')
+        new_op = self.__class__(init_lambda=lambda:
+                                (self._lambda_stack()).imag,
+                                shape=self.shape,
+                                root_obj=self._root_obj)
+        return new_op
+
 
     @staticmethod
     def isLazyLinearOp(obj):

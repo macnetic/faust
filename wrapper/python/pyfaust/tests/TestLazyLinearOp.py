@@ -179,5 +179,11 @@ class TestLazyLinearOpFaust(unittest.TestCase):
         lcF = lcF.real
         self.assertAlmostEqual(LA.norm(lcF.toarray()-cF.real.toarray()), 0)
 
+    def test_imag(self):
+        cF = pf.rand(10, 15, field='complex')
+        lcF = LazyLinearOp.create(cF)
+        lcF = lcF.imag
+        self.assertAlmostEqual(LA.norm(lcF.toarray()-cF.imag.toarray()), 0)
+
 if '__main__' == __name__:
     unittest.main()
