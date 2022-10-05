@@ -8,6 +8,7 @@
 %> @param c: the first column of the toeplitz Faust.
 %> @param r: (2nd argument) the first row of the toeplitz Faust. Defaulty r = conj(c).
 %> r(1) is ignored, the first row is always [c(1), r(2:)].
+%> @param 'dev', str: 'gpu' or 'cpu' to create the Faust on CPU or GPU ('cpu' is the default).
 %>
 %>
 %> @retval T the toeplitz Faust.
@@ -100,11 +101,33 @@
 %> @b See also matfaust.circ, matfaust.anticirc
 %=========================================
 function T = toeplitz(c, varargin)
+	dev = 'cpu';
     if (length(varargin) > 0)
         r = varargin{1};
         if(~ ismatrix(r) || size(r, 1) ~= 1 && size(r, 2) ~= 1)
             error('The second argument must be a vector')
         end
+		argc = length(varargin);
+		if(argc > 1)
+			for i=2:2:argc
+				if(argc > i)
+					% next arg (value corresponding to the key varargin{i})
+					tmparg = varargin{i+1};
+				end
+				switch(varargin{i})
+					case 'dev'
+						if(argc == i || ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu'))
+							error('dev keyword argument is not followed by a valid value: cpu, gpu*.')
+						else
+							dev = tmparg;
+						end
+					otherwise
+						if((isstr(varargin{i}) || ischar(varargin{i}))  && ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu'))
+							error([ tmparg ' unrecognized argument'])
+						end
+				end
+			end
+		end
     else
         r = conj(c); % default r
     end
@@ -127,4 +150,7 @@ function T = toeplitz(c, varargin)
     c_ = [c, zeros(1, N-m+1+N-n), r(end:-1:2)];
     C = matfaust.circ(c_);
     T = C(1:m, 1:n);
+	if startsWith(dev, 'gpu')
+		T = clone(T, 'dev', 'gpu');
+	end
 end

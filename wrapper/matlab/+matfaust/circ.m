@@ -2,6 +2,7 @@
 %> @brief Returns a circulant Faust C defined by the vector c (which is the first column of full(C)).
 %>
 %> @param c: the vector to define the circulant Faust. Its length must be a power of two.
+%> @param 'dev', str: 'gpu' or 'cpu' to create the Faust on CPU or GPU ('cpu' is the default).
 %>
 %> @b Example:
 %>
@@ -53,8 +54,30 @@
 %>
 %> @b See also matfaust.anticirc, matfaust.toeplitz
 %==========================================================================================
-function C = circ(c)
+function C = circ(c, varargin)
 	import matfaust.Faust
+	dev = 'cpu';
+	argc = length(varargin);
+	if(argc > 0)
+		for i=1:2:argc
+			if(argc > i)
+				% next arg (value corresponding to the key varargin{i})
+				tmparg = varargin{i+1};
+			end
+			switch(varargin{i})
+				case 'dev'
+					if(argc == i || ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu'))
+						error('dev keyword argument is not followed by a valid value: cpu, gpu*.')
+					else
+						dev = tmparg;
+					end
+				otherwise
+					if((isstr(varargin{i}) || ischar(varargin{i}))  && ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu'))
+						error([ tmparg ' unrecognized argument'])
+					end
+			end
+		end
+	end
     log2c = log2(numel(c));
     if(log2c ~= floor(log2c))
         error('Only power of two length vectors are supported')
@@ -82,5 +105,8 @@ function C = circ(c)
 		C = left(F, nf-1) * Faust(factors(F, nf) * S * factors(FH, 1) * factors(FH, 2)) * Faust(right(FH, 3));
 	else
 		C = Faust(left(F, nf-1)) * Faust(factors(F, nf) * S * factors(FH, 1) * factors(FH, 2));
+	end
+	if startsWith(dev, 'gpu')
+		C = clone(C, 'dev', 'gpu');
 	end
 end

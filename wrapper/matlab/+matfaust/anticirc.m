@@ -2,6 +2,7 @@
 %> @brief Returns an anticirculant Faust A defined by the vector c (which is the last column of full(A)).
 %>
 %> @param c: the vector to define the circulant Faust. Its length must be a power of two.
+%> @param 'dev', str: 'gpu' or 'cpu' to create the Faust on CPU or GPU ('cpu' is the default).
 %>
 %> @b Example
 %>
@@ -53,7 +54,29 @@
 %>
 %> @b See also matfaust.circ, matfaust.toeplitz
 %==========================================================================================
-function A = anticirc(c)
+function A = anticirc(c, varargin)
+	dev = 'cpu';
+	argc = length(varargin);
+	if(argc > 0)
+		for i=1:2:argc
+			if(argc > i)
+				% next arg (value corresponding to the key varargin{i})
+				tmparg = varargin{i+1};
+			end
+			switch(varargin{i})
+				case 'dev'
+					if(argc == i || ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu'))
+						error('dev keyword argument is not followed by a valid value: cpu, gpu*.')
+					else
+						dev = tmparg;
+					end
+				otherwise
+					if((isstr(varargin{i}) || ischar(varargin{i}))  && ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu'))
+						error([ tmparg ' unrecognized argument'])
+					end
+			end
+		end
+	end
 	C = matfaust.circ(c);
 	n = numel(c);
 	I = n:-1:1;
@@ -61,4 +84,7 @@ function A = anticirc(c)
 	P = sparse(I, J, 1);
 	N = numfactors(C);
 	A = left(C, N-1) * matfaust.Faust(factors(C, N) * P);
+	if startsWith(dev, 'gpu')
+		A = clone(A, 'dev', 'gpu');
+	end
 end

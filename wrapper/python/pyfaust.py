@@ -3627,12 +3627,13 @@ def dst(n, normed=True, dev='cpu', dtype='float64'):
         F = F.astype(dtype)
     return F
 
-def circ(c):
+def circ(c, dev='cpu'):
     """Returns a circulant Faust C defined by the vector c (which is the first
     column of C.toarray()).
 
     Args:
         c: the vector to define the circulant Faust. Its length must be a power of two.
+        dev: the device on which the Faust is created, 'cpu' (default) or 'gpu'.
 
     Example:
         >>> from pyfaust import circ
@@ -3700,13 +3701,16 @@ def circ(c):
         else:
             C = Faust(F.left(nf-2)) @ Faust(F.factors(nf-1) @ S @ FH.factors(0) @
                                      FH.factors(1))
+    if dev.startswith('gpu'):
+        return C.clone('gpu')
     return C
 
-def anticirc(c):
+def anticirc(c, dev='cpu'):
     """Returns an anti-circulant Faust A defined by the vector c (which is the last column of A.toarray()).
 
     Args:
         c: the vector to define the circulant Faust. Its length must be a power of two.
+        dev: the device on which the Faust is created, 'cpu' (default) or 'gpu'.
 
     Example:
         >>> from pyfaust import anticirc
@@ -3744,9 +3748,13 @@ def anticirc(c):
     I = np.arange(len(c)-1, -1, -1)
     J = np.arange(0, len(c))
     P = csr_matrix((np.ones(J.size), (I, J)))
-    return G.left(len(G)-2)@Faust(G.factors(len(G)-1)@P)
+    A = G.left(len(G)-2)@Faust(G.factors(len(G)-1)@P)
+    if dev.startswith('gpu'):
+        return A.clone('gpu')
+    return A
 
-def toeplitz(c, r=None):
+
+def toeplitz(c, r=None, dev='cpu'):
     """Constructs a toeplitz Faust whose first column is c and first row r.
 
     Args:
@@ -3754,6 +3762,7 @@ def toeplitz(c, r=None):
         r: the first row of the toeplitz Faust. If none then r =
         np.conjugate(c). r[0] is ignored, the first row is always [c[0],
         r[1:]].
+        dev: the device on which the Faust is created, 'cpu' (default) or 'gpu'.
 
     Returns:
         The toeplitz Faust.
@@ -3839,7 +3848,10 @@ def toeplitz(c, r=None):
     N = int(2**np.ceil(np.log2(max(m, n))))
     c_ = np.hstack((c, np.zeros(N-m+1+N-n), r[:0:-1]))
     C = circ(c_)
-    return C[:m, :n]
+    T = C[:m, :n]
+    if dev.startswith('gpu'):
+        return T.clone('gpu')
+    return T
 
 def eye(m, n=None, dtype='float64',  dev="cpu"):
     """
@@ -3912,7 +3924,7 @@ def rand_bsr(num_rows, num_cols, bnrows, bncols, num_factors=None, density=.1,
                     num_factors[0] and num_factors[1] (inclusively).
                     If num_factors is None then 5 factors are generated.
         density: the Faust factor density (it determines the number of nonzero blocks). It must be between 0 and 1.
-        dev: the device on which the Faust is created.
+        dev: the device on which the Faust is created, 'cpu' (default) or 'gpu'.
         dtype: the numpy dtype of the Faust.
 
     Example:
