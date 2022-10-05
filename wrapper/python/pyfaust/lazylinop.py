@@ -540,3 +540,29 @@ def asLazyLinearOp(obj):
     Creates a LazyLinearOp based on the object obj which must be of a linear operator compatible type.
     """
     return LazyLinearOp.create(obj)
+
+def hstack(lop1, obj):
+    """
+    Concatenates lop1 and obj horizontally.
+
+    Args:
+        lop1: a LazyLinearOp object.
+        obj: any array / matrix / LazyLinearOp compatible in dimensions.
+    """
+    if isLazyLinearOp(lop1):
+        return lop1.concatenate(obj, axis=1)
+    else:
+        raise TypeError('lop1 must be a LazyLinearOp')
+
+def vstack(lop1, obj):
+    """
+    Concatenates lop1 and obj vertically.
+
+    Args:
+        lop1: a LazyLinearOp object.
+        obj: any array / matrix / LazyLinearOp compatible in dimensions.
+    """
+    if isLazyLinearOp(lop1):
+        return lop1.concatenate(obj, axis=0)
+    else:
+        raise TypeError('lop1 must be a LazyLinearOp')

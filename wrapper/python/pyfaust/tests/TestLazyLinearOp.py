@@ -1,6 +1,6 @@
 import unittest
 import pyfaust as pf
-from pyfaust.lazylinop import LazyLinearOp
+from pyfaust.lazylinop import LazyLinearOp, vstack, hstack
 import numpy.linalg as LA
 import numpy as np
 
@@ -152,6 +152,18 @@ class TestLazyLinearOpFaust(unittest.TestCase):
                                                                    self.lopA))),
                                0)
         self.assertEqual(lcat.shape[0], self.lop.shape[0] + self.lop.shape[0])
+        # using hstack and vstack
+        lcat = vstack(self.lop, self.lop2)
+        self.assertAlmostEqual(LA.norm(lcat.toarray() - np.vstack((self.lopA,
+                                                                   self.lop2A))),
+                               0)
+        self.assertEqual(lcat.shape[0], self.lop.shape[0] + self.lop2.shape[0])
+        lcat = hstack(self.lop, self.lop2)
+        self.assertAlmostEqual(LA.norm(lcat.toarray() - np.hstack((self.lopA,
+                                                                   self.lop2A))),
+                               0)
+        self.assertEqual(lcat.shape[1], self.lop.shape[1] + self.lop2.shape[1])
+
 
 
     def test_chain_ops(self):
