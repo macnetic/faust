@@ -1,8 +1,9 @@
 ## @package pyfaust.lazylinop @brief The pyfaust module for lazy linear operators.
 
 import numpy as np
+from scipy.sparse.linalg import LinearOperator
 
-class LazyLinearOp:
+class LazyLinearOp(LinearOperator):
     """
     This class implements a lazy linear operator.
 
@@ -21,8 +22,10 @@ class LazyLinearOp:
         <b>See also:</b> LazyLinearOp.create.
         """
         self._lambda_stack = init_lambda
-        self._shape = shape
+        self.shape = shape
         self._root_obj = root_obj
+        self.dtype = None
+        super(LazyLinearOp, self).__init__(self.dtype, self.shape)
 
     @staticmethod
     def create(obj):
@@ -99,13 +102,6 @@ class LazyLinearOp:
         return o.eval() if isinstance(o, LazyLinearOp) else o
 
     @property
-    def shape(self):
-        """
-        Returns the shape of the LazyLinearOp.
-        """
-        return self._shape
-
-    @property
     def ndim(self):
         """
         Returns the number of dimensions of the LazyLinearOp.
@@ -161,9 +157,15 @@ class LazyLinearOp:
     @property
     def H(self):
         """
-        Returns the LazyLinearOp adjoint.
+        The LazyLinearOp adjoint.
         """
         return self.getH()
+
+    def _adjoint(self):
+        """
+        Returns the LazyLinearOp adjoint.
+        """
+        return self.H
 
     def __add__(self, op):
         """
@@ -306,6 +308,31 @@ class LazyLinearOp:
             raise ValueError('op must be a vector -- attribute ndim to 1 or'
                              ' shape[0] or shape[1] to 1')
         return self.__matmul__(op)
+
+    def _rmatvec(self, op):
+        """
+        Returns self^H @ v, where self^H is the conjugate transpose of A.
+        LinearOperator need.
+        """
+        return self.H @ op
+
+    def _matmat(self, op):
+        """
+        See matmat.
+        LinearOperator need.
+        """
+        if not hasattr(op, 'shape') or not hasattr(op, 'ndim'):
+            raise TypeError('op must have shape and ndim attributes')
+        if op.ndim > 2 or op.ndim == 0:
+            raise ValueError('op.ndim must be 1 or 2')
+        return self.__matmul__(op)
+
+    def _rmatmat(self, op):
+        """
+        Returns self^H @ v, where self^H is the conjugate transpose of A.
+        LinearOperator need.
+        """
+        return self.H @ op
 
     def __imatmul__(self, op):
         """
