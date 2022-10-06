@@ -263,7 +263,6 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         return self
 
     def __array_function__(self, func, types, args, kwargs):
-        print("__array_function__")
         if func not in HANDLED_FUNCTIONS:
             return NotImplemented
         # Note: this allows subclasses that don't override
@@ -1564,63 +1563,63 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         empty_faust_except = Exception("Cannot create empty Faust.")
         idx_error_exception = IndexError("only integers, slices (`:`), ellipsis"
                                      " (`...`), and integer are valid indices")
-        if(isinstance(indices, np.ndarray)):
+        if isinstance(indices, np.ndarray):
             indices = list(indices)
-        if(indices == Ellipsis): # F[...]
+        if indices == Ellipsis: # F[...]
             out_indices = [slice(0,F.shape[0]), slice(0, F.shape[1])]
-        elif(isinstance(indices,int)): # F[i] # a row
+        elif isinstance(indices, int): # F[i] # a row
             out_indices = [slice(indices, indices+1), slice(0, F.shape[1])]
-        elif(isinstance(indices,slice)):
+        elif isinstance(indices, slice):
             #F[i:j] a group of contiguous lines
             out_indices = [indices, slice(0, F.shape[1])]
-        elif(isinstance(indices, list)):
+        elif isinstance(indices, list):
             out_indices = [indices, slice(0, F.shape[1])]
             #TODO: check indices are all integers lying into F shape
-        elif(isinstance(indices, tuple)):
-            if(len(indices) == 1):
+        elif isinstance(indices, tuple):
+            if len(indices) == 1:
                 return F.__getitem__(indices[0])
-            if(len(indices) == 2):
+            if len(indices) == 2:
                 out_indices = [0,0]
                 if(isinstance(indices[0], int) and isinstance(indices[1],int)):
                     if 'OPT_GET_ITEM' in environ and environ['OPT_GET_ITEM'] == '0':
                         return F.toarray()[indices[0],indices[1]]
                     else:
                         return F.m_faust.get_item(indices[0], indices[1])
-                if(isinstance(indices[0], np.ndarray)):
+                if isinstance(indices[0], np.ndarray):
                     indices = (list(indices[0]), indices[1])
-                if(isinstance(indices[1], np.ndarray)):
+                if isinstance(indices[1], np.ndarray):
                     indices = (indices[0], list(indices[1]))
-                if(indices[0] == Ellipsis):
-                    if(indices[1] == Ellipsis):
+                if indices[0] == Ellipsis:
+                    if indices[1] == Ellipsis:
                         raise IndexError('an index can only have a single ellipsis '
                                          '(\'...\')')
                     else:
-                        # all lines
+                        # all rows
                         out_indices[0] = slice(0, F.shape[0])
-                elif(isinstance(indices[0], int)):
-                    # line F[i]
+                elif isinstance(indices[0], int):
+                    # row F[i]
                     out_indices[0] = slice(indices[0], indices[0]+1)
-                elif(isinstance(indices[0], slice)):
+                elif isinstance(indices[0], slice):
                     out_indices[0] = indices[0]
-                elif(isinstance(indices[0], list)):
-                    if(len(indices[0]) == 0): raise empty_faust_except
+                elif isinstance(indices[0], list):
+                    if len(indices[0]) == 0: raise empty_faust_except
                     out_indices[0] = indices[0]
                 else:
                      raise idx_error_exception
-                if(indices[1] == Ellipsis):
-                    # all lines
+                if indices[1] == Ellipsis:
+                    # all columns
                     out_indices[1] = slice(0, F.shape[1])
-                elif(isinstance(indices[1], int)):
-                    # line F[i]
+                elif isinstance(indices[1], int):
+                    # col F[i]
                     out_indices[1] = slice(indices[1], indices[1]+1)
-                elif(isinstance(indices[1], slice)):
+                elif isinstance(indices[1], slice):
                     out_indices[1] = indices[1]
-                elif(isinstance(indices[1], list)):
-                    if(isinstance(indices[0],list)): raise \
+                elif isinstance(indices[1], list):
+                    if isinstance(indices[0],list): raise \
                     Exception("F[list1,list2] error: fancy indexing "
                               "on both dimensions is not implemented "
                               "rather use F[list1][:,list2].")
-                    if(len(indices[1]) == 0): raise empty_faust_except
+                    if len(indices[1]) == 0: raise empty_faust_except
                     out_indices[1] = indices[1]
                 else:
                      raise idx_error_exception
@@ -1630,31 +1629,31 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             raise idx_error_exception
 
         for i in range(0,2):
-            if(isinstance(out_indices[i], slice)):
-                if(out_indices[i].start == None and out_indices[i].stop == None):
+            if isinstance(out_indices[i], slice):
+                if out_indices[i].start == None and out_indices[i].stop == None:
                     #F[::] or F[::,any] or F[any, ::]
                     out_indices[i] = slice(0,F.shape[i],out_indices[i].step)
-                elif(out_indices[i].start == None): # out_indices[i].stop != None
+                elif out_indices[i].start == None: # out_indices[i].stop != None
                     out_indices[i] = slice(0, out_indices[i].stop,
                                            out_indices[i].step)
-                elif(out_indices[i].stop == None): # out_indices[i].start != None
+                elif out_indices[i].stop == None: # out_indices[i].start != None
                     out_indices[i] = slice(out_indices[i].start,
                                            F.shape[i],out_indices[i].step)
-                if(out_indices[i].stop < 0):
+                if out_indices[i].stop < 0:
                     out_indices[i] = slice(out_indices[i].start,
                                            F.shape[i]+out_indices[i].stop,
                                            out_indices[i].step)
 
-                if(out_indices[i].step == None):
+                if out_indices[i].step == None:
                     out_indices[i] = slice(out_indices[i].start,
                                                 out_indices[i].stop,
                                                 1)
-                if(out_indices[i].start < 0):
+                if out_indices[i].start < 0 :
                     out_indices[i] = \
                     slice(F.shape[i]+out_indices[i].start,out_indices[i].stop,
                          out_indices[i].step)
 
-                if(out_indices[i].start >= F.shape[i] or out_indices[i].stop > F.shape[i]):
+                if out_indices[i].start >= F.shape[i] or out_indices[i].stop > F.shape[i]:
                     raise IndexError("index "+
                                      str(max(out_indices[i].start,out_indices[i].stop-1))+
                                      " is out of bounds for axis "+str(i)+" with size "+
@@ -1663,17 +1662,17 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                 # transform slice with neg. step to a list for using fancy
                 # indexing
                 # likewise for step > 1
-                if(out_indices[i].step < 0 or out_indices[i].step > 1):
+                if out_indices[i].step < 0 or out_indices[i].step > 1:
                     out_indices[i] = \
                     list(range(out_indices[i].start,out_indices[i].stop,out_indices[i].step))
-                    if(len(out_indices[i]) == 0): raise empty_faust_except
-                elif(out_indices[i].start >= out_indices[i].stop):
+                    if len(out_indices[i]) == 0: raise empty_faust_except
+                elif out_indices[i].start >= out_indices[i].stop :
                     raise empty_faust_except
-                elif(out_indices[i].step == 0):
+                elif out_indices[i].step == 0 :
                     raise ValueError("slice step cannot be zero")
 
-        if(isinstance(out_indices[0],list) or
-                      isinstance(out_indices[1], list)):
+        if isinstance(out_indices[0],list) or \
+                      isinstance(out_indices[1], list):
             sub_F = Faust(core_obj=F.m_faust.fancy_idx(out_indices))
         else:
             sub_F = Faust(core_obj=F.m_faust.slice(out_indices))

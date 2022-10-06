@@ -3,6 +3,8 @@
 import numpy as np
 from scipy.sparse.linalg import LinearOperator
 
+HANDLED_FUNCTIONS = {}
+
 class LazyLinearOp(LinearOperator):
     """
     This class implements a lazy linear operator.
@@ -173,8 +175,7 @@ class LazyLinearOp(LinearOperator):
         """
         self._checkattr('__add__')
         new_op = self.__class__(init_lambda=lambda:
-                                (self._lambda_stack()).\
-                                __add__(LazyLinearOp._eval_if_lazy(op)),
+                                self._lambda_stack() + LazyLinearOp._eval_if_lazy(op),
                                 shape=(tuple(self.shape)),
                                 root_obj=self._root_obj)
         return new_op
@@ -205,9 +206,7 @@ class LazyLinearOp(LinearOperator):
         Returns the LazyLinearOp for self - op.
         """
         self._checkattr('__sub__')
-        new_op = self.__class__(init_lambda=lambda:
-                                (self._lambda_stack()).\
-                                __sub__(LazyLinearOp._eval_if_lazy(op)),
+        new_op = self.__class__(init_lambda=lambda: self._lambda_stack() - LazyLinearOp._eval_if_lazy(op),
                                 shape=(tuple(self.shape)),
                                 root_obj=self._root_obj)
         return new_op
@@ -218,8 +217,8 @@ class LazyLinearOp(LinearOperator):
         """
         self._checkattr('__rsub__')
         new_op = self.__class__(init_lambda=lambda:
-                                (self._lambda_stack()).\
-                                __rsub__(LazyLinearOp._eval_if_lazy(op)),
+                                LazyLinearOp._eval_if_lazy(op) -
+                                self._lambda_stack(),
                                 shape=(tuple(self.shape)),
                                 root_obj=self._root_obj)
         return new_op
@@ -245,8 +244,7 @@ class LazyLinearOp(LinearOperator):
         """
         self._checkattr('__truediv__')
         new_op = self.__class__(init_lambda=lambda:
-                                (self._lambda_stack()).\
-                                __truediv__(LazyLinearOp._eval_if_lazy(op)),
+                                self._lambda_stack() / LazyLinearOp._eval_if_lazy(op),
                                 shape=(tuple(self.shape)),
                                 root_obj=self._root_obj)
         return new_op
@@ -378,8 +376,7 @@ class LazyLinearOp(LinearOperator):
            op.shape[0] == 1 and op.shape[1] == self.shape[1] or \
            op.shape[1] == 1 and op.shape[0] == self.shape[0]:
             new_op = self.__class__(init_lambda=lambda:
-                                    (self._lambda_stack()).\
-                                    __mul__(LazyLinearOp._eval_if_lazy(op)),
+                                    self._lambda_stack() * LazyLinearOp._eval_if_lazy(op),
                                     shape=(tuple(self.shape)),
                                     root_obj=self._root_obj)
             return new_op
@@ -397,11 +394,13 @@ class LazyLinearOp(LinearOperator):
            op.shape[1] == 1 and op.shape[0] == self.shape[0]:
             self._checkattr('__rmul__')
             new_op = self.__class__(init_lambda=lambda:
-                                    (self._lambda_stack()).\
-                                    __rmul__(LazyLinearOp._eval_if_lazy(op)),
+                                    LazyLinearOp._eval_if_lazy(op) *
+                                    self._lambda_stack(),
                                     shape=(tuple(self.shape)),
                                     root_obj=self._root_obj)
             return new_op
+        else:
+            raise ValueError('operands could not be broadcast together')
 
     def __imul__(self, op):
         """
@@ -421,11 +420,11 @@ class LazyLinearOp(LinearOperator):
         """
         Returns the numpy array resulting from self evaluation.
         """
-        self._checkattr('toarray')
         ev_op = self.eval()
         if isinstance(ev_op, np.ndarray):
             return ev_op
         else:
+            self._checkattr('toarray')
             return self.eval().toarray()
 
     def __getitem__(self, indices):
@@ -439,8 +438,84 @@ class LazyLinearOp(LinearOperator):
             return self.__class__(init_lambda=lambda:
                                   (self._lambda_stack()).\
                                   __getitem__(indices),
-                                  shape=(tuple(self.shape)),
+                                  shape=self._newshape_getitem(indices),
                                   root_obj=self._root_obj)
+
+    def _newshape_getitem(self, indices):
+        empty_lop_except = Exception("Cannot create an empty LazyLinearOp.")
+        if isinstance(indices, (np.ndarray, list)):
+            return (len(indices), self.shape[1])
+        elif indices == Ellipsis:
+            return self.shape
+        elif isinstance(indices,int):
+            # self[i] is a row
+            return (1, self.shape[1])
+        elif isinstance(indices, slice):
+            #self[i:j] a group of contiguous lines
+            start, stop, step = indices.start, indices.stop, indices.step
+            if stop is None:
+                stop = self.shape[0]
+            if start is None:
+                start = 0
+            if step is None:
+                step = 1
+            return ((stop - start) // step, self.shape[1])
+        elif isinstance(indices, tuple):
+            if len(indices) == 1:
+                return self._newshape_getitem(indices[0])
+            elif len(indices) == 2:
+                if(isinstance(indices[0], int) and isinstance(indices[1],int)):
+                    # item
+                    return (1, 1)
+            else:
+                raise IndexError('Too many indices.')
+
+            if indices[0] == Ellipsis:
+                if indices[1] == Ellipsis:
+                    raise IndexError('an index can only have a single ellipsis '
+                                     '(\'...\')')
+                else:
+                    # all rows
+                    new_shape = self.shape
+            elif isinstance(indices[0], int):
+                # line F[i]
+                new_shape = (1, self.shape[1])
+            elif isinstance(indices[0], slice):
+                start, stop, step = indices[0].start, indices[0].stop, indices[0].step
+                if stop is None:
+                    stop = self.shape[0]
+                if start is None:
+                    start = 0
+                if step is None:
+                    step = 1
+                new_shape = ((stop - start) // step, self.shape[1])
+            elif isinstance(indices[0], (list, np.ndarray)):
+                if len(indices[0]) == 0: raise empty_lop_except
+                new_shape = (len(indices[0]), self.shape[1])
+            else:
+                 raise idx_error_exception
+
+            if indices[1] == Ellipsis:
+                # all columns
+                new_shape = self.shape
+            elif isinstance(indices[1], int):
+                # col F[:, i]
+                new_shape = (new_shape[0], 1)
+            elif isinstance(indices[1], slice):
+                start, stop, step = indices[1].start, indices[1].stop, indices[1].step
+                if stop is None:
+                    stop = self.shape[1]
+                if start is None:
+                    start = 0
+                if step is None:
+                    step = 1
+                new_shape = (new_shape[0], (stop - start) // step)
+            elif isinstance(indices[1], (list, np.ndarray)):
+                if len(indices[1]) == 0: raise empty_lop_except
+                new_shape = (new_shape[0], len(indices[1]))
+            else:
+                 raise idx_error_exception
+            return new_shape
 
     def concatenate(self, op, axis=0):
         """
@@ -538,6 +613,9 @@ def isLazyLinearOp(obj):
 def asLazyLinearOp(obj):
     """
     Creates a LazyLinearOp based on the object obj which must be of a linear operator compatible type.
+
+    Args:
+        obj: it can be a ndarray (ndim == 2), a Faust or a scipy matrix.
     """
     return LazyLinearOp.create(obj)
 
