@@ -13,6 +13,8 @@ class LazyLinearOp(LinearOperator):
 
     For creation and evaluation look at LazyLinearOp.create and
     LazyLinearOp.eval.
+
+    Warning: this code is in a beta status.
     """
     def __init__(self, init_lambda, shape, root_obj):
         """
