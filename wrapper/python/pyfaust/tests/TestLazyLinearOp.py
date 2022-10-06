@@ -25,6 +25,8 @@ class TestLazyLinearOpFaust(unittest.TestCase):
         self.assertAlmostEqual(LA.norm(lopT.toarray()-self.lopA.T), 0)
         lopT = self.lop.transpose()
         self.assertAlmostEqual(LA.norm(lopT.toarray()-self.lopA.T), 0)
+        self.assertEqual(self.lop.shape[0], lopT.shape[1])
+        self.assertEqual(self.lop.shape[1], lopT.shape[0])
 
     def test_conj(self):
         lopC = self.lop.conj()
@@ -35,6 +37,8 @@ class TestLazyLinearOpFaust(unittest.TestCase):
         self.assertAlmostEqual(LA.norm(lopH.toarray()-self.lopA.conj().T), 0)
         lopH = self.lop.getH()
         self.assertAlmostEqual(LA.norm(lopH.toarray()-self.lopA.conj().T), 0)
+        self.assertEqual(self.lop.shape[0], lopH.shape[1])
+        self.assertEqual(self.lop.shape[1], lopH.shape[0])
 
     def test_add(self):
         ladd = self.lop + self.lop2

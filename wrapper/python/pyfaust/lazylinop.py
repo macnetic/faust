@@ -14,7 +14,7 @@ class LazyLinearOp(LinearOperator):
     For creation and evaluation look at LazyLinearOp.create and
     LazyLinearOp.eval.
     """
-    def __init__(self, init_lambda = None, shape=(0,0), root_obj=None):
+    def __init__(self, init_lambda, shape, root_obj):
         """
         Constructor. Not meant to be used directly.
 
@@ -117,7 +117,7 @@ class LazyLinearOp(LinearOperator):
         self._checkattr('transpose')
         new_op = self.__class__(init_lambda=lambda:
                                 (self._lambda_stack()).transpose(),
-                                shape=self.shape,
+                                shape=(self.shape[1], self.shape[0]),
                                 root_obj=self._root_obj)
         return new_op
 
@@ -135,7 +135,7 @@ class LazyLinearOp(LinearOperator):
         self._checkattr('conj')
         new_op = self.__class__(init_lambda=lambda:
                                 (self._lambda_stack()).conj(),
-                                shape=(tuple(self.shape)),
+                                shape=self.shape,
                                 root_obj=self._root_obj)
         return new_op
 
@@ -152,7 +152,7 @@ class LazyLinearOp(LinearOperator):
         self._checkattr('getH')
         new_op = self.__class__(init_lambda=lambda:
                                 (self._lambda_stack()).getH(),
-                                shape=(tuple(self.shape)),
+                                shape=(self.shape[1], self.shape[0]),
                                 root_obj=self._root_obj)
         return new_op
 
