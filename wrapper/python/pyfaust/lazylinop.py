@@ -11,7 +11,7 @@ class LazyLinearOp(LinearOperator):
 
     The evaluation of any defined operation is delayed.
 
-    For creation and evaluation look at LazyLinearOp.create and
+    For creation and evaluation look at pyfaust.lazylinop.asLazyLinearOp and
     LazyLinearOp.eval.
 
     Warning: this code is in a beta status.
