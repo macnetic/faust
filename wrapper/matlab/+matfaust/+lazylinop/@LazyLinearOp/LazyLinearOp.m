@@ -10,10 +10,10 @@
 % ======================================================================
 classdef LazyLinearOp
 	properties (SetAccess = private, Hidden = true)
-		lambda_stack
-		root_obj
-		shape
-		class % reserved but not used
+		lambda_stack;
+		root_obj;
+		shape;
+		class; % reserved but not used
 	end
 	methods
 		function L = LazyLinearOp(init_lambda, shape, root_obj)
@@ -24,10 +24,13 @@ classdef LazyLinearOp
 		end
 
 		function check_meth(obj, meth)
-			b = any(ismember(methods(obj), meth));
-			if ~ b
+			if ~ is_meth(obj, meth)
 				error(meth+' is not supported by the rootobject of this LazyLinearOp')
 			end
+		end
+
+		function b = is_meth(obj, meth)
+			b = any(ismember(methods(obj), meth));
 		end
 
 		function s = size(L, varargin)
@@ -49,7 +52,7 @@ classdef LazyLinearOp
 			import matfaust.lazylinop.LazyLinearOp
 			check_meth(L, 'ctranspose');
 			Ls = size(L);
-			LT = LazyLinearOp(@() ctranspose(L.lambda_stack()), [Ls(2), Ls(1)], L.root_obj);
+			LCT = LazyLinearOp(@() ctranspose(L.lambda_stack()), [Ls(2), Ls(1)], L.root_obj);
 		end
 
 		function LC = conj(L)
@@ -61,20 +64,20 @@ classdef LazyLinearOp
 
 		function Lp = plus(L, op)
 			import matfaust.lazylinop.LazyLinearOp
-			check_meth(L, 'plus')
+			check_meth(L, 'plus');
 			if ~ all(size(op) == [1, 1]) && ~ all(size(L) == size(op))
 				error('Dimensions must agree')
 			end
 			Lp = LazyLinearOp(@() L.lambda_stack() + LazyLinearOp.eval_if_lazy(op), size(L), L.root_obj);
 		end
 
-		function LUP = uplus(L) 
+		function LUP = uplus(L)
 			LUP = L;
 		end
 
 		function Lm = minus(L, op)
 			import matfaust.lazylinop.LazyLinearOp
-			check_meth(L, 'minus')
+			check_meth(L, 'minus');
 			if ~ all(size(op) == [1, 1]) && ~ all(size(L) == size(op))
 				error('Dimensions must agree')
 			end
@@ -87,7 +90,11 @@ classdef LazyLinearOp
 
 		function Lm = mtimes(L, op)
 			import matfaust.lazylinop.LazyLinearOp
-			check_meth(L, 'mtimes')
+			if isscalar(L) && LazyLinearOp.isLazyLinearOp(op)
+				Lm = mtimes(op, L);
+				return;
+			end
+			check_meth(L, 'mtimes');
 			op_is_scalar = all(size(op) == [1, 1]);
 			if ~ op_is_scalar && ~ all(size(L, 2) == size(op, 1))
 				error('Dimensions must agree')
@@ -97,7 +104,12 @@ classdef LazyLinearOp
 			else
 				new_size = [size(L, 1), size(op, 2)];
 			end
-			Lm = LazyLinearOp(@() L.lambda_stack() * LazyLinearOp.eval_if_lazy(op), new_size, L.root_obj);
+			if ~ LazyLinearOp.isLazyLinearOp(op) && ismatrix(op) && isnumeric(op) && ~ issparse(op) && any(size(op) ~= [1, 1])
+				% op is a dense matrix that is not limited to one element
+				Lm = eval(L) * op;
+			else
+				Lm = LazyLinearOp(@() L.lambda_stack() * LazyLinearOp.eval_if_lazy(op), new_size, L.root_obj);
+			end
 		end
 
 		function Lm = mrdivide(L, s)
@@ -109,12 +121,17 @@ classdef LazyLinearOp
 
 		function D = full(L)
 			D = eval(L);
+			if is_meth(L, 'full');
+				D = full(D);
+			else
+				error('full is not available on the result of eval')
+			end
 		end
 
 		function SUB = subsref(L, S)
 
 			import matfaust.lazylinop.LazyLinearOp
-			check_meth(L, 'subsref')
+			check_meth(L, 'subsref');
 
 			if (~isfield(S,'type')) | (~isfield(S,'subs'))
 				error(' subsref invalid structure S missing field type or subs');
@@ -192,42 +209,49 @@ classdef LazyLinearOp
 			SUB = LazyLinearOp(@() subsref(L.lambda_stack(), S) , new_shape, L.root_obj);
 		end
 
-		function LH = horzcat(L, O)
+		function LH = horzcat(varargin)
 			import matfaust.lazylinop.LazyLinearOp
-			check_meth(L, 'horzcat')
-			LH = cat(2, L, O)
+			check_meth(varargin{1}, 'horzcat');
+			LH = cat(2, varargin{1}, varargin{2:end});
 		end
 
-		function LV = vertcat(L, O)
+		function LV = vertcat(varargin)
 			import matfaust.lazylinop.LazyLinearOp
-			check_meth(L, 'vertcat')
-			LV = cat(1, L, O)
+			check_meth(varargin{1}, 'vertcat');
+			LV = cat(1, varargin{1}, varargin{2:end});
 		end
 
-		function LC = cat(dim, L, O)
+		function LC = cat(varargin)
 			import matfaust.lazylinop.LazyLinearOp
-			if dim == 1
-				odim = 2;
-				new_size = [size(L, 1) + size(O, 1), size(L, 2)];
-			elseif dim == 2
-				odim = 1;
-				new_size = [size(L, 1), size(L, 2) + size(O, 2)];
+			dim = varargin{1};
+			L = varargin{2};
+			check_meth(L, 'cat');
+			for i=3:nargin
+				O = varargin{i};
+				if dim == 1
+					odim = 2;
+					new_size = [size(L, 1) + size(O, 1), size(L, 2)];
+				elseif dim == 2
+					odim = 1;
+					new_size = [size(L, 1), size(L, 2) + size(O, 2)];
+				end
+				if ~ all(size(L, odim) == size(O, odim))
+					error('Dimensions must agree')
+				end
+				LC = LazyLinearOp(@() cat(dim, L.lambda_stack(), LazyLinearOp.eval_if_lazy(O)), new_size, L.root_obj);
+				L = LC;
 			end
-			if ~ all(size(L, odim) == size(O, odim))
-				error('Dimensions must agree')
-			end
-			LC = LazyLinearOp(@() cat(dim, L.lambda_stack(), LazyLinearOp.eval_if_lazy(O)), new_size, L.root_obj);
 		end
 
 		function LR = real(L)
 			import matfaust.lazylinop.LazyLinearOp
-			check_meth(L, 'real')
+			check_meth(L, 'real');
 			LR = LazyLinearOp(@() real(L.lambda_stack()) , L.shape, L.root_obj);
 		end
 
 		function LI = imag(L)
 			import matfaust.lazylinop.LazyLinearOp
-			check_meth(L, 'real')
+			check_meth(L, 'real');
 			LI = LazyLinearOp(@() imag(L.lambda_stack()) , L.shape, L.root_obj);
 		end
 
