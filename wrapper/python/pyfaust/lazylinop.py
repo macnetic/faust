@@ -7,23 +7,28 @@ HANDLED_FUNCTIONS = {}
 
 class LazyLinearOp(LinearOperator):
     """
-    This class implements a lazy linear operator.
+    This class implements a lazy linear operator. A LazyLinearOp is a
+    specialization of a <a
+    href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html">scipy.linalg.LinearOperator</a>.
 
-    The evaluation of any defined operation is delayed.
+    The evaluation of any defined operation is delayed until a multiplication
+    by a dense matrix/vector, a call of LazyLinearOp.toarray or an explicit
+    evaluation through LazyLinearOp.eval.
 
-    For creation and evaluation look at pyfaust.lazylinop.asLazyLinearOp and
-    LazyLinearOp.eval.
+    To instantiate a LazyLinearOp look at pyfaust.lazylinop.asLazyLinearOp.
 
-    Warning: this code is in a beta status.
+    Warning: This code is in a beta status.
     """
     def __init__(self, init_lambda, shape, root_obj):
         """
         Constructor. Not meant to be used directly.
 
         Args:
-            init_lambda: starting operation
+            init_lambda: starting operation.
+            shape: the initial shape of the operator.
+            root_obj: the initial object the operator is based on.
 
-        <b>See also:</b> LazyLinearOp.create.
+        <b>See also:</b> LazyLinearOp.create, pyfaust.lazylinop.asLazyLinearOp.
         """
         self._lambda_stack = init_lambda
         self.shape = shape
@@ -37,10 +42,13 @@ class LazyLinearOp(LinearOperator):
         Creates a Lazy linear operator.
 
         NOTE: obj must support operations and attributes defined in this class.
+        Any operation not supported would raise an exception at the evaluation
+        time.
 
         Args:
             obj: the root object on which the LazyLinearOp is based (it could
-            be a numpy array, a scipy matrix, a Faust object).
+            be a numpy array, a scipy matrix, a Faust object or almost any
+            object that supports the same kind of functions).
 
         Returns:
             a LazyLinearOp instance based on obj.
@@ -55,7 +63,7 @@ class LazyLinearOp(LinearOperator):
             <pyfaust.lazylinop.LazyLinearOp at 0x7fcd7d7750f0>
             >>> import pyfaust as pf
             >>> F = pf.rand(10, 12)
-            >>> lF = LazyLinearOp.create(M)
+            >>> lF = LazyLinearOp.create(F)
             >>> twolF = lF + lF
             >>> twolF
             <pyfaust.lazylinop.LazyLinearOp at 0x7fcd7d774730>
@@ -68,7 +76,7 @@ class LazyLinearOp(LinearOperator):
         evaluated.
 
         Returns:
-            a "real" linear operator object (which the type depends of the
+            a linear operator object (which the type depends of the
             LazyLinearOp initialization through LazyLinearOp.create and the
             operations made upon this object).
 
@@ -103,12 +111,12 @@ class LazyLinearOp(LinearOperator):
 
     @staticmethod
     def _eval_if_lazy(o):
-        return o.eval() if isinstance(o, LazyLinearOp) else o
+        return o.eval() if isLazyLinearOp(o) else o
 
     @property
     def ndim(self):
         """
-        Returns the number of dimensions of the LazyLinearOp.
+        Returns the number of dimensions of the LazyLinearOp (it always 2).
         """
         return 2
 
@@ -149,7 +157,7 @@ class LazyLinearOp(LinearOperator):
 
     def getH(self):
         """
-        Returns the LazyLinearOp adjoint.
+        Returns the LazyLinearOp adjoint/transconjugate.
         """
         self._checkattr('getH')
         new_op = self.__class__(init_lambda=lambda:
@@ -161,19 +169,23 @@ class LazyLinearOp(LinearOperator):
     @property
     def H(self):
         """
-        The LazyLinearOp adjoint.
+        The LazyLinearOp adjoint/transconjugate.
         """
         return self.getH()
 
     def _adjoint(self):
         """
-        Returns the LazyLinearOp adjoint.
+        Returns the LazyLinearOp adjoint/transconjugate.
         """
         return self.H
 
     def __add__(self, op):
         """
         Returns the LazyLinearOp for self + op.
+
+        Args:
+            op: an object compatible with self for this binary operation.
+
         """
         self._checkattr('__add__')
         new_op = self.__class__(init_lambda=lambda:
@@ -185,6 +197,10 @@ class LazyLinearOp(LinearOperator):
     def __radd__(self, op):
         """
         Returns the LazyLinearOp for op + self.
+
+        Args:
+            op: an object compatible with self for this binary operation.
+
         """
         return self.__add__(op)
 
@@ -193,7 +209,7 @@ class LazyLinearOp(LinearOperator):
         Not Implemented self += op.
         """
         raise NotImplementedError(self.__class__.__name__+".__iadd__")
-# can't do as follows, it recurses indefinitely because on self.eval
+# can't do as follows, it recurses indefinitely because of self.eval
 #        self._checkattr('__iadd__')
 #        self = self.__class__(init_lambda=lambda:
 #                              (self._lambda_stack()).\
@@ -206,6 +222,10 @@ class LazyLinearOp(LinearOperator):
     def __sub__(self, op):
         """
         Returns the LazyLinearOp for self - op.
+
+        Args:
+            op: an object compatible with self for this binary operation.
+
         """
         self._checkattr('__sub__')
         new_op = self.__class__(init_lambda=lambda: self._lambda_stack() - LazyLinearOp._eval_if_lazy(op),
@@ -216,6 +236,10 @@ class LazyLinearOp(LinearOperator):
     def __rsub__(self, op):
         """
         Returns the LazyLinearOp for op - self.
+
+        Args:
+            op: an object compatible with self for this binary operation.
+
         """
         self._checkattr('__rsub__')
         new_op = self.__class__(init_lambda=lambda:
@@ -230,7 +254,7 @@ class LazyLinearOp(LinearOperator):
         Not implemented self -= op.
         """
         raise NotImplementedError(self.__class__.__name__+".__isub__")
-# can't do as follows, it recurses indefinitely because on self.eval
+# can't do as follows, it recurses indefinitely because of self.eval
 #        self._checkattr('__isub__')
 #        self = self.__class__(init_lambda=lambda:
 #                              (self._lambda_stack()).\
@@ -243,6 +267,10 @@ class LazyLinearOp(LinearOperator):
     def __truediv__(self, op):
         """
         Returns the LazyLinearOp for self / op.
+
+        Args:
+            op: an object compatible with self for this binary operation.
+
         """
         self._checkattr('__truediv__')
         new_op = self.__class__(init_lambda=lambda:
@@ -256,7 +284,7 @@ class LazyLinearOp(LinearOperator):
         Not implemented self /= op.
         """
         raise NotImplementedError(self.__class__.__name__+".__itruediv__")
-# can't do as follows, it recurses indefinitely because on self.eval
+# can't do as follows, it recurses indefinitely because of self.eval
 #
 #        self._checkattr('__itruediv__')
 #        self = self.__class__(init_lambda=lambda:
@@ -268,8 +296,11 @@ class LazyLinearOp(LinearOperator):
 
     def __matmul__(self, op):
         """
-        Returns the LazyLinearOp for self @ op or the np.ndarray resulting
-        of the evaluation of self @ op if op is a np.ndarray.
+        Returns the LazyLinearOp for the multiplication self @ op or if op is a np.ndarray it returns the np.ndarray (self @ op).
+
+        Args:
+            op: an object compatible with self for this binary operation.
+
         """
         self._checkattr('__matmul__')
         if not hasattr(op, 'shape'):
@@ -287,18 +318,21 @@ class LazyLinearOp(LinearOperator):
 
     def dot(self, op):
         """
-        Returns the LazyLinearOp for self.dot(op) or the np.ndarray resulting
-        of the evaluation of self @ op if op is a np.ndarray.
+        Alias of LazyLinearOp.__matmul__.
         """
         return self.__matmul__(op)
 
     def matvec(self, op):
         """
-        Returns the LazyLinearOp for self.matvec(op) or the np.ndarray resulting
-        of the evaluation of self @ op if op is a np.ndarray.
+        Returns the LazyLinearOp for the multiplication self.matvec(op) or the np.ndarray
+        resulting of the evaluation of self.matvec(op) if op is a np.ndarray.
 
         Args:
             op: must be a vector (row or column).
+
+        <b>See also</b>: LazyLinearOp.__matmul__,<a
+        href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.matvec.html#scipy.sparse.linalg.LinearOperator.matvec">
+        scipy.linalg.LinearOperator.matvec</a>
         """
         if not hasattr(op, 'shape') or not hasattr(op, 'ndim'):
             raise TypeError('op must have shape and ndim attributes')
@@ -311,16 +345,16 @@ class LazyLinearOp(LinearOperator):
 
     def _rmatvec(self, op):
         """
-        Returns self^H @ v, where self^H is the conjugate transpose of A.
-        LinearOperator need.
+        Returns the LazyLinearOp for self^H @ v, where self^H is the conjugate transpose of A.
         """
+        # LinearOperator need.
         return self.H @ op
 
     def _matmat(self, op):
         """
-        See matmat.
-        LinearOperator need.
+        Alias of LazyLinearOp.__matmul__.
         """
+        # LinearOperator need.
         if not hasattr(op, 'shape') or not hasattr(op, 'ndim'):
             raise TypeError('op must have shape and ndim attributes')
         if op.ndim > 2 or op.ndim == 0:
@@ -329,9 +363,9 @@ class LazyLinearOp(LinearOperator):
 
     def _rmatmat(self, op):
         """
-        Returns self^H @ v, where self^H is the conjugate transpose of A.
-        LinearOperator need.
+        Returns the LazyLinearOp for self^H @ v, where self^H is the conjugate transpose of A.
         """
+        # LinearOperator need.
         return self.H @ op
 
     def __imatmul__(self, op):
@@ -339,7 +373,7 @@ class LazyLinearOp(LinearOperator):
         Not implemented self @= op.
         """
         raise NotImplementedError(self.__class__.__name__+".__imatmul__")
-# can't do as follows, it recurses indefinitely because on self.eval
+# can't do as follows, it recurses indefinitely because of self.eval
 #        self._checkattr('__imatmul__')
 #        self = self.__class__(init_lambda=lambda:
 #                              (self._lambda_stack()).\
@@ -351,6 +385,10 @@ class LazyLinearOp(LinearOperator):
     def __rmatmul__(self, op):
         """
         Returns the LazyLinearOp for op @ self.
+
+        Args:
+            op: an object compatible with self for this binary operation.
+
         """
         self._checkattr('__rmatmul__')
         if not hasattr(op, 'shape'):
@@ -370,6 +408,10 @@ class LazyLinearOp(LinearOperator):
     def __mul__(self, op):
         """
         Returns the LazyLinearOp for self * op.
+
+        Args:
+            op: an object compatible with self for this binary operation.
+
         """
         self._checkattr('__mul__')
         if isinstance(op, (float, int, complex)) or \
@@ -388,6 +430,10 @@ class LazyLinearOp(LinearOperator):
     def __rmul__(self, op):
         """
         Returns the LazyLinearOp for op * self.
+
+        Args:
+            op: an object compatible with self for this binary operation.
+
         """
         if isinstance(op, (float, int, complex)) or \
            op.ndim == 1 and op.size == self.shape[1] or \
@@ -409,7 +455,7 @@ class LazyLinearOp(LinearOperator):
         Not implemented self *= op.
         """
         raise NotImplementedError(self.__class__.__name__+".__imul__")
-#        # can't do as follows, it recurses indefinitely because on self.eval
+#        # can't do as follows, it recurses indefinitely because of self.eval
 #        self._checkattr('__imul__')
 #        self = self.__class__(init_lambda=lambda:
 #                              (self._lambda_stack()).\
@@ -432,6 +478,11 @@ class LazyLinearOp(LinearOperator):
     def __getitem__(self, indices):
         """
         Returns the LazyLinearOp for indexing.
+
+        Args:
+            indices: array of length 1 or 2 which elements must be slice, integer or
+            Ellipsis (...). Note that using Ellipsis for more than two indices is forbidden.
+
         """
         self._checkattr('__getitem__')
         if isinstance(indices, tuple) and len(indices) == 2 and isinstance(indices[0], int) and isinstance(indices[1], int):
@@ -597,7 +648,6 @@ class LazyLinearOp(LinearOperator):
         return self
 
     def __array_function__(self, func, types, args, kwargs):
-        print("__array_function__")
         if func not in HANDLED_FUNCTIONS:
             return NotImplemented
         # Note: this allows subclasses that don't override
@@ -617,7 +667,8 @@ def asLazyLinearOp(obj):
     Creates a LazyLinearOp based on the object obj which must be of a linear operator compatible type.
 
     Args:
-        obj: it can be a ndarray (ndim == 2), a Faust or a scipy matrix.
+        obj: it can be a ndarray (ndim == 2), a Faust, a scipy matrix or a
+        numpy array (but any compliant linear operator object might be used).
     """
     return LazyLinearOp.create(obj)
 
