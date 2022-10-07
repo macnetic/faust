@@ -157,16 +157,18 @@ class TestLazyLinearOpFaust(unittest.TestCase):
                                0)
         self.assertEqual(lcat.shape[0], self.lop.shape[0] + self.lop.shape[0])
         # using hstack and vstack
-        lcat = vstack(self.lop, self.lop2)
+        lcat = vstack((self.lop, self.lop2, self.lop))
         self.assertAlmostEqual(LA.norm(lcat.toarray() - np.vstack((self.lopA,
-                                                                   self.lop2A))),
+                                                                   self.lop2A,
+                                                                  self.lopA))),
                                0)
-        self.assertEqual(lcat.shape[0], self.lop.shape[0] + self.lop2.shape[0])
-        lcat = hstack(self.lop, self.lop2)
+        self.assertEqual(lcat.shape[0], 2 * self.lop.shape[0] + self.lop2.shape[0])
+        lcat = hstack((self.lop, self.lop2, self.lopA))
         self.assertAlmostEqual(LA.norm(lcat.toarray() - np.hstack((self.lopA,
-                                                                   self.lop2A))),
+                                                                   self.lop2A,
+                                                                  self.lopA))),
                                0)
-        self.assertEqual(lcat.shape[1], self.lop.shape[1] + self.lop2.shape[1])
+        self.assertEqual(lcat.shape[1], 2 * self.lop.shape[1] + self.lop2.shape[1])
 
 
 

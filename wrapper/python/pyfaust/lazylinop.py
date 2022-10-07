@@ -570,7 +570,7 @@ class LazyLinearOp(LinearOperator):
                  raise idx_error_exception
             return new_shape
 
-    def concatenate(self, op, axis=0):
+    def concatenate(self, *ops, axis=0):
         """
         Returns the LazyLinearOp for the concatenation of self and op.
 
@@ -578,11 +578,19 @@ class LazyLinearOp(LinearOperator):
             axis: axis of concatenation (0 for rows, 1 for columns).
         """
         from pyfaust import concatenate as cat
-        new_shape = (self.shape[0] + op.shape[0] if axis == 0 else self.shape[0],
-                     self.shape[1] + op.shape[1] if axis == 1 else self.shape[1])
+        nrows = self.shape[0]
+        ncols = self.shape[1]
+        if axis == 0:
+            for op in ops:
+                nrows += op.shape[0]
+        elif axis == 1:
+            for op in ops:
+                ncols += op.shape[1]
+        new_shape = (nrows, ncols)
         new_op = self.__class__(init_lambda=lambda:
                                 cat((self._lambda_stack(),
-                                     LazyLinearOp._eval_if_lazy(op)), axis=axis),
+                                     *[LazyLinearOp._eval_if_lazy(op) for op in
+                                      ops]), axis=axis),
                                 shape=(new_shape),
                                 root_obj=self._root_obj)
         return new_op
@@ -672,28 +680,36 @@ def asLazyLinearOp(obj):
     """
     return LazyLinearOp.create(obj)
 
-def hstack(lop1, obj):
+def hstack(tup):
     """
     Concatenates lop1 and obj horizontally.
 
     Args:
-        lop1: a LazyLinearOp object.
-        obj: any array / matrix / LazyLinearOp compatible in dimensions.
-    """
-    if isLazyLinearOp(lop1):
-        return lop1.concatenate(obj, axis=1)
-    else:
-        raise TypeError('lop1 must be a LazyLinearOp')
+        tup: a tuple whose first argument is a LazyLinearOp and other must be
+        compatible objects (numpy array, matrix, LazyLinearOp).
 
-def vstack(lop1, obj):
+    Return:
+        A LazyLinearOp resulting of the concatenation.
+    """
+    lop = tup[0]
+    if isLazyLinearOp(lop):
+        return lop.concatenate(*tup[1:], axis=1)
+    else:
+        raise TypeError('lop must be a LazyLinearOp')
+
+def vstack(tup):
     """
     Concatenates lop1 and obj vertically.
 
     Args:
-        lop1: a LazyLinearOp object.
-        obj: any array / matrix / LazyLinearOp compatible in dimensions.
+        tup: a tuple whose first argument is a LazyLinearOp and other must be
+        compatible objects (numpy array, matrix, LazyLinearOp).
+
+    Return:
+        A LazyLinearOp resulting of the concatenation.
     """
-    if isLazyLinearOp(lop1):
-        return lop1.concatenate(obj, axis=0)
+    lop = tup[0]
+    if isLazyLinearOp(lop):
+        return lop.concatenate(*tup[1:], axis=0)
     else:
-        raise TypeError('lop1 must be a LazyLinearOp')
+        raise TypeError('lop must be a LazyLinearOp')
