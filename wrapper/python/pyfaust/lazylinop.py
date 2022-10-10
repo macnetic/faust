@@ -39,19 +39,13 @@ class LazyLinearOp(LinearOperator):
     @staticmethod
     def create(obj):
         """
-        Creates a Lazy linear operator.
-
-        NOTE: obj must support operations and attributes defined in this class.
-        Any operation not supported would raise an exception at the evaluation
-        time.
+        Alias of pyfaust.lazylinop.asLazyLinearOp.
 
         Args:
-            obj: the root object on which the LazyLinearOp is based (it could
-            be a numpy array, a scipy matrix, a Faust object or almost any
-            object that supports the same kind of functions).
+            obj: cf. pyfaust.lazylinop.asLazyLinearOp.
 
         Returns:
-            a LazyLinearOp instance based on obj.
+            cf. pyfaust.lazylinop.asLazyLinearOp.
 
         Example:
             >>> from pyfaust.lazylinop import LazyLinearOp
@@ -67,18 +61,19 @@ class LazyLinearOp(LinearOperator):
             >>> twolF = lF + lF
             >>> twolF
             <pyfaust.lazylinop.LazyLinearOp at 0x7fcd7d774730>
+
+
+        <b>See also:</b> pyfaust.rand.
         """
         return LazyLinearOp(lambda:obj, obj.shape, obj)
 
     def eval(self):
         """
-        Evaluate the LazyLinearOp. All stacked virtual operations are then
-        evaluated.
+        Evaluate the LazyLinearOp. All stacked virtual operations are evaluated.
 
         Returns:
-            a linear operator object (which the type depends of the
-            LazyLinearOp initialization through LazyLinearOp.create and the
-            operations made upon this object).
+            a linear operator object (whose type depends of the LazyLinearOp
+            initialization through pyfaust.lazylinop.asLazyLinearOp and the operations made upon this object).
 
         Example:
             >>> import pyfaust as pf
@@ -674,9 +669,36 @@ def asLazyLinearOp(obj):
     """
     Creates a LazyLinearOp based on the object obj which must be of a linear operator compatible type.
 
+    NOTE: obj must support operations and attributes defined in this class.
+    Any operation not supported would raise an exception at the evaluation
+    time.
+
     Args:
-        obj: it can be a ndarray (ndim == 2), a Faust, a scipy matrix or a
-        numpy array (but any compliant linear operator object might be used).
+        obj: the root object on which the LazyLinearOp is based (it could
+        be a numpy array, a scipy matrix, a Faust object or almost any
+        object that supports the same kind of functions).
+
+
+    Returns:
+        a LazyLinearOp instance based on obj.
+
+    Example:
+        >>> from pyfaust.lazylinop import asLazyLinearOp
+        >>> import numpy as np
+        >>> M = np.random.rand(10, 12)
+        >>> lM = asLazyLinearOp(M)
+        >>> twolM = lM + lM
+        >>> twolM
+        <pyfaust.lazylinop.LazyLinearOp at 0x7fcd7d7750f0>
+        >>> import pyfaust as pf
+        >>> F = pf.rand(10, 12)
+        >>> lF = asLazyLinearOp(F)
+        >>> twolF = lF + lF
+        >>> twolF
+        <pyfaust.lazylinop.LazyLinearOp at 0x7fcd7d774730>
+
+
+    <b>See also:</b> pyfaust.rand.
     """
     return LazyLinearOp.create(obj)
 
