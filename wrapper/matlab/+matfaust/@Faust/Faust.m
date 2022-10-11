@@ -529,6 +529,10 @@ classdef Faust
 		function F = plus(varargin)
 			import matfaust.Faust
 			F = varargin{1};
+            % this first arg is not necessarily a Faust
+            if ~ matfaust.isFaust(F)
+                F = matfaust.Faust({F});
+            end
 			for i=2:nargin
 				G = varargin{i};
 				if(isa(G,'matfaust.Faust'))
@@ -2884,8 +2888,12 @@ classdef Faust
 		function C = cat(varargin)
 			err_1st_arg = 'Wrong first argument: must be an integer between 1 and 2.';
 			if(nargin > 0 && isscalar(varargin{1}))
-				F = varargin{2}; % we kwnow it's a Faust or we wouldn't be here
-				if(varargin{1} == 1)
+				F = varargin{2}; % there must be a Faust in the args but not
+                % necessarily in first pos
+                if ~ matfaust.isFaust(F)
+                    F = matfaust.Faust({F});
+                end
+                if(varargin{1} == 1)
 					mex_func_name = 'vertcat';
 				elseif(varargin{1} == 2)
 					mex_func_name = 'horzcat';
