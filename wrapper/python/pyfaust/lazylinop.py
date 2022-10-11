@@ -289,6 +289,13 @@ class LazyLinearOp(LinearOperator):
 #                              root_obj=self._root_obj)
 #        return self
 
+    def _sanitize_matmul(self, op):
+        self._checkattr('__matmul__')
+        if not hasattr(op, 'shape'):
+            raise TypeError('op must have a shape attribute')
+        if self.shape[1] != op.shape[0]:
+            raise ValueError('dimensions must agree')
+
     def __matmul__(self, op):
         """
         Returns the LazyLinearOp for the multiplication self @ op or if op is a np.ndarray it returns the np.ndarray (self @ op).
@@ -297,11 +304,7 @@ class LazyLinearOp(LinearOperator):
             op: an object compatible with self for this binary operation.
 
         """
-        self._checkattr('__matmul__')
-        if not hasattr(op, 'shape'):
-            raise TypeError('op must have a shape attribute')
-        if self.shape[1] != op.shape[0]:
-            raise ValueError('dimensions must agree')
+        self._sanitize_matmul(op)
         if isinstance(op, np.ndarray):
             res = self.eval() @ op
         else:
@@ -669,7 +672,8 @@ def asLazyLinearOp(obj):
     """
     Creates a LazyLinearOp based on the object obj which must be of a linear operator compatible type.
 
-    NOTE: obj must support operations and attributes defined in this class.
+    NOTE: obj must support operations and attributes defined in the
+    LazyLinearOp class.
     Any operation not supported would raise an exception at the evaluation
     time.
 
@@ -737,32 +741,29 @@ def vstack(tup):
         raise TypeError('lop must be a LazyLinearOp')
 
 def kron(A, B):
-    return LazyLinearOpKron(lambda: A, A, B)
+    return LazyLinearOpKron(A, B)
 
 class LazyLinearOpKron(LazyLinearOp):
 
-    def __init__(self, init_lambda, A, B):
+    def __init__(self, A, B):
         self.A = A
         self.B = B
         shape = (A.shape[0] * B.shape[0], A.shape[1] * B.shape[1])
-        super(LazyLinearOpKron, self).__init__(init_lambda, shape, A)
+        super(LazyLinearOpKron, self).__init__(lambda: A, shape, A)
 
     def conj(self):
-        return LazyLinearOpKron(self._lambda_stack, self.A.conj(), self.B.conj())
+        return LazyLinearOpKron(asLazyLinearOp(self.A).conj(),
+                                asLazyLinearOp(self.B).conj())
 
     def transpose(self):
-        return LazyLinearOpKron(self._lambda_stack, self.A.T, self.B.T)
+        return LazyLinearOpKron(asLazyLinearOp(self.A).T, asLazyLinearOp(self.B).T)
 
     def getH(self):
-        return LazyLinearOpKron(self._lambda_stack, self.A.getH(), self.B.getH())
+        return LazyLinearOpKron(asLazyLinearOp(self.A).getH(), asLazyLinearOp(self.B).getH())
 
     def __matmul__(self, op):
         #TODO: refactor with parent function
-        self._checkattr('__matmul__')
-        if not hasattr(op, 'shape'):
-            raise TypeError('op must have a shape attribute')
-        if self.shape[1] != op.shape[0]:
-            raise ValueError('dimensions must agree')
+        self._sanitize_matmul(op)
         if hasattr(op, 'reshape') and hasattr(op, '__matmul__') and hasattr(op,
                                                                             '__getitem__'):
             if op.ndim == 1:
