@@ -210,5 +210,18 @@ class TestLazyLinearOpFaust(unittest.TestCase):
         self.assertTrue(pf.lazylinop.isLazyLinearOp(lcF))
         self.assertEqual(cF.shape, lcF.shape)
 
+class TestLazyLinearOpFaustKron(TestLazyLinearOpFaust):
+
+    def setUp(self):
+        from pyfaust.lazylinop import kron as lkron
+        lop_A = LazyLinearOp.create(pf.rand(10, 15))
+        lop_B = LazyLinearOp.create(pf.rand(10, 15))
+        self.lop = lkron(lop_A, lop_B)
+        self.lopA = self.lop.toarray()
+        self.lop2 = LazyLinearOp.create(pf.rand(*self.lop.shape))
+        self.lop2A = self.lop2.toarray()
+        self.lop3 = LazyLinearOp.create(pf.rand(self.lop.shape[1], 10))
+        self.lop3A = self.lop3.toarray()
+
 if '__main__' == __name__:
     unittest.main()
