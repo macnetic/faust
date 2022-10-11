@@ -5,7 +5,7 @@
 %> by a dense matrix/vector, a call of LazyLinearOp.toarray or an explicit
 %> evaluation through LazyLinearOp.eval.
 %>
-%> To instantiate a LazyLinearOp look at pyfaust.lazylinop.asLazyLinearOp.
+%> To instantiate a LazyLinearOp look at matfaust.lazylinop.asLazyLinearOp.
 %>
 %> @warning This code is in a beta status.
 % ======================================================================
