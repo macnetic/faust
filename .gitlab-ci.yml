@@ -245,7 +245,7 @@ pkg_linux_release:
     tags:
         - linux
         - matlab
-        - tux_packager
+        - rpm_deb_release
     only:
         - tags
     needs:
@@ -273,7 +273,7 @@ pkg_linux_release_static:
     tags:
         - linux
         - matlab
-        - tux_packager
+        - rpm_deb_release
     only:
         - tags
     needs:
