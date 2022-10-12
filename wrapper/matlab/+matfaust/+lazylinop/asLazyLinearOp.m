@@ -1,7 +1,7 @@
 %=============================================================
 %> @brief Creates a LazyLinearOp based on the object obj which must be of a linear operator compatible type.
 %>
-%> @note obj must support operations and attributes defined in this class.
+%> @note obj must support operations and attributes defined in the LazyLinearOp class.
 %> Any operation not supported would raise an exception at the evaluation time.
 %> @param obj: the root object on which the LazyLinearOp is based (it could
 %> be a dense matrix, a sparse matrix, a Faust object or almost any

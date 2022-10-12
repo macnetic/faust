@@ -10,7 +10,7 @@
 %> @warning This code is in a beta status.
 % ======================================================================
 classdef LazyLinearOp
-	properties (SetAccess = private, Hidden = true)
+	properties (SetAccess = protected, Hidden = true)
 		lambda_stack;
 		root_obj;
 		shape;
@@ -57,7 +57,7 @@ classdef LazyLinearOp
 			import matfaust.lazylinop.LazyLinearOp
 			check_meth(L, 'transpose');
 			Ls = size(L);
-			LT = LazyLinearOp(@() transpose(L.lambda_stack()), [Ls(2), Ls(1)], L.root_obj);
+			LT = LazyLinearOp(@() transpose(eval(L)), [Ls(2), Ls(1)], L.root_obj);
 		end
 
 		%=============================================================
@@ -67,7 +67,7 @@ classdef LazyLinearOp
 			import matfaust.lazylinop.LazyLinearOp
 			check_meth(L, 'ctranspose');
 			Ls = size(L);
-			LCT = LazyLinearOp(@() ctranspose(L.lambda_stack()), [Ls(2), Ls(1)], L.root_obj);
+			LCT = LazyLinearOp(@() ctranspose(eval(L)), [Ls(2), Ls(1)], L.root_obj);
 		end
 
 		%=============================================================
@@ -77,7 +77,7 @@ classdef LazyLinearOp
 			import matfaust.lazylinop.LazyLinearOp
 			check_meth(L, 'conj');
 			Ls = size(L);
-			LC = LazyLinearOp(@() conj(L.lambda_stack()), Ls, L.root_obj);
+			LC = LazyLinearOp(@() conj(eval(L)), Ls, L.root_obj);
 		end
 
 		%=============================================================
@@ -91,7 +91,7 @@ classdef LazyLinearOp
 			if ~ all(size(op) == [1, 1]) && ~ all(size(L) == size(op))
 				error('Dimensions must agree')
 			end
-			Lp = LazyLinearOp(@() L.lambda_stack() + LazyLinearOp.eval_if_lazy(op), size(L), L.root_obj);
+			Lp = LazyLinearOp(@() eval(L) + LazyLinearOp.eval_if_lazy(op), size(L), L.root_obj);
 		end
 
 		%=============================================================
@@ -112,7 +112,7 @@ classdef LazyLinearOp
 			if ~ all(size(op) == [1, 1]) && ~ all(size(L) == size(op))
 				error('Dimensions must agree')
 			end
-			Lm = LazyLinearOp(@() L.lambda_stack() - LazyLinearOp.eval_if_lazy(op), size(L), L.root_obj);
+			Lm = LazyLinearOp(@() eval(L) - LazyLinearOp.eval_if_lazy(op), size(L), L.root_obj);
 		end
 
 		%=============================================================
@@ -185,7 +185,7 @@ classdef LazyLinearOp
 				% op is a dense matrix that is not limited to one element
 				Lm = eval(L) * op;
 			else
-				Lm = LazyLinearOp(@() L.lambda_stack() * LazyLinearOp.eval_if_lazy(op), new_size, L.root_obj);
+				Lm = LazyLinearOp(@() eval(L) * LazyLinearOp.eval_if_lazy(op), new_size, L.root_obj);
 			end
 		end
 
@@ -197,7 +197,7 @@ classdef LazyLinearOp
 		%> @b See @b also: mrdivide matlab built-in.
 		%=============================================================
 		function Lm = mrdivide(L, op)
-			Lm = LazyLinearOp(@() mrdivide(L.lambda_stack() * LazyLinearOp.eval_if_lazy(op), new_size, L.root_obj));
+			Lm = LazyLinearOp(@() mrdivide(eval(L) * LazyLinearOp.eval_if_lazy(op), new_size, L.root_obj));
 		end
 
 		%=============================================================
@@ -292,7 +292,7 @@ classdef LazyLinearOp
 				end
 			end
 
-			SUB = LazyLinearOp(@() subsref(L.lambda_stack(), S) , new_shape, L.root_obj);
+			SUB = LazyLinearOp(@() subsref(eval(L), S) , new_shape, L.root_obj);
 		end
 
 		%=============================================================
@@ -340,7 +340,7 @@ classdef LazyLinearOp
 				if ~ all(size(L, odim) == size(O, odim))
 					error('Dimensions must agree')
 				end
-				LC = LazyLinearOp(@() cat(dim, L.lambda_stack(), LazyLinearOp.eval_if_lazy(O)), new_size, L.root_obj);
+				LC = LazyLinearOp(@() cat(dim, eval(L), LazyLinearOp.eval_if_lazy(O)), new_size, L.root_obj);
 				L = LC;
 			end
 		end
@@ -353,7 +353,7 @@ classdef LazyLinearOp
 		function LR = real(L)
 			import matfaust.lazylinop.LazyLinearOp
 			check_meth(L, 'real');
-			LR = LazyLinearOp(@() real(L.lambda_stack()) , L.shape, L.root_obj);
+			LR = LazyLinearOp(@() real(eval(L)) , L.shape, L.root_obj);
 		end
 
 		%=============================================================
@@ -364,7 +364,7 @@ classdef LazyLinearOp
 		function LI = imag(L)
 			import matfaust.lazylinop.LazyLinearOp
 			check_meth(L, 'real');
-			LI = LazyLinearOp(@() imag(L.lambda_stack()) , L.shape, L.root_obj);
+			LI = LazyLinearOp(@() imag(eval(L)) , L.shape, L.root_obj);
 		end
 
 	end
@@ -410,7 +410,7 @@ classdef LazyLinearOp
 			B = isa(obj, 'matfaust.lazylinop.LazyLinearOp');
 		end
 	end
-	methods(Static, Access = private)
+	methods(Static, Access = protected)
 		function O = eval_if_lazy(obj)
 			import matfaust.lazylinop.LazyLinearOp
 			if LazyLinearOp.isLazyLinearOp(obj)
@@ -420,7 +420,7 @@ classdef LazyLinearOp
 			end
 		end
 	end
-	methods(Access = private)
+	methods(Access = protected)
 		function check_meth(obj, meth)
 			if ~ is_meth(obj, meth)
 				error(meth+' is not supported by the root object of this LazyLinearOp')
