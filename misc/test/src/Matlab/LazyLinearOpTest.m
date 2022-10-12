@@ -1,14 +1,13 @@
 classdef LazyLinearOpTest < matlab.unittest.TestCase
-    % Tests the Faust class.
 
 	properties
-		lop
-        lopA
-        lop2
-        lop2A
-        lop3
-        lop3A
-		faust_paths
+		lop;
+        lopA;
+        lop2;
+        lop2A;
+        lop3;
+        lop3A;
+		faust_paths;
     end
 
 	properties (Constant = true)
