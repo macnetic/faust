@@ -154,6 +154,8 @@ if(BUILD_DOCUMENTATION)
 	configure_file(${FAUST_DOC_SRC_DIR}/MHTP_algorithms.html ${PROJECT_BINARY_DIR}/doc/html/MHTP_algorithms.html COPYONLY)
 	configure_file(${FAUST_DOC_SRC_DIR}/Faust_optimizations.ipynb ${PROJECT_BINARY_DIR}/doc/html/Faust_optimizations.ipynb COPYONLY)
 	configure_file(${FAUST_DOC_SRC_DIR}/Faust_optimizations.html ${PROJECT_BINARY_DIR}/doc/html/Faust_optimizations.html COPYONLY)
+	configure_file(${FAUST_DOC_SRC_DIR}/lazylinop.ipynb ${PROJECT_BINARY_DIR}/doc/html/lazylinop.ipynb COPYONLY)
+	configure_file(${FAUST_DOC_SRC_DIR}/lazylinop.html ${PROJECT_BINARY_DIR}/doc/html/lazylinop.html COPYONLY)
 
 	# matfaust matlab livescripts (mlx and html)
 	configure_file(${FAUST_DOC_SRC_DIR}/Faust_creation.mlx ${PROJECT_BINARY_DIR}/doc/html/Faust_creation.mlx COPYONLY)
