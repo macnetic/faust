@@ -1,9 +1,18 @@
+% ================================
+%> @brief This class implements a specialization of LazyLinearOp dedicated to the
+%> Kronecker product of two linear operators.
+%>
+%> @b See @b also: matfaust.lazylinop.kron.
+% ================================
 classdef LazyLinearOpKron < matfaust.lazylinop.LazyLinearOp
 	properties (SetAccess = private, Hidden = true)
 		A;
 		B;
 	end
 	methods
+		%================================
+		%> Constructor for the A x B Kronecker product.
+		%================================
 		function LK = LazyLinearOpKron(A, B)
 
 			shape = [size(A, 1) * size(B, 1), size(A, 2) * size(B, 2)];
@@ -12,21 +21,39 @@ classdef LazyLinearOpKron < matfaust.lazylinop.LazyLinearOp
 			LK.B = B;
 		end
 
+		%================================
+		%> Returns the LazyLinearOpKron conjugate.
+		%================================
 		function CLK = conj(LK)
 			import matfaust.lazylinop.*
 			CLK = LazyLinearOpKron(conj(asLazyLinearOp(LK.A)), conj(asLazyLinearOp(LK.B)));
 		end
 
+		%================================
+		%> Returns the LazyLinearOpKron transpose.
+		%================================
 		function CLK = transpose(LK)
 			import matfaust.lazylinop.*
 			CLK = LazyLinearOpKron(transpose(asLazyLinearOp(LK.A)), transpose(asLazyLinearOp((LK.B))));
 		end
 
+		%================================
+		%> Returns the LazyLinearOpKron adjoint/transconjugate.
+		%================================
 		function CTLK = ctranspose(LK)
 			import matfaust.lazylinop.*
 			CTLK = LazyLinearOpKron(ctranspose(asLazyLinearOp(LK.A)), ctranspose(asLazyLinearOp((LK.B))));
 		end
 
+		%=============================================================
+		%> @brief Returns the LazyLinearOp for the multiplication self * op
+		%> or if op is a full matrix it returns the full matrix (self * op).
+		%>
+		%> @note this specialization is particularly optimized for multiplying the
+		%> operator by a vector.
+		%>
+		%> @param op: an object compatible with self for this binary operation.
+		%=============================================================
 		function LmK = mtimes(LK, op)
 			import matfaust.lazylinop.LazyLinearOp
 			if isscalar(LK) && LazyLinearOp.isLazyLinearOp(op)
@@ -57,8 +84,10 @@ classdef LazyLinearOpKron < matfaust.lazylinop.LazyLinearOp
 			end
 		end
 
+		%================================
+		%> See LazyLinearOp.eval.
+		%================================
 		function E = eval(LK)
-
 			A = LK.A;
 			B = LK.B;
 			if any(ismember(methods(A), 'full'))

@@ -741,28 +741,86 @@ def vstack(tup):
         raise TypeError('lop must be a LazyLinearOp')
 
 def kron(A, B):
+    """
+    Returns the LazyLinearOp(Kron) for the Kronecker product A x B.
+
+    Note: this specialization is particularly optimized for multiplying the
+    operator by a vector.
+
+    Args:
+        A: LinearOperator (scaling factor),
+        B: LinearOperator (block factor).
+
+    Example:
+        >>> from pyfaust.lazylinop import kron as lkron
+        >>> import numpy as np
+        >>> from pyfaust import rand
+        >>> A = np.random.rand(100, 100)
+        >>> B = np.random.rand(100, 100)
+        >>> AxB = np.kron(A,B)
+        >>> lAxB = lkron(A, B)
+        >>> x = np.random.rand(AxB.shape[1], 1)
+        >>> print(np.allclose(AxB@x, lAxB@x))
+        True
+        >>> from timeit import timeit
+        >>> timeit(lambda: AxB @ x, number=10)
+        0.4692082800902426
+        >>> timeit(lambda: lAxB @ x, number=10)
+        0.03464869409799576
+
+    <b>See also:</b> LazyLinearOpKron, numpy.kron.
+    """
     return LazyLinearOpKron(A, B)
 
 class LazyLinearOpKron(LazyLinearOp):
+    """
+    This class implements a specialization of LazyLinearOp dedicated to the
+    Kronecker product of two linear operators.
+
+    <b>See also:</b> pyfaust.lazylinop.kron.
+    """
 
     def __init__(self, A, B):
+        """
+        Constructor for the A x B Kronecker product.
+        """
         self.A = A
         self.B = B
         shape = (A.shape[0] * B.shape[0], A.shape[1] * B.shape[1])
         super(LazyLinearOpKron, self).__init__(lambda: A, shape, A)
 
     def conj(self):
+        """
+        Returns the LazyLinearOpKron conjugate.
+        """
         return LazyLinearOpKron(asLazyLinearOp(self.A).conj(),
                                 asLazyLinearOp(self.B).conj())
 
     def transpose(self):
+        """
+        Returns the LazyLinearOpKron transpose.
+        """
         return LazyLinearOpKron(asLazyLinearOp(self.A).T, asLazyLinearOp(self.B).T)
 
     def getH(self):
+        """
+        Returns the LazyLinearOpKron adjoint/transconjugate.
+        """
         return LazyLinearOpKron(asLazyLinearOp(self.A).getH(), asLazyLinearOp(self.B).getH())
 
     def __matmul__(self, op):
-        #TODO: refactor with parent function
+        """
+        Returns the LazyLinearOpKron for the multiplication self @ op or if op is a np.ndarray it returns the np.ndarray (self @ op).
+
+        Note: this specialization is particularly optimized for multiplying the
+        operator by a vector.
+
+        Args:
+            op: an object compatible with self for this binary operation.
+
+        <b>See also:</b> pyfaust.lazylinop.kron.
+        """
+
         self._sanitize_matmul(op)
         if hasattr(op, 'reshape') and hasattr(op, '__matmul__') and hasattr(op,
                                                                             '__getitem__'):
