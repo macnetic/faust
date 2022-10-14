@@ -313,8 +313,8 @@ pages:
         paths:
             - public/
     tags:
-        - linux
-        - matlab
+      #- linux
+      # - matlab
         - pages
     only:
         - tags
