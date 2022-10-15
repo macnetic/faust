@@ -1,5 +1,6 @@
 #ifndef __FAUST_TRANSFORM_HELPER_DFT__
 #define __FAUST_TRANSFORM_HELPER_DFT__
+#define IGNORE_TRANSFORM_HELPER_VARIADIC_TPL
 #include "faust_TransformHelper.h"
 
 #ifdef USE_PYTHONIC
@@ -21,6 +22,8 @@ types::ndarray<T, types::pshape<long>> arrayFromBuf1D(T* fPtr, long size)
 }
 #endif
 
+#include <memory> // shared_ptr
+
 namespace Faust
 {
 	template<typename FPP, FDevice DEV>
@@ -38,11 +41,12 @@ namespace Faust
 			FPP *perm_d_ptr;
 			DiagMat D;
 			std::vector<unsigned int> bitrev_perm;
-			std::vector<ButterflyMat<FPP, Cpu>> opt_factors;
+			std::vector<std::shared_ptr<ButterflyMat<FPP, Cpu>>> opt_factors;
 
 
-			// private ctor
+			// private ctors
 			TransformHelperButterfly<FPP, Cpu>(const std::vector<MatGeneric<FPP,Cpu> *>& facts, const FPP lambda_ = (FPP)1.0, const bool optimizedCopy=false, const bool cloning_fact = true, const bool internal_call=false);
+			TransformHelperButterfly(const TransformHelperButterfly<FPP,Cpu>* th, bool transpose, bool conjugate);
 
 
 			public:
@@ -55,7 +59,7 @@ namespace Faust
 			MatDense<FPP, Cpu> multiply(const MatSparse<FPP,Cpu> &A);
 			static TransformHelper<FPP,Cpu>* fourierFaust(unsigned int n, const bool norma=true);
 			static TransformHelper<FPP, Cpu>* optFaust(const TransformHelper<FPP, Cpu>* F);
-
+			TransformHelper<FPP,Cpu>* transpose();
 		};
 
 	template<typename FPP>
@@ -66,6 +70,7 @@ namespace Faust
 		using DiagMat = Eigen::DiagonalMatrix<FPP, Eigen::Dynamic>;
 		DiagMat D1;
 		DiagMat D2;
+		DiagMat D2T; // D2 for the transpose case
 		std::vector<int> subdiag_ids;
 #ifdef USE_PYTHONIC
 		long *subdiag_ids_ptr;
@@ -76,12 +81,13 @@ namespace Faust
 		public:
 		ButterflyMat<FPP, Cpu>(const MatSparse<FPP, Cpu> &factor, int level);
 
-		Vect<FPP, Cpu> multiply(const Vect<FPP, Cpu>& x) const;
-		void multiply(const FPP* x, FPP* y, size_t size) const;
+		void init_transpose();
+		Vect<FPP, Cpu> multiply(const Vect<FPP, Cpu>& x, bool transpose = false);
+		void multiply(const FPP* x, FPP* y, size_t size, bool transpose = false);
 		void Display() const;
 
-		void multiply(const FPP* A, int A_ncols, FPP* C, size_t size);
-		MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> &A);
+		void multiply(const FPP* A, int A_ncols, FPP* C, size_t size, bool transpose = false);
+		MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> &A, bool transpose = false);
 //		MatDense<FPP, Cpu> multiply(const MatSparse<FPP,Cpu> &A);
 		public:
 			const DiagMat& getD1() {return D1;};

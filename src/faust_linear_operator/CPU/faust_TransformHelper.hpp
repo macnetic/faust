@@ -726,6 +726,7 @@ namespace Faust {
 			this->transform->push_first(M, optimizedCopy, this->is_conjugate, copying); //2nd argument is for opt. (possibly converting dense <-> sparse)
 		}
 
+#ifndef IGNORE_TRANSFORM_HELPER_VARIADIC_TPL
 	template<typename FPP>
 		template<typename Head, typename ... Tail>
 		void TransformHelper<FPP,Cpu>::push_back_(Head& h, Tail&... t)
@@ -748,6 +749,7 @@ namespace Faust {
 		{
 			// do nothing, here just for empty tail of above function
 		}
+#endif
 
 	template<typename FPP>
 		faust_unsigned_int TransformHelper<FPP,Cpu>::getNBytes() const

@@ -90,7 +90,8 @@ namespace Faust
 			TransformHelper(TransformHelper<FPP,Cpu>* th, faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols);
 			TransformHelper(Transform<FPP,Cpu> &t, const bool moving=false);
 #ifndef IGNORE_TRANSFORM_HELPER_VARIADIC_TPL
-			template<typename ...GList> TransformHelper(GList& ... t);
+			template<typename ...GList>
+				TransformHelper(GList& ... t);
 #endif
 
 			void copy_mul_mode_state(const TransformHelper<FPP,Cpu>& th);
@@ -185,7 +186,7 @@ namespace Faust
             static int get_mat_file_type(const char* filepath);
 			virtual double spectralNorm(const int nbr_iter_max, double threshold, int &flag) const;
 			FPP power_iteration(const faust_unsigned_int nbr_iter_max, const Real<FPP>& threshold, int & flag) const;
-			TransformHelper<FPP,Cpu>* transpose();
+			virtual TransformHelper<FPP,Cpu>* transpose();
 			TransformHelper<FPP,Cpu>* conjugate();
 			TransformHelper<FPP,Cpu>* adjoint() const;
 			virtual TransformHelper<FPP,Cpu>* vertcat(const TransformHelper<FPP,Cpu>*);
