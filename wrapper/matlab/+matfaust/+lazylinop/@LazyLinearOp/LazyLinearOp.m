@@ -181,7 +181,7 @@ classdef LazyLinearOp
 			else
 				new_size = [size(L, 1), size(op, 2)];
 			end
-			if ~ LazyLinearOp.isLazyLinearOp(op) && ismatrix(op) && isnumeric(op) && ~ issparse(op) && any(size(op) ~= [1, 1])
+			if ~ LazyLinearOp.isLazyLinearOp(op) && ismatrix(op) && isnumeric(op) && any(size(op) ~= [1, 1])
 				% op is a dense matrix that is not limited to one element
 				Lm = eval(L) * op;
 			else

@@ -70,7 +70,7 @@ classdef LazyLinearOpKron < matfaust.lazylinop.LazyLinearOp
 			else
 				new_size = [size(LK, 1), size(op, 2)];
 			end
-			if ~ LazyLinearOp.isLazyLinearOp(op) && ismatrix(op) && isnumeric(op) && ~ issparse(op) && any(size(op) ~= [1, 1]) && any(ismember(methods(op), 'reshape')) && any(ismember(methods(op), 'mtimes')) %&& any(ismember(methods(op), 'subsref'))
+			if ~ LazyLinearOp.isLazyLinearOp(op) && ismatrix(op) && isnumeric(op) && any(size(op) ~= [1, 1]) && any(ismember(methods(op), 'reshape')) && any(ismember(methods(op), 'mtimes')) %&& any(ismember(methods(op), 'subsref'))
 				% op is a dense matrix that is not limited to one element
 				LmK = zeros(new_size);
 				A = LK.A;
