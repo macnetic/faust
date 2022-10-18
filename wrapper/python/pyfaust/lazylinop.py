@@ -360,7 +360,7 @@ class LazyLinearOp(LinearOperator):
         Returns the LazyLinearOp for self^H @ v, where self^H is the conjugate transpose of A.
         """
         # LinearOperator need.
-        return self.H @ op
+        return self.T.conj() @ op
 
     def _matmat(self, op):
         """
@@ -378,7 +378,7 @@ class LazyLinearOp(LinearOperator):
         Returns the LazyLinearOp for self^H @ v, where self^H is the conjugate transpose of A.
         """
         # LinearOperator need.
-        return self.H @ op
+        return self.T.conj() @ op
 
     def __imatmul__(self, op):
         """
