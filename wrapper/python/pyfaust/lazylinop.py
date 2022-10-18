@@ -30,6 +30,14 @@ class LazyLinearOp(LinearOperator):
 
         <b>See also:</b> LazyLinearOp.create, pyfaust.lazylinop.asLazyLinearOp.
         """
+        if not hasattr(root_obj, 'ndim'):
+            raise TypeError('The starting object to initialize a'
+                            ' LazyLinearOperator must possess a ndim'
+                            ' attribute.')
+        if root_obj.ndim != 2:
+            raise ValueError('The starting object to initialize a LazyLinearOp '
+                             'must have two dimensions, not: '+str(root_obj.ndim))
+
         self._lambda_stack = init_lambda
         self.shape = shape
         self._root_obj = root_obj
