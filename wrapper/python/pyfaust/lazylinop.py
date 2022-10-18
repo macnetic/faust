@@ -298,14 +298,20 @@ class LazyLinearOp(LinearOperator):
 
     def __matmul__(self, op):
         """
-        Returns the LazyLinearOp for the multiplication self @ op or if op is a np.ndarray it returns the np.ndarray (self @ op).
+        Returns self @ op as a sparse matrix / dense array or as a LazyLinearOp.
 
         Args:
             op: an object compatible with self for this binary operation.
 
+        Returns:
+            If op is an numpy array or a scipy matrix the function returns (self @
+            op) as a numpy array or a scipy matrix. Otherwise it returns the
+            LazyLinearOp for the multiplication self @ op.
+
         """
+        from scipy.sparse import issparse
         self._sanitize_matmul(op)
-        if isinstance(op, np.ndarray):
+        if isinstance(op, np.ndarray) or issparse(op):
             res = self.eval() @ op
         else:
             res = LazyLinearOp(init_lambda=lambda:
@@ -833,9 +839,9 @@ class LazyLinearOpKron(LazyLinearOp):
             if force_eval:
                 res = self.eval() @ op
             else:
-                if isFaust(self.B) or isFaust(self.B):
+                if isFaust(self.A) or isFaust(self.B):
                     parallel = False # e.g. for A, B Fausts in R^100x100 and op 128 columns
-                    # it was found that the sequential computation was faster
+                    # it was found that the sequential computation is faster
                 else:
                     parallel = True
                 if 'KRON_PARALLEL' in environ:
