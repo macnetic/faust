@@ -1130,10 +1130,12 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                         (F.__matmul__(A.imag))*j
             else:
                 return F.m_faust.multiply_csr_mat(A.astype(F.dtype))
-        elif(isinstance(A, (dia_matrix, csc_matrix))):
+        elif(isinstance(A, (dia_matrix, csc_matrix, bsr_matrix, coo_matrix))):
             return F.__matmul__(A.tocsr())
         else:
-            raise TypeError("can't multiply a Faust by something that is not a Faust, a np.ndarray, a csr_matrix or a dia_matrix.")
+            raise TypeError("can't multiply a Faust by something that is not a"
+                            " Faust, a np.ndarray, a csr_matrix, a csc_matrix,"
+                            " a coo_matrix or a dia_matrix.")
 
     def dot(F, A, *args, **kwargs):
         """Performs equivalent operation of numpy.dot() between the Faust F and A.
