@@ -1108,9 +1108,9 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                                       "fly. Please use np.asfortranarray by "
                                       "yourself.")
             if A.dtype == 'complex' and F.dtype != 'complex':
-                A_r = np.asfortranarray(A.real)
-                A_i = np.asfortranarray(A.imag)
-                if not A.imag.flags['F_CONTIGUOUS']:
+                A_r = A.real
+                A_i = A.imag
+                if not A.flags['F_CONTIGUOUS']:
                     w()
                     A_i = np.asfortranarray(A_i)
                     A_r = np.asfortranarray(A_r)
