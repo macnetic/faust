@@ -77,10 +77,13 @@ class TestLazyLinearOpFaust(unittest.TestCase):
         self.assertRaises(NotImplementedError, self.lop.__isub__, self.lop2)
 
     def test_matmul_dot_matvec(self):
+        from scipy.sparse import csr_matrix, issparse
         lmul = self.lop @ self.lop3
+        self.assertTrue(pf.lazylinop.isLazyLinearOp(lmul))
         self.assertAlmostEqual(LA.norm(lmul.toarray() - (self.lopA @ self.lop3A)),
                                0)
         lmul = self.lop.dot(self.lop3)
+        self.assertTrue(pf.lazylinop.isLazyLinearOp(lmul))
         self.assertAlmostEqual(LA.norm(lmul.toarray() - (self.lopA @ self.lop3A)),
                                0)
         M = np.random.rand(self.lop.shape[1], 15)
@@ -88,9 +91,21 @@ class TestLazyLinearOpFaust(unittest.TestCase):
         self.assertTrue(isinstance(lmul2, np.ndarray))
         self.assertAlmostEqual(LA.norm(lmul2 - (self.lopA @ M)),
                                0)
+
+        lmul2 = self.lop @ csr_matrix(M)
+        self.assertTrue(isinstance(lmul2, np.ndarray))
+        self.assertAlmostEqual(LA.norm(lmul2 - (self.lop @ M)),
+        0)
+
         lmul2 = self.lop.matvec(M[:,0])
         self.assertTrue(isinstance(lmul2, np.ndarray))
         self.assertAlmostEqual(LA.norm(lmul2 - (self.lopA @ M[:,0])),
+                               0)
+
+        S = csr_matrix(M)
+        lmul3 = pf.lazylinop.asLazyLinearOp(S) @ S.T
+        self.assertTrue(issparse(lmul3))
+        self.assertAlmostEqual(LA.norm(lmul3 - (M @ M.T)),
                                0)
 
     def test_rmatmul(self):
