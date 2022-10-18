@@ -94,7 +94,9 @@ classdef LazyLinearOpTest < matlab.unittest.TestCase
         end
 
         function testmtimes(this)
+			import matfaust.lazylinop.*
             lmul = this.lop * this.lop3;
+            this.verifyTrue(isLazyLinearOp(lmul))
             this.verifyEqual(full(lmul), this.lopA * this.lop3A, 'AbsTol', 1e-6)
 
             M = rand(size(this.lop, 2), 15)
@@ -103,15 +105,27 @@ classdef LazyLinearOpTest < matlab.unittest.TestCase
             this.verifyTrue(ismatrix(lmul2))
             this.verifyEqual(full(lmul2), this.lopA * M, 'AbsTol', 1e-6)
 
+            lmul2 = this.lop * sparse(M)
+            this.verifyFalse(isLazyLinearOp(lmul2))
+            this.verifyTrue(ismatrix(lmul2))
+            this.verifyEqual(full(lmul2), this.lopA * M, 'AbsTol', 1e-6)
+
             lmul3 = this.lop * M(:, 1)
-            this.verifyFalse(isa(lmul3, 'matfaust.lazylinop.LazyLinearOp'))
+            this.verifyFalse(isLazyLinearOp(lmul3))
             this.verifyTrue(ismatrix(lmul3))
             this.verifyEqual(full(lmul3), this.lopA * M(:,1), 'AbsTol', 1e-6)
 
+            lmulS = asLazyLinearOp(sparse(M)) * sparse(M.')
+            this.verifyFalse(isLazyLinearOp(lmulS))
+            this.verifyTrue(ismatrix(lmulS))
+            this.verifyEqual(full(lmulS), M * M.', 'AbsTol', 1e-6)
+
             lmul4 = this.lop * 5
-            this.verifyTrue(isa(lmul4, 'matfaust.lazylinop.LazyLinearOp'))
+            this.verifyTrue(isLazyLinearOp(lmul4))
             this.verifyEqual(size(lmul4), size(this.lop))
             this.verifyEqual(full(lmul4), this.lopA * 5, 'AbsTol', 1e-6)
+
+
         end
 
         function testCat(this)
