@@ -13971,16 +13971,17 @@ a.anchor-link {
 
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h1 id="Using-LazyLinearOp-s">Using LazyLinearOp-s<a class="anchor-link" href="#Using-LazyLinearOp-s">&#182;</a></h1><p>The <code>LazyLinearOp</code> class is a kind of linear operator (indeed, it extends the scipy <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html">LinearOperator</a> class) for which the operations you make are delayed until you choose to evaluate them.</p>
-<p>This class is intended to lower the computational cost in situations where many operations are made on linear operators but eventually not all of them will be used / evaluated.
-Theoretically, it might also be useful to distribute the calculations around many computation units.</p>
-<p>In this notebook we shall see how to create a <code>LazyLinearOp</code> instance, make operations on it and finally how to evaluate it to get the real result of these operations. We assume the reader is familiar with at least numpy arrays and their operations.</p>
+<h1 id="Using-LazyLinearOp-s">Using LazyLinearOp-s<a class="anchor-link" href="#Using-LazyLinearOp-s">&#182;</a></h1><p>The <code>LazyLinearOp</code> class is a kind of linear operator extending the scipy <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html">LinearOperator</a> class.</p>
+<p>Starting from a <code>numpy</code> array, a <code>scipy</code> matrix, a <code>Faust</code> object, or potentially many other compatible linear operators with efficient implementatons, this class follows the <em>lazy evaluation paradigm</em>.</p>
+<p>In short, one can <em>aggregate low-level <code>LazyLinearOp</code> objects into higher-level ones</em> using classical operations (addition, concatenation, adjoint, real part, slicing, etc.), without actually building arrays. The actual effect of these operations is delayed until the resulting linear operator is actually applied to a vector (or to a collection of vectors, seen as a matrix).</p>
+<p>The main interest of this paradigm is to enable the construction of processing pipelines that exploit as building blocks efficient implementations of  ``low-level'' linear operators.</p>
+<h2 id="This-notebook">This notebook<a class="anchor-link" href="#This-notebook">&#182;</a></h2><p>In this notebook we shall see how to create a <code>LazyLinearOp</code> instance, create more complex instances using various lazy operations, and finally how to apply the resulting instance on vectors or matrices. We assume the reader is familiar with at least <code>numpy</code> arrays and their operations.</p>
 
 </div>
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="1.-Creating-a-LazyLinearOp">1. Creating a LazyLinearOp<a class="anchor-link" href="#1.-Creating-a-LazyLinearOp">&#182;</a></h3><p>In order to create this kind of object, you simply need to use the <code>asLazyLinearOp</code> function. This function receives an object that represents a linear operator, for instance a <code>Faust</code> (but it can also be a numpy array or a scipy matrix). The function instantiates a <code>LazyLinearOp</code> that encapsulates the <code>Faust</code> you gave.</p>
+<h3 id="1.-Creating-a-LazyLinearOp">1. Creating a LazyLinearOp<a class="anchor-link" href="#1.-Creating-a-LazyLinearOp">&#182;</a></h3><p>In order to create this kind of object, you simply need to use the <code>asLazyLinearOp</code> function. This function receives an object that represents a linear operator, for instance a <code>Faust</code> (but it can also be a <code>numpy</code> array or a <code>scipy</code> matrix). The function instantiates a <code>LazyLinearOp</code> that encapsulates the <code>Faust</code> you gave.</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
@@ -13991,8 +13992,10 @@ Theoretically, it might also be useful to distribute the calculations around man
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust.lazylinop</span> <span class="kn">import</span> <span class="n">asLazyLinearOp</span>
 <span class="kn">import</span> <span class="nn">pyfaust</span> <span class="k">as</span> <span class="nn">pf</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">32</span>
 <span class="c1"># create a random Faust</span>
-<span class="n">F</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">4096</span><span class="p">,</span> <span class="mi">4096</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="mf">.001</span><span class="p">)</span>
+<span class="n">F</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="mf">.1</span><span class="p">)</span>
 <span class="c1"># create a LazyLinearOp upon it</span>
 <span class="n">lF</span> <span class="o">=</span> <span class="n">asLazyLinearOp</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">lF</span><span class="p">)</span>
@@ -14015,7 +14018,7 @@ Theoretically, it might also be useful to distribute the calculations around man
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>&lt;4096x4096 LazyLinearOp with unspecified dtype&gt;
+<pre>&lt;32x32 LazyLinearOp with unspecified dtype&gt;
 </pre>
 </div>
 </div>
@@ -14027,7 +14030,7 @@ Theoretically, it might also be useful to distribute the calculations around man
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>As said earlier, it is also possible to create a <code>LazyLinearOp</code> upon numpy arrays or scipy matrices.</p>
+<p>As said earlier, it is also possible to create  <code>LazyLinearOp</code> operators based on <code>numpy</code> arrays or <code>scipy</code> matrices.</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
@@ -14038,9 +14041,9 @@ Theoretically, it might also be useful to distribute the calculations around man
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">random</span>
 <span class="kn">from</span> <span class="nn">numpy.random</span> <span class="kn">import</span> <span class="n">rand</span>
-<span class="n">S</span> <span class="o">=</span> <span class="n">random</span><span class="p">(</span><span class="mi">4096</span><span class="p">,</span> <span class="mi">4096</span><span class="p">,</span> <span class="mf">.2</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csr&#39;</span><span class="p">)</span> <span class="c1"># scipy matrix</span>
+<span class="n">S</span> <span class="o">=</span> <span class="n">random</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="mf">.2</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csc&#39;</span><span class="p">)</span> <span class="c1"># scipy matrix</span>
 <span class="n">lS</span> <span class="o">=</span> <span class="n">asLazyLinearOp</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
-<span class="n">M</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">4096</span><span class="p">,</span> <span class="mi">4096</span><span class="p">)</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span> <span class="c1"># numpy complex array</span>
+<span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asfortranarray</span><span class="p">(</span><span class="n">rand</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span><span class="p">)</span> <span class="c1"># numpy complex array</span>
 <span class="n">lM</span> <span class="o">=</span> <span class="n">asLazyLinearOp</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
 </pre></div>
 
@@ -14052,13 +14055,57 @@ Theoretically, it might also be useful to distribute the calculations around man
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Then we can start to do some operations on these new objects. For example, let's multiply <code>lF</code> by a scalar:</p>
+<p>It's worth noting that a <code>LazyLinearOp</code> must have two dimensions. Trying to instantiate a <code>LazyLinearOp</code> from a vector (defined with one dimension) would raise an exception, as the example below shows.</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[3]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">try</span><span class="p">:</span>
+    <span class="n">lMSF_imag</span><span class="nd">@asLazyLinearOp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;A LazyLinearOp must have two dimensions&quot;</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
+<pre>A LazyLinearOp must have two dimensions
+</pre>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Then we can start to build more complex <code>LazyLinearOp</code> objects using various operations. For example, let's multiply <code>lF</code> by a scalar:</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[4]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">lF</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">lF</span>
@@ -14082,7 +14129,7 @@ Theoretically, it might also be useful to distribute the calculations around man
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>&lt;4096x4096 LazyLinearOp with unspecified dtype&gt;
+<pre>&lt;32x32 LazyLinearOp with unspecified dtype&gt;
 </pre>
 </div>
 </div>
@@ -14094,14 +14141,14 @@ Theoretically, it might also be useful to distribute the calculations around man
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>As you can see it stays a <code>LazyLinearOp</code> after the scalar multiplication. That's the principle of the lazy evaluation we talked about at the beginning of this notebook. No operation is really computed, only the track of the operations asked is kept in a new LazyLinearOp object.<br>
-Let's continue asking other operations. For example, a matrix multiplication and then a concatenation.</p>
+<p>As you can see the result is still a <code>LazyLinearOp</code> after the scalar multiplication. That's the principle of the lazy evaluation we mentioned in the beginning of this notebook. No operation is really computed, only the track of the operations asked is kept in a new <code>LazyLinearOp</code> object.<br>
+Let's continue with other possible operations. For example, a matrix multiplication and then a concatenation.</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[4]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[5]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pyfaust.lazylinop</span> <span class="k">as</span> <span class="nn">lp</span>
@@ -14128,8 +14175,8 @@ Let's continue asking other operations. For example, a matrix multiplication and
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>lF shape before concatenation: (4096, 4096)
-lF shape after concatenation: (8192, 4096)
+<pre>lF shape before concatenation: (32, 32)
+lF shape after concatenation: (64, 32)
 </pre>
 </div>
 </div>
@@ -14141,17 +14188,17 @@ lF shape after concatenation: (8192, 4096)
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Note that we know the shape of the resulting LazyLinearOp without the need to evaluate it.</p>
-<p>Let's try other operations with <code>lM</code> and <code>lS</code>, all <code>LazyLinearOp</code> are compatible with each other.</p>
+<p>Note that we know the <code>shape</code> of the resulting LazyLinearOp without the need to evaluate it.</p>
+<p>Let's try other operations with <code>lM</code> and <code>lS</code>, all <code>LazyLinearOp</code> are compatible with each other provided their <code>shape</code>s are compatible.</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[5]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[6]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">lMSF</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">lM</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span><span class="o">.</span><span class="n">T</span> <span class="o">+</span> <span class="n">lS</span><span class="p">)</span> <span class="o">@</span> <span class="n">lFc</span><span class="p">[:</span><span class="mi">4096</span><span class="p">,</span> <span class="p">:]</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">lMSF</span> <span class="o">=</span>  <span class="n">lFc</span><span class="p">[:</span><span class="n">n</span><span class="p">,</span> <span class="p">:]</span> <span class="o">@</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">lM</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">lS</span><span class="p">)</span>
 <span class="c1"># then get back the imaginary part of the LazyLinearOp</span>
 <span class="n">lMSF_imag</span> <span class="o">=</span> <span class="n">lMSF</span><span class="o">.</span><span class="n">imag</span>
 </pre></div>
@@ -14164,25 +14211,33 @@ lF shape after concatenation: (8192, 4096)
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Note that we know the shape of the resulting <code>LazyLinearOp</code> without the need to evaluate it.</p>
-<p>For a tour of all supported operations on <code>LazyLinearOp</code> objects please take a look at : <a href="LazyLinearOp reference">https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1lazylinop_1_1LazyLinearOp.html</a>.</p>
+<p>For a tour of all supported operations on <code>LazyLinearOp</code> objects please take a look at : <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1lazylinop_1_1LazyLinearOp.html">LazyLinearOp reference</a>.
+Let us mention most importantly:</p>
+<ul>
+<li>lazy scalar multiplication</li>
+<li>lazy addition</li>
+<li>lazy operator multiplication </li>
+<li>lazy operator concatenation</li>
+<li>lazy slicing</li>
+<li>lazy real/imaginary part </li>
+<li>lazy operator tranpose / conjugate / transconjugate</li>
+</ul>
 
 </div>
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="2.-Evaluating-a-LazyLinearOp">2. Evaluating a LazyLinearOp<a class="anchor-link" href="#2.-Evaluating-a-LazyLinearOp">&#182;</a></h3><p>Now that we've seen how to create and operate a <code>LazyLinearOp</code> let's see how to get the evaluation done, that is obtaining the real results of our operations.</p>
-<p>There are several ways to get these results. The most important way is to multiply the <code>LazyLinearOp</code> by a dense matrix (a numpy array) or a vector.</p>
+<h3 id="2.-Applying-a-LazyLinearOp-to-a-vector-or-a-matrix">2. Applying a LazyLinearOp to a vector or a matrix<a class="anchor-link" href="#2.-Applying-a-LazyLinearOp-to-a-vector-or-a-matrix">&#182;</a></h3><p>Now that we've seen how to create and operate a <code>LazyLinearOp</code> let's see how to apply it to a vector or a matrix, represented by a <code>numpy</code> array.</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[6]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[7]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="n">lMSF_imag</span><span class="nd">@np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">4096</span><span class="p">)</span>
+<span class="n">lMSF_imag</span><span class="nd">@np</span><span class="o">.</span><span class="n">asfortranarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
 </pre></div>
 
      </div>
@@ -14198,27 +14253,20 @@ lF shape after concatenation: (8192, 4096)
 <div class="jp-OutputArea-child">
 
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-
-
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr">
-<pre>/home/hinria/faust2/build/wrapper/python/pyfaust/__init__.py:1232: UserWarning: The numpy array to multiply is not F_CONTIGUOUS, costly conversion on the fly. Please use np.asfortranarray by yourself.
-  w = lambda: warnings.warn(&#34;The numpy array to multiply is not &#34;
-</pre>
-</div>
-</div>
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[6]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[7]:</div>
 
 
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>array([-8530146.26492832, -8655215.32851946, -8665462.62810018, ...,
-       -8608862.48598899, -8575730.53047507, -8592534.66859016])</pre>
+<pre>array([-6778.3655755 , -3643.4503338 , -3976.39332338, -5284.6793148 ,
+       -6202.66241806, -1838.57645157, -6291.10864022, -3546.08748508,
+       -3765.31284656, -2539.76796902, -4791.17688341, -4027.90133623,
+       -6368.33044665, -2592.89948489, -3872.35724823, -4150.14719107,
+       -1750.33671134, -6950.18766645, -2457.52862596, -3228.67780379,
+       -3759.38411412, -4222.65065609, -2728.39997077, -3955.24016077,
+       -9561.33794413, -4407.14043322, -2272.74587039, -4553.5197302 ,
+       -3312.88313101, -1378.24605711, -6255.85864097, -3241.80048742])</pre>
 </div>
 
 </div>
@@ -14230,19 +14278,138 @@ lF shape after concatenation: (8192, 4096)
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>The other ways to evaluate is to call <code>LazyLinearOp.eval</code> or <code>LazyLinearOp.toarray</code> on our object. The former function returns an object whose type depends on the operations made so far on the starting object. The latter function returns always a numpy array which is the result of the same operations.</p>
-
-</div>
-</div>
-<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="3.-Checking-the-computation-times">3. Checking the computation times<a class="anchor-link" href="#3.-Checking-the-computation-times">&#182;</a></h3><p>As a last step in this notebook, we shall verify how much computation time it takes to use a <code>LazyLinearOperator</code> compared to a numpy array. Of course it depends on the underlying objects used behind (in the operations encoded in the <code>LazyLinearOperator</code>). Here we make the measurement on <code>lFs</code> which was initialized before upon a Faust object.</p>
+<p>Note the difference with the lazy multiplication by the another random vector taken as A <code>LazyLinearOp</code>.</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[7]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[8]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">lMSF_imag</span><span class="nd">@asLazyLinearOp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[8]:</div>
+
+
+
+
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
+<pre>&lt;32x1 LazyLinearOp with unspecified dtype&gt;</pre>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Instead of computing the resulting vector it gives another <code>LazyLinearOp</code>.</p>
+<p>The vector doesn't have to be dense, a sparse one can totally be used in the multiplication.</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[9]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">random</span> <span class="k">as</span> <span class="n">srand</span>
+<span class="n">lMSF_imag</span><span class="nd">@srand</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="mf">0.25</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[9]:</div>
+
+
+
+
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
+<pre>array([[-1051.55582488],
+       [ -564.25727327],
+       [ -615.7901987 ],
+       [ -819.09463323],
+       [ -961.07665441],
+       [ -285.12457081],
+       [ -975.70287335],
+       [ -549.67183104],
+       [ -584.0155423 ],
+       [ -393.43717265],
+       [ -742.83790818],
+       [ -624.9341357 ],
+       [ -987.15140043],
+       [ -401.89994988],
+       [ -600.66743139],
+       [ -643.17502163],
+       [ -271.66282295],
+       [-1077.32747263],
+       [ -381.32199321],
+       [ -500.54423938],
+       [ -582.68558083],
+       [ -654.73033943],
+       [ -423.20432372],
+       [ -612.84015814],
+       [-1483.24220478],
+       [ -683.8174828 ],
+       [ -352.28995837],
+       [ -707.13528174],
+       [ -513.47800818],
+       [ -213.6210086 ],
+       [ -971.17025227],
+       [ -503.59639766]])</pre>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>One can also simply <em>convert</em> a <code>LazyLinearOp</code> to an equivalent numpy array using <code>LazyLinearOp.toarray</code>. An example will come next when we compare the resulting computation times.</p>
+
+</div>
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h3 id="3.-Comparing-computation-times">3. Comparing computation times<a class="anchor-link" href="#3.-Comparing-computation-times">&#182;</a></h3><p>As a last step in this notebook, we shall verify how much computation time it takes to use a <code>LazyLinearOp</code> compared to a numpy array. Of course it depends on the underlying objects used behind (in the operations encoded in the <code>LazyLinearOp</code>). Here we make the measurement on <code>lFs</code> which was initialized before upon a Faust object.</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[10]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">timeit</span> lFs@M
@@ -14269,10 +14436,10 @@ lF shape after concatenation: (8192, 4096)
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>8.38 s ± 100 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
-1.75 s ± 19.2 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
-13.5 s ± 1.01 s per loop (mean ± std. dev. of 7 runs, 1 loop each)
-consistent results: True
+<pre>165 µs ± 2.46 µs per loop (mean ± std. dev. of 7 runs, 10000 loops each)
+88.9 µs ± 4.18 µs per loop (mean ± std. dev. of 7 runs, 10000 loops each)
+20.6 µs ± 1.43 µs per loop (mean ± std. dev. of 7 runs, 10000 loops each)
+consistent results: False
 </pre>
 </div>
 </div>
@@ -14284,20 +14451,206 @@ consistent results: True
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Great! As excepted <code>lFs</code> is faster than its numpy array counterpart <code>FD</code>.</p>
+<p>Great! As expected <code>lFs</code> is faster to apply than its numpy array counterpart <code>FD</code>.</p>
 
 </div>
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>This notebook comes to its end. We've seen quickly how to create and evaluate a <code>LazyLinearOp</code> objects based on a Faust object, numpy array or scipy matrices. For more information about <code>LazyLinearOp</code> objects you can take a look to the API documentation <a href="TODO">here</a>.</p>
+<h3 id="4.-Higher-level-operations-on-LazyLinearOp">4. Higher-level operations on LazyLinearOp<a class="anchor-link" href="#4.-Higher-level-operations-on-LazyLinearOp">&#182;</a></h3>
+</div>
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Because a <code>LazyLinearOp</code> is a kind of scipy <code>LinearOperator</code>, it is straightforward to use many operations provided by scipy on this type of object.</p>
+<h4 id="4.1-The-SVD">4.1 The SVD<a class="anchor-link" href="#4.1-The-SVD">&#182;</a></h4><p>For example, let's try a SVD decomposition on a <code>LazyLinearOp</code> in one hand and on a numpy array on the other hand.</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[11]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.sparse.linalg</span> <span class="kn">import</span> <span class="n">svds</span>
+<span class="n">U1</span><span class="p">,</span> <span class="n">S1</span><span class="p">,</span> <span class="n">Vh1</span> <span class="o">=</span> <span class="n">svds</span><span class="p">(</span><span class="n">lMSF_imag</span><span class="p">)</span>
+<span class="n">U2</span><span class="p">,</span> <span class="n">S2</span><span class="p">,</span> <span class="n">Vh2</span> <span class="o">=</span> <span class="n">svds</span><span class="p">(</span><span class="n">lMSF_imag</span><span class="o">.</span><span class="n">toarray</span><span class="p">())</span>
+<span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">U1</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">S1</span><span class="p">)</span> <span class="o">@</span> <span class="n">Vh1</span><span class="p">,</span> <span class="n">U2</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">S2</span><span class="p">)</span> <span class="o">@</span> <span class="n">Vh2</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[11]:</div>
+
+
+
+
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
+<pre>True</pre>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>It works the same!</p>
+<h4 id="4.2-The-Kronecker-product">4.2 The Kronecker product<a class="anchor-link" href="#4.2-The-Kronecker-product">&#182;</a></h4><p>Another operation we can try is the Kronecker product. This time we will use the <code>numpy.kron</code> function on A and B numpy arrays and we will compare this function to the <code>pyfaust.lazylinop.kron</code> which computes the Kronecker product too but as a <code>LazyLinearOp</code>. Precisely, we compare these functions on the multiplication of the Kronecker product by a vector.</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[12]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust.lazylinop</span> <span class="kn">import</span> <span class="n">kron</span> <span class="k">as</span> <span class="n">lkron</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">pyfaust</span> <span class="kn">import</span> <span class="n">rand</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">AxB</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">)</span>
+<span class="n">lAxB</span> <span class="o">=</span> <span class="n">lkron</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">AxB</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">AxB</span><span class="nd">@x</span><span class="p">,</span> <span class="n">lAxB</span><span class="nd">@x</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[12]:</div>
+
+
+
+
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
+<pre>True</pre>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>The two versions of kron give the same result. Now let's compare the computation times.</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[13]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">timeit</span> AxB @ x
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
+<pre>45.5 ms ± 1.81 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+</pre>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[14]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">timeit</span> lAxB @ x
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
+<pre>2.26 ms ± 1.18 ms per loop (mean ± std. dev. of 7 runs, 100 loops each)
+</pre>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>The LazyLinearOp kron function is much faster! Indeed, it is optimized for <code>LazyLinearOp-s</code>.</p>
+
+</div>
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>This notebook comes to its end. We've seen quickly how to create and evaluate <code>LazyLinearOp</code> objects based on numpy arrays, scipy matrices, or a Faust objects. We've seen a bunch of operations we can call on this kind of objects. For more information about <code>LazyLinearOp</code> objects you can take a look to the API documentation <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacepyfaust_1_1lazylinop.html">here</a>.</p>
 <p><strong>NOTE</strong>: this notebook was executed using the pyfaust version:</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[8]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[15]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">pf</span><span class="o">.</span><span class="n">version</span><span class="p">()</span>
@@ -14316,13 +14669,13 @@ consistent results: True
 <div class="jp-OutputArea-child">
 
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[8]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[15]:</div>
 
 
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>&#39;3.35.5&#39;</pre>
+<pre>&#39;3.35.8&#39;</pre>
 </div>
 
 </div>
