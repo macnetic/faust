@@ -14,6 +14,7 @@ You might also be interested in this introduction to pyfaust through Jupyter Not
 - [Using the poly module](./pyfaust_poly.html)
 - [Using the PALM4MSA-MHTP algorithm](./MHTP_algorithms.html)
 - [Faust Optimizations](./Faust_optimizations.html)
+- [Using LazyLinearOp-s](./lazylinop.html)
 
 Download all the notebooks (.ipynb) [here](./pyfaust_notebooks.zip).
 
