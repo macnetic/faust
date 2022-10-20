@@ -286,13 +286,13 @@ namespace Faust
 
 				}
 			}
-//			#pragma omp parallel for // Tested but non-efficient because of solveDTO calls are already parallelized
-//			for(int i=0;i<noncec.size();i++)
-//			{
-//				Faust::MatDense<FPP, Cpu> submat, bestx, besty;
-//				auto ce = noncec[i];
-			for(auto ce: noncec)
+			#pragma omp parallel for
+			for(int i=0;i<noncec.size();i++)
 			{
+				Faust::MatDense<FPP, Cpu> submat, bestx, besty;
+				auto ce = noncec[i];
+//			for(auto ce: noncec)
+//			{
 				auto r = (*ce)[0];
 				auto RP = s1.col_nonzero_inds(r);
 				auto CP = s2.row_nonzero_inds(r);
