@@ -58,6 +58,8 @@
 #include <Eigen/SVD>
 #include "faust_init_from_matio.h"
 
+#include <Eigen/Eigenvalues>
+
 namespace Faust
 {
 
@@ -1404,7 +1406,7 @@ template<typename FPP>
 void MatDense<FPP, Cpu>::best_low_rank(const int &r, MatDense<FPP,Cpu> &bestX, MatDense<FPP, Cpu> &bestY) const
 {
 #if(EIGEN_WORLD_VERSION > 3 || EIGEN_WORLD_VERSION >= 3 && EIGEN_MAJOR_VERSION >= 3)
-	Eigen::JacobiSVD<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>> svd(this->mat, Eigen::ComputeThinU | Eigen::ComputeThinV);
+	Eigen::BDCSVD<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>> svd(this->mat, Eigen::ComputeThinU | Eigen::ComputeThinV);
 #else
 	//#ifdef _MSC_VER
 	// as far as I tested eigen3.4rc1 doesn't compile with VS 14
@@ -1412,6 +1414,27 @@ void MatDense<FPP, Cpu>::best_low_rank(const int &r, MatDense<FPP,Cpu> &bestX, M
 	Eigen::JacobiSVD<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>> svd(this->mat, Eigen::ComputeThinU | Eigen::ComputeThinV);
 #endif
 	best_low_rank(r, bestX, bestY, svd);
+}
+
+
+template<typename FPP>
+void MatDense<FPP, Cpu>::best_low_rank2(MatDense<FPP,Cpu> &bestX, MatDense<FPP, Cpu> &bestY) const
+{
+	// NOTE: this function is another try to do faster than best_low_rank, but it doesn't work better for rank == 1
+	MatDense<FPP, Cpu> AtA;
+	bestX.resize(this->getNbRow(), 1);
+	bestY.resize(this->getNbCol(), 1);
+	gemm(*this, *this, AtA, FPP(1.0), FPP(0.0), 'N', 'H');
+	Eigen::SelfAdjointEigenSolver<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>> es;
+	es.compute(AtA.mat);
+//	std::cout << "eigenvalues:" << es.eigenvalues().transpose() << std::endl;
+	int loc;
+	es.eigenvalues().maxCoeff(&loc);
+//	std::cout << "max of eigenvalues:" << loc << std::endl;
+	bestX.mat = es.eigenvectors().col(loc);
+	bestX.mat *= sqrt(es.eigenvalues()[loc]);
+	bestY.mat = bestX.mat.householderQr().solve(mat);
+	bestY.adjoint();
 }
 
 template<typename FPP>

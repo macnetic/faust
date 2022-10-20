@@ -522,6 +522,8 @@ namespace Faust
 
 			void best_low_rank(const int &r, MatDense<FPP,Cpu> &bestX, MatDense<FPP, Cpu> &bestY) const;
 
+			void best_low_rank2(MatDense<FPP,Cpu> &bestX, MatDense<FPP, Cpu> &bestY) const;
+
 			void initJacobiSVD(Eigen::JacobiSVD<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>>& svd);
 			/**
 			 * \brief Returns the best rank-1 approximate this = bestX * bestY using the svd/eigensolver/power iteration.
