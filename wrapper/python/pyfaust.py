@@ -1110,10 +1110,10 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             if A.dtype == 'complex' and F.dtype != 'complex':
                 A_r = A.real
                 A_i = A.imag
-                if not A.flags['F_CONTIGUOUS']:
-                    w()
-                    A_i = np.asfortranarray(A_i)
-                    A_r = np.asfortranarray(A_r)
+                # whatever are the A.flags, real and imag will be F_CONTIGUOUS
+                # == False because they don't own data (conversion needed)
+                A_i = np.asfortranarray(A_i)
+                A_r = np.asfortranarray(A_r)
                 G = F.m_faust.multiply(A_r) + 1j*F.m_faust.multiply(A_i)
                 return G
             else:
