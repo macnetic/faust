@@ -1438,6 +1438,57 @@ void MatDense<FPP, Cpu>::best_low_rank2(MatDense<FPP,Cpu> &bestX, MatDense<FPP, 
 }
 
 template<typename FPP>
+void MatDense<FPP, Cpu>::solveNullspaceQR(MatDense<FPP, Cpu>& X) const
+{
+	//TODO: X should be a vector
+	auto qr = mat.transpose().colPivHouseholderQr();
+	EigDenseMat Q = qr.householderQ();
+	X.mat = Q.col(mat.rows()-1);
+}
+
+template<typename FPP>
+void MatDense<FPP, Cpu>::best_low_rank3(MatDense<FPP,Cpu> &bestX, MatDense<FPP, Cpu> &bestY) const
+{
+	// NOTE: this function is another try to do faster than best_low_rank in the particular case of nrows == 2
+	assert(this->getNbRow() == 2);
+	MatDense<FPP, Cpu> AtA;
+	MatDense<FPP, Cpu> tAA;
+	bestX.resize(this->getNbRow(), 1);
+	bestY.resize(this->getNbCol(), 1);
+	gemm(*this, *this, AtA, FPP(1.0), FPP(0.0), 'N', 'H');
+	auto singular_vec = [](const MatDense<FPP, Cpu>& A, MatDense<FPP, Cpu>& vec, FPP& lambda)
+	{
+		FPP a = 1, b, c;
+		b = - A(0, 0) - A(1, 1);
+		c = A(0, 0) * A(1, 1);
+		FPP delta = b * b - 4 * a * c;
+//		FPP lambda1 = (- b - std::sqrt(delta)) / 2 / a;
+//		FPP lambda2 = (- b + std::sqrt(delta)) / 2 / a;
+		FPP lambda1 = (- b - std::sqrt(delta)) / a;
+		FPP lambda2 = (- b + std::sqrt(delta)) / a;
+		FPP abs_lambda1 = std::abs(lambda1);
+		FPP abs_lambda2 = std::abs(lambda2);
+		lambda = abs_lambda1 > abs_lambda2? abs_lambda1:abs_lambda2;
+		MatDense<FPP, Cpu> A_minus_lambdaI(2, 2);
+		MatDense<FPP, Cpu> lambdaI(2, 2);
+		lambdaI.setEyes();
+		lambdaI.scalarMultiply(lambda);
+		A_minus_lambdaI.mat = A.mat - lambdaI.mat;
+		A_minus_lambdaI.solveNullspaceQR(vec);
+//		std::cout << "lambda: " << lambda << std::endl;
+//		std::cout << "vec: " << vec.mat << std::endl;
+	};
+	FPP lambda;
+	// left singular vector
+	singular_vec(AtA, bestX, lambda);
+	MatDense<FPP, Cpu> bestX2, bestY2;
+	// right singular vector
+	bestX.mat *= sqrt(lambda);
+	bestY.mat = bestX.mat.householderQr().solve(mat);
+	bestY.adjoint();
+}
+
+template<typename FPP>
 void MatDense<FPP, Cpu>::approx_rank1(MatDense<FPP,Cpu> &bestX, MatDense<FPP, Cpu> &bestY) const
 {
 	MatDense<FPP, Cpu> AtA, tAA;

@@ -138,6 +138,7 @@ namespace Faust
 	template<typename FPP>
 		class MatDense<FPP,Cpu> : public MatGeneric<FPP,Cpu>
 		{
+			using EigDenseMat = Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>;
 
 			friend class MatSparse<FPP,Cpu>;
 			friend class MatBSR<FPP, Cpu>;
@@ -523,6 +524,9 @@ namespace Faust
 			void best_low_rank(const int &r, MatDense<FPP,Cpu> &bestX, MatDense<FPP, Cpu> &bestY) const;
 
 			void best_low_rank2(MatDense<FPP,Cpu> &bestX, MatDense<FPP, Cpu> &bestY) const;
+			void best_low_rank3(MatDense<FPP,Cpu> &bestX, MatDense<FPP, Cpu> &bestY) const;
+
+			void solveNullspaceQR(MatDense<FPP, Cpu>& X) const;
 
 			void initJacobiSVD(Eigen::JacobiSVD<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>>& svd);
 			/**
