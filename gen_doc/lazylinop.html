@@ -13993,7 +13993,7 @@ a.anchor-link {
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust.lazylinop</span> <span class="kn">import</span> <span class="n">asLazyLinearOp</span>
 <span class="kn">import</span> <span class="nn">pyfaust</span> <span class="k">as</span> <span class="nn">pf</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="n">n</span> <span class="o">=</span> <span class="mi">4096</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">3000</span>
 <span class="c1"># create a random Faust</span>
 <span class="n">F</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="mf">.001</span><span class="p">)</span>
 <span class="c1"># create a LazyLinearOp upon it</span>
@@ -14018,7 +14018,7 @@ a.anchor-link {
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>&lt;4096x4096 LazyLinearOp with unspecified dtype&gt;
+<pre>&lt;3000x3000 LazyLinearOp with unspecified dtype&gt;
 </pre>
 </div>
 </div>
@@ -14135,7 +14135,7 @@ a.anchor-link {
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>&lt;4096x4096 LazyLinearOp with unspecified dtype&gt;
+<pre>&lt;3000x3000 LazyLinearOp with unspecified dtype&gt;
 </pre>
 </div>
 </div>
@@ -14181,8 +14181,8 @@ Let's continue with other possible operations. For example, a matrix multiplicat
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>lF shape before concatenation: (4096, 4096)
-lF shape after concatenation: (8192, 4096)
+<pre>lF shape before concatenation: (3000, 3000)
+lF shape after concatenation: (6000, 3000)
 </pre>
 </div>
 </div>
@@ -14266,8 +14266,8 @@ Let us mention most importantly:</p>
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>array([-1.00620547e+13, -9.18062576e+12, -1.98816577e+13, ...,
-       -1.37765382e+13, -8.17111461e+12, -1.40277424e+13])</pre>
+<pre>array([-4.37087002e+11, -7.12681237e+11, -3.69084854e+11, ...,
+       -2.13941538e+11, -3.07422772e+11, -4.48677676e+11])</pre>
 </div>
 
 </div>
@@ -14310,7 +14310,7 @@ Let us mention most importantly:</p>
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>&lt;4096x1 LazyLinearOp with unspecified dtype&gt;</pre>
+<pre>&lt;3000x1 LazyLinearOp with unspecified dtype&gt;</pre>
 </div>
 
 </div>
@@ -14356,13 +14356,13 @@ Let us mention most importantly:</p>
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>array([[-6.09369711e+08],
-       [-5.55991302e+08],
-       [-1.20405933e+09],
+<pre>array([[-35354739.71112707],
+       [-57647006.01911021],
+       [-29854372.68627841],
        ...,
-       [-8.34326602e+08],
-       [-4.94852534e+08],
-       [-8.49534382e+08]])</pre>
+       [-17304361.33190581],
+       [-24866582.71587702],
+       [-36293755.41532906]])</pre>
 </div>
 
 </div>
@@ -14413,9 +14413,9 @@ Let us mention most importantly:</p>
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>9.2 s ± 193 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
-1.89 s ± 59.8 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
-13.8 s ± 1.51 s per loop (mean ± std. dev. of 7 runs, 1 loop each)
+<pre>2.1 s ± 85.9 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+947 ms ± 9.42 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+3.68 s ± 72.6 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
 consistent results: True
 </pre>
 </div>
@@ -14568,7 +14568,7 @@ consistent results: True
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>45.7 ms ± 2.19 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+<pre>41.4 ms ± 3.16 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
 </pre>
 </div>
 </div>
@@ -14603,7 +14603,7 @@ consistent results: True
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>1.75 ms ± 716 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+<pre>972 µs ± 122 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
 </pre>
 </div>
 </div>
@@ -14653,7 +14653,7 @@ consistent results: True
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>&#39;3.35.9&#39;</pre>
+<pre>&#39;3.35.10&#39;</pre>
 </div>
 
 </div>
