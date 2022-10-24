@@ -3633,7 +3633,7 @@ def circ(c, dev='cpu'):
     column of C.toarray()).
 
     Args:
-        c: the vector to define the circulant Faust. Its length must be a power of two.
+        c: the vector to define the circulant Faust.
         dev: the device on which the Faust is created, 'cpu' (default) or 'gpu'.
 
     Example:
@@ -3674,21 +3674,21 @@ def circ(c, dev='cpu'):
 #    if 'diag_factor' in kwargs.keys():
 #        diag_factor = kwargs['diag_factor']
 #    else:
+    if not isinstance(c, np.ndarray) or c.ndim != 1:
+        raise TypeError('c must be a vector of numpy array type')
     diag_factor = 'multiplied'
     if diag_factor not in ['multiplied', 'csr']:
         raise ValueError('option diag_factor must be \'csr\' or'
                          ' \'multiplied\'')
     log2c = np.log2(len(c))
     if  log2c != np.floor(log2c):
-        raise ValueError('Only power of two length vectors are supported')
-    if not isinstance(c, np.ndarray) or c.ndim != 1:
-        raise TypeError('c must be a vector of numpy array type')
+        C = toeplitz(c, np.hstack((c[0:1], c[-1:0:-1])), dev=dev)
+        return C
     n = len(c)
     F = dft(n, normed=False)
     FH = F.H
     S = csr_matrix(diags(FH@(c/n)))
 #    S = csr_matrix(diags(np.sqrt(n)*FH@c)) # if it was normed==True
-
     if diag_factor == 'csr':
         C = F @ Faust(S) @ FH
     elif diag_factor == 'multiplied':
@@ -3710,7 +3710,7 @@ def anticirc(c, dev='cpu'):
     """Returns an anti-circulant Faust A defined by the vector c (which is the last column of A.toarray()).
 
     Args:
-        c: the vector to define the circulant Faust. Its length must be a power of two.
+        c: the vector to define the anti-circulant Faust.
         dev: the device on which the Faust is created, 'cpu' (default) or 'gpu'.
 
     Example:

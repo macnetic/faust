@@ -889,27 +889,29 @@ class TestFaustPy(unittest.TestCase):
                     self.assertTrue(np.allclose(a,b))
 
     def test_circulant(self):
-        v = np.random.rand(1024)
         from scipy.linalg import circulant
         from pyfaust import circ
-        self.assertTrue(np.allclose(circulant(v), circ(v).toarray()))
+        # power of two dim
+        # random dim
+        for v in [np.random.rand(1024), np.random.rand(self.r.randint(3, 45))]:
+            self.assertTrue(np.allclose(circulant(v), circ(v).toarray()))
 
     def test_anticirculant(self):
-        v = np.random.rand(1024)
         from scipy.linalg import circulant
         from pyfaust import anticirc
-        P = np.zeros((len(v), len(v)))
-        I = np.arange(len(v)-1, -1, -1)
-        J = np.arange(0, len(v))
-        P[I, J] = 1
-        self.assertTrue(np.allclose(circulant(v), anticirc(v).toarray()@P))
+        for v in [np.random.rand(1024), np.random.rand(self.r.randint(3, 45))]:
+            P = np.zeros((len(v), len(v)))
+            I = np.arange(len(v)-1, -1, -1)
+            J = np.arange(0, len(v))
+            P[I, J] = 1
+            self.assertTrue(np.allclose(circulant(v), anticirc(v).toarray()@P))
 
     def test_toeplitz(self):
-        r = np.random.rand(1024)
-        c = np.random.rand(2048)
         from scipy.linalg import toeplitz
         from pyfaust import toeplitz as ftoeplitz
-        self.assertTrue(np.allclose(toeplitz(c, r), ftoeplitz(c, r).toarray()))
+        from numpy.random import rand
+        for r, c in zip([rand(1024), rand(25)], [rand(2048), rand(42)]):
+            self.assertTrue(np.allclose(toeplitz(c, r), ftoeplitz(c, r).toarray()))
 
     def test_bsr_get_fact(self):
         print("test_bsr_get_fact")
