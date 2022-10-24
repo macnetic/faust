@@ -1,7 +1,7 @@
 %==========================================================================================
 %> @brief Returns a circulant Faust C defined by the vector c (which is the first column of full(C)).
 %>
-%> @param c: the vector to define the circulant Faust. Its length must be a power of two.
+%> @param c: the vector to define the circulant Faust.
 %> @param 'dev', str: 'gpu' or 'cpu' to create the Faust on CPU or GPU ('cpu' is the default).
 %>
 %> @b Example:
@@ -78,12 +78,13 @@ function C = circ(c, varargin)
 			end
 		end
 	end
-    log2c = log2(numel(c));
-    if(log2c ~= floor(log2c))
-        error('Only power of two length vectors are supported')
-    end
     if ~ ismatrix(c) || ~ isnumeric(c)
         error('c must be numeric vector')
+    end
+    log2c = log2(numel(c));
+    if(log2c ~= floor(log2c))
+		C = matfaust.toeplitz(c, [c(1) c(end:-1:2)]);
+		return
     end
     if size(c, 2) == 1
         c = c.';

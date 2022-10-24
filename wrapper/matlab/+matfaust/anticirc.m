@@ -1,7 +1,7 @@
 %==========================================================================================
 %> @brief Returns an anticirculant Faust A defined by the vector c (which is the last column of full(A)).
 %>
-%> @param c: the vector to define the circulant Faust. Its length must be a power of two.
+%> @param c: the vector to define the anticirculant Faust.
 %> @param 'dev', str: 'gpu' or 'cpu' to create the Faust on CPU or GPU ('cpu' is the default).
 %>
 %> @b Example

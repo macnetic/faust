@@ -543,8 +543,22 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			A = [[2     3     4     1]
 			     [3     4     1     2]
 			     [4     1     2     3]
-			     [1     2     3     4]]
+			     [1     2     3     4]];
 			this.assertEqual(A, real(full(matfaust.anticirc(c))))
+			% not a power of two
+			c = [1 2 3 4 5];
+			C = [[1     5     4     3     2]
+				 [2     1     5     4     3]
+				 [3     2     1     5     4]
+				 [4     3     2     1     5];
+				 [5     4     3     2     1]];
+			this.assertEqual(C, real(full(matfaust.circ(c))), 'AbsTol', 1e-8)
+			A = [[2     3     4     5    1]
+			     [3     4     5     1    2]
+			     [4     5     1     2    3]
+			     [5     1     2     3    4]
+			     [1     2     3     4    5]];
+			this.assertEqual(A, real(full(matfaust.anticirc(c))), 'AbsTol', 1e-8)
 		end
 
 		function testToeplitz(this)
