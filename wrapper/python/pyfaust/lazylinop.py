@@ -995,15 +995,15 @@ class LazyLinearOp2(LinearOperator):
         # TODO: refactor with create_from_funcs (in ctor)
         lambdas['T'] = lambda: lopT
         lambdas['H'] = lambda: lopH
-        lambdas['slice'] = lambda indices: LazyLinearOp2._slice_lambda(lop,
+        lambdas['slice'] = lambda indices: LazyLinearOp2._index_lambda(lop,
                                                                        indices)()
         lambdasT['T'] = lambda: lop
         lambdasT['H'] = lambda: lopC
-        lambdasT['slice'] = lambda indices: LazyLinearOp2._slice_lambda(lopT,
+        lambdasT['slice'] = lambda indices: LazyLinearOp2._index_lambda(lopT,
                                                                         indices)()
         lambdasH['T'] = lambda: lopC
         lambdasH['H'] = lambda: lop
-        lambdasH['slice'] = lambda indices: LazyLinearOp2._slice_lambda(lopH,
+        lambdasH['slice'] = lambda indices: LazyLinearOp2._index_lambda(lopH,
                                                                         indices)()
         return lop
 
@@ -1043,15 +1043,15 @@ class LazyLinearOp2(LinearOperator):
 
         lambdas['T'] = lambda: lopT
         lambdas['H'] = lambda: lopH
-        lambdas['slice'] = lambda indices: LazyLinearOp2._slice_lambda(lop,
+        lambdas['slice'] = lambda indices: LazyLinearOp2._index_lambda(lop,
                                                                        indices)()
         lambdasT['T'] = lambda: lop
         lambdasT['H'] = lambda: lopC
-        lambdasT['slice'] = lambda indices: LazyLinearOp2._slice_lambda(lopT,
+        lambdasT['slice'] = lambda indices: LazyLinearOp2._index_lambda(lopT,
                                                                         indices)()
         lambdasH['T'] = lambda: lopC
         lambdasH['H'] = lambda: lop
-        lambdasH['slice'] = lambda indices: LazyLinearOp2._slice_lambda(lopH,
+        lambdasH['slice'] = lambda indices: LazyLinearOp2._index_lambda(lopH,
                                                                         indices)()
         return lop
 
@@ -1060,13 +1060,12 @@ class LazyLinearOp2(LinearOperator):
             raise TypeError(attr+' is not supported by the root object of this'
                             ' LazyLinearOp')
 
-    def _slice_lambda(lop, indices):
-        #TODO: handle indices[0] or indices[1] == ':' ?
+    def _index_lambda(lop, indices):
         from scipy.sparse import eye as seye
         s = lambda: \
                 LazyLinearOp2.create_from_op(seye(lop.shape[0],
                                                   format='csr')[indices[0]]) \
-        @ lop @ LazyLinearOp2.create_from_op(seye(lop.shape[1], format='csr')[:, indices[1]])
+                @ lop @ LazyLinearOp2.create_from_op(seye(lop.shape[1], format='csr')[:, indices[1]])
         return s
 
     @property
@@ -1454,8 +1453,7 @@ class LazyLinearOp2(LinearOperator):
                 isinstance(indices[0], slice):
             return self._slice(indices)
         else:
-            raise Exception('Other __getitem__ call than slicing and item'
-                            ' access is not yet supported')
+            return self._slice(indices)
 
     def _newshape_getitem(self, indices):
         empty_lop_except = Exception("Cannot create an empty LazyLinearOp.")
