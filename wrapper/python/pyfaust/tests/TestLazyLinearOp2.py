@@ -123,14 +123,15 @@ class TestLazyLinearOpFaust(unittest.TestCase):
     def test_mul(self):
         v = np.random.rand(self.lop.shape[1])
         lmul2 = self.lop * v
-        self.assertTrue(isinstance(lmul2, LazyLinearOp2))
-        self.assertAlmostEqual(LA.norm(lmul2.toarray() - (self.lopA * v)),
+        self.assertTrue(isinstance(lmul2, np.ndarray))
+        self.assertAlmostEqual(LA.norm(lmul2 - (self.lopA @ v)),
                                0)
-        v = np.random.rand(1, self.lop.shape[1])
+        v = np.random.rand(self.lop.shape[1], 1)
         lmul2 = self.lop * v
-        self.assertTrue(isinstance(lmul2, LazyLinearOp2))
-        self.assertAlmostEqual(LA.norm(lmul2.toarray() - (self.lopA * v)),
+        self.assertTrue(isinstance(lmul2, np.ndarray))
+        self.assertAlmostEqual(LA.norm(lmul2 - (self.lopA @ v)),
                                0)
+
         s = np.random.rand(1, 1)[0, 0]
         lmul2 = self.lop * s
         self.assertTrue(isinstance(lmul2, LazyLinearOp2))
@@ -138,19 +139,20 @@ class TestLazyLinearOpFaust(unittest.TestCase):
                                0)
 
     def test_rmul(self):
-        v = np.random.rand(self.lop.shape[1])
+        v = np.random.rand(self.lop.shape[0])
         lmul2 = v * self.lop
-        self.assertTrue(isinstance(lmul2, LazyLinearOp2))
-        self.assertAlmostEqual(LA.norm(lmul2.toarray() - (v * self.lopA)),
+        self.assertTrue(isinstance(lmul2, np.ndarray))
+        self.assertAlmostEqual(LA.norm(lmul2 - (v @ self.lopA)),
                                0)
 
-        v = np.random.rand(1, self.lop.shape[1])
-        lmul2 = v * self.lop
-        self.assertTrue(isinstance(lmul2, LazyLinearOp2))
-        self.assertAlmostEqual(LA.norm(lmul2.toarray() - (v * self.lopA)),
+        v = np.random.rand(1, self.lop.shape[0])
+        lmul2 = v @ self.lop
+        self.assertTrue(isinstance(lmul2, np.ndarray))
+        self.assertAlmostEqual(LA.norm(lmul2 - (v @ self.lopA)),
                                0)
 
         s = np.random.rand(1, 1)[0, 0]
+        self.assertTrue(np.isscalar(s))
         lmul2 = s * self.lop
         self.assertTrue(isinstance(lmul2, LazyLinearOp2))
         self.assertAlmostEqual(LA.norm(lmul2.toarray() - (s * self.lopA)),
@@ -193,11 +195,10 @@ class TestLazyLinearOpFaust(unittest.TestCase):
     def test_chain_ops(self):
         lchain = self.lop + self.lop2
         lchain = lchain @ self.lop3
-        lchain = 2 * lchain
-        v = np.random.rand(lchain.shape[1])
-        lchain = lchain * v
+        lchain = 2 * lchain * 3
+        self.assertTrue(np.allclose(lchain.toarray(), 6 * (self.lopA + self.lop2A) @ self.lop3A))
         lchain = lchain.concatenate(self.lop3, axis=0)
-        mat_ref = np.vstack(((2 * (self.lopA + self.lop2A) @ self.lop3A) * v,
+        mat_ref = np.vstack(((2 * (self.lopA + self.lop2A) @ self.lop3A * 3),
                              self.lop3A))
         self.assertAlmostEqual(LA.norm(lchain.toarray() - mat_ref),
                                0)

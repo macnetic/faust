@@ -1297,7 +1297,17 @@ class LazyLinearOp2(LinearOperator):
         self._checkattr('__matmul__')
         if not hasattr(op, 'shape'):
             raise TypeError('op must have a shape attribute')
-        if swap and op.shape[1] != self.shape[0] or not swap and self.shape[1] != op.shape[0]:
+        if not hasattr(op, 'ndim'):
+            raise TypeError('op must have a ndim attribute')
+        if op.ndim == 1 and (self.shape[0] if swap else self.shape[1]) != op.size or op.ndim == 2 and (swap and
+                                                                       op.shape[1]
+                                                                       !=
+                                                                       self.shape[0]
+                                                                       or not
+                                                                       swap and
+                                                                       self.shape[1]
+                                                                       !=
+                                                                       op.shape[0]):
             raise ValueError('dimensions must agree')
 
     def __matmul__(self, op):
@@ -1435,15 +1445,9 @@ class LazyLinearOp2(LinearOperator):
         if np.isscalar(other):
             S = eye(self.shape[1], format='csr') * other
             lop = LazyLinearOp2.create_from_op(S)
-        elif hasattr(other, 'ndim') and other.ndim == 1 or other.ndim == 2 and other.shape[0] == 1:
-            if other.size == 1:
-                return self * self.item()
-            else:
-                D = diags(other.squeeze())
-                lop = LazyLinearOp2.create_from_op(D)
+            new_op = self @ lop
         else:
-            raise TypeError('Unsupported type for other')
-        new_op = self @ lop
+            new_op = self @ other
         return new_op
 
     def __rmul__(self, s):
@@ -1456,7 +1460,10 @@ class LazyLinearOp2(LinearOperator):
         """
         # because s is a scalar, it is commutative
         # for vector broadcasting too
-        return self * s
+        if np.isscalar(s):
+            return self * s
+        else:
+            return s @ self
 
 
     def __imul__(self, op):
