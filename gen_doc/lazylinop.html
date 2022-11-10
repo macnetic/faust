@@ -13990,14 +13990,14 @@ a.anchor-link {
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[1]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust.lazylinop</span> <span class="kn">import</span> <span class="n">asLazyLinearOp</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust.lazylinop</span> <span class="kn">import</span> <span class="n">aslazylinearoperator</span>
 <span class="kn">import</span> <span class="nn">pyfaust</span> <span class="k">as</span> <span class="nn">pf</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="n">n</span> <span class="o">=</span> <span class="mi">3000</span>
 <span class="c1"># create a random Faust</span>
 <span class="n">F</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="mf">.001</span><span class="p">)</span>
 <span class="c1"># create a LazyLinearOp upon it</span>
-<span class="n">lF</span> <span class="o">=</span> <span class="n">asLazyLinearOp</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
+<span class="n">lF</span> <span class="o">=</span> <span class="n">aslazylinearoperator</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">lF</span><span class="p">)</span>
 </pre></div>
 
@@ -14018,7 +14018,7 @@ a.anchor-link {
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>&lt;3000x3000 LazyLinearOp with unspecified dtype&gt;
+<pre>&lt;3000x3000 LazyLinearOp with dtype=float64&gt;
 </pre>
 </div>
 </div>
@@ -14042,9 +14042,9 @@ a.anchor-link {
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">random</span>
 <span class="kn">from</span> <span class="nn">numpy.random</span> <span class="kn">import</span> <span class="n">rand</span>
 <span class="n">S</span> <span class="o">=</span> <span class="n">random</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="mf">.2</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csc&#39;</span><span class="p">)</span> <span class="c1"># scipy matrix</span>
-<span class="n">lS</span> <span class="o">=</span> <span class="n">asLazyLinearOp</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+<span class="n">lS</span> <span class="o">=</span> <span class="n">aslazylinearoperator</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
 <span class="n">M</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">+</span> <span class="n">rand</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">n</span><span class="p">)</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span> <span class="c1"># numpy complex array</span>
-<span class="n">lM</span> <span class="o">=</span> <span class="n">asLazyLinearOp</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+<span class="n">lM</span> <span class="o">=</span> <span class="n">aslazylinearoperator</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
 </pre></div>
 
      </div>
@@ -14065,7 +14065,7 @@ a.anchor-link {
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">try</span><span class="p">:</span>
-    <span class="n">lMSF_imag</span><span class="nd">@asLazyLinearOp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+    <span class="n">lMSF_imag</span><span class="nd">@aslazylinearoperator</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
 <span class="k">except</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;A LazyLinearOp must have two dimensions&quot;</span><span class="p">)</span>
 </pre></div>
@@ -14266,8 +14266,8 @@ Let us mention most importantly:</p>
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>array([-4.37087002e+11, -7.12681237e+11, -3.69084854e+11, ...,
-       -2.13941538e+11, -3.07422772e+11, -4.48677676e+11])</pre>
+<pre>array([-3.18354596e+11+0.j, -1.69834652e+11+0.j, -2.70490716e+11+0.j, ...,
+       -3.29820432e+11+0.j, -2.03847006e+11+0.j, -3.06795470e+11+0.j])</pre>
 </div>
 
 </div>
@@ -14288,7 +14288,7 @@ Let us mention most importantly:</p>
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[8]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">lMSF_imag</span><span class="nd">@asLazyLinearOp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">lMSF_imag</span><span class="nd">@aslazylinearoperator</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
 </pre></div>
 
      </div>
@@ -14356,13 +14356,13 @@ Let us mention most importantly:</p>
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>array([[-35354739.71112707],
-       [-57647006.01911021],
-       [-29854372.68627841],
+<pre>array([[-27384056.98062814+0.j],
+       [-14608555.65643751+0.j],
+       [-23266887.35681728+0.j],
        ...,
-       [-17304361.33190581],
-       [-24866582.71587702],
-       [-36293755.41532906]])</pre>
+       [-28370216.25666752+0.j],
+       [-17533776.78465986+0.j],
+       [-26388695.98882961+0.j]])</pre>
 </div>
 
 </div>
@@ -14413,9 +14413,33 @@ Let us mention most importantly:</p>
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>2.1 s ± 85.9 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
-947 ms ± 9.42 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
-3.68 s ± 72.6 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+<pre>3.57 s ± 328 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+</pre>
+</div>
+</div>
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr">
+<pre>/home/hinria/faust2/build/wrapper/python/pyfaust/__init__.py:1232: UserWarning: The numpy array to multiply is not F_CONTIGUOUS, costly conversion on the fly. Please use np.asfortranarray by yourself.
+  w = lambda: warnings.warn(&#34;The numpy array to multiply is not &#34;
+</pre>
+</div>
+</div>
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
+<pre>1.31 s ± 93 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+4.85 s ± 139 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
 consistent results: True
 </pre>
 </div>
@@ -14450,7 +14474,7 @@ consistent results: True
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.sparse.linalg</span> <span class="kn">import</span> <span class="n">svds</span>
-<span class="n">lF</span> <span class="o">=</span> <span class="n">asLazyLinearOp</span><span class="p">(</span><span class="n">pf</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">25</span><span class="p">))</span>
+<span class="n">lF</span> <span class="o">=</span> <span class="n">aslazylinearoperator</span><span class="p">(</span><span class="n">pf</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">25</span><span class="p">))</span>
 <span class="n">U1</span><span class="p">,</span> <span class="n">S1</span><span class="p">,</span> <span class="n">Vh1</span> <span class="o">=</span> <span class="n">svds</span><span class="p">(</span><span class="n">lF</span><span class="p">)</span>
 <span class="n">U2</span><span class="p">,</span> <span class="n">S2</span><span class="p">,</span> <span class="n">Vh2</span> <span class="o">=</span> <span class="n">svds</span><span class="p">(</span><span class="n">lF</span><span class="o">.</span><span class="n">toarray</span><span class="p">())</span>
 <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">U1</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">S1</span><span class="p">)</span> <span class="o">@</span> <span class="n">Vh1</span><span class="p">,</span> <span class="n">U2</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">S2</span><span class="p">)</span> <span class="o">@</span> <span class="n">Vh2</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">)</span>
@@ -14568,7 +14592,7 @@ consistent results: True
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>41.4 ms ± 3.16 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+<pre>64.6 ms ± 4.89 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
 </pre>
 </div>
 </div>
@@ -14603,7 +14627,7 @@ consistent results: True
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>972 µs ± 122 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
+<pre>2.12 ms ± 656 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
 </pre>
 </div>
 </div>
@@ -14653,7 +14677,7 @@ consistent results: True
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>&#39;3.35.10&#39;</pre>
+<pre>&#39;3.35.11&#39;</pre>
 </div>
 
 </div>
