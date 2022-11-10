@@ -244,5 +244,18 @@ class TestLazyLinearOpFFTFunc(TestLazyLinearOpFaust):
         self.lop3 = aslazylinearoperator(pf.rand(self.lop.shape[1], self.lop.shape[0]))
         self.lop3A = self.lop3.toarray()
 
+class TestLazyLinearOpFaustKron(TestLazyLinearOpFaust):
+
+    def setUp(self):
+        from pyfaust.lazylinop import kron2 as lkron
+        lop_A = aslazylinearoperator(pf.rand(10, 15))
+        lop_B = aslazylinearoperator(pf.rand(10, 15))
+        self.lop = lkron(lop_A, lop_B)
+        self.lopA = self.lop.toarray()
+        self.lop2 = aslazylinearoperator(pf.rand(*self.lop.shape))
+        self.lop2A = self.lop2.toarray()
+        self.lop3 = aslazylinearoperator(pf.rand(self.lop.shape[1], 10))
+        self.lop3A = self.lop3.toarray()
+
 if '__main__' == __name__:
     unittest.main()

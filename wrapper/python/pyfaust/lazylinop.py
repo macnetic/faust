@@ -1820,3 +1820,69 @@ def LazyLinearOperator(shape, **kwargs):
         rmatmat = lambda M: _matmat(M, rmatvec)
 
     return LazyLinearOp2.create_from_funcs(matmat, rmatmat, shape, dtype=dtype)
+
+def kron2(A, B):
+
+    def _kron(A, B, shape, op):
+        """
+        Returns the LazyLinearOpKron for the multiplication self @ op or if op is a np.ndarray it returns the np.ndarray (self @ op).
+
+        Note: this specialization is particularly optimized for multiplying the
+        operator by a vector.
+
+        Args:
+            op: an object compatible with self for this binary operation.
+
+        <b>See also:</b> pyfaust.lazylinop.kron.
+        """
+        from threading import Thread
+        from multiprocessing import cpu_count
+        from os import environ
+        from pyfaust import isFaust
+        #LazyLinearOp._sanitize_matmul(op) # TODO
+        if hasattr(op, 'reshape') and hasattr(op, '__matmul__') and hasattr(op,
+                                                                            '__getitem__'):
+            if isFaust(A) or isFaust(B):
+                parallel = False # e.g. for A, B Fausts in R^100x100 and op 128 columns
+                # it was found that the sequential computation is faster
+            else:
+                parallel = True
+            if 'KRON_PARALLEL' in environ:
+                parallel = environ['KRON_PARALLEL'] == '1'
+            nthreads = cpu_count() // 2
+            if op.ndim == 1:
+                op = op.reshape((op.size, 1))
+                one_dim = True
+            else:
+                one_dim = False
+            res = np.empty((shape[0], op.shape[1]))
+            def out_col(j, ncols):
+                for j in range(j, min(j + ncols, op.shape[1])):
+                    op_mat = op[:, j].reshape((A.shape[1], B.shape[1]))
+                    res[:, j] = (A @ op_mat @ B.T).reshape(shape[0])
+            ncols = op.shape[1]
+            if parallel:
+                t = []
+                cols_per_thread = ncols // nthreads
+                if cols_per_thread * nthreads < ncols:
+                    cols_per_thread += 1
+                while len(t) < nthreads:
+                    t.append(Thread(target=out_col, args=(cols_per_thread *
+                                                          len(t),
+                                                          cols_per_thread)))
+                    t[-1].start()
+
+                for j in range(nthreads):
+                    t[j].join()
+            else:
+                out_col(0, ncols)
+            if one_dim:
+                res = res.ravel()
+        else:
+            raise TypeError('op must possess reshape, __matmul__ and'
+                            ' __getitem__ attributes')
+        return res
+    shape = (A.shape[0] * B.shape[0], A.shape[1] * B.shape[1])
+    return LazyLinearOperator(shape, matmat=lambda x: _kron(A, B, shape, x),
+                              rmatmat=lambda x : _kron(A.T.conj(), B.T.conj(),
+                                                       (shape[1], shape[0]), x))
