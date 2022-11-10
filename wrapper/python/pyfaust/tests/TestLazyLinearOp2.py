@@ -1,17 +1,18 @@
 import unittest
 import pyfaust as pf
-from pyfaust.lazylinop import LazyLinearOp2, vstack, hstack, LazyLinearOp2
+from pyfaust.lazylinop import (LazyLinearOp2, vstack, hstack, LazyLinearOp2,
+                               LazyLinearOperator, aslazylinearoperator)
 import numpy.linalg as LA
 import numpy as np
 
 class TestLazyLinearOpFaust(unittest.TestCase):
 
     def setUp(self):
-        self.lop = LazyLinearOp2.create_from_op(pf.rand(10, 15))
+        self.lop = aslazylinearoperator(pf.rand(10, 15))
         self.lopA = self.lop.toarray()
-        self.lop2 = LazyLinearOp2.create_from_op(pf.rand(self.lop.shape[0], self.lop.shape[1]))
+        self.lop2 = aslazylinearoperator(pf.rand(self.lop.shape[0], self.lop.shape[1]))
         self.lop2A = self.lop2.toarray()
-        self.lop3 = LazyLinearOp2.create_from_op(pf.rand(self.lop.shape[1], self.lop.shape[0]))
+        self.lop3 = aslazylinearoperator(pf.rand(self.lop.shape[1], self.lop.shape[0]))
         self.lop3A = self.lop3.toarray()
 
     def test_shape(self):
@@ -234,12 +235,12 @@ class TestLazyLinearOpFFTFunc(TestLazyLinearOpFaust):
         from scipy.fft import fft, ifft
         # axis = 0 to be consistent with LazyLinearOp2.toarray() which applies
         # fft on columns of the matrix, not on the rows (axis=1)
-        self.lop = LazyLinearOp2.create_from_funcs(lambda x: fft(x, axis=0),
-                                                   lambda x: 8 * ifft(x, axis=0), (8, 8))
+        self.lop = LazyLinearOperator((8, 8), matmat=lambda x: fft(x, axis=0),
+                                      rmatmat=lambda x: 8 * ifft(x, axis=0))
         self.lopA = self.lop.toarray()
-        self.lop2 = LazyLinearOp2.create_from_op(pf.rand(self.lop.shape[0], self.lop.shape[1]))
+        self.lop2 = aslazylinearoperator(pf.rand(self.lop.shape[0], self.lop.shape[1]))
         self.lop2A = self.lop2.toarray()
-        self.lop3 = LazyLinearOp2.create_from_op(pf.rand(self.lop.shape[1], self.lop.shape[0]))
+        self.lop3 = aslazylinearoperator(pf.rand(self.lop.shape[1], self.lop.shape[0]))
         self.lop3A = self.lop3.toarray()
 
 if '__main__' == __name__:

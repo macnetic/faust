@@ -716,7 +716,45 @@ def asLazyLinearOp(obj):
 
     <b>See also:</b> pyfaust.rand.
     """
-    return LazyLinearOp.create(obj)
+    return LazyLinearOp2.create_from_op(obj)
+
+def aslazylinearoperator(obj):
+    """
+    Creates a LazyLinearOp based on the object obj which must be of a linear operator compatible type.
+
+    NOTE: obj must support operations and attributes defined in the
+    LazyLinearOp class.
+    Any operation not supported would raise an exception at the evaluation
+    time.
+
+    Args:
+        obj: the root object on which the LazyLinearOp is based (it could
+        be a numpy array, a scipy matrix, a Faust object or almost any
+        object that supports the same kind of functions).
+
+
+    Returns:
+        a LazyLinearOp instance based on obj.
+
+    Example:
+        >>> from pyfaust.lazylinop import asLazyLinearOp
+        >>> import numpy as np
+        >>> M = np.random.rand(10, 12)
+        >>> lM = azlazylinearoperator(M)
+        >>> twolM = lM + lM
+        >>> twolM
+        <pyfaust.lazylinop.LazyLinearOp at 0x7fcd7d7750f0>
+        >>> import pyfaust as pf
+        >>> F = pf.rand(10, 12)
+        >>> lF = azlazylinearoperator(F)
+        >>> twolF = lF + lF
+        >>> twolF
+        <pyfaust.lazylinop.LazyLinearOp at 0x7fcd7d774730>
+
+
+    <b>See also:</b> pyfaust.rand.
+    """
+    return LazyLinearOp2.create_from_op(obj)
 
 def hstack(tup):
     """
@@ -912,7 +950,7 @@ class LazyLinearOp2(LinearOperator):
 
     Warning: This code is in a beta status.
     """
-    def __init__(self, lambdas, shape, root_obj):
+    def __init__(self, lambdas, shape, root_obj, dtype=None):
         """
         Constructor. Not meant to be used directly.
 
@@ -936,7 +974,7 @@ class LazyLinearOp2(LinearOperator):
         self.shape = shape
         self._root_obj = root_obj #TODO: delete because it can't always be
         # defined (create_from_funcs and hybrid operations)
-        self.dtype = None
+        self.dtype = dtype
         super(LazyLinearOp2, self).__init__(self.dtype, self.shape)
 
     def _check_lambdas(self):
@@ -987,10 +1025,10 @@ class LazyLinearOp2(LinearOperator):
             l['T'] = None
             l['H'] = None
             l['slice'] = None
-        lop = LazyLinearOp2(lambdas, obj.shape, obj)
-        lopT = LazyLinearOp2(lambdasT, (obj.shape[1], obj.shape[0]), obj)
-        lopH = LazyLinearOp2(lambdasH, (obj.shape[1], obj.shape[0]), obj)
-        lopC = LazyLinearOp2(lambdasC, (obj.shape[0], obj.shape[1]), obj)
+        lop = LazyLinearOp2(lambdas, obj.shape, obj, dtype=obj.dtype)
+        lopT = LazyLinearOp2(lambdasT, (obj.shape[1], obj.shape[0]), obj, dtype=obj.dtype)
+        lopH = LazyLinearOp2(lambdasH, (obj.shape[1], obj.shape[0]), obj, dtype=obj.dtype)
+        lopC = LazyLinearOp2(lambdasC, (obj.shape[0], obj.shape[1]), obj, dtype=obj.dtype)
 
         # TODO: refactor with create_from_funcs (in ctor)
         lambdas['T'] = lambda: lopT
@@ -1015,7 +1053,7 @@ class LazyLinearOp2(LinearOperator):
         return create_from_op(a)
 
     @staticmethod
-    def create_from_funcs(matmat, rmatmat, shape):
+    def create_from_funcs(matmat, rmatmat, shape, dtype=None):
         from scipy.sparse import eye as seye
 
         #MX = lambda X: matmat(np.eye(shape[1])) @ X
@@ -1722,3 +1760,56 @@ class LazyLinearOp2(LinearOperator):
         if not all(issubclass(t, LazyLinearOp) for t in types):
             return NotImplemented
         return HANDLED_FUNCTIONS[func](*args, **kwargs)
+
+def LazyLinearOperator(shape, **kwargs):
+    """
+    Returns a LazyLinearOp defined by shape and at least matvec.
+
+    NOTE: At least a matvec or a matmat function must be passed in kwargs.
+
+    Args:
+        shape: (tuple) dimensions (M, N).
+        matvec: (callable) returns A * v (v a vector).
+        rmatvec: (callable) returns A^H * v (v a vector of size N).
+        matmat: (callable) returns A * V (V a dense matrix of dimensions (N, K)).
+        rmatmat: (callable) returns A^H * V (V a dense matrix of dimensions (M, K)).
+        dtype: data type of the matrix (can be None).
+
+    """
+    matvec, rmatvec, matmat, rmatmat = [None for i in range(4)]
+    def callable_err(k):
+        return TypeError(k+' in kwargs must be a callable/function')
+    for k in kwargs.keys():
+        if k != 'dtype' and not callable(kwargs[k]):
+            raise callable_err(k)
+    if 'matvec' in kwargs.keys():
+        matvec = kwargs['matvec']
+    if 'rmatvec' in kwargs.keys():
+        rmatvec = kwargs['rmatvec']
+    if 'matmat' in kwargs.keys():
+        matmat = kwargs['matmat']
+    if 'rmatmat' in kwargs.keys():
+        rmatmat = kwargs['rmatmat']
+    if 'dtype' in kwargs.keys():
+        dtype = kwargs['dtype']
+    else:
+        dtype = None
+
+    if matvec is None and matmat is None:
+        raise ValueError('At least a matvec or a matmat function must be'
+                         ' passed in kwargs.')
+
+    def _matmat(M, _matvec):
+        out = np.empty((shape[0], M.shape[1]), dtype=dtype if dtype is not None
+                      else M.dtype)
+        for i in range(M.shape[1]):
+            out[:, i] = _matvec(M[:,i])
+        return out
+
+    if matmat is None:
+        matmat = lambda M: _matmat(M, matvec)
+
+    if rmatmat is None and rmatvec is not None:
+        rmatmat = lambda M: _matmat(M, rmatvec)
+
+    return LazyLinearOp2.create_from_funcs(matmat, rmatmat, shape, dtype=dtype)
