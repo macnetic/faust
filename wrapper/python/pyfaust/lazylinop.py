@@ -167,6 +167,11 @@ class LazyLinearOp(LinearOperator):
         lambdasH['H'] = lambda: lop
         lambdasH['slice'] = lambda indices: LazyLinearOp._index_lambda(lopH,
                                                                         indices)()
+        lambdasC['T'] = lambda: lopH
+        lambdasC['H'] = lambda: lopT
+        lambdasC['slice'] = lambda indices: LazyLinearOp._index_lambda(lopC,
+                                                                        indices)()
+
         return lop
 
     @staticmethod
@@ -221,6 +226,11 @@ class LazyLinearOp(LinearOperator):
         lambdasH['H'] = lambda: lop
         lambdasH['slice'] = lambda indices: LazyLinearOp._index_lambda(lopH,
                                                                         indices)()
+        lambdasC['T'] = lambda: lopH
+        lambdasC['H'] = lambda: lopT
+        lambdasC['slice'] = lambda indices: LazyLinearOp._index_lambda(lopC,
+                                                                        indices)()
+
         return lop
 
     def _checkattr(self, attr):
