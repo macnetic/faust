@@ -921,9 +921,7 @@ class LazyLinearOp(LinearOperator):
 
 def LazyLinearOperator(shape, **kwargs):
     """
-    Returns a LazyLinearOp defined by shape and at least matvec.
-
-    NOTE: At least a matvec or a matmat function must be passed in kwargs.
+    Returns a LazyLinearOp defined by shape and at least a matvec or a matmat function.
 
     Args:
         shape: (tuple) dimensions (M, N).
