@@ -51,7 +51,7 @@ def aslazylinearoperator(obj):
 
 def hstack(tup):
     """
-    Concatenates lop1 and obj horizontally.
+    Concatenates tup objects horizontally.
 
     Args:
         tup: a tuple whose first argument is a LazyLinearOp and other must be
@@ -68,7 +68,7 @@ def hstack(tup):
 
 def vstack(tup):
     """
-    Concatenates lop1 and obj vertically.
+    Concatenates tup objects vertically.
 
     Args:
         tup: a tuple whose first argument is a LazyLinearOp and other must be
@@ -90,19 +90,21 @@ class LazyLinearOp(LinearOperator):
     href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html">scipy.linalg.LinearOperator</a>.
 
     The evaluation of any defined operation is delayed until a multiplication
-    by a dense matrix/vector, a call of LazyLinearOp.toarray or an explicit
-    evaluation through LazyLinearOp.eval.
+    by a dense matrix/vector, a call of LazyLinearOp.toarray.
 
-    To instantiate a LazyLinearOp look at pyfaust.lazylinop.asLazyLinearOp.
+    To instantiate a LazyLinearOp look at
+    pyfaust.lazylinop.aslazylinearoperator or
+    pyfaust.lazylinop.LazyLinearOperator to instantiate from matmat/matvec
+    functions.
 
     Warning: This code is in a beta status.
     """
-    def __init__(self, lambdas, shape, root_obj, dtype=None):
+    def __init__(self, lambdas, shape, root_obj=None, dtype=None):
         """
         Constructor. Not meant to be used directly.
 
         Args:
-            init_lambda: starting operation.
+            lambdas: starting operations.
             shape: the initial shape of the operator.
             root_obj: the initial object the operator is based on.
 
@@ -119,8 +121,7 @@ class LazyLinearOp(LinearOperator):
         self.lambdas = lambdas
         self._check_lambdas()
         self.shape = shape
-        self._root_obj = root_obj #TODO: delete because it can't always be
-        # defined (create_from_funcs and hybrid operations)
+        self._root_obj = root_obj
         self.dtype = dtype
         super(LazyLinearOp, self).__init__(self.dtype, self.shape)
 
@@ -136,31 +137,7 @@ class LazyLinearOp(LinearOperator):
     @staticmethod
     def create_from_op(obj):
         """
-        Alias of pyfaust.lazylinop.asLazyLinearOp.
-
-        Args:
-            obj: cf. pyfaust.lazylinop.asLazyLinearOp.
-
-        Returns:
-            cf. pyfaust.lazylinop.asLazyLinearOp.
-
-        Example:
-            >>> from pyfaust.lazylinop import LazyLinearOp
-            >>> import numpy as np
-            >>> M = np.random.rand(10, 12)
-            >>> lM = LazyLinearOp.create(M)
-            >>> twolM = lM + lM
-            >>> twolM
-            <pyfaust.lazylinop.LazyLinearOp at 0x7fcd7d7750f0>
-            >>> import pyfaust as pf
-            >>> F = pf.rand(10, 12)
-            >>> lF = LazyLinearOp.create(F)
-            >>> twolF = lF + lF
-            >>> twolF
-            <pyfaust.lazylinop.LazyLinearOp at 0x7fcd7d774730>
-
-
-        <b>See also:</b> pyfaust.rand.
+        Alias of pyfaust.lazylinop.aslazylinearoperator.
         """
         lambdas = {'@': lambda op: obj @ op}
         lambdasT = {'@': lambda op: obj.T @ op}
@@ -194,6 +171,9 @@ class LazyLinearOp(LinearOperator):
 
     @staticmethod
     def create_from_scalar(s, shape=None):
+        """
+        Returns a LazyLinearOp L created from the scalar s, such as each L[i, i] == s.
+        """
         if shape is None:
             shape = (1, 1)
         a = np.ones(shape) * s
@@ -201,6 +181,9 @@ class LazyLinearOp(LinearOperator):
 
     @staticmethod
     def create_from_funcs(matmat, rmatmat, shape, dtype=None):
+        """
+        Alias of ctor pyfaust.lazylinop.LazyLinearOperator.
+        """
         from scipy.sparse import eye as seye
 
         #MX = lambda X: matmat(np.eye(shape[1])) @ X
@@ -256,7 +239,7 @@ class LazyLinearOp(LinearOperator):
     @property
     def ndim(self):
         """
-        Returns the number of dimensions of the LazyLinearOp (it always 2).
+        Returns the number of dimensions of the LazyLinearOp (it is always 2).
         """
         return 2
 
@@ -459,7 +442,7 @@ class LazyLinearOp(LinearOperator):
 
     def __matmul__(self, op):
         """
-        Returns self @ op as a sparse matrix / dense array or as a LazyLinearOp.
+        Computes self @ op as a sparse matrix / dense array or as a LazyLinearOp depending on the type of op.
 
         Args:
             op: an object compatible with self for this binary operation.
@@ -503,15 +486,12 @@ class LazyLinearOp(LinearOperator):
 
     def matvec(self, op):
         """
-        Returns the LazyLinearOp for the multiplication self.matvec(op) or the np.ndarray
-        resulting of the evaluation of self.matvec(op) if op is a np.ndarray.
+        This function is an alias of self @ op, where the multiplication might
+        be specialized for op a vector (depending on how self has been defined
+        ; upon on a operator object or through a matvec/matmat function).
 
-        Args:
-            op: must be a vector (row or column).
 
-        <b>See also</b>: LazyLinearOp.__matmul__,<a
-        href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.matvec.html#scipy.sparse.linalg.LinearOperator.matvec">
-        scipy.linalg.LinearOperator.matvec</a>
+        <b>See also:</b> pyfaust.lazylinop.LazyLinearOperator.
         """
         if not hasattr(op, 'shape') or not hasattr(op, 'ndim'):
             raise TypeError('op must have shape and ndim attributes')
@@ -524,7 +504,11 @@ class LazyLinearOp(LinearOperator):
 
     def _rmatvec(self, op):
         """
-        Returns the LazyLinearOp for self^H @ v, where self^H is the conjugate transpose of A.
+        Returns self^H @ op, where self^H is the conjugate transpose of A.
+
+        Returns:
+            It might be a LazyLinearOp or an array depending on the op type
+            (cf. pyfaust.lazylinop.LazyLinearOp.__matmul__).
         """
         # LinearOperator need.
         return self.T.conj() @ op
@@ -542,7 +526,11 @@ class LazyLinearOp(LinearOperator):
 
     def _rmatmat(self, op):
         """
-        Returns the LazyLinearOp for self^H @ v, where self^H is the conjugate transpose of A.
+        Returns self^H @ op, where self^H is the conjugate transpose of A.
+
+        Returns:
+            It might be a LazyLinearOp or an array depending on the op type
+            (cf. pyfaust.lazylinop.LazyLinearOp.__matmul__).
         """
         # LinearOperator need.
         return self.T.conj() @ op
@@ -555,11 +543,12 @@ class LazyLinearOp(LinearOperator):
 
     def __rmatmul__(self, op):
         """
-        Returns the LazyLinearOp for op @ self.
+        Returns op @ self which can be a LazyLinearOp or an array depending on op type.
 
         Args:
             op: an object compatible with self for this binary operation.
 
+        <b>See also:</b> pyfaust.lazylinop.LazyLinearOp.__matmul__)
         """
         self._checkattr('__rmatmul__')
         from scipy.sparse import issparse
@@ -581,11 +570,13 @@ class LazyLinearOp(LinearOperator):
 
     def __mul__(self, other):
         """
-        Returns the LazyLinearOp for self * other.
+        Returns the LazyLinearOp for self * other if other is a scalar
+        otherwise returns self @ other.
 
         Args:
-            other: a scalar or a vector.
+            other: a scalar or a vector/array.
 
+        <b>See also:</b> pyfaust.lazylinop.LazyLinearOp.__matmul__)
         """
         self._checkattr('__mul__')
         from scipy.sparse import eye, diags
@@ -597,20 +588,18 @@ class LazyLinearOp(LinearOperator):
             new_op = self @ other
         return new_op
 
-    def __rmul__(self, s):
+    def __rmul__(self, other):
         """
-        Returns the LazyLinearOp for op * self.
+        Returns other * self.
 
         Args:
-            s: a scalar.
+            other: a scalar or a vector/array.
 
         """
-        # because s is a scalar, it is commutative
-        # for vector broadcasting too
-        if np.isscalar(s):
-            return self * s
+        if np.isscalar(other):
+            return self * other
         else:
-            return s @ self
+            return other @ self
 
 
     def __imul__(self, op):
@@ -621,7 +610,7 @@ class LazyLinearOp(LinearOperator):
 
     def toarray(self):
         """
-        Returns the numpy array resulting from self evaluation.
+        Returns self as a numpy array.
         """
         #from scipy.sparse import eye
         #return self @ eye(self.shape[1], self.shape[1], format='csr')
@@ -635,7 +624,8 @@ class LazyLinearOp(LinearOperator):
 
         Args:
             indices: array of length 1 or 2 which elements must be slice, integer or
-            Ellipsis (...). Note that using Ellipsis for more than two indices is forbidden.
+            Ellipsis (...). Note that using Ellipsis for more than two indices
+            is normally forbidden.
 
         """
         self._checkattr('__getitem__')
@@ -777,6 +767,9 @@ class LazyLinearOp(LinearOperator):
 
 
     def vstack(self, op):
+        """
+        See pyfaust.lazylinop.vstack.
+        """
         if self.shape[1] != op.shape[1]:
             raise ValueError('The number of columns of self and op are not the'
                              ' same')
@@ -825,6 +818,9 @@ class LazyLinearOp(LinearOperator):
                     + op @ o._slice((slice(self.shape[1], o.shape[0]), slice(0, o.shape[1])))
 
     def hstack(self, op):
+        """
+        See pyfaust.lazylinop.hstack.
+        """
         if self.shape[0] != op.shape[0]:
             raise ValueError('The number of columns of self and op are not the'
                              ' same')
@@ -1004,17 +1000,6 @@ def kron(A, B):
     <b>See also:</b> numpy.kron.
     """
     def _kron(A, B, shape, op):
-        """
-        Returns the LazyLinearOpKron for the multiplication self @ op or if op is a np.ndarray it returns the np.ndarray (self @ op).
-
-        Note: this specialization is particularly optimized for multiplying the
-        operator by a vector.
-
-        Args:
-            op: an object compatible with self for this binary operation.
-
-        <b>See also:</b> pyfaust.lazylinop.kron.
-        """
         from threading import Thread
         from multiprocessing import cpu_count
         from os import environ
