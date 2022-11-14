@@ -958,6 +958,9 @@ def LazyLinearOperator(shape, **kwargs):
                          ' passed in kwargs.')
 
     def _matmat(M, _matvec):
+        if M.ndim == 1:
+            return _matvec(M)
+
         out = np.empty((shape[0], M.shape[1]), dtype=dtype if dtype is not None
                       else M.dtype)
         for i in range(M.shape[1]):
