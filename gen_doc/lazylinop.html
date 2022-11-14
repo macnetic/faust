@@ -13974,14 +13974,15 @@ a.anchor-link {
 <h1 id="Using-LazyLinearOp-s">Using LazyLinearOp-s<a class="anchor-link" href="#Using-LazyLinearOp-s">&#182;</a></h1><p>The <code>LazyLinearOp</code> class defines a kind of linear operator extending the scipy <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html">LinearOperator</a> class.</p>
 <p>Starting from a <code>numpy</code> array, a <code>scipy</code> matrix, a <code>Faust</code> object, or potentially many other compatible linear operators with efficient implementatons, this class follows the <em>lazy evaluation paradigm</em>.</p>
 <p>In short, one can <em>aggregate low-level <code>LazyLinearOp</code> objects into higher-level ones</em> using classical operations (addition, concatenation, adjoint, real part, slicing, etc.), without actually building arrays. The actual effect of these operations is delayed until the resulting linear operator is actually applied to a vector (or to a collection of vectors, seen as a matrix).</p>
-<p>The main interest of this paradigm is to enable the construction of processing pipelines that exploit as building blocks efficient implementations of  ``low-level'' linear operators.</p>
+<p>The main interest of this paradigm is to enable the construction of processing pipelines that exploit as building blocks efficient implementations of ``low-level'' linear operators.</p>
 <h2 id="This-notebook">This notebook<a class="anchor-link" href="#This-notebook">&#182;</a></h2><p>In this notebook we shall see how to create a <code>LazyLinearOp</code> instance, create more complex instances using various lazy operations, and finally how to apply the resulting instance on vectors or matrices. We assume the reader is familiar with at least <code>numpy</code> arrays and their operations.</p>
 
 </div>
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="1.-Creating-a-LazyLinearOp">1. Creating a LazyLinearOp<a class="anchor-link" href="#1.-Creating-a-LazyLinearOp">&#182;</a></h3><p>In order to create this kind of object, you simply need to use the <code>asLazyLinearOp</code> function. This function receives an object that represents a linear operator, for instance a <code>Faust</code> (but it can also be a <code>numpy</code> array or a <code>scipy</code> matrix). The function instantiates a <code>LazyLinearOp</code> that encapsulates the <code>Faust</code> you gave.</p>
+<h3 id="1.-How-to-create-and-use-a-LazyLinearOp">1. How to create and use a LazyLinearOp<a class="anchor-link" href="#1.-How-to-create-and-use-a-LazyLinearOp">&#182;</a></h3><p>In order to create this kind of object, you simply need to use the <code>aslazylinearoperator</code> function. This function receives an object that represents a linear operator, for instance a <code>Faust</code> (but it can also be a <code>numpy</code> array or a <code>scipy</code> matrix). Besides, note that there is another way to create a LazyLinearOp using the kind of functions we call matmat or matvec as explained in 4.3 with the FFT use case.</p>
+<p>In the example below, the function <code>aslazylinearoperator</code> allows us to instantiate a <code>LazyLinearOp</code> that encapsulates a <code>Faust</code>.</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
@@ -14266,8 +14267,8 @@ Let us mention most importantly:</p>
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>array([-3.18354596e+11+0.j, -1.69834652e+11+0.j, -2.70490716e+11+0.j, ...,
-       -3.29820432e+11+0.j, -2.03847006e+11+0.j, -3.06795470e+11+0.j])</pre>
+<pre>array([-2.63467895e+11+0.j, -1.82512222e+11+0.j, -3.24855445e+11+0.j, ...,
+       -2.18234934e+11+0.j, -1.40949814e+11+0.j, -2.27929503e+11+0.j])</pre>
 </div>
 
 </div>
@@ -14356,13 +14357,13 @@ Let us mention most importantly:</p>
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>array([[-27384056.98062814+0.j],
-       [-14608555.65643751+0.j],
-       [-23266887.35681728+0.j],
+<pre>array([[-21912992.26312142+0.j],
+       [-15180144.64900897+0.j],
+       [-27019233.94555141+0.j],
        ...,
-       [-28370216.25666752+0.j],
-       [-17533776.78465986+0.j],
-       [-26388695.98882961+0.j]])</pre>
+       [-18151408.88322322+0.j],
+       [-11723135.21816526+0.j],
+       [-18957276.86080584+0.j]])</pre>
 </div>
 
 </div>
@@ -14413,7 +14414,7 @@ Let us mention most importantly:</p>
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>3.57 s ± 328 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+<pre>2.47 s ± 192 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
 </pre>
 </div>
 </div>
@@ -14438,8 +14439,8 @@ Let us mention most importantly:</p>
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>1.31 s ± 93 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
-4.85 s ± 139 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+<pre>1.16 s ± 75.2 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+4.51 s ± 543 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
 consistent results: True
 </pre>
 </div>
@@ -14592,7 +14593,7 @@ consistent results: True
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>64.6 ms ± 4.89 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+<pre>42.6 ms ± 2.8 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
 </pre>
 </div>
 </div>
@@ -14627,7 +14628,7 @@ consistent results: True
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>2.12 ms ± 656 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+<pre>2.76 ms ± 282 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
 </pre>
 </div>
 </div>
@@ -14640,19 +14641,106 @@ consistent results: True
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <p>The LazyLinearOp kron function is much faster! Indeed, it is optimized for <code>LazyLinearOp-s</code>.</p>
+<h4 id="4.3-The-FFT-and-its-inverse-as-a-LazyLinearOp">4.3 The FFT and its inverse as a LazyLinearOp<a class="anchor-link" href="#4.3-The-FFT-and-its-inverse-as-a-LazyLinearOp">&#182;</a></h4><p>Now let's explain how it is possible to create a <code>LazyLinearOp</code> not using a pre-defined operator like a Faust or a numpy array but a function that defines how to apply the operator on a vector (the kind of function we name matvec) or on a matrix (in which case the function is named matmat). Actually, this process mimics the scipy <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html">LinearOperator</a> constructor, so it works pretty the same for a <code>LazyLinearOp</code> as we show in the example below for an operator that represents the FFT.</p>
 
 </div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[15]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust</span> <span class="kn">import</span> <span class="n">dft</span>
+<span class="kn">from</span> <span class="nn">pyfaust.lazylinop</span> <span class="kn">import</span> <span class="n">LazyLinearOperator</span><span class="p">,</span> <span class="n">aslazylinearoperator</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.fft</span> <span class="kn">import</span> <span class="n">fft</span><span class="p">,</span> <span class="n">ifft</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">1024</span>
+<span class="n">lfft</span> <span class="o">=</span> <span class="n">LazyLinearOperator</span><span class="p">(</span><span class="n">matvec</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">fft</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">rmatvec</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">n</span> <span class="o">*</span> <span class="n">ifft</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>This notebook comes to its end. We've seen quickly how to create and evaluate <code>LazyLinearOp</code> objects based on numpy arrays, scipy matrices, or a Faust objects. We've seen a bunch of operations we can call on this kind of objects. For more information about <code>LazyLinearOp</code> objects you can take a look to the API documentation <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacepyfaust_1_1lazylinop.html">here</a>.</p>
+<p>Hence, <code>lfft</code> is a <code>LazyLinearOp</code> defined upon the scipy <code>fft</code> and <code>ifft</code> functions. Here <code>fft</code> is the matvec function, it defines how to apply the <code>lfft</code> operator to a vector. Likewise, the <code>ifft</code>, as a <code>rmatvec</code> function, defines how to apply the inverse of the lfft operator to a vector.
+The operator can totally be applied on matrices too. So, since we choose to apply the 1D FFT on columns instead of rows we set the axis argument of scipy fft to 0. The reason of the scaling by n of the <code>ifft</code> is to find on the scipy documentation <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.fft.html#scipy.fft.fft">fft doc.</a> (look at the norm argument). For more details about the <code>LazyLinearOperator</code> constructor, please look at the <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacepyfaust_1_1lazylinop.html">API documentation</a>.</p>
+<p>We can compare this <code>lfft</code> operator to the equivalent operator based this time on the DFT Faust.</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[16]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">F</span> <span class="o">=</span> <span class="n">dft</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">normed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">lF</span> <span class="o">=</span> <span class="n">aslazylinearoperator</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>The two operators give the same results when applying them to a vector.</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[17]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">lfft</span> <span class="o">@</span> <span class="n">x</span><span class="p">,</span> <span class="n">lF</span> <span class="o">@</span> <span class="n">x</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[17]:</div>
+
+
+
+
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
+<pre>True</pre>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>This notebook comes to its end. We've seen quickly how to create and evaluate <code>LazyLinearOp</code> objects based on numpy arrays, scipy matrices, or a Faust objects. We've also seen how to define them upon <code>matmat</code> and <code>matvec</code> functions. We've tried a bunch of operations we can call on this kind of objects. For more information about <code>LazyLinearOp</code> objects you can take a look to the API documentation <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacepyfaust_1_1lazylinop.html">here</a>.</p>
 <p><strong>NOTE</strong>: this notebook was executed using the pyfaust version:</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[15]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[18]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">pf</span><span class="o">.</span><span class="n">version</span><span class="p">()</span>
@@ -14671,13 +14759,13 @@ consistent results: True
 <div class="jp-OutputArea-child">
 
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[15]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[18]:</div>
 
 
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>&#39;3.35.11&#39;</pre>
+<pre>&#39;3.35.13&#39;</pre>
 </div>
 
 </div>
