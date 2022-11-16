@@ -7,7 +7,8 @@ classdef LazyLinearOpTest < matlab.unittest.TestCase
         lop2A;
         lop3;
         lop3A;
-		faust_paths;
+        faust_paths;
+        from_func;
     end
 
 	properties (Constant = true)
@@ -32,6 +33,7 @@ classdef LazyLinearOpTest < matlab.unittest.TestCase
             import matfaust.lazylinop.aslazylinearoperator
             F1 = rand(10, 15);
 			this.lop = aslazylinearoperator(F1);
+            this.from_func = false;
             this.lopA = full(F1);
             F2 = rand(10, 15);
 			this.lop2 = aslazylinearoperator(F2);
@@ -105,10 +107,12 @@ classdef LazyLinearOpTest < matlab.unittest.TestCase
             this.verifyTrue(ismatrix(lmul2))
             this.verifyEqual(full(lmul2), this.lopA * M, 'AbsTol', 1e-6)
 
-            lmul2 = this.lop * sparse(M)
-            this.verifyFalse(isLazyLinearOp(lmul2))
-            this.verifyTrue(ismatrix(lmul2))
-            this.verifyEqual(full(lmul2), this.lopA * M, 'AbsTol', 1e-6)
+            if ~ this.from_func
+                lmul2 = this.lop * sparse(M)
+                this.verifyFalse(isLazyLinearOp(lmul2))
+                this.verifyTrue(ismatrix(lmul2))
+                this.verifyEqual(full(lmul2), this.lopA * M, 'AbsTol', 1e-6)
+            end
 
             lmul3 = this.lop * M(:, 1)
             this.verifyFalse(isLazyLinearOp(lmul3))
