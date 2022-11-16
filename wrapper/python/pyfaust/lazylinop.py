@@ -148,11 +148,11 @@ class LazyLinearOp(LinearOperator):
         for l in [lambdas, lambdasT, lambdasH, lambdasC]:
             l['T'] = None
             l['H'] = None
-            l['slice'] = None
+            l['slice'] = None #TODO: rename slice to index
         lop = LazyLinearOp(lambdas, obj.shape, obj, dtype=obj.dtype)
         lopT = LazyLinearOp(lambdasT, (obj.shape[1], obj.shape[0]), obj, dtype=obj.dtype)
         lopH = LazyLinearOp(lambdasH, (obj.shape[1], obj.shape[0]), obj, dtype=obj.dtype)
-        lopC = LazyLinearOp(lambdasC, (obj.shape[0], obj.shape[1]), obj, dtype=obj.dtype)
+        lopC = LazyLinearOp(lambdasC, obj.shape, obj, dtype=obj.dtype)
 
         # TODO: refactor with create_from_funcs (in ctor)
         lambdas['T'] = lambda: lopT
@@ -174,6 +174,7 @@ class LazyLinearOp(LinearOperator):
 
         return lop
 
+    #TODO: function not used anywhere, delete it?
     @staticmethod
     def create_from_scalar(s, shape=None):
         """
@@ -193,7 +194,7 @@ class LazyLinearOp(LinearOperator):
 
         #MX = lambda X: matmat(np.eye(shape[1])) @ X
         MX = lambda X: matmat(X)
-        MTX = lambda X: rmatmat(X.T).T
+        #MTX = lambda X: rmatmat(X.T).T
         MHX = lambda X: rmatmat(X)
 
         lambdas = {'@': MX}
@@ -209,10 +210,10 @@ class LazyLinearOp(LinearOperator):
             l['H'] = None
             l['slice'] = None
 
-        lop = LazyLinearOp(lambdas, shape, None)
-        lopT = LazyLinearOp(lambdasT, (shape[1], shape[0]), None)
-        lopH = LazyLinearOp(lambdasH, (shape[1], shape[0]), None)
-        lopC = LazyLinearOp(lambdasC, shape, None)
+        lop = LazyLinearOp(lambdas, shape, dtype)
+        lopT = LazyLinearOp(lambdasT, (shape[1], shape[0]), dtype)
+        lopH = LazyLinearOp(lambdasH, (shape[1], shape[0]), dtype)
+        lopC = LazyLinearOp(lambdasC, shape, dtype)
 
         lambdas['T'] = lambda: lopT
         lambdas['H'] = lambda: lopH
@@ -749,8 +750,8 @@ class LazyLinearOp(LinearOperator):
             raise ValueError('Can\'t handle non-contiguous slice -- step > 1')
         if rslice.start == None:
             rslice = slice(0, rslice.stop, rslice.step)
-        if rslice.start == None:
-            rslice = slice(rslice.start, -1, rslice.step)
+        if rslice.stop == None:
+            rslice = slice(rslice.start, self.shape[0] + op.shape[0], rslice.step)
         if rslice.stop > self.shape[0] + op.shape[0]:
             raise ValueError('Slice overflows the row dimension')
         if rslice.start >= 0 and rslice.stop <= self.shape[0]:
@@ -781,7 +782,7 @@ class LazyLinearOp(LinearOperator):
         See pyfaust.lazylinop.vstack.
         """
         if self.shape[1] != op.shape[1]:
-            raise ValueError('The number of columns of self and op are not the'
+            raise ValueError('self and op numbers of columns must be the'
                              ' same')
         if not LazyLinearOp.isLazyLinearOp(op):
             op = LazyLinearOp.create_from_op(op)
@@ -832,7 +833,7 @@ class LazyLinearOp(LinearOperator):
         See pyfaust.lazylinop.hstack.
         """
         if self.shape[0] != op.shape[0]:
-            raise ValueError('The number of columns of self and op are not the'
+            raise ValueError('self and op numbers of rows must be the'
                              ' same')
         if not LazyLinearOp.isLazyLinearOp(op):
             op = LazyLinearOp.create_from_op(op)
