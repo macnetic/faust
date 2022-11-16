@@ -29,15 +29,15 @@ classdef LazyLinearOpTest < matlab.unittest.TestCase
 
 		function instantiateTestFaust(this)
 			import matfaust.rand
-            import matfaust.lazylinop.asLazyLinearOp
+            import matfaust.lazylinop.aslazylinearoperator
             F1 = rand(10, 15);
-			this.lop = asLazyLinearOp(F1);
+			this.lop = aslazylinearoperator(F1);
             this.lopA = full(F1);
             F2 = rand(10, 15);
-			this.lop2 = asLazyLinearOp(F2);
+			this.lop2 = aslazylinearoperator(F2);
             this.lop2A = full(F2);
             F3 = rand(15, 10);
-			this.lop3 = asLazyLinearOp(F3);
+			this.lop3 = aslazylinearoperator(F3);
             this.lop3A = full(F3);
 		end
     end
@@ -53,7 +53,7 @@ classdef LazyLinearOpTest < matlab.unittest.TestCase
 	methods (Test)
 
         function testSize(this)
-            this.verifyEqual(size(this.lop), size(eval(this.lop)))
+            this.verifyEqual(size(this.lop), size(full(this.lop)))
         end
 
         function testTransp(this)
@@ -115,7 +115,7 @@ classdef LazyLinearOpTest < matlab.unittest.TestCase
             this.verifyTrue(ismatrix(lmul3))
             this.verifyEqual(full(lmul3), this.lopA * M(:,1), 'AbsTol', 1e-6)
 
-            lmulS = asLazyLinearOp(sparse(M)) * sparse(M.')
+            lmulS = aslazylinearoperator(sparse(M)) * sparse(M.')
             this.verifyFalse(isLazyLinearOp(lmulS))
             this.verifyTrue(ismatrix(lmulS))
             this.verifyEqual(full(lmulS), M * M.', 'AbsTol', 1e-6)
@@ -169,24 +169,24 @@ classdef LazyLinearOpTest < matlab.unittest.TestCase
         end
 
         function testReal(this)
-            import matfaust.lazylinop.asLazyLinearOp
+            import matfaust.lazylinop.aslazylinearoperator
             cF = matfaust.rand(10, 15, 'field', 'complex')
-            lcF = asLazyLinearOp(cF)
+            lcF = aslazylinearoperator(cF)
             this.verifyEqual(full(real(lcF)), full(real(cF)), 'AbsTol', 1e-6)
         end
 
         function testImag(this)
-            import matfaust.lazylinop.asLazyLinearOp
+            import matfaust.lazylinop.aslazylinearoperator
             cF = matfaust.rand(10, 15, 'field', 'complex')
-            lcF = asLazyLinearOp(cF)
+            lcF = aslazylinearoperator(cF)
             this.verifyEqual(full(imag(lcF)), full(imag(cF)), 'AbsTol', 1e-6)
         end
 
         function testAsLazyLinearOperator(this)
-            import matfaust.lazylinop.asLazyLinearOp
+            import matfaust.lazylinop.aslazylinearoperator
             import matfaust.lazylinop.isLazyLinearOp
             cF = matfaust.rand(10, 15, 'field', 'complex');
-            lcF = asLazyLinearOp(cF);
+            lcF = aslazylinearoperator(cF);
             this.verifyTrue(isLazyLinearOp(lcF))
             this.verifyEqual(size(cF), size(lcF))
         end
