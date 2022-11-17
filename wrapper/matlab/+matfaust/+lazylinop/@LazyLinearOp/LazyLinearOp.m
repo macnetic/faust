@@ -117,54 +117,59 @@ classdef LazyLinearOp < handle % needed to use references on objects
         end
 
 
-        function LM = mtimes(L, A)
-            import matfaust.lazylinop.LazyLinearOp
-            if isscalar(L) && LazyLinearOp.isLazyLinearOp(A)
-                LM = mtimes(A, L);
-                return;
-            end
-            check_meth(L, 'mtimes');
-            op_is_scalar = all(size(A) == [1, 1]);
-            if ~ op_is_scalar && ~ all(size(L, 2) == size(A, 1))
-                error('Dimensions must agree')
-            end
-            if op_is_scalar
-                new_size = size(L);
-            else
-                new_size = [size(L, 1), size(A, 2)];
-            end
+		function LM = mtimes(L, A)
+			import matfaust.lazylinop.LazyLinearOp
+			if LazyLinearOp.isLazyLinearOp(A)
+				if isscalar(L)
+					LM = mtimes(A, L);
+					return;
+				elseif ~ LazyLinearOp.isLazyLinearOp(L)
+					LM = ctranspose(mtimes(A.', L.'));
+					return;
+				end
+			end
+			check_meth(L, 'mtimes');
+			op_is_scalar = all(size(A) == [1, 1]);
+			if ~ op_is_scalar && ~ all(size(L, 2) == size(A, 1))
+				error('Dimensions must agree')
+			end
+			if op_is_scalar
+				new_size = size(L);
+			else
+				new_size = [size(L, 1), size(A, 2)];
+			end
 
-            function l = mul_index_lambda(L, A, S)
-                % L and A must be LazyLinearOp
-                import matfaust.lazylinop.LazyLinearOp
-                Sr.type = '()';
-                Sr.subs = {S.subs{1}, ':'};
-                Sc.type = '()';
-                Sc.subs = {':', S.subs{2}};
-                L.lambdas{L.I}(Sr) * A.lambdas{L.I}(Sc);
-            end
+			function l = mul_index_lambda(L, A, S)
+				% L and A must be LazyLinearOp
+				import matfaust.lazylinop.LazyLinearOp
+				Sr.type = '()';
+				Sr.subs = {S.subs{1}, ':'};
+				Sc.type = '()';
+				Sc.subs = {':', S.subs{2}};
+				L.lambdas{L.I}(Sr) * A.lambdas{L.I}(Sc);
+			end
 
-            if ~ LazyLinearOp.isLazyLinearOp(A) && ismatrix(A) && isnumeric(A) && any(size(A) ~= [1, 1])
-                % A is a dense matrix that is not limited to one element
-                LM = L.lambdas{L.MUL}(A);
-            else
-                if isscalar(A)
-                    LM_size = size(L);
-                else
-                    if ~ LazyLinearOp.isLazyLinearOp(A)
-                        A = LazyLinearOp.create_from_op(A);
-                    end
-                    LM_size = [size(L, 1), size(A, 2)] 
-                end
+			if ~ LazyLinearOp.isLazyLinearOp(A) && ismatrix(A) && isnumeric(A) && any(size(A) ~= [1, 1])
+				% A is a dense matrix that is not limited to one element
+				LM = L.lambdas{L.MUL}(A);
+			else
+				if isscalar(A)
+					LM_size = size(L);
+				else
+					if ~ LazyLinearOp.isLazyLinearOp(A)
+						A = LazyLinearOp.create_from_op(A);
+					end
+					LM_size = [size(L, 1), size(A, 2)] 
+				end
 
-                lambdas = {@(o) L * (A * o), ... %MUL
-                    @() A.' * L.', ... % T 
-                    @() A' * L', ... % H 
-                    @(S) mul_index_lambda(L, A, S)% I
-                };
-                LM = LazyLinearOp(lambdas, LM_size);
-            end
-        end
+				lambdas = {@(o) L * (A * o), ... %MUL
+					@() A.' * L.', ... % T 
+					@() A' * L', ... % H 
+					@(S) mul_index_lambda(L, A, S)% I
+				};
+				LM = LazyLinearOp(lambdas, LM_size);
+			end
+		end
 
 
         function LP = plus(L, op)
