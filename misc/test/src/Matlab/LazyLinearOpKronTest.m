@@ -19,17 +19,17 @@ classdef LazyLinearOpKronTest < LazyLinearOpTest
 
 		function instantiateTestFaust(this)
 			import matfaust.rand
-            import matfaust.lazylinop.asLazyLinearOp
+            import matfaust.lazylinop.aslazylinearoperator
             import matfaust.lazylinop.kron
             F1 = rand(10, 15);
             F2 = rand(10, 15);
-			lop_A = asLazyLinearOp(F1);
-			lop_B = asLazyLinearOp(F2);
+			lop_A = aslazylinearoperator(F1);
+			lop_B = aslazylinearoperator(F2);
             this.lop = kron(lop_A, lop_B)
             this.lopA = full(this.lop);
-			this.lop2 = asLazyLinearOp(rand(size(this.lop, 1), size(this.lop, 2)));
+			this.lop2 = aslazylinearoperator(rand(size(this.lop, 1), size(this.lop, 2)));
             this.lop2A = full(this.lop2);
-			this.lop3 = asLazyLinearOp(rand(size(this.lop, 2), 10));
+			this.lop3 = aslazylinearoperator(rand(size(this.lop, 2), 10));
             this.lop3A = full(this.lop3);
 		end
     end
