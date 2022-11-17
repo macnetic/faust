@@ -1,3 +1,13 @@
+% ======================================================================
+%> @brief This class implements a lazy linear operator.
+%>
+%> The evaluation of any defined operation is delayed until proceeding to a multiplication
+%> by a dense matrix/vector, a call of LazyLinearOp.toarray.
+%>
+%> To instantiate a LazyLinearOp look at matfaust.lazylinop.aslazylinearoperator or matfaust.lazylinop.LazyLinearOperator to instantiate from matmat/matvec functions.
+%>
+%> @warning This code is in a beta status.
+% ======================================================================
 classdef LazyLinearOp < handle % needed to use references on objects 
     properties (SetAccess = protected, Hidden = true)
         lambdas;
@@ -14,6 +24,15 @@ classdef LazyLinearOp < handle % needed to use references on objects
     end
     methods
 
+        %======================================================================
+        %> @brief Constructor. Not meant to be used directly.
+        %>
+        %> @param lambdas: starting operations.
+        %> @param shape: the initial shape of the operator.
+        %> @param root_obj: (optional) the initial object the operator is based on.
+        %>
+        %> <p>@b See @b also matfaust.lazylinop.aslazylinearoperator
+        %======================================================================
         function L = LazyLinearOp(lambdas, shape, varargin)
             L.lambdas = lambdas;
             L.shape = shape;
@@ -72,6 +91,14 @@ classdef LazyLinearOp < handle % needed to use references on objects
             L = LazyLinearOp.create_from_op(subsref(irows, irowsS)) * L * LazyLinearOp.create_from_op(subsref(icols, icolsS));
         end
 
+        %======================================================================
+        %> @brief size of L.
+        %>
+        %> @param dim: the dimension (1 for rows, 2 for columns) to get the size of.
+        %>
+        %> @retval s: by default, an array of two numbers (the number of rows and the number of columns) or the size of only one dimension if dim argument is used.
+        %>
+        %======================================================================
 		function s = size(L, varargin)
 			if length(varargin) == 0
 				s = L.shape;
@@ -80,21 +107,35 @@ classdef LazyLinearOp < handle % needed to use references on objects
 			end
 		end
 
+        %=============================================================
+        %> @brief Returns the LazyLinearOp transpose.
+        %=============================================================
         function LT = transpose(L)
             check_meth(L, 'transpose')
             LT = L.lambdas{matfaust.lazylinop.LazyLinearOp.T}();
         end
 
+        %=============================================================
+        %> @brief Returns the LazyLinearOp ctranspose.
+        %=============================================================
         function LH = ctranspose(L)
             check_meth(L, 'ctranspose')
             LH = L.lambdas{matfaust.lazylinop.LazyLinearOp.H}();
         end
 
+        %=============================================================
+        %> @brief Returns the LazyLinearOp conjugate.
+        %=============================================================
         function LC = conj(L)
             check_meth(L, 'conj')
             LC = (L').';
         end
 
+        %=============================================================
+        %> @brief Returns the LazyLinearOp for indexing.
+        %>
+        %> @b See @b also: subsref matlab built-in.
+        %=============================================================
         function LS = subsref(L, S)
 
 			if (~isfield(S,'type')) | (~isfield(S,'subs'))
@@ -117,6 +158,12 @@ classdef LazyLinearOp < handle % needed to use references on objects
         end
 
 
+        %=============================================================
+        %> @brief Returns the LazyLinearOp for the multiplication self * op
+        %> or if op is a full matrix it returns the full matrix (self * op).
+        %>
+        %> @param op: an object compatible with self for this binary operation.
+        %=============================================================
 		function LM = mtimes(L, A)
 			import matfaust.lazylinop.LazyLinearOp
 			if LazyLinearOp.isLazyLinearOp(A)
@@ -172,6 +219,11 @@ classdef LazyLinearOp < handle % needed to use references on objects
 		end
 
 
+        %=============================================================
+        %> @brief Returns the LazyLinearOp L + op.
+        %>
+        %> @param op: an object compatible with self for this binary operation.
+        %=============================================================
         function LP = plus(L, op)
             import matfaust.lazylinop.LazyLinearOp
             check_meth(L, 'plus')
@@ -192,10 +244,18 @@ classdef LazyLinearOp < handle % needed to use references on objects
             LP = LazyLinearOp(lambdas, [size(L, 1), size(op, 2)]);
         end
 
+        %=============================================================
+        %> @brief Returns the LazyLinearOp (+ L).
+        %=============================================================
         function LUP = uplus(L)
             LUP = L;
         end
 
+        %=============================================================
+        %> @brief Returns the LazyLinearOp L - op.
+        %>
+        %> @param op: an object compatible with self for this binary operation.
+        %=============================================================
         function LUP = minus(L, op)
             import matfaust.lazylinop.LazyLinearOp
             check_meth(L, 'minus')
@@ -216,10 +276,18 @@ classdef LazyLinearOp < handle % needed to use references on objects
             LUP = LazyLinearOp(lambdas, [size(L, 1), size(op, 2)]);
         end
 
+        %=============================================================
+        %> @brief Returns the full matrix resulting from L.
+        %=============================================================
         function LF = full(L)
             LF = L * eye(size(L, 2));
         end
 
+        %=============================================================
+        %> @brief Returns the LazyLinearOp for the vertical concatenation [L, varargin{:}].
+        %>
+        %> @b See @b also: vertcat matlab built-in.
+        %=============================================================
         function LV = vertcat(L, op)
             import matfaust.lazylinop.LazyLinearOp
             if size(L, 2) ~= size(op, 2)
@@ -282,6 +350,11 @@ classdef LazyLinearOp < handle % needed to use references on objects
         end
 
 
+        %=============================================================
+        %> @brief Returns the LazyLinearOp for the horizontal concatenation [L, varargin{:}].
+        %>
+        %> @b See @b also: horzcat matlab built-in.
+        %=============================================================
         function LH = horzcat(L, op)
             import matfaust.lazylinop.LazyLinearOp
             if size(L, 1) ~= size(op, 1)
@@ -340,6 +413,11 @@ classdef LazyLinearOp < handle % needed to use references on objects
             LH = LazyLinearOp(lambdas, [size(L, 1), size(L, 2) + size(op, 2)]);
         end
 
+        %=============================================================
+        %> @brief Returns the LazyLinearOp for the concatenation [L, varargin{:}] or [L; varargin{:}].
+        %>
+        %> @b See @b also: cat matlab built-in.
+        %=============================================================
 		function LC = cat(varargin)
 			import matfaust.lazylinop.LazyLinearOp
 			dim = varargin{1};
@@ -356,16 +434,21 @@ classdef LazyLinearOp < handle % needed to use references on objects
             LC = L;
 		end
 
+        %=============================================================
+        %> @brief Returns the LazyLinearOp for real(L).
+        %>
+        %> @b See @b also: real matlab built-in.
+        %=============================================================
         function LR = real(L)
 			import matfaust.lazylinop.LazyLinearOp
-            function RM = mul(L, o)
+            function RM = real_mul(L, o)
                 if LazyLinearOp.isLazyLinearOp(o) && ismatrix(o) && isnumeric(o) && any(size(o) ~= [1, 1])
                     RM = real(L * real(o)) + real(L * imag(o) * 1j);
                 else
                     RM = real(L * o);
                 end
             end
-            lambdas = {@(o) mul(L, o), ... %MUL
+            lambdas = {@(o) real_mul(L, o), ... %MUL
                 @() real(L.'), ... % T
                 @() real(L.'), ... % H
                 @(S) real(subsref(L, S)) % I
@@ -373,16 +456,21 @@ classdef LazyLinearOp < handle % needed to use references on objects
             LR = LazyLinearOp(lambdas, size(L));
         end
 
+        %=============================================================
+        %> @brief Returns the LazyLinearOp for imag(L).
+        %>
+        %> @b See @b also: imag matlab built-in.
+        %=============================================================
         function LI = imag(L)
 			import matfaust.lazylinop.LazyLinearOp
-            function IM = mul(L, o)
+            function IM = imag_mul(L, o)
                 if LazyLinearOp.isLazyLinearOp(o) && ismatrix(o) && isnumeric(o) && any(size(o) ~= [1, 1])
                     IM = imag(L * real(o)) + imag(L * imag(o) * 1j);
                 else
                     IM = imag(L * o)
                 end
             end
-            lambdas = {@(o) mul(L, o), ... %MUL
+            lambdas = {@(o) imag_mul(L, o), ... %MUL
                 @() imag(L.'), ... % T
                 @() imag(L.'), ... % H
                 @(S) imag(subsref(L, S)) % I
@@ -392,9 +480,13 @@ classdef LazyLinearOp < handle % needed to use references on objects
 
     end
     methods(Static = true)
+        %=============================================================
+        %> Alias of matfaust.lazylinop.isLazyLinearOp.
+        %=============================================================
         function b = isLazyLinearOp(obj)
             b = isa(obj, 'matfaust.lazylinop.LazyLinearOp');
         end
+
         function lop = create_from_op(obj)
             import matfaust.lazylinop.LazyLinearOp
             lambdas = cell(1, 4);

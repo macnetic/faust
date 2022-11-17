@@ -9,7 +9,7 @@
 %>
 %> @b Example:
 %> @code
-%>>> A = rand(100, 100);
+%> >> A = rand(100, 100);
 %> >> B = rand(100, 100);
 %> >> AxB = kron(A, B);
 %> >> lAxB = matfaust.lazylinop.kron(A, B)

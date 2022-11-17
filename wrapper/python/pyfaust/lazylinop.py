@@ -108,7 +108,7 @@ class LazyLinearOp(LinearOperator):
             shape: the initial shape of the operator.
             root_obj: the initial object the operator is based on.
 
-        <b>See also:</b> LazyLinearOp.create, pyfaust.lazylinop.asLazyLinearOp.
+        <b>See also:</b> pyfaust.lazylinop.aslazylinearoperator.
         """
         if root_obj is not None:
             if not hasattr(root_obj, 'ndim'):
@@ -937,6 +937,16 @@ def LazyLinearOperator(shape, **kwargs):
         matmat: (callable) returns A * V (V a dense matrix of dimensions (N, K)).
         rmatmat: (callable) returns A^H * V (V a dense matrix of dimensions (M, K)).
         dtype: data type of the matrix (can be None).
+
+    Example:
+        >>> # In this example we create a LazyLinearOp for the DFT using the fft from scipy
+        >>> import numpy as np
+        >>> from scipy.fft import fft, ifft
+        >>> from pyfaust.lazylinop import LazyLinearOperator
+        >>> lfft = LazyLinearOperator((8, 8), matmat=lambda x: fft(x, axis=0), rmatmat=lambda x: 8 * ifft(x, axis=0))
+        >>> x = np.random.rand(8)
+        >>> np.allclose(lfft * x, fft(x))
+        True
 
     """
     matvec, rmatvec, matmat, rmatmat = [None for i in range(4)]

@@ -1,3 +1,31 @@
+%=============================================================
+%> Returns a LazyLinearOp L defined by shape and at least a matvec or matmat function.
+%>
+%> @param shape: dimensions of the operator (M, N),
+%> @param 'matvec', function_handle: returns L * v (v a vector of size N).
+%> @param 'rmatvec', function_handle: (optional) returns L' * v (v a vector of size M).
+%> @param 'matmat', function_handle: returns A * V (V a dense matrix of dimensions (N, K)).
+%> @param 'rmatmat', function_handle: (optional) returns A' * V (V a dense matrix of dimensions (M, K)).
+%> @param dtype, str: (optional) complex, double, single or undefined (by default).
+%>
+%>
+%> @b Example:
+%> In this example we create a LazyLinearOp for the DFT using the fft matlab
+%> built-in.
+%> @code
+%> >> import matfaust.lazylinop.LazyLinearOperator
+%> >> lfft = LazyLinearOperator([8, 8], 'matvec', @(x) fft(x), 'rmatvec', @(x) 8 * ifft(x))
+%> >> x = rand(8, 1);
+%> >> norm(lfft * x - fft(x)) < 1e-12
+%>
+%> ans =
+%>
+%>  logical
+%>
+%>  1
+%> @endcode
+%>
+%=============================================================
 function L = LazyLinearOperator(shape, varargin)
     import matfaust.lazylinop.LazyLinearOp
     p = inputParser;
