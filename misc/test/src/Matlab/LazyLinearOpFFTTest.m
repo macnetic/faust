@@ -20,7 +20,8 @@ classdef LazyLinearOpFFTTest < LazyLinearOpTest
 		function instantiateTestFaust(this)
 			import matfaust.rand
             import matfaust.lazylinop.*
-			this.lop = LazyLinearOp.create_from_funcs(@(x) fft(x), @(x) 8 * ifft(x), [8, 8]);
+			%this.lop = LazyLinearOp.create_from_funcs(@(x) fft(x), @(x) 8 * ifft(x), [8, 8]);
+            this.lop = LazyLinearOperator([8, 8], 'matmat', @(x) fft(x), 'rmatvec', @(x) 8 * ifft(x))
             this.from_func = true;
             this.lopA = full(this.lop);
             F2 = rand(8, 8);
