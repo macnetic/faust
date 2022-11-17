@@ -1056,7 +1056,9 @@ def kron(A, B):
                 res = res.ravel()
         else:
             raise TypeError('op must possess reshape, __matmul__ and'
-                            ' __getitem__ attributes')
+                            ' __getitem__ attributes to be multiplied by a'
+                            ' Kronecker LazyLinearOp (use toarray on the'
+                            ' latter to multiply by the former)')
         return res
     shape = (A.shape[0] * B.shape[0], A.shape[1] * B.shape[1])
     return LazyLinearOperator(shape, matmat=lambda x: _kron(A, B, shape, x),
