@@ -165,7 +165,7 @@ classdef LazyLinearOp < handle % needed to use references on objects
         %> @param op: an object compatible with self for this binary operation.
         %=============================================================
 		function LM = mtimes(L, A)
-			import matfaust.lazylinop.LazyLinearOp
+			import matfaust.lazylinop.*
 			if LazyLinearOp.isLazyLinearOp(A)
 				if isscalar(L)
 					LM = mtimes(A, L);
@@ -176,24 +176,19 @@ classdef LazyLinearOp < handle % needed to use references on objects
 				end
 			end
 			check_meth(L, 'mtimes');
-			op_is_scalar = all(size(A) == [1, 1]);
-			if ~ op_is_scalar && ~ all(size(L, 2) == size(A, 1))
+			A_is_scalar = all(size(A) == [1, 1]);
+			if ~ A_is_scalar && ~ all(size(L, 2) == size(A, 1))
 				error('Dimensions must agree')
 			end
-			if op_is_scalar
-				new_size = size(L);
-			else
-				new_size = [size(L, 1), size(A, 2)];
-			end
 
-			function l = mul_index_lambda(L, A, S)
+			function LMI = mul_index_lambda(L, A, S)
 				% L and A must be LazyLinearOp
 				import matfaust.lazylinop.LazyLinearOp
 				Sr.type = '()';
 				Sr.subs = {S.subs{1}, ':'};
 				Sc.type = '()';
 				Sc.subs = {':', S.subs{2}};
-				L.lambdas{L.I}(Sr) * A.lambdas{L.I}(Sc);
+				LMI = L.lambdas{L.I}(Sr) * A.lambdas{L.I}(Sc);
 			end
 
 			if ~ LazyLinearOp.isLazyLinearOp(A) && ismatrix(A) && isnumeric(A) && any(size(A) ~= [1, 1])
@@ -201,17 +196,19 @@ classdef LazyLinearOp < handle % needed to use references on objects
 				LM = L.lambdas{L.MUL}(A);
 			else
 				if isscalar(A)
-					LM_size = size(L);
+					matmat = @(M) M * A;
+					LM = L * LazyLinearOperator([L.size(2), L.size(2)], 'matmat', matmat, 'rmatmat', matmat);
+					return;
 				else
 					if ~ LazyLinearOp.isLazyLinearOp(A)
 						A = LazyLinearOp.create_from_op(A);
 					end
-					LM_size = [size(L, 1), size(A, 2)] 
+					LM_size = [size(L, 1), size(A, 2)];
 				end
 
 				lambdas = {@(o) L * (A * o), ... %MUL
-					@() A.' * L.', ... % T 
-					@() A' * L', ... % H 
+					@() A.' * L.', ... % T
+					@() A' * L', ... % H
 					@(S) mul_index_lambda(L, A, S)% I
 				};
 				LM = LazyLinearOp(lambdas, LM_size);

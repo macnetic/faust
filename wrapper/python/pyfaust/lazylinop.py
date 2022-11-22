@@ -590,11 +590,11 @@ class LazyLinearOp(LinearOperator):
         <b>See also:</b> pyfaust.lazylinop.LazyLinearOp.__matmul__)
         """
         self._checkattr('__mul__')
-        from scipy.sparse import eye
         if np.isscalar(other):
-            S = eye(self.shape[1], format='csr') * other
-            lop = LazyLinearOp.create_from_op(S)
-            new_op = self @ lop
+            Dshape = (self.shape[1], self.shape[1])
+            matmat = lambda M: M * other
+            D = LazyLinearOperator(Dshape, matmat=matmat, rmatmat=matmat)
+            new_op = self @ D
         else:
             new_op = self @ other
         return new_op
