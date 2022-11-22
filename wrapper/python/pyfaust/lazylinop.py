@@ -590,7 +590,7 @@ class LazyLinearOp(LinearOperator):
         <b>See also:</b> pyfaust.lazylinop.LazyLinearOp.__matmul__)
         """
         self._checkattr('__mul__')
-        from scipy.sparse import eye, diags
+        from scipy.sparse import eye
         if np.isscalar(other):
             S = eye(self.shape[1], format='csr') * other
             lop = LazyLinearOp.create_from_op(S)
@@ -627,7 +627,7 @@ class LazyLinearOp(LinearOperator):
         #return self @ eye(self.shape[1], self.shape[1], format='csr')
         # don't use csr because of function based LazyLinearOp
         # (e.g. scipy fft receives only numpy array)
-        return self @ np.eye(self.shape[1])
+        return self @ np.eye(self.shape[1], order='F')
 
     def __getitem__(self, indices):
         """
