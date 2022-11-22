@@ -873,7 +873,7 @@ class LazyLinearOp(LinearOperator):
         """
         from scipy.sparse import issparse
         lambdas = {'@': lambda o: (self @ o.real).imag + \
-                   1j * (self @ o.imag).imag if isinstance(o, np.ndarray) \
+                   (self @ (1j * o.imag)).imag if isinstance(o, np.ndarray) \
                    or issparse(o) else imag(self @ o),
                    'H': lambda: self.T.imag,
                    'T': lambda: self.T.imag,
