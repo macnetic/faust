@@ -13975,6 +13975,7 @@ a.anchor-link {
 <p>Starting from a <code>numpy</code> array, a <code>scipy</code> matrix, a <code>Faust</code> object, or potentially many other compatible linear operators with efficient implementatons, this class follows the <em>lazy evaluation paradigm</em>.</p>
 <p>In short, one can <em>aggregate low-level <code>LazyLinearOp</code> objects into higher-level ones</em> using classical operations (addition, concatenation, adjoint, real part, slicing, etc.), without actually building arrays. The actual effect of these operations is delayed until the resulting linear operator is actually applied to a vector (or to a collection of vectors, seen as a matrix).</p>
 <p>The main interest of this paradigm is to enable the construction of processing pipelines that exploit as building blocks efficient implementations of ``low-level'' linear operators.</p>
+<p>LazyLinearOperators are complementary to other “lazy” objects such as LazyTensors in <a href="https://www.kernel-operations.io/keops/_auto_tutorials/a_LazyTensors/plot_lazytensors_a.html">Kheops</a>, or the ones of <a href="https://lazyarray.readthedocs.io/en/latest/index.html">lazyarray</a>, <a href="https://www.weld.rs/weldnumpy/]">WeldNumpy</a> libraries,  which, to the best of our knowledge, primarily provide compact descriptions of arrays which entries can be evaluated efficiently on the fly.</p>
 <h2 id="This-notebook">This notebook<a class="anchor-link" href="#This-notebook">&#182;</a></h2><p>In this notebook we shall see how to create a <code>LazyLinearOp</code> instance, create more complex instances using various lazy operations, and finally how to apply the resulting instance on vectors or matrices. We assume the reader is familiar with at least <code>numpy</code> arrays and their operations.</p>
 
 </div>
@@ -14267,8 +14268,8 @@ Let us mention most importantly:</p>
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>array([-2.63467895e+11+0.j, -1.82512222e+11+0.j, -3.24855445e+11+0.j, ...,
-       -2.18234934e+11+0.j, -1.40949814e+11+0.j, -2.27929503e+11+0.j])</pre>
+<pre>array([-2.43516666e+11, -5.23268916e+11, -4.19169965e+11, ...,
+       -2.58653991e+11, -3.34532139e+11, -6.53673371e+11])</pre>
 </div>
 
 </div>
@@ -14357,13 +14358,13 @@ Let us mention most importantly:</p>
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>array([[-21912992.26312142+0.j],
-       [-15180144.64900897+0.j],
-       [-27019233.94555141+0.j],
+<pre>array([[-19787814.52565873],
+       [-42520196.99833652],
+       [-34061613.02022415],
        ...,
-       [-18151408.88322322+0.j],
-       [-11723135.21816526+0.j],
-       [-18957276.86080584+0.j]])</pre>
+       [-21018083.96961382],
+       [-27184057.67527183],
+       [-53118164.47840539]])</pre>
 </div>
 
 </div>
@@ -14387,7 +14388,7 @@ Let us mention most importantly:</p>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[10]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[11]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">timeit</span> lFs@M
@@ -14414,33 +14415,9 @@ Let us mention most importantly:</p>
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>2.47 s ± 192 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
-</pre>
-</div>
-</div>
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-
-
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr">
-<pre>/home/hinria/faust2/build/wrapper/python/pyfaust/__init__.py:1232: UserWarning: The numpy array to multiply is not F_CONTIGUOUS, costly conversion on the fly. Please use np.asfortranarray by yourself.
-  w = lambda: warnings.warn(&#34;The numpy array to multiply is not &#34;
-</pre>
-</div>
-</div>
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-
-
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>1.16 s ± 75.2 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
-4.51 s ± 543 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+<pre>2 s ± 86.3 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+880 ms ± 44.6 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+3.51 s ± 69.1 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
 consistent results: True
 </pre>
 </div>
@@ -14471,7 +14448,7 @@ consistent results: True
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[11]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[12]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.sparse.linalg</span> <span class="kn">import</span> <span class="n">svds</span>
@@ -14479,58 +14456,6 @@ consistent results: True
 <span class="n">U1</span><span class="p">,</span> <span class="n">S1</span><span class="p">,</span> <span class="n">Vh1</span> <span class="o">=</span> <span class="n">svds</span><span class="p">(</span><span class="n">lF</span><span class="p">)</span>
 <span class="n">U2</span><span class="p">,</span> <span class="n">S2</span><span class="p">,</span> <span class="n">Vh2</span> <span class="o">=</span> <span class="n">svds</span><span class="p">(</span><span class="n">lF</span><span class="o">.</span><span class="n">toarray</span><span class="p">())</span>
 <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">U1</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">S1</span><span class="p">)</span> <span class="o">@</span> <span class="n">Vh1</span><span class="p">,</span> <span class="n">U2</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">S2</span><span class="p">)</span> <span class="o">@</span> <span class="n">Vh2</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">)</span>
-</pre></div>
-
-     </div>
-</div>
-</div>
-</div>
-
-<div class="jp-Cell-outputWrapper">
-
-
-<div class="jp-OutputArea jp-Cell-outputArea">
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[11]:</div>
-
-
-
-
-<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>True</pre>
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>It works the same!</p>
-<h4 id="4.2-The-Kronecker-product">4.2 The Kronecker product<a class="anchor-link" href="#4.2-The-Kronecker-product">&#182;</a></h4><p>Another operation we can try is the Kronecker product. This time we will use the <code>numpy.kron</code> function on A and B numpy arrays and we will compare this function to the <code>pyfaust.lazylinop.kron</code> which computes the Kronecker product too but as a <code>LazyLinearOp</code>. Precisely, we compare these functions on the multiplication of the Kronecker product by a vector.</p>
-
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[12]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-     <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust.lazylinop</span> <span class="kn">import</span> <span class="n">kron</span> <span class="k">as</span> <span class="n">lkron</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">pyfaust</span> <span class="kn">import</span> <span class="n">rand</span>
-<span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
-<span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
-<span class="n">AxB</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">)</span>
-<span class="n">lAxB</span> <span class="o">=</span> <span class="n">lkron</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
-<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">AxB</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
-<span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">AxB</span><span class="nd">@x</span><span class="p">,</span> <span class="n">lAxB</span><span class="nd">@x</span><span class="p">)</span>
 </pre></div>
 
      </div>
@@ -14564,13 +14489,65 @@ consistent results: True
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>The two versions of kron give the same result. Now let's compare the computation times.</p>
+<p>It works the same!</p>
+<h4 id="4.2-The-Kronecker-product">4.2 The Kronecker product<a class="anchor-link" href="#4.2-The-Kronecker-product">&#182;</a></h4><p>Another operation we can try is the Kronecker product. This time we will use the <code>numpy.kron</code> function on A and B numpy arrays and we will compare this function to the <code>pyfaust.lazylinop.kron</code> which computes the Kronecker product too but as a <code>LazyLinearOp</code>. Precisely, we compare these functions on the multiplication of the Kronecker product by a vector.</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[13]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust.lazylinop</span> <span class="kn">import</span> <span class="n">kron</span> <span class="k">as</span> <span class="n">lkron</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">pyfaust</span> <span class="kn">import</span> <span class="n">rand</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">AxB</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">)</span>
+<span class="n">lAxB</span> <span class="o">=</span> <span class="n">lkron</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">AxB</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">AxB</span><span class="nd">@x</span><span class="p">,</span> <span class="n">lAxB</span><span class="nd">@x</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[13]:</div>
+
+
+
+
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
+<pre>True</pre>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>The two versions of kron give the same result. Now let's compare the computation times.</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[14]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">timeit</span> AxB @ x
@@ -14593,7 +14570,7 @@ consistent results: True
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>42.6 ms ± 2.8 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+<pre>38.4 ms ± 967 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
 </pre>
 </div>
 </div>
@@ -14605,7 +14582,7 @@ consistent results: True
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[14]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[15]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">timeit</span> lAxB @ x
@@ -14628,7 +14605,7 @@ consistent results: True
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>2.76 ms ± 282 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+<pre>816 µs ± 110 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
 </pre>
 </div>
 </div>
@@ -14647,7 +14624,7 @@ consistent results: True
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[15]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[16]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust</span> <span class="kn">import</span> <span class="n">dft</span>
@@ -14674,7 +14651,7 @@ The operator can totally be applied on matrices too. So, since we choose to appl
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[16]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[17]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">F</span> <span class="o">=</span> <span class="n">dft</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">normed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -14695,7 +14672,7 @@ The operator can totally be applied on matrices too. So, since we choose to appl
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[17]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[18]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
@@ -14715,7 +14692,7 @@ The operator can totally be applied on matrices too. So, since we choose to appl
 <div class="jp-OutputArea-child">
 
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[17]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[18]:</div>
 
 
 
@@ -14740,7 +14717,7 @@ The operator can totally be applied on matrices too. So, since we choose to appl
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[18]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[19]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">pf</span><span class="o">.</span><span class="n">version</span><span class="p">()</span>
@@ -14759,13 +14736,13 @@ The operator can totally be applied on matrices too. So, since we choose to appl
 <div class="jp-OutputArea-child">
 
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[18]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[19]:</div>
 
 
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>&#39;3.35.13&#39;</pre>
+<pre>&#39;3.35.15&#39;</pre>
 </div>
 
 </div>
