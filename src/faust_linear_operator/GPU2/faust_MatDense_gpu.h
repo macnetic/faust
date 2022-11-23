@@ -20,6 +20,10 @@ namespace Faust
 		void butterfly_diag_prod(MatDense<FPP, GPU2>& X, const Vect<FPP, GPU2>& d1, const Vect<FPP, GPU2>& d2, const int* ids);
 
 	template<typename FPP>
+		void batched_svd(MatDense<FPP, GPU2>& As, const uint32_t nbatches, MatDense<FPP, GPU2>& Us, MatDense<FPP, GPU2>& Vs, MatDense<FPP, GPU2>& Ss, const uint32_t rank = 0);
+
+
+	template<typename FPP>
 		class MatDense<FPP, GPU2> : public MatGeneric<FPP,GPU2>
 		{
 			friend Transform<FPP,GPU2>; // need to access to get_gpu_mat_ptr
@@ -27,6 +31,7 @@ namespace Faust
 			friend MatBSR<FPP,GPU2>;
 			friend MatDense<std::complex<double>,GPU2>; // TODO limit to real function
 			friend void butterfly_diag_prod<>(MatDense<FPP, GPU2>& X, const Vect<FPP, GPU2>& d1, const Vect<FPP, GPU2>& d2, const int* ids);
+			friend void batched_svd<>(MatDense<FPP, GPU2>& As, const uint32_t nbatches, MatDense<FPP, GPU2>& Us, MatDense<FPP, GPU2>& Vs, MatDense<FPP, GPU2>& Ss, const uint32_t rank /*= 0*/);
 //			friend void gemm<>(const MatDense<FPP, GPU2> &A, const MatDense<FPP, GPU2> &B, MatDense<FPP, GPU2> &C, const FPP& alpha, const FPP& beta, const char opA, const char opB);
 //
 //			friend void gemv<>(const MatDense<FPP, GPU2> &A, const Vect<FPP, GPU2> &B, Vect<FPP, GPU2> &C, const FPP& alpha, const FPP& beta, const char opA, const char opB);

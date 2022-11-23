@@ -767,12 +767,18 @@ namespace Faust
 				dsm_funcs->free(real_mat.gpu_mat);
 			real_mat.gpu_mat = real_gpu_mat;
 		}
-	
 
 	template<>
 		void butterfly_diag_prod(MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>& X, const Vect<@FAUST_SCALAR_FOR_GM@, GPU2>& d1, const Vect<@FAUST_SCALAR_FOR_GM@, GPU2>& d2, const int* ids)
 		{
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
 			dsm_funcs->butterfly_diag_prod(X.gpu_mat, d1.gpu_mat, d2.gpu_mat, ids);
+		}
+
+	template<>
+		void batched_svd(MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>& As, const uint32_t nbatches, MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>& Us, MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>& Vs, MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>& Ss, const uint32_t rank /*= 0*/)
+		{
+			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
+			dsm_funcs->batched_svd(As.gpu_mat, nbatches, Us.gpu_mat, Vs.gpu_mat, Ss.gpu_mat, rank);
 		}
 }
