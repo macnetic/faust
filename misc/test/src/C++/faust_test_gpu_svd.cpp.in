@@ -1,0 +1,59 @@
+#include "faust_gpu_mod_utils.h"
+#include "faust_MatDense.h"
+#include "faust_MatDense_gpu.h"
+#include <iostream>
+
+using namespace std;
+using namespace Faust;
+typedef @TEST_FPP@ FPP;
+
+
+int main()
+{
+	Faust::enable_gpu_mod();
+	int m = 16, n = 18; // TODO: option with default values
+	int nbatches = 32; // TODO: option with default values
+	const int minmn = (m < n) ? m : n; /* min(m,n) */
+
+	MatDense<FPP, Cpu>* As = MatDense<FPP, Cpu>::randMat(m, n * nbatches);
+	MatDense<FPP, Cpu> Us, Vs, Ss;
+
+
+	MatDense<FPP, GPU2> gpu_As(*As);
+
+	MatDense<FPP, GPU2> gpu_Us(m, m * nbatches);
+	MatDense<FPP, GPU2> gpu_Vs(n, n * nbatches);
+	MatDense<FPP, GPU2> gpu_Ss(minmn, nbatches);
+	batched_svd(gpu_As, nbatches, gpu_Us, gpu_Vs, gpu_Ss/*, rank*/);
+
+	gpu_Us.tocpu(Us);
+	gpu_Vs.tocpu(Vs);
+	gpu_Ss.tocpu(Ss);
+
+	for(int i=0;i < nbatches; i++)
+	{
+		auto A = As->get_cols(i * n, n);
+		auto U = Us.get_cols(i * m, m);
+		auto V = Vs.get_cols(i * n, n);
+		auto S = Ss.get_cols(i, 1);
+		MatDense<FPP, Cpu> SD(m, n);
+		SD.setZeros();
+		for(int j=0;j<minmn;j++)
+			SD.getData()[j * m + j] = (*S)(j);
+		auto E = *A;
+		auto P = *U;
+		P.multiplyRight(SD);
+		V->adjoint();
+		P.multiplyRight(*V);
+		E -= P;
+		auto err = E.norm() / A->norm();
+		cout << "err:" << err << endl;
+		assert(err < 1e-7);
+		delete A;
+		delete U;
+		delete V;
+		delete S;
+	}
+	delete As;
+}
+
