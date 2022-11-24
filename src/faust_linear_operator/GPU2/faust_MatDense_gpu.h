@@ -19,8 +19,25 @@ namespace Faust
 	template<typename FPP>
 		void butterfly_diag_prod(MatDense<FPP, GPU2>& X, const Vect<FPP, GPU2>& d1, const Vect<FPP, GPU2>& d2, const int* ids);
 
+	/***
+	 * \brief Computes the SVD of a batch of matrices As.
+	 *
+	 * \param As: a batch of matrices horizontally concatenated.
+	 * \param batch_sz: the number of matrices to compute the SVD of.
+	 * \param Us: receives the left singulars vectors of each matrix of As (the singulars vectors of each matrix are concatenated horizontally).
+	 * \param Vs: same as Us for the right singular vectors.
+	 * \param Ss: revices the singular values for each matrix of As (the columns in Ss corresponds to the matrices of As in the same order).
+	 */
 	template<typename FPP>
-		void batched_svd(MatDense<FPP, GPU2>& As, const uint32_t nbatches, MatDense<FPP, GPU2>& Us, MatDense<FPP, GPU2>& Vs, MatDense<FPP, GPU2>& Ss, const uint32_t rank = 0);
+		void batched_svd(MatDense<FPP, GPU2>& As, const uint32_t batch_sz, MatDense<FPP, GPU2>& Us, MatDense<FPP, GPU2>& Vs, MatDense<Real<FPP>, GPU2>& Ss, const uint32_t rank = 0);
+
+
+	/***
+	 * \brief Similar to the previous prototype except that the results is transferred into CPU matrices and only a number of rank singular vectors/values is copied.
+	 *
+	 */
+	template<typename FPP>
+		void batched_svd(MatDense<FPP, Cpu>& As, const uint32_t batch_sz, MatDense<FPP, Cpu>& Us, MatDense<FPP, Cpu>& Vs, MatDense<Real<FPP>, Cpu>& Ss, const uint32_t rank = 0);
 
 
 	template<typename FPP>
@@ -31,7 +48,10 @@ namespace Faust
 			friend MatBSR<FPP,GPU2>;
 			friend MatDense<std::complex<double>,GPU2>; // TODO limit to real function
 			friend void butterfly_diag_prod<>(MatDense<FPP, GPU2>& X, const Vect<FPP, GPU2>& d1, const Vect<FPP, GPU2>& d2, const int* ids);
-			friend void batched_svd<>(MatDense<FPP, GPU2>& As, const uint32_t nbatches, MatDense<FPP, GPU2>& Us, MatDense<FPP, GPU2>& Vs, MatDense<FPP, GPU2>& Ss, const uint32_t rank /*= 0*/);
+			friend void batched_svd<>(MatDense<FPP, GPU2>& As, const uint32_t batch_sz, MatDense<FPP, GPU2>& Us, MatDense<FPP, GPU2>& Vs, MatDense<Real<FPP>, GPU2>& Ss, const uint32_t rank /*= 0*/);
+			friend void batched_svd<>(MatDense<std::complex<Real<FPP>>, GPU2>& As, const uint32_t batch_sz, MatDense<std::complex<Real<FPP>>, GPU2>& Us, MatDense<std::complex<Real<FPP>>, GPU2>& Vs, MatDense<Real<FPP>, GPU2>& Ss, const uint32_t rank /*= 0*/);
+			friend void batched_svd<>(MatDense<FPP, Cpu>& As, const uint32_t batch_sz, MatDense<FPP, Cpu>& Us, MatDense<FPP, Cpu>& Vs, MatDense<Real<FPP>, Cpu>& Ss, const uint32_t rank /*= 0*/);
+			friend void batched_svd<>(MatDense<std::complex<Real<FPP>>, Cpu>& As, const uint32_t batch_sz, MatDense<std::complex<Real<FPP>>, Cpu>& Us, MatDense<std::complex<Real<FPP>>, Cpu>& Vs, MatDense<Real<std::complex<Real<FPP>>>, Cpu>& Ss, const uint32_t rank /*= 0*/);
 //			friend void gemm<>(const MatDense<FPP, GPU2> &A, const MatDense<FPP, GPU2> &B, MatDense<FPP, GPU2> &C, const FPP& alpha, const FPP& beta, const char opA, const char opB);
 //
 //			friend void gemv<>(const MatDense<FPP, GPU2> &A, const Vect<FPP, GPU2> &B, Vect<FPP, GPU2> &C, const FPP& alpha, const FPP& beta, const char opA, const char opB);
@@ -143,6 +163,12 @@ namespace Faust
 				MatDense<FPP,GPU2>* get_cols(faust_unsigned_int start_col_id, faust_unsigned_int num_cols) const;
 				MatDense<FPP,GPU2>* get_cols(faust_unsigned_int* col_ids, faust_unsigned_int n) const;
 				void copyBuf(FPP* dst_cpu_buf, const void* stream=nullptr) const;
+				/** \brief copy a block (defined by offset and size) of this matrix into a CPU buffer
+				 *
+				 * \param offset: defines the offset of the block to copy (in number of scalar elements).
+				 * \param size: number of scalar elements to copy from this matrix to the CPU buffer, starting from the offset.
+				 */
+				void copyBufBlock(FPP* dst_cpu_buf, uint32_t offset = 0, int32_t size = -1, const void* stream=nullptr) const;
 				bool isReal() const;
 				void prox_sp(int32_t k, bool normalized=false, bool pos=false) const;
 				void prox_spcol(int32_t k, bool normalized=false, bool pos=false) const;

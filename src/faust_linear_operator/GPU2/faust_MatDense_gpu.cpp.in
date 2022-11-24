@@ -725,9 +725,19 @@ namespace Faust
 	template<>
 		void Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::copyBuf(@FAUST_SCALAR_FOR_GM@* dst_cpu_buf, const void* stream/*=nullptr*/) const
 		{
+			//TODO: could be moved in hpp using copyBufBlock with default values of size and offset
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
 			dsm_funcs->set_stream(gpu_mat, stream);
 			dsm_funcs->tocpu(gpu_mat, (@GM_SCALAR@*) reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(dst_cpu_buf));
+			dsm_funcs->set_stream(gpu_mat, nullptr);
+		}
+
+	template<>
+		void Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::copyBufBlock(@FAUST_SCALAR_FOR_GM@* dst_cpu_buf, uint32_t offset/* = 0*/, int32_t size /*= -1*/, const void* stream/*=nullptr*/) const
+		{
+			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
+			dsm_funcs->set_stream(gpu_mat, stream);
+			dsm_funcs->block_tocpu(gpu_mat, offset, size, (@GM_SCALAR@*) reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(dst_cpu_buf));
 			dsm_funcs->set_stream(gpu_mat, nullptr);
 		}
 
@@ -776,9 +786,49 @@ namespace Faust
 		}
 
 	template<>
-		void batched_svd(MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>& As, const uint32_t nbatches, MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>& Us, MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>& Vs, MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>& Ss, const uint32_t rank /*= 0*/)
+		void batched_svd(MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>& As, const uint32_t batch_sz, MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>& Us, MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>& Vs, MatDense<Real<@FAUST_SCALAR_FOR_GM@>, GPU2>& Ss, const uint32_t rank /*= 0*/)
 		{
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
-			dsm_funcs->batched_svd(As.gpu_mat, nbatches, Us.gpu_mat, Vs.gpu_mat, Ss.gpu_mat, rank);
+			dsm_funcs->batched_svd(As.gpu_mat, batch_sz, Us.gpu_mat, Vs.gpu_mat, Ss.gpu_mat, rank);
+		}
+
+	template<>
+		void batched_svd(MatDense<@FAUST_SCALAR_FOR_GM@, Cpu>& As, const uint32_t batch_sz, MatDense<@FAUST_SCALAR_FOR_GM@, Cpu>& Us, MatDense<@FAUST_SCALAR_FOR_GM@, Cpu>& Vs, MatDense<Real<@FAUST_SCALAR_FOR_GM@>, Cpu>& Ss, const uint32_t rank /*= 0*/)
+		{
+
+			const int m = As.getNbRow(), n = As.getNbCol() / batch_sz;
+			const int minmn = (m < n) ? m : n; /* min(m,n) */
+
+			bool partial_svd = rank > 0 && rank <= minmn;
+
+			if(rank > minmn)
+				throw std::runtime_error("Invalid rank");
+
+			MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> gpu_As(As);
+			MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> gpu_Us(m, m * batch_sz);
+			MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> gpu_Vs(n, n * batch_sz);
+			MatDense<Real<@FAUST_SCALAR_FOR_GM@>, GPU2> gpu_Ss(minmn, batch_sz);
+
+			//TODO: refactor this function in hpp because it can use batched_svd GPU2 prototype
+			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
+			dsm_funcs->batched_svd(gpu_As.gpu_mat, batch_sz, gpu_Us.gpu_mat, gpu_Vs.gpu_mat, gpu_Ss.gpu_mat, rank);
+
+			if(partial_svd)
+			{
+				for(int i=0;i < batch_sz; i++)
+				{
+					gpu_Us.copyBufBlock(Us.getData() + i * m * rank, i * m * m, rank * m);
+					gpu_Vs.copyBufBlock(Vs.getData() + rank * n * i, n * n * i, n * rank);
+					gpu_Ss.copyBufBlock(Ss.getData() + i * rank, i * minmn, rank);
+				}
+
+			}
+			else
+			{
+				// full svd
+				gpu_Us.tocpu(Us);
+				gpu_Vs.tocpu(Vs);
+				gpu_Ss.tocpu(Ss);
+			}
 		}
 }
