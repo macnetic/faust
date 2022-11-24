@@ -7,36 +7,35 @@ using namespace std;
 using namespace Faust;
 typedef @TEST_FPP@ FPP;
 
-
-int main()
+void test_batched_full_svd()
 {
-	Faust::enable_gpu_mod();
 	int m = 16, n = 18; // TODO: option with default values
-	int nbatches = 32; // TODO: option with default values
+	int batch_sz = 32; // TODO: option with default values
 	const int minmn = (m < n) ? m : n; /* min(m,n) */
 
-	MatDense<FPP, Cpu>* As = MatDense<FPP, Cpu>::randMat(m, n * nbatches);
-	MatDense<FPP, Cpu> Us, Vs, Ss;
+	MatDense<FPP, Cpu>* As = MatDense<FPP, Cpu>::randMat(m, n * batch_sz);
+	MatDense<FPP, Cpu> Us, Vs;
+	MatDense<Real<FPP>, Cpu> Ss;
 
 
 	MatDense<FPP, GPU2> gpu_As(*As);
 
-	MatDense<FPP, GPU2> gpu_Us(m, m * nbatches);
-	MatDense<FPP, GPU2> gpu_Vs(n, n * nbatches);
-	MatDense<FPP, GPU2> gpu_Ss(minmn, nbatches);
-	batched_svd(gpu_As, nbatches, gpu_Us, gpu_Vs, gpu_Ss/*, rank*/);
+	MatDense<FPP, GPU2> gpu_Us(m, m * batch_sz);
+	MatDense<FPP, GPU2> gpu_Vs(n, n * batch_sz);
+	MatDense<Real<FPP>, GPU2> gpu_Ss(minmn, batch_sz);
+	batched_svd(gpu_As, batch_sz, gpu_Us, gpu_Vs, gpu_Ss/*, rank*/);
 
 	gpu_Us.tocpu(Us);
 	gpu_Vs.tocpu(Vs);
 	gpu_Ss.tocpu(Ss);
 
-	for(int i=0;i < nbatches; i++)
+	for(int i=0;i < batch_sz; i++)
 	{
 		auto A = As->get_cols(i * n, n);
 		auto U = Us.get_cols(i * m, m);
 		auto V = Vs.get_cols(i * n, n);
 		auto S = Ss.get_cols(i, 1);
-		MatDense<FPP, Cpu> SD(m, n);
+		MatDense<Real<FPP>, Cpu> SD(m, n);
 		SD.setZeros();
 		for(int j=0;j<minmn;j++)
 			SD.getData()[j * m + j] = (*S)(j);
@@ -55,5 +54,66 @@ int main()
 		delete S;
 	}
 	delete As;
+
+}
+
+void test_batched_partial_svd()
+{
+	int m = 4, n = 5; // TODO: option with default values
+	int batch_sz = 3; // TODO: option with default values
+	const int minmn = (m < n) ? m : n; /* min(m,n) */
+
+	int rank = 1;
+	MatDense<FPP, Cpu> As(m, n * batch_sz);
+
+	for(int i = 0; i < batch_sz; i++)
+	{
+		auto v1 = MatDense<FPP, Cpu>::randMat(m, 1);
+		auto v2 = MatDense<FPP, Cpu>::randMat(1, n);
+		auto A = *v2;
+		v1->multiply(A, 'N');
+		delete v1;
+		delete v2;
+		memcpy(As.getData() + i * m * n, A.getData(), sizeof(FPP) * m * n);
+	}
+
+	MatDense<FPP, Cpu> Us(m, batch_sz * rank), Vs(n, batch_sz * rank);
+	MatDense<Real<FPP>, Cpu> Ss(minmn, batch_sz * rank);
+
+
+	batched_svd(As, batch_sz, Us, Vs, Ss, /* rank */ 1);
+
+	for(int i=0;i < batch_sz; i++)
+	{
+		auto A = As.get_cols(i * n, n);
+		A->print_mat("A:");
+		auto U = Us.get_cols(i * rank, 1);
+		auto V = Vs.get_cols(i * rank, 1);
+		auto S = Ss(i);
+		cout << "S:" << S << endl;
+		U->print_mat("U:");
+		V->print_mat("V:");
+		auto E = *A;
+		auto P = *U;
+		P.scalarMultiply(S);
+		V->adjoint();
+		P.multiplyRight(*V);
+		E -= P;
+		auto err = E.norm() / A->norm();
+		cout << "err:" << err << endl;
+		assert(err < 1e-7);
+		delete A;
+		delete U;
+		delete V;
+	}
+
+}
+
+
+int main()
+{
+	Faust::enable_gpu_mod();
+	test_batched_full_svd();
+	test_batched_partial_svd();
 }
 
