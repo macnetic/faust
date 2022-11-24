@@ -377,6 +377,12 @@ namespace Faust
 			//! \brief Displays the MatDense
 			void Display() const;
 
+			/**
+			 * \brief Prints matrix with an optional header/title.
+			 */
+			void print_mat(std::string header="") const { if (header != "") std::cout << header << std::endl; std::cout << mat << std::endl;}
+
+
 			//! \brief Returns all the features of the MatDense.
 			std::string to_string(const bool transpose=false, const bool displaying_small_mat_elts=false) const;
 
