@@ -552,6 +552,8 @@ namespace Faust
 			 */
 			void submatrix(const std::vector<int> &row_ids, const std::vector<int> &col_ids, MatDense<FPP, Cpu> & submat) const;
 
+			void submatrix(const std::vector<int> &row_ids, const std::vector<int> &col_ids, FPP* submat_data) const;
+
 			/**
 			 * Assigns this[row_ids[i], col_id] to values[i, val_col_id] for each i in {0, ..., row_ids.size()}.
 			 */

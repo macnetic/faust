@@ -364,6 +364,7 @@ namespace Faust
 
 
 			void submatrix(const std::vector<int> &row_ids, const std::vector<int> &col_ids, MatDense<FPP, Cpu> & submat) const;
+			void submatrix(const std::vector<int> &row_ids, const std::vector<int> &col_ids, FPP* submat_data) const;
 			Vect<FPP,Cpu> get_col(faust_unsigned_int id) const;
 			void get_col(faust_unsigned_int id, Vect<FPP, Cpu> &out_vec) const;
 			/*

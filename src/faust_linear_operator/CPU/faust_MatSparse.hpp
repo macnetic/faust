@@ -948,6 +948,17 @@ void Faust::MatSparse<FPP, Cpu>::submatrix(const std::vector<int> &row_ids, cons
 			submat.mat(i,j) = mat.coeff(row_ids[i], col_ids[j]);
 }
 
+
+template<typename FPP>
+void Faust::MatSparse<FPP, Cpu>::submatrix(const std::vector<int> &row_ids, const std::vector<int> &col_ids, FPP* submat_data) const
+{
+	using Map = Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>>;
+	Map submat_mat(submat_data, row_ids.size(), col_ids.size());
+	for(int i=0;i<row_ids.size();i++)
+		for(int j=0;j<col_ids.size();j++)
+			submat_mat(i,j) = mat.coeff(row_ids[i], col_ids[j]);
+}
+
 template<typename FPP>
 Faust::Vect<FPP,Cpu> Faust::MatSparse<FPP,Cpu>::get_col(faust_unsigned_int id) const
 {

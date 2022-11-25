@@ -1544,8 +1544,8 @@ std::vector<int> MatDense<FPP, Cpu>::row_nonzero_inds(faust_unsigned_int row_id)
 	return ids;
 }
 
-template<typename EigenDenseMat, typename EigenDim0Ind, typename EigenDim1Ind>
-EigenDenseMat submatrix(const EigenDenseMat& in_mat, EigenDenseMat& out_submat, const EigenDim0Ind &row_ids,  const EigenDim1Ind &col_ids)
+template<typename EigenDenseMat, typename EigenDenseMat2, typename EigenDim0Ind, typename EigenDim1Ind>
+EigenDenseMat submatrix(const EigenDenseMat& in_mat, EigenDenseMat2& out_submat, const EigenDim0Ind &row_ids,  const EigenDim1Ind &col_ids)
 {
 #ifdef _MSC_VER // TODO: replace by a check on Eigen version EIGEN_WORLD_VERSION, EIGEN_MAJOR_VERSION
 	// as far as I tested eigen3.4rc1 doesn't compile with VS 14
@@ -1595,6 +1595,14 @@ void MatDense<FPP, Cpu>::submatrix(const std::vector<int> &row_ids, const std::v
 	if(this->dim1 != row_ids.size() || this->dim2 != col_ids.size())
 		submat.resize(row_ids.size(), col_ids.size());
 	Faust::submatrix(mat, submat.mat, row_ids, col_ids);
+}
+
+template<typename FPP>
+void MatDense<FPP, Cpu>::submatrix(const std::vector<int> &row_ids, const std::vector<int> &col_ids, FPP* submat_data) const
+{
+	using Map = Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>>;
+	Map submat_mat(submat_data, row_ids.size(), col_ids.size());
+	Faust::submatrix(mat, submat_mat, row_ids, col_ids);
 }
 
 template<typename FPP>
