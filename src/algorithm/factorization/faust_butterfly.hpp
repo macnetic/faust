@@ -188,45 +188,116 @@ namespace Faust
 			X.setZeros();
 			Y.setZeros();
 
-			std::vector<MatDense<FPP, Cpu>> U(r), V(r);
+			bool svd_on_gpu = false;
 			std::vector<std::vector<int>> rows(r), cols(r);
-			#pragma omp parallel for schedule(dynamic) private(subA)
+
+			#pragma omp parallel for schedule(dynamic)
 			for(int t=0;t<r;t++)
 			{
 				rows[t] = s1.col_nonzero_inds(t);
 				cols[t] = s2.row_nonzero_inds(t);
-				if(dsA)
-					dsA->submatrix(rows[t], cols[t], subA);
-				else
-					spA->submatrix(rows[t], cols[t], subA);
-				//#define BUTTERFLY_APPROX_RANK1
-#ifdef BUTTERFLY_APPROX_RANK1
-				subA.approx_rank1(U[t], V[t]);
+			}
+
+
+			if(svd_on_gpu && rows[0].size() <= 32 && rows[1].size() <= 32) // GPU batched svd is limited to 32 nrows/ncols max
+			{
+#ifdef USE_GPU_MOD
+				compute_XY_on_gpu(A, s1, s2, X, Y, rows, cols);
 #else
-				if(A.getNbRow() >= (1 << 14) && (std::is_same<FPP, double>::value || std::is_same<FPP, std::complex<double>>::value))
-				{
-					// use jacobi svd as a workaround to this bug https://gitlab.com/libeigen/eigen/-/issues/1723
-					// TODO: remove when it'll be fixed
-					Eigen::JacobiSVD<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>> svd;
-					subA.initJacobiSVD(svd);
-					subA.best_low_rank(1, U[t], V[t], svd);
-				}
-				else
-					subA.best_low_rank(1, U[t], V[t]);
+				throw std::runtime_error("GPU SVD is not enabled in this version of FAµST.");
 #endif
 			}
+			else
+			{
+				std::vector<MatDense<FPP, Cpu>> U(r), V(r);
+#pragma omp parallel for schedule(dynamic) private(subA)
+				for(int t=0;t<r;t++)
+				{
+					if(dsA)
+						dsA->submatrix(rows[t], cols[t], subA);
+					else
+						spA->submatrix(rows[t], cols[t], subA);
+					//#define BUTTERFLY_APPROX_RANK1
+#ifdef BUTTERFLY_APPROX_RANK1
+					subA.approx_rank1(U[t], V[t]);
+#else
+					if(A.getNbRow() >= (1 << 14) && (std::is_same<FPP, double>::value || std::is_same<FPP, std::complex<double>>::value))
+					{
+						// use jacobi svd as a workaround to this bug https://gitlab.com/libeigen/eigen/-/issues/1723
+						// TODO: remove when it'll be fixed
+						Eigen::JacobiSVD<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>> svd;
+						subA.initJacobiSVD(svd);
+						subA.best_low_rank(1, U[t], V[t], svd);
+					}
+					else
+						subA.best_low_rank(1, U[t], V[t]);
+#endif
+				}
+
+				std::vector<Eigen::Triplet<FPP>> XtripletList;
+				std::vector<Eigen::Triplet<FPP>> YtripletList;
+				for(int t=0;t<r;t++)
+				{
+					for(int i=0;i<rows[t].size();i++)
+						XtripletList.push_back(Eigen::Triplet<FPP>(rows[t][i], t, U[t].getData()[i]));
+					for(int i=0;i<cols[t].size();i++)
+						YtripletList.push_back(Eigen::Triplet<FPP>(t, cols[t][i], V[t](0,i)));
+				}
+				X = MatSparse<FPP, Cpu>(XtripletList, s1.getNbRow(), s1.getNbCol());
+				Y = MatSparse<FPP, Cpu>(YtripletList, s2.getNbRow(), s2.getNbCol());
+			}
+		}
+
+#ifdef USE_GPU_MOD
+	template<typename FPP>
+		void compute_XY_on_gpu(const Faust::MatGeneric<FPP, Cpu>& A, const Faust::MatSparse<FPP, Cpu>& s1, const Faust::MatSparse<FPP, Cpu>& s2, Faust::MatSparse<FPP, Cpu>& X, Faust::MatSparse<FPP, Cpu>& Y, std::vector<std::vector<int>> &rows, std::vector<std::vector<int>> &cols)
+		{
+			const Faust::MatDense<FPP, Cpu>* dsA = dynamic_cast<const Faust::MatDense<FPP, Cpu>*>(&A);
+			const Faust::MatSparse<FPP, Cpu>* spA;
+			if(dsA == nullptr)
+			{
+				spA = dynamic_cast<const Faust::MatSparse<FPP, Cpu>*>(&A);
+				if(spA == nullptr)
+					throw std::runtime_error("lifting_two_layers_factorization A must be MatDense or MatSparse.");
+			}
+			int r = s1.getNbCol();
+			int m = rows[0].size(), n = cols[0].size();
+			MatDense<FPP, Cpu> Us(m, r), Vs(n, r);
+			MatDense<FPP, Cpu> Ss(r);
+			MatDense<FPP, Cpu> subAs(m, r * n);
+			for(int i=0; i < r; i++)
+				if(dsA)
+					dsA->submatrix(rows[i], cols[i], subAs.getData() + i * m * n);
+				else
+					spA->submatrix(rows[i], cols[i], subAs.getData() + i * m * n);
+
+			batched_svd(subAs, r /* batch_sz */, Us, Vs, Ss, /* rank */ 1);
+
+
+			using Map = Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>>;
+
+			for(int i=0; i < r; i++)
+			{
+				Map U(Us.getData() + i * m, m, 1);
+				U *= Ss(i);
+				Vs.adjoint();
+			}
+
 			std::vector<Eigen::Triplet<FPP>> XtripletList;
 			std::vector<Eigen::Triplet<FPP>> YtripletList;
 			for(int t=0;t<r;t++)
 			{
+				Map U_(Us.getData() + t * m, m, 1);
+				Map V_(Vs.getData() + t * n, 1, n);
 				for(int i=0;i<rows[t].size();i++)
-						XtripletList.push_back(Eigen::Triplet<FPP>(rows[t][i], t, U[t].getData()[i]));
+					XtripletList.push_back(Eigen::Triplet<FPP>(rows[t][i], t, U_(i, 0)));
 				for(int i=0;i<cols[t].size();i++)
-						YtripletList.push_back(Eigen::Triplet<FPP>(t, cols[t][i], V[t](0,i)));
+					YtripletList.push_back(Eigen::Triplet<FPP>(t, cols[t][i], V_(0, i)));
 			}
 			X = MatSparse<FPP, Cpu>(XtripletList, s1.getNbRow(), s1.getNbCol());
 			Y = MatSparse<FPP, Cpu>(YtripletList, s2.getNbRow(), s2.getNbCol());
 		}
+#endif
 
 	template<typename FPP>
 		void solveDTO(const Faust::MatDense<FPP, Cpu>& A, const Faust::MatDense<FPP, Cpu>& s1, const Faust::MatDense<FPP, Cpu>& s2, Faust::MatDense<FPP, Cpu>& X, Faust::MatDense<FPP, Cpu>& Y)
@@ -311,6 +382,7 @@ namespace Faust
 					Y.set_row_coeffs(row_id, CP, besty, i);
 				}
 			}
+
 		}
 
 	template<typename FPP>
