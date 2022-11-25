@@ -8,6 +8,9 @@
 #endif
 #include <cmath>
 #include <limits>
+#ifdef USE_GPU_MOD
+#include "faust_MatDense_gpu.h"
+#endif
 
 namespace Faust
 {
@@ -199,7 +202,7 @@ namespace Faust
 			}
 
 
-			if(svd_on_gpu && rows[0].size() <= 32 && rows[1].size() <= 32) // GPU batched svd is limited to 32 nrows/ncols max
+			if(svd_on_gpu && rows[0].size() <= 32 && cols[0].size() <= 32) // GPU batched svd is limited to 32 nrows/ncols max
 			{
 #ifdef USE_GPU_MOD
 				compute_XY_on_gpu(A, s1, s2, X, Y, rows, cols);
@@ -263,7 +266,7 @@ namespace Faust
 			int r = s1.getNbCol();
 			int m = rows[0].size(), n = cols[0].size();
 			MatDense<FPP, Cpu> Us(m, r), Vs(n, r);
-			MatDense<FPP, Cpu> Ss(r);
+			MatDense<Real<FPP>, Cpu> Ss(r);
 			MatDense<FPP, Cpu> subAs(m, r * n);
 			for(int i=0; i < r; i++)
 				if(dsA)
@@ -271,7 +274,7 @@ namespace Faust
 				else
 					spA->submatrix(rows[i], cols[i], subAs.getData() + i * m * n);
 
-			batched_svd(subAs, r /* batch_sz */, Us, Vs, Ss, /* rank */ 1);
+			Faust::batched_svd(subAs, r /* batch_sz */, Us, Vs, Ss, /* rank */ 1);
 
 
 			using Map = Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>>;
