@@ -342,7 +342,7 @@ namespace Faust
 				Map V(Vs.getData() + i * n, n, 1);
 				V *= std::sqrt(Ss(i));
 				auto Vh = V.adjoint();
-				Y.set_row_coeffs(row_id, cols[r], Vh.data(), 0, Vh.rows());
+				Y.set_row_coeffs(row_id, cols[r], Vh.eval().data(), 0, Vh.rows());
 			}
 		}
 #endif
