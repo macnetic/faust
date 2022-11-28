@@ -3,6 +3,9 @@
 #include "faust_MatDense.h"
 #include "faust_TransformHelper.h"
 #include "faust_butterfly.h"
+#ifdef USE_GPU_MOD
+#include "faust_gpu_mod_utils.h"
+#endif
 
 typedef @TEST_FPP@ FPP;
 
@@ -12,6 +15,9 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
+#ifdef USE_GPU_MOD
+	Faust::enable_gpu_mod();
+#endif
 	int log2dim;
 	if(argc >= 2)
 		log2dim = std::atoi(argv[1]);
@@ -98,8 +104,13 @@ int main(int argc, char** argv)
 
 	ButterflyFactDir dir = (argc > 1 && !strcmp(argv[1], "1"))?LEFT:RIGHT;
 	std::cout << "Factorization dir: " << dir << std::endl;
+	auto facto_start = std::chrono::steady_clock::now();
 	auto th = butterfly_hierarchical(A, dir);
+	auto facto_end = std::chrono::steady_clock::now();
+	chrono::duration<double> facto_time = facto_end - facto_start;
 	th->display();
+
+	std::cout << "factorization time: " << facto_time.count() << std::endl;
 //	auto support = support_DFT<FPP>((int) log2dim);
 //	for(int i=0;i<support.size();i++)
 //	{
