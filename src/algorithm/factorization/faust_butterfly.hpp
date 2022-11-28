@@ -279,6 +279,7 @@ namespace Faust
 
 			using Map = Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>>;
 
+			#pragma omp parallel for
 			for(int i=0; i < r; i++)
 			{
 				Map U(Us.getData() + i * m, m, 1);
@@ -288,6 +289,7 @@ namespace Faust
 
 			std::vector<Eigen::Triplet<FPP>> XtripletList;
 			std::vector<Eigen::Triplet<FPP>> YtripletList;
+			#pragma omp parallel for
 			for(int t=0;t<r;t++)
 			{
 				Map U_(Us.getData() + t * m, m, 1);
@@ -299,6 +301,49 @@ namespace Faust
 			}
 			X = MatSparse<FPP, Cpu>(XtripletList, s1.getNbRow(), s1.getNbCol());
 			Y = MatSparse<FPP, Cpu>(YtripletList, s2.getNbRow(), s2.getNbCol());
+		}
+
+	template<typename FPP>
+		void compute_XY_on_gpu(const Faust::MatDense<FPP, Cpu>& A, vector<vector<faust_unsigned_int>*> &cec, vector<vector<faust_unsigned_int>*> &noncec, Faust::MatDense<FPP, Cpu>& X, Faust::MatDense<FPP, Cpu>& Y, std::vector<std::vector<int>> &rows, std::vector<std::vector<int>> &cols)
+		{
+			int bs = noncec.size(); // batch size
+			int m = rows[0].size(), n = cols[0].size();
+			MatDense<FPP, Cpu> Us(m, bs), Vs(n, bs);
+			MatDense<Real<FPP>, Cpu> Ss(bs);
+			MatDense<FPP, Cpu> subAs(m, bs * n);
+
+			using Map = Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>>;
+			#pragma omp parallel for
+			for(int i=0;i<bs;i++)
+			{
+				Faust::MatDense<FPP, Cpu> submat;
+				auto ce = noncec[i];
+				auto r = (*ce)[0];
+				A.submatrix(rows[r], cols[r], subAs.getData() + i * m * n);
+			}
+			Faust::batched_svd(subAs, bs /* batch_sz */, Us, Vs, Ss, /* rank */ 1);
+
+
+			#pragma omp parallel for
+			for(int i=0; i < bs; i++)
+			{
+
+
+				auto ce = noncec[i];
+				Map U(Us.getData() + i * m, m, 1);
+				U *= std::sqrt(Ss(i));
+
+
+				auto r = (*ce)[0];
+
+				auto col_id = (*ce)[0];
+				X.set_col_coeffs(col_id, rows[r], U.data(), 0, U.rows());
+				auto row_id = (*ce)[0];
+				Map V(Vs.getData() + i * n, n, 1);
+				V *= std::sqrt(Ss(i));
+				auto Vh = V.adjoint();
+				Y.set_row_coeffs(row_id, cols[r], Vh.data(), 0, Vh.rows());
+			}
 		}
 #endif
 
@@ -360,29 +405,52 @@ namespace Faust
 
 				}
 			}
-			#pragma omp parallel for
+
+			std::vector<std::vector<int>> rows(noncec.size()), cols(noncec.size());
+
+			#pragma omp parallel for schedule(dynamic)
 			for(int i=0;i<noncec.size();i++)
 			{
-				Faust::MatDense<FPP, Cpu> submat, bestx, besty;
 				auto ce = noncec[i];
-//			for(auto ce: noncec)
-//			{
 				auto r = (*ce)[0];
-				auto RP = s1.col_nonzero_inds(r);
-				auto CP = s2.row_nonzero_inds(r);
-				A.submatrix(RP, CP, submat);
-#ifdef BUTTERFLY_APPROX_RANK1
-				submat.approx_rank1(bestx, besty);
-#else
-				submat.best_low_rank(ce->size(), bestx, besty);
-#endif
-				for(int i=0;i< ce->size();i++)
-				{
+				rows[r] = s1.col_nonzero_inds(r);
+				cols[r] = s2.row_nonzero_inds(r);
+			}
 
-					auto col_id = (*ce)[i];
-					X.set_col_coeffs(col_id, RP, bestx, i);
-					auto row_id = (*ce)[i];
-					Y.set_row_coeffs(row_id, CP, besty, i);
+			bool svd_on_gpu = false;
+			if(svd_on_gpu && rows[0].size() <= 32 && cols[0].size() <= 32) // GPU batched svd is limited to 32 nrows/ncols max
+			{
+#ifdef USE_GPU_MOD
+				compute_XY_on_gpu(A, cec, noncec, X, Y, rows, cols);
+#else
+				throw std::runtime_error("GPU SVD is not enabled in this version of FAµST.");
+#endif
+			}
+			else
+			{
+
+				using Map = Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>>;
+
+#pragma omp parallel for
+				for(int i=0;i<noncec.size();i++)
+				{
+					Faust::MatDense<FPP, Cpu> submat, bestx, besty;
+					auto ce = noncec[i];
+					auto r = (*ce)[0];
+					A.submatrix(rows[r], cols[r], submat);
+#ifdef BUTTERFLY_APPROX_RANK1
+					submat.approx_rank1(bestx, besty);
+#else
+					submat.best_low_rank(ce->size(), bestx, besty);
+#endif
+					for(int i=0;i < ce->size();i++)
+					{
+
+						auto col_id = (*ce)[i];
+						X.set_col_coeffs(col_id, rows[r], bestx, i);
+						auto row_id = (*ce)[i];
+						Y.set_row_coeffs(row_id, cols[r], besty, i);
+					}
 				}
 			}
 
