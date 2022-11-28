@@ -1608,6 +1608,7 @@ void MatDense<FPP, Cpu>::submatrix(const std::vector<int> &row_ids, const std::v
 template<typename FPP>
 void MatDense<FPP, Cpu>::set_col_coeffs(faust_unsigned_int col_id, const std::vector<int> &row_ids, const MatDense<FPP, Cpu> &values, faust_unsigned_int val_col_id)
 {
+	//TODO: use following set_col_coeffs  with values.getData()
 	for(int i=0;i<row_ids.size();i++)
 	{
 		auto row_id = row_ids[i];
@@ -1617,13 +1618,39 @@ void MatDense<FPP, Cpu>::set_col_coeffs(faust_unsigned_int col_id, const std::ve
 	this->isZeros = false; // too costly to verify exhaustively, in doubt say it is not 0
 }
 
+
+template<typename FPP>
+void MatDense<FPP, Cpu>::set_col_coeffs(faust_unsigned_int col_id, const std::vector<int> &row_ids, const FPP* values, faust_unsigned_int val_col_id, faust_unsigned_int values_nrows)
+{
+	for(int i=0;i<row_ids.size();i++)
+	{
+		auto row_id = row_ids[i];
+		mat(row_id, col_id) =  *(values + values_nrows * val_col_id + i); // values(i, val_col_id)
+	}
+//	this->isZeros = this->getNonZeros() == 0;
+	this->isZeros = false; // too costly to verify exhaustively, in doubt say it is not 0
+}
+
 template<typename FPP>
 void MatDense<FPP, Cpu>::set_row_coeffs(faust_unsigned_int row_id, const std::vector<int> &col_ids, const MatDense<FPP, Cpu> &values, faust_unsigned_int val_row_id)
 {
+	//TODO: use following set_row_coeffs  with values.getData() and values.getNbRow()
 	for(int i=0;i<col_ids.size();i++)
 	{
 		auto col_id = col_ids[i];
 		mat(row_id, col_id) = values(val_row_id, i);
+	}
+//	this->isZeros = this->getNonZeros() == 0;
+	this->isZeros = false; // too costly to verify exhaustively, in doubt say it is not 0
+}
+
+template<typename FPP>
+void MatDense<FPP, Cpu>::set_row_coeffs(faust_unsigned_int row_id, const std::vector<int> &col_ids, const FPP* values, faust_unsigned_int val_row_id, faust_unsigned_int values_nrows)
+{
+	for(int i=0;i<col_ids.size();i++)
+	{
+		auto col_id = col_ids[i];
+		mat(row_id, col_id) = *(values + values_nrows * i + val_row_id); //values(val_row_id, i);
 	}
 //	this->isZeros = this->getNonZeros() == 0;
 	this->isZeros = false; // too costly to verify exhaustively, in doubt say it is not 0

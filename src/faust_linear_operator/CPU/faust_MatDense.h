@@ -558,11 +558,13 @@ namespace Faust
 			 * Assigns this[row_ids[i], col_id] to values[i, val_col_id] for each i in {0, ..., row_ids.size()}.
 			 */
 			void set_col_coeffs(faust_unsigned_int col_id, const std::vector<int> &row_ids, const MatDense<FPP, Cpu> &values, faust_unsigned_int val_col_id);
+			void set_col_coeffs(faust_unsigned_int col_id, const std::vector<int> &row_ids, const FPP* values, faust_unsigned_int val_col_id, faust_unsigned_int values_nrows);
 
 			/**
 			 * Assigns this[row_id, col_ids[j]] to values[val_row_id, j] for each j in {0, ..., col_ids.size()}.
 			 */
 			void set_row_coeffs(faust_unsigned_int row_id, const std::vector<int> &col_ids, const MatDense<FPP, Cpu> &values, faust_unsigned_int val_row_id);
+			void set_row_coeffs(faust_unsigned_int row_id, const std::vector<int> &col_ids, const FPP* values, faust_unsigned_int val_row_id, faust_unsigned_int values_nrows);
 
 
 			bool containsNaN() const;
