@@ -1133,3 +1133,21 @@ def eye(m, n=None, k = 0, dtype='float'):
         return mul
     return LazyLinearOperator((m, n), matmat=lambda x: matmat(x, m, n, k),
                               rmatmat=lambda x: matmat(x, n, m, -k))
+
+def diag(v, k=0):
+    """
+    """
+    if v.ndim > 1 or v.ndim == 0:
+        raise ValueError("v must be a 1-dim vector.")
+    m = v.size + abs(k)
+    def matmat(x, v, k):
+        if k > 0:
+            y = v * x[k:k+v.size]
+            y = np.hstack((y, np.zeros(k)))
+        elif k < 0:
+            y = v * x[:v.size]
+            y = np.hstack((np.zeros(abs(k)), y))
+        # TODO: if x is LazyLinearOp, do a naive np.diag(v) @ x
+        return y
+    return LazyLinearOperator((m, m), matmat=lambda x: matmat(x, v, k),
+                              rmatmat=lambda x: matmat(x, v, -k))
