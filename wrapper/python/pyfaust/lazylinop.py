@@ -1074,3 +1074,62 @@ def kron(A, B):
     return LazyLinearOperator(shape, matmat=lambda x: _kron(A, B, shape, x),
                               rmatmat=lambda x : _kron(A.T.conj(), B.T.conj(),
                                                        (shape[1], shape[0]), x))
+
+def eye(m, n=None, k = 0, dtype='float'):
+    """
+    Returns the LazyLinearOp for eye.
+
+    Args:
+        m: (int) Number of rows of the LazyLinearOp.
+        n: (int) Number of columns. Default is m.
+        k: (int) Diagonal to place ones on. Default is 0 (main diagonal).
+        dtype: (str) data type of the LazyLinearOp.
+
+    <b>See also:</b> scipy.sparse.eye.
+    """
+    def matmat(x, m, n, k):
+        nonlocal dtype # TODO: take dtype into account
+        if n != x.shape[0]:
+            raise ValueError('Dimensions must agree')
+        if k == 0:
+            return x[:m]
+        if x.ndim == 1:
+             x = x.reshape(x.size, 1)
+             x_1dim = True
+        else:
+             x_1dim = False
+        n = n if n is not None else m
+        minmn = min(m, n)
+        x_islop = isLazyLinearOp(x)
+        if k < 0:
+            neg_k = True
+            nz = np.zeros((abs(k), x.shape[1]))
+            if x_islop:
+                nz = aslazylinearoperator(nz)
+            limk = min(minmn, m - abs(k))
+            k = 0
+        else:
+            limk = min(minmn, n - k)
+            neg_k = False
+        mul = x[k: k + limk, :]
+        if neg_k:
+            if x_islop:
+                mul = vstack((nz, mul))
+            else:
+                mul = np.vstack((nz, mul))
+        if mul.shape[0] < m:
+            z = np.zeros((m -
+                      mul.shape[0],
+                      mul.shape[1]))
+            if x_islop:
+                    z = aslazylinearoperator(z)
+            t = (mul, z)
+            if x_islop:
+                mul = vstack(t)
+            else:
+                mul = np.vstack(t)
+        if x_1dim:
+            mul = mul.reshape(-1)
+        return mul
+    return LazyLinearOperator((m, n), matmat=lambda x: matmat(x, m, n, k),
+                              rmatmat=lambda x: matmat(x, n, m, -k))
