@@ -1093,8 +1093,6 @@ def eye(m, n=None, k=0, dtype='float'):
         nonlocal dtype # TODO: take dtype into account
         if n != x.shape[0]:
             raise ValueError('Dimensions must agree')
-        if k == 0:
-            return x[:m]
         if x.ndim == 1:
              x = x.reshape(x.size, 1)
              x_1dim = True
