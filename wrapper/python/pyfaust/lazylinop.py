@@ -1085,6 +1085,8 @@ def eye(m, n=None, k=0, dtype='float'):
         m: (int) Number of rows of the LazyLinearOp.
         n: (int) Number of columns. Default is m.
         k: (int) Diagonal to place ones on. Default is 0 (main diagonal).
+        Negative integer for a diagonal below the main diagonal, strictly
+        positive integer for a diagonal above.
         dtype: (str) data type of the LazyLinearOp.
 
     <b>See also:</b> scipy.sparse.eye.

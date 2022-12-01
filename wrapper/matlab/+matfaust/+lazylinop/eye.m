@@ -1,3 +1,14 @@
+%> @package matfaust.lazylinop @brief The matfaust module for lazy linear operators.
+%=============================================================
+%> @brief Returns the LazyLinearOp for eye.
+%>
+%> @param m: (int) the number of rows.
+%> @param n: (int, optional) the number of columns.
+%> @param k: (int, optional) diagonal to place ones on. Default is 0 (main diagonal). Negative integer for a diagonal below the main diagonal, strictly positive integer for a diagonal above.
+%> @param 'dtype', str: data type of the LazyLinearOp ('double', 'single', 'complex').
+%>
+%>
+%=============================================================
 function EL = eye(m, varargin)
 	import matfaust.lazylinop.*
 	p = inputParser;
