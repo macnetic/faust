@@ -3,7 +3,7 @@
 import numpy as np
 from scipy.sparse.linalg import LinearOperator
 
-HANDLED_FUNCTIONS = {}
+HANDLED_FUNCTIONS = {'ndim'}
 
 def isLazyLinearOp(obj):
     """
@@ -906,6 +906,8 @@ class LazyLinearOp(LinearOperator):
             elif str(ufunc) == "<ufunc 'subtract'>" and len(inputs) >= 2 and \
                     LazyLinearOp.isLazyLinearOp(inputs[1]):
                 return inputs[1].__rsub__(inputs[0])
+            elif str(ufunc) == "<ufunc 'ndim'>":
+                print("ufunc ndim")
         elif method == 'reduce':
 #            # not necessary numpy calls Faust.sum
 #            if ufunc == "<ufunc 'add'>":
@@ -918,13 +920,13 @@ class LazyLinearOp(LinearOperator):
         return self
 
     def __array_function__(self, func, types, args, kwargs):
-        if func not in HANDLED_FUNCTIONS:
-            return NotImplemented
         # Note: this allows subclasses that don't override
-        # __array_function__ to handle Faust objects
+        # __array_function__ to handle self.__class__ objects
         if not all(issubclass(t, LazyLinearOp) for t in types):
             return NotImplemented
-        return HANDLED_FUNCTIONS[func](*args, **kwargs)
+        if func.__name__ == 'ndim':
+            return self.ndim
+        return NotImplemented
 
 def LazyLinearOperator(shape, **kwargs):
     """
@@ -1075,7 +1077,7 @@ def kron(A, B):
                               rmatmat=lambda x : _kron(A.T.conj(), B.T.conj(),
                                                        (shape[1], shape[0]), x))
 
-def eye(m, n=None, k = 0, dtype='float'):
+def eye(m, n=None, k=0, dtype='float'):
     """
     Returns the LazyLinearOp for eye.
 
