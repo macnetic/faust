@@ -268,5 +268,18 @@ class TestLazyLinearOpEye(TestLazyLinearOpFaust):
         self.lop3 = eye(self.lop.shape[1], self.lop.shape[0], k=-2)
         self.lop3A = self.lop3.toarray()
 
+class TestLazyLinearOpDiag(TestLazyLinearOpFaust):
+
+    def setUp(self):
+        from pyfaust.lazylinop import diag
+        v = np.random.rand(10)
+        self.lop = diag(v, k=2)
+        self.lopA = self.lop.toarray()
+        self.lop2 = diag(v, k=-2)
+        self.lop2A = self.lop2.toarray()
+        self.lop3 = diag(v, k=2)
+        self.lop3A = self.lop3.toarray()
+
+
 if '__main__' == __name__:
     unittest.main()
