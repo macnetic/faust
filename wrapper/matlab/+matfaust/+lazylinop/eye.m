@@ -4,9 +4,13 @@ function EL = eye(m, varargin)
 
 
 	validK = @(k) isscalar(k) && 0 == k - floor(k);
-	addParameter(p, 'n', 'undefined', validK)
+	addOptional(p, 'n', 'undefined', validK)
 
-	addParameter(p, 'k', 0, validK)
+	addOptional(p, 'k', 0, validK)
+
+	%addParameter(p, 'n', 'undefined', validK)
+
+	%addParameter(p, 'k', 0, validK)
 
 	validDtype = @(dtype) any(strcmp(dtype, {'complex', 'double', 'single', 'undefined'}));
 	% TODO: use dtype
