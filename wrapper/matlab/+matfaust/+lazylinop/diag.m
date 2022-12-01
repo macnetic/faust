@@ -4,7 +4,64 @@
 %> @param v a vector for the diagonal.
 %> @param k (int, optional) diagonal to place the vector on. Default is 0 (main diagonal). Negative integer for a diagonal below the main diagonal, strictly positive integer for a diagonal above.
 %>
-%> @retval the diagonal LazyLinearOp.
+%> @retval DL the diagonal LazyLinearOp.
+%>
+%> @b Example
+%> @code
+%> >> import matfaust.lazylinop.diag
+%> >> v = rand(1, 5)
+%> >> ld1 = diag(v)
+%>
+%> ld1 =
+%>
+%>   5x5 LazyLinearOp array with no properties.
+%>
+%> >> full(ld1)
+%> ans =
+%>
+%>     0.6678         0         0         0         0
+%>          0    0.8444         0         0         0
+%>          0         0    0.3445         0         0
+%>          0         0         0    0.7805         0
+%>          0         0         0         0    0.6753
+%>
+%> >> ld2 = diag(v, -2)
+%>
+%> ld2 =
+%>
+%>   7x7 LazyLinearOp array with no properties.
+%>
+%> >> full(ld2)
+%>
+%> ans =
+%>
+%>          0         0         0         0         0         0         0
+%>          0         0         0         0         0         0         0
+%>     0.6678         0         0         0         0         0         0
+%>          0    0.8444         0         0         0         0         0
+%>          0         0    0.3445         0         0         0         0
+%>          0         0         0    0.7805         0         0         0
+%>          0         0         0         0    0.6753         0         0
+%>
+%> >> ld3 = diag(v, 2)
+%>
+%> ld3 =
+%>
+%>   7x7 LazyLinearOp array with no properties.
+%>
+%> >> full(ld3)
+%>
+%> ans =
+%>
+%>          0         0    0.6678         0         0         0         0
+%>          0         0         0    0.8444         0         0         0
+%>          0         0         0         0    0.3445         0         0
+%>          0         0         0         0         0    0.7805         0
+%>          0         0         0         0         0         0    0.6753
+%>          0         0         0         0         0         0         0
+%>          0         0         0         0         0         0         0
+%>
+%> @endcode
 %>
 %=============================================================
 function DL = diag(v, varargin)
