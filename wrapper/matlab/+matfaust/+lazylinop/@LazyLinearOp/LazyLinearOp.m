@@ -39,8 +39,8 @@ classdef LazyLinearOp < handle % needed to use references on objects
 
             p = inputParser;
             validDtype = @(dtype) any(strcmp(dtype, {'complex', 'double', 'single', 'undefined'}));
-            addOptional(p, 'dtype', 'undefined', validDtype)
-            addOptional(p, 'root_obj', 'none')
+            addParameter(p, 'dtype', 'undefined', validDtype)
+            addParameter(p, 'root_obj', 'none')
 
             parse(p, varargin{:})
             L.dtype = p.Results.dtype;
@@ -535,7 +535,7 @@ classdef LazyLinearOp < handle % needed to use references on objects
 
             p = inputParser;
             validDtype = @(dtype) any(strcmp(dtype, {'complex', 'double', 'single', 'undefined'}));
-            addOptional(p, 'dtype', 'undefined', validDtype)
+            addParameter(p, 'dtype', 'undefined', validDtype)
 
             parse(p, varargin{:})
             dtype = p.Results.dtype;
