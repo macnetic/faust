@@ -1167,6 +1167,8 @@ def diag(v, k=0):
             elif k < 0:
                 y = v * x[:v.size]
                 y = np.vstack((np.zeros((abs(k), x.shape[1])), y))
+            else: # k == 0
+                y = v * x[:v.size]
             if x_is_1d:
                 y = y.ravel()
         return y
