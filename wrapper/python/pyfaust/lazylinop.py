@@ -1136,18 +1136,37 @@ def eye(m, n=None, k = 0, dtype='float'):
 
 def diag(v, k=0):
     """
+    Construct a diagonal LazyLinearOp.
+
+    Args:
+        v: a 1-D numpy array for the diagonal.
+        k: (int) the index of digonal, 0 for the main diagonal, k>0 for diagonals
+        above, k<0 for diagonals below.
+
+    Returns:
+        The diagonal LazyLinearOperator.
     """
     if v.ndim > 1 or v.ndim == 0:
         raise ValueError("v must be a 1-dim vector.")
     m = v.size + abs(k)
     def matmat(x, v, k):
-        if k > 0:
-            y = v * x[k:k+v.size]
-            y = np.hstack((y, np.zeros(k)))
-        elif k < 0:
-            y = v * x[:v.size]
-            y = np.hstack((np.zeros(abs(k)), y))
-        # TODO: if x is LazyLinearOp, do a naive np.diag(v) @ x
+        v = v.reshape(v.size, 1)
+        if x.ndim == 1:
+            x_is_1d = True
+            x = x.reshape(x.size, 1)
+        else:
+            x_is_1d = False
+        if isLazyLinearOp(x):
+            y = np.diag(v, k) @ x
+        else:
+            if k > 0:
+                y = v * x[k:k+v.size]
+                y = np.vstack((y, np.zeros((k, x.shape[1]))))
+            elif k < 0:
+                y = v * x[:v.size]
+                y = np.vstack((np.zeros((abs(k), x.shape[1])), y))
+            if x_is_1d:
+                y = y.ravel()
         return y
     return LazyLinearOperator((m, m), matmat=lambda x: matmat(x, v, k),
                               rmatmat=lambda x: matmat(x, v, -k))
