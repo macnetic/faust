@@ -1089,6 +1089,45 @@ def eye(m, n=None, k=0, dtype='float'):
         positive integer for a diagonal above.
         dtype: (str) data type of the LazyLinearOp.
 
+    Example:
+        >>> from pyfaust.lazylinop import eye
+        >>> le1 = eye(5)
+        >>> le1
+        <5x5 LazyLinearOp with unspecified dtype>
+        >>> le1.toarray()
+        array([[1., 0., 0., 0., 0.],
+              [0., 1., 0., 0., 0.],
+              [0., 0., 1., 0., 0.],
+              [0., 0., 0., 1., 0.],
+              [0., 0., 0., 0., 1.]])
+        >>> le2 = eye(5, 2)
+        >>> le2
+        <5x2 LazyLinearOp with unspecified dtype>
+        >>> le2.toarray()
+        array([[1., 0.],
+              [0., 1.],
+              [0., 0.],
+              [0., 0.],
+              [0., 0.]])
+        >>> le3 = eye(5, 3, 1)
+        >>> le3
+        <5x3 LazyLinearOp with unspecified dtype>
+        >>> le3.toarray()
+        array([[0., 1., 0.],
+              [0., 0., 1.],
+              [0., 0., 0.],
+              [0., 0., 0.],
+              [0., 0., 0.]])
+        >>> le4 = eye(5, 3, -1)
+        >>> le4
+        <5x3 LazyLinearOp with unspecified dtype>
+        >>> le4.toarray()
+        array([[0., 0., 0.],
+              [1., 0., 0.],
+              [0., 1., 0.],
+              [0., 0., 1.],
+              [0., 0., 0.]])
+
     <b>See also:</b> scipy.sparse.eye.
     """
     def matmat(x, m, n, k):
@@ -1100,7 +1139,6 @@ def eye(m, n=None, k=0, dtype='float'):
              x_1dim = True
         else:
              x_1dim = False
-        n = n if n is not None else m
         minmn = min(m, n)
         x_islop = isLazyLinearOp(x)
         if k < 0:
@@ -1133,12 +1171,13 @@ def eye(m, n=None, k=0, dtype='float'):
         if x_1dim:
             mul = mul.reshape(-1)
         return mul
+    n = n if n is not None else m
     return LazyLinearOperator((m, n), matmat=lambda x: matmat(x, m, n, k),
                               rmatmat=lambda x: matmat(x, n, m, -k))
 
 def diag(v, k=0):
     """
-    Construct a diagonal LazyLinearOp.
+    Constructs a diagonal LazyLinearOp.
 
     Args:
         v: a 1-D numpy array for the diagonal.
@@ -1147,6 +1186,44 @@ def diag(v, k=0):
 
     Returns:
         The diagonal LazyLinearOperator.
+
+    Example:
+        >>> from pyfaust.lazylinop import diag
+        >>> import numpy as np
+        >>> v = np.arange(1, 6)
+        >>> v
+        array([1, 2, 3, 4, 5])
+        >>> ld1 = diag(v)
+        >>> ld1
+        <5x5 LazyLinearOp with unspecified dtype>
+        >>> ld1.toarray()
+        array([[1., 0., 0., 0., 0.],
+                      [0., 2., 0., 0., 0.],
+                      [0., 0., 3., 0., 0.],
+                      [0., 0., 0., 4., 0.],
+                      [0., 0., 0., 0., 5.]])
+        >>> ld2 = diag(v, -2)
+        >>> ld2
+        <7x7 LazyLinearOp with unspecified dtype>
+        >>> ld2.toarray()
+        array([[0., 0., 0., 0., 0., 0., 0.],
+                      [0., 0., 0., 0., 0., 0., 0.],
+                      [1., 0., 0., 0., 0., 0., 0.],
+                      [0., 2., 0., 0., 0., 0., 0.],
+                      [0., 0., 3., 0., 0., 0., 0.],
+                      [0., 0., 0., 4., 0., 0., 0.],
+                      [0., 0., 0., 0., 5., 0., 0.]])
+        >>> ld3 = diag(v, 2)
+        >>> ld3
+        <7x7 LazyLinearOp with unspecified dtype>
+        >>> ld3.toarray()
+        array([[0., 0., 1., 0., 0., 0., 0.],
+                      [0., 0., 0., 2., 0., 0., 0.],
+                      [0., 0., 0., 0., 3., 0., 0.],
+                      [0., 0., 0., 0., 0., 4., 0.],
+                      [0., 0., 0., 0., 0., 0., 5.],
+                      [0., 0., 0., 0., 0., 0., 0.],
+                      [0., 0., 0., 0., 0., 0., 0.]])
     """
     if v.ndim > 1 or v.ndim == 0:
         raise ValueError("v must be a 1-dim vector.")
