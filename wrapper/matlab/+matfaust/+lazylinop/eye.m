@@ -7,6 +7,74 @@
 %> @param k: (int, optional) diagonal to place ones on. Default is 0 (main diagonal). Negative integer for a diagonal below the main diagonal, strictly positive integer for a diagonal above.
 %> @param 'dtype', str: data type of the LazyLinearOp ('double', 'single', 'complex').
 %>
+%> @b Example:
+%> @code
+%>
+%> >> import matfaust.lazylinop.eye
+%> >> le1 = eye(5)
+%>
+%> le1 =
+%>
+%>   5x5 LazyLinearOp array with no properties.
+%>
+%> >> full(le1)
+%>
+%> ans =
+%>
+%>      1     0     0     0     0
+%>      0     1     0     0     0
+%>      0     0     1     0     0
+%>      0     0     0     1     0
+%>      0     0     0     0     1
+%>
+%> >> le2 = eye(5, 2)
+%>
+%> le2 =
+%>
+%>   5x2 LazyLinearOp array with no properties.
+%>
+%> >> full(le2)
+%>
+%> ans =
+%>
+%>      1     0
+%>      0     1
+%>      0     0
+%>      0     0
+%>      0     0
+%>
+%> >> le3 = eye(5, 3, 1)
+%>
+%> le3 =
+%>
+%>   5x3 LazyLinearOp array with no properties.
+%>
+%> >> full(le3)
+%>
+%> ans =
+%>
+%>      0     1     0
+%>      0     0     1
+%>      0     0     0
+%>      0     0     0
+%>      0     0     0
+%>
+%> >> le4 = eye(5, 3, -1)
+%>
+%> le4 =
+%>
+%>   5x3 LazyLinearOp array with no properties.
+%>
+%> >> full(le4)
+%>
+%> ans =
+%>
+%>      0     0     0
+%>      1     0     0
+%>      0     1     0
+%>      0     0     1
+%>      0     0     0
+%> @endcode
 %>
 %=============================================================
 function EL = eye(m, varargin)
