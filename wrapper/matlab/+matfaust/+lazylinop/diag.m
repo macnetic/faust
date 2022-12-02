@@ -10,6 +10,11 @@
 %> @code
 %> >> import matfaust.lazylinop.diag
 %> >> v = rand(1, 5)
+%>
+%> v =
+%>
+%>     0.6678    0.8444    0.3445    0.7805    0.6753
+%>
 %> >> ld1 = diag(v)
 %>
 %> ld1 =
