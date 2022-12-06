@@ -261,6 +261,15 @@ namespace Faust
 			isZeros = false;
 		}
 
+
+	template<typename FPP>
+		void MatDense<FPP,Cpu>::setRand()
+		{
+			mat = EigDenseMat::Random(mat.rows(), mat.cols());
+			isZeros = false;
+			this->is_identity = false;
+		}
+
 	template<typename FPP>
 		void MatDense<FPP, Cpu>::setNZtoOne()
 		{

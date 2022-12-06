@@ -264,6 +264,10 @@ namespace Faust
 			// \brief Sets all nonzeros to one.
 			void setNZtoOne();
 
+			// \brief Sets the matrix to random values.
+			// \note using this function is preferable instead of using randMat functions.
+			void setRand();
+
 			//! \brief Returns the identity matrix.
 			static MatDense<FPP,Cpu> eye(faust_unsigned_int nrows, faust_unsigned_int ncols);
 

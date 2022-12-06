@@ -15,29 +15,29 @@ int main(int argc, char* argv[])
 	faust_unsigned_int dim1 = 3;
 	faust_unsigned_int dim2 = 4;
 
-	MatDense<FPP,Cpu>* M;
+	MatDense<FPP,Cpu> M(dim1, dim2);
 	MatDense<FPP,Cpu> M_copy;
-	M = MatDense<FPP,Cpu>::randMat(dim1,dim2);
-	M_copy = *M;
+	M.setRand();
+	M_copy = M;
 	cout<<"mat value"<<endl;
-	M->Display();
+	M.Display();
 
-	M->conjugate(false);
+	M.conjugate(false);
 	cout<<"conjugate mat value (without eval)"<<endl;
-	M->Display();
+	M.Display();
 
-	M->transpose();
+	M.transpose();
 	cout<<"conjugate-transpose mat value (with eval)"<<endl;
-	M->Display();
+	M.Display();
 
-	M->conjugate();
+	M.conjugate();
 	cout << "transpose mat value from conjugate-transpose (with eval)" << endl;
-	M->Display();
+	M.Display();
 
-	M->transpose();
-	assert(M->isEqual(M_copy));
+	M.transpose();
+	assert(M.isEqual(M_copy));
 	cout << "mat value:" << endl;
-	M->Display();
+	M.Display();
 
 	return 0;
 }
