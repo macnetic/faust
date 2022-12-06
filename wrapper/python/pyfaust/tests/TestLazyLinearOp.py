@@ -280,6 +280,21 @@ class TestLazyLinearOpDiag(TestLazyLinearOpFaust):
         self.lop3 = diag(v, k=2)
         self.lop3A = self.lop3.toarray()
 
+class TestLazyLinearOpBlkDiag(TestLazyLinearOpFaust):
+
+    def setUp(self):
+        from pyfaust.lazylinop import block_diag
+        from scipy.linalg import block_diag as sblock_diag
+        from pyfaust import rand
+        A = rand(12, 14)
+        B = rand(13, 15)
+        C = rand(14, 16)
+        self.lop = block_diag(A, B, C)
+        self.lopA = sblock_diag(A.toarray(), B.toarray(), C.toarray())
+        self.lop2 = block_diag(A+A, B+B, C+C)
+        self.lop2A = sblock_diag(2 * A.toarray(), 2 * B.toarray(), 2 * C.toarray())
+        self.lop3 = block_diag(C.T, B.T, A.T)
+        self.lop3A = sblock_diag(C.T.toarray(), B.T.toarray(), A.T.toarray())
 
 if '__main__' == __name__:
     unittest.main()
