@@ -1338,7 +1338,7 @@ def block_diag(*lops, mt=False):
         far it's not faster than sequential execution).
 
     Returns:
-        The LazyLinearOp for the sum of lops.
+        The diagonal block LazyLinearOp.
 
     Example:
         >>> import numpy as np
@@ -1403,5 +1403,5 @@ def block_diag(*lops, mt=False):
         for i in range(1, n):
             S = np.vstack((S, Ps[i]))
         return S
-    return LazyLinearOperator((np.sum([A.shape[0] for A in lops]), np.sum([A.shape[1] for A in lops])), matmat=lambda x: matmat(x, lAx),
+    return LazyLinearOperator((np.sum([A.shape[0] for A in lops]), offsets[-1]), matmat=lambda x: matmat(x, lAx),
                               rmatmat=lambda x: matmat(x, lAHx))
