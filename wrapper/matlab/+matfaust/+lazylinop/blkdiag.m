@@ -29,18 +29,18 @@ function LB = blkdiag(varargin)
 	lAx = @(A, x) A * x;
 	lAHx = @(A, x) A' * x;
 	n = length(varargin);
-	offsets = zeros(n, 1);
-	nrows = 0;
+	roffsets = zeros(n+1, 1);
+	coffsets = zeros(n+1, 1);
 	for i=2:n+1
-		offsets(i) = offsets(i-1) + size(varargin{i-1}, 2);
-		nrows = nrows + size(varargin{i-1}, 1);
+		roffsets(i) = roffsets(i-1) + size(varargin{i-1}, 2);
+		coffsets(i) = coffsets(i-1) + size(varargin{i-1}, 1);
 	end
-	function P = matmat(x, lmul)
+	function P = matmat(x, lmul, offsets)
 		P = [];
 		for i=1:n
 			A = varargin{i};
 			P = [P ; lmul(A, x(offsets(i)+1: offsets(i+1), :))];
 		end
 	end
-	LB = LazyLinearOperator([nrows, offsets(n+1)], 'matmat', @(x) matmat(x, lAx), 'rmatmat', @(x) matmat(x, lAHx));
+	LB = LazyLinearOperator([coffsets(n+1), roffsets(n+1)], 'matmat', @(x) matmat(x, lAx, roffsets), 'rmatmat', @(x) matmat(x, lAHx, coffsets));
 end
