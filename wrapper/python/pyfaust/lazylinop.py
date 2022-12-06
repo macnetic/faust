@@ -47,6 +47,8 @@ def aslazylinearoperator(obj):
 
     <b>See also:</b> pyfaust.rand.
     """
+    if isLazyLinearOp(obj):
+        return obj
     return LazyLinearOp.create_from_op(obj)
 
 def hstack(tup):
@@ -1407,8 +1409,16 @@ def block_diag(*lops, mt=False):
             for i, A in enumerate(lops):
                 Ps[i] = lmul(A, x[offsets[i]:offsets[i+1]])
         S = Ps[0]
+        conv_to_lop = isLazyLinearOp(S)
+        vcat = vstack if conv_to_lop else np.vstack
         for i in range(1, n):
-            S = np.vstack((S, Ps[i]))
+            if conv_to_lop:
+                Ps[i] = aslazylinearoperator(Ps[i])
+            elif isLazyLinearOp(Ps[i]):
+                S = aslazylinearoperator(S)
+                conv_to_lop = True
+                vcat = vstack
+            S = vcat((S, Ps[i]))
         if x_is_1d:
             S = S.ravel()
         return S
