@@ -317,6 +317,8 @@ class LazyLinearOp(LinearOperator):
         self._checkattr('__add__')
         if not LazyLinearOp.isLazyLinearOp(op):
             op = LazyLinearOp.create_from_op(op)
+        if op.shape != self.shape:
+            raise ValueError('Dimensions must agree')
         lambdas = {'@': lambda o: self @ o + op @ o,
                    'H': lambda: self.H + op.H,
                    'T': lambda: self.T + op.T,
@@ -1281,6 +1283,9 @@ def sum(*lops, mt=False, af=False):
     """
     lAx = lambda A, x: A @ x
     lAHx = lambda A, x: A.T.conj() @ x
+    for l in lops[1:]:
+        if l.shape != lops[0].shape:
+            raise ValueError('Dimensions must agree')
     def matmat(x, lmul):
         if af:
             S = lops[0]
