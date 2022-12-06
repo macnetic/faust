@@ -644,6 +644,8 @@ class LazyLinearOp(LinearOperator):
 
         """
         self._checkattr('__getitem__')
+        if isinstance(indices, int):
+            indices = (indices, slice(0, self.shape[1]))
         if isinstance(indices, tuple) and len(indices) == 2 and isinstance(indices[0], int) and isinstance(indices[1], int):
             return self.toarray().__getitem__(indices)
         elif isinstance(indices, slice) or isinstance(indices[0], slice) and \
