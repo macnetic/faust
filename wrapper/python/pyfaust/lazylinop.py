@@ -1355,12 +1355,19 @@ def block_diag(*lops, mt=False):
     """
     lAx = lambda A, x: A @ x
     lAHx = lambda A, x: A.T.conj() @ x
-    offsets =  [0]
+    roffsets =  [0]
+    coffsets =  [0] # needed for transpose case
     for i in range(len(lops)):
-        offsets += [offsets[i] + lops[i].shape[1]]
-    def matmat(x, lmul):
+        roffsets += [roffsets[i] + lops[i].shape[1]]
+        coffsets += [coffsets[i] + lops[i].shape[0]]
+    def matmat(x, lmul, offsets):
         from threading import Thread
         from multiprocessing import cpu_count
+        if x.ndim == 1:
+            x_is_1d = True
+            x = x.reshape(x.size, 1)
+        else:
+            x_is_1d = False
         Ps = [None for _ in range(len(lops))]
         n = len(lops)
         class Mul(Thread):
@@ -1402,6 +1409,9 @@ def block_diag(*lops, mt=False):
         S = Ps[0]
         for i in range(1, n):
             S = np.vstack((S, Ps[i]))
+        if x_is_1d:
+            S = S.ravel()
         return S
-    return LazyLinearOperator((np.sum([A.shape[0] for A in lops]), offsets[-1]), matmat=lambda x: matmat(x, lAx),
-                              rmatmat=lambda x: matmat(x, lAHx))
+    return LazyLinearOperator((coffsets[-1], roffsets[-1]), matmat=lambda x:
+                              matmat(x, lAx, roffsets),
+                              rmatmat=lambda x: matmat(x, lAHx, coffsets))
