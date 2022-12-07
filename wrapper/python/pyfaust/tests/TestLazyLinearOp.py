@@ -110,6 +110,10 @@ class TestLazyLinearOpFaust(unittest.TestCase):
         self.assertAlmostEqual(LA.norm(lmul3 - (M @ M.T)),
                                0)
 
+        # test multiplication of a sequence of matrices
+        M = np.random.rand(2, 3, 4, self.lop.shape[1], 15)
+        np.allclose(self.lop.toarray() @ M, self.lop.toarray() @ M)
+
     def test_rmatmul(self):
         M = np.random.rand(15, self.lop.shape[0])
         lmul2 = M @ self.lop
