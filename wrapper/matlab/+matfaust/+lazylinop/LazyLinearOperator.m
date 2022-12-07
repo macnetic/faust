@@ -1,5 +1,5 @@
 %=============================================================
-%> Returns a LazyLinearOp L defined by shape and at least a matvec or matmat function.
+%> @brief Returns a LazyLinearOp L defined by shape and at least a matvec or matmat function.
 %>
 %> @param shape: dimensions of the operator (M, N),
 %> @param 'matvec', function_handle: returns L * v (v a vector of size N).
