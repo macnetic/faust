@@ -176,6 +176,13 @@ classdef LazyLinearOp < handle % needed to use references on objects
 				end
 			end
 			check_meth(L, 'mtimes');
+            if numel(size(A)) > 2
+                error(['Arguments must be 2-D, or at least one argument must be scalar.,'...
+                    ' Use TIMES (.*) for', ...
+                ' elementwise multiplication, or use PAGEMTIMES to apply matrix', ...
+                    ' multiplication to the', ...
+                    ' pages of N-D arrays.'])
+            end
 			A_is_scalar = all(size(A) == [1, 1]);
 			if ~ A_is_scalar && ~ all(size(L, 2) == size(A, 1))
 				error('Dimensions must agree')
@@ -214,6 +221,60 @@ classdef LazyLinearOp < handle % needed to use references on objects
 				LM = LazyLinearOp(lambdas, LM_size);
 			end
 		end
+
+        %=============================================================
+        %> @brief Computes the matrix product of L by corresponding pages of the N-D array op.
+        %>
+        %> @retval PM the N-D array PM(:, :, i_1, i_2, ..., i_n) = L * op(:, :, i1, i2, ..., i_n)
+        %> for any tuple (i_1, i_2, ..., i_n), 1 <= i_1 <= size(op, 3), 1 <= i_2 <= size(op, 4), ...,
+        %> 1 <= i_n <= size(op, n).
+        %>
+        %> @b Example:
+        %> @code
+        %> >> import matfaust.lazylinop.aslazylinearoperator
+        %> >> M = rand(13, 12);
+        %> >> lM = aslazylinearoperator(M)
+        %>
+        %> lM =
+        %>
+        %>   13x12 LazyLinearOp array with no properties.
+        %>
+        %> >> N = rand(12, 13, 3, 3, 2);
+        %> >> PM = pagemtimes(lM, N);
+        %> >> PM_ref = pagemtimes(M, N);
+        %> >> norm(PM(:, :, 1, 1, 1, 1) - PM_ref(:, :, 1, 1, 1, 1))
+        %>
+        %> ans =
+        %>
+        %>    1.8841e-15
+        %>
+        %> @endcode
+        %>
+        %=============================================================
+        function PM = pagemtimes(L, op)
+			function C = product(varargin)
+				[F{1:nargin}] = ndgrid(varargin{:});
+				for i=nargin:-1:1
+					G(:,i) = F{i}(:);
+				end
+				C = unique(G , 'rows');
+			end
+            sop = size(op);
+            sopc = num2cell(sop);
+            PM = zeros(size(L, 1), size(op, 2), sopc{3:end});
+            idl = cell(1, numel(sop) - 2);
+            for i=1:length(idl)
+                idl{1, i} = 1:sop(i+2);
+            end
+            P = product(idl{:});
+            for i=1:size(P, 1)
+                t = num2cell(P(i, :));
+                tr.type = '()';
+                tr.subs = {':', ':', t{:}};
+                R = L.lambdas{L.MUL}(subsref(op, tr));
+                PM = subsasgn(PM, tr, R);
+            end
+        end
 
 
         %=============================================================
