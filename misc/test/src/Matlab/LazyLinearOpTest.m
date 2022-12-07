@@ -132,6 +132,17 @@ classdef LazyLinearOpTest < matlab.unittest.TestCase
 
         end
 
+        function testpagemtimes(this)
+            M = rand(size(this.lop, 2), 15, 2, 2)
+            lmul = pagemtimes(this.lop, M);
+            mul_ref = pagemtimes(this.lopA , M);
+            for i=1:2
+                for j=1:2
+                    this.verifyEqual(lmul(:,:, i, j), mul_ref(:, :, i, j), 'AbsTol', 1e-6)
+                end
+            end
+        end
+
         function testCat(this)
             import matfaust.lazylinop.LazyLinearOp
             lop = this.lop;
