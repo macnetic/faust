@@ -60,6 +60,7 @@ namespace Faust
 
 			MatGeneric<FPP,Cpu>* Clone(const bool isOptimize=false) const;
 			void multiply(Vect<FPP,Cpu> & vec, char opThis='N') const;
+			Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> &v) const; // from LinearOperator
 			void multiply(MatDense<FPP,Cpu> & M, char opThis) const;
 			void multiply(MatSparse<FPP, Cpu>& M, char opThis) const;
 			void multiplyRight(MatSparse<FPP, Cpu> const& M) ;
@@ -83,6 +84,8 @@ namespace Faust
 			void setZeros();
 			bool containsNaN()const;
 			const FPP& operator()(faust_unsigned_int i, faust_unsigned_int j)const ;
+
+			void faust_gemm(const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char typeA, char typeB)const; //from LinearOperator
 		};
 
 }

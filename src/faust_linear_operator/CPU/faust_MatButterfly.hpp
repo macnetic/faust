@@ -98,11 +98,20 @@ namespace Faust
 	}
 
 	template<typename FPP>
+	Vect<FPP, Cpu> MatButterfly<FPP, Cpu>::multiply(const Vect<FPP,Cpu> & x) const
+	{
+		Vect<FPP, Cpu> z(x.size());
+		const_cast<MatButterfly<FPP, Cpu>*>(this)->multiply(x.getData(), z.getData(), x.size(), false); //TODO: conjugate
+		return z;
+	}
+
+
+	template<typename FPP>
 	void MatButterfly<FPP, Cpu>::multiply(Vect<FPP,Cpu> & x, char opThis) const
 	{
 		Vect<FPP, Cpu> z(x.size());
-		multiply(x.getData(), z.getData(), x.size(), opThis != 'N'); //TODO: conjugate
-		return z;
+		const_cast<MatButterfly<FPP, Cpu>*>(this)->multiply(x.getData(), z.getData(), x.size(), opThis != 'N'); //TODO: conjugate
+		x = z;
 	}
 
 	template<typename FPP>
@@ -188,6 +197,14 @@ namespace Faust
 #else
 			Y_mat = D1 * X_mat + D2 * X_mat(subdiag_ids, Eigen::placeholders::all);
 #endif
+		}
+
+
+
+	template<typename FPP>
+		void MatButterfly<FPP, Cpu>::faust_gemm(const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char typeA, char typeB)const
+		{
+			//TODO
 		}
 
 	template<typename FPP>
