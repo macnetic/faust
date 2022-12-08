@@ -1,0 +1,66 @@
+#include "faust_TransformHelperButterfly.h"
+#include "faust_MatButterfly.h"
+#include <cstdio>
+
+typedef @TEST_FPP@ FPP;
+
+using namespace Faust;
+
+int main(int argc, char** argv)
+{
+	int log2size = 4;
+	if(argc > 1)
+		log2size = std::atoi(argv[1]);
+	std::cout << "log2size: " << log2size << std::endl;
+
+	int size = 1 << log2size;
+	auto F = TransformHelper<FPP, Cpu>::fourierFaust(log2size, false);
+	auto dsButterflyMat = F->get_fact(0);
+	MatSparse<FPP, Cpu> spButterflyMat(dsButterflyMat);
+	MatButterfly<FPP, Cpu> butterflyMat(spButterflyMat, /* level */ 0);
+
+	Vect<FPP, Cpu> x(size);
+	x.setRand();
+	const Vect<FPP, Cpu> x_(x);
+//	x.setOnes();
+
+	Vect<FPP, Cpu> ref_v = spButterflyMat.multiply(x_);
+	Vect<FPP, Cpu> test_v = butterflyMat.multiply(x_);
+
+	ref_v.Display();
+	test_v.Display();
+	auto err = test_v;
+	err -= ref_v;
+	assert(err.norm() <= 1e-6);
+	std::cout << "butterfly-vector product OK" << std::endl;
+
+
+//	// test multiplying a MatDense
+//	auto X = MatDense<FPP, Cpu>::randMat(size, size);
+//	//	 X->setOnes();
+//
+//	auto refY = spButterflyMat.multiply(*X);
+//	auto testY = butterflyMat.multiply(*X);
+//
+//
+//	auto errY = testY;
+//	errY -= refY;
+//	assert(errY.norm() <= 1e-6);
+//
+//	std::cout << "Faust-dense matrix product OK" << std::endl;
+//
+//	// test multiplying a MatSparse
+//	auto spX = MatSparse<FPP, Cpu>::randMat(size, size, .2);
+//	//	 X->setOnes();
+//
+//	auto refYsp = spButterflyMat.multiply(*spX);
+//	auto testYsp = butterflyMat.multiply(*spX, 'N');
+//
+//	auto errYsp = testYsp;
+//	errYsp -= refYsp;
+//	assert(errYsp.norm() <= 1e-6);
+//
+//	std::cout << "Faust-sparse matrix product OK" << std::endl;
+
+	return EXIT_SUCCESS;
+}
