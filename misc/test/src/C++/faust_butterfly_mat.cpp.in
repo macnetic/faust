@@ -35,32 +35,35 @@ int main(int argc, char** argv)
 	std::cout << "butterfly-vector product OK" << std::endl;
 
 
-//	// test multiplying a MatDense
-//	auto X = MatDense<FPP, Cpu>::randMat(size, size);
-//	//	 X->setOnes();
-//
-//	auto refY = spButterflyMat.multiply(*X);
-//	auto testY = butterflyMat.multiply(*X);
-//
-//
-//	auto errY = testY;
-//	errY -= refY;
-//	assert(errY.norm() <= 1e-6);
-//
-//	std::cout << "Faust-dense matrix product OK" << std::endl;
-//
-//	// test multiplying a MatSparse
-//	auto spX = MatSparse<FPP, Cpu>::randMat(size, size, .2);
-//	//	 X->setOnes();
-//
-//	auto refYsp = spButterflyMat.multiply(*spX);
-//	auto testYsp = butterflyMat.multiply(*spX, 'N');
-//
-//	auto errYsp = testYsp;
-//	errYsp -= refYsp;
-//	assert(errYsp.norm() <= 1e-6);
-//
-//	std::cout << "Faust-sparse matrix product OK" << std::endl;
+	// test multiplying a MatDense
+	auto X = MatDense<FPP, Cpu>::randMat(size, size);
+	MatDense<FPP, Cpu> refY(*X);
+	MatDense<FPP, Cpu> testY(*X);
+
+	spButterflyMat.multiply(refY, 'N');
+	butterflyMat.multiply(testY, 'N');
+
+
+	auto errY = testY;
+	errY -= refY;
+	assert(errY.norm() <= 1e-6);
+
+	std::cout << "Faust-dense matrix product OK" << std::endl;
+
+	// test multiplying a MatSparse
+	auto spX = MatSparse<FPP, Cpu>::randMat(size, size, .2);
+	MatSparse<FPP, Cpu> refYsp(*spX);
+	MatSparse<FPP, Cpu> testYsp(*spX);
+	//	 X->setOnes();
+
+	spButterflyMat.multiply(refYsp, 'N');
+	butterflyMat.multiply(testYsp, 'N');
+
+	MatDense<FPP, Cpu> errYsp = testYsp;
+	errYsp -= refYsp;
+	assert(errYsp.norm() <= 1e-6);
+
+	std::cout << "Faust-sparse matrix product OK" << std::endl;
 
 	return EXIT_SUCCESS;
 }
