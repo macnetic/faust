@@ -117,19 +117,24 @@ namespace Faust
 	template<typename FPP>
 	void MatButterfly<FPP, Cpu>::multiply(MatDense<FPP,Cpu> & M, char opThis) const
 	{
-		//TODO
+
+		MatDense<FPP, Cpu> Y(this->getNbRow(), M.getNbCol());
+		const_cast<MatButterfly<FPP, Cpu>*>(this)->multiply(M.getData(), M.getNbCol(), Y.getData(), Y.getNbRow(), 'T' == opThis);
+		M = Y;
 	}
 
 	template<typename FPP>
 	void MatButterfly<FPP, Cpu>::multiply(MatSparse<FPP, Cpu>& M, char opThis) const
 	{
-		//TODO
+		MatDense<FPP, Cpu> Y(M);
+		this->multiply(Y, opThis);
+		M = Y;
 	}
 
 	template<typename FPP>
 	void MatButterfly<FPP, Cpu>::multiplyRight(MatSparse<FPP, Cpu> const& M)
 	{
-		//TODO
+		throw std::runtime_error("multiplyRight is not supported on a MatButterfly because the matrix must stay a butterfly matrix.");
 	}
 
 
