@@ -6,6 +6,51 @@ typedef @TEST_FPP@ FPP;
 
 using namespace Faust;
 
+void testClone(MatButterfly<FPP, Cpu>& butterflyMat)
+{
+	auto size = butterflyMat.getNbRow();
+	auto clone = butterflyMat.Clone();
+	auto X = MatDense<FPP, Cpu>::randMat(size, size);
+	MatDense<FPP, Cpu> refY_(*X);
+	MatDense<FPP, Cpu> testY_(*X);
+
+	butterflyMat.multiply(refY_, 'N');
+	clone->multiply(testY_, 'N');
+
+
+	auto errY_ = testY_;
+	errY_ -= refY_;
+	assert(errY_.norm() <= 1e-6);
+
+	std::cout << "MatButterfly cloning OK" << std::endl;
+	delete X;
+	delete clone;
+}
+
+
+void testTranspose(MatButterfly<FPP, Cpu>& butterflyMat, MatSparse<FPP, Cpu>& spButterflyMat)
+{
+	auto size = butterflyMat.getNbRow();
+	MatSparse<FPP, Cpu> trefsp(spButterflyMat);
+	trefsp.transpose();
+	MatButterfly<FPP, Cpu> ttest(butterflyMat);
+	ttest.transpose();
+
+	auto X = MatDense<FPP, Cpu>::randMat(size, size);
+	MatDense<FPP, Cpu> refY_(*X);
+	MatDense<FPP, Cpu> testY_(*X);
+
+	trefsp.multiply(refY_, 'N');
+	ttest.multiply(testY_, 'N');
+
+	auto errY_ = testY_;
+	errY_ -= refY_;
+	assert(errY_.norm() <= 1e-6);
+
+	std::cout << "MatButterfly transpose OK" << std::endl;
+	delete X;
+}
+
 int main(int argc, char** argv)
 {
 	int log2size = 4;
@@ -65,21 +110,9 @@ int main(int argc, char** argv)
 
 	std::cout << "Faust-sparse matrix product OK" << std::endl;
 
-	// test Clone
-	auto clone = butterflyMat.Clone();
-	auto X_ = MatDense<FPP, Cpu>::randMat(size, size);
-	MatDense<FPP, Cpu> refY_(*X);
-	MatDense<FPP, Cpu> testY_(*X);
+	testClone(butterflyMat);
 
-	butterflyMat.multiply(refY_, 'N');
-	clone->multiply(testY_, 'N');
-
-
-	auto errY_ = testY_;
-	errY_ -= refY_;
-	assert(errY_.norm() <= 1e-6);
-
-	std::cout << "MatButterfly cloning OK" << std::endl;
+	testTranspose(butterflyMat, spButterflyMat);
 
 	return EXIT_SUCCESS;
 }
