@@ -43,6 +43,7 @@ namespace Faust
 		copy(subdiag_ids.begin(), subdiag_ids.end(),subdiag_ids_ptr);
 #endif
 		this->level = level;
+		this->is_transp = false;
 	}
 
 	template<typename FPP>
@@ -64,6 +65,7 @@ namespace Faust
 		copy(src.subdiag_ids_ptr, src.subdiag_ids_ptr + src.getNbRow(), subdiag_ids_ptr);
 #endif
 		level = src.level;
+		is_transp = src.is_transp;
 		return *this;
 	}
 
@@ -92,23 +94,22 @@ namespace Faust
 		{
 			//TODO: simplify in case of symmetric matrix (it happens for the FFT)
 			auto size = D2.rows();
-			if(D2T.size() != 0)
-				// already done
-				return;
-			FPP *d1_ptr, *d2_ptr, *d2t_ptr;
-			d1_ptr = D1.diagonal().data();
-			d2_ptr = D2.diagonal().data();
-			D2T.resize(size);
-			d2t_ptr = D2T.diagonal().data();
-
-			auto d_offset = size >> (level+1);
-			// D1 doesn't change
-			// swap every pair of D2 contiguous blocks to form D2T
-			for(int i = 0;i < size; i += d_offset * 2)
+			if(D2T.size() == 0)
 			{
-				// swap two next blocks of size d_offset into d2t_ptr
-				copy(d2_ptr + i, d2_ptr + i + d_offset, d2t_ptr + i + d_offset);
-				copy(d2_ptr + i + d_offset, d2_ptr + i + 2 * d_offset, d2t_ptr + i);
+				FPP *d2_ptr, *d2t_ptr;
+				d2_ptr = D2.diagonal().data();
+				D2T.resize(size);
+				d2t_ptr = D2T.diagonal().data();
+
+				auto d_offset = size >> (level+1);
+				// D1 doesn't change
+				// swap every pair of D2 contiguous blocks to form D2T
+				for(int i = 0;i < size; i += d_offset * 2)
+				{
+					// swap two next blocks of size d_offset into d2t_ptr
+					copy(d2_ptr + i, d2_ptr + i + d_offset, d2t_ptr + i + d_offset);
+					copy(d2_ptr + i + d_offset, d2_ptr + i + 2 * d_offset, d2t_ptr + i);
+				}
 			}
 		}
 
@@ -165,7 +166,7 @@ namespace Faust
 		DiagMat &D2 = this->D2;
 		const FPP *d1_ptr, *d2_ptr;
 		d1_ptr = D1.diagonal().data();
-		if(transpose)
+		if(transpose ^ is_transp)
 		{
 			init_transpose(); // no cost if already initialized
 			d2_ptr = D2T.diagonal().data();
@@ -206,7 +207,7 @@ namespace Faust
 			DiagMat &D2 = this->D2;
 			const FPP *d1_ptr, *d2_ptr;
 			d1_ptr = D1.diagonal().data();
-			if(transpose)
+			if(transpose ^ is_transp)
 			{
 				init_transpose(); // no cost if already initialized
 				d2_ptr = D2T.diagonal().data();
@@ -236,7 +237,8 @@ namespace Faust
 	template<typename FPP>
 	void MatButterfly<FPP, Cpu>::transpose()
 	{
-		//TODO
+		init_transpose(); // free cost if already called once
+		is_transp = ! is_transp;
 	}
 
 	template<typename FPP>

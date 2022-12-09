@@ -43,6 +43,7 @@ namespace Faust
 			long *subdiag_ids_ptr;
 #endif
 			int level;
+			bool is_transp;
 
 
 			public:
