@@ -65,5 +65,21 @@ int main(int argc, char** argv)
 
 	std::cout << "Faust-sparse matrix product OK" << std::endl;
 
+	// test Clone
+	auto clone = butterflyMat.Clone();
+	auto X_ = MatDense<FPP, Cpu>::randMat(size, size);
+	MatDense<FPP, Cpu> refY_(*X);
+	MatDense<FPP, Cpu> testY_(*X);
+
+	butterflyMat.multiply(refY_, 'N');
+	clone->multiply(testY_, 'N');
+
+
+	auto errY_ = testY_;
+	errY_ -= refY_;
+	assert(errY_.norm() <= 1e-6);
+
+	std::cout << "MatButterfly cloning OK" << std::endl;
+
 	return EXIT_SUCCESS;
 }
