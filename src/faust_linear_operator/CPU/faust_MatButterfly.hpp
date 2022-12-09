@@ -46,6 +46,28 @@ namespace Faust
 	}
 
 	template<typename FPP>
+	MatButterfly<FPP, Cpu>::MatButterfly(const MatButterfly& src)
+	{
+		*this = src;
+	}
+
+
+	template<typename FPP>
+	MatButterfly<FPP, Cpu>& MatButterfly<FPP, Cpu>::operator=(const MatButterfly& src)
+	{
+		D1 = src.D1;
+		D2 = src.D2;
+		D2T = src.D2T;
+		subdiag_ids = src.subdiag_ids;
+#ifdef USE_PYTHONIC
+		subdiag_ids_ptr = new long[src.getNbRow()];
+		copy(src.subdiag_ids_ptr, src.subdiag_ids_ptr + src.getNbRow(), subdiag_ids_ptr);
+#endif
+		level = src.level;
+		return *this;
+	}
+
+	template<typename FPP>
 	void MatButterfly<FPP, Cpu>::Display() const
 	{
 		//TODO: adjust consistently with MatGeneric Display (using to_string)
@@ -93,8 +115,7 @@ namespace Faust
 	template<typename FPP>
 	MatGeneric<FPP,Cpu>* MatButterfly<FPP, Cpu>::Clone(const bool isOptimize) const
 	{
-		//TODO
-		return nullptr;
+		return new MatButterfly<FPP, Cpu>(*this);
 	}
 
 	template<typename FPP>

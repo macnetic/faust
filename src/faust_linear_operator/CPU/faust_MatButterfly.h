@@ -48,6 +48,9 @@ namespace Faust
 			public:
 			MatButterfly<FPP,Cpu>(const MatSparse<FPP, Cpu> &factor, int level);
 
+			MatButterfly(const MatButterfly& src); // copy ctor
+			MatButterfly<FPP, Cpu>& operator=(const MatButterfly& src); // assignment operator
+
 			void init_transpose();
 			void Display() const;
 
