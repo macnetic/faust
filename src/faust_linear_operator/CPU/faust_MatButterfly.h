@@ -51,6 +51,9 @@ namespace Faust
 			void init_transpose();
 			void Display() const;
 
+			faust_unsigned_int getNbRow() const { return D1.rows();};
+			faust_unsigned_int getNbCol() const { return D1.cols();};
+
 			void multiply(const FPP* x, FPP* y, size_t size, bool transpose = false);
 			void multiply(const FPP* A, int A_ncols, FPP* C, size_t size, bool transpose = false);
 

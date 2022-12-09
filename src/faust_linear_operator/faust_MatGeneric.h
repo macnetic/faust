@@ -90,10 +90,10 @@ namespace Faust
 			void setOp(const char op, faust_unsigned_int& nbRowOp, faust_unsigned_int& nbColOp)const;
 
 			//! \brief return the number of rows of (*this)
-			faust_unsigned_int getNbRow() const {return dim1;}
+			virtual faust_unsigned_int getNbRow() const {return dim1;}
 
 			//! \brief return the number of column of (*this)
-			faust_unsigned_int getNbCol() const {return dim2;}
+			virtual faust_unsigned_int getNbCol() const {return dim2;}
 
 			//! \brief resize (*this)
 			//! \param dim1_ : new number of rows
