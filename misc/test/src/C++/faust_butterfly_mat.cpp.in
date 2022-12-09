@@ -32,11 +32,13 @@ void testTranspose(MatButterfly<FPP, Cpu>& butterflyMat, MatSparse<FPP, Cpu>& sp
 {
 	auto size = butterflyMat.getNbRow();
 	MatSparse<FPP, Cpu> trefsp(spButterflyMat);
-	trefsp.transpose();
 	MatButterfly<FPP, Cpu> ttest(butterflyMat);
-	ttest.transpose();
 
 	auto X = MatDense<FPP, Cpu>::randMat(size, size);
+
+	trefsp.transpose();
+	ttest.transpose();
+
 	MatDense<FPP, Cpu> refY_(*X);
 	MatDense<FPP, Cpu> testY_(*X);
 
@@ -47,8 +49,52 @@ void testTranspose(MatButterfly<FPP, Cpu>& butterflyMat, MatSparse<FPP, Cpu>& sp
 	errY_ -= refY_;
 	assert(errY_.norm() <= 1e-6);
 
-	std::cout << "MatButterfly transpose OK" << std::endl;
+	// test transpose of transpose
+	trefsp.transpose();
+	ttest.transpose();
+
+	refY_ = *X;
+	testY_ = *X;
+
+	trefsp.multiply(refY_, 'N');
+	ttest.multiply(testY_, 'N');
+
+	errY_ = testY_;
+	errY_ -= refY_;
+	assert(errY_.norm() <= 1e-6);
+
+	// test mul of transpose by a vector
+	Vect<FPP, Cpu> refy(X->getNbRow(), X->getData());
+	Vect<FPP, Cpu> testy(X->getNbRow(), X->getData());
+
+	trefsp.transpose();
+	ttest.transpose();
+
+	trefsp.multiply(refy, 'N');
+	ttest.multiply(testy, 'N');
+
+	auto erry = refy;
+	erry -= testy;
+	assert(erry.norm() <= 1e-6);
+
+	// test mul of transpose of transpose by a vector
+	Vect<FPP, Cpu> refy2(X->getNbRow(), X->getData());
+	Vect<FPP, Cpu> testy2(X->getNbRow(), X->getData());
+
+	trefsp.transpose();
+	ttest.transpose();
+
+	trefsp.multiply(refy2, 'N');
+	ttest.multiply(testy2, 'N');
+
+	erry = refy2;
+	erry -= testy2;
+	assert(erry.norm() <= 1e-6);
+
 	delete X;
+
+
+	std::cout << "MatButterfly transpose OK" << std::endl;
 }
 
 int main(int argc, char** argv)
