@@ -265,13 +265,13 @@ namespace Faust
 	template<typename FPP>
 	faust_unsigned_int MatButterfly<FPP, Cpu>::getNonZeros()const
 	{
-		//TODO
+		return D1.diagonal().nonZeros() + D2.diagonal().nonZeros();
 	}
 
 	template<typename FPP>
 	size_t MatButterfly<FPP, Cpu>::getNBytes() const
 	{
-		//TODO
+		return (D1.rows() + D2.rows() + (D2T.size() != 0?D2T.rows():0)) * sizeof(FPP) + subdiag_ids.size() * sizeof(int);
 	}
 
 	template<typename FPP>
