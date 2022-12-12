@@ -7,6 +7,21 @@ typedef @TEST_FPP@ FPP;
 using namespace Faust;
 using namespace std;
 
+bool verifyVecEq(Vect<FPP, Cpu> refv, Vect<FPP, Cpu> testv, double tol)
+{
+	auto err = refv;
+	err -= testv;
+	return err.norm() <= 1e-6;
+}
+
+
+bool verifyMatEq(MatDense<FPP, Cpu> refm, MatDense<FPP, Cpu> testm, double tol)
+{
+	auto err = refm;
+	err -= testm;
+	return err.norm() <= 1e-6;
+}
+
 void testClone(MatButterfly<FPP, Cpu>& butterflyMat)
 {
 	auto size = butterflyMat.getNbRow();
@@ -18,10 +33,7 @@ void testClone(MatButterfly<FPP, Cpu>& butterflyMat)
 	butterflyMat.multiply(refY_, 'N');
 	clone->multiply(testY_, 'N');
 
-
-	auto errY_ = testY_;
-	errY_ -= refY_;
-	assert(errY_.norm() <= 1e-6);
+	assert(verifyMatEq(refY_, testY_, 1e-6));
 
 	std::cout << "MatButterfly cloning OK" << std::endl;
 	delete X;
@@ -111,6 +123,38 @@ void testNNZSize(MatButterfly<FPP, Cpu>& butterflyMat, MatSparse<FPP, Cpu>& spBu
 	std::cout << "MatButterfly getNonZeros() and getNBytes() OK" << std::endl;
 }
 
+void testType(MatButterfly<FPP, Cpu>& butterflyMat)
+{
+	assert(butterflyMat.getType() == Butterfly);
+	std::cout << "MatButterfly getType() OK" << std::endl;
+}
+
+void testScalMul(const MatButterfly<FPP, Cpu>& butterflyMat,  const MatSparse<FPP, Cpu>& spButterflyMat)
+{
+
+	auto size = spButterflyMat.getNbRow();
+	auto X = MatDense<FPP, Cpu>::randMat(size, size);
+	auto alpha = FPP(2.0);
+
+	MatButterfly<FPP, Cpu> mButterflyMat(butterflyMat);
+	MatSparse<FPP, Cpu> mspButterflyMat(spButterflyMat);
+
+	mButterflyMat *= alpha;
+	mspButterflyMat *= alpha;
+
+	Vect<FPP, Cpu> refy(X->getNbRow(), X->getData());
+	Vect<FPP, Cpu> testy(X->getNbRow(), X->getData());
+
+	mButterflyMat.multiply(refy, 'N');
+	mspButterflyMat.multiply(testy, 'N');
+
+	assert(verifyVecEq(refy, testy, 1e-6));
+
+	delete X;
+
+	std::cout << "MatButterfly scal. mul OK" << std::endl;
+}
+
 int main(int argc, char** argv)
 {
 	int log2size = 4;
@@ -148,7 +192,6 @@ int main(int argc, char** argv)
 	spButterflyMat.multiply(refY, 'N');
 	butterflyMat.multiply(testY, 'N');
 
-
 	auto errY = testY;
 	errY -= refY;
 	assert(errY.norm() <= 1e-6);
@@ -174,7 +217,8 @@ int main(int argc, char** argv)
 
 	testTranspose(butterflyMat, spButterflyMat);
 	testNNZSize(butterflyMat, spButterflyMat);
+	testType(butterflyMat);
 
-
+	testScalMul(butterflyMat, spButterflyMat);
 	return EXIT_SUCCESS;
 }
