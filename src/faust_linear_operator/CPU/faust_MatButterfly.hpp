@@ -292,8 +292,7 @@ namespace Faust
 	template<typename FPP>
 	matvar_t* MatButterfly<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate, const char *var_name) const
 	{
-		//TODO
-
+		throw std::runtime_error("Saving MatButterfly to a .mat file is not supported.");
 	}
 
 	template<typename FPP>
@@ -305,7 +304,8 @@ namespace Faust
 	template<typename FPP>
 	Real<FPP> MatButterfly<FPP, Cpu>::norm() const
 	{
-		//TODO
+		auto s = (D1.diagonal().array() * D1.diagonal().conjugate().array() + D2.diagonal().array() * D2.diagonal().conjugate().array()).sum();
+		return Faust::fabs(std::sqrt(s));
 	}
 
 	template<typename FPP>

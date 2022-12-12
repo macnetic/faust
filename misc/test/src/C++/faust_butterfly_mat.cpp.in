@@ -40,7 +40,6 @@ void testClone(MatButterfly<FPP, Cpu>& butterflyMat)
 	delete clone;
 }
 
-
 void testTranspose(MatButterfly<FPP, Cpu>& butterflyMat, MatSparse<FPP, Cpu>& spButterflyMat)
 {
 	auto size = butterflyMat.getNbRow();
@@ -155,6 +154,14 @@ void testScalMul(const MatButterfly<FPP, Cpu>& butterflyMat,  const MatSparse<FP
 	std::cout << "MatButterfly scal. mul OK" << std::endl;
 }
 
+void testNorm2(const MatButterfly<FPP, Cpu>& butterflyMat,  const MatSparse<FPP, Cpu>& spButterflyMat)
+{
+//	cout << butterflyMat.norm()  << endl;
+//	cout << spButterflyMat.norm()  << endl;
+	assert(std::abs(butterflyMat.norm() - spButterflyMat.norm()) < 1e-6);
+	std::cout << "MatButterfly fro-norm OK" << std::endl;
+}
+
 int main(int argc, char** argv)
 {
 	int log2size = 4;
@@ -220,5 +227,6 @@ int main(int argc, char** argv)
 	testType(butterflyMat);
 
 	testScalMul(butterflyMat, spButterflyMat);
+	testNorm2(butterflyMat, spButterflyMat);
 	return EXIT_SUCCESS;
 }
