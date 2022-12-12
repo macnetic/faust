@@ -94,6 +94,7 @@ enum MatType
    Sparse, 
    Diag,
    BSR,
+   Butterfly,
    None
 };
 
