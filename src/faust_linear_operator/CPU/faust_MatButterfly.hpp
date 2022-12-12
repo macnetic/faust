@@ -277,19 +277,23 @@ namespace Faust
 	template<typename FPP>
 	MatType MatButterfly<FPP, Cpu>::getType() const
 	{
-		//TODO
+		return Butterfly;
 	}
 
 	template<typename FPP>
 	void MatButterfly<FPP, Cpu>::operator*=(const FPP alpha)
 	{
-		//TODO
+		D1 = D1 * alpha;
+		D2 = D2 * alpha;
+		if(D2T.size() != 0)
+			D2T = D2T * alpha;
 	}
 
 	template<typename FPP>
 	matvar_t* MatButterfly<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate, const char *var_name) const
 	{
 		//TODO
+
 	}
 
 	template<typename FPP>
