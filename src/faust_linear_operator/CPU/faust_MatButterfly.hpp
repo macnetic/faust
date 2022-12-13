@@ -345,9 +345,25 @@ namespace Faust
 	}
 
 	template<typename FPP>
-	std::list<std::pair<int,int>> MatButterfly<FPP, Cpu>::nonzeros_indices() const
+	std::list<std::pair<int,int>> MatButterfly<FPP, Cpu>::nonzeros_indices(const double& tol/*=0*/) const
 	{
-		//TODO
+		auto s = this->getNbRow();
+		auto k = s >> (level + 1); // D2 diagonal offset
+		std::list<std::pair<int,int>> indices;
+		const FPP *d1_ptr, *d2_ptr;
+		d1_ptr = D1.diagonal().data();
+		d2_ptr = D2.diagonal().data();
+		for(int i=0; i < s; i++)
+		{
+			if(std::abs(d1_ptr[i]) > tol)
+				indices.push_back(std::make_pair(i, i)); // main diag coeff
+			if(std::abs(d2_ptr[i]) > tol)
+				if((i / k) & 1)
+					indices.push_back(std::make_pair(i, i - k)); // below diag coeff
+				else
+					indices.push_back(std::make_pair(i, i + k)); // above diag coeff
+		}
+		return indices;
 	}
 
 	template<typename FPP>
