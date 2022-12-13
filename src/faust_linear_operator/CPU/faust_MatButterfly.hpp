@@ -296,7 +296,7 @@ namespace Faust
 	}
 
 	template<typename FPP>
-	Real<FPP> MatButterfly<FPP, Cpu>::normL1(const bool transpose) const
+	Real<FPP> MatButterfly<FPP, Cpu>::normL1(const bool transpose/*=false*/) const
 	{
 		return toMatSparse().normL1(transpose);
 	}
@@ -423,7 +423,9 @@ namespace Faust
 					tripletList.push_back(Eigen::Triplet<FPP>(i, i + k, d2_ptr[i]));
 				}
 			}
-			return MatSparse<FPP, Cpu>(tripletList, s, s);
+			auto sp = MatSparse<FPP, Cpu>(tripletList, s, s);
+			sp.conservativeResize(s, s);
+			return sp;
 		}
 
 }

@@ -79,7 +79,7 @@ namespace Faust
 			MatType getType() const;
 			void operator*=(const FPP alpha);
 			matvar_t* toMatIOVar(bool transpose, bool conjugate, const char *var_name=nullptr) const;
-			Real<FPP> normL1(const bool transpose) const;
+			Real<FPP> normL1(const bool transpose=false) const;
 			Real<FPP> norm() const;
 			Real<FPP> normL1(faust_unsigned_int& col_id, const bool transpose) const;
 			Vect<FPP,Cpu> get_col(faust_unsigned_int id) const;
