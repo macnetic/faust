@@ -1318,7 +1318,7 @@ Faust::MatSparse<FPP, Cpu>* Faust::MatSparse<FPP, Cpu>::eye(faust_unsigned_int n
 }
 
 template<typename FPP>
-list<pair<int,int>> Faust::MatSparse<FPP,Cpu>::nonzeros_indices() const
+list<pair<int,int>> Faust::MatSparse<FPP,Cpu>::nonzeros_indices(const double& tol/* = 0*/) const
 {
 	list<pair<int,int>> nz_inds;
 	int i,j, k;
@@ -1333,7 +1333,8 @@ list<pair<int,int>> Faust::MatSparse<FPP,Cpu>::nonzeros_indices() const
 			for(k=getOuterIndexPtr()[i];k<getOuterIndexPtr()[i+1];k++)
 			{
 				j = getInnerIndexPtr()[k];
-				nz_inds.push_back(make_pair(i,j));
+				if(std::abs((*this)(i, j)) > tol)
+					nz_inds.push_back(make_pair(i,j));
 			}
 		}
 	}

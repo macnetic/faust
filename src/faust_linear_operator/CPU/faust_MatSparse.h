@@ -408,7 +408,7 @@ namespace Faust
 			std::vector<int> col_nonzero_inds(faust_unsigned_int col_id) const;
 			std::vector<int> row_nonzero_inds(faust_unsigned_int row_id) const;
 
-			std::list<std::pair<int,int>> nonzeros_indices() const;
+			std::list<std::pair<int,int>> nonzeros_indices(const double& tol=0) const;
 
 			/**
 			 * \brief Concatenates vertically top and bottom matrices, resizing this if necessary.

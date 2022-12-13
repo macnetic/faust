@@ -202,7 +202,7 @@ namespace Faust
 
 
 	template<typename FPP>
-		std::list<std::pair<int,int>> MatDense<FPP,Cpu>::nonzeros_indices() const
+		std::list<std::pair<int,int>> MatDense<FPP,Cpu>::nonzeros_indices(const double& tol/*=0*/) const
 		{
 			std::list<std::pair<int,int>> nz_inds;
 			if(this->is_identity)
@@ -216,7 +216,7 @@ namespace Faust
 			{
 				int i,j;
 				for(int k=0;k<this->dim1*this->dim2;k++)
-					if(mat(k) != FPP(0))
+					if(std::abs(mat(k)) > tol)
 					{
 						j = k/this->dim1;
 						i = k-j*this->dim1;

@@ -166,11 +166,12 @@ Faust::MatGeneric<FPP,Cpu>* Faust::MatDiag<FPP>::get_rows(const faust_unsigned_i
 	return MatSparse<FPP,Cpu>(*this).get_rows(row_ids, num_rows);
 }
 template<typename FPP>
-std::list<std::pair<int,int>> Faust::MatDiag<FPP>::nonzeros_indices() const
+std::list<std::pair<int,int>> Faust::MatDiag<FPP>::nonzeros_indices(const double& tol/*=0*/) const
 {
 	std::list<std::pair<int,int>> nz_inds;
 	for(int i=0;i<this->getNbRow();i++)
-		nz_inds.push_back(std::make_pair(i,i));
+		if(std::abs(mat.diagonal()(i, i)) > tol)
+			nz_inds.push_back(std::make_pair(i,i));
 	return nz_inds;
 }
 

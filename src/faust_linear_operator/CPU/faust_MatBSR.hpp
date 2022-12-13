@@ -542,9 +542,9 @@ namespace Faust
 		}
 
 	template <typename FPP>
-		std::list<std::pair<int,int>> MatBSR<FPP,Cpu>::nonzeros_indices() const
+		std::list<std::pair<int,int>> MatBSR<FPP,Cpu>::nonzeros_indices(const double& tol/*=0*/) const
 		{
-			return bmat.nonzeros_indices();
+			return bmat.nonzeros_indices(tol);
 		}
 
 	template <typename FPP>
@@ -1079,15 +1079,15 @@ const T& BSRMat<T, BlockStorageOrder>::operator()(unsigned int i, unsigned int j
 }
 
 template<typename T, int BlockStorageOrder>
-std::list<std::pair<int,int>> BSRMat<T, BlockStorageOrder>::nonzeros_indices() const
+std::list<std::pair<int,int>> BSRMat<T, BlockStorageOrder>::nonzeros_indices(const double& tol/*=0*/) const
 {
 	std::list<std::pair<int,int>> nz_inds;
-	iter_block([&nz_inds, this](int mat_row_id, int mat_col_id, int block_offset)
+	iter_block([&nz_inds, &tol, this](int mat_row_id, int mat_col_id, int block_offset)
 			{
 				for(int i=0;i<bm;i++)
 					for(int j=0;j<bn;j++)
 					{
-						if(data[block_offset*bm*bn+j*bm+i] != T(0)) // nz item
+						if(std::abs(data[block_offset*bm*bn+j*bm+i]) > tol) // nz item
 							nz_inds.push_back(std::make_pair(mat_row_id+i, mat_col_id+j));
 					}
 			});

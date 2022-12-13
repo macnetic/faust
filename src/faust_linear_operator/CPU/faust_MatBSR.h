@@ -87,7 +87,7 @@ namespace Faust
 			MatSparse<FPP,Cpu>* get_rows(faust_unsigned_int row_id_start, faust_unsigned_int num_rows) const;
 			MatSparse<FPP,Cpu>* get_cols(const faust_unsigned_int* col_ids, faust_unsigned_int num_cols) const;
 			MatSparse<FPP,Cpu>* get_rows(const faust_unsigned_int* row_ids, faust_unsigned_int num_rows) const;
-			std::list<std::pair<int,int>> nonzeros_indices() const;
+			std::list<std::pair<int,int>> nonzeros_indices(const double& tol=0) const;
 			void setZeros();
 			bool containsNaN() const;
 			const FPP& operator()(faust_unsigned_int i, faust_unsigned_int j)const ;
@@ -177,7 +177,7 @@ class BSRMat
 	/**
 	 * Returns the indices on the nonzeros of this.
 	 */
-	std::list<std::pair<int,int>> nonzeros_indices() const;
+	std::list<std::pair<int,int>> nonzeros_indices(const double& tol=0) const;
 	/**
 	 * Returns the number of bytes consumed by this.
 	 */

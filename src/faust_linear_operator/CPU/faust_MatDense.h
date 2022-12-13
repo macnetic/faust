@@ -522,7 +522,7 @@ namespace Faust
 			/**
 			 * \brief Returns the nonzeros indices.
 			 */
-			std::list<std::pair<int,int>> nonzeros_indices() const;
+			std::list<std::pair<int,int>> nonzeros_indices(const double& tol=0) const;
 
 			/**
 			 * \brief Returns the best low rank approximation this = bestX * bestY using the svd.
