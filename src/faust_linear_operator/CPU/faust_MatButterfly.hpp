@@ -353,6 +353,7 @@ namespace Faust
 	template<typename FPP>
 	void MatButterfly<FPP, Cpu>::setZeros()
 	{
+		throw std::runtime_error("setZeros is not available on a MatButterfly matrix.");
 	}
 
 	template<typename FPP>
