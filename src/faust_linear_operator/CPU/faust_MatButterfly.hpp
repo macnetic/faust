@@ -298,7 +298,7 @@ namespace Faust
 	template<typename FPP>
 	Real<FPP> MatButterfly<FPP, Cpu>::normL1(const bool transpose) const
 	{
-		//TODO
+		return toMatSparse().normL1(transpose);
 	}
 
 	template<typename FPP>
@@ -311,37 +311,37 @@ namespace Faust
 	template<typename FPP>
 	Real<FPP> MatButterfly<FPP, Cpu>::normL1(faust_unsigned_int& col_id, const bool transpose) const
 	{
-		//TODO
+		return toMatSparse().normL1(col_id, transpose);
 	}
 
 	template<typename FPP>
 	Vect<FPP,Cpu> MatButterfly<FPP, Cpu>::get_col(faust_unsigned_int id) const
 	{
-		//TODO
+		return toMatSparse().get_col(id);
 	}
 
 	template<typename FPP>
 	MatGeneric<FPP,Cpu>* MatButterfly<FPP, Cpu>::get_cols(faust_unsigned_int col_id_start, faust_unsigned_int num_cols) const
 	{
-		//TODO
+		return toMatSparse().get_cols(col_id_start, num_cols);
 	}
 
 	template<typename FPP>
 	MatGeneric<FPP,Cpu>* MatButterfly<FPP, Cpu>::get_rows(faust_unsigned_int row_id_start, faust_unsigned_int num_rows) const
 	{
-		//TODO
+		return toMatSparse().get_rows(row_id_start, num_rows);
 	}
 
 	template<typename FPP>
 	MatGeneric<FPP,Cpu>* MatButterfly<FPP, Cpu>::get_cols(const faust_unsigned_int* col_ids, faust_unsigned_int num_cols) const
 	{
-		//TODO
+		return toMatSparse().get_cols(col_ids, num_cols);
 	}
 
 	template<typename FPP>
 	MatGeneric<FPP,Cpu>* MatButterfly<FPP, Cpu>::get_rows(const faust_unsigned_int* row_ids, faust_unsigned_int num_rows) const
 	{
-		//TODO
+		return toMatSparse().get_rows(row_ids, num_rows);
 	}
 
 	template<typename FPP>
