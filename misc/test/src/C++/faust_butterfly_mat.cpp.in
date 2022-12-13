@@ -183,6 +183,30 @@ void testGetCoeff(const MatButterfly<FPP, Cpu>& butterflyMat,  const MatSparse<F
 	std::cout << "MatButterfly::operator() OK" << std::endl;
 }
 
+
+void testNZinds(const MatButterfly<FPP, Cpu>& butterflyMat,  const MatSparse<FPP, Cpu>& spButterflyMat)
+{
+	auto ref_indices = spButterflyMat.nonzeros_indices(1e-16);
+	auto test_indices = butterflyMat.nonzeros_indices(1e-16);
+//	std::cout << "sizes: " << ref_indices.size() << " " <<  test_indices.size() << std::endl;
+	assert(ref_indices.size() == test_indices.size());
+	for(auto rit=ref_indices.begin(); rit != ref_indices.end(); rit++)
+	{
+		auto ref_ind = *rit;
+		bool ind_found = false;
+		for(auto tit = test_indices.begin(); tit != test_indices.end(); tit++)
+		{
+			auto test_ind = *tit;
+			if(ref_ind.first == test_ind.first && ref_ind.second == test_ind.second)
+			{
+				ind_found = true;
+			}
+		}
+		assert(ind_found);
+	}
+	std::cout << "MatButterfly::nonzeros_indices() OK" << std::endl;
+}
+
 void testHasNaN(const MatButterfly<FPP, Cpu>& butterflyMat,  const MatSparse<FPP, Cpu>& spButterflyMat)
 {
 	assert(butterflyMat.containsNaN() == spButterflyMat.containsNaN());
@@ -258,5 +282,6 @@ int main(int argc, char** argv)
 	testToMatSparse(butterflyMat, spButterflyMat);
 	testGetCoeff(butterflyMat, spButterflyMat);
 	testHasNaN(butterflyMat, spButterflyMat);
+	testNZinds(butterflyMat, spButterflyMat);
 	return EXIT_SUCCESS;
 }
