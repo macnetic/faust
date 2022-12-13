@@ -364,7 +364,22 @@ namespace Faust
 	template<typename FPP>
 	const FPP& MatButterfly<FPP, Cpu>::operator()(faust_unsigned_int i, faust_unsigned_int j) const
 	{
-		//TODO
+		auto s = this->getNbRow();
+		auto k = s >> (level + 1); // D2 diagonal offset
+		const FPP *d1_ptr, *d2_ptr;
+		d1_ptr = D1.diagonal().data();
+		d2_ptr = D2.diagonal().data();
+		if(i == j)
+			return d1_ptr[i];
+		if((i / k) & 1)
+			if(j == i - k)
+				return d2_ptr[i];
+			else
+				return FPP(0);
+		if(j == i + k)
+			return d2_ptr[i];
+		else
+			return FPP(0);
 	}
 
 

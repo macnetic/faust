@@ -171,6 +171,16 @@ void testToMatSparse(const MatButterfly<FPP, Cpu>& butterflyMat,  const MatSpars
 	std::cout << "MatButterfly::toMatSparse OK" << std::endl;
 }
 
+void testGetCoeff(const MatButterfly<FPP, Cpu>& butterflyMat,  const MatSparse<FPP, Cpu>& spButterflyMat)
+{
+	for(int i=0;i < spButterflyMat.getNbRow(); i++)
+		for(int j=0;j < spButterflyMat.getNbCol(); j++)
+		{
+//			cout << butterflyMat(i, j) << " " << spButterflyMat(i, j) << endl;
+			assert(std::abs(butterflyMat(i, j) - spButterflyMat(i, j)) < 1e-6);
+		}
+}
+
 int main(int argc, char** argv)
 {
 	int log2size = 4;
@@ -238,5 +248,6 @@ int main(int argc, char** argv)
 	testScalMul(butterflyMat, spButterflyMat);
 	testNorm2(butterflyMat, spButterflyMat);
 	testToMatSparse(butterflyMat, spButterflyMat);
+	testGetCoeff(butterflyMat, spButterflyMat);
 	return EXIT_SUCCESS;
 }
