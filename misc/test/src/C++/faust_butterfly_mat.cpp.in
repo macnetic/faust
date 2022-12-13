@@ -162,10 +162,18 @@ void testNorm2(const MatButterfly<FPP, Cpu>& butterflyMat,  const MatSparse<FPP,
 	std::cout << "MatButterfly fro-norm OK" << std::endl;
 }
 
+void testNorm1(const MatButterfly<FPP, Cpu>& butterflyMat,  const MatSparse<FPP, Cpu>& spButterflyMat)
+{
+//	cout << butterflyMat.normL1()  << endl;
+//	cout << spButterflyMat.normL1()  << endl;
+	assert(std::abs(butterflyMat.normL1() - spButterflyMat.normL1()) < 1e-6);
+	std::cout << "MatButterfly norm-1 OK" << std::endl;
+}
 void testToMatSparse(const MatButterfly<FPP, Cpu>& butterflyMat,  const MatSparse<FPP, Cpu>& spButterflyMat)
 {
 	auto convSpButterflyMat = butterflyMat.toMatSparse();
 
+//	convSpButterflyMat.Display();
 	assert(verifyMatEq(MatDense<FPP, Cpu>(convSpButterflyMat), MatDense<FPP, Cpu>(spButterflyMat), 1e-6));
 
 	std::cout << "MatButterfly::toMatSparse OK" << std::endl;
@@ -283,5 +291,6 @@ int main(int argc, char** argv)
 	testGetCoeff(butterflyMat, spButterflyMat);
 	testHasNaN(butterflyMat, spButterflyMat);
 	testNZinds(butterflyMat, spButterflyMat);
+	testNorm1(butterflyMat, spButterflyMat);
 	return EXIT_SUCCESS;
 }
