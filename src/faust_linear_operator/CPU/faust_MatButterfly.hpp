@@ -358,7 +358,7 @@ namespace Faust
 	template<typename FPP>
 	bool MatButterfly<FPP, Cpu>::containsNaN() const
 	{
-		//TODO
+		return D1.diagonal().hasNaN() || D2.diagonal().hasNaN();
 	}
 
 	template<typename FPP>

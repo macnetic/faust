@@ -179,6 +179,14 @@ void testGetCoeff(const MatButterfly<FPP, Cpu>& butterflyMat,  const MatSparse<F
 //			cout << butterflyMat(i, j) << " " << spButterflyMat(i, j) << endl;
 			assert(std::abs(butterflyMat(i, j) - spButterflyMat(i, j)) < 1e-6);
 		}
+
+	std::cout << "MatButterfly::operator() OK" << std::endl;
+}
+
+void testHasNaN(const MatButterfly<FPP, Cpu>& butterflyMat,  const MatSparse<FPP, Cpu>& spButterflyMat)
+{
+	assert(butterflyMat.containsNaN() == spButterflyMat.containsNaN());
+	std::cout << "MatButterfly::containsNaN OK" << std::endl;
 }
 
 int main(int argc, char** argv)
@@ -249,5 +257,6 @@ int main(int argc, char** argv)
 	testNorm2(butterflyMat, spButterflyMat);
 	testToMatSparse(butterflyMat, spButterflyMat);
 	testGetCoeff(butterflyMat, spButterflyMat);
+	testHasNaN(butterflyMat, spButterflyMat);
 	return EXIT_SUCCESS;
 }
