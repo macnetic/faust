@@ -231,11 +231,55 @@ namespace Faust
 		}
 
 
-
 	template<typename FPP>
 		void MatButterfly<FPP, Cpu>::faust_gemm(const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char typeA, char typeB)const
 		{
-			//TODO
+			std::runtime_error op_except("Invalid operation letter in MatButterfly::faust_gemm; it must be 'N', 'T' or 'H'.");
+			if(beta == FPP(0))
+			{
+				if(typeB == 'N')
+				{
+					C = B;
+					multiply(C, 'N');
+				}
+				else if(typeB == 'T')
+				{
+					auto C = B;
+					C.transpose();
+					multiply(C, 'N');
+				}
+				else if(typeB == 'H')
+				{
+					auto C = B;
+					C.adjoint();
+					multiply(C, 'N');
+				}
+				else
+					throw op_except;
+			}
+			else // beta != 0
+			{
+				C *= beta;
+				MatDense<FPP, Cpu> Bc(B); //copy
+				if(typeB == 'N')
+				{
+					multiply(Bc, 'N');
+				}
+				else if(typeB == 'T')
+				{
+					Bc.transpose();
+					multiply(Bc, 'N');
+				}
+				else if(typeB == 'H')
+				{
+
+					Bc.transpose();
+					multiply(Bc, 'N');
+				}
+				else
+					throw op_except;
+				C += Bc;
+			}
 		}
 
 	template<typename FPP>
