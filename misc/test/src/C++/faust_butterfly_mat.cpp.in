@@ -162,6 +162,15 @@ void testNorm2(const MatButterfly<FPP, Cpu>& butterflyMat,  const MatSparse<FPP,
 	std::cout << "MatButterfly fro-norm OK" << std::endl;
 }
 
+void testToMatSparse(const MatButterfly<FPP, Cpu>& butterflyMat,  const MatSparse<FPP, Cpu>& spButterflyMat)
+{
+	auto convSpButterflyMat = butterflyMat.toMatSparse();
+
+	assert(verifyMatEq(MatDense<FPP, Cpu>(convSpButterflyMat), MatDense<FPP, Cpu>(spButterflyMat), 1e-6));
+
+	std::cout << "MatButterfly::toMatSparse OK" << std::endl;
+}
+
 int main(int argc, char** argv)
 {
 	int log2size = 4;
@@ -228,5 +237,6 @@ int main(int argc, char** argv)
 
 	testScalMul(butterflyMat, spButterflyMat);
 	testNorm2(butterflyMat, spButterflyMat);
+	testToMatSparse(butterflyMat, spButterflyMat);
 	return EXIT_SUCCESS;
 }

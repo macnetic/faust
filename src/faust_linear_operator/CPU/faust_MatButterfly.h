@@ -90,7 +90,9 @@ namespace Faust
 			std::list<std::pair<int,int>> nonzeros_indices() const;
 			void setZeros();
 			bool containsNaN()const;
-			const FPP& operator()(faust_unsigned_int i, faust_unsigned_int j)const ;
+			const FPP& operator()(faust_unsigned_int i, faust_unsigned_int j)const;
+
+			MatSparse<FPP, Cpu> toMatSparse() const;
 
 			void faust_gemm(const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char typeA, char typeB)const; //from LinearOperator
 		};

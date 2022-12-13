@@ -353,7 +353,6 @@ namespace Faust
 	template<typename FPP>
 	void MatButterfly<FPP, Cpu>::setZeros()
 	{
-		//TODO
 	}
 
 	template<typename FPP>
@@ -367,5 +366,32 @@ namespace Faust
 	{
 		//TODO
 	}
+
+
+	template<typename FPP>
+		MatSparse<FPP, Cpu> MatButterfly<FPP, Cpu>::toMatSparse() const
+		{
+			auto s = this->getNbRow();
+			auto k = s >> (level + 1); // D2 diagonal offset
+			vector<Eigen::Triplet<FPP> > tripletList;
+			const FPP *d1_ptr, *d2_ptr;
+			d1_ptr = D1.diagonal().data();
+			d2_ptr = D2.diagonal().data();
+			for(int i=0; i < s; i++)
+			{
+				tripletList.push_back(Eigen::Triplet<FPP>(i, i, d1_ptr[i]));
+				if((i / k) & 1)
+				{
+					// d2 coeff is the first elt of row i
+					tripletList.push_back(Eigen::Triplet<FPP>(i, i - k, d2_ptr[i]));
+				}
+				else
+				{
+					// d2 coeff is the last elt of row i
+					tripletList.push_back(Eigen::Triplet<FPP>(i, i + k, d2_ptr[i]));
+				}
+			}
+			return MatSparse<FPP, Cpu>(tripletList, s, s);
+		}
 
 }
