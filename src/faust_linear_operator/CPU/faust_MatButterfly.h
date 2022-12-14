@@ -25,6 +25,8 @@ types::ndarray<T, types::pshape<long>> arrayFromBuf1D(T* fPtr, long size)
 #include <Eigen/Core>
 #include <memory> // shared_ptr
 
+#define diag_conj(D) DiagMat(D.diagonal().conjugate()) // D is a DiagMat
+
 namespace Faust
 {
 	template<typename FPP, FDevice DEVICE> class MatButterfly;
@@ -58,8 +60,8 @@ namespace Faust
 			faust_unsigned_int getNbRow() const { return D1.rows();};
 			faust_unsigned_int getNbCol() const { return D1.cols();};
 
-			void multiply(const FPP* x, FPP* y, size_t size, bool transpose = false);
-			void multiply(const FPP* A, int A_ncols, FPP* C, size_t size, bool transpose = false);
+			void multiply(const FPP* x, FPP* y, size_t size, bool transpose = false, bool conjugate  = false);
+			void multiply(const FPP* A, int A_ncols, FPP* C, size_t size, bool transpose = false, bool conjugate  = false);
 
 			const DiagMat& getD1() {return D1;}; //TODO/ move to .hpp
 			const DiagMat& getD2() {return D2;};
