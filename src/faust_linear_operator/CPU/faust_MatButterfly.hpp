@@ -1,4 +1,4 @@
-
+#include "faust_conj.h"
 namespace Faust
 {
 	template<typename FPP>
@@ -188,7 +188,7 @@ namespace Faust
 #pragma omp parallel for
 		for(int i=0;i < size; i++)
 			if(conjugate)
-				y[i] = std::conj(d1_ptr[i]) * x[i] + std::conj(d2_ptr[i]) * x[subdiag_ids[i]];
+				y[i] = Faust::conj(d1_ptr[i]) * x[i] + Faust::conj(d2_ptr[i]) * x[subdiag_ids[i]];
 			else
 				y[i] = d1_ptr[i] * x[i] + d2_ptr[i] * x[subdiag_ids[i]];
 #else
@@ -231,7 +231,7 @@ namespace Faust
 			#pragma omp parallel for
 			for(int i=0;i < Y_nrows; i++)
 				if(conjugate)
-					Y_mat.row(i) = std::conj(d1_ptr[i]) * X_mat.row(i) + std::conj(d2_ptr[i]) * X_mat.row(subdiag_ids[i]);
+					Y_mat.row(i) = Faust::conj(d1_ptr[i]) * X_mat.row(i) + Faust::conj(d2_ptr[i]) * X_mat.row(subdiag_ids[i]);
 				else
 					Y_mat.row(i) = d1_ptr[i] * X_mat.row(i) + d2_ptr[i] * X_mat.row(subdiag_ids[i]);
 #else
