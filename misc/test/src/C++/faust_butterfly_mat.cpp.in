@@ -221,6 +221,48 @@ void testHasNaN(const MatButterfly<FPP, Cpu>& butterflyMat,  const MatSparse<FPP
 	std::cout << "MatButterfly::containsNaN OK" << std::endl;
 }
 
+void testGemm(const MatButterfly<FPP, Cpu>& butterflyMat,  const MatSparse<FPP, Cpu>& spButterflyMat)
+{
+	auto size = butterflyMat.getNbRow();
+	auto B = MatDense<FPP, Cpu>::randMat(size, size);
+	auto C = MatDense<FPP, Cpu>::randMat(size, size);
+
+	MatDense<FPP, Cpu> Cr(*C); // ref
+	MatDense<FPP, Cpu> Ct(*C); // test
+
+	const char *Aops = "NTH";
+	const char *Bops = "NTH";
+
+	FPP* scal = new FPP[3];
+	scal[0] = FPP(0);
+	scal[1] = FPP(1);
+	scal[2] = FPP(2);
+
+	for(int i = 0; i < std::strlen(Aops); i++)
+	{
+		auto Aop = Aops[i];
+		for(int j = 0; j < std::strlen(Bops); j++)
+		{
+			auto Bop = Bops[j];
+			for(int k = 0; k < 3; k++)
+			{
+
+				FPP alpha = scal[k];
+				for(int l = 0; l < 3; l++)
+				{
+					FPP beta = scal[k];
+//					cout << "Aop: " << Aop << " Bop: " << Bop << endl;
+//					cout << "alpha: " << alpha << " beta: " << beta << endl;
+					spButterflyMat.faust_gemm(*B, Cr, alpha, beta, Aop, Bop);
+					butterflyMat.faust_gemm(*B, Ct, alpha, beta, Aop, Bop);
+					assert(verifyMatEq(Cr, Ct, 1e-6));
+				}
+			}
+		}
+	}
+	std::cout << "MatButterfly::testGemm OK" << std::endl;
+}
+
 int main(int argc, char** argv)
 {
 	int log2size = 4;
@@ -292,5 +334,6 @@ int main(int argc, char** argv)
 	testHasNaN(butterflyMat, spButterflyMat);
 	testNZinds(butterflyMat, spButterflyMat);
 	testNorm1(butterflyMat, spButterflyMat);
+	testGemm(butterflyMat, spButterflyMat);
 	return EXIT_SUCCESS;
 }
