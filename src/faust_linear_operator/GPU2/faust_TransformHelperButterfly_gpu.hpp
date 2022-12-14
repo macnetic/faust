@@ -131,7 +131,7 @@ namespace Faust
 	template<typename FPP>
 		ButterflyMat<FPP, GPU2>::ButterflyMat(const MatSparse<FPP, Cpu> &factor, int level) : level(level)
 	{
-		ButterflyMat<FPP, Cpu> cpu_bmat(factor, level);
+		MatButterfly<FPP, Cpu> cpu_bmat(factor, level);
 		auto cpu_d1 = cpu_bmat.getD1();
 		auto cpu_d2 = cpu_bmat.getD2();
 		d1 = Vect<FPP, GPU2>(cpu_d1.rows(), cpu_d1.diagonal().data());
