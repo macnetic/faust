@@ -1,0 +1,340 @@
+#include "faust_TransformHelperButterfly.h"
+#include "faust_MatPerm.h"
+#include <cstdio>
+
+typedef @TEST_FPP@ FPP;
+
+using namespace Faust;
+using namespace std;
+
+bool verifyVecEq(Vect<FPP, Cpu> refv, Vect<FPP, Cpu> testv, double tol)
+{
+	auto err = refv;
+	err -= testv;
+	return err.norm() <= 1e-6;
+}
+
+
+bool verifyMatEq(MatDense<FPP, Cpu> refm, MatDense<FPP, Cpu> testm, double tol)
+{
+	auto err = refm;
+	err -= testm;
+	return err.norm() <= 1e-6;
+}
+
+void testClone(MatPerm<FPP, Cpu>& permMat)
+{
+	auto size = permMat.getNbRow();
+	auto clone = permMat.Clone();
+	auto X = MatDense<FPP, Cpu>::randMat(size, size);
+	MatDense<FPP, Cpu> refY_(*X);
+	MatDense<FPP, Cpu> testY_(*X);
+
+	permMat.multiply(refY_, 'N');
+	clone->multiply(testY_, 'N');
+
+	assert(verifyMatEq(refY_, testY_, 1e-6));
+
+	std::cout << "MatPerm cloning OK" << std::endl;
+	delete X;
+	delete clone;
+}
+
+void testTranspose(MatPerm<FPP, Cpu>& permMat, MatSparse<FPP, Cpu>& spPermMat)
+{
+	auto size = permMat.getNbRow();
+	MatSparse<FPP, Cpu> trefsp(spPermMat);
+	MatPerm<FPP, Cpu> ttest(permMat);
+
+	auto X = MatDense<FPP, Cpu>::randMat(size, size);
+
+	trefsp.transpose();
+	ttest.transpose();
+
+	MatDense<FPP, Cpu> refY_(*X);
+	MatDense<FPP, Cpu> testY_(*X);
+
+	trefsp.multiply(refY_, 'N');
+	ttest.multiply(testY_, 'N');
+
+	auto errY_ = testY_;
+	errY_ -= refY_;
+	assert(errY_.norm() <= 1e-6);
+
+	// test transpose of transpose
+	trefsp.transpose();
+	ttest.transpose();
+
+	refY_ = *X;
+	testY_ = *X;
+
+	trefsp.multiply(refY_, 'N');
+	ttest.multiply(testY_, 'N');
+
+	errY_ = testY_;
+	errY_ -= refY_;
+	assert(errY_.norm() <= 1e-6);
+
+	// test mul of transpose by a vector
+	Vect<FPP, Cpu> refy(X->getNbRow(), X->getData());
+	Vect<FPP, Cpu> testy(X->getNbRow(), X->getData());
+
+	trefsp.transpose();
+	ttest.transpose();
+
+	trefsp.multiply(refy, 'N');
+	ttest.multiply(testy, 'N');
+
+	auto erry = refy;
+	erry -= testy;
+	assert(erry.norm() <= 1e-6);
+
+	// test mul of transpose of transpose by a vector
+	Vect<FPP, Cpu> refy2(X->getNbRow(), X->getData());
+	Vect<FPP, Cpu> testy2(X->getNbRow(), X->getData());
+
+	trefsp.transpose();
+	ttest.transpose();
+
+	trefsp.multiply(refy2, 'N');
+	ttest.multiply(testy2, 'N');
+
+	erry = refy2;
+	erry -= testy2;
+	assert(erry.norm() <= 1e-6);
+
+	delete X;
+
+
+	std::cout << "MatPerm transpose OK" << std::endl;
+}
+
+void testNNZSize(MatPerm<FPP, Cpu>& permMat, MatSparse<FPP, Cpu>& spPermMat)
+{
+
+	assert(permMat.getNonZeros() == spPermMat.getNonZeros());
+//	cout << "nbytes sp, butter:" << spPermMat.getNBytes() << " " << permMat.getNBytes()  << endl;
+	assert(permMat.getNBytes() == (permMat.getNbRow() * (sizeof(FPP) + sizeof(int))));
+	MatPerm<FPP, Cpu> tpermMat(permMat);
+	tpermMat.transpose();
+//	cout << "nbytes sp, tbutter:" << spPermMat.getNBytes() << " " << tpermMat.getNBytes()  << endl;
+	assert(tpermMat.getNBytes() == (tpermMat.getNbRow() * (2 * sizeof(FPP) + sizeof(int))));
+	std::cout << "MatPerm getNonZeros() and getNBytes() OK" << std::endl;
+}
+
+void testType(MatPerm<FPP, Cpu>& permMat)
+{
+	assert(permMat.getType() == Perm);
+	std::cout << "MatPerm getType() OK" << std::endl;
+}
+
+void testScalMul(const MatPerm<FPP, Cpu>& permMat,  const MatSparse<FPP, Cpu>& spPermMat)
+{
+
+	auto size = spPermMat.getNbRow();
+	auto X = MatDense<FPP, Cpu>::randMat(size, size);
+	auto alpha = FPP(2.0);
+
+	MatPerm<FPP, Cpu> mPermMat(permMat);
+	MatSparse<FPP, Cpu> mspPermMat(spPermMat);
+
+	mPermMat *= alpha;
+	mspPermMat *= alpha;
+
+	Vect<FPP, Cpu> refy(X->getNbRow(), X->getData());
+	Vect<FPP, Cpu> testy(X->getNbRow(), X->getData());
+
+	mPermMat.multiply(refy, 'N');
+	mspPermMat.multiply(testy, 'N');
+
+	assert(verifyVecEq(refy, testy, 1e-6));
+
+	delete X;
+
+	std::cout << "MatPerm scal. mul OK" << std::endl;
+}
+
+void testNorm2(const MatPerm<FPP, Cpu>& permMat,  const MatSparse<FPP, Cpu>& spPermMat)
+{
+//	cout << permMat.norm()  << endl;
+//	cout << spPermMat.norm()  << endl;
+	assert(std::abs(permMat.norm() - spPermMat.norm()) < 1e-6);
+	std::cout << "MatPerm fro-norm OK" << std::endl;
+}
+
+void testNorm1(const MatPerm<FPP, Cpu>& permMat,  const MatSparse<FPP, Cpu>& spPermMat)
+{
+//	cout << permMat.normL1()  << endl;
+//	cout << spPermMat.normL1()  << endl;
+	assert(std::abs(permMat.normL1() - spPermMat.normL1()) < 1e-6);
+	std::cout << "MatPerm norm-1 OK" << std::endl;
+}
+void testToMatSparse(const MatPerm<FPP, Cpu>& permMat,  const MatSparse<FPP, Cpu>& spPermMat)
+{
+	auto convSpPermMat = permMat.toMatSparse();
+
+//	convSpPermMat.Display();
+	assert(verifyMatEq(MatDense<FPP, Cpu>(convSpPermMat), MatDense<FPP, Cpu>(spPermMat), 1e-6));
+
+	std::cout << "MatPerm::toMatSparse OK" << std::endl;
+}
+
+void testGetCoeff(const MatPerm<FPP, Cpu>& permMat,  const MatSparse<FPP, Cpu>& spPermMat)
+{
+	for(int i=0;i < spPermMat.getNbRow(); i++)
+		for(int j=0;j < spPermMat.getNbCol(); j++)
+		{
+//			cout << permMat(i, j) << " " << spPermMat(i, j) << endl;
+			assert(std::abs(permMat(i, j) - spPermMat(i, j)) < 1e-6);
+		}
+
+	std::cout << "MatPerm::operator() OK" << std::endl;
+}
+
+
+void testNZinds(const MatPerm<FPP, Cpu>& permMat,  const MatSparse<FPP, Cpu>& spPermMat)
+{
+	auto ref_indices = spPermMat.nonzeros_indices(1e-16);
+	auto test_indices = permMat.nonzeros_indices(1e-16);
+//	std::cout << "sizes: " << ref_indices.size() << " " <<  test_indices.size() << std::endl;
+	assert(ref_indices.size() == test_indices.size());
+	for(auto rit=ref_indices.begin(); rit != ref_indices.end(); rit++)
+	{
+		auto ref_ind = *rit;
+		bool ind_found = false;
+		for(auto tit = test_indices.begin(); tit != test_indices.end(); tit++)
+		{
+			auto test_ind = *tit;
+			if(ref_ind.first == test_ind.first && ref_ind.second == test_ind.second)
+			{
+				ind_found = true;
+			}
+		}
+		assert(ind_found);
+	}
+	std::cout << "MatPerm::nonzeros_indices() OK" << std::endl;
+}
+
+void testHasNaN(const MatPerm<FPP, Cpu>& permMat,  const MatSparse<FPP, Cpu>& spPermMat)
+{
+	assert(permMat.containsNaN() == spPermMat.containsNaN());
+	std::cout << "MatPerm::containsNaN OK" << std::endl;
+}
+
+void testGemm(const MatPerm<FPP, Cpu>& permMat,  const MatSparse<FPP, Cpu>& spPermMat)
+{
+	auto size = permMat.getNbRow();
+	auto B = MatDense<FPP, Cpu>::randMat(size, size);
+	auto C = MatDense<FPP, Cpu>::randMat(size, size);
+
+	MatDense<FPP, Cpu> Cr(*C); // ref
+	MatDense<FPP, Cpu> Ct(*C); // test
+
+	const char *Aops = "NTH";
+	const char *Bops = "NTH";
+
+	FPP* scal = new FPP[3];
+	scal[0] = FPP(0);
+	scal[1] = FPP(1);
+	scal[2] = FPP(2);
+
+	for(int i = 0; i < std::strlen(Aops); i++)
+	{
+		auto Aop = Aops[i];
+		for(int j = 0; j < std::strlen(Bops); j++)
+		{
+			auto Bop = Bops[j];
+			for(int k = 0; k < 3; k++)
+			{
+
+				FPP alpha = scal[k];
+				for(int l = 0; l < 3; l++)
+				{
+					FPP beta = scal[k];
+//					cout << "Aop: " << Aop << " Bop: " << Bop << endl;
+//					cout << "alpha: " << alpha << " beta: " << beta << endl;
+					spPermMat.faust_gemm(*B, Cr, alpha, beta, Aop, Bop);
+					permMat.faust_gemm(*B, Ct, alpha, beta, Aop, Bop);
+					assert(verifyMatEq(Cr, Ct, 1e-6));
+				}
+			}
+		}
+	}
+	std::cout << "MatPerm::testGemm OK" << std::endl;
+}
+
+int main(int argc, char** argv)
+{
+	int log2size = 4;
+	if(argc > 1)
+		log2size = std::atoi(argv[1]);
+	std::cout << "log2size: " << log2size << std::endl;
+
+	int size = 1 << log2size;
+	auto F = TransformHelper<FPP, Cpu>::fourierFaust(log2size, false);
+	//TODO: use a random permutation matrix
+	auto dsPermMat = F->get_fact(F->size()-1);
+	MatSparse<FPP, Cpu> spPermMat(dsPermMat);
+	MatPerm<FPP, Cpu> permMat(spPermMat);
+
+	Vect<FPP, Cpu> x(size);
+	x.setRand();
+	const Vect<FPP, Cpu> x_(x);
+//	x.setOnes();
+
+	Vect<FPP, Cpu> ref_v = spPermMat.multiply(x_);
+	Vect<FPP, Cpu> test_v = permMat.multiply(x_);
+
+	ref_v.Display();
+	test_v.Display();
+	auto err = test_v;
+	err -= ref_v;
+	assert(err.norm() <= 1e-6);
+	std::cout << "perm-vector product OK" << std::endl;
+
+
+	// test multiplying a MatDense
+	auto X = MatDense<FPP, Cpu>::randMat(size, size);
+	MatDense<FPP, Cpu> refY(*X);
+	MatDense<FPP, Cpu> testY(*X);
+
+	spPermMat.multiply(refY, 'N');
+	permMat.multiply(testY, 'N');
+
+	auto errY = testY;
+	errY -= refY;
+	assert(errY.norm() <= 1e-6);
+
+	std::cout << "Faust-dense matrix product OK" << std::endl;
+
+	// test multiplying a MatSparse
+	auto spX = MatSparse<FPP, Cpu>::randMat(size, size, .2);
+	MatSparse<FPP, Cpu> refYsp(*spX);
+	MatSparse<FPP, Cpu> testYsp(*spX);
+	//	 X->setOnes();
+
+	spPermMat.multiply(refYsp, 'N');
+	permMat.multiply(testYsp, 'N');
+
+	MatDense<FPP, Cpu> errYsp = testYsp;
+	errYsp -= refYsp;
+	assert(errYsp.norm() <= 1e-6);
+
+	std::cout << "Faust-sparse matrix product OK" << std::endl;
+
+	testClone(permMat);
+
+	testTranspose(permMat, spPermMat);
+	testNNZSize(permMat, spPermMat);
+	testType(permMat);
+
+	testScalMul(permMat, spPermMat);
+	testNorm2(permMat, spPermMat);
+	testToMatSparse(permMat, spPermMat);
+	testGetCoeff(permMat, spPermMat);
+	testHasNaN(permMat, spPermMat);
+	testNZinds(permMat, spPermMat);
+	testNorm1(permMat, spPermMat);
+	testGemm(permMat, spPermMat);
+	return EXIT_SUCCESS;
+}
