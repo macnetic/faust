@@ -1325,7 +1325,7 @@ list<pair<int,int>> Faust::MatSparse<FPP,Cpu>::nonzeros_indices(const double& to
 	int i, j, k;
 	unsigned int rowi_nelts = 0;
 	const_cast<Faust::MatSparse<FPP, Cpu>*>(this)->makeCompression(); // can't assume it's already done
-	update_dim();
+	const_cast<Faust::MatSparse<FPP, Cpu>*>(this)->update_dim();
 	for(i=0;i<this->dim1;i++)
 	{
 		rowi_nelts = getOuterIndexPtr()[i+1] - getOuterIndexPtr()[i];
