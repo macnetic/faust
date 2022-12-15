@@ -141,6 +141,7 @@ void Faust::MatSparse<FPP,Cpu>::operator=(const Faust::MatSparse<FPP1,Cpu>& M)
 	}
 	mat.setFromTriplets(tripletList.begin(), tripletList.end());
 	makeCompression();
+	update_dim();
 	this->is_ortho = M.is_ortho;
 	this->is_identity = M.is_identity;
 }
@@ -1321,9 +1322,10 @@ template<typename FPP>
 list<pair<int,int>> Faust::MatSparse<FPP,Cpu>::nonzeros_indices(const double& tol/* = 0*/) const
 {
 	list<pair<int,int>> nz_inds;
-	int i,j, k;
+	int i, j, k;
 	unsigned int rowi_nelts = 0;
-	//makeCompression(); // assuming it's already done
+	const_cast<Faust::MatSparse<FPP, Cpu>*>(this)->makeCompression(); // can't assume it's already done
+	update_dim();
 	for(i=0;i<this->dim1;i++)
 	{
 		rowi_nelts = getOuterIndexPtr()[i+1] - getOuterIndexPtr()[i];
@@ -1333,7 +1335,7 @@ list<pair<int,int>> Faust::MatSparse<FPP,Cpu>::nonzeros_indices(const double& to
 			for(k=getOuterIndexPtr()[i];k<getOuterIndexPtr()[i+1];k++)
 			{
 				j = getInnerIndexPtr()[k];
-				if(std::abs((*this)(i, j)) > tol)
+				if(j < this->dim2 /* shouldn't happen */ && std::abs((*this)(i, j)) > tol)
 					nz_inds.push_back(make_pair(i,j));
 			}
 		}
