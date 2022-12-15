@@ -1,6 +1,9 @@
 #include "faust_conj.h"
 namespace Faust
 {
+
+	//TODO: default ctor
+
 	template<typename FPP>
 	MatButterfly<FPP, Cpu>::MatButterfly(const MatSparse<FPP, Cpu> &factor, int level)
 	{
@@ -123,7 +126,7 @@ namespace Faust
 	Vect<FPP, Cpu> MatButterfly<FPP, Cpu>::multiply(const Vect<FPP,Cpu> & x) const
 	{
 		Vect<FPP, Cpu> z(x.size());
-		const_cast<MatButterfly<FPP, Cpu>*>(this)->multiply(x.getData(), z.getData(), x.size(), false); //TODO: conjugate
+		const_cast<MatButterfly<FPP, Cpu>*>(this)->multiply(x.getData(), z.getData(), x.size(), false);
 		return z;
 	}
 
@@ -132,7 +135,7 @@ namespace Faust
 	void MatButterfly<FPP, Cpu>::multiply(Vect<FPP,Cpu> & x, char opThis) const
 	{
 		Vect<FPP, Cpu> z(x.size());
-		const_cast<MatButterfly<FPP, Cpu>*>(this)->multiply(x.getData(), z.getData(), x.size(), opThis != 'N'); //TODO: conjugate
+		const_cast<MatButterfly<FPP, Cpu>*>(this)->multiply(x.getData(), z.getData(), x.size(), opThis != 'N');
 		x = z;
 	}
 
@@ -319,6 +322,7 @@ namespace Faust
 		VecMap d2_vec(const_cast<FPP*>(D2.diagonal().data()), size); // const_cast is harmless
 		d1_vec = d1_vec.conjugate();
 		d2_vec = d2_vec.conjugate();
+		//TODO: D2T
 	}
 
 	template<typename FPP>
@@ -413,6 +417,7 @@ namespace Faust
 	template<typename FPP>
 	std::list<std::pair<int,int>> MatButterfly<FPP, Cpu>::nonzeros_indices(const double& tol/*=0*/) const
 	{
+		//TODO: transpose case
 		auto s = this->getNbRow();
 		auto k = s >> (level + 1); // D2 diagonal offset
 		std::list<std::pair<int,int>> indices;
@@ -448,6 +453,8 @@ namespace Faust
 	const FPP& MatButterfly<FPP, Cpu>::operator()(faust_unsigned_int i, faust_unsigned_int j) const
 	{
 		auto s = this->getNbRow();
+		if(i > s || j > s)
+			throw std::runtime_error("MatButterfly::operator(int i, int j) error: out of bounds coordinates");
 		auto k = s >> (level + 1); // D2 diagonal offset
 		const FPP *d1_ptr, *d2_ptr;
 		d1_ptr = D1.diagonal().data();
