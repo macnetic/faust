@@ -50,6 +50,7 @@ namespace Faust
 			public:
 			MatPerm<FPP,Cpu>(const MatSparse<FPP, Cpu> &factor);
 
+			MatPerm(); // default ctor
 			MatPerm(const MatPerm& src); // copy ctor
 			MatPerm<FPP, Cpu>& operator=(const MatPerm& src); // assignment operator
 

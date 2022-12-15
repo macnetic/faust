@@ -2,10 +2,19 @@
 namespace Faust
 {
 
-	//TODO: default ctor
+	//TODO: dtor?
+	//
+	template<typename FPP>
+	MatPerm<FPP, Cpu>::MatPerm()
+	{
+#ifdef USE_PYTHONIC
+		perm_ids_ptr = nullptr;
+#endif
+		is_transp = false;
+	}
 
 	template<typename FPP>
-	MatPerm<FPP, Cpu>::MatPerm(const MatSparse<FPP, Cpu> &sp_mat)
+	MatPerm<FPP, Cpu>::MatPerm(const MatSparse<FPP, Cpu> &sp_mat) : MatPerm()
 	{
 		//TODO: test sp_mat is a permutation matrix (at least nrows == ncols)
 		auto size = sp_mat.getNbRow();
@@ -18,11 +27,10 @@ namespace Faust
 
 		perm_ids.resize(size);
 		copy(sp_mat.getColInd(), sp_mat.getColInd()+size, perm_ids.begin());
-		this->is_transp = false;
 	}
 
 	template<typename FPP>
-	MatPerm<FPP, Cpu>::MatPerm(const MatPerm& src)
+	MatPerm<FPP, Cpu>::MatPerm(const MatPerm& src) : MatPerm()
 	{
 		*this = src;
 	}
