@@ -3,6 +3,7 @@ namespace Faust
 {
 
 	//TODO: default ctor
+	//TODO: dtor?
 
 	template<typename FPP>
 	MatButterfly<FPP, Cpu>::MatButterfly(const MatSparse<FPP, Cpu> &factor, int level)

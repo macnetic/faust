@@ -4,6 +4,7 @@
 #include "faust_TransformHelper.h"
 
 #include "faust_MatButterfly.h"
+#include "faust_MatPerm.h"
 
 #include <memory> // shared_ptr
 
@@ -12,19 +13,13 @@ namespace Faust
 	template<typename FPP, FDevice DEV>
 		class TransformHelperButterfly;
 
-//	template<typename FPP, FDevice DEV>
-//	class ButterflyMat;
-
 	template<typename FPP>
 		class TransformHelperButterfly<FPP, Cpu> : public TransformHelper<FPP, Cpu>
 		{
 			using VecMap = Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>>;
 			using DiagMat = Eigen::DiagonalMatrix<FPP, Eigen::Dynamic>;
 			bool has_permutation;
-			FPP *perm_d_ptr;
-			DiagMat D;
-			std::vector<unsigned int> bitrev_perm;
-//			std::vector<std::shared_ptr<ButterflyMat<FPP, Cpu>>> opt_factors;
+			MatPerm<FPP, Cpu> perm;
 			std::vector<std::shared_ptr<Faust::MatButterfly<FPP, Cpu>>> opt_factors;
 
 

@@ -15,25 +15,13 @@ namespace Faust
 		for(auto csr_fac_it = this->begin(); csr_fac_it != end_it; csr_fac_it++)
 		{
 			auto csr_fac = *csr_fac_it;
-//			opt_factors.insert(opt_factors.begin(), std::make_shared<ButterflyMat<FPP, Cpu>>(*dynamic_cast<const MatSparse<FPP, Cpu>*>(csr_fac), i++));
 			opt_factors.insert(opt_factors.begin(), std::make_shared<MatButterfly<FPP, Cpu>>(*dynamic_cast<const MatSparse<FPP, Cpu>*>(csr_fac), i++));
 		}
 		if(has_permutation)
 		{
 			// set the permutation factor
 			auto csr_fac = *(this->end()-1);
-			D.resize(size);
-			perm_d_ptr = D.diagonal().data();
-			// only a setOnes should be enough because this is a permutation matrix (but it could be normalized)
-			memcpy(perm_d_ptr, dynamic_cast<const MatSparse<FPP, Cpu>*>(csr_fac)->getValuePtr(), size*sizeof(FPP));
-//			auto bitrev_perm_ids = new unsigned int[size];
-//			iota(bitrev_perm_ids, bitrev_perm_ids+size, 0);
-//			bit_rev_permu(facts.size()-1, bitrev_perm_ids);
-			bitrev_perm.resize(size);
-//			copy(bitrev_perm_ids, bitrev_perm_ids+size, bitrev_perm.begin());
-//			delete[] bitrev_perm_ids;
-			//TODO: rename bitrev_perm to something generic (this class is not limited to the FFT)
-			copy(dynamic_cast<const MatSparse<FPP, Cpu>*>(csr_fac)->getColInd(), dynamic_cast<const MatSparse<FPP, Cpu>*>(csr_fac)->getColInd()+size, bitrev_perm.begin());
+			perm = MatPerm<FPP, Cpu>(*dynamic_cast<const MatSparse<FPP, Cpu>*>(csr_fac));
 		}
 	}
 
@@ -60,16 +48,11 @@ namespace Faust
 			auto csr_fac = *(this->end()-1);
 			auto size = csr_fac->getNbRow();
 			MatSparse<FPP, Cpu> sp_fac = MatSparse<FPP, Cpu>(*dynamic_cast<const MatSparse<FPP, Cpu>*>(csr_fac));
+			perm = MatPerm<FPP, Cpu>(sp_fac);
 			if(transpose)
-				sp_fac.transpose();
+				perm.transpose();
 			if(conjugate)
-				sp_fac.conjugate();
-			D.resize(size);
-			perm_d_ptr = D.diagonal().data();
-			memcpy(perm_d_ptr, sp_fac.getValuePtr(), size*sizeof(FPP));
-			bitrev_perm.resize(size);
-			copy(sp_fac.getColInd(), sp_fac.getColInd()+size, bitrev_perm.begin());
-			this->has_permutation = true;
+				perm.conjugate();
 		}
 	}
 
@@ -138,33 +121,10 @@ template<typename FPP>
 			int i = 0;
 			if(has_permutation && ! this->is_transposed)
 			{
-				VecMap y_vec(y, size);
-				if(x == y)
-				{
-					// an intermediate vector is needed to index x
-					auto x_ = new FPP[size];
-#pragma omp parallel for
-					for(int i=0;i < size; i++)
-						x_[i] = x[bitrev_perm[i]];
-#pragma omp parallel for
-					for(int i=0;i < size; i++)
-						y[i] = perm_d_ptr[i] * x_[i];
-					delete[] x_;
-				}
-				else
-#define BUTTERFLY_MUL_VEC_OMP_LOOP
-#ifdef BUTTERFLY_MUL_VEC_OMP_LOOP
-					// faster
-#pragma omp parallel for
-					for(int i=0;i < this->getNbRow(); i++)
-						y[i] = perm_d_ptr[i] * x[bitrev_perm[i]];
-#else
-				y_vec = D * x_vec(bitrev_perm);
-#endif
+				perm.multiply(x, y, size, false, this->is_conjugate);
 			}
 			else
 			{
-//				ButterflyMat<FPP, Cpu>& fac = * opt_factors[0];
 				MatButterfly<FPP, Cpu>& fac = * opt_factors[0];
 				fac.multiply(x, z.getData(), this->getNbRow(), this->is_transposed);
 				i = 1;
@@ -172,7 +132,6 @@ template<typename FPP>
 
 			while(i < opt_factors.size())
 			{
-//				ButterflyMat<FPP, Cpu>& fac = * opt_factors[i];
 				MatButterfly<FPP, Cpu>& fac = * opt_factors[i];
 				if(i & 1)
 					fac.multiply(z.getData(), y, this->getNbRow(), this->is_transposed);
@@ -185,17 +144,12 @@ template<typename FPP>
 				if(i & 1)
 				{
 					// the vector is in z
-					//TODO: refactor eltwise mul
-                   #pragma omp parallel for
-					for(int i=0;i < this->getNbRow(); i++)
-						y[i] = perm_d_ptr[i] * z[bitrev_perm[i]];
+					perm.multiply(z.getData(), y, this->getNbRow(), true, this->is_conjugate);
 				}
 				else
 				{
 					// the vector is in y
-                   #pragma omp parallel for
-					for(int i=0;i < this->getNbRow(); i++)
-						z[i] = perm_d_ptr[i] * y[bitrev_perm[i]];
+					perm.multiply(y, z.getData(), this->getNbRow(), true, this->is_conjugate);
 					memcpy(y, z.getData(), size*sizeof(FPP));
 				}
 			}
@@ -220,29 +174,19 @@ template<typename FPP>
 				auto Z = new FPP[this->getNbRow()*X_ncols];
 				int i = 0;
 				MatMap Y_mat(Y, this->getNbRow(), X_ncols);
-				if(has_permutation)
+				if(has_permutation && ! this->is_transposed)
 				{
-#if defined(BUTTERFLY_MUL_MAT_OMP_LOOP) || ! EIGEN_VERSION_AT_LEAST(3, 4, 0)
-					// this is slower
-#pragma parallel omp for
-					for(int i=0;i < this->getNbRow(); i ++)
-						Y_mat.row(i) = X_mat.row(bitrev_perm[i]) * perm_d_ptr[i];
-#else
-					Y_mat = D * X_mat(bitrev_perm, Eigen::placeholders::all);
-#endif
+					perm.multiply(X, X_ncols, Y, this->getNbRow(), false, this->is_conjugate);
 				}
 				else
 				{
-//					ButterflyMat<FPP, Cpu>& fac = * opt_factors[0];
 					MatButterfly<FPP, Cpu>& fac = * opt_factors[0];
 					fac.multiply(X, X_mat.cols(), Z, this->getNbRow(), this->is_transposed);
 					i = 1;
 				}
 
 				while(i < opt_factors.size())
-					//			for(auto fac: opt_factors)
 				{
-//					const Faust::ButterflyMat<FPP, Cpu>& fac = * opt_factors[i];
 					MatButterfly<FPP, Cpu>& fac = const_cast<MatButterfly<FPP, Cpu>&>(* opt_factors[i]);
 
 					if(i & 1)
@@ -251,8 +195,20 @@ template<typename FPP>
 						fac.multiply(Y, Y_mat.cols(), Z, this->getNbRow(), this->is_transposed);
 					i++;
 				}
-				if(i & 1)
-					memcpy(Y, Z, sizeof(FPP)*this->getNbRow()*X_ncols);
+
+				if(has_permutation && this->is_transposed)
+				{
+					if(i & 1)
+						perm.multiply(Z, X_ncols, Y, this->getNbRow(), true, this->is_conjugate);
+					else
+					{
+						perm.multiply(Y, X_ncols, Z, this->getNbRow(), true, this->is_conjugate);
+						memcpy(Y, Z, sizeof(FPP)*this->getNbRow()*X_ncols);
+					}
+				}
+				else
+					if(i & 1)
+						memcpy(Y, Z, sizeof(FPP)*this->getNbRow()*X_ncols);
 				delete[] Z;
 			}
 
@@ -270,12 +226,11 @@ template<typename FPP>
 				MatDense<FPP, Cpu> Y(this->getNbRow(), X.getNbCol());
 				auto Z = new FPP[this->getNbRow()*X.getNbCol()];
 				int i = 0;
-				if(has_permutation)
+				if(has_permutation && ! this->is_transposed)
 				{
-#pragma omp parallel for
-					for(int i=0;i < this->getNbRow(); i ++)
-						Y.mat.row(i) = X.mat.row(bitrev_perm[i]) * perm_d_ptr[i];
-
+					//TODO: conjugate
+					Y = X;
+					perm.multiply(Y, 'N');
 				}
 				else
 				{
@@ -286,7 +241,6 @@ template<typename FPP>
 				//					for(auto fac: opt_factors)
 				while(i < opt_factors.size())
 				{
-//					ButterflyMat<FPP, Cpu>& fac = * opt_factors[i];
 					MatButterfly<FPP, Cpu>& fac = * opt_factors[i];
 					Y = fac.multiply(Y, this->is_transposed);
 					i++;
@@ -304,8 +258,17 @@ template<typename FPP>
 						fac.multiply(Y.getData(), Y.mat.cols(), Z, this->getNbRow(), this->is_transposed);
 					i++;
 				}
-
-				if(i & 1)
+				if(has_permutation && this->is_transposed)
+				{
+					if(i & 1)
+						perm.multiply(Z, X.getNbCol(), Y.getData(), this->getNbRow(), true, this->is_conjugate);
+					else
+					{
+						perm.multiply(Y.getData(), X.getNbCol(), Z, this->getNbRow(), true, this->is_conjugate);
+						memcpy(Y.getData(), Z, sizeof(FPP)*this->getNbRow()*X.getNbCol());
+					}
+				}
+				else if(i & 1)
 					memcpy(Y.getData(), Z, sizeof(FPP)*this->getNbRow()*X.getNbCol());
 				delete[] Z;
 #endif
