@@ -150,7 +150,7 @@ template<typename FPP, FDevice DEV>
 {
     Faust::TransformHelper<FPP, DEV>* th;
     if(diag_opt)
-        th = Faust::TransformHelperButterfly<FPP,DEV>::fourierFaust(n, norma);
+        th = Faust::TransformHelper<FPP,DEV>::fourierFaustOpt(n, norma);
     else
         th = Faust::TransformHelper<FPP,DEV>::fourierFaust(n, norma);
       if(!th) return NULL;
