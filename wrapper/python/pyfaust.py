@@ -3628,13 +3628,15 @@ def dst(n, normed=True, dev='cpu', dtype='float64'):
         F = F.astype(dtype)
     return F
 
-def circ(c, dev='cpu'):
+def circ(c, dev='cpu', diag_opt=False):
     """Returns a circulant Faust C defined by the vector c (which is the first
     column of C.toarray()).
 
     Args:
         c: the vector to define the circulant Faust.
         dev: the device on which the Faust is created, 'cpu' (default) or 'gpu'.
+        diag_opt: if True then the returned Faust is optimized using
+        pyfaust.opt_butterfly_faust (because the DFT is used to implement circ).
 
     Example:
         >>> from pyfaust import circ
@@ -3685,11 +3687,11 @@ def circ(c, dev='cpu'):
         C = toeplitz(c, np.hstack((c[0:1], c[-1:0:-1])), dev=dev)
         return C
     n = len(c)
-    F = dft(n, normed=False)
+    F = dft(n, normed=False, diag_opt=diag_opt)
     FH = F.H
     S = csr_matrix(diags(FH@(c/n)))
 #    S = csr_matrix(diags(np.sqrt(n)*FH@c)) # if it was normed==True
-    if diag_factor == 'csr':
+    if diag_factor == 'csr' or diag_opt:
         C = F @ Faust(S) @ FH
     elif diag_factor == 'multiplied':
         nf = F.numfactors()
