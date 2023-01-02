@@ -96,6 +96,13 @@ namespace Faust
 			MatSparse<FPP, Cpu> toMatSparse() const;
 
 			void faust_gemm(const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char typeA, char typeB)const; //from LinearOperator
+
+			/**
+			 * \brief Returns true if the MatSparse S is permutation (in which case it is eligible to a MatPerm conversion).
+			 *
+			 * If the matrix S is well-formed the cost is O(nnz^2) in the worst case.
+			 */
+			static bool isPerm(const MatSparse<FPP, Cpu> &S, bool verify_ones=true);
 		};
 
 }

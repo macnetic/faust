@@ -459,4 +459,44 @@ namespace Faust
 			return sp;
 		}
 
+
+	template<typename FPP>
+	bool MatPerm<FPP, Cpu>::isPerm(const MatSparse<FPP, Cpu> &S, bool verify_ones/*=true*/)
+	{
+		// verify the matrix is square
+		if(S.getNbRow() != S.getNbCol()) return false;
+		// verify the nnz
+		if(S.getNonZeros() != S.getNbRow()) return false;
+		// verify only one nz is set per row
+		auto rowptr = S.getRowPtr();
+		for(int i=0;i < S.getNbRow(); i++)
+		{
+			if(rowptr[i+1] - rowptr[i] > 1)
+				return false;
+		}
+		// verify all columns are covered
+		std::vector<int> cols(S.getNbCol());
+		std::iota(cols.begin(), cols.end(), 0);
+		auto colind = S.getColInd();
+		for(int i=0;i<S.getNonZeros();i++)
+		{
+			auto it = std::find(cols.begin(), cols.end(), colind[i]);
+			if(it == cols.end()) return false; // a column is zero
+			cols.erase(it);
+		}
+		if(cols.size() != 0)
+			// not all columns are covered by the nz
+			return false;
+		if(verify_ones)
+		{
+			auto valptr = S.getValuePtr();
+			for(int i=0;i<S.getNonZeros();i++)
+			{
+				if(valptr[i] != FPP(1.0))
+					return false;
+			}
+		}
+		return true;
+	}
+
 }
