@@ -6,13 +6,13 @@ namespace Faust
 	template<>
 		double conj<double>(const double& e)
 		{
-			return std::conj(e).real();
+			return std::real(std::conj(e));
 		}
 
 	template<>
 		float conj<float>(const float& e)
 		{
-			return std::conj(e).real();
+			return std::real(std::conj(e));
 		}
 
 	template<>
