@@ -301,17 +301,30 @@ namespace Faust {
 			else
 			{
 				this->eval_fancy_idx_Transform();
-				int x_size;
-				// assuming that x size is valid, infer it from this size
-				if(this->is_transposed)
-					x_size = this->transform->getNbRow();
+				// count MatButterfly and MatPerm factors
+				auto bfp_count = 0;
+				for(int i=0;i<size();i++)
+					bfp_count += dynamic_cast<MatButterfly<FPP, Cpu>*>(this->transform->data[i]) || dynamic_cast<MatPerm<FPP, Cpu>*>(this->transform->data[i])?1:0;
+				// tradeoff: if all factors or the majority are MatButterfly/MatPerm double-buffering is used
+				if(bfp_count > size() / 2)
+				{
+					// TODO: find a way to do it more cleanly than a if-else block
+					// it is faster to multiply this way than as it is made in else block below when all factors are MatButterfly/MatPerm
+					this->transform->multiply(x, y, this->transposed2char(this->is_transposed, this->is_conjugate));
+					// this alternative call is not used for CSR/Dense Faust-vector mul because even if it avoids all copies made below, it is slower because the method below keeps only one Eigen vector to compute the whole product contrary to this one that uses two vectors (output and operand vectors), which is slower
+				}
 				else
-					x_size = this->transform->getNbCol();
-				Vect<FPP, Cpu> vx(x_size, x);
-				auto y_vec = std::move(this->multiply(vx));
-				memcpy(y, y_vec.getData(), sizeof(FPP)*y_vec.size());
-				// this alternative call is commented out because even if it avoids all copies made above, it is slower because the method above keeps only one Eigen vector to compute the whole product contrary to the following function that uses two vectors (output and operand vectors), which is slower
-//				this->transform->multiply(x, y, this->transposed2char(this->is_transposed, this->is_conjugate));
+				{
+					int x_size;
+					// assuming that x size is valid, infer it from this size
+					if(this->is_transposed)
+						x_size = this->transform->getNbRow();
+					else
+						x_size = this->transform->getNbCol();
+					Vect<FPP, Cpu> vx(x_size, x);
+					auto y_vec = std::move(this->multiply(vx));
+					memcpy(y, y_vec.getData(), sizeof(FPP)*y_vec.size());
+				}
 			}
 		}
 
@@ -1464,6 +1477,31 @@ template<typename FPP>
 		try
 		{
 			fft_factors(n, factors);
+			FPP alpha = norma?FPP(1/sqrt((double)(1 << n))):FPP(1.0);
+			fourierFaust = new TransformHelper<FPP, Cpu>(factors, alpha, false, false, /* internal call */ true);
+		}
+		catch(std::bad_alloc e)
+		{
+			//nothing to do, out of memory, return nullptr
+		}
+		return fourierFaust;
+	}
+
+template<typename FPP>
+	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::fourierFaustOpt(unsigned int n, const bool norma/*=true*/)
+	{
+
+		vector<MatGeneric<FPP,Cpu>*> factors(n+1);
+		TransformHelper<FPP,Cpu>* fourierFaust = nullptr;
+		try
+		{
+			fft_factors(n, factors);
+			for(int i = 0; i < n; i++)
+			{
+				factors[i] = new MatButterfly<FPP, Cpu>(*dynamic_cast<MatSparse<FPP, Cpu>*>(factors[i]), i);
+			}
+			// permutation factor
+			factors[n] = new MatPerm<FPP, Cpu>(*dynamic_cast<MatSparse<FPP, Cpu>*>(factors[n]));
 			FPP alpha = norma?FPP(1/sqrt((double)(1 << n))):FPP(1.0);
 			fourierFaust = new TransformHelper<FPP, Cpu>(factors, alpha, false, false, /* internal call */ true);
 		}

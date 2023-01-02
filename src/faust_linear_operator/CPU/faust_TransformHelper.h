@@ -58,6 +58,8 @@
 #include "faust_torch.h"
 #endif
 #include "faust_TransformHelper_cat.h"
+#include "faust_MatButterfly.h"
+#include "faust_MatPerm.h"
 
 namespace Faust
 {
@@ -230,6 +232,8 @@ namespace Faust
 			static TransformHelper<FPP,Cpu>* randFaust(int faust_nrows, int faust_ncols, RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density=.1f, bool per_row=true);
 			static TransformHelper<FPP,Cpu>* hadamardFaust(unsigned int n, const bool norma=true);
 			static TransformHelper<FPP,Cpu>* fourierFaust(unsigned int n, const bool norma=true);
+			// \brief Optimized version of fourierFaust using MatButterfly and MatPerm matrices
+			static TransformHelper<FPP,Cpu>* fourierFaustOpt(unsigned int n, const bool norma=true);
 			static TransformHelper<FPP,Cpu>* eyeFaust(unsigned int n, unsigned int m);
 
 			virtual ~TransformHelper();
