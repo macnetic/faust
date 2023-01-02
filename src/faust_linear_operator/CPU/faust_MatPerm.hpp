@@ -26,7 +26,7 @@ namespace Faust
 		memcpy(perm_d_ptr, sp_mat.getValuePtr(), size*sizeof(FPP));
 
 		perm_ids.resize(size);
-		copy(sp_mat.getColInd(), sp_mat.getColInd()+size, perm_ids.begin());
+		std::copy(sp_mat.getColInd(), sp_mat.getColInd()+size, perm_ids.begin());
 	}
 
 	template<typename FPP>
@@ -43,7 +43,7 @@ namespace Faust
 		perm_ids = src.perm_ids;
 #ifdef USE_PYTHONIC
 		perm_ids_ptr = new long[src.getNbRow()];
-		copy(src.perm_ids_ptr, src.perm_ids_ptr + src.getNbRow(), perm_ids_ptr);
+		std::copy(src.perm_ids_ptr, src.perm_ids_ptr + src.getNbRow(), perm_ids_ptr);
 #endif
 		if(src.DT.size() > 0)
 		{
@@ -62,18 +62,18 @@ namespace Faust
 		std::cout << "MatPerm on CPU: ";
 		std::cout << "D: ";
 		std::cout << D.diagonal() << std::endl;
-		cout << "perm_ids: ";
+		std::cout << "perm_ids: ";
 		for(int i=0;i < perm_ids.size();i++)
-			cout << perm_ids[i] << " ";
-		cout << std::endl;
+			std::cout << perm_ids[i] << " ";
+		std::cout << std::endl;
 		if(DT.size() > 0)
 		{
 			std::cout << "DT: ";
 			std::cout << DT.diagonal() << std::endl;
-			cout << "perm_ids_T: ";
+			std::cout << "perm_ids_T: ";
 			for(int i=0;i < perm_ids.size();i++)
-				cout << perm_ids_T[i] << " ";
-			cout << std::endl;
+				std::cout << perm_ids_T[i] << " ";
+			std::cout << std::endl;
 		}
 	}
 
@@ -449,7 +449,7 @@ namespace Faust
 		MatSparse<FPP, Cpu> MatPerm<FPP, Cpu>::toMatSparse() const
 		{
 			auto s = this->getNbRow();
-			vector<Eigen::Triplet<FPP> > tripletList;
+			std::vector<Eigen::Triplet<FPP> > tripletList;
 			const FPP *d_ptr;
 			d_ptr = D.diagonal().data();
 			for(int i=0; i < s; i++)

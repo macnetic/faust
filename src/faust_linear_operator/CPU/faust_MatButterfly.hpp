@@ -39,12 +39,12 @@ namespace Faust
 		subdiag_ids.resize(size);
 		for(int i = 0;i < size; i += d_offset * 2)
 		{
-			copy(seq.begin()+i+d_offset, seq.begin()+i+2*d_offset, subdiag_ids.begin()+i);
-			copy(seq.begin()+i, seq.begin()+i+d_offset, subdiag_ids.begin()+i+d_offset);
+			std::copy(seq.begin()+i+d_offset, seq.begin()+i+2*d_offset, subdiag_ids.begin()+i);
+			std::copy(seq.begin()+i, seq.begin()+i+d_offset, subdiag_ids.begin()+i+d_offset);
 		}
 #ifdef USE_PYTHONIC
 		subdiag_ids_ptr = new long[size];
-		copy(subdiag_ids.begin(), subdiag_ids.end(),subdiag_ids_ptr);
+		std::copy(subdiag_ids.begin(), subdiag_ids.end(),subdiag_ids_ptr);
 #endif
 		this->level = level;
 		this->is_transp = false;
@@ -66,7 +66,7 @@ namespace Faust
 		subdiag_ids = src.subdiag_ids;
 #ifdef USE_PYTHONIC
 		subdiag_ids_ptr = new long[src.getNbRow()];
-		copy(src.subdiag_ids_ptr, src.subdiag_ids_ptr + src.getNbRow(), subdiag_ids_ptr);
+		std::copy(src.subdiag_ids_ptr, src.subdiag_ids_ptr + src.getNbRow(), subdiag_ids_ptr);
 #endif
 		level = src.level;
 		is_transp = src.is_transp;
@@ -87,10 +87,10 @@ namespace Faust
 			std::cout << "D2T: ";
 			std::cout << D2T.diagonal() << std::endl;
 		}
-		cout << "subdiag_ids: ";
+		std::cout << "subdiag_ids: ";
 		for(int i=0;i < subdiag_ids.size();i++)
-			cout << subdiag_ids[i] << " ";
-		cout << std::endl;
+			std::cout << subdiag_ids[i] << " ";
+		std::cout << std::endl;
 	}
 
 	template<typename FPP>
@@ -111,8 +111,8 @@ namespace Faust
 				for(int i = 0;i < size; i += d_offset * 2)
 				{
 					// swap two next blocks of size d_offset into d2t_ptr
-					copy(d2_ptr + i, d2_ptr + i + d_offset, d2t_ptr + i + d_offset);
-					copy(d2_ptr + i + d_offset, d2_ptr + i + 2 * d_offset, d2t_ptr + i);
+					std::copy(d2_ptr + i, d2_ptr + i + d_offset, d2t_ptr + i + d_offset);
+					std::copy(d2_ptr + i + d_offset, d2_ptr + i + 2 * d_offset, d2t_ptr + i);
 				}
 			}
 		}
@@ -479,7 +479,7 @@ namespace Faust
 		{
 			auto s = this->getNbRow();
 			auto k = s >> (level + 1); // D2 diagonal offset
-			vector<Eigen::Triplet<FPP> > tripletList;
+			std::vector<Eigen::Triplet<FPP> > tripletList;
 			const FPP *d1_ptr, *d2_ptr;
 			d1_ptr = D1.diagonal().data();
 			d2_ptr = D2.diagonal().data();
