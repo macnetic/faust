@@ -234,6 +234,7 @@ namespace Faust
 			static TransformHelper<FPP,Cpu>* fourierFaust(unsigned int n, const bool norma=true);
 			// \brief Optimized version of fourierFaust using MatButterfly and MatPerm matrices
 			static TransformHelper<FPP,Cpu>* fourierFaustOpt(unsigned int n, const bool norma=true);
+			static TransformHelper<FPP, Cpu>* optButterflyFaust(const TransformHelper<FPP, Cpu>* F);
 			static TransformHelper<FPP,Cpu>* eyeFaust(unsigned int n, unsigned int m);
 
 			virtual ~TransformHelper();

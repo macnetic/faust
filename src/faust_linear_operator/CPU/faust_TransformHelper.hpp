@@ -304,7 +304,7 @@ namespace Faust {
 				// count MatButterfly and MatPerm factors
 				auto bfp_count = 0;
 				for(int i=0;i<size();i++)
-					bfp_count += dynamic_cast<MatButterfly<FPP, Cpu>*>(this->transform->data[i]) || dynamic_cast<MatPerm<FPP, Cpu>*>(this->transform->data[i])?1:0;
+					bfp_count += (dynamic_cast<MatButterfly<FPP, Cpu>*>(this->transform->data[i]) || dynamic_cast<MatPerm<FPP, Cpu>*>(this->transform->data[i]))?1:0;
 				// tradeoff: if all factors or the majority are MatButterfly/MatPerm double-buffering is used
 				if(bfp_count > size() / 2)
 				{
@@ -1487,6 +1487,18 @@ template<typename FPP>
 		return fourierFaust;
 	}
 
+/** helper macro for fourierFaustOpt and optButterflyFaust:
+ *  \param factors must be a vector<MatGeneric<FPP,Cpu>*> of all factors to transform to MatButterfly/MatPerm,
+ *  has_perm a bool to say if the last factor is to be converted to a MatPerm */
+#define optButterfly_factors(factors, has_perm, src_factors) \
+int n__ = has_perm?factors.size() - 1:factors.size(); \
+for(int i = 0; i < n__; i++)\
+{\
+	factors[i] = new MatButterfly<FPP, Cpu>(*dynamic_cast<MatSparse<FPP, Cpu>*>(src_factors[i]), i);\
+}\
+if(has_perm) factors[n__] = new MatPerm<FPP, Cpu>(*dynamic_cast<MatSparse<FPP, Cpu>*>(src_factors[n__]));\
+
+
 template<typename FPP>
 	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::fourierFaustOpt(unsigned int n, const bool norma/*=true*/)
 	{
@@ -1496,12 +1508,7 @@ template<typename FPP>
 		try
 		{
 			fft_factors(n, factors);
-			for(int i = 0; i < n; i++)
-			{
-				factors[i] = new MatButterfly<FPP, Cpu>(*dynamic_cast<MatSparse<FPP, Cpu>*>(factors[i]), i);
-			}
-			// permutation factor
-			factors[n] = new MatPerm<FPP, Cpu>(*dynamic_cast<MatSparse<FPP, Cpu>*>(factors[n]));
+			optButterfly_factors(factors, /* has_perm */ true, factors);
 			FPP alpha = norma?FPP(1/sqrt((double)(1 << n))):FPP(1.0);
 			fourierFaust = new TransformHelper<FPP, Cpu>(factors, alpha, false, false, /* internal call */ true);
 		}
@@ -1511,6 +1518,42 @@ template<typename FPP>
 		}
 		return fourierFaust;
 	}
+
+
+	template<typename FPP>
+		TransformHelper<FPP, Cpu>* TransformHelper<FPP,Cpu>::optButterflyFaust(const TransformHelper<FPP, Cpu>* F)
+		{
+			//TODO: verify a few assertions to detect if F factors do not match a butterfly structure
+			// TODO: what if F's state is special (transpose, conjugate, sliced, indexed)?
+			bool has_perm = false;
+			const MatSparse<FPP, Cpu>* last_sp_mat = nullptr;
+			// test if last_perm is a valid permutation (if not it is assumed that it's a butterfly matrix)
+			if(last_sp_mat = dynamic_cast<MatSparse<FPP, Cpu>*>(F->transform->data[F->size()-1]))
+				has_perm = MatPerm<FPP, Cpu>::isPerm(*last_sp_mat, /*verify_ones*/ false);
+			std::vector<MatGeneric<FPP,Cpu>*> factors(F->size());
+			optButterfly_factors(factors, has_perm, F->transform->data);
+			auto oF = new TransformHelper<FPP, Cpu>(factors, FPP(1.0), false, false, /* internal call */ true);
+			if(F->is_transposed && F->is_conjugate)
+			{
+				auto oF_ = oF->adjoint();
+				delete oF;
+				oF = oF_;
+			}
+			else if(F->is_transposed)
+			{
+				auto oF_ = oF->transpose();
+				delete oF;
+				oF = oF_;
+			}
+
+			else if(F->is_conjugate)
+			{
+				auto oF_ = oF->conjugate();
+				delete oF;
+				oF = oF_;
+			}
+			return oF;
+		}
 
 template<typename FPP>
 	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::eyeFaust(unsigned int n, unsigned int m)
