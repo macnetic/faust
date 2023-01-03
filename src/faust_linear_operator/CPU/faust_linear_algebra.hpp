@@ -51,6 +51,8 @@
 #include "faust_constant.h"
 #include "faust_Vect.h"
 #include <Eigen/SparseCore>
+#include "faust_MatButterfly.h"
+#include "faust_MatPerm.h"
 
 #ifdef __COMPILE_TIMERS__
     #include "faust_Timer.h"
@@ -906,6 +908,15 @@ namespace Faust
 	template<typename FPP> void gemm_gen(const MatGeneric<FPP, Cpu>& A, const MatGeneric<FPP, Cpu>& B, MatDense<FPP, Cpu>& out, const FPP alpha/*=FPP(1.0)*/, const FPP beta/*=(0.0)*/, const char opA/*='N'*/, const char opB/*='N'*/)
 	{
 		//TODO: refactor this function with at least 3 new functions gemm_spA, gemm_dsA, gemm_bsrA
+		//TODO: properly process MatButterfly/Perm instead of converting
+		if(dynamic_cast<const MatButterfly<FPP, Cpu>*>(&A) != nullptr)
+			return gemm_gen(dynamic_cast<const MatButterfly<FPP, Cpu>*>(&A)->toMatSparse(), B, out, alpha, beta, opA, opB);
+		if(dynamic_cast<const MatButterfly<FPP, Cpu>*>(&B) != nullptr)
+			return gemm_gen(A, dynamic_cast<const MatButterfly<FPP, Cpu>*>(&B)->toMatSparse(), out, alpha, beta, opA, opB);
+		if(dynamic_cast<const MatPerm<FPP, Cpu>*>(&A) != nullptr)
+			return gemm_gen(dynamic_cast<const MatPerm<FPP, Cpu>*>(&A)->toMatSparse(), B, out, alpha, beta, opA, opB);
+		if(dynamic_cast<const MatPerm<FPP, Cpu>*>(&B) != nullptr)
+			return gemm_gen(A, dynamic_cast<const MatPerm<FPP, Cpu>*>(&B)->toMatSparse(), out, alpha, beta, opA, opB);
 		std::runtime_error type_err("faust_linear_algebra mul function doesn't handle other type of factors than MatDense, MatSparse or MatBSR.");
 		if(opA != 'N' && opA != 'T' && opA != 'H')
 			throw std::runtime_error("opA must be among 'N', 'T', 'H'");
