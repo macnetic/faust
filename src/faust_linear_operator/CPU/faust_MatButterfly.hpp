@@ -1,4 +1,5 @@
 #include "faust_conj.h"
+#include <numeric>
 namespace Faust
 {
 
@@ -35,7 +36,7 @@ namespace Faust
 			}
 		}
 		std::vector<int> seq(size);
-		iota(seq.begin(), seq.end(), 0);
+		std::iota(seq.begin(), seq.end(), 0);
 		subdiag_ids.resize(size);
 		for(int i = 0;i < size; i += d_offset * 2)
 		{
@@ -323,7 +324,11 @@ namespace Faust
 		VecMap d2_vec(const_cast<FPP*>(D2.diagonal().data()), size); // const_cast is harmless
 		d1_vec = d1_vec.conjugate();
 		d2_vec = d2_vec.conjugate();
-		//TODO: D2T
+		if(D2T.size() > 0)
+		{
+			VecMap d2t_vec(const_cast<FPP*>(D2T.diagonal().data()), size); // const_cast is harmless
+			d2t_vec = d2t_vec.conjugate();
+		}
 	}
 
 	template<typename FPP>
