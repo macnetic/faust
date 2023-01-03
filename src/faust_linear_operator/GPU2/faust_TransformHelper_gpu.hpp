@@ -1003,6 +1003,13 @@ namespace Faust
 			return cpu_out;
 		}
 
+
+	template<typename FPP>
+		TransformHelper<FPP, Cpu>* TransformHelper<FPP,Cpu>::optButterflyFaust(const TransformHelper<FPP, GPU2>* F)
+		{
+			return TransformHelperButterfly<FPP, GPU2>::optFaust(F);
+		}
+
 }
 
 #include "faust_TransformHelper_cat_gpu.hpp"
