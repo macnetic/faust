@@ -263,6 +263,33 @@ void testGemm(const MatButterfly<FPP, Cpu>& butterflyMat,  const MatSparse<FPP, 
 	std::cout << "MatButterfly::testGemm OK" << std::endl;
 }
 
+void testCloneTranspConj(MatButterfly<FPP, Cpu>& butterflyMat,  const MatSparse<FPP, Cpu>& spButterflyMat)
+{
+	// it is equivalent to test MatButterfly::adjoint
+	auto size = butterflyMat.getNbRow();
+
+	auto clone = butterflyMat.Clone();
+	clone->transpose();
+	clone->conjugate();
+
+	MatSparse<FPP, Cpu> spMat = spButterflyMat;
+	spMat.transpose();
+	spMat.conjugate();
+
+	auto X = MatDense<FPP, Cpu>::randMat(size, size);
+	MatDense<FPP, Cpu> refY_(*X);
+	MatDense<FPP, Cpu> testY_(*X);
+
+	spMat.multiply(refY_, 'N');
+	clone->multiply(testY_, 'N');
+
+	assert(verifyMatEq(refY_, testY_, 1e-6));
+
+	std::cout << "MatButterfly clone+transpose+conjugate OK" << std::endl;
+	delete X;
+	delete clone;
+}
+
 int main(int argc, char** argv)
 {
 	int log2size = 4;
@@ -335,5 +362,6 @@ int main(int argc, char** argv)
 	testNZinds(butterflyMat, spButterflyMat);
 	testNorm1(butterflyMat, spButterflyMat);
 	testGemm(butterflyMat, spButterflyMat);
+	testCloneTranspConj(butterflyMat, spButterflyMat);
 	return EXIT_SUCCESS;
 }
