@@ -1487,7 +1487,19 @@ template<typename FPP>
 		return fourierFaust;
 	}
 
-/** helper macro for fourierFaustOpt and optButterflyFaust:
+
+
+template<typename FPP>
+	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::fourierFaustOpt(unsigned int n, const bool norma/*=true*/)
+	{
+		auto F = TransformHelper<FPP,Cpu>::fourierFaust(n, norma);
+		auto Fo = TransformHelper<FPP,Cpu>::optButterflyFaust(F);
+		delete F;
+		return Fo;
+	}
+
+
+/** helper macro for optButterflyFaust:
  *  \param factors must be a vector<MatGeneric<FPP,Cpu>*> of all factors to transform to MatButterfly/MatPerm,
  *  has_perm a bool to say if the last factor is to be converted to a MatPerm */
 #define optButterfly_factors(factors, has_perm, src_factors) \
@@ -1497,28 +1509,6 @@ for(int i = 0; i < n__; i++)\
 	factors[i] = new MatButterfly<FPP, Cpu>(*dynamic_cast<MatSparse<FPP, Cpu>*>(src_factors[i]), i);\
 }\
 if(has_perm) factors[n__] = new MatPerm<FPP, Cpu>(*dynamic_cast<MatSparse<FPP, Cpu>*>(src_factors[n__]));\
-
-
-template<typename FPP>
-	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::fourierFaustOpt(unsigned int n, const bool norma/*=true*/)
-	{
-
-		vector<MatGeneric<FPP,Cpu>*> factors(n+1);
-		TransformHelper<FPP,Cpu>* fourierFaust = nullptr;
-		try
-		{
-			fft_factors(n, factors);
-			optButterfly_factors(factors, /* has_perm */ true, factors);
-			FPP alpha = norma?FPP(1/sqrt((double)(1 << n))):FPP(1.0);
-			fourierFaust = new TransformHelper<FPP, Cpu>(factors, alpha, false, false, /* internal call */ true);
-		}
-		catch(std::bad_alloc e)
-		{
-			//nothing to do, out of memory, return nullptr
-		}
-		return fourierFaust;
-	}
-
 
 	template<typename FPP>
 		TransformHelper<FPP, Cpu>* TransformHelper<FPP,Cpu>::optButterflyFaust(const TransformHelper<FPP, Cpu>* F)

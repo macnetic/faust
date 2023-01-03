@@ -1005,10 +1005,19 @@ namespace Faust
 
 
 	template<typename FPP>
-		TransformHelper<FPP, Cpu>* TransformHelper<FPP,Cpu>::optButterflyFaust(const TransformHelper<FPP, GPU2>* F)
+		TransformHelper<FPP, GPU2>* TransformHelper<FPP,GPU2>::optButterflyFaust(const TransformHelper<FPP, GPU2>* F)
 		{
 			return TransformHelperButterfly<FPP, GPU2>::optFaust(F);
 		}
+
+template<typename FPP>
+	TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::fourierFaustOpt(unsigned int n, const bool norma/*=true*/)
+	{
+		auto F = TransformHelper<FPP,GPU2>::fourierFaust(n, norma);
+		auto Fo = TransformHelper<FPP,GPU2>::optButterflyFaust(F);
+		delete F;
+		return Fo;
+	}
 
 }
 

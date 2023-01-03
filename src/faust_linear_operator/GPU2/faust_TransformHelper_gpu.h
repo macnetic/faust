@@ -133,6 +133,7 @@ namespace Faust
 				virtual ~TransformHelper() {};
 				static TransformHelper<FPP,GPU2>* hadamardFaust(unsigned int n, const bool norma=true);
 				static TransformHelper<FPP,GPU2>* fourierFaust(unsigned int n, const bool norma=true);
+				static TransformHelper<FPP,GPU2>* fourierFaustOpt(unsigned int n, const bool norma=true);
 				static TransformHelper<FPP,GPU2>* optButterflyFaust(const TransformHelper<FPP, GPU2>* F);
 				static TransformHelper<FPP,GPU2>* eyeFaust(unsigned int n, unsigned int m);
 				TransformHelper<FPP,GPU2>* pruneout(const int nnz_tres, const int npasses=-1, const bool only_forward=false);
