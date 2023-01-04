@@ -131,12 +131,18 @@ namespace Faust {
 		TransformHelper<FPP,Cpu>::TransformHelper(TransformHelper<FPP,Cpu>* th, Slice s[2]): TransformHelper<FPP,Cpu>()
 	{
 		this->init_sliced_transform(th, s);
+		//TODO: MatButterfly, MatBSR, MatPerm and MatDiag are not handled by sliceMultiply yet, so we can't use virtual slicing
+		if(!containsOnlySparseDense())
+			this->eval_sliced_Transform();
 	}
 
 	template<typename FPP>
 		TransformHelper<FPP,Cpu>::TransformHelper(TransformHelper<FPP,Cpu>* th, faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols): TransformHelper<FPP,Cpu>()
 	{
 		this->init_fancy_idx_transform(th, row_ids, num_rows, col_ids, num_cols);
+		//TODO: MatButterfly, MatBSR, MatPerm and MatDiag are not handled by sliceMultiply yet, so we can't use virtual indexing
+		if(!containsOnlySparseDense())
+			this->eval_fancy_idx_Transform();
 	}
 
 	template<typename FPP>
@@ -881,6 +887,19 @@ template<typename FPP>
 				this->replace(mat_sparse, i);
 			}
 		}
+	}
+
+
+template<typename FPP>
+	bool TransformHelper<FPP, Cpu>::containsOnlySparseDense()
+	{
+		for(auto gen_fac : this->transform->data)
+		{
+			auto type = gen_fac->getType();
+			if(type != Sparse && type != Dense)
+				return false;
+		}
+		return true;
 	}
 
 template<typename FPP>
@@ -1965,9 +1984,10 @@ template<typename FPP>
 FPP* Faust::TransformHelper<FPP,Cpu>::sliceMultiply(const Slice s[2], const FPP* X, FPP* out/*=nullptr*/, int X_ncols/*=1*/) const
 {
 #if (EIGEN_WORLD_VERSION >= 3 && EIGEN_MAJOR_VERSION >= 4)
-	// NOTE: Take care if you edit this method, it must avoid any method that calls eval_sliced_Transform or it would became useless or bugged
+	// NOTE: Take care if you edit this method, it must avoid any method that calls eval_sliced_Transform or it would become useless or bugged
 	//TODO: refactor this function (too long)
 	//TODO: refactor with MatDense/MatSparse/eigenSliceMul, similar to eigenIndexMul
+	// TODO: MatBSR/MatButterfly/MatPerm::eigenSliceMul (function to rename becaose eigen won't be used for them), add a MatGeneric::sliceMul pure virtual function (likewise for indexMultiply)
 	using Mat = Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>;
 	using MatMap = Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>>;
 	MatMap X_map(const_cast<FPP*>(X), this->getNbCol(), X_ncols); // the const_cast is harmless, no modif. is made
