@@ -3672,10 +3672,6 @@ def circ(c, dev='cpu', diag_opt=False):
     """
     if isinstance(c, list):
         c = np.array(c)
-    # hidden option
-#    if 'diag_factor' in kwargs.keys():
-#        diag_factor = kwargs['diag_factor']
-#    else:
     if not isinstance(c, np.ndarray) or c.ndim != 1:
         raise TypeError('c must be a vector of numpy array type')
     diag_factor = 'multiplied'
@@ -3687,25 +3683,31 @@ def circ(c, dev='cpu', diag_opt=False):
         C = toeplitz(c, np.hstack((c[0:1], c[-1:0:-1])), dev=dev)
         return C
     n = len(c)
-    F = dft(n, normed=False, diag_opt=diag_opt)
-    FH = F.H
-    S = csr_matrix(diags(FH@(c/n)))
-#    S = csr_matrix(diags(np.sqrt(n)*FH@c)) # if it was normed==True
-    if diag_factor == 'csr' or diag_opt:
-        C = F @ Faust(S) @ FH
-    elif diag_factor == 'multiplied':
-        nf = F.numfactors()
-        if nf > 3:
-            C = F.left(nf-2) @ Faust(F.factors(nf-1) @ S @ FH.factors(0) @
-                                     FH.factors(1)) @ FH.right(2)
-        elif nf > 2:
-            C = F.left(nf-2) @ Faust(F.factors(nf-1) @ S @ FH.factors(0) @
-                                     FH.factors(1)) @ Faust(FH.right(2))
-        else:
-            C = Faust(F.left(nf-2)) @ Faust(F.factors(nf-1) @ S @ FH.factors(0) @
-                                     FH.factors(1))
+    F = dft(n, normed=False, diag_opt=False)
+    nf = F.numfactors()
+    P = F.factors(nf-1) # bitrev perm
+    D = diags(F.H@(c/n))
+    S = csr_matrix(P @ D @ P.H)
+    FwP = F.left(nf - 2) # F without permutation
+    if not isFaust(FwP):
+        # F is two factors, so FwP is one factor (i.e. a csr_matrix, not a
+        # Faust)
+        FwP = Faust(FwP)
+    if diag_opt:
+        right = opt_butterfly_faust(FwP).H
+    else:
+        right = FwP.H
+    nfwp = FwP.numfactors()
+    left = FwP.left(nfwp-2) # ignoring last butterfly factor
+    # reintegrate last butterfly factor multiplied by S
+    left = left @ Faust(FwP.factors(nfwp-1) @ S)
+    if diag_opt:
+        left = opt_butterfly_faust(left)
+    C = left @ right
     if dev.startswith('gpu'):
-        return C.clone('gpu')
+        if diag_opt:
+            raise ValueError('diag_opt on GPU is not yet implemented')
+        C = C.clone('gpu')
     return C
 
 def anticirc(c, dev='cpu'):
