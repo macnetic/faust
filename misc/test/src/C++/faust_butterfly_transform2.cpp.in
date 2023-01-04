@@ -4,6 +4,7 @@
 typedef @TEST_FPP@ FPP;
 
 using namespace Faust;
+using namespace std;
 
 int main(int argc, char** argv)
 {
@@ -13,8 +14,9 @@ int main(int argc, char** argv)
 	std::cout << "log2size: " << log2size << std::endl;
 
 	int size = 1 << log2size;
-	auto oF = TransformHelperButterfly<FPP, Cpu>::fourierFaust(log2size, false);
 	auto F = TransformHelper<FPP, Cpu>::fourierFaust(log2size, false);
+	auto oF = TransformHelper<FPP, Cpu>::fourierFaustOpt(log2size, false); // equivalent to the next line
+//	auto oF = TransformHelper<FPP, Cpu>::optButterflyFaust(F);
 
 	Vect<FPP, Cpu> x(size);
 	x.setRand();
