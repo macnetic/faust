@@ -3670,6 +3670,7 @@ def circ(c, dev='cpu', diag_opt=False):
 
     See also <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.linalg.circulant.html">scipy.linalg.circulant</a>, pyfaust.anticirc, pyfaust.toeplitz.
     """
+    #TODO: handle cases len(c) == 1, 2
     if isinstance(c, list):
         c = np.array(c)
     if not isinstance(c, np.ndarray) or c.ndim != 1:
@@ -3684,7 +3685,7 @@ def circ(c, dev='cpu', diag_opt=False):
         return C
     n = len(c)
     F = dft(n, normed=False, diag_opt=False)
-    nf = F.numfactors()
+    nf = len(F)
     P = F.factors(nf-1) # bitrev perm
     D = diags(F.H@(c/n))
     S = csr_matrix(P @ D @ P.H)
@@ -3697,7 +3698,7 @@ def circ(c, dev='cpu', diag_opt=False):
         right = opt_butterfly_faust(FwP).H
     else:
         right = FwP.H
-    nfwp = FwP.numfactors()
+    nfwp = len(FwP)
     left = FwP.left(nfwp-2) # ignoring last butterfly factor
     # reintegrate last butterfly factor multiplied by S
     left = left @ Faust(FwP.factors(nfwp-1) @ S)
@@ -3706,16 +3707,17 @@ def circ(c, dev='cpu', diag_opt=False):
     C = left @ right
     if dev.startswith('gpu'):
         if diag_opt:
-            raise ValueError('diag_opt on GPU is not yet implemented')
+            raise ValueError('diag_opt on GPU Faust is not yet implemented')
         C = C.clone('gpu')
     return C
 
-def anticirc(c, dev='cpu'):
+def anticirc(c, dev='cpu', diag_opt=False):
     """Returns an anti-circulant Faust A defined by the vector c (which is the last column of A.toarray()).
 
     Args:
         c: the vector to define the anti-circulant Faust.
         dev: the device on which the Faust is created, 'cpu' (default) or 'gpu'.
+        diag_opt: cf. pyfaust.circ.
 
     Example:
         >>> from pyfaust import anticirc
@@ -3749,17 +3751,25 @@ def anticirc(c, dev='cpu'):
 
     See also pyfaust.circ, pyfaust.toeplitz.
     """
-    G = circ(c)
+    #TODO: handle cases len(c) == 1, 2
+    G = circ(c, diag_opt=diag_opt)
+    nG = len(G)
     I = np.arange(len(c)-1, -1, -1)
     J = np.arange(0, len(c))
     P = csr_matrix((np.ones(J.size), (I, J)))
-    A = G.left(len(G)-2)@Faust(G.factors(len(G)-1)@P)
+    if diag_opt:
+        A = G @ Faust(P)
+    else:
+        # nG > 2
+        A = G.left(nG-2) @ Faust(G.factors(nG-1) @ P)
     if dev.startswith('gpu'):
+        if diag_opt:
+            raise ValueError('diag_opt on GPU Faust is not yet implemented')
         return A.clone('gpu')
     return A
 
 
-def toeplitz(c, r=None, dev='cpu'):
+def toeplitz(c, r=None, dev='cpu', diag_opt=False):
     """Constructs a toeplitz Faust whose first column is c and first row r.
 
     Args:
@@ -3768,6 +3778,7 @@ def toeplitz(c, r=None, dev='cpu'):
         np.conjugate(c). r[0] is ignored, the first row is always [c[0],
         r[1:]].
         dev: the device on which the Faust is created, 'cpu' (default) or 'gpu'.
+        diag_opt: cf. pyfaust.circ.
 
     Returns:
         The toeplitz Faust.
@@ -3852,9 +3863,12 @@ def toeplitz(c, r=None, dev='cpu'):
     n = len(r)
     N = int(2**np.ceil(np.log2(max(m, n))))
     c_ = np.hstack((c, np.zeros(N-m+1+N-n), r[:0:-1]))
-    C = circ(c_)
+    #TODO: handle cases len(c) == 1, 2
+    C = circ(c_, diag_opt=diag_opt)
     T = C[:m, :n]
     if dev.startswith('gpu'):
+        if diag_opt:
+            raise ValueError('diag_opt on GPU Faust is not yet implemented')
         return T.clone('gpu')
     return T
 
