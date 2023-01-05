@@ -895,6 +895,9 @@ class TestFaustPy(unittest.TestCase):
         # random dim
         for v in [np.random.rand(1024), np.random.rand(self.r.randint(3, 45))]:
             self.assertTrue(np.allclose(circulant(v), circ(v).toarray()))
+            self.assertTrue(np.allclose(circulant(v) @ v, circ(v,
+                                                               diag_opt=True) @ v))
+            self.assertTrue(np.allclose(circulant(v), circ(v, diag_opt=True).toarray()))
 
     def test_anticirculant(self):
         from scipy.linalg import circulant
@@ -905,6 +908,10 @@ class TestFaustPy(unittest.TestCase):
             J = np.arange(0, len(v))
             P[I, J] = 1
             self.assertTrue(np.allclose(circulant(v), anticirc(v).toarray()@P))
+            self.assertTrue(np.allclose(circulant(v), anticirc(v, diag_opt=True).toarray()@P))
+            self.assertTrue(np.allclose(circulant(v) @ v, anticirc(v,
+                                                                   diag_opt=True)
+                                        @ P @ v))
 
     def test_toeplitz(self):
         from scipy.linalg import toeplitz
@@ -912,6 +919,9 @@ class TestFaustPy(unittest.TestCase):
         from numpy.random import rand
         for r, c in zip([rand(1024), rand(25)], [rand(2048), rand(42)]):
             self.assertTrue(np.allclose(toeplitz(c, r), ftoeplitz(c, r).toarray()))
+            self.assertTrue(np.allclose(toeplitz(c, r), ftoeplitz(c, r,
+                                                                  diag_opt=True).toarray()))
+            self.assertTrue(np.allclose(toeplitz(c, r) @ r, ftoeplitz(c, r, diag_opt=True) @ r))
 
     def test_bsr_get_fact(self):
         print("test_bsr_get_fact")
