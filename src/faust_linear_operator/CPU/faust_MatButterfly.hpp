@@ -482,6 +482,14 @@ namespace Faust
 	template<typename FPP>
 		MatSparse<FPP, Cpu> MatButterfly<FPP, Cpu>::toMatSparse() const
 		{
+#define MULID_TOMATSPARSE
+#ifdef MULID_TOMATSPARSE
+			MatSparse<FPP, Cpu> sp(this->getNbRow(), this->getNbCol());
+			sp.setEyes();
+			multiply(sp, 'N');
+			return sp;
+#else
+			// strange rare bugs occurred with this version (when making a toarray of a pyfaust.Faust containing MatButterfly)
 			auto s = this->getNbRow();
 			auto k = s >> (level + 1); // D2 diagonal offset
 			std::vector<Eigen::Triplet<FPP> > tripletList;
@@ -505,6 +513,7 @@ namespace Faust
 			auto sp = MatSparse<FPP, Cpu>(tripletList, s, s);
 			sp.conservativeResize(s, s);
 			return sp;
+#endif
 		}
 
 }
