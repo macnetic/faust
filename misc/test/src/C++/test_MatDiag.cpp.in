@@ -47,7 +47,7 @@ void test_mul_adjoint()
 
 	Vect<FPP, Cpu> ref_vec(10);
 	for(int i = 0; i < 10; i++)
-		ref_vec.getData()[i] = conj(v(i)) * v2(i);
+		ref_vec.getData()[i] = Faust::conj(v(i)) * v2(i);
 
 	test_vec -= ref_vec;
 	assert(test_vec.norm() < 1e-6);
