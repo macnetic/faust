@@ -17,7 +17,7 @@ void faust_fourier(const mxArray **prhs, const int nrhs, mxArray **plhs, const i
 	bool diag_prod = (bool) mxGetScalar(prhs[3]);
 	Faust::TransformHelper<std::complex<double>,DEV> * F = nullptr;
 	if(diag_prod)
-		F = Faust::TransformHelperButterfly<std::complex<double>,DEV>::fourierFaust(n, norma);
+		F = Faust::TransformHelper<std::complex<double>,DEV>::fourierFaustOpt(n, norma);
 	else
 		F = Faust::TransformHelper<std::complex<double>,DEV>::fourierFaust(n, norma);
 
