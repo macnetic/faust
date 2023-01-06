@@ -9,7 +9,7 @@ template <typename SCALAR, FDevice DEV>
 void faust_opt_butterfly(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs)
 {
 	auto F = convertMat2Ptr<Faust::TransformHelper<SCALAR, DEV>>(prhs[1]);
-	auto oF = Faust::TransformHelperButterfly<SCALAR, DEV>::optFaust(F);
+	auto oF = Faust::TransformHelper<SCALAR, DEV>::optButterflyFaust(F);
 	plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,DEV>>(oF);
 }
 
