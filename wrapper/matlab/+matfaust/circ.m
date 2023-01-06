@@ -3,6 +3,8 @@
 %>
 %> @param c: the vector to define the circulant Faust.
 %> @param 'dev', str: 'gpu' or 'cpu' to create the Faust on CPU or GPU ('cpu' is the default).
+%> @param 'diag_opt', logical: if true then the returned Faust is optimized using
+%> matfaust.opt_butterfly_faust (because the DFT is used to implement circ).
 %>
 %> @b Example:
 %>
@@ -58,6 +60,7 @@ function C = circ(c, varargin)
 	import matfaust.Faust
 	dev = 'cpu';
 	argc = length(varargin);
+	diag_opt = false;
 	if(argc > 0)
 		for i=1:2:argc
 			if(argc > i)
@@ -70,6 +73,13 @@ function C = circ(c, varargin)
 						error('dev keyword argument is not followed by a valid value: cpu, gpu*.')
 					else
 						dev = tmparg;
+					end
+				case 'diag_opt'
+
+					if(argc == i || ~ islogical(tmparg))
+						error('diag_opt keyword argument is not followed by a logical')
+					else
+						diag_opt = tmparg;
 					end
 				otherwise
 					if((isstr(varargin{i}) || ischar(varargin{i}))  && ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu'))
@@ -92,22 +102,38 @@ function C = circ(c, varargin)
         error('c must be a vector')
     end
     n = numel(c);
-    F = matfaust.dft(n, 'normed', false);
-    FH = F';
+    F = matfaust.dft(n, 'normed', false, 'diag_opt', false);
+	nf = numfactors(F);
+	P = factors(F, nf); % bitrev perm
     if (size(c, 1) < size(c, 2))
         c = c.';
     end
-    S = sparse(diag(FH*(c/n)));
+	D = diag(F'*(c/n));
+    S = sparse(P * D * P');
+	FwP = left(F, nf - 1); % F without permutation
 %    C = F * matfaust.Faust(S*factors(FH, 1)) * right(FH, 2);
-	nf = numfactors(F);
-	if(nf > 3)
-		C = left(F, nf-1) * Faust(factors(F, nf) * S * factors(FH, 1) * factors(FH, 2)) * right(FH, 3);
-	elseif(nf > 2)
-		C = left(F, nf-1) * Faust(factors(F, nf) * S * factors(FH, 1) * factors(FH, 2)) * Faust(right(FH, 3));
-	else
-		C = Faust(left(F, nf-1)) * Faust(factors(F, nf) * S * factors(FH, 1) * factors(FH, 2));
+	if ~ matfaust.isFaust(FwP)
+		FwP = matfaust.Faust(FwP);
 	end
+	if diag_opt
+		r = matfaust.opt_butterfly_faust(FwP)';
+	else
+		r = FwP';
+	end
+	nfwp = numfactors(FwP);
+	l = left(FwP, nfwp-1);
+	if ~ matfaust.isFaust(l)
+		l = matfaust.Faust(l);
+	end
+	l = l * matfaust.Faust(factors(FwP, nfwp) * S);
+	if diag_opt
+		l = matfaust.opt_butterfly_faust(l);
+	end
+	C = l * r;
 	if startsWith(dev, 'gpu')
+		if diag_opt
+			error('diag_opt on GPU Faust is not yet implemented')
+		end
 		C = clone(C, 'dev', 'gpu');
 	end
 end
