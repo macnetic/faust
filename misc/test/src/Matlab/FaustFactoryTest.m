@@ -540,11 +540,15 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			[3     2     1     4]
 			[4     3     2     1]];
 			this.assertEqual(C, real(full(matfaust.circ(c))))
+			this.assertEqual(C, real(full(matfaust.circ(c, 'diag_opt', true))))
+			this.assertEqual(matfaust.circ(c) * reshape(c, numel(c), 1), matfaust.circ(c, 'diag_opt', true) * reshape(c, numel(c), 1))
 			A = [[2     3     4     1]
 			     [3     4     1     2]
 			     [4     1     2     3]
 			     [1     2     3     4]];
 			this.assertEqual(A, real(full(matfaust.anticirc(c))))
+			this.assertEqual(A, real(full(matfaust.anticirc(c, 'diag_opt', true))))
+			this.assertEqual(matfaust.anticirc(c) * reshape(c, numel(c), 1), matfaust.anticirc(c, 'diag_opt', true) * reshape(c, numel(c), 1))
 			% not a power of two
 			c = [1 2 3 4 5];
 			C = [[1     5     4     3     2]
@@ -553,12 +557,16 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 				 [4     3     2     1     5];
 				 [5     4     3     2     1]];
 			this.assertEqual(C, real(full(matfaust.circ(c))), 'AbsTol', 1e-8)
+			this.assertEqual(C, real(full(matfaust.circ(c, 'diag_opt', true))), 'AbsTol', 1e-8)
+			this.assertEqual(matfaust.circ(c) * reshape(c, numel(c), 1), matfaust.circ(c, 'diag_opt', true) * reshape(c, numel(c), 1))
 			A = [[2     3     4     5    1]
 			     [3     4     5     1    2]
 			     [4     5     1     2    3]
 			     [5     1     2     3    4]
 			     [1     2     3     4    5]];
 			this.assertEqual(A, real(full(matfaust.anticirc(c))), 'AbsTol', 1e-8)
+			this.assertEqual(A, real(full(matfaust.anticirc(c, 'diag_opt', true))), 'AbsTol', 1e-8)
+			this.assertEqual(matfaust.anticirc(c) * reshape(c, numel(c), 1), matfaust.anticirc(c, 'diag_opt', true) * reshape(c, numel(c), 1))
 		end
 
 		function testToeplitz(this)
@@ -569,8 +577,13 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			[3., 2., 1.]
 			[4., 3., 2.]]
 			this.verifyEqual(T, real(full(matfaust.toeplitz(c, r))), 'AbsTol', 1e-6)
+			this.verifyEqual(T, real(full(matfaust.toeplitz(c, r, 'diag_opt', true))), 'AbsTol', 1e-6)
 			this.verifyEqual(toeplitz(c, r), real(full(matfaust.toeplitz(c, r))), 'AbsTol', 1e-6)
+			this.verifyEqual(toeplitz(c, r), real(full(matfaust.toeplitz(c, r, 'diag_opt', true))), 'AbsTol', 1e-6)
 			this.verifyEqual(toeplitz(c), real(full(matfaust.toeplitz(c))), 'AbsTol', 1e-6)
+			this.verifyEqual(toeplitz(c), real(full(matfaust.toeplitz(c, 'diag_opt', true))), 'AbsTol', 1e-6)
+			this.verifyEqual(toeplitz(c) * reshape(c, numel(c), 1) , matfaust.toeplitz(c, 'diag_opt', true) * reshape(c, numel(c), 1) , 'AbsTol', 1e-6)
+			this.verifyEqual(toeplitz(c) * reshape(c, numel(c), 1) , matfaust.toeplitz(c, 'diag_opt', false) * reshape(c, numel(c), 1) , 'AbsTol', 1e-6)
 		end
 
 		function test_sp(this)
