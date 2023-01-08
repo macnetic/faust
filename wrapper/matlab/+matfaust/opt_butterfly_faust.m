@@ -4,5 +4,5 @@
 %=================================
 function G = opt_butterfly_faust(F)
 	import matfaust.Faust;
-	G = Faust.opt_butterfly(F)
+	G = Faust.opt_butterfly(F);
 end
