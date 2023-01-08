@@ -9,6 +9,7 @@
 %> @param r: (2nd argument) the first row of the toeplitz Faust. Defaulty r = conj(c).
 %> r(1) is ignored, the first row is always [c(1), r(2:)].
 %> @param 'dev', str: 'gpu' or 'cpu' to create the Faust on CPU or GPU ('cpu' is the default).
+%> @param 'diag_opt', logical: cf. matfaust.circ.
 %>
 %>
 %> @retval T the toeplitz Faust.
@@ -102,32 +103,48 @@
 %=========================================
 function T = toeplitz(c, varargin)
 	dev = 'cpu';
-    if (length(varargin) > 0)
-        r = varargin{1};
-        if(~ ismatrix(r) || size(r, 1) ~= 1 && size(r, 2) ~= 1)
-            error('The second argument must be a vector')
+    diag_opt = false;
+    argc = length(varargin);
+    if (argc > 0)
+        i = 1;
+        if ismatrix(varargin{1}) && isnumeric(varargin{1})
+            r = varargin{1};
+            if(size(r, 1) ~= 1 && size(r, 2) ~= 1)
+                error('The second argument must be a vector')
+            end
+            i = 2;
+        else
+            r = conj(c); % default r
         end
-		argc = length(varargin);
 		if(argc > 1)
-			for i=2:2:argc
-				if(argc > i)
-					% next arg (value corresponding to the key varargin{i})
-					tmparg = varargin{i+1};
-				end
-				switch(varargin{i})
-					case 'dev'
-						if(argc == i || ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu'))
-							error('dev keyword argument is not followed by a valid value: cpu, gpu*.')
-						else
-							dev = tmparg;
-						end
-					otherwise
-						if((isstr(varargin{i}) || ischar(varargin{i}))  && ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu'))
-							error([ tmparg ' unrecognized argument'])
-						end
-				end
-			end
-		end
+            while i <= argc
+                %for i=2:2:argc
+                if(argc > i)
+                    % next arg (value corresponding to the key varargin{i})
+                    tmparg = varargin{i+1};
+                end
+                switch(varargin{i})
+                    case 'dev'
+                        if(argc == i || ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu'))
+                            error('dev keyword argument is not followed by a valid value: cpu, gpu*.')
+                        else
+                            dev = tmparg;
+                        end
+                    case 'diag_opt'
+
+                        if(argc == i || ~ islogical(tmparg))
+                            error('diag_opt keyword argument is not followed by a logical')
+                        else
+                            diag_opt = tmparg;
+                        end
+                    otherwise
+                        if((isstr(varargin{i}) || ischar(varargin{i}))  && ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu'))
+                            error([ tmparg ' unrecognized argument'])
+                        end
+                end
+                i = i + 2;
+            end
+        end
     else
         r = conj(c); % default r
     end
@@ -148,9 +165,12 @@ function T = toeplitz(c, varargin)
     n = numel(r);
     N = 2 ^ ceil(log2(max(m, n)));
     c_ = [c, zeros(1, N-m+1+N-n), r(end:-1:2)];
-    C = matfaust.circ(c_);
+    C = matfaust.circ(c_, 'diag_opt', diag_opt);
     T = C(1:m, 1:n);
 	if startsWith(dev, 'gpu')
+		if diag_opt
+			error('diag_opt on GPU Faust is not yet implemented')
+		end
 		T = clone(T, 'dev', 'gpu');
 	end
 end
