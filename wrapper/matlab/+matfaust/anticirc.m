@@ -3,6 +3,7 @@
 %>
 %> @param c: the vector to define the anticirculant Faust.
 %> @param 'dev', str: 'gpu' or 'cpu' to create the Faust on CPU or GPU ('cpu' is the default).
+%> @param 'diag_opt', logical: cf. matfaust.circ.
 %>
 %> @b Example
 %>
@@ -57,6 +58,7 @@
 function A = anticirc(c, varargin)
 	dev = 'cpu';
 	argc = length(varargin);
+    diag_opt = false;
 	if(argc > 0)
 		for i=1:2:argc
 			if(argc > i)
@@ -70,6 +72,13 @@ function A = anticirc(c, varargin)
 					else
 						dev = tmparg;
 					end
+				case 'diag_opt'
+
+					if(argc == i || ~ islogical(tmparg))
+						error('diag_opt keyword argument is not followed by a logical')
+					else
+						diag_opt = tmparg;
+					end
 				otherwise
 					if((isstr(varargin{i}) || ischar(varargin{i}))  && ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu'))
 						error([ tmparg ' unrecognized argument'])
@@ -77,14 +86,21 @@ function A = anticirc(c, varargin)
 			end
 		end
 	end
-	C = matfaust.circ(c);
+	C = matfaust.circ(c, 'diag_opt', diag_opt);
 	n = numel(c);
 	I = n:-1:1;
 	J = 1:n;
 	P = sparse(I, J, 1);
 	N = numfactors(C);
-	A = left(C, N-1) * matfaust.Faust(factors(C, N) * P);
-	if startsWith(dev, 'gpu')
+    if diag_opt
+        A = C * matfaust.Faust(P);
+    else
+        A = left(C, N-1) * matfaust.Faust(factors(C, N) * P);
+    end
+    if startsWith(dev, 'gpu')
+		if diag_opt
+			error('diag_opt on GPU Faust is not yet implemented')
+		end
 		A = clone(A, 'dev', 'gpu');
 	end
 end
