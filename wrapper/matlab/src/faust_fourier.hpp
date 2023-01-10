@@ -1,8 +1,7 @@
 #include "class_handle.hpp"
 #include "faust_TransformHelper.h"
-#include "faust_TransformHelperButterfly.h"
 #ifdef USE_GPU_MOD
-#include "faust_TransformHelperButterfly_gpu.h"
+#include "faust_TransformHelper_gpu.h"
 #endif
 template <typename SCALAR, FDevice DEV>
 void faust_fourier(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs)

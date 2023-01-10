@@ -1,4 +1,3 @@
-#include "faust_TransformHelperButterfly.h"
 namespace Faust
 {
 
