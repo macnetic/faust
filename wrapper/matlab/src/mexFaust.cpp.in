@@ -67,6 +67,7 @@
 #ifdef USE_GPU_MOD
 #include "faust_gpu_mod_utils.h"
 #include "faust_TransformHelper_gpu.h"
+#include "faust_TransformHelperButterfly_gpu.h"
 #endif
 #include "new_faust.h"
 #include "faust_disp.h"
