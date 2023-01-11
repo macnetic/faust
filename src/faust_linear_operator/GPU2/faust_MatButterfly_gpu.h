@@ -17,6 +17,8 @@ namespace Faust
 			Vect<FPP, GPU2> d2;
 			int* subdiag_ids;
 			int level;
+
+			Vect<FPP, GPU2> d2t;
 			bool is_transp;
 
 			public:
@@ -45,6 +47,7 @@ namespace Faust
 			void Display() const;
 			Real<FPP> norm() const;*/
 			void multiply(MatDense<FPP, GPU2> &other, const char op_this);
+			void multiply(MatSparse<FPP, GPU2> &other, const char op_this);
 		};
 
 }

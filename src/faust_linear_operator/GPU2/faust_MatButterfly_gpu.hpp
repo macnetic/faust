@@ -33,4 +33,13 @@ namespace Faust
 		{
 			return (d1.size() + d2.size() + (is_transp?d2.size():0)) * sizeof(FPP) + d2.size() * sizeof(int);
 		}
+
+
+	template<typename FPP>
+		void MatButterfly<FPP, GPU2>::multiply(MatSparse<FPP, GPU2>& M, const char opThis)
+		{
+			MatDense<FPP, GPU2> Y(M);
+			this->multiply(Y, opThis);
+			M = Y;
+		}
 }

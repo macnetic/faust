@@ -17,6 +17,14 @@ bool verifyMatEq(MatDense<FPP, Cpu> refm, MatDense<FPP, Cpu> testm, double tol=1
 	return err.norm() <= tol;
 }
 
+bool verifyMatEq(MatDense<FPP, Cpu> refm, MatDense<FPP, GPU2> testm_gpu, double tol=1e-6)
+{
+	auto testm = testm_gpu.tocpu();
+	auto err = refm;
+	err -= testm;
+	return err.norm() <= tol;
+}
+
 void test_mul_matdense(MatButterfly<FPP, GPU2> &gpu_bm, MatButterfly<FPP, Cpu> &cpu_bm)
 {
 	cout << "Test MatButterfly<FPP, GPU2>::multiply(MatDense<FPP, GPU2>, const char* op)" << endl;
@@ -28,6 +36,24 @@ void test_mul_matdense(MatButterfly<FPP, GPU2> &gpu_bm, MatButterfly<FPP, Cpu> &
 	gpu_bm.multiply(test_mat, 'N');
 	auto test_mat_cpu = test_mat.tocpu();
 	assert(verifyMatEq(test_mat_cpu, ref_mat));
+	delete rmat;
+	cout << "OK" << endl;
+}
+
+
+void test_mul_matsparse(MatButterfly<FPP, GPU2> &gpu_bm, MatButterfly<FPP, Cpu> &cpu_bm)
+{
+	cout << "Test MatButterfly<FPP, GPU2>::multiply(MatSparse<FPP, GPU2>, const char* op)" << endl;
+	auto size = cpu_bm.getNbRow();
+	auto rmat = MatDense<FPP, Cpu>::randMat(size, size);
+	MatSparse<FPP, Cpu> rspmat(*rmat);
+	MatSparse<FPP, GPU2> rspmat_gpu(rspmat);
+	cpu_bm.multiply(rspmat, 'N');
+	gpu_bm.multiply(rspmat_gpu, 'N');
+	MatDense<FPP, Cpu> ref_mat(rspmat);
+	MatDense<FPP, GPU2> test_mat(rspmat_gpu);
+	assert(verifyMatEq(ref_mat, test_mat));
+	delete rmat;
 	cout << "OK" << endl;
 }
 
@@ -73,6 +99,7 @@ int main(int argc, char** argv)
 	test_get_nbytes(gpu_bm, cpu_bm);
 	test_get_nbrowcol(gpu_bm, cpu_bm);
 	test_get_type(gpu_bm, cpu_bm);
+	test_mul_matsparse(gpu_bm, cpu_bm);
 
 	return 0;
 }
