@@ -1,0 +1,60 @@
+#include "faust_constant.h"
+#include "faust_TransformHelper.h"
+#include "faust_gpu_mod_utils.h"
+#include "faust_MatSparse_gpu.h"
+#include "faust_MatDense_gpu.h"
+#include "faust_MatButterfly_gpu.h"
+#include <iostream>
+
+typedef @TEST_FPP@ FPP;
+using namespace std;
+using namespace Faust;
+
+bool verifyMatEq(MatDense<FPP, Cpu> refm, MatDense<FPP, Cpu> testm, double tol=1e-6)
+{
+	auto err = refm;
+	err -= testm;
+	return err.norm() <= tol;
+}
+
+void test_mul_matdense(MatButterfly<FPP, GPU2> &gpu_bm, MatButterfly<FPP, Cpu> &cpu_bm)
+{
+	cout << "Test MatButterfly<FPP, GPU2>::multiply(MatDense<FPP, GPU2>, const char* op)" << endl;
+	auto size = cpu_bm.getNbRow();
+	auto rmat = MatDense<FPP, Cpu>::randMat(size, size);
+	MatDense<FPP, Cpu> ref_mat(*rmat);
+	MatDense<FPP, GPU2> test_mat(*rmat);
+	cpu_bm.multiply(ref_mat, 'N');
+	gpu_bm.multiply(test_mat, 'N');
+	auto test_mat_cpu = test_mat.tocpu();
+	assert(verifyMatEq(test_mat_cpu, ref_mat));
+	cout << "OK" << endl;
+}
+
+void test_get_nbytes(MatButterfly<FPP, GPU2> &gpu_bm, MatButterfly<FPP, Cpu> &cpu_bm)
+{
+	cout << "Test MatButterfly<FPP, GPU2>::getNBytes()" << endl;
+	assert(gpu_bm.getNBytes() == cpu_bm.getNBytes());
+	cout << "OK" << endl;
+}
+
+int main(int argc, char** argv)
+{
+	Faust::enable_gpu_mod();
+
+	int log2size = 4;
+	if(argc > 1)
+		log2size = std::atoi(argv[1]);
+	std::cout << "log2size: " << log2size << std::endl;
+
+	int size = 1 << log2size;
+	auto F = TransformHelper<FPP, Cpu>::fourierFaust(log2size, false);
+	auto dsButterflyMat = F->get_fact(0);
+	MatSparse<FPP, Cpu> spButterflyMat(dsButterflyMat);
+	MatButterfly<FPP, Cpu> cpu_bm(spButterflyMat, /* level */ 0);
+	MatButterfly<FPP, GPU2> gpu_bm(spButterflyMat, /* level */ 0);
+	test_mul_matdense(gpu_bm, cpu_bm);
+	test_get_nbytes(gpu_bm, cpu_bm);
+
+	return 0;
+}

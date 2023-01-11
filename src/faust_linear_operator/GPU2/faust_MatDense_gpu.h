@@ -101,6 +101,7 @@ namespace Faust
 				 * \param ids: if not nullptr then *this rows are multiplied in this order to vec.
 				 */
 				void eltwise_mul(const Vect<FPP, GPU2> &vec, const int *ids=nullptr);
+				//  TODO: other shouldn't be const if it is the output
 				//  other = (*this) * other
 				void multiply(const MatDense<FPP, GPU2> &other, const char op_this='N');
 				//  other = (*this) * other
