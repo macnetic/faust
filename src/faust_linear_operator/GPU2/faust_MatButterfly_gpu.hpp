@@ -45,11 +45,66 @@ namespace Faust
 
 
 	template<typename FPP>
-		MatSparse<FPP, GPU2> MatButterfly<FPP, GPU2>::toMatSparse()
+		MatSparse<FPP, GPU2> MatButterfly<FPP, GPU2>::toMatSparse() const
 		{
 			MatSparse<FPP, GPU2> sp(this->getNbRow(), this->getNbCol());
 			sp.setEyes();
-			multiply(sp, 'N');
+			const_cast<MatButterfly<FPP, GPU2>*>(this)->multiply(sp, 'N');
 			return sp;
+		}
+
+
+	template<typename FPP>
+		MatSparse<FPP,GPU2>* MatButterfly<FPP, GPU2>::get_cols(faust_unsigned_int col_id_start, faust_unsigned_int num_cols) const
+		{
+			return toMatSparse().get_cols(col_id_start, num_cols);
+		}
+
+	template<typename FPP>
+		MatSparse<FPP,GPU2>* MatButterfly<FPP, GPU2>::get_rows(faust_unsigned_int row_id_start, faust_unsigned_int num_rows) const
+		{
+			return toMatSparse().get_rows(row_id_start, num_rows);
+		}
+
+	template<typename FPP>
+		MatSparse<FPP,GPU2>* MatButterfly<FPP, GPU2>::get_cols(faust_unsigned_int* col_ids, faust_unsigned_int num_cols) const
+		{
+			return toMatSparse().get_cols(col_ids, num_cols);
+		}
+
+	template<typename FPP>
+		MatSparse<FPP,GPU2>* MatButterfly<FPP, GPU2>::get_rows(faust_unsigned_int* row_ids, faust_unsigned_int num_rows) const
+		{
+			return toMatSparse().get_rows(row_ids, num_rows);
+		}
+
+
+	template<typename FPP>
+		Real<FPP> MatButterfly<FPP, GPU2>::norm() const
+		{
+			return toMatSparse().norm();
+		}
+
+	template<typename FPP>
+		MatButterfly<FPP,GPU2>* MatButterfly<FPP, GPU2>::clone(const int32_t dev_id/*=-1*/, const void* stream/*=nullptr*/) const
+		{
+			//TODO: dev_id and stream should be used
+			MatSparse<FPP, Cpu> cpu_sp;
+			toMatSparse().tocpu(cpu_sp);
+			//TODO/ without going throug cpu mem
+			return new MatButterfly<FPP, GPU2>(cpu_sp, level);
+		}
+
+	template<typename FPP>
+		MatButterfly<FPP,GPU2>* MatButterfly<FPP, GPU2>::Clone(const bool isOptimize/*=false*/) const
+		{
+
+			if (isOptimize)
+			{
+				throw std::runtime_error("MatButterfly doesn't handle isOptimize flag");
+			} else
+			{
+				return clone();
+			}
 		}
 }

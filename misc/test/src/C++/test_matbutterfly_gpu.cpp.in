@@ -91,6 +91,60 @@ void test_toMatSparse(MatButterfly<FPP, GPU2> &gpu_bm, MatButterfly<FPP, Cpu> &c
 	cout << "OK" << endl;
 }
 
+void test_get_colsrows(MatButterfly<FPP, GPU2> &gpu_bm, MatButterfly<FPP, Cpu> &cpu_bm)
+{
+	cout << "Test MatButterfly<FPP, GPU2>::get_rows/cols" << endl;
+	faust_unsigned_int start_id = cpu_bm.getNbRow()/2;
+	faust_unsigned_int n = cpu_bm.getNbRow()/2;
+	auto gpu_rows = gpu_bm.get_rows(start_id, n);
+	auto cpu_rows = cpu_bm.get_rows(start_id, n);
+	assert(verifyMatEq(MatDense<FPP, Cpu>(*dynamic_cast<MatSparse<FPP, Cpu>*>(cpu_rows)), MatDense<FPP, GPU2>(*gpu_rows)));
+	auto gpu_cols = gpu_bm.get_cols(start_id, n);
+	auto cpu_cols = cpu_bm.get_cols(start_id, n);
+	assert(verifyMatEq(MatDense<FPP, Cpu>(*dynamic_cast<MatSparse<FPP, Cpu>*>(cpu_cols)), MatDense<FPP, GPU2>(*gpu_cols)));
+	delete gpu_rows;
+	delete cpu_rows;
+	delete gpu_cols;
+	delete cpu_cols;
+	faust_unsigned_int ids[3] = {0, n, cpu_bm.getNbRow()-1};
+	n =3;
+	gpu_rows = gpu_bm.get_rows(ids, n);
+	cpu_rows = cpu_bm.get_rows(ids, n);
+	assert(verifyMatEq(MatDense<FPP, Cpu>(*dynamic_cast<MatSparse<FPP, Cpu>*>(cpu_rows)), MatDense<FPP, GPU2>(*gpu_rows)));
+	gpu_cols = gpu_bm.get_cols(ids, n);
+	cpu_cols = cpu_bm.get_cols(ids, n);
+	assert(verifyMatEq(MatDense<FPP, Cpu>(*dynamic_cast<MatSparse<FPP, Cpu>*>(cpu_cols)), MatDense<FPP, GPU2>(*gpu_cols)));
+	delete gpu_rows;
+	delete cpu_rows;
+	delete gpu_cols;
+	delete cpu_cols;
+	cout << "OK" << endl;
+}
+
+
+void test_norm(MatButterfly<FPP, GPU2> &gpu_bm, MatButterfly<FPP, Cpu> &cpu_bm)
+{
+	cout << "Test MatButterfly<FPP, GPU2>::norm()" << endl;
+	assert(gpu_bm.norm() == cpu_bm.norm());
+	cout << "OK" << endl;
+}
+
+
+void test_clone(MatButterfly<FPP, GPU2> &gpu_bm, MatButterfly<FPP, Cpu> &cpu_bm)
+{
+	cout << "Test MatButterfly<FPP, GPU2>::clone()" << endl;
+	MatSparse<FPP, Cpu> sp_test;	
+	auto gpu_clone = gpu_bm.clone();
+	auto cpu_clone = cpu_bm.Clone();
+	gpu_clone->toMatSparse().tocpu(sp_test);
+	MatDense<FPP, Cpu> ds_test(sp_test);
+	MatDense<FPP, Cpu> ds_ref(dynamic_cast<MatButterfly<FPP, Cpu>*>(cpu_clone)->toMatSparse());
+	assert(verifyMatEq(ds_ref, ds_test));
+	delete cpu_clone;
+	delete gpu_clone;
+	cout << "OK" << endl;
+}
+
 int main(int argc, char** argv)
 {
 	Faust::enable_gpu_mod();
@@ -112,6 +166,9 @@ int main(int argc, char** argv)
 	test_get_type(gpu_bm, cpu_bm);
 	test_mul_matsparse(gpu_bm, cpu_bm);
 	test_toMatSparse(gpu_bm, cpu_bm);
+	test_get_colsrows(gpu_bm, cpu_bm);
+	test_norm(gpu_bm, cpu_bm);
+	test_clone(gpu_bm, cpu_bm);
 
 	return 0;
 }
