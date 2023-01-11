@@ -145,6 +145,43 @@ void test_clone(MatButterfly<FPP, GPU2> &gpu_bm, MatButterfly<FPP, Cpu> &cpu_bm)
 	cout << "OK" << endl;
 }
 
+
+void test_getNonZeros(MatButterfly<FPP, GPU2> &gpu_bm, MatButterfly<FPP, Cpu> &cpu_bm)
+{
+	cout << "Test MatButterfly<FPP, GPU2>::getNonZeros()" << endl;
+	assert(gpu_bm.getNonZeros() == cpu_bm.getNonZeros());
+	cout << "OK" << endl;
+}
+
+
+void test_transpose(MatButterfly<FPP, GPU2> &gpu_bm, MatButterfly<FPP, Cpu> &cpu_bm)
+{
+	cout << "Test MatButterfly<FPP, GPU2>::transpose()" << endl;
+	auto size = cpu_bm.getNbRow();
+	auto rmat = MatDense<FPP, Cpu>::randMat(size, size);
+	MatDense<FPP, Cpu> ref_mat(*rmat);
+	MatDense<FPP, GPU2> test_mat(*rmat);
+	auto gpu_clone = gpu_bm.clone();
+	auto cpu_clone = cpu_bm.Clone();
+	cpu_clone->transpose();
+	cpu_clone->multiply(ref_mat, 'N');
+	gpu_clone->transpose();
+	gpu_clone->multiply(test_mat, 'N');
+	auto test_mat_cpu = test_mat.tocpu();
+	assert(verifyMatEq(test_mat_cpu, ref_mat));
+	// undo the transpose
+	cpu_clone->transpose();
+	cpu_clone->multiply(ref_mat, 'N');
+	gpu_clone->transpose();
+	gpu_clone->multiply(test_mat, 'N');
+	test_mat_cpu = test_mat.tocpu();
+	assert(verifyMatEq(test_mat_cpu, ref_mat));
+	delete rmat;
+	delete gpu_clone;
+	delete cpu_clone;
+	cout << "OK" << endl;
+}
+
 int main(int argc, char** argv)
 {
 	Faust::enable_gpu_mod();
@@ -169,6 +206,8 @@ int main(int argc, char** argv)
 	test_get_colsrows(gpu_bm, cpu_bm);
 	test_norm(gpu_bm, cpu_bm);
 	test_clone(gpu_bm, cpu_bm);
+	test_getNonZeros(gpu_bm, cpu_bm);
+	test_transpose(gpu_bm, cpu_bm);
 
 	return 0;
 }

@@ -28,11 +28,12 @@ namespace Faust
 			MatType getType() const {return Butterfly;} //TODO: move def in hpp
 			int32_t getNbRow() const {return d1.size();} //TODO: move def in hpp
 			int32_t getNbCol() const {return d1.size();} //TODO: move def in hpp
+			faust_unsigned_int getNonZeros() const;
 			MatButterfly<FPP,GPU2>* clone(const int32_t dev_id=-1, const void* stream=nullptr) const;
 			MatButterfly<FPP,GPU2>* Clone(const bool isOptimize=false) const;
+			void transpose();
+			void init_transpose();
 			/*  void* get_gpu_mat_ptr() const;
-			  faust_unsigned_int getNonZeros() const;
-			  void transpose();
 			  void conjugate();
 			  void adjoint();*/
 			//! \brief Returns a sub-group of rows of this matrix as the same type of matrix

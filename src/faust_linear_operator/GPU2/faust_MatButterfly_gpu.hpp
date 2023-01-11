@@ -13,6 +13,7 @@ namespace Faust
 		auto sd_ids_vec = cpu_bmat.get_subdiag_ids();
 		subdiag_ids = new int[sd_ids_vec.size()];
 		memcpy(subdiag_ids, sd_ids_vec.data(), sizeof(int) * sd_ids_vec.size());
+		d2t.resize(0);
 	}
 
 	template<typename FPP>
@@ -25,7 +26,8 @@ namespace Faust
 	template<typename FPP>
 		void MatButterfly<FPP, GPU2>::multiply(MatDense<FPP, GPU2> &other, const char op_this)
 		{
-			butterfly_diag_prod(other, d1, d2, subdiag_ids);
+			bool use_d2t = is_transp ^ op_this == 'T';
+			butterfly_diag_prod(other, d1, use_d2t?d2t:d2, subdiag_ids);
 		}
 
 	template<typename FPP>
@@ -105,6 +107,50 @@ namespace Faust
 			} else
 			{
 				return clone();
+			}
+		}
+
+
+	template<typename FPP>
+		faust_unsigned_int MatButterfly<FPP, GPU2>::getNonZeros() const
+		{
+			return d1.getNonZeros() + d2.getNonZeros();
+		}
+
+
+	template<typename FPP>
+		void MatButterfly<FPP, GPU2>::transpose()
+		{
+			init_transpose(); // free cost if already called once
+			is_transp = ! is_transp;
+		}
+
+
+	template<typename FPP>
+		void MatButterfly<FPP, GPU2>::init_transpose()
+		{
+			//TODO: simplify in case of symmetric matrix (it happens for the FFT)
+			if(d2t.size() == 0)
+			{
+				//TODO: do it all in GPU memory
+				auto size = d2.size();
+				FPP *d2_ptr, *d2t_ptr;
+				auto cpu_d2 = d2.tocpu();
+				d2_ptr = cpu_d2.getData();
+				d2t.resize(size);
+				Vect<FPP, Cpu> cpu_d2t(size);
+				d2t_ptr = cpu_d2t.getData();
+
+				auto d_offset = size >> (level+1);
+				// D1 doesn't change
+				// swap every pair of D2 contiguous blocks to form D2T
+				for(int i = 0;i < size; i += d_offset * 2)
+				{
+					// swap two next blocks of size d_offset into d2t_ptr
+					std::copy(d2_ptr + i, d2_ptr + i + d_offset, d2t_ptr + i + d_offset);
+					std::copy(d2_ptr + i + d_offset, d2_ptr + i + 2 * d_offset, d2t_ptr + i);
+				}
+				d2t =  cpu_d2t;
 			}
 		}
 }
