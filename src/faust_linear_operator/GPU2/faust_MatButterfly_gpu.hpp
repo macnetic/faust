@@ -26,6 +26,8 @@ namespace Faust
 	template<typename FPP>
 		void MatButterfly<FPP, GPU2>::multiply(MatDense<FPP, GPU2> &other, const char op_this)
 		{
+			if(op_this != 'N' && op_this != 'T')
+				throw std::runtime_error("MatButtermfly::multiply only handle 'N' and 'T' for op_this");
 			bool use_d2t = is_transp ^ op_this == 'T';
 			butterfly_diag_prod(other, d1, use_d2t?d2t:d2, subdiag_ids);
 		}
@@ -152,5 +154,49 @@ namespace Faust
 				}
 				d2t =  cpu_d2t;
 			}
+		}
+
+	template<typename FPP>
+		void MatButterfly<FPP, GPU2>::conjugate()
+		{
+			d1.conjugate();
+			d2.conjugate();
+			if(d2t.size() > 0)
+				d2t.conjugate();
+		}
+
+
+	template<typename FPP>
+		void MatButterfly<FPP, GPU2>::adjoint()
+		{
+			transpose();
+			conjugate();
+		}
+
+
+	template<typename FPP>
+		void MatButterfly<FPP, GPU2>::Display() const
+		{
+			//TODO: adjust consistently with MatGeneric Display (using to_string)
+			std::cout << "MatButterfly on GPU: ";
+			std::cout << "D1: ";
+			d1.tocpu().Display();
+			std::cout << "D2: ";
+			d2.tocpu().Display();
+			if(d2t.size() > 0)
+			{
+				std::cout << "D2T: ";
+				d2t.tocpu().Display();
+			}
+			std::cout << "subdiag_ids: ";
+			for(int i=0;i < d2.size();i++)
+				std::cout << subdiag_ids[i] << " ";
+			std::cout << std::endl;
+		}
+
+	template<typename FPP>
+		MatButterfly<FPP, GPU2>::~MatButterfly()
+		{
+			delete subdiag_ids;
 		}
 }

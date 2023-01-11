@@ -182,6 +182,69 @@ void test_transpose(MatButterfly<FPP, GPU2> &gpu_bm, MatButterfly<FPP, Cpu> &cpu
 	cout << "OK" << endl;
 }
 
+void test_conjugate(MatButterfly<FPP, GPU2> &gpu_bm, MatButterfly<FPP, Cpu> &cpu_bm)
+{
+	cout << "Test MatButterfly<FPP, GPU2>::conjugate()" << endl;
+	auto size = cpu_bm.getNbRow();
+	auto rmat = MatDense<FPP, Cpu>::randMat(size, size);
+	MatDense<FPP, Cpu> ref_mat(*rmat);
+	MatDense<FPP, GPU2> test_mat(*rmat);
+	auto gpu_clone = gpu_bm.clone();
+	auto cpu_clone = cpu_bm.Clone();
+	cpu_clone->conjugate();
+	cpu_clone->multiply(ref_mat, 'N');
+	gpu_clone->conjugate();
+	gpu_clone->multiply(test_mat, 'N');
+	auto test_mat_cpu = test_mat.tocpu();
+	assert(verifyMatEq(test_mat_cpu, ref_mat));
+	// undo the conjugate
+	cpu_clone->conjugate();
+	cpu_clone->multiply(ref_mat, 'N');
+	gpu_clone->conjugate();
+	gpu_clone->multiply(test_mat, 'N');
+	test_mat_cpu = test_mat.tocpu();
+	assert(verifyMatEq(test_mat_cpu, ref_mat));
+	delete rmat;
+	delete gpu_clone;
+	delete cpu_clone;
+	cout << "OK" << endl;
+}
+
+void test_adjoint(MatButterfly<FPP, GPU2> &gpu_bm, MatButterfly<FPP, Cpu> &cpu_bm)
+{
+	cout << "Test MatButterfly<FPP, GPU2>::adjoint()" << endl;
+	auto size = cpu_bm.getNbRow();
+	auto rmat = MatDense<FPP, Cpu>::randMat(size, size);
+	MatDense<FPP, Cpu> ref_mat(*rmat);
+	MatDense<FPP, GPU2> test_mat(*rmat);
+	auto gpu_clone = gpu_bm.clone();
+	auto cpu_clone = cpu_bm.Clone();
+	cpu_clone->adjoint();
+	cpu_clone->multiply(ref_mat, 'N');
+	gpu_clone->adjoint();
+	gpu_clone->multiply(test_mat, 'N');
+	auto test_mat_cpu = test_mat.tocpu();
+	assert(verifyMatEq(test_mat_cpu, ref_mat));
+	// undo the adjoint
+	cpu_clone->adjoint();
+	cpu_clone->multiply(ref_mat, 'N');
+	gpu_clone->adjoint();
+	gpu_clone->multiply(test_mat, 'N');
+	test_mat_cpu = test_mat.tocpu();
+	assert(verifyMatEq(test_mat_cpu, ref_mat));
+	delete rmat;
+	delete gpu_clone;
+	delete cpu_clone;
+	cout << "OK" << endl;
+}
+
+void test_display(MatButterfly<FPP, GPU2> &gpu_bm)
+{
+	cout << "Test MatButterfly<FPP, GPU2>::Display()" << endl;
+	gpu_bm.Display();
+	cout << "OK" << endl;
+}
+
 int main(int argc, char** argv)
 {
 	Faust::enable_gpu_mod();
@@ -208,6 +271,9 @@ int main(int argc, char** argv)
 	test_clone(gpu_bm, cpu_bm);
 	test_getNonZeros(gpu_bm, cpu_bm);
 	test_transpose(gpu_bm, cpu_bm);
+	test_conjugate(gpu_bm, cpu_bm);
+	test_adjoint(gpu_bm, cpu_bm);
+	test_display(gpu_bm);
 
 	return 0;
 }

@@ -33,9 +33,9 @@ namespace Faust
 			MatButterfly<FPP,GPU2>* Clone(const bool isOptimize=false) const;
 			void transpose();
 			void init_transpose();
-			/*  void* get_gpu_mat_ptr() const;
-			  void conjugate();
-			  void adjoint();*/
+			void conjugate();
+			void adjoint();
+			void* get_gpu_mat_ptr() const {return d1.getData();} // not only one pointer, choose d1 arbitrarily 
 			//! \brief Returns a sub-group of rows of this matrix as the same type of matrix
 			MatSparse<FPP,GPU2>* get_rows(faust_unsigned_int row_id_start, faust_unsigned_int num_rows) const;
 			//! \brief Returns a sub-group of rows of this matrix as the same type of matrix
@@ -45,11 +45,12 @@ namespace Faust
 			//! \brief Returns a sub-group of columns of this matrix as the same type of matrix
 			MatSparse<FPP,GPU2>* get_cols(faust_unsigned_int* col_ids, faust_unsigned_int num_cols) const;
 
-			/*void Display() const;*/
+			void Display() const;
 			Real<FPP> norm() const;
 			void multiply(MatDense<FPP, GPU2> &other, const char op_this);
 			void multiply(MatSparse<FPP, GPU2> &other, const char op_this);
 			MatSparse<FPP, GPU2> toMatSparse() const;
+			~MatButterfly();
 		};
 
 }
