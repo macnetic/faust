@@ -38,6 +38,22 @@ void test_get_nbytes(MatButterfly<FPP, GPU2> &gpu_bm, MatButterfly<FPP, Cpu> &cp
 	cout << "OK" << endl;
 }
 
+void test_get_nbrowcol(MatButterfly<FPP, GPU2> &gpu_bm, MatButterfly<FPP, Cpu> &cpu_bm)
+{
+	cout << "Test MatButterfly<FPP, GPU2>::getNbRow/Col()" << endl;
+	assert(gpu_bm.getNbRow() == cpu_bm.getNbRow());
+	assert(gpu_bm.getNbCol() == cpu_bm.getNbCol());
+	cout << "OK" << endl;
+}
+
+void test_get_type(MatButterfly<FPP, GPU2> &gpu_bm, MatButterfly<FPP, Cpu> &cpu_bm)
+{
+	cout << "Test MatButterfly<FPP, GPU2>::getType()" << endl;
+	assert(gpu_bm.getType() == cpu_bm.getType());
+	assert(gpu_bm.getType() == Butterfly);
+	cout << "OK" << endl;
+}
+
 int main(int argc, char** argv)
 {
 	Faust::enable_gpu_mod();
@@ -55,6 +71,8 @@ int main(int argc, char** argv)
 	MatButterfly<FPP, GPU2> gpu_bm(spButterflyMat, /* level */ 0);
 	test_mul_matdense(gpu_bm, cpu_bm);
 	test_get_nbytes(gpu_bm, cpu_bm);
+	test_get_nbrowcol(gpu_bm, cpu_bm);
+	test_get_type(gpu_bm, cpu_bm);
 
 	return 0;
 }
