@@ -48,6 +48,7 @@ namespace Faust
 			Real<FPP> norm() const;*/
 			void multiply(MatDense<FPP, GPU2> &other, const char op_this);
 			void multiply(MatSparse<FPP, GPU2> &other, const char op_this);
+			MatSparse<FPP, GPU2> toMatSparse();
 		};
 
 }

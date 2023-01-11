@@ -42,4 +42,14 @@ namespace Faust
 			this->multiply(Y, opThis);
 			M = Y;
 		}
+
+
+	template<typename FPP>
+		MatSparse<FPP, GPU2> MatButterfly<FPP, GPU2>::toMatSparse()
+		{
+			MatSparse<FPP, GPU2> sp(this->getNbRow(), this->getNbCol());
+			sp.setEyes();
+			multiply(sp, 'N');
+			return sp;
+		}
 }

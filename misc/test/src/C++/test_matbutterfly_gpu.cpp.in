@@ -80,6 +80,17 @@ void test_get_type(MatButterfly<FPP, GPU2> &gpu_bm, MatButterfly<FPP, Cpu> &cpu_
 	cout << "OK" << endl;
 }
 
+void test_toMatSparse(MatButterfly<FPP, GPU2> &gpu_bm, MatButterfly<FPP, Cpu> &cpu_bm)
+{
+	cout << "Test MatButterfly<FPP, GPU2>::toMatSparse()" << endl;
+	MatSparse<FPP, Cpu> sp_test;	
+	gpu_bm.toMatSparse().tocpu(sp_test);
+	MatDense<FPP, Cpu> ds_test(sp_test);
+	MatDense<FPP, Cpu> ds_ref(cpu_bm.toMatSparse());
+	assert(verifyMatEq(ds_ref, ds_test));
+	cout << "OK" << endl;
+}
+
 int main(int argc, char** argv)
 {
 	Faust::enable_gpu_mod();
@@ -100,6 +111,7 @@ int main(int argc, char** argv)
 	test_get_nbrowcol(gpu_bm, cpu_bm);
 	test_get_type(gpu_bm, cpu_bm);
 	test_mul_matsparse(gpu_bm, cpu_bm);
+	test_toMatSparse(gpu_bm, cpu_bm);
 
 	return 0;
 }
