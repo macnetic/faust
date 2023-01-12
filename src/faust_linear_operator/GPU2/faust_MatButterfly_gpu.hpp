@@ -92,11 +92,7 @@ namespace Faust
 	template<typename FPP>
 		MatButterfly<FPP,GPU2>* MatButterfly<FPP, GPU2>::clone(const int32_t dev_id/*=-1*/, const void* stream/*=nullptr*/) const
 		{
-			//TODO: dev_id and stream should be used
-			MatSparse<FPP, Cpu> cpu_sp;
-			toMatSparse().tocpu(cpu_sp);
-			//TODO/ without going throug cpu mem
-			return new MatButterfly<FPP, GPU2>(cpu_sp, level);
+			return new MatButterfly<FPP, GPU2>(*this);
 		}
 
 	template<typename FPP>
@@ -195,8 +191,38 @@ namespace Faust
 		}
 
 	template<typename FPP>
+		MatDense<FPP, GPU2> MatButterfly<FPP, GPU2>::multiply(const FPP* X, int X_ncols)
+		{
+			MatDense<FPP, GPU2> gpu_X(d1.size(), X_ncols, X);
+			return multiply(gpu_X);
+		}
+
+	template<typename FPP>
+		MatDense<FPP, GPU2> MatButterfly<FPP, GPU2>::multiply(const FPP* x)
+		{
+			return multiply(x, 1);
+		}
+
+
+	template<typename FPP>
+		void MatButterfly<FPP, GPU2>::multiply(MatDense<FPP, GPU2> &gpu_X, MatDense<FPP, Cpu> &cpu_out)
+		{
+			multiply(gpu_X);
+			gpu_X.tocpu(cpu_out);
+		}
+
+	template<typename FPP>
+		MatDense<FPP, GPU2> MatButterfly<FPP, GPU2>::multiply(MatDense<FPP, GPU2> &gpu_X)
+		{
+			//TODO: do we really need this method?
+			butterfly_diag_prod(gpu_X, d1, d2, subdiag_ids);
+			return gpu_X;
+		}
+
+	template<typename FPP>
 		MatButterfly<FPP, GPU2>::~MatButterfly()
 		{
-			delete subdiag_ids;
+			if(subdiag_ids)
+				delete subdiag_ids;
 		}
 }

@@ -9,7 +9,7 @@ namespace Faust
 		class MatButterfly;
 
 	template<typename FPP>
-		class MatButterfly<FPP, GPU2>/* : public MatGeneric<FPP,GPU2>*/
+		class MatButterfly<FPP, GPU2> : public MatGeneric<FPP,GPU2>
 		{
 
 
@@ -22,6 +22,35 @@ namespace Faust
 			bool is_transp;
 
 			public:
+			//TODO: move defs in hpp
+			MatButterfly() : level(-1), subdiag_ids(nullptr), d1(), d2(), d2t(), is_transp(false)
+			{
+			}
+
+			MatButterfly(const MatButterfly<FPP, GPU2>& bmat)
+			{
+				*this = bmat;
+			}
+
+			MatButterfly& operator=(const MatButterfly<FPP, GPU2>& bmat)
+			{
+				this->d1 = bmat.d1;
+				this->d2 = bmat.d2;
+				this->d2t = bmat.d2t;
+				this->is_transp = bmat.is_transp;
+				this->level = bmat.level;
+				this->subdiag_ids = new int[d1.size()];
+				std::copy(bmat.subdiag_ids, bmat.subdiag_ids+d1.size(), this->subdiag_ids);
+				return *this;
+			}
+
+			MatDense<FPP, GPU2> multiply(const FPP* x);
+			MatDense<FPP, GPU2> multiply(const FPP* A, int A_ncols);
+			MatDense<FPP, GPU2> multiply(MatDense<FPP,GPU2> &A);
+			void multiply(MatDense<FPP,GPU2> &A, MatDense<FPP, Cpu> & out);
+			const Vect<FPP, GPU2>& getD1() {return d1;};
+			const Vect<FPP, GPU2>& getD2() {return d2;};
+
 			MatButterfly(const MatSparse<FPP, Cpu> &factor, int level);
 			void setZeros();
 			size_t getNBytes() const;
@@ -35,7 +64,8 @@ namespace Faust
 			void init_transpose();
 			void conjugate();
 			void adjoint();
-			void* get_gpu_mat_ptr() const {return d1.getData();} // not only one pointer, choose d1 arbitrarily 
+			void* get_gpu_mat_ptr() const { throw std::runtime_error("get_gpu_mat_ptr doesn't make sense for a MatButterfly");}
+			void set_gpu_mat_ptr(void*) { throw std::runtime_error("set_gpu_mat_ptr doesn't make sense for a MatButterfly");}
 			//! \brief Returns a sub-group of rows of this matrix as the same type of matrix
 			MatSparse<FPP,GPU2>* get_rows(faust_unsigned_int row_id_start, faust_unsigned_int num_rows) const;
 			//! \brief Returns a sub-group of rows of this matrix as the same type of matrix
