@@ -3,6 +3,7 @@
 #ifdef USE_GPU_MOD
 #include "faust_TransformHelper_gpu.h"
 #include "faust_MatButterfly_gpu.h"
+#include "faust_MatPerm_gpu.h"
 
 namespace Faust
 {
@@ -16,6 +17,7 @@ namespace Faust
 			Vect<FPP, GPU2> d_perm;
 			bool has_permutation;
 			std::vector<MatButterfly<FPP, GPU2>> opt_factors;
+			MatPerm<FPP, GPU2> P;
 
 
 			// private ctor

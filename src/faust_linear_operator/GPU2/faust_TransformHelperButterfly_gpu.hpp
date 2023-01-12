@@ -40,14 +40,7 @@ namespace Faust
 			{
 				// set the permutation factor
 				auto csr_fac = dynamic_cast<const MatSparse<FPP, Cpu>*>(*(facts.end()-1));
-				this->push_back(csr_fac);
-				d_perm.resize(size);
-				if(csr_fac->getNonZeros() != size)
-					throw std::runtime_error("Permutation matrix is not valid");
-				// only ones should be enough because this is a permutation matrix but it could be normalized
-				d_perm = Vect<FPP, GPU2>(size, csr_fac->getValuePtr());
-				perm_ids = new int[size];
-				copy(csr_fac->getColInd(), csr_fac->getColInd()+size, perm_ids);
+				P = MatPerm<FPP, GPU2>(*csr_fac);
 			}
 		}
 
@@ -59,7 +52,7 @@ namespace Faust
 
 			int i = 0;
 			if(has_permutation)
-				gpu_X.eltwise_mul(d_perm, perm_ids);
+				P.multiply(gpu_X, 'N');
 
 			for(auto gpu_bmat: opt_factors)
 				gpu_bmat.multiply(gpu_X);
