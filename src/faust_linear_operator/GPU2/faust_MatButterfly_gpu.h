@@ -37,10 +37,11 @@ namespace Faust
 				this->d1 = bmat.d1;
 				this->d2 = bmat.d2;
 				this->d2t = bmat.d2t;
-				this->is_transp = bmat.is_transp;
 				this->level = bmat.level;
 				this->subdiag_ids = new int[d1.size()];
 				std::copy(bmat.subdiag_ids, bmat.subdiag_ids+d1.size(), this->subdiag_ids);
+				if(bmat.is_transp)
+					transpose();
 				return *this;
 			}
 
