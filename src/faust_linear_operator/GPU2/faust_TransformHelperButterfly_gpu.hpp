@@ -24,13 +24,13 @@ namespace Faust
 						auto mul_csr = new MatSparse<FPP, Cpu>(*csr_fac);
 						*mul_csr *= lambda_;
 						opt_factors.insert(opt_factors.begin(),
-								ButterflyMat<FPP, GPU2>(*mul_csr, i++));
+								MatButterfly<FPP, GPU2>(*mul_csr, i++));
 						this->push_back(mul_csr);
 					}
 					else
 					{
 						opt_factors.insert(opt_factors.begin(),
-								ButterflyMat<FPP, GPU2>(*csr_fac, i++));
+								MatButterfly<FPP, GPU2>(*csr_fac, i++));
 						this->push_back(csr_fac);
 					}
 				}
@@ -127,62 +127,4 @@ namespace Faust
 		return fourierFaust;
 	}
 
-	template<typename FPP>
-		ButterflyMat<FPP, GPU2>::ButterflyMat(const MatSparse<FPP, Cpu> &factor, int level) : level(level)
-	{
-		MatButterfly<FPP, Cpu> cpu_bmat(factor, level);
-		auto cpu_d1 = cpu_bmat.getD1();
-		auto cpu_d2 = cpu_bmat.getD2();
-		d1 = Vect<FPP, GPU2>(cpu_d1.rows(), cpu_d1.diagonal().data());
-		d2 = Vect<FPP, GPU2>(cpu_d2.rows(), cpu_d2.diagonal().data());
-		auto sd_ids_vec = cpu_bmat.get_subdiag_ids();
-		subdiag_ids = new int[sd_ids_vec.size()];
-		memcpy(subdiag_ids, sd_ids_vec.data(), sizeof(int) * sd_ids_vec.size());
-	}
-
-
-	template<typename FPP>
-	void ButterflyMat<FPP, GPU2>::Display() const
-	{
-		std::cout << "ButterflyMat on GPU: ";
-		std::cout << "D1: ";
-		d1.Display();
-		std::cout << "D2: ";
-		d1.Display();
-		cout << "subdiag_ids: ";
-		for(int i=0;i < d1.size();i++)
-			cout << subdiag_ids[i] << " ";
-		cout << std::endl;
-	}
-
-	template<typename FPP>
-		MatDense<FPP, GPU2> ButterflyMat<FPP, GPU2>::multiply(const FPP* X, int X_ncols)
-		{
-			MatDense<FPP, GPU2> gpu_X(d1.size(), X_ncols, X);
-			return multiply(gpu_X);
-		}
-
-	template<typename FPP>
-		MatDense<FPP, GPU2> ButterflyMat<FPP, GPU2>::multiply(const FPP* x)
-		{
-			return multiply(x, 1);
-		}
-
-	template<typename FPP>
-		MatDense<FPP, GPU2> ButterflyMat<FPP, GPU2>::multiply(MatDense<FPP, GPU2> &gpu_X)
-		{
-			/*MatDense<FPP, GPU2> gpu_X2(gpu_X);
-			gpu_X.eltwise_mul(d2, subdiag_ids);
-			gpu_X2.eltwise_mul(d1);
-			gpu_X += gpu_X2;*/
-			butterfly_diag_prod(gpu_X, d1, d2, subdiag_ids);
-			return gpu_X;
-		}
-
-	template<typename FPP>
-		void ButterflyMat<FPP, GPU2>::multiply(MatDense<FPP, GPU2> &gpu_X, MatDense<FPP, Cpu> &cpu_out)
-		{
-			multiply(gpu_X);
-			gpu_X.tocpu(cpu_out);
-		}
 }

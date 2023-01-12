@@ -98,7 +98,7 @@ namespace Faust
 	template<typename FPP, FDevice DEVICE, typename FPP2> class GivensFGFTComplex;
 	template<typename FPP> class TransformHelperPoly;
 	template<typename FPP, FDevice DEV> class TransformHelperButterfly;
-	template<typename FPP, FDevice DEV> class ButterflyMat;
+	template<typename FPP, FDevice DEV> class MatButterfly;
 	//TODO: simplify/remove the friendship by adding/using a public setter to is_ortho
 	//template<typename FPP> void wht_factors(unsigned int n, std::vector<MatGeneric<FPP,Cpu>*>&  factors, const bool, const bool);
 	template<typename FPP>
@@ -120,7 +120,7 @@ namespace Faust
 			friend TransformHelper<FPP,Cpu>; // TODO: limit to needed member functions only
 			friend TransformHelperPoly<FPP>; // TODO: limit to needed member functions only
 			friend TransformHelperButterfly<FPP, Cpu>; // TODO: limit to needed member functions only
-			friend ButterflyMat<FPP, Cpu>; // TODO: limit to needed member functions only
+			friend MatButterfly<FPP, Cpu>; // TODO: limit to needed member functions only
 			friend void wht_factors<>(unsigned int n, std::vector<MatGeneric<FPP,Cpu>*>&  factors, const bool, const bool);
 			friend class MatDense<FPP,Cpu>;
 			friend class MatSparse<std::complex<double>, Cpu>;
