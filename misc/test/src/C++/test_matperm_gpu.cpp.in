@@ -1,0 +1,279 @@
+#include "faust_constant.h"
+#include "faust_TransformHelper.h"
+#include "faust_gpu_mod_utils.h"
+#include "faust_MatSparse_gpu.h"
+#include "faust_MatDense_gpu.h"
+#include "faust_MatPerm_gpu.h"
+#include <iostream>
+
+typedef @TEST_FPP@ FPP;
+using namespace std;
+using namespace Faust;
+
+bool verifyMatEq(MatDense<FPP, Cpu> refm, MatDense<FPP, Cpu> testm, double tol=1e-6)
+{
+	auto err = refm;
+	err -= testm;
+	return err.norm() <= tol;
+}
+
+bool verifyMatEq(MatDense<FPP, Cpu> refm, MatDense<FPP, GPU2> testm_gpu, double tol=1e-6)
+{
+	auto testm = testm_gpu.tocpu();
+	auto err = refm;
+	err -= testm;
+	return err.norm() <= tol;
+}
+
+void test_mul_matdense(MatPerm<FPP, GPU2> &gpu_bm, MatPerm<FPP, Cpu> &cpu_bm)
+{
+	cout << "Test MatPerm<FPP, GPU2>::multiply(MatDense<FPP, GPU2>, const char* op)" << endl;
+	auto size = cpu_bm.getNbRow();
+	auto rmat = MatDense<FPP, Cpu>::randMat(size, size);
+	MatDense<FPP, Cpu> ref_mat(*rmat);
+	MatDense<FPP, GPU2> test_mat(*rmat);
+	cpu_bm.multiply(ref_mat, 'N');
+	gpu_bm.multiply(test_mat, 'N');
+	auto test_mat_cpu = test_mat.tocpu();
+	assert(verifyMatEq(test_mat_cpu, ref_mat));
+	delete rmat;
+	cout << "OK" << endl;
+}
+
+
+void test_mul_matsparse(MatPerm<FPP, GPU2> &gpu_bm, MatPerm<FPP, Cpu> &cpu_bm)
+{
+	cout << "Test MatPerm<FPP, GPU2>::multiply(MatSparse<FPP, GPU2>, const char* op)" << endl;
+	auto size = cpu_bm.getNbRow();
+	auto rmat = MatDense<FPP, Cpu>::randMat(size, size);
+	MatSparse<FPP, Cpu> rspmat(*rmat);
+	MatSparse<FPP, GPU2> rspmat_gpu(rspmat);
+	cpu_bm.multiply(rspmat, 'N');
+	gpu_bm.multiply(rspmat_gpu, 'N');
+	MatDense<FPP, Cpu> ref_mat(rspmat);
+	MatDense<FPP, GPU2> test_mat(rspmat_gpu);
+	assert(verifyMatEq(ref_mat, test_mat));
+	delete rmat;
+	cout << "OK" << endl;
+}
+
+void test_get_nbytes(MatPerm<FPP, GPU2> &gpu_bm, MatPerm<FPP, Cpu> &cpu_bm)
+{
+	cout << "Test MatPerm<FPP, GPU2>::getNBytes()" << endl;
+	assert(gpu_bm.getNBytes() == cpu_bm.getNBytes());
+	cout << "OK" << endl;
+}
+
+void test_get_nbrowcol(MatPerm<FPP, GPU2> &gpu_bm, MatPerm<FPP, Cpu> &cpu_bm)
+{
+	cout << "Test MatPerm<FPP, GPU2>::getNbRow/Col()" << endl;
+	assert(gpu_bm.getNbRow() == cpu_bm.getNbRow());
+	assert(gpu_bm.getNbCol() == cpu_bm.getNbCol());
+	cout << "OK" << endl;
+}
+
+void test_get_type(MatPerm<FPP, GPU2> &gpu_bm, MatPerm<FPP, Cpu> &cpu_bm)
+{
+	cout << "Test MatPerm<FPP, GPU2>::getType()" << endl;
+	assert(gpu_bm.getType() == cpu_bm.getType());
+	assert(gpu_bm.getType() == Perm);
+	cout << "OK" << endl;
+}
+
+void test_toMatSparse(MatPerm<FPP, GPU2> &gpu_bm, MatPerm<FPP, Cpu> &cpu_bm)
+{
+	cout << "Test MatPerm<FPP, GPU2>::toMatSparse()" << endl;
+	MatSparse<FPP, Cpu> sp_test;	
+	gpu_bm.toMatSparse().tocpu(sp_test);
+	MatDense<FPP, Cpu> ds_test(sp_test);
+	MatDense<FPP, Cpu> ds_ref(cpu_bm.toMatSparse());
+	assert(verifyMatEq(ds_ref, ds_test));
+	cout << "OK" << endl;
+}
+
+void test_get_colsrows(MatPerm<FPP, GPU2> &gpu_bm, MatPerm<FPP, Cpu> &cpu_bm)
+{
+	cout << "Test MatPerm<FPP, GPU2>::get_rows/cols" << endl;
+	faust_unsigned_int start_id = cpu_bm.getNbRow()/2;
+	faust_unsigned_int n = cpu_bm.getNbRow()/2;
+	auto gpu_rows = gpu_bm.get_rows(start_id, n);
+	auto cpu_rows = cpu_bm.get_rows(start_id, n);
+	assert(verifyMatEq(MatDense<FPP, Cpu>(*dynamic_cast<MatSparse<FPP, Cpu>*>(cpu_rows)), MatDense<FPP, GPU2>(*gpu_rows)));
+	auto gpu_cols = gpu_bm.get_cols(start_id, n);
+	auto cpu_cols = cpu_bm.get_cols(start_id, n);
+	assert(verifyMatEq(MatDense<FPP, Cpu>(*dynamic_cast<MatSparse<FPP, Cpu>*>(cpu_cols)), MatDense<FPP, GPU2>(*gpu_cols)));
+	delete gpu_rows;
+	delete cpu_rows;
+	delete gpu_cols;
+	delete cpu_cols;
+	faust_unsigned_int ids[3] = {0, n, cpu_bm.getNbRow()-1};
+	n =3;
+	gpu_rows = gpu_bm.get_rows(ids, n);
+	cpu_rows = cpu_bm.get_rows(ids, n);
+	assert(verifyMatEq(MatDense<FPP, Cpu>(*dynamic_cast<MatSparse<FPP, Cpu>*>(cpu_rows)), MatDense<FPP, GPU2>(*gpu_rows)));
+	gpu_cols = gpu_bm.get_cols(ids, n);
+	cpu_cols = cpu_bm.get_cols(ids, n);
+	assert(verifyMatEq(MatDense<FPP, Cpu>(*dynamic_cast<MatSparse<FPP, Cpu>*>(cpu_cols)), MatDense<FPP, GPU2>(*gpu_cols)));
+	delete gpu_rows;
+	delete cpu_rows;
+	delete gpu_cols;
+	delete cpu_cols;
+	cout << "OK" << endl;
+}
+
+
+void test_norm(MatPerm<FPP, GPU2> &gpu_bm, MatPerm<FPP, Cpu> &cpu_bm)
+{
+	cout << "Test MatPerm<FPP, GPU2>::norm()" << endl;
+	assert(gpu_bm.norm() == cpu_bm.norm());
+	cout << "OK" << endl;
+}
+
+
+void test_clone(MatPerm<FPP, GPU2> &gpu_bm, MatPerm<FPP, Cpu> &cpu_bm)
+{
+	cout << "Test MatPerm<FPP, GPU2>::clone()" << endl;
+	MatSparse<FPP, Cpu> sp_test;	
+	auto gpu_clone = gpu_bm.clone();
+	auto cpu_clone = cpu_bm.Clone();
+	gpu_clone->toMatSparse().tocpu(sp_test);
+	MatDense<FPP, Cpu> ds_test(sp_test);
+	MatDense<FPP, Cpu> ds_ref(dynamic_cast<MatPerm<FPP, Cpu>*>(cpu_clone)->toMatSparse());
+	assert(verifyMatEq(ds_ref, ds_test));
+	delete cpu_clone;
+	delete gpu_clone;
+	cout << "OK" << endl;
+}
+
+
+void test_getNonZeros(MatPerm<FPP, GPU2> &gpu_bm, MatPerm<FPP, Cpu> &cpu_bm)
+{
+	cout << "Test MatPerm<FPP, GPU2>::getNonZeros()" << endl;
+	assert(gpu_bm.getNonZeros() == cpu_bm.getNonZeros());
+	cout << "OK" << endl;
+}
+
+
+void test_transpose(MatPerm<FPP, GPU2> &gpu_bm, MatPerm<FPP, Cpu> &cpu_bm)
+{
+	cout << "Test MatPerm<FPP, GPU2>::transpose()" << endl;
+	auto size = cpu_bm.getNbRow();
+	auto rmat = MatDense<FPP, Cpu>::randMat(size, size);
+	MatDense<FPP, Cpu> ref_mat(*rmat);
+	MatDense<FPP, GPU2> test_mat(*rmat);
+	auto gpu_clone = gpu_bm.clone();
+	auto cpu_clone = cpu_bm.Clone();
+	cpu_clone->transpose();
+	cpu_clone->multiply(ref_mat, 'N');
+	gpu_clone->transpose();
+	gpu_clone->multiply(test_mat, 'N');
+	auto test_mat_cpu = test_mat.tocpu();
+	assert(verifyMatEq(test_mat_cpu, ref_mat));
+	// undo the transpose
+	cpu_clone->transpose();
+	cpu_clone->multiply(ref_mat, 'N');
+	gpu_clone->transpose();
+	gpu_clone->multiply(test_mat, 'N');
+	test_mat_cpu = test_mat.tocpu();
+	assert(verifyMatEq(test_mat_cpu, ref_mat));
+	delete rmat;
+	delete gpu_clone;
+	delete cpu_clone;
+	cout << "OK" << endl;
+}
+
+void test_conjugate(MatPerm<FPP, GPU2> &gpu_bm, MatPerm<FPP, Cpu> &cpu_bm)
+{
+	cout << "Test MatPerm<FPP, GPU2>::conjugate()" << endl;
+	auto size = cpu_bm.getNbRow();
+	auto rmat = MatDense<FPP, Cpu>::randMat(size, size);
+	MatDense<FPP, Cpu> ref_mat(*rmat);
+	MatDense<FPP, GPU2> test_mat(*rmat);
+	auto gpu_clone = gpu_bm.clone();
+	auto cpu_clone = cpu_bm.Clone();
+	cpu_clone->conjugate();
+	cpu_clone->multiply(ref_mat, 'N');
+	gpu_clone->conjugate();
+	gpu_clone->multiply(test_mat, 'N');
+	auto test_mat_cpu = test_mat.tocpu();
+	assert(verifyMatEq(test_mat_cpu, ref_mat));
+	// undo the conjugate
+	cpu_clone->conjugate();
+	cpu_clone->multiply(ref_mat, 'N');
+	gpu_clone->conjugate();
+	gpu_clone->multiply(test_mat, 'N');
+	test_mat_cpu = test_mat.tocpu();
+	assert(verifyMatEq(test_mat_cpu, ref_mat));
+	delete rmat;
+	delete gpu_clone;
+	delete cpu_clone;
+	cout << "OK" << endl;
+}
+
+void test_adjoint(MatPerm<FPP, GPU2> &gpu_bm, MatPerm<FPP, Cpu> &cpu_bm)
+{
+	cout << "Test MatPerm<FPP, GPU2>::adjoint()" << endl;
+	auto size = cpu_bm.getNbRow();
+	auto rmat = MatDense<FPP, Cpu>::randMat(size, size);
+	MatDense<FPP, Cpu> ref_mat(*rmat);
+	MatDense<FPP, GPU2> test_mat(*rmat);
+	auto gpu_clone = gpu_bm.clone();
+	auto cpu_clone = cpu_bm.Clone();
+	cpu_clone->adjoint();
+	cpu_clone->multiply(ref_mat, 'N');
+	gpu_clone->adjoint();
+	gpu_clone->multiply(test_mat, 'N');
+	auto test_mat_cpu = test_mat.tocpu();
+	assert(verifyMatEq(test_mat_cpu, ref_mat));
+	// undo the adjoint
+	cpu_clone->adjoint();
+	cpu_clone->multiply(ref_mat, 'N');
+	gpu_clone->adjoint();
+	gpu_clone->multiply(test_mat, 'N');
+	test_mat_cpu = test_mat.tocpu();
+	assert(verifyMatEq(test_mat_cpu, ref_mat));
+	delete rmat;
+	delete gpu_clone;
+	delete cpu_clone;
+	cout << "OK" << endl;
+}
+
+void test_display(MatPerm<FPP, GPU2> &gpu_bm)
+{
+	cout << "Test MatPerm<FPP, GPU2>::Display()" << endl;
+	gpu_bm.Display();
+	cout << "OK" << endl;
+}
+
+int main(int argc, char** argv)
+{
+	Faust::enable_gpu_mod();
+
+	int log2size = 4;
+	if(argc > 1)
+		log2size = std::atoi(argv[1]);
+	std::cout << "log2size: " << log2size << std::endl;
+
+	int size = 1 << log2size;
+	auto F = TransformHelper<FPP, Cpu>::fourierFaust(log2size, false);
+	auto dsPermMat = F->get_fact(log2size); // bitrev perm
+	MatSparse<FPP, Cpu> spPermMat(dsPermMat);
+	MatPerm<FPP, Cpu> cpu_bm(spPermMat);
+	MatPerm<FPP, GPU2> gpu_bm(spPermMat);
+	test_mul_matdense(gpu_bm, cpu_bm);
+	test_get_nbytes(gpu_bm, cpu_bm);
+	test_get_nbrowcol(gpu_bm, cpu_bm);
+	test_get_type(gpu_bm, cpu_bm);
+	test_mul_matsparse(gpu_bm, cpu_bm);
+	test_toMatSparse(gpu_bm, cpu_bm);
+	test_get_colsrows(gpu_bm, cpu_bm);
+	test_norm(gpu_bm, cpu_bm);
+	test_clone(gpu_bm, cpu_bm);
+	test_getNonZeros(gpu_bm, cpu_bm);
+	test_transpose(gpu_bm, cpu_bm);
+	test_conjugate(gpu_bm, cpu_bm);
+	test_adjoint(gpu_bm, cpu_bm);
+	test_display(gpu_bm);
+
+	return 0;
+}
