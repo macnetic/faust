@@ -3706,8 +3706,6 @@ def circ(c, dev='cpu', diag_opt=False):
         left = opt_butterfly_faust(left)
     C = left @ right
     if dev.startswith('gpu'):
-        if diag_opt:
-            raise ValueError('diag_opt on GPU Faust is not yet implemented')
         C = C.clone('gpu')
     return C
 
@@ -3763,8 +3761,6 @@ def anticirc(c, dev='cpu', diag_opt=False):
         # nG > 2
         A = G.left(nG-2) @ Faust(G.factors(nG-1) @ P)
     if dev.startswith('gpu'):
-        if diag_opt:
-            raise ValueError('diag_opt on GPU Faust is not yet implemented')
         return A.clone('gpu')
     return A
 

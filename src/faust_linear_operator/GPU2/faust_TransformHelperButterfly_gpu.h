@@ -13,8 +13,6 @@ namespace Faust
 	template<typename FPP>
 		class TransformHelperButterfly<FPP, GPU2> : public TransformHelper<FPP, GPU2>
 		{
-			int* perm_ids;
-			Vect<FPP, GPU2> d_perm;
 			bool has_permutation;
 			std::vector<MatButterfly<FPP, GPU2>> opt_factors;
 			MatPerm<FPP, GPU2> P;
@@ -24,7 +22,8 @@ namespace Faust
 			TransformHelperButterfly(const std::vector<MatGeneric<FPP, Cpu> *>& facts, const FPP lambda_ = (FPP)1.0, const bool optimizedCopy=false, const bool cloning_fact = true, const bool internal_call=false);
 
 			public:
-			~TransformHelperButterfly() { if(perm_ids != nullptr) delete[] perm_ids;}
+			TransformHelperButterfly(const TransformHelper<FPP, Cpu> & cputh);
+			~TransformHelperButterfly() {}
 			static TransformHelper<FPP,GPU2>* fourierFaust(unsigned int n, const bool norma=true);
 			static TransformHelper<FPP,GPU2>* optFaust(const TransformHelper<FPP, GPU2>* F) { throw std::runtime_error("Not yet implemented on GPU");};
 			Vect<FPP, Cpu> multiply(const Vect<FPP, Cpu>& x);

@@ -88,6 +88,8 @@ namespace Faust
             const MatDense<FPP,Cpu>* cpu_dM = nullptr;
             const MatSparse<FPP,Cpu>* cpu_sM = nullptr;
             const MatBSR<FPP,Cpu>* cpu_bM = nullptr;
+            const MatButterfly<FPP,Cpu>* cpu_bf = nullptr;
+            const MatPerm<FPP,Cpu>* cpu_p = nullptr;
             if(nullptr != (cpu_dM = dynamic_cast<const MatDense<FPP,Cpu>*>(M)))
             {
                 auto gpu_dM = new MatDense<FPP,GPU2>(M->getNbRow(), M->getNbCol(), cpu_dM->getData());
@@ -103,6 +105,18 @@ namespace Faust
                 auto gpu_bM = new MatBSR<FPP,GPU2>(*cpu_bM);
                 gpu_M = gpu_bM;
             }
+            else if(nullptr != (cpu_bf = dynamic_cast<const MatButterfly<FPP,Cpu>*>(M)))
+            {
+                auto gpu_bf = new MatButterfly<FPP,GPU2>(*cpu_bf);
+                gpu_M = gpu_bf;
+            }
+            else if(nullptr != (cpu_p = dynamic_cast<const MatPerm<FPP,Cpu>*>(M)))
+            {
+                auto gpu_p = new MatPerm<FPP,GPU2>(*cpu_p);
+                gpu_M = gpu_p;
+            }
+	    else throw std::runtime_error("Unhandled CPU matrix type for conversion to GPU TransformHelper");
+	    // won't work  anyway for MatPerm/Butterfly because of get_gpu_mat_ptr exception (but it will when Transform GPU2 will be more idenpendent from gpu_mod cuMatArray)
             this->transform->push_back(gpu_M, false);
         }
 
@@ -986,20 +1000,20 @@ namespace Faust
 	template<typename FPP>
 		FPP* Faust::TransformHelper<FPP,GPU2>::indexMultiply(faust_unsigned_int* ids[2], size_t id_lens[2], const FPP* cpu_X, int X_ncols/*=1*/, FPP* cpu_out/*=nullptr*/) const
 		{
-            int32_t X_nrows;
+			int32_t X_nrows;
 			if(id_lens[1] > 0)
 				X_nrows = id_lens[1];
 			else
 				X_nrows = this->getNbCol();
-            MatDense<FPP,GPU2> gpu_X(X_nrows, X_ncols, cpu_X, false);
-            MatDense<FPP,GPU2> gpu_M = this->transform->indexMultiply(ids, id_lens, gpu_X, this->isTransposed2char());
+			MatDense<FPP,GPU2> gpu_X(X_nrows, X_ncols, cpu_X, false);
+			MatDense<FPP,GPU2> gpu_M = this->transform->indexMultiply(ids, id_lens, gpu_X, this->isTransposed2char());
 			if(cpu_out == nullptr)
 			{
 				auto out_nrows = id_lens[0]>0?id_lens[0]:this->getNbRow();
 				auto out_ncols = X_ncols;
 				cpu_out = new FPP[out_nrows*out_ncols*sizeof(FPP)];
 			}
-            gpu_M.tocpu(cpu_out, nullptr);
+			gpu_M.tocpu(cpu_out, nullptr);
 			return cpu_out;
 		}
 

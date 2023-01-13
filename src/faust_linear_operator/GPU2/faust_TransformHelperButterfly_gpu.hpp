@@ -45,6 +45,39 @@ namespace Faust
 		}
 
 	template<typename FPP>
+		TransformHelperButterfly<FPP, GPU2>::TransformHelperButterfly(const TransformHelper<FPP, Cpu> & cputh)
+		{
+			MatButterfly<FPP, Cpu>* mbf;
+			MatPerm<FPP, Cpu>* mp;
+			MatSparse<FPP, Cpu>* ms;
+			MatSparse<FPP, Cpu> sp;
+			has_permutation = false;
+			for(auto gen_fac: cputh)
+			{
+				if(mbf = dynamic_cast<MatButterfly<FPP, Cpu>*>(gen_fac))
+				{
+					opt_factors.insert(opt_factors.begin(), MatButterfly<FPP, GPU2>(*mbf));	
+					sp = mbf->toMatSparse();
+				}
+				else if(mp = dynamic_cast<MatPerm<FPP, Cpu>*>(gen_fac))
+				{
+					P = MatPerm<FPP, GPU2>(*mp);	
+					sp = mp->toMatSparse();
+					has_permutation = true;
+				}
+				else if((ms = dynamic_cast<MatSparse<FPP, Cpu>*>(gen_fac)) && MatPerm<FPP, Cpu>::isPerm(*ms, false))
+				{
+					sp = *ms;
+					P = MatPerm<FPP, GPU2>(sp);	
+					has_permutation = true;
+				}
+				else
+					throw std::runtime_error("Cannot convert CPU TransformHelper to GPU TransformHelperButterfly if it contains other matrix type than MatButterfly and MatPerm or MatSparse permutation");
+				this->push_back(new MatSparse<FPP, GPU2>(sp));
+			}
+		}
+
+	template<typename FPP>
 		void TransformHelperButterfly<FPP, GPU2>::multiply(const FPP* A, int A_ncols, FPP* C)
 	{
 
@@ -119,5 +152,8 @@ namespace Faust
 		}
 		return fourierFaust;
 	}
+
+
+
 
 }

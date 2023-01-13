@@ -903,6 +903,31 @@ template<typename FPP>
 	}
 
 template<typename FPP>
+	bool TransformHelper<FPP, Cpu>::containsOnlyButterflyPerm()
+	{
+		for(auto gen_fac : this->transform->data)
+		{
+			auto type = gen_fac->getType();
+			auto csr_fac = dynamic_cast<MatSparse<FPP, Cpu>*>(gen_fac);
+			if(type != Butterfly && type != Perm && (csr_fac == nullptr || ! MatPerm<FPP, Cpu>::isPerm(*csr_fac, false)))
+				return false;
+		}
+		return true;
+	}
+
+template<typename FPP>
+	bool TransformHelper<FPP, Cpu>::containsOnlyButterflySparse()
+	{
+		for(auto gen_fac : this->transform->data)
+		{
+			auto type = gen_fac->getType();
+			if(type != Butterfly && type != Sparse)
+				return false;
+		}
+		return true;
+	}
+
+template<typename FPP>
 	void TransformHelper<FPP, Cpu>::convertToDense()
 	{
 		this->eval_sliced_Transform();
