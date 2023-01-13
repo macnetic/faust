@@ -45,12 +45,28 @@ namespace Faust
 				return *this;
 			}
 
+			MatButterfly(const MatSparse<FPP, GPU2> &factor, int level)
+			{
+				MatSparse<FPP, Cpu> Scpu;
+				factor.tocpu(Scpu);
+				MatButterfly<FPP, GPU2> this_(Scpu, level);
+				*this = this_;
+			//TODO: do it without passing through CPU mem. and move the def in hpp
+			}
+
+
+			MatButterfly(const MatButterfly<FPP, Cpu>& bmat) : MatButterfly(bmat.toMatSparse(), bmat.getLevel())
+			{
+				//TODO/ without conversion to MatSparse
+			}
+
 			MatDense<FPP, GPU2> multiply(const FPP* x);
 			MatDense<FPP, GPU2> multiply(const FPP* A, int A_ncols);
 			MatDense<FPP, GPU2> multiply(MatDense<FPP,GPU2> &A);
 			void multiply(MatDense<FPP,GPU2> &A, MatDense<FPP, Cpu> & out);
 			const Vect<FPP, GPU2>& getD1() {return d1;};
 			const Vect<FPP, GPU2>& getD2() {return d2;};
+			const int getLevel() const {return level;}
 
 			MatButterfly(const MatSparse<FPP, Cpu> &factor, int level);
 			void setZeros();
