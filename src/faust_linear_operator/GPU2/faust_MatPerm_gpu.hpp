@@ -213,8 +213,8 @@ namespace Faust
 		MatPerm<FPP, GPU2>::~MatPerm()
 		{
 			if(perm_ids)
-				delete perm_ids;
-			if(dt.size() > 0 && perm_ids_T)
-				delete perm_ids_T;
+				delete[] perm_ids;
+			if(perm_ids_T)
+				delete[] perm_ids_T;
 		}
 }
