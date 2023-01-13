@@ -26,7 +26,7 @@ namespace Faust
 			{
 			}
 
-			MatPerm(const MatPerm<FPP, GPU2>& bmat)
+			MatPerm(const MatPerm<FPP, GPU2>& bmat) : MatPerm()
 			{
 				*this = bmat;
 			}
@@ -40,6 +40,22 @@ namespace Faust
 				if(bmat.is_transp)
 					transpose();
 				return *this;
+			}
+
+
+			MatPerm(const MatSparse<FPP, GPU2> &factor) : MatPerm()
+			{
+				MatSparse<FPP, Cpu> Scpu;
+				factor.tocpu(Scpu);
+				MatPerm<FPP, GPU2> this_(Scpu);
+				*this = this_;
+			//TODO: do it without passing through CPU mem. and move the def in hpp
+			}
+
+
+			MatPerm(const MatPerm<FPP, Cpu>& bmat) : MatPerm(bmat.toMatSparse())
+			{
+				//TODO/ without conversion to MatSparse
 			}
 
 			MatDense<FPP, GPU2> multiply(const FPP* x);
@@ -77,6 +93,15 @@ namespace Faust
 			void multiply(MatDense<FPP, GPU2> &other, const char op_this);
 			void multiply(MatSparse<FPP, GPU2> &other, const char op_this);
 			MatSparse<FPP, GPU2> toMatSparse() const;
+
+			static bool isPerm(const MatSparse<FPP, GPU2> &S, bool verify_ones=true)
+			{
+				//TODO: do it without copy in CPU mem and move def in hpp
+				MatSparse<FPP, Cpu> Scpu;
+				S.tocpu(Scpu);
+				return MatPerm<FPP, Cpu>::isPerm(Scpu, verify_ones);
+			}
+
 			~MatPerm();
 		};
 
