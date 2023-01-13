@@ -65,6 +65,7 @@ namespace Faust
 
 			const DiagMat& getD1() {return D1;}; //TODO/ move to .hpp
 			const DiagMat& getD2() {return D2;};
+			const int getLevel() const {return level;}
 			const std::vector<int>& get_subdiag_ids() {return subdiag_ids;}
 
 			MatGeneric<FPP,Cpu>* Clone(const bool isOptimize=false) const;
