@@ -223,6 +223,6 @@ namespace Faust
 		MatButterfly<FPP, GPU2>::~MatButterfly()
 		{
 			if(subdiag_ids)
-				delete subdiag_ids;
+				delete[] subdiag_ids;
 		}
 }
