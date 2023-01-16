@@ -1,3 +1,6 @@
+#include "faust_MatButterfly_gpu.h"
+#include "faust_MatPerm_gpu.h"
+
 namespace Faust
 {
     template<typename FPP,FDevice DEVICE> class Transform;
