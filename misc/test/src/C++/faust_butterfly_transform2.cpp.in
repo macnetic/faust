@@ -1,4 +1,4 @@
-#include "faust_TransformHelperButterfly.h"
+#include "faust_TransformHelper.h"
 #include <cstdio>
 
 typedef @TEST_FPP@ FPP;
