@@ -1,14 +1,6 @@
 #include "faust_Transform_gpu.h"
 namespace Faust
 {
-	template<>
-	Faust::RefManager Faust::Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::ref_man([](void *fact)
-			{
-#ifdef DEBUG
-			std::cout << "Faust::Transform delete_fact" << std::endl;
-#endif
-			delete static_cast<MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>*>(fact);
-			});
 
 	template<>
 		int32_t Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::getNbRow() const
@@ -31,7 +23,7 @@ namespace Faust
 		}
 
 	template<>
-		Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::Transform() : gpu_mat_arr(nullptr), dtor_delete_data(false), dtor_disabled(false), data(std::vector<Faust::MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>*>())
+		Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::Transform() : gpu_mat_arr(nullptr), dtor_delete_data(false), dtor_disabled(false), data(std::vector<MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>*>())
 	{
 	}
 
@@ -85,69 +77,10 @@ namespace Faust
 		}
 
 	template<>
-		MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>* Faust::Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::get_fact(int32_t id, bool cloning_fact) const
-		{
-//			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
-//			auto is_sparse = marr_funcs->is_sparse_at(this->gpu_mat_arr, id);
-//			MatGeneric<@FAUST_SCALAR_FOR_GM@, GPU2>* M = nullptr;
-//			if(is_sparse)
-//			{
-//				M = new MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>();
-//				M->set_gpu_mat_ptr(marr_funcs->get_spm(this->gpu_mat_arr, id));
-//			}
-//			else
-//			{
-//				M = new MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>();
-//				M->set_gpu_mat_ptr(marr_funcs->get_dsm(this->gpu_mat_arr, id));
-//			}
-//			if(cloning_fact)
-//			{
-//				auto tmp = M;
-//				M = M->clone();
-//				delete tmp;
-//			}
-//			return M;
-			if(cloning_fact)
-				return data[id]->clone();
-			else
-				return data[id];
-		}
-
-	template<>
-		void Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::update(const MatGeneric<@FAUST_SCALAR_FOR_GM@, GPU2>& M, const faust_unsigned_int id)
-		{
-			auto fact = get_fact(id, false);
-			auto fact_type = fact->getType();
-			if(M.getType() != fact_type)
-				throw std::runtime_error("The factor matrix to update is not of the same type (dense or sparse) as the input matrix.");
-			if(fact_type == Dense)
-			{
-				// fact to update is dense
-				auto dfact = dynamic_cast<MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>*>(fact);
-				auto dM = dynamic_cast<const MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>*>(&M);
-				*dfact = *dM;
-			}
-			else
-			{
-				// fact to update is sparse
-				auto sfact = dynamic_cast<MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>*>(fact);
-				auto sM = dynamic_cast<const MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>*>(&M);
-				*sfact = *sM;
-			}
-//			fact->set_id(M.is_id()); //TODO: in MatGeneric<FPP,GPU2> add is_id/set_id
-		}
-
-	template<>
 		void Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::Display(bool transpose/*=false*/) const
 		{
 			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 			marr_funcs->display_op(gpu_mat_arr, transpose?OP_TRANSP:OP_NOTRANSP);
-		}
-
-	template<>
-		void Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::update_total_nnz() const
-		{
-			//nothing to do get_total_nnz doesn't use any cache by now
 		}
 
 	template<>
@@ -162,19 +95,10 @@ namespace Faust
 				delete data[id];
 			else
 				ref_man.release(data[id]);
-			data[id] = const_cast<Faust::MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>*>(new_mat);
+			data[id] = const_cast<MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>*>(new_mat);
 			if(! dtor_delete_data)
 				ref_man.acquire(data[id]);
 			this->update_total_nnz();
-		}
-
-	template<>
-		void Transform<@FAUST_SCALAR_FOR_GM@, GPU2>::get_facts(std::vector<MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>*> &factors, bool cloning_facts/*=true*/) const
-		{
-			for(int i=0;i < size(); i++)
-			{
-				factors.push_back(get_fact(i, cloning_facts));
-			}
 		}
 
 	template<>
@@ -197,22 +121,6 @@ namespace Faust
 		}
 
 	template<>
-		void Transform<@FAUST_SCALAR_FOR_GM@, GPU2>::operator=(const Transform<@FAUST_SCALAR_FOR_GM@,GPU2>& t)
-		{
-			this->clear();
-			for(int i=0;i<t.size();i++)
-			{
-				this->push_back(t.get_fact(i, /*cloning*/false), /*copying*/ true);
-			}
-		}
-
-	template<>
-		Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::Transform(const Transform<@FAUST_SCALAR_FOR_GM@,GPU2> & t) : Transform<@FAUST_SCALAR_FOR_GM@,GPU2>()
-	{
-		*this = t;
-	}
-
-	template<>
 		void Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::insert(int32_t id, const MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>* M, bool copying/*=true*/)
 		{
 			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
@@ -224,12 +132,6 @@ namespace Faust
 			marr_funcs->insert_anymat(gpu_mat_arr, ins_M->get_gpu_mat_ptr(), id);
 			data.insert(data.begin()+id, ins_M);
 			if(!dtor_delete_data) ref_man.acquire(ins_M);
-		}
-
-	template<>
-		void Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::push_first(const MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>* M, bool copying/*=true*/)
-		{
-			this->insert(0, M, copying);
 		}
 
 	template<>
@@ -245,12 +147,6 @@ namespace Faust
 		}
 
 	template<>
-		void Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::pop_front()
-		{
-			this->erase(0);
-		}
-
-	template<>
 		void Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::transpose()
 		{
 			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
@@ -259,12 +155,6 @@ namespace Faust
 			else
 				throw std::runtime_error("gpu_mat_arr is nullptr");
 			std::reverse(data.begin(),data.end());
-		}
-
-	template<>
-		void Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::pop_back()
-		{
-			this->erase(size()-1);
 		}
 
 	template<>
@@ -316,14 +206,6 @@ namespace Faust
 		}
 
 	template<>
-		MatDense<@FAUST_SCALAR_FOR_GM@,GPU2> Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::get_product(const char opThis/*='N'*/, const bool isConj/*=false*/) const
-		{
-			MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> M;
-			this->get_product(M, opThis, isConj);
-			return M;
-		}
-
-	template<>
 		faust_unsigned_int Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::get_total_nnz() const
 		{
 			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
@@ -361,30 +243,7 @@ namespace Faust
 		}
 
 	template<>
-		void Faust::Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::multiply(const Faust::Transform<@FAUST_SCALAR_FOR_GM@,GPU2> & A)
-		{
-			if (A.size() != 0)
-			{
-				if (size() == 0)
-				{
-					(*this)=A;
-				}
-				else
-				{
-					if (getNbCol() != A.getNbRow())
-					{
-						throw std::runtime_error("Dimensions must agree");
-					}
-					for (int i=0;i<A.size();i++)
-					{
-						this->push_back(A.get_fact(i, /*cloning*/ false)); // push_back clones it afterward
-					}
-				}
-			}
-		}
-
-	template<>
-		MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> Faust::Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::sliceMultiply(const Slice s[2], MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>& gpu_X, const char opThis) const
+		MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::sliceMultiply(const Slice s[2], MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>& gpu_X, const char opThis) const
 		{
 			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 			if(gpu_mat_arr == nullptr) throw std::runtime_error("gpu_mat_arr is nullptr");
@@ -419,7 +278,7 @@ namespace Faust
 		}
 
 	template<>
-		MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> Faust::Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::indexMultiply(faust_unsigned_int* ids[2], size_t id_lens[2], MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>& gpu_X, const char opThis) const
+		MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::indexMultiply(faust_unsigned_int* ids[2], size_t id_lens[2], MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>& gpu_X, const char opThis) const
 		{
 			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 			if(gpu_mat_arr == nullptr) throw std::runtime_error("gpu_mat_arr is nullptr");
@@ -447,259 +306,9 @@ namespace Faust
 		}
 
 	template<>
-		void Faust::Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::multiplyLeft(const Faust::Transform<@FAUST_SCALAR_FOR_GM@,GPU2> & A)
-		{
-			if (A.size() != 0)
-			{
-				if (size() == 0)
-				{
-					(*this)=A;
-				}
-				else
-				{
-					if (A.getNbCol() != getNbRow())
-					{
-						throw std::runtime_error("Dimensions must agree");
-					}
-					for (int i=A.size()-1;i>-1;i--)
-					{
-						this->push_first(A.get_fact(i, /*cloning*/ false)); // push_back clones it afterward
-					}
-				}
-			}
-		}
-
-	template<>
 		void Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::multiply(const @FAUST_SCALAR_FOR_GM@& a, const int32_t id/*=-1*/)
 		{
 			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 			marr_funcs->scalar_mul_id(this->gpu_mat_arr, reinterpret_cast<const @GM_SCALAR@*>(&a), id);
-		}
-
-	template<>
-		bool Faust::Transform<@FAUST_SCALAR_FOR_GM@, GPU2>::is_fact_sparse(int id) const
-		{
-			return get_fact(id, /*cloning*/ false)->getType() == Sparse;
-		}
-
-	template<>
-		bool Faust::Transform<@FAUST_SCALAR_FOR_GM@, GPU2>::is_fact_dense(int id) const
-		{
-			return get_fact(id, /*cloning*/ false)->getType() == Dense;
-		}
-
-	template<>
-		bool Faust::Transform<@FAUST_SCALAR_FOR_GM@, GPU2>::is_fact_bsr(int id) const
-		{
-			return get_fact(id, /*cloning*/ false)->getType() == BSR;
-		}
-
-	template<>
-		void Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::get_fact(const faust_unsigned_int &id,
-				@FAUST_SCALAR_FOR_GM@* elts,
-				faust_unsigned_int* num_rows,
-				faust_unsigned_int* num_cols,
-				const bool transpose /*=false*/) const
-		{
-			if(! is_fact_dense(id))
-				throw std::runtime_error("faust_Transform_gpu: this get_fact function signature is for MatDense only.");
-			auto gen_mat = get_fact(id, /*cloning*/ false);
-			auto dmat = dynamic_cast<MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>*>(gen_mat);
-			@FAUST_SCALAR_FOR_GM@ tmp;
-			*num_cols = gen_mat->getNbCol();
-			*num_rows = gen_mat->getNbRow();
-			/******* failsafe copy **/
-			auto cpu_mdense = new MatDense<@FAUST_SCALAR_FOR_GM@,Cpu>(dmat->getNbRow(), dmat->getNbCol());
-			dmat->tocpu(*cpu_mdense);
-			memcpy(elts, cpu_mdense->getData(),cpu_mdense->getNbCol()*cpu_mdense->getNbRow()*sizeof(@FAUST_SCALAR_FOR_GM@));
-			delete cpu_mdense;
-			/********* efficient copy that should work but doesn't */
-			// TODO: normally it must be possible to copy directly to elts but I noticed a segfault (and I couldn't figure out how to fix it)
-//			dmat->tocpu(elts);
-			/***************************/
-			if(transpose)
-			{
-				// transpose in-place
-				// the matrix is in column-major order
-				for(int j=0;j<*num_cols;j++)
-					for(int i=0; i<*num_rows;i++)
-					{
-						tmp = elts[i**num_cols+j];
-						elts[i**num_cols+j] = elts[j**num_rows+i];
-						elts[j**num_rows+i] = tmp;
-					}
-				// swap num_cols and num_rows
-				// (with only these 2 variables -- F2 arithmetic trick)
-				*num_cols = *num_cols^*num_rows;
-				*num_rows = *num_cols^*num_rows;
-				*num_cols = *num_cols^*num_rows;
-			}
-		}
-
-template<>
-void Faust::Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::get_fact(const faust_unsigned_int id,
-		int* d_outer_count_ptr, int* d_inner_ptr, @FAUST_SCALAR_FOR_GM@* d_elts,
-		faust_unsigned_int* nnz,
-		faust_unsigned_int* num_rows, faust_unsigned_int* num_cols,
-		bool transpose /* default to false */) const
-{
-	if(! is_fact_sparse(id))
-		throw std::runtime_error("faust_Transform_gpu: this get_fact function signature is for MatSparse only.");
-	auto gen_mat = get_fact(id, /*cloning*/ false);
-	auto smat = dynamic_cast<MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>*>(gen_mat);
-	MatSparse<@FAUST_SCALAR_FOR_GM@,Cpu> cpu_smat;
-	if(transpose)
-	{
-		auto t_smat = smat->clone();
-		t_smat->transpose();
-		t_smat->tocpu(d_outer_count_ptr, d_inner_ptr, d_elts, (int32_t*) num_rows, (int32_t*) num_cols, (int32_t*) nnz);
-		delete t_smat;
-	}
-	else
-	{
-		smat->tocpu(d_outer_count_ptr, d_inner_ptr, d_elts, (int32_t*) num_rows, (int32_t*) num_cols, (int32_t*) nnz);
-	}
-}
-
-
-	template<>
-	Vect<@FAUST_SCALAR_FOR_GM@,GPU2> Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::multiply(const Vect<@FAUST_SCALAR_FOR_GM@,GPU2>& x, const char opThis/*='N'*/)
-	{
-		MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> out = this->multiply((const MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>)x, opThis);
-		Vect<@FAUST_SCALAR_FOR_GM@,GPU2> v_out;
-		v_out.gpu_mat = out.gpu_mat;
-		out.gpu_mat = nullptr; // avoid freeing v_out.gpu_mat when out of scope
-		return v_out;
-	}
-
-	template<>
-		MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>* Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator::operator*() const
-		{
-			return container.get_fact(index, /*cloning_fact*/ false);
-		}
-
-	template<>
-		Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator& Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator::operator++()
-		{
-			index++;
-			return *this;
-		}
-
-	template<>
-		Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator::operator+(int arg)
-		{
-			iterator copy(*this);
-			copy.index = this->index+arg;
-			return copy;
-		}
-
-	template<>
-		Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator::operator-(int arg)
-		{
-			iterator copy(*this);
-			copy.index = this->index-arg;
-			return copy;
-		}
-
-	template<>
-		Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator::operator++(int)
-		{
-			iterator copy(*this);
-			this->index++;
-			return copy;
-		}
-
-	template<>
-		bool Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator::operator<(const Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator& it)
-		{
-			return this->index < it.index;
-		}
-
-	template<>
-		bool Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator::operator!=(const Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator& it)
-		{
-			return this->index != it.index;
-		}
-
-	template<>
-		Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator::iterator(const Transform<@FAUST_SCALAR_FOR_GM@, GPU2>& container, size_t index) : index(index), container(container)
-		{
-		}
-
-	template<>
-		Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::begin() const
-		{
-			return Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator(*this, 0);
-		}
-
-	template<>
-		Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::end() const
-		{
-			return Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator(*this, size());
-		}
-
-	template<>
-		void Transform<@FAUST_SCALAR_FOR_GM@, GPU2>::tocpu(Transform<@FAUST_SCALAR_FOR_GM@, Cpu>& cpu_transf) const
-		{
-
-			MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>* gpu_mdense = nullptr;
-			MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>* gpu_msparse = nullptr;
-			MatBSR<@FAUST_SCALAR_FOR_GM@, GPU2>* gpu_mbsr = nullptr;
-			for(auto gpu_mat: data)
-			{
-				if(gpu_mdense = dynamic_cast<MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>*>(gpu_mat))
-				{
-					auto cpu_mdense = new MatDense<@FAUST_SCALAR_FOR_GM@,Cpu>(gpu_mdense->getNbRow(), gpu_mdense->getNbCol());
-					gpu_mdense->tocpu(*cpu_mdense);
-					cpu_transf.push_back(cpu_mdense, false, false);
-				 }
-				else if(gpu_msparse = dynamic_cast<MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>*>(gpu_mat))
-				{
-					auto cpu_msparse = new MatSparse<@FAUST_SCALAR_FOR_GM@,Cpu>();
-					cpu_msparse->resize(gpu_msparse->getNonZeros(), gpu_msparse->getNbRow(), gpu_msparse->getNbCol());
-					gpu_msparse->tocpu(*cpu_msparse);
-					cpu_transf.push_back(cpu_msparse, false, false, false);
-				}
-				else if(gpu_mbsr = dynamic_cast<MatBSR<@FAUST_SCALAR_FOR_GM@, GPU2>*>(gpu_mat))
-				{
-					auto cpu_mbsr = new MatBSR<@FAUST_SCALAR_FOR_GM@,Cpu>();
-					gpu_mbsr->tocpu(*cpu_mbsr);
-					cpu_transf.push_back(cpu_mbsr, false, false, false);
-				}
-				else
-					throw std::runtime_error("Invalid matrix pointer");
-			}
-		}
-
-	template<>
-		Transform<@FAUST_SCALAR_FOR_GM@, Cpu> Transform<@FAUST_SCALAR_FOR_GM@, GPU2>::tocpu() const
-		{
-			Transform<@FAUST_SCALAR_FOR_GM@, Cpu> cpu_transf;
-			tocpu(cpu_transf);
-			return cpu_transf;
-		}
-
-	template<>
-		void Transform<@FAUST_SCALAR_FOR_GM@, GPU2>::save_mat_file(const char* filename, const bool transpose, const bool conjugate) const
-		{
-			Transform<@FAUST_SCALAR_FOR_GM@,Cpu> cpu_transf;
-			this->tocpu(cpu_transf);
-			cpu_transf.save_mat_file(filename, transpose, conjugate);
-		}
-
-	template<>
-		Real<@FAUST_SCALAR_FOR_GM@> Faust::Transform<@FAUST_SCALAR_FOR_GM@, GPU2>::normL1(const bool transpose /* = false */, const bool full_array/*=true*/, const int batch_size/*=1*/) const
-		{
-			double norm;
-			MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> full = get_product(transpose?'T':'N');
-			norm = std::abs(full.normL1(/*transpose*/)); //transpose not necessary because full is already transposed if needed
-			return norm;
-		}
-
-
-	template<>
-		faust_unsigned_int Transform<@FAUST_SCALAR_FOR_GM@, GPU2>::get_fact_nnz(const faust_unsigned_int id) const
-		{
-			return this->get_fact(id, false)->getNonZeros();
 		}
 }
