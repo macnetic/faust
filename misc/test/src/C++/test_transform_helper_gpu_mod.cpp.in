@@ -11,6 +11,7 @@ using namespace std;
 
 int main()
 {
+	//TODO: refactor as proper unit tests + with assertions
 	Faust::enable_gpu_mod();
 	TransformHelper<double, GPU2> th;
 	auto cpu_mat1 = MatDense<double,Cpu>::randMat(12,24);
@@ -54,15 +55,25 @@ int main()
 	cout << "M_cpu.norm() " << M_cpu.norm() << endl;
 	cout << "M_gpu.norm() " << M_gpu.norm() << endl;
 	cout << "========== sliceMultiply" << endl;
+	// N.B.: compile with DEBUG compiler constant defined to see debug messages proving sliceMultiply is called (on GPU and CPU)
 //			MatDense<FPP, Cpu> sliceMultiply(const Slice s[2], const FPP* X, int X_ncols=1) const;
 	auto cpu_mat7 = Faust::MatDense<double,Cpu>::randMat(11, 32);
-	Slice s[2];
-	s[0] = Slice(0, th2_cpu.getNbRow());
-	s[1] = Slice(0, 11);
-	auto M_cpu8 = th2_cpu.sliceMultiply(s, cpu_mat7->getData(), nullptr, cpu_mat7->getNbCol());
-	auto M_gpu8 = th2.sliceMultiply(s, cpu_mat7->getData(), nullptr, cpu_mat7->getNbCol());
-	cout << "M_cpu.norm() " << M_cpu.norm() << endl;
-	cout << "M_gpu.norm() " << M_gpu.norm() << endl;
+	// can't call sliceMultiply directly (for dimensions reason) so call slice + multiply (which normally calls sliceMultiply)
+	auto sth2_cpu = th2_cpu.slice(0, th2_cpu.getNbRow(), 0, 11);
+	auto th2_gpu = new TransformHelper<double, GPU2>(th2_cpu);
+	auto sth2 = th2_gpu->slice(0, th2.getNbRow(), 0, 11);
+
+	MatDense<double, Cpu> M_cpu8(sth2_cpu->getNbRow(), cpu_mat7->getNbCol());
+	MatDense<double, Cpu> M_gpu8(sth2->getNbRow(), cpu_mat7->getNbCol());
+	sth2_cpu->multiply(cpu_mat7->getData(), cpu_mat7->getNbCol(), M_cpu8.getData());
+	sth2->multiply(cpu_mat7->getData(), cpu_mat7->getNbCol(), M_gpu8.getData());
+	sth2_cpu->display();
+	sth2->display();
+	cout << "M_cpu.norm() " << M_cpu8.norm() << endl;
+	cout << "M_gpu.norm() " << M_gpu8.norm() << endl;
+	delete th2_gpu;
+	delete sth2_cpu;
+	delete sth2;
 	return EXIT_SUCCESS;
 }
 

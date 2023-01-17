@@ -479,6 +479,9 @@ namespace Faust
         {
 			if(this->is_sliced)
 			{
+#if DEBUG
+				std::cout << "calling sliceMultiply on GPU Faust" << std::endl;
+#endif
 				this->sliceMultiply(this->slices, cpu_x_buf, cpu_out_buf, x_ncols);
 			}
 			else if(this->is_fancy_indexed)

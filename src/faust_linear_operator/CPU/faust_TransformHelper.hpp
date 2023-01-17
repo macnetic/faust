@@ -403,8 +403,11 @@ namespace Faust {
 	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::multiply(const FPP* A, int A_ncols, FPP* C)
 		{
-			if(this->is_sliced && (A_ncols == 1 || this->size() > 1)) // benchmarks have shown that a single factor Faust is less efficient to multiply a marix (A_ncols > 1) with sliceMultiply than using eval_sliced_Transform and multiply
+			if(this->is_sliced && (A_ncols == 1 || this->size() > 1)) // benchmarks have shown that a single factor Faust is less efficient to multiply a matrix (A_ncols > 1) with sliceMultiply than using eval_sliced_Transform and multiply
 			{
+#if DEBUG
+				std::cout << "calling sliceMultiply on CPU Faust to mul a matrix" << std::endl;
+#endif
 #if (EIGEN_WORLD_VERSION >= 3 && EIGEN_MAJOR_VERSION >= 4)
 				this->sliceMultiply(this->slices, A, C, A_ncols);
 #else
@@ -2012,7 +2015,7 @@ FPP* Faust::TransformHelper<FPP,Cpu>::sliceMultiply(const Slice s[2], const FPP*
 	// NOTE: Take care if you edit this method, it must avoid any method that calls eval_sliced_Transform or it would become useless or bugged
 	//TODO: refactor this function (too long)
 	//TODO: refactor with MatDense/MatSparse/eigenSliceMul, similar to eigenIndexMul
-	// TODO: MatBSR/MatButterfly/MatPerm::eigenSliceMul (function to rename becaose eigen won't be used for them), add a MatGeneric::sliceMul pure virtual function (likewise for indexMultiply)
+	// TODO: MatBSR/MatButterfly/MatPerm::eigenSliceMul (function to rename because eigen won't be used for them), add a MatGeneric::sliceMul pure virtual function (likewise for indexMultiply)
 	using Mat = Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>;
 	using MatMap = Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>>;
 	MatMap X_map(const_cast<FPP*>(X), this->getNbCol(), X_ncols); // the const_cast is harmless, no modif. is made
