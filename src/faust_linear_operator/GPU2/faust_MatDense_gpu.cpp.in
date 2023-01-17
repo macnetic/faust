@@ -67,17 +67,6 @@ namespace Faust
 				const void* stream/*=nullptr*/) : MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>(mat.getNbRow(), mat.getNbCol(), mat.getData(), /*no_alloc*/ mat.getData() == nullptr, dev_id, stream){}
 
 
-
-	template<>
-		void Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::multiply(const MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> &other, const char op_this)
-		{
-			// other = this * other
-			gm_Op gop_this;
-			char2gm_Op(op_this, gop_this);
-			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
-			dsm_funcs->mul_gpu_dsm_ext(this->gpu_mat, other.gpu_mat, other.gpu_mat, gop_this, OP_NOTRANSP);
-		}
-
 	template<>
 		void Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::multiply(MatDense<@FAUST_SCALAR_FOR_GM@, Cpu> &other, const char op_this)
 		{
@@ -631,6 +620,28 @@ namespace Faust
 			mat.gpu_mat = nullptr;
 			return *this;
 		}
+
+	template<>
+		void Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::multiply(MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> &other, const char op_this) const
+		{
+			// other = this * other
+			gm_Op gop_this;
+			char2gm_Op(op_this, gop_this);
+			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
+			faust_unsigned_int m, n; // prod dims
+			m = op_this == 'N'?this->getNbRow():this->getNbCol();
+			n = other.getNbCol();
+			// is other large enough to receive this * other ?
+			if(other.getNbRow() < m)
+			{
+				MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> out(m, n);
+				dsm_funcs->mul_gpu_dsm_ext(this->gpu_mat, other.gpu_mat, out.gpu_mat, gop_this, OP_NOTRANSP);
+				other = std::move(out);
+			}
+			else
+				dsm_funcs->mul_gpu_dsm_ext(this->gpu_mat, other.gpu_mat, other.gpu_mat, gop_this, OP_NOTRANSP);
+		}
+
 
 	template<>
 		MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::MatDense(MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>&& mat)

@@ -24,7 +24,7 @@ namespace Faust
 
 
 	template<typename FPP>
-		void MatButterfly<FPP, GPU2>::multiply(MatDense<FPP, GPU2> &other, const char op_this)
+		void MatButterfly<FPP, GPU2>::multiply(MatDense<FPP, GPU2> &other, const char op_this) const
 		{
 			if(op_this != 'N' && op_this != 'T')
 				throw std::runtime_error("MatButtermfly::multiply only handle 'N' and 'T' for op_this");

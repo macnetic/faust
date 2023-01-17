@@ -474,7 +474,7 @@ namespace Faust
 		}
 
 	template<>
-		void MatSparse<FSFG, GPU2>::multiply(MatDense<FSFG,GPU2>& mat, char opThis/*='N'*/) const
+		void MatSparse<FSFG, GPU2>::multiply(MatDense<FSFG,GPU2>& mat, const char opThis/*='N'*/) const
 		{
 			gm_Op gop_this;
 			char2gm_Op(opThis, gop_this);

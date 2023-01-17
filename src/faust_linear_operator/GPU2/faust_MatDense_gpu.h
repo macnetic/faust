@@ -103,7 +103,7 @@ namespace Faust
 				void eltwise_mul(const Vect<FPP, GPU2> &vec, const int *ids=nullptr);
 				//  TODO: other shouldn't be const if it is the output
 				//  other = (*this) * other
-				void multiply(const MatDense<FPP, GPU2> &other, const char op_this='N');
+				void multiply(MatDense<FPP, GPU2> &other, const char op_this='N') const;
 				//  other = (*this) * other
 				void multiply(MatDense<FPP, Cpu> &other, const char op_this='N');
 //				void multiply(MatSparse<FPP, Cpu> &other, MatDense<FPP, GPU2>& output, const char op_this='N');
