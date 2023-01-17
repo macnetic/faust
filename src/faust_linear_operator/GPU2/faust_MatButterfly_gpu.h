@@ -27,7 +27,7 @@ namespace Faust
 			{
 			}
 
-			MatButterfly(const MatButterfly<FPP, GPU2>& bmat)
+			MatButterfly(const MatButterfly<FPP, GPU2>& bmat) : MatButterfly()
 			{
 				*this = bmat;
 			}
