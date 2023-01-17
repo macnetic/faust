@@ -49,6 +49,14 @@ void free_gpu_factors(vector<MatGeneric<FPP,GPU2>*> &gpu_factors)
 }
 
 
+bool verifyMatEq(MatDense<FPP, Cpu> refm, MatDense<FPP, GPU2> testm_gpu, double tol=1e-6)
+{
+	auto testm = testm_gpu.tocpu();
+	auto err = refm;
+	err -= testm;
+	return err.norm() <= tol;
+}
+
 void assert_gpu_cpu_Transform_almost_eq(const Faust::Transform<FPP, GPU2> & t_gpu, const Faust::Transform<FPP, Cpu>& t_cpu)
 {
 	auto cpu_p = t_cpu.get_product();
@@ -268,6 +276,26 @@ void test_Transform_multiply_Transform()
 	cout << "OK" << endl;
 }
 
+void test_Transform_multiply_MatDense()
+{
+	cout << "void test_Transform_multiply_MatDense()" << endl;
+	vector<MatGeneric<FPP,GPU2>*> gpu_factors;
+	vector<MatGeneric<FPP,Cpu>*> cpu_factors;
+	generate_cpu_gpu_factors(gpu_factors, cpu_factors);
+	Faust::Transform<FPP, GPU2> t_gpu(gpu_factors);
+	Faust::Transform<FPP, Cpu> t_cpu(cpu_factors);
+	t_gpu.Display();
+	t_cpu.Display();
+	auto cpu_mat = MatDense<FPP, Cpu>::randMat(t_cpu.getNbCol(), 32);
+	MatDense<FPP, GPU2> gpu_mat(*cpu_mat);
+	t_cpu.multiply(*cpu_mat, 'N');
+	t_gpu.multiply(gpu_mat, 'N');
+	assert(verifyMatEq(*cpu_mat, gpu_mat));
+	free_gpu_factors(gpu_factors);
+	delete cpu_mat;
+	cout << "OK" << endl;
+}
+
 void test_Transform_multiplyLeft_Transform()
 {
 	cout << "void test_Transform_multiplyLeft_Transform()" << endl;
@@ -401,5 +429,6 @@ int main()
 	test_Transform_spectralNorm();
 	test_Transform_get_facts();
 	test_Transform_tocpu();
+	test_Transform_multiply_MatDense();
 	return EXIT_SUCCESS;
 }

@@ -111,5 +111,6 @@ namespace Faust
 		};
 }
 
+#include "faust_Transform_gpu.hpp"
 #endif
 #endif
