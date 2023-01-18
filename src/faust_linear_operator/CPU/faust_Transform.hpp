@@ -590,14 +590,7 @@ void Faust::Transform<FPP,Cpu>::get_product(Faust::MatDense<FPP,Cpu> &mat, const
 		{
 			auto end = this->size()-1;
 			// just one matrix in the Faust, return a copy as dense matrix
-			if(dynamic_cast<MatSparse<FPP,Cpu>*>(data[end]))
-				mat = *dynamic_cast<MatSparse<FPP,Cpu>*>(data[end]);
-			else if(dynamic_cast<MatDense<FPP,Cpu>*>(data[end]))
-				mat = *dynamic_cast<MatDense<FPP,Cpu>*>(data[end]);
-			else if(dynamic_cast<MatBSR<FPP, Cpu>*>(data[end]))
-			{
-				mat = dynamic_cast<MatBSR<FPP, Cpu>*>(data[end])->to_dense();
-			}
+			mat = data[end]->to_dense();
 			if(isConj)
 				mat.conjugate();
 			return;
@@ -612,15 +605,13 @@ void Faust::Transform<FPP,Cpu>::get_product(Faust::MatDense<FPP,Cpu> &mat, const
 		{
 			data[i]->multiply(mat,opThis);
 		}
-	}else
+	}
+	else
 	{
 		if(data.size() == 1)
 		{
-			// just one matrix in the Faust, return a transposed or transconjugate copy as dense matrix
-			if(dynamic_cast<MatSparse<FPP,Cpu>*>(data[0]))
-				mat = *dynamic_cast<MatSparse<FPP,Cpu>*>(data[0]);
-			else if(dynamic_cast<MatDense<FPP,Cpu>*>(data[0]))
-				mat = *dynamic_cast<MatDense<FPP,Cpu>*>(data[0]);
+			// just one matrix in the Faust, return a transpose or transconjugate copy as dense matrix
+			mat = data[0]->to_dense();
 			if(opThis == 'H' || opThis == 'T' && isConj)
 				mat.adjoint();
 			else if(opThis == 'T')
