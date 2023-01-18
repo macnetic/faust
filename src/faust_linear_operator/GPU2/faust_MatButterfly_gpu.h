@@ -98,6 +98,7 @@ namespace Faust
 			void multiply(MatDense<FPP, GPU2> &other, const char op_this) const;
 			void multiply(MatSparse<FPP, GPU2> &other, const char op_this);
 			MatSparse<FPP, GPU2> toMatSparse() const;
+			MatDense<FPP, GPU2> to_dense() const;
 			~MatButterfly();
 		};
 

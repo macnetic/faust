@@ -177,6 +177,8 @@ namespace Faust
 				void real(MatDense<Real<FPP>, GPU2>& real_mat) const;
 				template<typename FPP2>
 					MatDense<Real<FPP2>, GPU2> to_real() const;
+
+				MatDense<FPP, GPU2> to_dense() const;
 				static void gemm(const MatDense<FPP, GPU2> &A, const MatDense<FPP, GPU2> &B, MatDense<FPP, GPU2> &C, const FPP& alpha, const FPP& beta, const char opA, const char opB);
 				static void gemv(const MatDense<FPP, GPU2> &A, const Vect<FPP, GPU2> &B, Vect<FPP, GPU2> &C, const FPP& alpha, const FPP& beta, const char opA, const char opB='N');
 

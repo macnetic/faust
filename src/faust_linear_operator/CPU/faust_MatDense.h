@@ -621,6 +621,8 @@ namespace Faust
 				void eigenIndexMul(const faust_unsigned_int* row_ids, const faust_unsigned_int* col_ids, size_t nrows, size_t ncols, const MatType1 &in_mat, MatType2 &out_mat, bool transpose = false, bool conjugate = false);
 
 
+
+			MatDense<FPP, Cpu> to_dense() const;
 		};
 
 	// \brief Computes the Kronecker product A \otimes B into out.

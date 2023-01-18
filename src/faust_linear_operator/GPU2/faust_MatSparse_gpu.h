@@ -110,6 +110,8 @@ namespace Faust
 			MatSparse<FPP,GPU2>* get_cols(faust_unsigned_int col_id_start, faust_unsigned_int num_cols) const;
 			MatSparse<FPP,GPU2>* get_cols(faust_unsigned_int* col_ids, faust_unsigned_int num_cols) const;
 
+			MatDense<FPP, GPU2> to_dense() const;
+
 
 			private:
 				void* get_gpu_mat_ptr() const;

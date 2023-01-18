@@ -149,6 +149,9 @@ namespace Faust
 			//! \return value between 0 and 1
 			float density() const{return ((float) this->getNonZeros())/((float)this->getNbCol()*this->getNbRow());}
 
+			// \brief Converts the matrix to a MatDense<FPP, DEVICE>.
+			virtual MatDense<FPP, DEVICE> to_dense() const=0;
+
 			//! \brief get the dynamic type of the matrix (SPARSE, DENSE, etc.)
 			virtual MatType getType() const=0;
 

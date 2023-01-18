@@ -1685,5 +1685,12 @@ namespace Faust {
 			throw std::runtime_error("MatSparse::eigenIndexMul is not supported with eigen version < 3.9");
 #endif
 		}
+
+
+	template <typename FPP>
+		MatDense<FPP, Cpu> MatSparse<FPP, Cpu>::to_dense() const
+		{
+			return MatDense<FPP, Cpu>(*this);
+		}
 }
 #endif

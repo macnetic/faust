@@ -96,6 +96,8 @@ namespace Faust
 			void multiply(MatSparse<FPP, GPU2> &other, const char op_this);
 			MatSparse<FPP, GPU2> toMatSparse() const;
 
+			MatDense<FPP, GPU2> to_dense() const;
+
 			static bool isPerm(const MatSparse<FPP, GPU2> &S, bool verify_ones=true)
 			{
 				//TODO: do it without copy in CPU mem and move def in hpp

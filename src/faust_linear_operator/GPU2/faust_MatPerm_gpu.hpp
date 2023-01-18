@@ -222,8 +222,15 @@ namespace Faust
 	template<typename FPP>
 		void MatPerm<FPP, GPU2>::operator*=(const FPP& alpha)
 		{
-			d *= alpha;
+			d.scalarMultiply(alpha);
 			if(dt.size() > 0)
-				dt *= alpha;
+				dt.scalarMultiply(alpha);
+		}
+
+	template<typename FPP>
+		MatDense<FPP, GPU2> MatPerm<FPP,GPU2>::to_dense() const
+		{
+			//TODO: without converting to MatSparse (multiplying by Id ?)
+			return this->toMatSparse().to_dense();
 		}
 }

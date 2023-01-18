@@ -103,6 +103,8 @@ namespace Faust
 			 * If the matrix S is well-formed the cost is O(nnz^2) in the worst case.
 			 */
 			static bool isPerm(const MatSparse<FPP, Cpu> &S, bool verify_ones=true);
+
+			MatDense<FPP, Cpu> to_dense() const;
 		};
 
 }

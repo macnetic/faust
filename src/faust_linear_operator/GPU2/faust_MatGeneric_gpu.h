@@ -49,6 +49,9 @@ namespace Faust
 
 				virtual void multiply(MatDense<FPP,GPU2> &A, const char opThis) const =0;
 				virtual void operator*=(const FPP& alpha) =0;
+
+				// \brief Converts the matrix to a MatDense<FPP, DEVICE>.
+				virtual MatDense<FPP, GPU2> to_dense() const=0;
 				MatGeneric();
 
 				virtual ~MatGeneric();

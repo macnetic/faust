@@ -5,6 +5,7 @@ namespace Faust
 		int32_t Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::getNbRow() const
 		{
 			int32_t nrows;
+			if(gpu_mat == nullptr) return 0;
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
 			dsm_funcs->info(gpu_mat, &nrows, nullptr);
 			return nrows;
@@ -14,6 +15,7 @@ namespace Faust
 		int32_t Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::getNbCol() const
 		{
 			int32_t ncols;
+			if(gpu_mat == nullptr) return 0;
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
 			dsm_funcs->info(gpu_mat, nullptr, &ncols);
 			return ncols;

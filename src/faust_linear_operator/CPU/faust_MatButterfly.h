@@ -97,6 +97,8 @@ namespace Faust
 
 			MatSparse<FPP, Cpu> toMatSparse() const;
 
+			MatDense<FPP, Cpu> to_dense() const;
+
 			void faust_gemm(const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char typeA, char typeB)const; //from LinearOperator
 		};
 

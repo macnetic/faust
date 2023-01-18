@@ -194,3 +194,15 @@ bool Faust::MatDiag<FPP>::containsNaN() const
 {
 	return Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>>(const_cast<FPP*>(getData()) /* no worry, just a read access */, min(this->dim1, this->dim2), 1).hasNaN();
 }
+
+namespace Faust
+{
+	template<typename FPP>
+		MatDense<FPP, Cpu> MatDiag<FPP>::to_dense() const
+		{
+			MatDense<FPP, Cpu> dense(this->getNbCol(), this->getNbCol());
+			dense.setOnes();
+			multiply(dense, 'N');
+			return dense;
+		}
+}

@@ -18,6 +18,7 @@ namespace Faust
 //	template<typename FPP, FDevice DEVICE>
 //		class MatGeneric;
 
+	//TODO: a MatDiag is a particular MatPerm with nonones coeffs (MatPerm should be a parent as it allows to set nonones coeffs)
 	template<typename FPP>
 		class MatDiag : public MatGeneric<FPP,Cpu>
 		{
@@ -95,6 +96,8 @@ namespace Faust
 
 			bool containsNaN() const;
 			const FPP* getData() const { return mat.diagonal().data();};
+
+			MatDense<FPP, Cpu> to_dense() const;
 
 		};
 }

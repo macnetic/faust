@@ -499,4 +499,14 @@ namespace Faust
 		return true;
 	}
 
+
+
+	template<typename FPP>
+		MatDense<FPP, Cpu> MatPerm<FPP, Cpu>::to_dense() const
+		{
+			MatDense<FPP, Cpu> dense(this->getNbCol(), this->getNbCol());
+			dense.setOnes();
+			multiply(dense, 'N');
+			return dense;
+		}
 }

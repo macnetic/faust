@@ -2069,6 +2069,11 @@ void MatDense<FPP,Cpu>::print_timers()const
 }
 #endif
 
+template<typename FPP>
+MatDense<FPP, Cpu> MatDense<FPP, Cpu>::to_dense() const
+{
+	return *this;
+}
 
 }
 #endif

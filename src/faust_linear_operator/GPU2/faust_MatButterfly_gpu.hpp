@@ -220,12 +220,12 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		void MatPerm<FPP, GPU2>::operator*=(const FPP& alpha)
+		void MatButterfly<FPP, GPU2>::operator*=(const FPP& alpha)
 		{
-			d1 *= alpha;
-			d2 *= alpha;
+			d1.scalarMultiply(alpha);
+			d2.scalarMultiply(alpha);
 			if(d2t.size() > 0)
-				d2t *= alpha;
+				d2t.scalarMultiply(alpha);
 		}
 
 	template<typename FPP>
@@ -233,5 +233,12 @@ namespace Faust
 		{
 			if(subdiag_ids)
 				delete[] subdiag_ids;
+		}
+
+	template<typename FPP>
+		MatDense<FPP, GPU2> MatButterfly<FPP,GPU2>::to_dense() const
+		{
+			//TODO: without converting to MatSparse (multiplying by Id ?)
+			return this->toMatSparse().to_dense();
 		}
 }
