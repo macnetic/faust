@@ -217,4 +217,13 @@ namespace Faust
 			if(perm_ids_T)
 				delete[] perm_ids_T;
 		}
+
+
+	template<typename FPP>
+		void MatPerm<FPP, GPU2>::operator*=(const FPP& alpha)
+		{
+			d *= alpha;
+			if(dt.size() > 0)
+				dt *= alpha;
+		}
 }

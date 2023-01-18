@@ -79,6 +79,7 @@ namespace Faust
 			/*********** own member functions **************/
 			void multiply(MatDense<FPP,GPU2>& M, char opThis='N') const;
 			void multiply(Vect<FPP,GPU2>& vec, char opThis='N') const;
+			void operator*=(const FPP& alpha);
 			static void bsrgemm(const MatBSR<FPP, GPU2>& A, const MatDense<FPP,GPU2>& B, MatDense<FPP,GPU2>& C, const FPP& alpha, const FPP& beta, const char opThis/*='N'*/, const char opB /*= 'N'*/);
 
 			void tocpu(int32_t* browptr, int32_t* bcolinds, FPP* bdata, int32_t* nrows=nullptr, int32_t* ncols=nullptr, int32_t *bnrows=nullptr, int32_t *bncol=nullptr, int32_t* bnnz=nullptr) const;

@@ -117,4 +117,13 @@ namespace Faust
 			this->gpu_mat = gpu_mat;
 		}
 
+	template<typename FPP>
+		void MatBSR<FPP, GPU2>::operator*=(const FPP& alpha)
+		{
+			//TODO: avoid CPU-GPU back and forth
+			MatBSR<FPP, Cpu> cpu_mat;
+			tocpu(cpu_mat);
+			cpu_mat *= alpha;
+			*this = MatBSR<FPP, GPU2>(cpu_mat);
+		}
 };

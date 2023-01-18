@@ -64,6 +64,7 @@ namespace Faust
 			MatDense<FPP, GPU2> multiply(const FPP* A, int A_ncols);
 			MatDense<FPP, GPU2> multiply(MatDense<FPP,GPU2> &A);
 			void multiply(MatDense<FPP,GPU2> &A, MatDense<FPP, Cpu> & out);
+			void operator*=(const FPP& alpha);
 			const Vect<FPP, GPU2>& getD1() {return d1;};
 			const Vect<FPP, GPU2>& getD2() {return d2;};
 			const int getLevel() const {return level;}

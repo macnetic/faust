@@ -19,7 +19,7 @@ namespace Faust
 
 			Vect();
 
-			Vect(const faust_unsigned_int size,
+			explicit Vect(const faust_unsigned_int size,
 					const FPP* cpu_data=nullptr,
 					const bool no_alloc=false,
 					const int32_t dev_id=-1,

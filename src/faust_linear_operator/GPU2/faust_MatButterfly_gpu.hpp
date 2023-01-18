@@ -220,6 +220,15 @@ namespace Faust
 		}
 
 	template<typename FPP>
+		void MatPerm<FPP, GPU2>::operator*=(const FPP& alpha)
+		{
+			d1 *= alpha;
+			d2 *= alpha;
+			if(d2t.size() > 0)
+				d2t *= alpha;
+		}
+
+	template<typename FPP>
 		MatButterfly<FPP, GPU2>::~MatButterfly()
 		{
 			if(subdiag_ids)

@@ -48,6 +48,7 @@ namespace Faust
 				virtual Real<FPP> norm() const=0;
 
 				virtual void multiply(MatDense<FPP,GPU2> &A, const char opThis) const =0;
+				virtual void operator*=(const FPP& alpha) =0;
 				MatGeneric();
 
 				virtual ~MatGeneric();
