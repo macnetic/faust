@@ -3,11 +3,23 @@
 #include "faust_MatSparse.h"
 #include "faust_MatSparse_gpu.h"
 #include "faust_cuda_device.h"
+#include "faust_linear_algebra_gpu.h"
 #include <cstdlib>
 #include <cmath>
 using namespace std;
 using namespace Faust;
 
+//TODO: use FPP and not double
+//
+void test_ds_mat_eq(MatDense<double, GPU2> &test, MatDense<double, Cpu> &ref, double tol=1e-6)
+{
+	assert(tol >= 0);
+	MatDense<double, Cpu> diff_mat = ref;
+	MatDense<double, Cpu> cpu_test(test.getNbRow(), test.getNbCol());
+	test.tocpu(cpu_test);
+	diff_mat -= MatDense<double, Cpu>(cpu_test);
+	assert(diff_mat.norm() < tol);
+}
 
 void test_gpu_norm()
 {
@@ -391,12 +403,34 @@ void test_get_device()
 	cout << "device id: " << dev_id << endl;
 }
 
+void test_spgemm()
+{
+	cout << "test MatSparse<double,GPU2>::test_spgemm" << endl;
+	auto nrows = 5;
+	auto ncols = 8;
+	auto cpu_sp_mat = Faust::MatSparse<double, Cpu>::randMat(nrows, ncols, .2);
+	auto cpu_ds_mat = Faust::MatDense<double, Cpu>::randMat(ncols, nrows);
+	MatDense<double, Cpu> cpu_out;
+
+	MatSparse<double, GPU2> gpu_sp_mat(*cpu_sp_mat);
+	MatDense<double, GPU2> gpu_ds_mat(*cpu_ds_mat);
+	MatDense<double, GPU2> gpu_out/*(5, 5)*/;
+
+	spgemm(*cpu_sp_mat, *cpu_ds_mat, cpu_out, double(1.0), double(0), 'N', 'N');
+	//cpu_out.Display();
+	MatSparse<double, GPU2>::spgemm(gpu_sp_mat, gpu_ds_mat, gpu_out, double(1.0), double(0), 'N', 'N');
+	//gpu_out.Display();
+	test_ds_mat_eq(gpu_out, cpu_out);
+	cout << "OK" << endl;
+}
+
 int main()
 {
 	Faust::enable_gpu_mod();
 	test_gpu_norm();
 	test_gpu_ctor_and_tocpu();
 	test_gpu_ctor_and_tocpu2();
+	test_spgemm();
 	test_eq_operator_rhs_cpu();
 	test_transpose();
 	test_adjoint();
