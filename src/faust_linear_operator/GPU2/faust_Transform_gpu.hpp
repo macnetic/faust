@@ -2,6 +2,29 @@ namespace Faust
 {
 
 	template<typename FPP>
+		faust_unsigned_int Transform<FPP,GPU2>::getNbRow() const // TODO: factorize with CPU code
+		{
+			if (size() != 0)
+				return data[0]->getNbRow();
+			throw std::runtime_error("Empty Transform");
+		}
+
+	template<typename FPP>
+		faust_unsigned_int Transform<FPP,GPU2>::getNbCol() const // TODO: factorize with CPU code
+		{
+			if (size() != 0)
+				return data[size()-1]->getNbCol();
+			throw std::runtime_error("Empty Transform");
+		}
+
+
+	template<typename FPP>
+		faust_unsigned_int Transform<FPP,GPU2>::size() const
+		{
+			return data.size();
+		}
+
+	template<typename FPP>
 		RefManager Transform<FPP,GPU2>::ref_man([](void *fact)
 				{
 #ifdef DEBUG
@@ -240,6 +263,28 @@ namespace Faust
 			v_out.gpu_mat = out.gpu_mat;
 			out.gpu_mat = nullptr; // avoid freeing v_out.gpu_mat when out of scope
 			return v_out;
+		}
+
+	template<typename FPP>
+		void Transform<FPP,GPU2>::multiply(const FPP& scalar) //TODO: factorize with CPU code (scalarMultiply)
+		{
+			// find smallest factor
+			if (size() == 0)
+				throw std::runtime_error("Empty Transform");
+
+			auto sid = 0;
+			auto ssize = data[0]->getNbRow() * data[0]->getNbCol();
+			for(auto i = 0;i < data.size(); i++)
+			{
+				auto fac = data[i];
+				auto s = fac->getNbRow() * fac->getNbCol();
+				if(s < ssize)
+				{
+					ssize = s;
+					sid = i;
+				}
+			}
+			*(data[sid]) *= scalar;
 		}
 
 	template<typename FPP>

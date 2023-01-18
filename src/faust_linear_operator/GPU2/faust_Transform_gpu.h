@@ -54,11 +54,11 @@ namespace Faust
 			bool is_fact_dense(int id) const;
 			bool is_fact_bsr(int id) const;
 			void transpose();
-			int32_t getNbRow()const;
-			int32_t getNbCol()const;
+			faust_unsigned_int getNbRow()const;
+			faust_unsigned_int getNbCol()const;
 			void Display(bool transpose=false) const;
 			std::string to_string(bool transpose=false) const;
-			int32_t size() const;
+			faust_unsigned_int size() const;
 			faust_unsigned_int get_fact_nnz(const faust_unsigned_int id) const;
 			faust_unsigned_int get_total_nnz() const;
 			void update_total_nnz() const;
@@ -70,7 +70,7 @@ namespace Faust
 			MatDense<FPP, GPU2> sliceMultiply(const Slice s[2], MatDense<FPP, GPU2>& gpu_X, const char opThis) const;
 			MatDense<FPP, GPU2> indexMultiply(faust_unsigned_int* ids[2], size_t id_lens[2], MatDense<FPP, GPU2>& gpu_X, const char opThis) const;
 			void multiplyLeft(const Transform<FPP,GPU2> & A);
-			void multiply(const FPP& a, const int32_t id=-1);
+			void multiply(const FPP& a);
 			Vect<FPP,GPU2> multiply(const Vect<FPP,GPU2>& x, const char opThis='N');
 			Real<FPP> spectralNorm(int32_t nb_iter_max, float threshold, int& flag);
 			FPP power_iteration(int32_t nb_iter_max, float threshold, int& flag);

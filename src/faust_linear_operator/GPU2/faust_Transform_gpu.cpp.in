@@ -3,26 +3,6 @@ namespace Faust
 {
 
 	template<>
-		int32_t Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::getNbRow() const
-		{
-			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
-			if(gpu_mat_arr)
-				return marr_funcs->nrows(gpu_mat_arr);
-			else
-				return -1;
-		}
-
-	template<>
-		int32_t Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::getNbCol() const
-		{
-			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
-			if(gpu_mat_arr)
-				return marr_funcs->ncols(gpu_mat_arr);
-			else
-				return -1;
-		}
-
-	template<>
 		Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::Transform() : gpu_mat_arr(nullptr), dtor_delete_data(false), dtor_disabled(false), data(std::vector<MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>*>())
 	{
 	}
@@ -66,14 +46,6 @@ namespace Faust
 			marr_funcs->addgpu_anymat(gpu_mat_arr, pushed_M->get_gpu_mat_ptr());
 			data.push_back(const_cast<MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>*>(pushed_M));
 			if(!dtor_delete_data) ref_man.acquire(const_cast<MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>*>(pushed_M));
-		}
-
-	template<>
-		int32_t Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::size() const
-		{
-			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
-			if(gpu_mat_arr == nullptr) return 0;
-			return marr_funcs->size(gpu_mat_arr);
 		}
 
 	template<>
@@ -305,10 +277,4 @@ namespace Faust
 			return out;
 		}
 
-	template<>
-		void Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::multiply(const @FAUST_SCALAR_FOR_GM@& a, const int32_t id/*=-1*/)
-		{
-			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
-			marr_funcs->scalar_mul_id(this->gpu_mat_arr, reinterpret_cast<const @GM_SCALAR@*>(&a), id);
-		}
 }
