@@ -493,6 +493,25 @@ namespace Faust
 		gm_Op gop_B;
 		char2gm_Op(opA, gop_A);
 		char2gm_Op(opB, gop_B);
+		// compute output size
+		faust_unsigned_int out_m, out_n;
+		if(opA == 'N')
+			out_m = A.getNbRow();
+		else
+			out_m = A.getNbCol();
+		if(opB == 'N')
+			out_n = B.getNbCol();
+		else
+			out_n = B.getNbRow();
+		if(out_m != C.getNbRow() || out_n != C.getNbCol())
+		{
+			if(beta == FSFG(0))
+				// just need to resize for the output
+				C.resize(out_m, out_n);
+			else
+				//can't use C in the computation, it's not dimensioned properly
+				throw std::runtime_error("C dimensions must agree");
+		}
 		auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 		auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 		spm_funcs->gemm(A.gpu_mat, B.gpu_mat, C.gpu_mat,
