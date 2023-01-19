@@ -17,4 +17,14 @@ namespace Faust
 		{
 			return *this;
 		}
+
+
+	template<typename FPP>
+		void MatDense<FPP,GPU2>::setRand()
+		{
+			//TODO: without CPU code? (cuRAND?)
+			MatDense<FPP, Cpu> cpu_m(this->getNbRow(), this->getNbCol());
+			cpu_m.setRand();
+			*this = MatDense<FPP, GPU2>(cpu_m);
+		}
 }

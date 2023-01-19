@@ -133,6 +133,7 @@ namespace Faust
 				void resize(const faust_unsigned_int nbRow){resize(nbRow,nbRow);}
 				void setOnes();
 				void setZeros();
+				void setRand();
 				void setEyes();
 				void setData(const FPP* data, int32_t nrows, int32_t ncols);
 				void transpose();
