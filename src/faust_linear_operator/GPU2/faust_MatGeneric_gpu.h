@@ -4,6 +4,8 @@
 #include "faust_Timer.h"
 #include "faust_MatDense_gpu.h"
 #include "faust_MatSparse_gpu.h"
+#include "faust_MatPerm_gpu.h"
+#include "faust_MatButterfly_gpu.h"
 
 namespace Faust
 {
@@ -44,7 +46,18 @@ namespace Faust
 				//! \brief Returns a sub-group of columns of this matrix as the same type of matrix
 				virtual Faust::MatGeneric<FPP,GPU2>* get_cols(faust_unsigned_int* col_ids, faust_unsigned_int num_cols) const=0;
 
-				virtual void Display() const=0;
+				//! \brief Display the features of the matrix (type Dense/Sparse, size, nnz, density of nnz ... )
+				virtual void Display() const;
+
+				//! \brief Returns the features of the matrix (type Dense/Sparse, size, nnz, density of nnz ... )
+				virtual std::string to_string(MatType type, const bool transpose=false, const bool displaying_small_mat_elts=false) const;
+				//
+				//! \brief Returns the features of the matrix (type Dense/Sparse, size, nnz, density of nnz ... )
+				virtual std::string to_string(const bool transpose=false, const bool displaying_small_mat_elts=false) const;
+
+				std::string to_string(int32_t nrows, int32_t ncols, bool transpose, Real<FPP> density, int32_t nnz, bool is_identity, MatType type) const;
+
+			static std::string get_scalar_type_str();
 				virtual Real<FPP> norm() const=0;
 
 				virtual void multiply(MatDense<FPP,GPU2> &A, const char opThis) const =0;

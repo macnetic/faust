@@ -538,7 +538,7 @@ namespace Faust
 
 	// compute the largest eigenvalue of A, A must be positive semi-definite
 	template<typename FPP>
-	template<typename FPP2>
+		template<typename FPP2>
 		FPP Transform<FPP, GPU2>::power_iteration(const faust_unsigned_int nbr_iter_max, const FPP2 threshold, int & flag, const bool rand_init/*=true*/) const
 		{
 			auto A = *this;
@@ -575,11 +575,11 @@ namespace Faust
 				xk_norm = xk;
 				xk_norm.normalize();
 				xk = A.multiply(xk_norm);
-//				if(xk.isZero()) // A is most likely zero, lambda is zero //TODO
-//				{
-//					std::cerr << "WARNING: power_iteration product Ax leads to zero vector, A is most likely zero, lambda should be zero too." << std::endl;
-//					return FPP(0);
-//				}
+				//				if(xk.isZero()) // A is most likely zero, lambda is zero //TODO
+				//				{
+				//					std::cerr << "WARNING: power_iteration product Ax leads to zero vector, A is most likely zero, lambda should be zero too." << std::endl;
+				//					return FPP(0);
+				//				}
 				lambda = xk_norm.dot(xk);
 				//std::cout << "i = " << i << " ; lambda=" << lambda << std::endl;
 			}
@@ -598,7 +598,7 @@ namespace Faust
 			}else
 			{
 				// if(this->is_zero) // The Faust is zero by at least one of its factors
-					//return 0; //TODO
+				//return 0; //TODO
 				// The Faust can still be zero (without any of its factor being)
 				// this case will be detected in power_iteration
 				Transform<FPP,GPU2> AtA((*this));
@@ -616,5 +616,40 @@ namespace Faust
 			}
 		}
 
+	template<typename FPP>
+		void Transform<FPP,GPU2>::Display(const bool transpose /* default to false */,const bool displaying_small_mat_elts /*false by default*/) const //TODO: factorize with CPU code
+		{
+			std::cout << to_string(transpose,displaying_small_mat_elts);
+		}
+
+
+	template<typename FPP>
+		std::string Transform<FPP,GPU2>::to_string(const bool transpose /* default to false */, const bool displaying_small_mat_elts/* false by default */) const //TODO: factorize with CPU code
+		{
+			std::ostringstream str;
+
+			if (size() == 0)
+				str<<"empty Faust"<<std::endl;
+			else
+			{
+				str<<"Faust size ";
+				if(transpose)
+					str << this->getNbCol() << "x" << this->getNbRow();
+				else
+					str << this->getNbRow()<<"x"<<this->getNbCol();
+				str <<", density "<<1.0/getRCG()<< ", nnz_sum "<<this->get_total_nnz() << ", " << size() << " factor(s): "<< std::endl;
+				int j;
+				for (int i=0 ; i<size() ; i++)
+				{
+					if(transpose)
+						j = size()-1-i;
+					else
+						j = i;
+					str << "- FACTOR " << i;
+					str << data[j]->to_string(transpose, displaying_small_mat_elts);
+				}
+			}
+			return str.str();
+		}
 
 }

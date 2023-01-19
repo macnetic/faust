@@ -10,6 +10,97 @@ namespace Faust
 	{
 	}
 
+
+	template<typename FPP>
+		void MatGeneric<FPP,GPU2>::Display() const
+		{//TODO: factorize with CPU code
+			std::cout << to_string();
+		}
+
+	template<typename FPP>
+		std::string MatGeneric<FPP, GPU2>::to_string(MatType type, const bool transpose /* set to false by default */, const bool displaying_small_mat_elts) const
+		{//TODO: factorize with CPU code
+			return this->to_string(getNbRow(), getNbCol(), transpose, this->density(), this->getNonZeros(), this->is_identity, type);
+		}
+
+	template<typename FPP>
+		std::string MatGeneric<FPP, GPU2>::to_string(const bool transpose /* set to false by default */, const bool displaying_small_mat_elts) const
+		{//TODO: factorize with CPU code
+			MatType type = Dense;
+			if(dynamic_cast<const MatSparse<FPP, GPU2>*>(this))
+				type = Sparse;
+			else if (dynamic_cast<const MatDense<FPP, GPU2>*>(this))
+				type = Dense;
+			else if (dynamic_cast<const MatDiag<FPP>*>(this))
+				type = Diag;
+			else if (dynamic_cast<const MatBSR<FPP, GPU2>*>(this))
+				type = BSR;
+			else if (dynamic_cast<const MatPerm<FPP, GPU2>*>(this))
+				type = Perm;
+			else if (dynamic_cast<const MatButterfly<FPP, GPU2>*>(this))
+				type = Butterfly;
+			else
+				throw std::runtime_error("Unhandled matrix type in MatGeneric::to_string()"); // shouldn't happen
+			return this->to_string(getNbRow(), getNbCol(), transpose, this->density(), this->getNonZeros(), this->is_identity, type);
+		}
+
+	template<typename FPP>
+		std::string MatGeneric<FPP, GPU2>::get_scalar_type_str()
+		{ //TODO: factorize with CPU code
+			std::string type_str;
+			if (! std::is_same<FPP,Real<FPP>>::value)
+				type_str = "complex";
+			else
+			{
+				if(std::is_same<FPP, float>::value)
+					type_str = "float";
+				else
+					type_str = "double";
+			}
+			return type_str;
+		}
+
+
+template<typename FPP>
+std::string Faust::MatGeneric<FPP,GPU2>::to_string(int32_t nrows, int32_t ncols, bool transpose, Real<FPP> density, int32_t nnz, bool is_identity, MatType type) const
+{
+	std::ostringstream str;
+	str << " (" << MatGeneric<FPP,GPU2>::get_scalar_type_str() << ") ";
+	str << "[GPU] ";
+	if(type == Dense)
+		str << "DENSE,";
+	else if(type == Sparse)
+		str << "SPARSE,";
+	else if(type == Diag)
+		str << "DIAG,";
+	else if(type == BSR)
+		str << "BSR,";
+	else if(type == Perm)
+		str << "PERM,";
+	else if(type == Butterfly)
+		str << "Butterfly,";
+	else if(type == None)
+		str << "UNKNOWN MATRIX TYPE,";
+	else
+		throw std::runtime_error("Invalid MatType passed to MatGeneric::to_string()");
+	str << " size ";
+	if(transpose)
+		str << ncols << "x" << nrows;
+	else
+		str << nrows << "x" << ncols;
+	if(type == BSR) //TODO: refactor with above almost same code into a new MatBSR member function
+		str << dynamic_cast<const MatBSR<FPP, GPU2>*>(this)->to_string_blocks(transpose);
+	str << ", density "<< density <<", nnz "<< nnz; 
+	if(type == BSR)
+		str <<  " (nnz blocks: " << dynamic_cast<const MatBSR<FPP, Cpu>*>(this)->getNBlocks() << ")";
+	str << ", addr: " << this;
+	//TODO: add gpu_mod data addr
+	str <<std::endl;
+	if (is_identity)
+		str <<" identity matrix flag" << std::endl;
+	return str.str();
+}
+
 //	//TODO: (factorize with faust_MatGeneric) only one template function with FDevice DEV as second param
 //	template<typename FPP>
 //		MatGeneric<FPP,GPU2>* optimize(Faust::MatDense<FPP,GPU2> const & M,Faust::MatSparse<FPP,GPU2> const & S)

@@ -162,6 +162,8 @@ namespace Faust
 	template<typename FPP>
 		void MatPerm<FPP, GPU2>::Display() const
 		{
+			MatGeneric<FPP, GPU2>::Display();
+#if DEBUG
 			//TODO: adjust consistently with MatGeneric Display (using to_string)
 			std::cout << "MatPerm on GPU: ";
 			std::cout << "D: ";
@@ -175,6 +177,7 @@ namespace Faust
 			for(int i=0;i < d.size();i++)
 				std::cout << perm_ids[i] << " ";
 			std::cout << std::endl;
+#endif
 		}
 
 	template<typename FPP>

@@ -71,8 +71,7 @@ namespace Faust
 			Faust::MatGeneric<FPP,GPU2>* get_cols(faust_unsigned_int col_id_start, faust_unsigned_int num_cols) const;
 			Faust::MatGeneric<FPP,GPU2>* get_cols(faust_unsigned_int* col_ids, faust_unsigned_int num_cols) const;
 
-			void Display() const;
-			std::string to_string() const;
+			std::string to_string_blocks(bool transpose) const;
 			Real<FPP> norm() const;
 
 			virtual void set_gpu_mat_ptr(void*);

@@ -96,8 +96,6 @@ namespace Faust
 				size_t getNBytes() const;
 				faust_unsigned_int getNonZeros() const;
 				int32_t getDevice() const;
-				void Display() const;
-				std::string to_string(const bool transpose=false, const bool displaying_small_mat_elts=false) const;
 				MatType getType() const;
 				void multiply(Vect<FPP,GPU2>& vec, char opThis='N') const;
 				void multiply(MatDense<FPP,GPU2>& mat, const char opThis='N') const;

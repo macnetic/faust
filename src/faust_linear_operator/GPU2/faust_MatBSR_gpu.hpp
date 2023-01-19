@@ -30,20 +30,25 @@ namespace Faust
 			return BSR;
 		}
 
-	template<typename FPP>
-		void MatBSR<FPP, GPU2>::Display() const
+	template <typename FPP>
+	std::string MatBSR<FPP,GPU2>::to_string_blocks(bool transpose) const
+	{
+		std::ostringstream str;
+		auto bsr_mat = dynamic_cast<const MatBSR<FPP, GPU2>*>(this); //TODO: why not directly using this?
+		faust_unsigned_int nbr, nbc;
+		if(transpose)
 		{
-			std::cout << this->to_string();
+			nbr = bsr_mat->getNbBlockCol();
+			nbc = bsr_mat->getNbBlockRow();
 		}
-
-	template<typename FPP>
-		std::string MatBSR<FPP, GPU2>::to_string() const
+		else
 		{
-			MatBSR<FPP, Cpu> bsr_mat;
-			tocpu(bsr_mat);
-			//TODO: rely on gpu_mod display function (yet to write)
-		    return "(on GPU device: " + std::to_string(getDevice())+ ") "+ bsr_mat.to_string();
+			nbr = bsr_mat->getNbBlockRow();
+			nbc = bsr_mat->getNbBlockCol();
 		}
+		str << " (blocksize = " <<  nbr << "x" << nbc << ")";
+		return str.str();
+	}
 
 	template<typename FPP>
 		MatBSR<FPP,GPU2>* MatBSR<FPP,GPU2>::Clone(const bool isOptimize /*default value=false*/) const

@@ -173,7 +173,8 @@ namespace Faust
 	template<typename FPP>
 		void MatButterfly<FPP, GPU2>::Display() const
 		{
-			//TODO: adjust consistently with MatGeneric Display (using to_string)
+			MatGeneric<FPP, GPU2>::Display();
+#if DEBUG
 			std::cout << "MatButterfly on GPU: ";
 			std::cout << "D1: ";
 			d1.tocpu().Display();
@@ -188,6 +189,7 @@ namespace Faust
 			for(int i=0;i < d2.size();i++)
 				std::cout << subdiag_ids[i] << " ";
 			std::cout << std::endl;
+#endif
 		}
 
 	template<typename FPP>

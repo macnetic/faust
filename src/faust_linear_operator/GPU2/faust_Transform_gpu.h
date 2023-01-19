@@ -59,8 +59,9 @@ namespace Faust
 			void adjoint();
 			faust_unsigned_int getNbRow()const;
 			faust_unsigned_int getNbCol()const;
-			void Display(bool transpose=false) const;
-			std::string to_string(bool transpose=false) const;
+			float getRCG() const{return ((float)(getNbRow()*getNbCol()))/((float) get_total_nnz());} //TODO: move in hpp and factorize with CPU code
+			void Display(const bool transpose=false, const bool display_small_mat_elts=false) const;
+			std::string to_string(const bool transpose=false, const bool display_small_mat_elts=false) const;
 			faust_unsigned_int size() const;
 			faust_unsigned_int get_fact_nnz(const faust_unsigned_int id) const;
 			faust_unsigned_int get_total_nnz() const;

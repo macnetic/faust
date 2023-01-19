@@ -153,8 +153,6 @@ namespace Faust
 				void tocpu(FPP* cpu_buffer, const void* stream/*=nullptr*/) const;
 				MatDense<FPP, Cpu> tocpu(const void* stream=nullptr) const;
 				void tocpu(MatDense<FPP, Cpu> &cpu_mat, const void* stream=nullptr) const;
-				void Display() const;
-				std::string to_string(const bool transpose=false, const bool displaying_small_mat_elts=false) const;
 				MatType getType() const;
 				size_t getNBytes() const;
 				int32_t getNbRow() const;

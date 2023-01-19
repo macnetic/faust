@@ -333,21 +333,6 @@ namespace Faust
 			return dev_id;
 		}
 
-	    template<>
-		std::string Faust::MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::to_string(const bool transpose/*=false*/, const bool displaying_small_mat_elts/*=false*/) const
-		{
-			MatSparse<@FAUST_SCALAR_FOR_GM@, Cpu> sp_mat;
-			tocpu(sp_mat);
-			//TODO: rely on gpu_mod display function (yet to write)
-		    return "(on GPU device: " + std::to_string(getDevice())+ ") "+ sp_mat.to_string();
-		}
-
-	    template<>
-		void Faust::MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::Display() const
-		{
-		    std::cout << this->to_string();
-		}
-
 		template<>
 			void* Faust::MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::get_gpu_mat_ptr() const
 		{

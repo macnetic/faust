@@ -2,7 +2,7 @@ template<typename FPP>
 void Faust::MatDiag<FPP>::Display() const
 {
 	std::cout<<this->to_string();
- }
+}
 
 template<typename FPP>
 std::string Faust::MatDiag<FPP>::to_string(const bool transpose /* set to false by default */, const bool displaying_small_mat_elts /* false by default */) const
