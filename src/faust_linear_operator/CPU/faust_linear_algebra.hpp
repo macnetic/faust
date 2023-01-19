@@ -814,7 +814,7 @@ FPP Faust::power_iteration(const  Faust::LinearOperator<FPP,Cpu> & A, const faus
 	    #ifdef __COMPILE_TIMERS__
             A.t_power_iteration.stop();
         #endif
-        handleError("linear_algebra "," power_iteration : Faust::Transform<FPP,Cpu> 1 must be a squared matrix");
+        handleError("linear_algebra "," power_iteration : Faust::Transform<FPP,Cpu> must be a squared matrix");
 	}
 	Faust::Vect<FPP,Cpu> xk(nb_col);
 	if(rand_init)

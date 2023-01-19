@@ -55,6 +55,7 @@ namespace Faust
 			bool is_fact_dense(int id) const;
 			bool is_fact_bsr(int id) const;
 			void transpose();
+			void adjoint();
 			faust_unsigned_int getNbRow()const;
 			faust_unsigned_int getNbCol()const;
 			void Display(bool transpose=false) const;
@@ -73,8 +74,10 @@ namespace Faust
 			void multiplyLeft(const Transform<FPP,GPU2> & A);
 			void multiply(const FPP& a);
 			Vect<FPP,GPU2> multiply(const Vect<FPP,GPU2>& x, const char opThis='N');
-			Real<FPP> spectralNorm(int32_t nb_iter_max, float threshold, int& flag);
-			FPP power_iteration(int32_t nb_iter_max, float threshold, int& flag);
+			Real<FPP> spectralNorm(int32_t nb_iter_max, float threshold, int& flag) const;
+			template<typename FPP2 = double>
+				FPP power_iteration(const faust_unsigned_int nbr_iter_max, const FPP2 threshold, int & flag, const bool rand_init=true) const;
+
 			Real<FPP> normL1(const bool transpose = false, const bool full_array=true, const int batch_size=1) const;
 			void tocpu(Transform<FPP, Cpu>& cpu_transf) const;
 			Transform<FPP, Cpu> tocpu() const;
@@ -110,6 +113,7 @@ namespace Faust
 			friend TransformHelper<FPP,GPU2>;
 			friend TransformHelperGen<FPP,GPU2>;
 		};
+
 }
 
 #include "faust_Transform_gpu.hpp"

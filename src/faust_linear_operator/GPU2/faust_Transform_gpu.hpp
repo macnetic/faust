@@ -324,7 +324,7 @@ namespace Faust
 	template<typename FPP>
 		Vect<FPP,GPU2> Transform<FPP,GPU2>::multiply(const Vect<FPP,GPU2>& x, const char opThis/*='N'*/)
 		{
-			MatDense<FPP, GPU2> out = this->multiply((const MatDense<FPP,GPU2>)x, opThis);
+			MatDense<FPP, GPU2> out = this->multiply(*dynamic_cast<const MatDense<FPP, GPU2>*>(&x), opThis);
 			Vect<FPP,GPU2> v_out;
 			v_out.gpu_mat = out.gpu_mat;
 			out.gpu_mat = nullptr; // avoid freeing v_out.gpu_mat when out of scope
@@ -512,5 +512,96 @@ namespace Faust
 			for (int i=0;i<size();i++)
 				data[i]->transpose();
 		}
+
+
+	template<typename FPP>
+		void Faust::Transform<FPP,GPU2>::adjoint()
+		{
+			transpose();
+			for(auto it = data.begin(); it != data.end(); it++){
+				(*it)->conjugate();
+			}
+		}
+
+	// compute the largest eigenvalue of A, A must be positive semi-definite
+	template<typename FPP>
+	template<typename FPP2>
+		FPP Transform<FPP, GPU2>::power_iteration(const faust_unsigned_int nbr_iter_max, const FPP2 threshold, int & flag, const bool rand_init/*=true*/) const
+		{
+			auto A = *this;
+
+			const int nb_col = A.getNbCol();
+			int i = 0;
+			flag = 0;
+
+			if (nbr_iter_max <= 0)
+			{
+				handleError("linear_algebra "," power_iteration :  nbr_iter_max <= 0");
+			}
+			if (nb_col != A.getNbRow())
+			{
+				handleError("linear_algebra "," power_iteration : Faust::Transform<FPP,GPU2> must be a square matrix");
+			}
+			Faust::Vect<FPP,GPU2> xk(nb_col);
+			if(rand_init)
+			{
+				srand(0xF4+'u'+57); // always the same seed, not standard but allows reproducibility
+				xk.setRand(); // the main objective is to make very unlikely to be orthogonal to the main eigenvector
+			}
+			else
+				xk.setOnes();
+			Faust::Vect<FPP,GPU2> xk_norm(nb_col);
+			FPP lambda_old = 1.0;
+			FPP lambda = 0.0;
+			FPP alpha = 1.0;
+			FPP beta = 0.0;
+			while((Faust::fabs(lambda_old-lambda)> Faust::fabs(threshold) || Faust::fabs(lambda) <= Faust::fabs(threshold)) && i<nbr_iter_max)
+			{
+				i++;
+				lambda_old = lambda;
+				xk_norm = xk;
+				xk_norm.normalize();
+				xk = A.multiply(xk_norm);
+//				if(xk.isZero()) // A is most likely zero, lambda is zero //TODO
+//				{
+//					std::cerr << "WARNING: power_iteration product Ax leads to zero vector, A is most likely zero, lambda should be zero too." << std::endl;
+//					return FPP(0);
+//				}
+				lambda = xk_norm.dot(xk);
+				//std::cout << "i = " << i << " ; lambda=" << lambda << std::endl;
+			}
+			flag = (i<nbr_iter_max)?i:-1;
+
+			return lambda;
+		}
+
+
+	template<typename FPP>
+		Real<FPP> Transform<FPP,GPU2>::spectralNorm(const int nbr_iter_max, float threshold, int &flag) const // TODO: factorize with CPU code
+		{
+			if (size() == 0)
+			{
+				return 1; // TODO: why?
+			}else
+			{
+				// if(this->is_zero) // The Faust is zero by at least one of its factors
+					//return 0; //TODO
+				// The Faust can still be zero (without any of its factor being)
+				// this case will be detected in power_iteration
+				Transform<FPP,GPU2> AtA((*this));
+				AtA.adjoint();
+				if (getNbCol() < getNbRow())
+				{
+					AtA.multiply(*this);
+				}else
+				{
+					AtA.multiplyLeft(*this);
+				}
+				FPP maxAbsValue = std::sqrt(AtA.power_iteration(nbr_iter_max, threshold, flag));
+				return absValue(maxAbsValue);
+
+			}
+		}
+
 
 }

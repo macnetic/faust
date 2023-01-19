@@ -155,27 +155,6 @@ namespace Faust
 			marr_funcs->scalar_mul(gpu_mat_arr, reinterpret_cast<const @GM_SCALAR@*>(&alpha));
 		}
 
-
-	template<>
-		Real<@FAUST_SCALAR_FOR_GM@> Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::spectralNorm(int32_t nb_iter_max, float threshold, int& flag)
-		{
-			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
-			if(gpu_mat_arr == nullptr) throw std::runtime_error("gpu_mat_arr is nullptr");
-			//TODO: update gpu_mod to handle output flag
-			return marr_funcs->spectral_norm(gpu_mat_arr, threshold, nb_iter_max);
-		}
-
-	template<>
-		@FAUST_SCALAR_FOR_GM@ Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::power_iteration(int32_t nb_iter_max, float threshold, int& flag)
-		{
-			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
-			if(gpu_mat_arr == nullptr) throw std::runtime_error("gpu_mat_arr is nullptr");
-			//TODO: update gpu_mod to handle output flag
-			@FAUST_SCALAR_FOR_GM@ lambda;
-			marr_funcs->power_iteration(gpu_mat_arr, threshold, nb_iter_max, reinterpret_cast<@GM_SCALAR@*>(&lambda));
-			return lambda;
-		}
-
 	template<>
 		MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::sliceMultiply(const Slice s[2], MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>& gpu_X, const char opThis) const
 		{
