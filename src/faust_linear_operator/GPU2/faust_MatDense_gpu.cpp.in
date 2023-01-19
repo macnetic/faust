@@ -633,15 +633,10 @@ namespace Faust
 			faust_unsigned_int m, n; // prod dims
 			m = op_this == 'N'?this->getNbRow():this->getNbCol();
 			n = other.getNbCol();
-			// is other large enough to receive this * other ?
-			if(other.getNbRow() < m)
-			{
-				MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> out(m, n);
-				dsm_funcs->mul_gpu_dsm_ext(this->gpu_mat, other.gpu_mat, out.gpu_mat, gop_this, OP_NOTRANSP);
-				other = std::move(out);
-			}
-			else
-				dsm_funcs->mul_gpu_dsm_ext(this->gpu_mat, other.gpu_mat, other.gpu_mat, gop_this, OP_NOTRANSP);
+			// an out buffer (different to other) is needed  
+			MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> out(m, n);
+			dsm_funcs->mul_gpu_dsm_ext(this->gpu_mat, other.gpu_mat, out.gpu_mat, gop_this, OP_NOTRANSP);
+			other = std::move(out);
 		}
 
 

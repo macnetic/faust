@@ -3,11 +3,6 @@ namespace Faust
 {
 
 	template<>
-		Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::Transform() : gpu_mat_arr(nullptr), dtor_delete_data(false), dtor_disabled(false), data(std::vector<MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>*>())
-	{
-	}
-
-	template<>
 		Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::~Transform()
 		{
 			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
@@ -119,17 +114,6 @@ namespace Faust
 		}
 
 	template<>
-		void Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::transpose()
-		{
-			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
-			if(gpu_mat_arr != nullptr)
-				marr_funcs->transpose(gpu_mat_arr);
-			else
-				throw std::runtime_error("gpu_mat_arr is nullptr");
-			std::reverse(data.begin(),data.end());
-		}
-
-	template<>
 		Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::Transform(const std::vector<MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>*> &factors, const @FAUST_SCALAR_FOR_GM@ lambda_ /*= (FPP)1.0*/, const bool optimizedCopy/*=false*/, const bool cloning_fact/*=true*/) : Transform()
 	{
 		//TODO: take optional arguments into account
@@ -153,28 +137,6 @@ namespace Faust
 			string out_str(cstr);
 			free((void*)cstr);
 			return out_str;
-		}
-
-	template<>
-		void Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::get_product(MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>& M, const char opThis/*='N'*/, const bool isConj/*=false*/) const
-		{
-			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
-			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
-			gm_Op op;
-			if(opThis == 'N')
-				op = OP_NOTRANSP;
-			else if(opThis == 'T')
-				op = OP_TRANSP;
-			else if(opThis == 'H' || opThis == 'T' && isConj)
-				op = OP_CONJTRANSP;
-			else
-				throw std::runtime_error("Invalid opThis");
-			auto gpu_mat = marr_funcs->chain_matmul_one(gpu_mat_arr, op);
-			if(M.gpu_mat != nullptr)
-				dsm_funcs->free(M.gpu_mat);
-			//TODO: rather to delete use a marr_funcs function that allows to pass a pre-allocated output buffer
-			M.gpu_mat = gpu_mat;
-			if(isConj && opThis == 'N') M.conjugate();
 		}
 
 	template<>

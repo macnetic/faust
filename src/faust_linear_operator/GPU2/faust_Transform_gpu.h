@@ -8,6 +8,7 @@
 #include "faust_MatDense_gpu.h"
 #include "faust_RefManager.h"
 #include "faust_Slice.h"
+#include "faust_linear_algebra_gpu.h"
 #include <vector>
 
 namespace Faust

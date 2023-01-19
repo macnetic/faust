@@ -1,5 +1,9 @@
 namespace Faust
 {
+	template<typename FPP>
+		Transform<FPP,GPU2>::Transform() : gpu_mat_arr(nullptr), dtor_delete_data(false), dtor_disabled(false), data(std::vector<MatGeneric<FPP, GPU2>*>())
+	{
+	}
 
 	template<typename FPP>
 		faust_unsigned_int Transform<FPP,GPU2>::getNbRow() const // TODO: factorize with CPU code
@@ -122,6 +126,68 @@ namespace Faust
 			this->get_product(M, opThis, isConj);
 			return M;
 		}
+
+
+	template<typename FPP>
+		void Faust::Transform<FPP,GPU2>::get_product(Faust::MatDense<FPP,GPU2> &mat, const char opThis, const bool isConj)const //TODO: factorize with CPU code
+		{
+
+			if (size() == 0)
+				throw std::runtime_error("get_product : empty Faust::Transform");
+
+			if (opThis == 'N')
+			{
+				if(data.size() == 1)
+				{
+					auto end = this->size()-1;
+					// just one matrix in the Faust, return a copy as dense matrix
+					mat = data[end]->to_dense();
+					if(isConj)
+						mat.conjugate();
+					return;
+				}
+				else
+				{
+					// at least two factors, compute the first product (of the last two matrices)
+					// it avoids making a copy of the last factor
+					gemm_gen(*data[this->size()-2], *data[this->size()-1], mat, FPP(1.0), FPP(0.0), 'N', 'N');
+				}
+				for (int i=this->size()-3; i >= 0; i--)
+				{
+					data[i]->multiply(mat,opThis);
+				}
+			}
+			else
+			{
+				if(data.size() == 1)
+				{
+					// just one matrix in the Faust, return a transpose or transconjugate copy as dense matrix
+					mat = data[0]->to_dense();
+					if(opThis == 'H' || opThis == 'T' && isConj)
+						mat.adjoint();
+					else if(opThis == 'T')
+						mat.transpose();
+					else if(isConj)
+						mat.conjugate();
+					return;
+				}
+				else
+				{
+					// at least two factors, compute the first product (of the last two matrices)
+					// it avoids making a copy of the first factor
+					gemm_gen(*data[1], *data[0], mat, FPP(1.0), FPP(0.0), opThis, opThis);
+				}
+				for (int i=2; i < this->size(); i++)
+				{
+					data[i]->multiply(mat, opThis);
+				}
+
+			}
+
+			if(isConj && opThis != 'H') mat.conjugate();
+
+		}
+
 
 	template<typename FPP>
 		void Transform<FPP,GPU2>::multiply(const Transform<FPP,GPU2> & A)
@@ -433,9 +499,18 @@ namespace Faust
 
 
 	template<typename FPP>
-		faust_unsigned_int Transform<FPP, GPU2>::get_fact_nnz(const faust_unsigned_int id) const
+		faust_unsigned_int Transform<FPP, GPU2>::get_fact_nnz(const faust_unsigned_int id) const //TODO: factorize with CPU code
 		{
 			return this->get_fact(id, false)->getNonZeros();
+		}
+
+
+	template<typename FPP>
+		void Faust::Transform<FPP, GPU2>::transpose() //TODO: factorize with CPU code
+		{
+			std::reverse(data.begin(), data.end());
+			for (int i=0;i<size();i++)
+				data[i]->transpose();
 		}
 
 }
