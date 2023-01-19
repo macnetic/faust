@@ -18,9 +18,7 @@ namespace Faust
 	template<typename FPP>
 		class Transform<FPP,GPU2>
 		{
-			gm_MatArray_t gpu_mat_arr;
-			std::vector<MatGeneric<FPP,GPU2>*> data; // same factors as in gpu_mat_arr
-													 // just pointer copies
+			std::vector<MatGeneric<FPP,GPU2>*> data; 
 			bool dtor_delete_data;
 			bool dtor_disabled;
 			static RefManager ref_man;
@@ -83,6 +81,7 @@ namespace Faust
 			Transform<FPP, Cpu> tocpu() const;
 			void save_mat_file(const char* filename, const bool transpose, const bool conjugate) const;
 			vector<MatGeneric<FPP,GPU2>*> getData() const {return data;} //TODO: delete and make TransformHelper a friend
+			gm_MatArray_t asGMObj() const;
 
 //			using transf_iterator = typename std::vector<MatGeneric<FPP,Cpu>*>::const_iterator;
 //

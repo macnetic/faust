@@ -1,7 +1,7 @@
 namespace Faust
 {
 	template<typename FPP>
-		Transform<FPP,GPU2>::Transform() : gpu_mat_arr(nullptr), dtor_delete_data(false), dtor_disabled(false), data(std::vector<MatGeneric<FPP, GPU2>*>()), total_nnz(0)
+		Transform<FPP,GPU2>::Transform() : dtor_delete_data(false), dtor_disabled(false), data(std::vector<MatGeneric<FPP, GPU2>*>()), total_nnz(0)
 	{
 	}
 
@@ -36,6 +36,44 @@ namespace Faust
 #endif
 				delete static_cast<MatGeneric<FPP,GPU2>*>(fact);
 				});
+
+	template<typename FPP>
+		void Transform<FPP,GPU2>::push_back(const MatGeneric<FPP,GPU2>* M, bool copying/*=true*/, const bool transpose/*=false*/, const bool conjugate/*=false*/)
+		{
+			auto pushed_M = const_cast<MatGeneric<FPP,GPU2>*>(M);
+			if((transpose || conjugate) && !copying)
+				throw std::runtime_error("Transform<FPP,GPU2>::push_back(): copying argument must be true if any of transpose or conjugate argument is true.");
+			if(copying)
+			{
+				pushed_M = M->clone();
+				if(transpose && conjugate)
+					pushed_M->adjoint();
+				else if(transpose)
+					pushed_M->transpose();
+				else if(conjugate)
+					pushed_M->conjugate();
+			}
+			data.push_back(const_cast<MatGeneric<FPP,GPU2>*>(pushed_M));
+			if(!dtor_delete_data) ref_man.acquire(const_cast<MatGeneric<FPP,GPU2>*>(pushed_M));
+			total_nnz += M->getNonZeros();
+		}
+
+	template<typename FPP>
+		void Transform<FPP,GPU2>::replace(const MatGeneric<FPP, GPU2>* new_mat, const faust_unsigned_int id)
+		{
+			// update the underlying gpu_mod array
+			total_nnz -= data[id]->getNonZeros();
+			// update local (wrapper) data
+			if(dtor_delete_data)
+				delete data[id];
+			else
+				ref_man.release(data[id]);
+			data[id] = const_cast<MatGeneric<FPP,GPU2>*>(new_mat);
+			total_nnz += new_mat->getNonZeros();
+			if(! dtor_delete_data)
+				ref_man.acquire(data[id]);
+			//this->update_total_nnz();
+		}
 
 	template<typename FPP>
 		MatGeneric<FPP,GPU2>* Transform<FPP,GPU2>::get_fact(int32_t id, bool cloning_fact) const
@@ -650,6 +688,64 @@ namespace Faust
 				}
 			}
 			return str.str();
+		}
+
+	template<typename FPP>
+		void Transform<FPP, GPU2>::clear()
+		{
+			for (int i=0;i<data.size();i++)
+			{
+				if(dtor_delete_data)
+					delete data[i];
+				else
+				{
+					ref_man.release(data[i]);
+				}
+			}
+			data.resize(0);
+			total_nnz = 0;
+		}
+
+	template<typename FPP>
+		void Transform<FPP,GPU2>::insert(int32_t id, const MatGeneric<FPP,GPU2>* M, bool copying/*=true*/)
+		{
+			auto ins_M = const_cast<MatGeneric<FPP,GPU2>*>(M);
+			if(copying)
+				ins_M = M->clone();
+			data.insert(data.begin()+id, ins_M);
+			if(!dtor_delete_data) ref_man.acquire(ins_M);
+			total_nnz += M->getNonZeros();
+		}
+
+	template<typename FPP>
+		void Transform<FPP,GPU2>::erase(int32_t id)
+		{
+			if(id < 0 || id >= size()) throw std::runtime_error("Transform<FPP, GPU2>: erase id is out of range");
+			total_nnz -= data[id]->getNonZeros();
+			if(!dtor_delete_data) ref_man.release(*(data.begin()+id));
+			data.erase(data.begin()+id);
+		}
+
+	template<typename FPP>
+		Transform<FPP,GPU2>::Transform(const std::vector<MatGeneric<FPP,GPU2>*> &factors, const FPP lambda_ /*= (FPP)1.0*/, const bool optimizedCopy/*=false*/, const bool cloning_fact/*=true*/) : Transform()
+	{
+		//TODO: take optional arguments into account
+		GPUModHandler::get_singleton()->check_gpu_mod_loaded();
+		for(auto m: factors)
+			push_back(m);
+	}
+
+	template<typename FPP>
+		Transform<FPP, GPU2>::~Transform()
+		{
+			if(! this->dtor_disabled)
+			{
+				for (auto fac: data)
+					if(this->dtor_delete_data)
+						delete fac;
+					else
+						ref_man.release(fac);
+			}
 		}
 
 }
