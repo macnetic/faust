@@ -44,7 +44,7 @@
 
 #include "faust_Transform.h"
 #if USE_GPU_MOD
-#include "faust_TransformHelperButterfly_gpu.h"
+
 #endif
 #include <iostream>
 #include <exception>
