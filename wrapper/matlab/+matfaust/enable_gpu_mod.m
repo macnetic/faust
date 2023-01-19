@@ -35,7 +35,7 @@ function enable_gpu_mod(varargin)
 				% if filepath doesn't exist, try to find lib in cwd
 				[~, name, ext] = fileparts(libpath);
 				libfile = [name ext];
-				libpath = libfile;
+				libpath = [ pwd filesep libfile];
 			end
 			libpaths = [libpaths libpath];
 		end
