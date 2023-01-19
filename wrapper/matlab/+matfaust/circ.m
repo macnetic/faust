@@ -93,7 +93,7 @@ function C = circ(c, varargin)
     end
     log2c = log2(numel(c));
     if(log2c ~= floor(log2c))
-		C = matfaust.toeplitz(c, [c(1) c(end:-1:2)]);
+		C = matfaust.toeplitz(c, [c(1) c(end:-1:2)], 'diag_opt', diag_opt, 'dev', dev);
 		return
     end
     if size(c, 2) == 1
@@ -131,9 +131,6 @@ function C = circ(c, varargin)
 	end
 	C = l * r;
 	if startsWith(dev, 'gpu')
-		if diag_opt
-			error('diag_opt on GPU Faust is not yet implemented')
-		end
 		C = clone(C, 'dev', 'gpu');
 	end
 end

@@ -167,10 +167,7 @@ function T = toeplitz(c, varargin)
     c_ = [c, zeros(1, N-m+1+N-n), r(end:-1:2)];
     C = matfaust.circ(c_, 'diag_opt', diag_opt);
     T = C(1:m, 1:n);
-	if startsWith(dev, 'gpu')
-		if diag_opt
-			error('diag_opt on GPU Faust is not yet implemented')
-		end
-		T = clone(T, 'dev', 'gpu');
-	end
+    if startsWith(dev, 'gpu')
+	    T = clone(T, 'dev', 'gpu');
+    end
 end

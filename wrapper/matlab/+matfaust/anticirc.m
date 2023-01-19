@@ -98,9 +98,6 @@ function A = anticirc(c, varargin)
         A = left(C, N-1) * matfaust.Faust(factors(C, N) * P);
     end
     if startsWith(dev, 'gpu')
-		if diag_opt
-			error('diag_opt on GPU Faust is not yet implemented')
-		end
 		A = clone(A, 'dev', 'gpu');
 	end
 end
