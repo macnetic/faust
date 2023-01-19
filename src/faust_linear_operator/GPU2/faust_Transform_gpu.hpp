@@ -1,7 +1,7 @@
 namespace Faust
 {
 	template<typename FPP>
-		Transform<FPP,GPU2>::Transform() : gpu_mat_arr(nullptr), dtor_delete_data(false), dtor_disabled(false), data(std::vector<MatGeneric<FPP, GPU2>*>())
+		Transform<FPP,GPU2>::Transform() : gpu_mat_arr(nullptr), dtor_delete_data(false), dtor_disabled(false), data(std::vector<MatGeneric<FPP, GPU2>*>()), total_nnz(0)
 	{
 	}
 
@@ -53,6 +53,7 @@ namespace Faust
 			auto fact_type = fact->getType();
 			if(M.getType() != fact_type)
 				throw std::runtime_error("The factor matrix to update is not of the same type (dense or sparse) as the input matrix.");
+			total_nnz -= fact->getNonZeros();
 			if(fact_type == Dense)
 			{
 				// fact to update is dense
@@ -67,13 +68,25 @@ namespace Faust
 				auto sM = dynamic_cast<const MatSparse<FPP,GPU2>*>(&M);
 				*sfact = *sM;
 			}
+			total_nnz += M.getNonZeros();
+			//TODO: other types
 			//			fact->set_id(M.is_id()); //TODO: in MatGeneric<FPP,GPU2> add is_id/set_id
 		}
 
 	template<typename FPP>
 		void Transform<FPP,GPU2>::update_total_nnz() const
 		{
-			//nothing to do get_total_nnz doesn't use any cache by now
+			total_nnz = 0;
+			for(auto fac: data)
+			{
+				total_nnz += fac->getNonZeros();
+			}
+		}
+
+	template<typename FPP>
+		faust_unsigned_int Transform<FPP, GPU2>::get_total_nnz() const
+		{
+			return total_nnz;
 		}
 
 	template<typename FPP>
@@ -332,7 +345,7 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		void Transform<FPP,GPU2>::multiply(const FPP& scalar) //TODO: factorize with CPU code (scalarMultiply)
+		void Transform<FPP,GPU2>::scalarMultiply(const FPP& scalar) //TODO: factorize with CPU code (scalarMultiply)
 		{
 			// find smallest factor
 			if (size() == 0)

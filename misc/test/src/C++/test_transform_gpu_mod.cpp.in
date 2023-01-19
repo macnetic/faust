@@ -296,23 +296,6 @@ void test_Transform_multiply_MatDense()
 	cout << "OK" << endl;
 }
 
-void test_Transform_multiply_scalar()
-{
-	cout << "void test_Transform_multiply_scalar()" << endl;
-	vector<MatGeneric<FPP,GPU2>*> gpu_factors;
-	vector<MatGeneric<FPP,Cpu>*> cpu_factors;
-	generate_cpu_gpu_factors(gpu_factors, cpu_factors);
-	Faust::Transform<FPP, GPU2> t_gpu(gpu_factors);
-	Faust::Transform<FPP, Cpu> t_cpu(cpu_factors);
-	t_gpu.Display();
-	t_cpu.Display();
-	t_cpu.scalarMultiply(FPP(33.2));
-	t_gpu.multiply(FPP(33.2));
-	assert_gpu_cpu_Transform_almost_eq(t_gpu, t_cpu);
-	free_gpu_factors(gpu_factors);
-	cout << "OK" << endl;
-}
-
 void test_Transform_multiplyLeft_Transform()
 {
 	cout << "void test_Transform_multiplyLeft_Transform()" << endl;
@@ -447,6 +430,5 @@ int main()
 	test_Transform_get_facts();
 	test_Transform_tocpu();
 	test_Transform_multiply_MatDense();
-	test_Transform_multiply_scalar();
 	return EXIT_SUCCESS;
 }

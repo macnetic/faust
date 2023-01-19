@@ -24,6 +24,7 @@ namespace Faust
 			bool dtor_delete_data;
 			bool dtor_disabled;
 			static RefManager ref_man;
+			faust_unsigned_int total_nnz;
 			public:
 			Transform();
 			Transform(const std::vector<MatGeneric<FPP,GPU2>*> &factors, const FPP lambda_ = (FPP)1.0, const bool optimizedCopy=false, const bool cloning_fact=true);
@@ -72,12 +73,10 @@ namespace Faust
 			MatDense<FPP, GPU2> sliceMultiply(const Slice s[2], MatDense<FPP, GPU2>& gpu_X, const char opThis) const;
 			MatDense<FPP, GPU2> indexMultiply(faust_unsigned_int* ids[2], size_t id_lens[2], MatDense<FPP, GPU2>& gpu_X, const char opThis) const;
 			void multiplyLeft(const Transform<FPP,GPU2> & A);
-			void multiply(const FPP& a);
 			Vect<FPP,GPU2> multiply(const Vect<FPP,GPU2>& x, const char opThis='N');
 			Real<FPP> spectralNorm(int32_t nb_iter_max, float threshold, int& flag) const;
 			template<typename FPP2 = double>
 				FPP power_iteration(const faust_unsigned_int nbr_iter_max, const FPP2 threshold, int & flag, const bool rand_init=true) const;
-
 			Real<FPP> normL1(const bool transpose = false, const bool full_array=true, const int batch_size=1) const;
 			void tocpu(Transform<FPP, Cpu>& cpu_transf) const;
 			Transform<FPP, Cpu> tocpu() const;

@@ -41,6 +41,7 @@ namespace Faust
 			marr_funcs->addgpu_anymat(gpu_mat_arr, pushed_M->get_gpu_mat_ptr());
 			data.push_back(const_cast<MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>*>(pushed_M));
 			if(!dtor_delete_data) ref_man.acquire(const_cast<MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>*>(pushed_M));
+			total_nnz += M->getNonZeros();
 		}
 
 	template<>
@@ -57,15 +58,17 @@ namespace Faust
 			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 			marr_funcs->erase_at(gpu_mat_arr, id, /* free */ false); // the RefManager is responsible to free the GPU matrix
 			marr_funcs->insert_anymat(gpu_mat_arr, new_mat->get_gpu_mat_ptr(), id);
+			total_nnz -= data[id]->getNonZeros();
 			// update local (wrapper) data
 			if(dtor_delete_data)
 				delete data[id];
 			else
 				ref_man.release(data[id]);
 			data[id] = const_cast<MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>*>(new_mat);
+			total_nnz += new_mat->getNonZeros();
 			if(! dtor_delete_data)
 				ref_man.acquire(data[id]);
-			this->update_total_nnz();
+			//this->update_total_nnz();
 		}
 
 	template<>
@@ -85,6 +88,7 @@ namespace Faust
 			}
 			data.resize(0);
 			gpu_mat_arr = marr_funcs->create();
+			total_nnz = 0;
 		}
 
 	template<>
@@ -99,6 +103,7 @@ namespace Faust
 			marr_funcs->insert_anymat(gpu_mat_arr, ins_M->get_gpu_mat_ptr(), id);
 			data.insert(data.begin()+id, ins_M);
 			if(!dtor_delete_data) ref_man.acquire(ins_M);
+			total_nnz += M->getNonZeros();
 		}
 
 	template<>
@@ -109,6 +114,7 @@ namespace Faust
 				marr_funcs->remove_mat(gpu_mat_arr, id);
 			else
 				throw std::runtime_error("gpu_mat_arr is nullptr");
+			total_nnz -= data[id]->getNonZeros();
 			if(!dtor_delete_data) ref_man.release(*(data.begin()+id));
 			data.erase(data.begin()+id);
 		}
@@ -137,22 +143,6 @@ namespace Faust
 			string out_str(cstr);
 			free((void*)cstr);
 			return out_str;
-		}
-
-	template<>
-		faust_unsigned_int Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::get_total_nnz() const
-		{
-			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
-			if(gpu_mat_arr == nullptr) throw std::runtime_error("gpu_mat_arr is nullptr");
-			return marr_funcs->get_total_nnz(gpu_mat_arr);
-		}
-
-	template<>
-		void Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::scalarMultiply(const @FAUST_SCALAR_FOR_GM@& alpha)
-		{
-			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
-			if(gpu_mat_arr == nullptr) throw std::runtime_error("gpu_mat_arr is nullptr");
-			marr_funcs->scalar_mul(gpu_mat_arr, reinterpret_cast<const @GM_SCALAR@*>(&alpha));
 		}
 
 	template<>
