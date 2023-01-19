@@ -48,9 +48,10 @@ int main()
 	cout << "norm of cpu source smat:" << cpu_mat5->norm() << endl;
 	th2.display();
 	cout << "============ multiply" << endl;
-	auto cpu_mat6 = Faust::MatDense<double,Cpu>::randMat(22, 32);
+	auto cpu_mat6 = Faust::MatDense<double,Cpu>::randMat(th2.getNbCol(), 32);
 	MatDense<double,GPU2> gpu_mat6(*cpu_mat6);
-	auto M_gpu = th2.multiply(gpu_mat6);
+	TransformHelper<double, GPU2> th3(gpu_fact_list, 1, false, true);
+	auto M_gpu = th3.multiply(gpu_mat6);
 	auto M_cpu = th2_cpu.multiply(*cpu_mat6);
 	cout << "M_cpu.norm() " << M_cpu.norm() << endl;
 	cout << "M_gpu.norm() " << M_gpu.norm() << endl;
