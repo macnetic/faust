@@ -3863,8 +3863,6 @@ def toeplitz(c, r=None, dev='cpu', diag_opt=False):
     C = circ(c_, diag_opt=diag_opt)
     T = C[:m, :n]
     if dev.startswith('gpu'):
-        if diag_opt:
-            raise ValueError('diag_opt on GPU Faust is not yet implemented')
         return T.clone('gpu')
     return T
 
