@@ -112,7 +112,7 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		void Transform<FPP,GPU2>::update_total_nnz() const
+		void Transform<FPP,GPU2>::update_total_nnz()
 		{
 			total_nnz = 0;
 			for(auto fac: data)
@@ -383,22 +383,24 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		void Transform<FPP,GPU2>::scalarMultiply(const FPP& scalar) //TODO: factorize with CPU code (scalarMultiply)
+		void Transform<FPP,GPU2>::scalarMultiply(const FPP& scalar, long int sid/*=-1*/) //TODO: factorize with CPU code (scalarMultiply)
 		{
 			// find smallest factor
 			if (size() == 0)
 				throw std::runtime_error("Empty Transform");
 
-			auto sid = 0;
-			auto ssize = data[0]->getNbRow() * data[0]->getNbCol();
-			for(auto i = 0;i < data.size(); i++)
+			if(sid < 0)
 			{
-				auto fac = data[i];
-				auto s = fac->getNbRow() * fac->getNbCol();
-				if(s < ssize)
+				auto ssize = data[0]->getNbRow() * data[0]->getNbCol();
+				for(auto i = 0;i < data.size(); i++)
 				{
-					ssize = s;
-					sid = i;
+					auto fac = data[i];
+					auto s = fac->getNbRow() * fac->getNbCol();
+					if(s < ssize)
+					{
+						ssize = s;
+						sid = i;
+					}
 				}
 			}
 			*(data[sid]) *= scalar;

@@ -63,8 +63,8 @@ namespace Faust
 			faust_unsigned_int size() const;
 			faust_unsigned_int get_fact_nnz(const faust_unsigned_int id) const;
 			faust_unsigned_int get_total_nnz() const;
-			void update_total_nnz() const;
-			void scalarMultiply(const FPP& alpha);
+			void update_total_nnz();
+			void scalarMultiply(const FPP& alpha, long int sid=-1);
 			MatDense<FPP,GPU2> get_product(const char opThis='N', const bool isConj=false) const;
 			void get_product(MatDense<FPP,GPU2>& M, const char opThis='N', const bool isConj=false) const;
 			MatDense<FPP,GPU2> multiply(const MatDense<FPP,GPU2> &A, const char opThis);
