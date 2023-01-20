@@ -29,15 +29,6 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		RefManager Transform<FPP,GPU2>::ref_man([](void *fact)
-				{
-#ifdef DEBUG
-				std::cout << "Transform delete_fact" << std::endl;
-#endif
-				delete static_cast<MatGeneric<FPP,GPU2>*>(fact);
-				});
-
-	template<typename FPP>
 		void Transform<FPP,GPU2>::push_back(const MatGeneric<FPP,GPU2>* M, bool copying/*=true*/, const bool transpose/*=false*/, const bool conjugate/*=false*/)
 		{
 			auto pushed_M = const_cast<MatGeneric<FPP,GPU2>*>(M);

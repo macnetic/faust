@@ -85,4 +85,12 @@ namespace Faust
 			return out;
 		}
 
+	template<>
+		RefManager Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::ref_man([](void *fact)
+				{
+#ifdef DEBUG
+				std::cout << "Transform delete_fact" << std::endl;
+#endif
+				delete static_cast<MatGeneric<@FAUST_SCALAR_FOR_GM@, GPU2>*>(fact);
+				});
 }
