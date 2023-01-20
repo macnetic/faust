@@ -45,13 +45,15 @@ namespace Faust
 				return *this;
 			}
 
-			MatButterfly(const MatSparse<FPP, GPU2> &factor, int level)
+			MatButterfly(const MatSparse<FPP, GPU2> &factor, int level) : MatButterfly<FPP, GPU2>(factor.tocpu(), level)
 			{
-				MatSparse<FPP, Cpu> Scpu;
+				//TODO: do it without passing through CPU mem. and move the def in hpp
+				
+				// TODO: fix this way of doing the same (reproduce bug with pyfaust.dft(1024, diag_opt=True, dev='gpu') @ x)
+				/*MatSparse<FPP, Cpu> Scpu(factor.getNbRow(), factor.getNbCol());
 				factor.tocpu(Scpu);
 				MatButterfly<FPP, GPU2> this_(Scpu, level);
-				*this = this_;
-			//TODO: do it without passing through CPU mem. and move the def in hpp
+				*this = this_;*/
 			}
 
 

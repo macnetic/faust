@@ -42,7 +42,7 @@ namespace Faust
 	template<>
 		void Vect<FSFG,GPU2>::operator=(const Vect<FSFG,GPU2> & v)
 		{
-			MatDense<FSFG, GPU2>::operator=(v); // TODO: remove it (in fact the function should be redefined because it does nothing more than the parent)
+			MatDense<FSFG, GPU2>::operator=(v); // TODO: remove it (in fact the function shouldn't be redefined because it does nothing more than the parent)
 		}
 
 	template<>
