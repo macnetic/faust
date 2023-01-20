@@ -29,5 +29,14 @@ namespace Faust {
 		{
 			return MatDense<FPP, GPU2>(*this);
 		}
+
+
+	template<typename FPP>
+		MatSparse<FPP, Cpu> MatSparse<FPP,GPU2>::tocpu() const
+		{
+			MatSparse<FPP, Cpu> cpu_smat(this->getNbRow(), this->getNbCol());
+			tocpu(cpu_smat);
+			return cpu_smat;
+		}
 }
 
