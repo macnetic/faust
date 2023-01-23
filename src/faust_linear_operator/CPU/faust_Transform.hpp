@@ -1098,6 +1098,42 @@ Faust::MatGeneric<FPP,Cpu>* Faust::Transform<FPP,Cpu>::get_fact(faust_unsigned_i
 }
 
 template<typename FPP>
+Faust::MatSparse<FPP, Cpu>* Faust::Transform<FPP,Cpu>::get_fact_as_sparse(const faust_unsigned_int id, bool& sparse_allocated) const
+{
+
+	MatGeneric<FPP,Cpu>* mat_ptr = get_fact(id, false);
+	MatSparse<FPP,Cpu>* smat_ptr = dynamic_cast<MatSparse<FPP,Cpu>*>(mat_ptr);
+	MatPerm<FPP,Cpu>* pmat_ptr = nullptr;
+	MatButterfly<FPP,Cpu>* bmat_ptr = nullptr;
+	sparse_allocated = false;
+	//TODO: unique_ptr<MatSparse<FPP, Cpu>*> MatGeneric::toMatSparse() const; //avoiding if-else and delete/allocated argument
+	if(! smat_ptr)
+	{
+		pmat_ptr = dynamic_cast<MatPerm<FPP,Cpu>*>(mat_ptr);
+		if (pmat_ptr)
+		{
+			smat_ptr = new MatSparse<FPP, Cpu>(pmat_ptr->toMatSparse());
+//			std::cout << "Perm to CSR:" << std::endl;
+//			smat_ptr->Display();
+			sparse_allocated = true;
+		}
+		else {
+			bmat_ptr = dynamic_cast<MatButterfly<FPP,Cpu>*>(mat_ptr);
+			if (bmat_ptr)
+			{
+				smat_ptr = new MatSparse<FPP, Cpu>(bmat_ptr->toMatSparse());
+//				std::cout << "Butterfly to CSR:" << std::endl;
+//				smat_ptr->Display();
+				sparse_allocated = true;
+			}
+			else
+				handleError(m_className, "get_fact(uint,uint**,uint**,FPP**,uint*,uint*,uint*): this prototype must be called only on sparse factors.");
+		}
+	}
+	return smat_ptr;
+}
+
+template<typename FPP>
 void Faust::Transform<FPP,Cpu>::get_fact(const faust_unsigned_int id,
 		const int** rowptr,
 		const int** col_ids,
@@ -1128,8 +1164,19 @@ void Faust::Transform<FPP,Cpu>::get_fact(const faust_unsigned_int id,
 {
 	const int* s_outer_count_ptr, *s_inner_ptr;
 	const FPP* s_elts;
-	this->get_fact(id, &s_outer_count_ptr, &s_inner_ptr, &s_elts,
-			nnz, num_rows, num_cols);
+//	this->get_fact(id, &s_outer_count_ptr, &s_inner_ptr, &s_elts,
+//			nnz, num_rows, num_cols);
+
+	bool allocated = false;
+	auto smat_ptr = get_fact_as_sparse(id, allocated);
+
+	s_outer_count_ptr = smat_ptr->getRowPtr();
+	s_inner_ptr = smat_ptr->getColInd();
+	s_elts = smat_ptr->getValuePtr();
+	*nnz = smat_ptr->getNonZeros();
+	*num_rows = smat_ptr->getNbRow();
+	*num_cols = smat_ptr->getNbCol();
+
 	if(transpose)
 	{
 		MatSparse<FPP,Cpu> tmat(*nnz, *num_rows, *num_cols, s_elts, s_outer_count_ptr,
@@ -1152,6 +1199,8 @@ void Faust::Transform<FPP,Cpu>::get_fact(const faust_unsigned_int id,
 		memcpy(d_inner_ptr, s_inner_ptr, sizeof(int)**nnz);
 		memcpy(d_elts, s_elts, sizeof(FPP)**nnz);
 	}
+
+	if(allocated) delete smat_ptr;
 }
 
 template<typename FPP>

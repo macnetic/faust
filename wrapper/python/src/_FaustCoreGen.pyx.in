@@ -482,7 +482,7 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
                                                     # 2 == Diag, 3 == BSR
         is_transposed = self.@CORE_OBJ@.isTransposed()
         #print("fac_type:", fac_type)
-        if fac_type == 1: # Sparse matrix
+        if fac_type in [1, 4, 5]: # Sparse matrix CSR, MatPerm or MatButterfly
             # is_transposed = False # uncomment to disable the trick which
             # uses csc representation instead of csr transpose
             # to optimize copy
@@ -504,9 +504,9 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
                                                  &col_ids_view[0],
                                                  &fact_view[0,0],
                                                  is_transposed)
-            #print("(rowptr)=", (rowptr))
-#                print("(col_ids)=", (col_ids))
-#                print("(elts[0,:]=", (elts))
+#            print("(rowptr)=", (rowptr))
+#            print("(col_ids)=", (col_ids))
+#            print("(elts[0,:]=", (elts))
             if(is_transposed):
                 fact = csc_matrix((elts[0,:], col_ids, rowptr), shape=shape)
             else:

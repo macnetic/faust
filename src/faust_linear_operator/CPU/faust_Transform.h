@@ -151,6 +151,7 @@ namespace Faust
 						faust_unsigned_int* nnz,
 						faust_unsigned_int* num_rows, faust_unsigned_int* num_cols,
 						const bool transpose=false) const;
+				MatSparse<FPP, Cpu>* get_fact_as_sparse(const faust_unsigned_int id, bool& sparse_allocated) const;
 				void get_fact(const faust_unsigned_int id,
 						const FPP** elts,
 						faust_unsigned_int* num_rows,

@@ -306,10 +306,10 @@ void FaustCoreCpp<FPP,DEV>::get_fact_sparse(const unsigned int& id,
         FPP* elts,
         const bool transpose) const
 {
-    faust_unsigned_int size, nrows, ncols; //TODO: delete nrows,ncols when NULL arg's ok
-    // only one copy per buffer (optimization) directly from underlying
-    // MatSparse buffers to scipy buffers
-    transform->get_fact(id, rowptr, col_ids, elts, &size, &nrows, &ncols, transpose);
+    faust_unsigned_int nnz, nrows, ncols; //TODO: delete nrows,ncols when NULL arg's ok
+                                           // only one copy per buffer (optimization) directly from underlying
+                                           // MatSparse buffers to scipy buffers
+    transform->get_fact(id, rowptr, col_ids, elts, &nnz, &nrows, &ncols, transpose);
 }
 
 template<typename FPP, FDevice DEV>
