@@ -456,6 +456,7 @@ namespace Faust
 				tripletList.push_back(Eigen::Triplet<FPP>(i, perm_ids[i], d_ptr[i]));
 			auto sp = MatSparse<FPP, Cpu>(tripletList, s, s);
 			sp.conservativeResize(s, s);
+			sp.set_id(false); //TODO: it might be the identity, verify (add a MatDiag::isDiag(bool verify_id=true), static function)
 			return sp;
 		}
 

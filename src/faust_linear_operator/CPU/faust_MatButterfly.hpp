@@ -487,6 +487,7 @@ namespace Faust
 			MatSparse<FPP, Cpu> sp(this->getNbRow(), this->getNbCol());
 			sp.setEyes();
 			multiply(sp, 'N');
+			sp.set_id(false);
 			return sp;
 #else
 			// strange rare bugs occurred with this version (when making a toarray of a pyfaust.Faust containing MatButterfly)
