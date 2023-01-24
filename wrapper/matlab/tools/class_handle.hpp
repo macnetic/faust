@@ -39,7 +39,7 @@ template<class base> inline mxArray *convertPtr2Mat(base *ptr)
 template<class base> inline class_handle<base> *convertMat2HandlePtr(const mxArray *in)
 {
     if (mxGetNumberOfElements(in) != 1 || mxGetClassID(in) != mxUINT64_CLASS || mxIsComplex(in))
-        mexErrMsgTxt("Input must be a real uint64 scalar.");
+        mexErrMsgTxt("Input must be a uint64 scalar.");
     class_handle<base> *ptr = reinterpret_cast<class_handle<base> *>(*((uint64_t *)mxGetData(in)));
     if (!ptr->isValid())
         mexErrMsgTxt("Handle not valid.");

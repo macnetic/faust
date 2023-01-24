@@ -1720,9 +1720,9 @@ classdef Faust
 
 		%=====================================================================
 		%> @brief Returns the i-th factor or a new Faust composed of F factors whose indices are listed in indices.
-                %>
-                %> @note Factors are copied in memory.
-                %>
+		%>
+		%> @note Factors are not copied in memory if subset greater than one is asked and doesn't need conversion.
+		%>
 		%> @b Usage
 		%>
 		%> &nbsp;&nbsp;&nbsp; @b factor = factors(F, i) returns the i-th factor of F.<br/>
@@ -1744,27 +1744,24 @@ classdef Faust
 		%> @endcode
 		%> <p>@b See @b also Faust.numfactors
 		%=====================================================================
-		function factors = factors(F, varargin)
-			factors = cell(1, size(varargin{1},2));
-			for j=1:length(factors)
-				i = varargin{1};
-				if(j < length(factors) && i(j+1) - i(j) ~= 1)
-					error('Indices must be contiguous.')
-				end
-				i = i(j);
-				if (~isa(i,'double'))
-					error('factors second argument (indice) must either be real positive integers or logicals.');
-				end
-
-				if (floor(i) ~= i)
-					error('factors second argument (indice) must either be real positive integers or logicals.');
-				end
-				factors{j} = call_mex(F, 'factors', i);
+		function factors = factors(F, ids)
+			ids_err = 'factors indices must either be real positive integers or logicals.';
+			if ~ strcmp(class(ids), 'double')
+				error(ids_err);
 			end
-			if(length(factors) > 1)
-				factors = matfaust.Faust(factors, 'dev', F.dev);
+			for j=1:length(ids)
+				i = ids(j);
+				if floor(i) ~= i
+					error(ids_err);
+				end
+			end
+			nargs = numel(ids);
+			if nargs > 1
+				factors = matfaust.Faust(F, call_mex(F, 'factors', uint64(ids-1)));
+			elseif nargs == 1
+				factors = call_mex(F, 'factors', uint64(ids-1));
 			else
-				factors = factors{j};
+				error('Empty range of factors')
 			end
 		end
 
