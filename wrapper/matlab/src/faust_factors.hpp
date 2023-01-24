@@ -72,10 +72,30 @@ mxArray* perm_mat_to_sp_mat(int id, Faust::TransformHelper<SCALAR,Cpu>* core_ptr
 }
 
 #ifdef USE_GPU_MOD
+// TODO: add opt argument dev to toMatSparse()/to_sparse() doing nothing for Cpu and converting to Cpu for GPU2.
+// it would allow to define one generic function per matrix type (instead of one for Cpu and the other for GPU2)
+// TODO: (better solution) generic function toMatSparse in Faust::MatGeneric<FPP, Cpu/GPU2> which throws exception if not possible, device argument still necessary but no need to make the difference among matrix types
 template <typename SCALAR>
 mxArray* bsr_mat_to_sp_mat(int id, Faust::TransformHelper<SCALAR, GPU2>* core_ptr)
 {
-	//TODO: nothing to do now because MatBSR aren't supported on GPU2, implement it later
-	return nullptr;
+	auto bsr_mat = dynamic_cast<const MatBSR<SCALAR, GPU2>*>(core_ptr->get_gen_fact(id));
+	auto sp_mat = bsr_mat->to_sparse().tocpu();
+	return FaustSpMat2mxArray(sp_mat);
+}
+
+template <typename SCALAR>
+mxArray* butterfly_mat_to_sp_mat(int id, Faust::TransformHelper<SCALAR,GPU2>* core_ptr)
+{
+	auto bf_mat = dynamic_cast<const MatButterfly<SCALAR, GPU2>*>(core_ptr->get_gen_fact(id));
+	auto sp_mat = bf_mat->toMatSparse().tocpu();
+	return FaustSpMat2mxArray(sp_mat);
+}
+
+template <typename SCALAR>
+mxArray* perm_mat_to_sp_mat(int id, Faust::TransformHelper<SCALAR,GPU2>* core_ptr)
+{
+	auto p_mat = dynamic_cast<const MatPerm<SCALAR, GPU2>*>(core_ptr->get_gen_fact(id));
+	auto sp_mat = p_mat->toMatSparse().tocpu();
+	return FaustSpMat2mxArray(sp_mat);
 }
 #endif
