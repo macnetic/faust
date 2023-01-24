@@ -56,6 +56,8 @@ cdef extern from "FaustCoreCpp.h":
         void get_fact_bsr(const size_t id, FPP* bdata, int* brow_ptr, int* bcol_inds) const
         bool is_all_sparse(bool csr, bool bsr) const
         bool is_all_dense() const
+        @CPP_CORE_CLASS@[FPP]* factors(const unsigned long int* ids,
+                                       const unsigned long int & nids) const
         @CPP_CORE_CLASS@[FPP]* right(const unsigned int) const
         @CPP_CORE_CLASS@[FPP]* left(const unsigned int) const
         @CPP_CORE_CLASS@[FPP]* get_slice(unsigned int, unsigned int, unsigned int,

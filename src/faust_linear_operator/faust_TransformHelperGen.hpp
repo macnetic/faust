@@ -381,7 +381,7 @@ namespace Faust
 			for(auto i=0; i < n_ids; i++)
 			{
 				int id = ids_[i];
-				auto factor = const_cast<Faust::MatGeneric<FPP,DEV>*>(this->transform->data[i]);
+				auto factor = const_cast<Faust::MatGeneric<FPP,DEV>*>(this->transform->data[id]);
 				if(is_transposed)
 					factors.insert(factors.begin(), factor);
 				else

@@ -370,6 +370,15 @@ FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::left(const faust_unsigned_int id) 
     return core;
 }
 
+
+template<typename FPP, FDevice DEV>
+FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::factors(const faust_unsigned_int *ids, const faust_unsigned_int& nids) const
+{
+    Faust::TransformHelper<FPP,DEV>* th = this->transform->factors(ids, nids);
+    FaustCoreCpp<FPP,DEV>* core = new FaustCoreCpp<FPP,DEV>(th);
+    return core;
+}
+
 template<typename FPP, FDevice DEV>
 FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::fancy_idx(unsigned long int* row_ids, unsigned long int
         num_rows, unsigned long int* col_ids,

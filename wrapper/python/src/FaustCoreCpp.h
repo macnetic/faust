@@ -139,6 +139,7 @@ class FaustCoreCpp
             int* bcol_inds) const;
     FaustCoreCpp<FPP,DEV>* left(const faust_unsigned_int) const;
     FaustCoreCpp<FPP,DEV>* right(const faust_unsigned_int) const;
+    FaustCoreCpp<FPP,DEV>* factors(const faust_unsigned_int *ids, const faust_unsigned_int& nids) const;
     faust_unsigned_int get_fact_nnz(const faust_unsigned_int) const;
     bool is_fact_sparse(const faust_unsigned_int id) const;
     int get_fact_type(const faust_unsigned_int id) const;

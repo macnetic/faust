@@ -587,6 +587,18 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
         core.@CORE_OBJ@ = self.@CORE_OBJ@.right(id)
         return core
 
+    def factors(self, ids):
+        cdef unsigned long int[:] indices_view
+        if not isinstance(ids, np.ndarray):
+            indices = np.array(ids, dtype='uint64')
+        else:
+            indices = ids.astype(np.uint64)
+        indices_view = indices
+        core = @CORE_CLASS@(core=True)
+        core.@CORE_OBJ@ = self.@CORE_OBJ@.factors(&indices_view[0], len(ids))
+        return core
+
+
     def fancy_idx(self, indices):
         cdef unsigned long int[:] row_indices_view
         cdef unsigned long int[:] col_indices_view

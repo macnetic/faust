@@ -1734,7 +1734,7 @@ classdef Faust
 		%> @retval factors a matrix copy of the i-th factor if i is a single index or a new Faust composed of i-th to the j-th factors of F. The factors copies keep the storage organization of the source matrix (full or sparse).
 		%>
 		%> @note Matlab doesn't support float sparse matrices, but matfaust does! Hence when you call Faust.factors on a float sparse Faust to retrieve one factor you'll get a double sparse matrix as a copy of the float sparse matrix.
-		%> @note As well for BSR matrices that aren't not supported by Matlab, the function can't return a bsr matrix so it rather converts it on the fly to a sparse matrix that is finally returned.
+		%> @note As well for BSR matrices that aren't not supported by Matlab, the function can't return a bsr matrix so it rather converts it on the fly to a sparse matrix that is finally returned (it applies also for other specialized matrix types).
 		%>
 		%> @b Example
 		%> @code

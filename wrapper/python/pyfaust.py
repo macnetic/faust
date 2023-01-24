@@ -2010,19 +2010,20 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         Args:
             F: the Faust object.
-            indices: the factor contiguous indices.
+            indices: the indices of wanted factors.
 
         Returns:
             if indices is a single index: a copy of the i-th factor.
-            Otherwise: a new Faust composed of copies of the contiguous factors of F
-            pointed by indices.
+            Otherwise a new Faust composed of the factors of F pointed by
+            indices (no copy is made).
 
-            Each copy type is:
+            For a single factor the type is:
                 - numpy.ndarray if it is a full storage matrix or,
                 - scipy.sparse.csc.matrix_csc if it's a sparse matrix of a
                 transposed Faust,
                 - scipy.sparse.csr.csr_matrix if it's a sparse matrix of a
                 non-transposed Faust.
+                - a scipy.sparse.bsr matrix if the factor is a BSR matrix.
 
         Raises:
             ValueError.
@@ -2036,23 +2037,17 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         <b>See also</b> Faust.numfactors, Faust.transpose
         """
-        if(hasattr(indices, '__iter__')):
+        if hasattr(indices, '__iter__'):
             indices = list(indices)
         else:
             indices = list([indices])
-        factors = []
-        oi = None
         for i in indices:
-            if(not isinstance(i, int)):
+            if not isinstance(i, int):
                 raise TypeError("Index must be an integer.")
-            if(oi != None and i-oi != 1):
-                raise Exception("Indices must be contiguous.")
-            factors += [F.m_faust.get_fact_opt(i)]
-            oi = i
-        if(len(factors) == 1):
-            return factors[0]
+        if len(indices) == 1:
+            return F.m_faust.get_fact_opt(indices[0])
         else:
-            return pyfaust.Faust(factors, dev=F.device)
+            return Faust(core_obj=F.m_faust.factors(indices))
 
     def right(F, i):
         """
