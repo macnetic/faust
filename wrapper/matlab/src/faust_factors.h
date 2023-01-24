@@ -45,5 +45,15 @@
 #define __MEX_FAUST_FACTORS__
 template <typename SCALAR, FDevice DEV>
 void faust_factors(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs);
+template <typename SCALAR>
+mxArray* bsr_mat_to_sp_mat(int id, Faust::TransformHelper<SCALAR,Cpu>* core_ptr);
+template <typename SCALAR>
+mxArray* bsr_mat_to_sp_mat(int id, Faust::TransformHelper<SCALAR,GPU2>* core_ptr);
+
+template <typename SCALAR>
+mxArray* butterfly_mat_to_sp_mat(int id, Faust::TransformHelper<SCALAR,Cpu>* core_ptr);
+template <typename SCALAR>
+mxArray* perm_mat_to_sp_mat(int id, Faust::TransformHelper<SCALAR,Cpu>* core_ptr);
+
 #include "faust_factors.hpp"
 #endif
