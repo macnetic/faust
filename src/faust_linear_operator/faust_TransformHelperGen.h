@@ -80,6 +80,12 @@ namespace Faust
 */
 			virtual TransformHelper<FPP,DEV>* right(const faust_unsigned_int id, const bool copy=false, bool caller_is_left=false) const;
 
+
+			/**
+			 * Returns a TransformHelper made of the n_ids factors of "this" identified by ids indices.
+			 *
+			 */
+			TransformHelper<FPP,DEV>* factors(const faust_unsigned_int *ids, const faust_unsigned_int n_ids) const;
 			void copy_slices(const TransformHelperGen<FPP,DEV>* th, const bool transpose = false);
 			void copy_slice_state(const TransformHelperGen<FPP,DEV>& th, bool transpose=false);
 			void copy_fancy_idx_state(const TransformHelperGen<FPP, DEV> &th, bool transpose=false);

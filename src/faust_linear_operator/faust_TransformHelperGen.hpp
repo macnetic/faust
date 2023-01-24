@@ -321,7 +321,7 @@ namespace Faust
 	template<typename FPP, FDevice DEV>
 		TransformHelper<FPP,DEV>* TransformHelperGen<FPP,DEV>::left(const faust_unsigned_int id, const bool copy /* default to false */, bool caller_is_right/*=false*/) const
 		{
-			if(id >= this->size()) throw out_of_range("factor id is lower than zero or greater or equal to the size of Transform.");
+			if(id >= this->size()) throw out_of_range("factor id is greater or equal to the size of Transform.");
 			const_cast<Faust::TransformHelperGen<FPP, DEV>*>(this)->eval_sliced_Transform();
 			const_cast<Faust::TransformHelperGen<FPP, DEV>*>(this)->eval_fancy_idx_Transform();
 			if(is_transposed && ! caller_is_right)
@@ -341,7 +341,7 @@ namespace Faust
 	template<typename FPP, FDevice DEV>
 		TransformHelper<FPP,DEV>* TransformHelperGen<FPP,DEV>::right(const faust_unsigned_int id, const bool copy /* default to false */, bool caller_is_left/*=false*/) const
 		{
-			if(id >= this->size()) throw out_of_range("factor id is lower than zero or greater or equal to the size of Transform.");
+			if(id >= this->size()) throw out_of_range("factor id is greater or equal to the size of Transform.");
 			const_cast<Faust::TransformHelperGen<FPP, DEV>*>(this)->eval_sliced_Transform();
 			const_cast<Faust::TransformHelperGen<FPP, DEV>*>(this)->eval_fancy_idx_Transform();
 			std::vector<Faust::MatGeneric<FPP,DEV>*> right_factors;
@@ -356,6 +356,43 @@ namespace Faust
 			right_th->is_transposed = is_transposed;
 			right_th->is_conjugate = is_conjugate;
 			return right_th;
+		}
+
+
+	template<typename FPP, FDevice DEV>
+		TransformHelper<FPP,DEV>* TransformHelperGen<FPP,DEV>::factors(const faust_unsigned_int *ids, const faust_unsigned_int n_ids) const
+		{
+			faust_unsigned_int* ids_ = const_cast<faust_unsigned_int*>(ids); // no worries, it is modified only if is_transposed, in which case it is duplicated
+			if(is_transposed)
+					ids_ = new faust_unsigned_int[n_ids];
+			for(auto i = 0;i < n_ids;i++)
+			{
+				auto id = ids_[i];
+				if(id >= size()) throw out_of_range("factor id is greater or equal to the size of Transform.");
+				if(id == 0 || id == size()-1)
+				{
+					const_cast<Faust::TransformHelperGen<FPP, DEV>*>(this)->eval_sliced_Transform();
+					const_cast<Faust::TransformHelperGen<FPP, DEV>*>(this)->eval_fancy_idx_Transform();
+				}
+				if(is_transposed)
+					ids_[i] = size() - id - 1;
+			}
+			std::vector<Faust::MatGeneric<FPP,DEV>*> factors;
+			for(auto i=0; i < n_ids; i++)
+			{
+				int id = ids_[i];
+				auto factor = const_cast<Faust::MatGeneric<FPP,DEV>*>(this->transform->data[i]);
+				if(is_transposed)
+					factors.insert(factors.begin(), factor);
+				else
+					factors.push_back(factor);
+			}
+			auto th = new TransformHelper<FPP,DEV>(factors, FPP(1.0), false, /*copy*/false, true);
+			th->is_transposed = is_transposed;
+			th->is_conjugate = is_conjugate;
+			if(ids_ != ids)
+				delete[] ids_;
+			return th;
 		}
 
 	template<typename FPP, FDevice DEV>
