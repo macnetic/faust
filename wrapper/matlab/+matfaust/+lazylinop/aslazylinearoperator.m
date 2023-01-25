@@ -3,9 +3,14 @@
 %>
 %> @note obj must support operations and attributes defined in the LazyLinearOp class.
 %> Any operation not supported would raise an exception at the evaluation time.
+%>
 %> @param obj: the root object on which the LazyLinearOp is based (it could
 %> be a dense matrix, a sparse matrix, a Faust object or almost any
 %> object that supports the same kind of functions).
+%> @param 'shape', [int, int] (optional): defines the shape of the resulting LazyLinearOp. In most cases
+%> this argument shouldn't be used because we can rely on size(obj) but
+%> if for any reason size(obj) is not well defined the user can explicitly
+%> define the shape of the LazyLinearOp.
 %>
 %> @retval L: a LazyLinearOp instance based on obj.
 %>
@@ -31,7 +36,7 @@
 %>
 %> @b See @b also: matfaust.rand.
 %=============================================================
-function L = aslazylinearoperator(obj)
+function L = aslazylinearoperator(obj, varargin)
 	import matfaust.lazylinop.LazyLinearOp
-	L = LazyLinearOp.create_from_op(obj);
+	L = LazyLinearOp.create_from_op(obj, varargin{:});
 end

@@ -545,7 +545,28 @@ classdef LazyLinearOp < handle % needed to use references on objects
             b = isa(obj, 'matfaust.lazylinop.LazyLinearOp');
         end
 
-        function lop = create_from_op(obj)
+        %=============================================================
+        %> Alias of matfaust.lazylinop.aslazylinearoperator.
+        %=============================================================
+        function lop = create_from_op(obj, varargin)
+			nargs = length(varargin);
+			if nargs >= 1
+				if ~ strcmp(varargin{1}, 'shape')
+					error([ varargin{1}, ' is not a valid keyword argument, valid one: ''shape'''])
+				end
+				if nargs >= 2
+					argval = varargin{2};
+				else
+					error('''shape'' must be followed by a value')
+				end
+				if ismatrix(varargin{2}) && isnumeric(varargin{2}) && all(size(varargin{2}) == [1, 2])
+					osize = varargin{2};
+				else
+					error('the value of ''shape'' must be a valid row-vector of 2 integers')
+				end
+			else
+				osize = size(obj);
+			end
             import matfaust.lazylinop.LazyLinearOp
             lambdas = cell(1, 4);
             lambdasT = cell(1, 4);
@@ -565,13 +586,13 @@ classdef LazyLinearOp < handle % needed to use references on objects
                 dtype = 'single';
             end
 
-            lop = LazyLinearOp(lambdas, size(obj), 'dtype', dtype, ...
+            lop = LazyLinearOp(lambdas, osize, 'dtype', dtype, ...
                 'root_obj', obj);
-            lopT = LazyLinearOp(lambdasT, [size(obj, 2), size(obj, 1)], 'dtype', dtype, ...
+            lopT = LazyLinearOp(lambdasT, [osize(2), osize(1)], 'dtype', dtype, ...
                 'root_obj', obj);
-            lopH = LazyLinearOp(lambdasH, [size(obj, 2), size(obj, 1)], 'dtype', dtype, ...
+            lopH = LazyLinearOp(lambdasH, [osize(2), osize(1)], 'dtype', dtype, ...
                 'root_obj', obj);
-            lopC = LazyLinearOp(lambdasC, size(obj), 'dtype', dtype, ...
+            lopC = LazyLinearOp(lambdasC, osize, 'dtype', dtype, ...
                 'root_obj', obj);
 
             lop.lambdas{LazyLinearOp.T} = @() lopT;
