@@ -1848,6 +1848,8 @@ classdef Faust
 		%==========================================================================================
 		%> @brief The number of factors of F.
 		%>
+		%> @note using length(F) is shorter!
+		%>
 		%> @b Usage
 		%>
 		%> &nbsp;&nbsp;&nbsp; @b A = numfactors(F)
@@ -2434,7 +2436,7 @@ classdef Faust
 		end
 
 		%==========================================================
-		%> Performs the power iteration algorithm to compute the greatest eigenvalue of the Faust.
+		%> @brief Performs the power iteration algorithm to compute the greatest eigenvalue of the Faust.
 		%>
 		%> For the algorithm to succeed the Faust should be diagonalizable
 		%> (similar to a digonalizable Faust), ideally, a symmetric positive-definite Faust.
