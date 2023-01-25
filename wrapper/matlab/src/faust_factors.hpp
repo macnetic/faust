@@ -11,13 +11,18 @@ void faust_factors(const mxArray **prhs, const int nrhs, mxArray **plhs, const i
 {
 	Faust::TransformHelper<SCALAR,DEV>* core_ptr = convertMat2Ptr<Faust::TransformHelper<SCALAR,DEV> >(prhs[1]);
 
-	if (nlhs > 1 || nrhs != 3)
+	if (nlhs > 1 || nrhs < 3)
 		mexErrMsgTxt("factors : incorrect number of arguments.");
 
 	auto ids = static_cast<unsigned long int*>(mxGetData(prhs[2]));
 	auto n_ids = mxGetNumberOfElements(prhs[2]);
+	bool as_faust = false;
 
-	if(n_ids == 1)
+	if(nrhs >= 4)
+		as_faust = static_cast<bool>(mxGetScalar(prhs[3]));
+		// if a single factor is asked it'll be returned as a Faust
+
+	if(n_ids == 1 && ! as_faust)
 	{ // asked a single factor
 		int id = ids[0];
 		auto type = core_ptr->get_fact_type(id);

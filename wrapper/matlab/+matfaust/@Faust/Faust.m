@@ -1721,7 +1721,7 @@ classdef Faust
 		%=====================================================================
 		%> @brief Returns the i-th factor or a new Faust composed of F factors whose indices are listed in indices.
 		%>
-		%> @note Factors are not copied in memory if subset greater than one is asked and doesn't need conversion.
+		%> @note Factors are not copied in memory if a subset greater than one is asked or if as_faust == true.
 		%>
 		%> @b Usage
 		%>
@@ -1729,7 +1729,9 @@ classdef Faust
 		%> &nbsp;&nbsp;&nbsp; @b factor = factors(F, i:j) returns a new Faust formed of the F's factors from the i-th to the j-th included.
 		%>
 		%> @param F the Faust object.
-		%> @param varargin the factor indices.
+		%> @param ids the factor indices.
+		%> @param 'as_faust', logical (optional): true to return a Faust even if a single factor is asked (length(ids) == 1), otherwise (as_faust == false) and a dense or sparse matrix is returned.
+		%>
 		%>
 		%> @retval factors a matrix copy of the i-th factor if i is a single index or a new Faust composed of i-th to the j-th factors of F. The factors copies keep the storage organization of the source matrix (full or sparse).
 		%>
@@ -1744,7 +1746,8 @@ classdef Faust
 		%> @endcode
 		%> <p>@b See @b also Faust.numfactors
 		%=====================================================================
-		function factors = factors(F, ids)
+		function factors = factors(F, ids, varargin)
+			as_faust = parse_as_faust(F, varargin{:});
 			ids_err = 'factors indices must either be real positive integers or logicals.';
 			if ~ strcmp(class(ids), 'double')
 				error(ids_err);
@@ -1756,8 +1759,8 @@ classdef Faust
 				end
 			end
 			nargs = numel(ids);
-			if nargs > 1
-				factors = matfaust.Faust(F, call_mex(F, 'factors', uint64(ids-1)));
+			if nargs > 1 || as_faust
+				factors = matfaust.Faust(F, call_mex(F, 'factors', uint64(ids-1), as_faust));
 			elseif nargs == 1
 				factors = call_mex(F, 'factors', uint64(ids-1));
 			else
@@ -1769,6 +1772,9 @@ classdef Faust
 		%> Returns the left hand side factors of F from index 1 to i included (in 1-base index).
 		%===
 		%>
+		%> @param F the Faust object.
+		%> @param i the bound factor index.
+		%> @param 'as_faust', logical (optional): true to return a Faust even if a single factor is asked (length(ids) == 1), otherwise (as_faust == false) and a dense or sparse matrix is returned.
 		%>
 		%> @retval a Faust if the number of factors to be returned is greater than 1,
 		%>           an array or a sparse matrix otherwise.
@@ -1799,15 +1805,19 @@ classdef Faust
 		%>@endcode
 		%> <p> @b See @b also Faust.factors, Faust.right
 		%================================================================
-		function lfactors = left(F, i)
+		function lfactors = left(F, i, varargin)
 			i = check_factor_idx(F, i);
-			lfactors = factors(F, 1:i);
+			as_faust = parse_as_faust(F, varargin{:});
+			lfactors = factors(F, 1:i, 'as_faust', as_faust);
 		end
 
 		%================================================================
 		%> Returns the right hand side factors of F from index i to end (in 1-base index).
 		%===
 		%>
+		%> @param F the Faust object.
+		%> @param i the bound factor index.
+		%> @param 'as_faust', logical (optional): true to return a Faust even if a single factor is asked (length(ids) == 1), otherwise (as_faust == false) and a dense or sparse matrix is returned.
 		%> @retval a Faust if the number of factors to be returned is greater than 1,
 		%>           an array or a sparse matrix otherwise.
 		%>
@@ -1839,9 +1849,10 @@ classdef Faust
 		%>
 		%> <p> @b See @b also Faust.factors, Faust.left
 		%================================================================
-		function rfactors = right(F, i)
+		function rfactors = right(F, i, varargin)
 			i = check_factor_idx(F, i);
-			rfactors = factors(F, i:numfactors(F));
+			as_faust = parse_as_faust(F, varargin{:});
+			rfactors = factors(F, i:numfactors(F), 'as_faust', as_faust);
 		end
 
 
@@ -3361,6 +3372,22 @@ classdef Faust
 			end
 			i = floor(i);
 
+		end
+
+		%================================================================
+		%> Parses 'as_faust' optional argument for factors, left, right methods.
+		%================================================================
+		function as_faust = parse_as_faust(F, varargin)
+			as_faust = false;
+			if length(varargin) > 1
+				if ~ strcmp(varargin{1}, 'as_faust')
+					error([varargin{1}, ' is not a valid optional keyword argument for left'])
+				end
+				as_faust = varargin{2};
+				if ~ islogical(as_faust)
+					error(['as_faust value must be a logical'])
+				end
+			end
 		end
 
 		%================================================================
