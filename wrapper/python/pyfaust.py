@@ -1966,6 +1966,8 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         """
         Returns the number of factors of F.
 
+        NOTE: using len(F) is more shorter!
+
         Returns:
             the number of factors.
 
@@ -2002,7 +2004,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         """
         return F.numfactors()
 
-    def factors(F, indices):
+    def factors(F, indices, as_faust=False):
         """
         Returns the i-th factor of F or a new Faust composed of F factors whose indices are listed in indices.
 
@@ -2011,13 +2013,16 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Args:
             F: the Faust object.
             indices: the indices of wanted factors.
+            as_faust: True to return a Faust even if a single factor is asked,
+            otherwise (as_faust == False) and a numpy array or a scipy
+            sparse matrix is returned.
 
         Returns:
-            if indices is a single index: a copy of the i-th factor.
+            if indices is a single index and as_faust == False: a copy of the i-th factor.
             Otherwise a new Faust composed of the factors of F pointed by
             indices (no copy is made).
 
-            For a single factor the type is:
+            For a single factor (with as_faust == False), the matrix type is:
                 - numpy.ndarray if it is a full storage matrix or,
                 - scipy.sparse.csc.matrix_csc if it's a sparse matrix of a
                 transposed Faust,
@@ -2035,7 +2040,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             >>> f0 = F.factors(0)
             >>> G = F.factors(range(3,5)) # a new Faust composed of the two last factors of F
 
-        <b>See also</b> Faust.numfactors, Faust.transpose
+        <b>See also</b> Faust.numfactors, Faust.transpose, Faust.left, Faust.right
         """
         if hasattr(indices, '__iter__'):
             indices = list(indices)
@@ -2044,18 +2049,25 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         for i in indices:
             if not isinstance(i, int):
                 raise TypeError("Index must be an integer.")
-        if len(indices) == 1:
+        if len(indices) == 1 and not as_faust:
             return F.m_faust.get_fact_opt(indices[0])
         else:
             return Faust(core_obj=F.m_faust.factors(indices))
 
-    def right(F, i):
+    def right(F, i, as_faust=False):
         """
         Returns the right hand side factors of F from index i to F.numfactors()-1.
 
+        Args:
+            F: the Faust from which to extract right factors.
+            i: the far left index of right factors to extract.
+            as_faust: True to return a Faust even if a single factor is asked
+            (i.e.: F.right(len(F)-1, as_faust=True) is a Faust, F.left(len(F)-1) is not).
+
         Returns:
-            a Faust if the number of factors to be returned is greater than 1, a
-            numpy array or a sparse matrix otherwise.
+            a Faust if the number of factors to be returned is greater than 1
+            or if as_faust == True,
+            a numpy array or a sparse matrix otherwise.
 
         Examples:
             >>> from pyfaust import rand
@@ -2081,17 +2093,24 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         """
         i = F._check_factor_idx(i)
         rF = Faust(core_obj=F.m_faust.right(i))
-        if(len(rF) == 1):
+        if len(rF) == 1 and not as_faust:
             return rF.factors(0)
         return rF
 
-    def left(F, i):
+    def left(F, i, as_faust=False):
         """
         Returns the left hand side factors of F from index 0 to i included.
 
+        Args:
+            F: the Faust from which to extract left factors.
+            i: the far right index of left factors to extract.
+            as_faust: True to return a Faust even if a single factor is asked
+            (i.e.: F.left(0, as_faust=True) is a Faust, F.left(0) is not).
+
         Returns:
-            a Faust if the number of factors to be returned is greater than 1, a
-            numpy array or a sparse matrix otherwise.
+            a Faust if the number of factors to be returned is greater than 1
+            or if as_faust == True,
+            a numpy array or a sparse matrix otherwise.
 
         Examples:
             >>> from pyfaust import rand
@@ -2117,7 +2136,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         """
         i = F._check_factor_idx(i)
         lF = Faust(core_obj=F.m_faust.left(i))
-        if(len(lF) == 1):
+        if len(lF) == 1 and not as_faust:
             return lF.factors(0)
         return lF
 
