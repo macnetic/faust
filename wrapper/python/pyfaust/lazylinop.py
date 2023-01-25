@@ -11,7 +11,7 @@ def isLazyLinearOp(obj):
     """
     return LazyLinearOp.isLazyLinearOp(obj)
 
-def aslazylinearoperator(obj):
+def aslazylinearoperator(obj, shape=None):
     """
     Creates a LazyLinearOp based on the object obj which must be of a linear operator compatible type.
 
@@ -24,32 +24,62 @@ def aslazylinearoperator(obj):
         obj: the root object on which the LazyLinearOp is based (it could
         be a numpy array, a scipy matrix, a Faust object or almost any
         object that supports the same kind of functions).
+        shape: defines the shape of the resulting LazyLinearOp. In most cases
+        this argument shouldn't be used because we can rely on obj.shape but
+        if for any reason obj.shape is not well defined the user can explicitly
+        define the shape of the LazyLinearOp (cf. example of pylops.Symmetrize
+        defective shape).
 
 
     Returns:
         a LazyLinearOp instance based on obj.
 
     Example:
-        >>> from pyfaust.lazylinop import asLazyLinearOp
+        >>> from pyfaust.lazylinop import aslazylinearoperator
         >>> import numpy as np
         >>> M = np.random.rand(10, 12)
-        >>> lM = azlazylinearoperator(M)
+        >>> lM = aslazylinearoperator(M)
         >>> twolM = lM + lM
         >>> twolM
         <pyfaust.lazylinop.LazyLinearOp at 0x7fcd7d7750f0>
         >>> import pyfaust as pf
         >>> F = pf.rand(10, 12)
-        >>> lF = azlazylinearoperator(F)
+        >>> lF = aslazylinearoperator(F)
         >>> twolF = lF + lF
         >>> twolF
         <pyfaust.lazylinop.LazyLinearOp at 0x7fcd7d774730>
+		>>> # To illustrate the use of the optional “shape” parameter, let us consider implementing a lazylinearoperator associated with the pylops.Symmetrize linear operator, 
+		>>> # https://pylops.readthedocs.io/en/latest/api/generated/pylops.Symmetrize.html
+		>>> which is designed to symmetrize a vector, or a matrix, along some coordinate axis
+		>>> from pylops import Symmetrize
+		>>> M = np.random.rand(22, 2)
+		>>> # Here the matrix M is of shape(22, 2) and we want to symmetrize it vertically (axis == 0), so we build the corresponding symmetrizing operator Sop
+		>>> Sop = Symmetrize(M.shape, axis=0)
+		>>> # Applying the operator to M works, and the symmetrized matrix has 43 = 2*22-1 rows, and 2 columns (as many as M) as expected
+		>>> (Sop @ M).shape
+		(43, 2)
+		>>> # Since it maps matrices with 22 rows to matrices with 43 rows, the “shape” of Sop should be (43,22) however, the “shape” as provided by pylops is inconsistent
+		>>> Sop.shape
+		(86, 44)    
+		>>> # To exploit Sop as a LazyLinearOperator we cannot rely on the “shape” given by pylops (otherwise the LazyLinearOp-matrix product wouldn't be properly defined, and would fail on a "dimensions must agree" exception)
+		>>> # Thanks to the optional “shape” parameter of aslazylinearoperator, this can be fixed
+		>>> lSop = aslazylinearoperator(Sop, shape=(43, 22))
+		>>> # now lSop.shape is consistent 
+		>>> lSop.shape
+		(43, 22)
+		>>> (lSop @ M).shape
+		(43, 2)
+		>>> # Besides, Sop @ M is equal to lSop @ M, so all is fine !
+		>>> np.allclose(lSop @ M, Sop @ M)
+		True
 
 
-    <b>See also:</b> pyfaust.rand.
+
+    <b>See also:</b> pyfaust.rand, <a href="https://pylops.readthedocs.io/en/latest/api/generated/pylops.Symmetrize.html">pylops.Symmetrize</a>
     """
     if isLazyLinearOp(obj):
         return obj
-    return LazyLinearOp.create_from_op(obj)
+    return LazyLinearOp.create_from_op(obj, shape)
 
 def hstack(tup):
     """
@@ -137,10 +167,14 @@ class LazyLinearOp(LinearOperator):
                                  ' self.lambdas')
 
     @staticmethod
-    def create_from_op(obj):
+    def create_from_op(obj, shape=None):
         """
         Alias of pyfaust.lazylinop.aslazylinearoperator.
         """
+        if shape is None:
+            oshape = obj.shape
+        else:
+            oshape = shape
         lambdas = {'@': lambda op: obj @ op}
         lambdasT = {'@': lambda op: obj.T @ op}
         lambdasH = {'@': lambda op: obj.T.conj() @ op}
@@ -151,10 +185,10 @@ class LazyLinearOp(LinearOperator):
             l['T'] = None
             l['H'] = None
             l['slice'] = None #TODO: rename slice to index
-        lop = LazyLinearOp(lambdas, obj.shape, obj, dtype=obj.dtype)
-        lopT = LazyLinearOp(lambdasT, (obj.shape[1], obj.shape[0]), obj, dtype=obj.dtype)
-        lopH = LazyLinearOp(lambdasH, (obj.shape[1], obj.shape[0]), obj, dtype=obj.dtype)
-        lopC = LazyLinearOp(lambdasC, obj.shape, obj, dtype=obj.dtype)
+        lop = LazyLinearOp(lambdas, oshape, obj, dtype=obj.dtype)
+        lopT = LazyLinearOp(lambdasT, (oshape[1], oshape[0]), obj, dtype=obj.dtype)
+        lopH = LazyLinearOp(lambdasH, (oshape[1], oshape[0]), obj, dtype=obj.dtype)
+        lopC = LazyLinearOp(lambdasC, oshape, obj, dtype=obj.dtype)
 
         # TODO: refactor with create_from_funcs (in ctor)
         lambdas['T'] = lambda: lopT
