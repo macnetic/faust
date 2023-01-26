@@ -1400,9 +1400,9 @@ template<typename FPP>
 	}
 
 template<typename FPP>
-	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density /* 1.f */, bool per_row /* true */)
+	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density /* 1.f */, bool per_row /* true */, unsigned int seed/*=0*/)
 	{
-		return TransformHelper<FPP,Cpu>::randFaust(-1, -1, t, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
+		return TransformHelper<FPP,Cpu>::randFaust(-1, -1, t, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row, seed);
 	}
 
 template<typename FPP>
@@ -1428,11 +1428,15 @@ template<typename FPP>
 	}
 
 template<typename FPP>
-	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::randFaust(int faust_nrows, int faust_ncols, RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density /* 1.f */, bool per_row /* true */)
+	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::randFaust(int faust_nrows, int faust_ncols, RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density /* 1.f */, bool per_row /* true */, unsigned int seed/*=0*/)
 	{
 		unsigned int tmp;
-		if(!TransformHelper<FPP,Cpu>::seed_init) {
-			std::srand(std::time(NULL)); //seed init needed for MatDense rand generation
+		if(!TransformHelper<FPP,Cpu>::seed_init || seed)
+		{
+			if(seed)
+				std::srand(seed);
+			else
+				std::srand(std::time(NULL));
 			TransformHelper<FPP,Cpu>::seed_init = true;
 		}
 		// pick randomly the number of factors into {min_num_factors, ..., max_num_factors}

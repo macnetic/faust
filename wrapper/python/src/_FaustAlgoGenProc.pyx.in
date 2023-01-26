@@ -22,13 +22,16 @@ cdef class FaustAlgoGen@PROC@@TYPE_NAME@:
 
     @staticmethod
     def randFaust(faust_nrows, faust_ncols, t, min_num_factors, max_num_factors, min_dim_size,
-                  max_dim_size, density=0.1, per_row=True):
+                  max_dim_size, density=0.1, per_row=True, seed=0):
         core = @CORE_CLASS@(core=True)
         core.@CORE_OBJ@ = \
                 FaustCoreCy.@CPP_CORE_CLASS@[@TYPE@].randFaust(faust_nrows,
                                                            faust_ncols,
                                                            t, min_num_factors, max_num_factors, min_dim_size,
-                                                           max_dim_size, density, per_row)
+                                                           max_dim_size,
+                                                               density,
+                                                               per_row,
+                                                               seed)
         if(core.@CORE_OBJ@ == NULL): raise MemoryError()
         return core
 

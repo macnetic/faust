@@ -804,9 +804,9 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::randFaust(int faust_nrows, int faust_ncols, RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density, bool per_row)
+		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::randFaust(int faust_nrows, int faust_ncols, RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density, bool per_row, unsigned int seed)
 		{
-			auto cpu_faust = TransformHelper<FPP,Cpu>::randFaust(faust_nrows, faust_ncols, t, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
+			auto cpu_faust = TransformHelper<FPP,Cpu>::randFaust(faust_nrows, faust_ncols, t, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row, seed);
 			//	TransformHelper<FPP,GPU2>::TransformHelper(const std::vector<MatGeneric<FPP,GPU2> *>& facts, const FPP lambda_/*= (FPP)1.0*/, const bool optimizedCopy/*=false*/, const bool cloning_fact /*= true*/, const bool internal_call/*=false*/)
 			TransformHelper<FPP,GPU2>* gpu_faust = new TransformHelper<FPP,GPU2>(*cpu_faust/*TODO: dev_id and stream ?*/);
 			//		void TransformHelper<FPP,GPU2>::push_back(const MatGeneric<FPP,Cpu>* M, const bool optimizedCopy/*=false*/, const int32_t dev_id/*=-1*/, const void* stream/*=nullptr*/)
@@ -818,9 +818,9 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density, bool per_row)
+		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density, bool per_row, unsigned int seed)
 		{
-			return TransformHelper<FPP,GPU2>::randFaust(-1, -1, t, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
+			return TransformHelper<FPP,GPU2>::randFaust(-1, -1, t, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row, seed);
 		}
 
 	template<typename FPP>

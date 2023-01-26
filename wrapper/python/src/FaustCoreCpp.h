@@ -181,12 +181,12 @@ class FaustCoreCpp
     static FaustCoreCpp<FPP,DEV>* randFaust(unsigned int t,
             unsigned int min_num_factors, unsigned int max_num_factors,
             unsigned int min_dim_size,
-            unsigned int max_dim_size, float density, bool per_row);
+            unsigned int max_dim_size, float density, bool per_row, unsigned int seed);
     static FaustCoreCpp<FPP,DEV>* randFaust(int faust_nrows, int faust_ncols,
             unsigned int t,
             unsigned int min_num_factors, unsigned int max_num_factors,
             unsigned int min_dim_size,
-            unsigned int max_dim_size, float density, bool per_row);
+            unsigned int max_dim_size, float density, bool per_row, unsigned int seed);
     static FaustCoreCpp<FPP,DEV>* randBSRFaust(unsigned int faust_nrows, unsigned int faust_ncols,
             unsigned int min_num_factors, unsigned int max_num_factors,
             unsigned int bnrows, unsigned int bncols, float density);

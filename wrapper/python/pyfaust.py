@@ -582,13 +582,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             >>> from pyfaust import rand
             >>> F = rand(50, 50)
             >>> F.__repr__()
-            >>> F.__repr__()
-            'Faust size 50x50, density 0.5, nnz_sum 1250, 5 factor(s): \n-
-            FACTOR 0 (double) SPARSE, size 50x50, density 0.1, nnz 250\n-
-            FACTOR 1 (double) SPARSE, size 50x50, density 0.1, nnz 250\n-
-            FACTOR 2 (double) SPARSE, size 50x50, density 0.1, nnz 250\n-
-            FACTOR 3 (double) SPARSE, size 50x50, density 0.1, nnz 250\n-
-            FACTOR 4 (double) SPARSE, size 50x50, density 0.1, nnz 250\n'
+			'Faust size 50x50, density 0.5, nnz_sum 1250, 5 factor(s): \\n- FACTOR 0 (double) SPARSE, size 50x50, density 0.1, nnz 250, addr: 0x561269ddcc50\\n- FACTOR 1 (double) SPARSE, size 50x50, density 0.1, nnz 250, addr: 0x561269da9100\\n- FACTOR 2 (double) SPARSE, size 50x50, density 0.1, nnz 250, addr: 0x561269c6fca0\\n- FACTOR 3 (double) SPARSE, size 50x50, density 0.1, nnz 250, addr: 0x561269c702c0\\n- FACTOR 4 (double) SPARSE, size 50x50, density 0.1, nnz 250, addr: 0x561269c5f7b0\\n'
             >>> # the same function is called when typing F in a terminal (but
             >>> # the output is properly formatted with line feeds):
             >>> F
@@ -2497,7 +2491,8 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 			- FACTOR 0 (double) BSR, size 10x10 (blocksize = 2x2), density 0.12, nnz 12 (nnz blocks: 3)
 			- FACTOR 1 (double) BSR, size 10x10 (blocksize = 2x2), density 0.12, nnz 12 (nnz blocks: 3)
 
-			>>> F.issparse() # default config. recognizes only csr 
+            # default config. recognizes only csr
+            >>> F.issparse()
             False
             >>> F.issparse(bsr=True)
             True
@@ -4043,7 +4038,7 @@ def rand_bsr(num_rows, num_cols, bnrows, bncols, num_factors=None, density=.1,
 
 def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
          density=None, fac_type='sparse',
-         per_row=True, dev='cpu', dtype='float64', field=None):
+         per_row=True, dev='cpu', dtype='float64', field=None, seed=0):
     """
     Generates a random Faust.
 
@@ -4085,6 +4080,8 @@ def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
                     made with the density applied on each column.
             dev: the device on which to create the Faust ('cpu' or 'gpu').
             field: (DEPRECATED, use dtype) a str to set the Faust field: 'real' or 'complex'.
+            seed: set PRNG initialization, useful for reproducibility of this function calls,
+            otherwise seed argument shouldn't be used (the PRNG is automatically initialized).
 
 
     Returns:
@@ -4192,17 +4189,29 @@ def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
                 rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUDbl.randFaust(num_rows,
                                                                               num_cols,
                                                                               fac_type_map[fac_type], min_num_factors, max_num_factors,
-                                                                              min_dim_size, max_dim_size, density, per_row))
+                                                                              min_dim_size,
+                                                                              max_dim_size,
+                                                                              density,
+                                                                              per_row,
+                                                                              seed))
             else: # type == 'float'
                 rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUFlt.randFaust(num_rows,
                                                                               num_cols,
                                                                               fac_type_map[fac_type], min_num_factors, max_num_factors,
-                                                                              min_dim_size, max_dim_size, density, per_row))
+                                                                              min_dim_size,
+                                                                              max_dim_size,
+                                                                              density,
+                                                                              per_row,
+                                                                              seed))
         elif field == COMPLEX:
             rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenCPUCplxDbl.randFaust(num_rows,
                                                                            num_cols,
                                                                            fac_type_map[fac_type], min_num_factors, max_num_factors,
-                                                                           min_dim_size, max_dim_size, density, per_row))
+                                                                              min_dim_size,
+                                                                              max_dim_size,
+                                                                              density,
+                                                                              per_row,
+                                                                              seed))
         # no else possible (see above)
     elif dev.startswith("gpu"):
         if field == REAL:
@@ -4210,17 +4219,29 @@ def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
                 rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUDbl.randFaust(num_rows,
                                                                               num_cols,
                                                                               fac_type_map[fac_type], min_num_factors, max_num_factors,
-                                                                              min_dim_size, max_dim_size, density, per_row))
+                                                                              min_dim_size,
+                                                                              max_dim_size,
+                                                                              density,
+                                                                              per_row,
+                                                                              seed))
             else: # type == float:
                 rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUFlt.randFaust(num_rows,
-                                                                           num_cols,
-                                                                           fac_type_map[fac_type], min_num_factors, max_num_factors,
-                                                                           min_dim_size, max_dim_size, density, per_row))
+                                                                              num_cols,
+                                                                              fac_type_map[fac_type], min_num_factors, max_num_factors,
+                                                                              min_dim_size,
+                                                                              max_dim_size,
+                                                                              density,
+                                                                              per_row,
+                                                                              seed))
         elif field == COMPLEX:
             rF = Faust(core_obj=_FaustCorePy.FaustAlgoGenGPUCplxDbl.randFaust(num_rows,
-                                                                           num_cols,
-                                                                           fac_type_map[fac_type], min_num_factors, max_num_factors,
-                                                                           min_dim_size, max_dim_size, density, per_row))
+                                                                              num_cols,
+                                                                              fac_type_map[fac_type], min_num_factors, max_num_factors,
+                                                                              min_dim_size,
+                                                                              max_dim_size,
+                                                                              density,
+                                                                              per_row,
+                                                                              seed))
     return rF
 
 def rand_butterfly(n, dtype='float64', dev='cpu', diag_opt=False):
