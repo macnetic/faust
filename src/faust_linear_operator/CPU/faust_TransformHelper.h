@@ -73,8 +73,6 @@ namespace Faust
 		{
 
 			friend TransformHelper<FPP,Cpu>* vertcat<FPP>(const std::vector<TransformHelper<FPP,Cpu>*>& THs);
-			static std::default_random_engine generator;
-			static bool seed_init;
 
 #ifdef FAUST_TORCH
 			std::vector<torch::Tensor> tensor_data;
@@ -253,7 +251,6 @@ namespace Faust
 			template<typename FPP2>
 			TransformHelper<Real<FPP2>, Cpu>* real();
 		};
-
 
 }
 

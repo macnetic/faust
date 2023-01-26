@@ -45,9 +45,10 @@
 #include "faust_prod_opt.h"
 #include <chrono>
 #include <cstdlib>
+#include "faust_prng.h"
 
-namespace Faust {
-
+namespace Faust
+{
 
 	template<typename FPP>
 		TransformHelper<FPP,Cpu>::TransformHelper(const std::vector<MatGeneric<FPP,Cpu> *>& facts,
@@ -171,7 +172,7 @@ namespace Faust {
 			{
 				// init tensor data cache
 				convMatGenListToTensorList(this->transform->data, tensor_data, at::kCPU, /* clone */ false, /* transpose */ ! this->is_transposed);
-//				display_TensorList(tensor_data);
+				//				display_TensorList(tensor_data);
 			}
 #endif
 
@@ -236,7 +237,7 @@ namespace Faust {
 			else
 				v = std::move(this->transform->multiply(x,
 							this->transposed2char(this->is_transposed, this->is_conjugate)));
-				//NOTE: the function below depends on this one for the non-sliced case
+			//NOTE: the function below depends on this one for the non-sliced case
 			return v;
 		}
 
@@ -252,11 +253,11 @@ namespace Faust {
 			if(this->is_sliced)
 			{
 				Vect<FPP, Cpu> v;
-//				int v_size;
-//				if(this->is_transposed)
-//					v_size = this->transform->getNbCol();
-//				else
-//					v_size = this->transform->getNbRow();
+				//				int v_size;
+				//				if(this->is_transposed)
+				//					v_size = this->transform->getNbCol();
+				//				else
+				//					v_size = this->transform->getNbRow();
 #if (EIGEN_WORLD_VERSION >= 3 && EIGEN_MAJOR_VERSION >= 4)
 				v.resize(this->getNbRow());
 				sliceMultiply(this->slices, x, v.getData(), 1);
@@ -343,7 +344,7 @@ namespace Faust {
 			{
 				// init tensor data cache
 				convMatGenListToTensorList(this->transform->data, tensor_data, at::kCPU, /* clone */ false, /* transpose */ ! this->is_transposed);
-//				display_TensorList(tensor_data);
+				//				display_TensorList(tensor_data);
 			}
 #endif
 
@@ -435,15 +436,15 @@ namespace Faust {
 			this->eval_sliced_Transform();
 			this->eval_fancy_idx_Transform();
 			std::vector<string> meth_names = {"DEFAULT_L2R", "GREEDY_ALL_ENDS", "GREEDY_1ST_BEST", "GREEDY_ALL_BEST_CONVDENSE", "GREEDY", "DYNPROG", "CPP_PROD_PAR_REDUC", "OMP_PROD_PAR_REDUC", "TORCH_CPU_L2R", "TORCH_CPU_GREEDY","TORCH_CPU_DENSE_DYNPROG_SPARSE_L2R" }; //TODO: it should be a function of faust_prod_opt module
-			// GREEDY_ALL_BEST_GENMAT is printed out as GREEDY to follow the wrappers name
+																																																																			 // GREEDY_ALL_BEST_GENMAT is printed out as GREEDY to follow the wrappers name
 			TransformHelper<FPP,Cpu>* t_opt = nullptr;
 			int NMETS = 11;
 			std::chrono::duration<double> * times = new std::chrono::duration<double>[NMETS]; //use heap because of VS14 (error C3863)
-//			MatDense<FPP,Cpu>* M = MatDense<FPP,Cpu>::randMat(transp?this->getNbRow():this->getNbCol(), 2048);
+																							  //			MatDense<FPP,Cpu>* M = MatDense<FPP,Cpu>::randMat(transp?this->getNbRow():this->getNbCol(), 2048);
 			int old_meth = this->get_mul_order_opt_mode();
 			int nmuls = nsamples, opt_meth=0;
 			std::vector<int> disabled_meths = {CPP_PROD_PAR_REDUC, OMP_PROD_PAR_REDUC}; // skip openmp/C++ threads methods because they are unfruitful when Eigen is multithreaded
-			// disable experimental (mostly less efficient) greedy methods
+																						// disable experimental (mostly less efficient) greedy methods
 			disabled_meths.push_back(GREEDY_ALL_ENDS);
 			disabled_meths.push_back(GREEDY_1ST_BEST);
 			disabled_meths.push_back(GREEDY_ALL_BEST_CONVDENSE);
@@ -457,7 +458,7 @@ namespace Faust {
 			{
 				// init tensor data cache
 				convMatGenListToTensorList(this->transform->data, tensor_data, at::kCPU, /* clone */ false, /* transpose */ ! this->is_transposed);
-//				display_TensorList(tensor_data);
+				//				display_TensorList(tensor_data);
 			}
 #else
 			disabled_meths.push_back(TORCH_CPU_L2R);
@@ -633,7 +634,7 @@ namespace Faust {
 			{
 				auto fac_nrows = pth->get_fact_nb_rows(i);
 				auto fac_ncols = pth->get_fact_nb_cols(i);
-//				std::cout << "fac nrows, ncols:" << fac_nrows << " " << fac_ncols << std::endl;
+				//				std::cout << "fac nrows, ncols:" << fac_nrows << " " << fac_ncols << std::endl;
 				if(fac_nrows == 0 && fac_ncols == 0)
 					pth->transform->erase(i);
 			}
@@ -664,10 +665,10 @@ namespace Faust {
 			this->eval_sliced_Transform();
 			this->eval_fancy_idx_Transform();
 			const vector<MatGeneric<FPP,Cpu>*>& vec = this->transform->data; //TransformHelper is a friend class of Transform // we can access private attribute data
-			//the point here is to minimize the number of copies (with direct access)
-			// the constructor then will copy the factors from the vector
-//			Transform<FPP,Cpu>* t = new Transform<FPP,Cpu>(vec, scalar, false, true); //optimizedCopy == false, cloning_fact == true
-//			TransformHelper<FPP,Cpu>* th  = new TransformHelper<FPP,Cpu>(*t);
+																			 //the point here is to minimize the number of copies (with direct access)
+																			 // the constructor then will copy the factors from the vector
+																			 //			Transform<FPP,Cpu>* t = new Transform<FPP,Cpu>(vec, scalar, false, true); //optimizedCopy == false, cloning_fact == true
+																			 //			TransformHelper<FPP,Cpu>* th  = new TransformHelper<FPP,Cpu>(*t);
 			TransformHelper<FPP,Cpu>* th = new TransformHelper<FPP,Cpu>(vec, scalar, false, false, true);
 			th->copy_transconj_state(*this);
 			th->copy_slice_state(*this);
@@ -677,26 +678,26 @@ namespace Faust {
 
 	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::pop_back()
-        {
-            this->transform->pop_back();
-        }
+		{
+			this->transform->pop_back();
+		}
 
 	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::pop_front()
-        {
-            this->transform->pop_front();
-        }
+		{
+			this->transform->pop_front();
+		}
 
 	template<typename FPP>
-			void TransformHelper<FPP,Cpu>::push_back(const FPP* bdata, const int* brow_ptr, const int* bcol_inds, const int nrows, const int ncols, const int bnnz, const int bnrows, const int bncols, const bool optimizedCopy/*=false*/, const bool transpose/*=false*/, const bool conjugate/*=false*/)
-			{
-				this->eval_sliced_Transform();
-				this->eval_fancy_idx_Transform();
-				auto bsr_mat = new MatBSR<FPP, Cpu>(nrows, ncols, bnrows, bncols, bnnz, bdata, brow_ptr, bcol_inds);
-				auto copying = optimizedCopy||transpose||conjugate;
-				this->push_back(bsr_mat, optimizedCopy, copying, transpose, conjugate);
-				if(copying) delete bsr_mat;
-			}
+		void TransformHelper<FPP,Cpu>::push_back(const FPP* bdata, const int* brow_ptr, const int* bcol_inds, const int nrows, const int ncols, const int bnnz, const int bnrows, const int bncols, const bool optimizedCopy/*=false*/, const bool transpose/*=false*/, const bool conjugate/*=false*/)
+		{
+			this->eval_sliced_Transform();
+			this->eval_fancy_idx_Transform();
+			auto bsr_mat = new MatBSR<FPP, Cpu>(nrows, ncols, bnrows, bncols, bnnz, bdata, brow_ptr, bcol_inds);
+			auto copying = optimizedCopy||transpose||conjugate;
+			this->push_back(bsr_mat, optimizedCopy, copying, transpose, conjugate);
+			if(copying) delete bsr_mat;
+		}
 
 	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::push_back(const FPP* data, int nrows, int ncols, const bool optimizedCopy/*=famse*/, const bool transpose/*=famse*/, const bool conjugate/*=famse*/)
@@ -755,14 +756,14 @@ namespace Faust {
 		{
 			this->eval_sliced_Transform();
 			this->eval_fancy_idx_Transform();
-//			for(auto f: h)
-//				this->push_back(f, false, false);
+			//			for(auto f: h)
+			//				this->push_back(f, false, false);
 			for(auto it=h.begin(); it < h.end(); it++)
 			{
 				auto f = *it;
 				this->push_back(f, false, false);
 			}
-//			this->push_back(h, false, false);
+			//			this->push_back(h, false, false);
 			this->push_back_(t...);
 		}
 
@@ -781,7 +782,7 @@ namespace Faust {
 			faust_unsigned_int nbytes = 0;
 			for(auto fac : this->transform->data)
 			{
-					nbytes += fac->getNBytes();
+				nbytes += fac->getNBytes();
 			}
 			return nbytes;
 		}
@@ -819,747 +820,747 @@ namespace Faust {
 		{
 			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
 			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
-			return this->transform->to_string(this->is_transposed);
+			return this->transform->to_string(this->is_transposed); 
 		}
 
 	//private
 	template<typename FPP>
-	const MatGeneric<FPP,Cpu>* TransformHelper<FPP,Cpu>::get_gen_fact(const faust_unsigned_int id) const
-	{
-		const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
-		const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
-		return this->transform->data[this->is_transposed?size()-id-1:id];
-	}
-
-template<typename FPP>
-	MatGeneric<FPP,Cpu>* TransformHelper<FPP,Cpu>::get_gen_fact_nonconst(const faust_unsigned_int id) const
-	{
-		const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
-		const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
-		return this->transform->data[this->is_transposed?size()-id-1:id];
-	}
-
-template<typename FPP>
-	void TransformHelper<FPP,Cpu>::update(const MatGeneric<FPP,Cpu>& M, const faust_unsigned_int fact_id)
-	{
-		this->eval_fancy_idx_Transform();
-		this->eval_sliced_Transform();
-		MatGeneric<FPP,Cpu>& M_ = const_cast<MatGeneric<FPP,Cpu>&>(M);
-		// I promise I won't change M
-		MatSparse<FPP,Cpu> *sp_mat, *sp_fact;
-		MatDense<FPP,Cpu> *ds_mat, *ds_fact;
-		MatGeneric<FPP,Cpu>* fact = get_gen_fact_nonconst(fact_id);
-		if(sp_mat = dynamic_cast<MatSparse<FPP,Cpu>*>(&M_))
+		const MatGeneric<FPP,Cpu>* TransformHelper<FPP,Cpu>::get_gen_fact(const faust_unsigned_int id) const
 		{
-			if(! (sp_fact = dynamic_cast<MatSparse<FPP,Cpu>*>(fact)))
-				throw std::runtime_error("A sparse factor can't be updated with a dense factor");
-			*sp_fact = *sp_mat;
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
+			return this->transform->data[this->is_transposed?size()-id-1:id];
 		}
-		else if(ds_mat = dynamic_cast<MatDense<FPP,Cpu>*>(&M_))
-		{
-			if(! (ds_fact = dynamic_cast<MatDense<FPP,Cpu>*>(fact)))
-				throw std::runtime_error("A dense factor can't be updated with a sparse factor");
-			*ds_fact = *ds_mat;
-		}
-		else
-		{
-			throw std::runtime_error("Only MatSparse and MatDense are accepted by TransformHelper::update().");
-		}
-		fact->set_id(M.is_id());
-		update_total_nnz();
-	}
 
-template<typename FPP>
-	void TransformHelper<FPP, Cpu>::convertToSparse()
-	{
-		this->eval_sliced_Transform();
-		this->eval_fancy_idx_Transform();
-		const MatDense<FPP,Cpu> * mat_dense;
-		const MatSparse<FPP,Cpu> * mat_sparse;
-		const MatBSR<FPP,Cpu> * mat_bsr;
-		for(int i=0;i<this->size();i++)
+	template<typename FPP>
+		MatGeneric<FPP,Cpu>* TransformHelper<FPP,Cpu>::get_gen_fact_nonconst(const faust_unsigned_int id) const
 		{
-			if(mat_dense = dynamic_cast<const MatDense<FPP,Cpu>*>(this->get_gen_fact(i)))
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
+			return this->transform->data[this->is_transposed?size()-id-1:id];
+		}
+
+	template<typename FPP>
+		void TransformHelper<FPP,Cpu>::update(const MatGeneric<FPP,Cpu>& M, const faust_unsigned_int fact_id)
+		{
+			this->eval_fancy_idx_Transform();
+			this->eval_sliced_Transform();
+			MatGeneric<FPP,Cpu>& M_ = const_cast<MatGeneric<FPP,Cpu>&>(M);
+			// I promise I won't change M
+			MatSparse<FPP,Cpu> *sp_mat, *sp_fact;
+			MatDense<FPP,Cpu> *ds_mat, *ds_fact;
+			MatGeneric<FPP,Cpu>* fact = get_gen_fact_nonconst(fact_id);
+			if(sp_mat = dynamic_cast<MatSparse<FPP,Cpu>*>(&M_))
 			{
-				mat_sparse = new MatSparse<FPP,Cpu>(*mat_dense);
-				this->replace(mat_sparse, i);
+				if(! (sp_fact = dynamic_cast<MatSparse<FPP,Cpu>*>(fact)))
+					throw std::runtime_error("A sparse factor can't be updated with a dense factor");
+				*sp_fact = *sp_mat;
 			}
-			else if(mat_bsr = dynamic_cast<const MatBSR<FPP,Cpu>*>(this->get_gen_fact(i)))
+			else if(ds_mat = dynamic_cast<MatDense<FPP,Cpu>*>(&M_))
 			{
-				mat_sparse =  new MatSparse<FPP, Cpu>(mat_bsr->to_sparse()); // TODO: avoid the copy
-				this->replace(mat_sparse, i);
-			}
-		}
-	}
-
-
-template<typename FPP>
-	bool TransformHelper<FPP, Cpu>::containsOnlySparseDense()
-	{
-		for(auto gen_fac : this->transform->data)
-		{
-			auto type = gen_fac->getType();
-			if(type != Sparse && type != Dense)
-				return false;
-		}
-		return true;
-	}
-
-template<typename FPP>
-	bool TransformHelper<FPP, Cpu>::containsOnlyButterflyPerm()
-	{
-		for(auto gen_fac : this->transform->data)
-		{
-			auto type = gen_fac->getType();
-			auto csr_fac = dynamic_cast<MatSparse<FPP, Cpu>*>(gen_fac);
-			if(type != Butterfly && type != Perm && (csr_fac == nullptr || ! MatPerm<FPP, Cpu>::isPerm(*csr_fac, false)))
-				return false;
-		}
-		return true;
-	}
-
-template<typename FPP>
-	bool TransformHelper<FPP, Cpu>::containsOnlyButterflySparse()
-	{
-		for(auto gen_fac : this->transform->data)
-		{
-			auto type = gen_fac->getType();
-			if(type != Butterfly && type != Sparse)
-				return false;
-		}
-		return true;
-	}
-
-template<typename FPP>
-	void TransformHelper<FPP, Cpu>::convertToDense()
-	{
-		this->eval_sliced_Transform();
-		this->eval_fancy_idx_Transform();
-		const MatDense<FPP,Cpu> * mat_dense;
-		const MatSparse<FPP,Cpu> * mat_sparse;
-		const MatBSR<FPP,Cpu> * mat_bsr;
-		for(int i=0;i<this->size();i++)
-		{
-			if(mat_sparse = dynamic_cast<const MatSparse<FPP,Cpu>*>(this->get_gen_fact(i)))
-			{
-				mat_dense = new MatDense<FPP,Cpu>(*mat_sparse);
-				this->replace(mat_dense, i);
-			}
-			else if(mat_bsr = dynamic_cast<const MatBSR<FPP,Cpu>*>(this->get_gen_fact(i)))
-			{
-				mat_dense =  new MatDense<FPP, Cpu>(mat_bsr->to_sparse()); // TODO: avoid the copy
-				this->replace(mat_dense, i);
-			}
-		}
-	}
-
-template<typename FPP>
-	void TransformHelper<FPP, Cpu>::replace(const MatGeneric<FPP, Cpu>* M, const faust_unsigned_int fact_id)
-	{
-		this->transform->replace(M, fact_id);
-	}
-
-template<typename FPP>
-	unsigned long long TransformHelper<FPP,Cpu>::get_fact_addr(const faust_unsigned_int id) const
-	{
-		return (unsigned long long) this->transform->data[this->is_transposed?size()-id-1:id];
-	}
-
-template<typename FPP>
-	void TransformHelper<FPP,Cpu>::get_fact(const faust_unsigned_int id,
-			FPP* bdata,
-			int* brow_ptr,
-			int* bcol_inds) const
-	{
-		if(id < 0 || id > this->size())
-			throw std::domain_error("get_fact(BSR): index out of bounds.");
-		if(this->get_fact_type(id) != BSR)
-			throw std::runtime_error("get_fact(BSR): matrix requested is not a MatBSR.");
-		if(id == 0 || id == this->size()-1)
-		{
-			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
-			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
-		}
-		MatBSR<FPP, Cpu> *bmat = dynamic_cast<MatBSR<FPP, Cpu>*>(this->transform->data[id]);
-		bmat->copy_bdata(bdata);
-		bmat->copy_browptr(brow_ptr);
-		bmat->copy_bcolinds(bcol_inds);
-	}
-
-template<typename FPP>
-	void TransformHelper<FPP,Cpu>::get_fact_bsr_info(const faust_unsigned_int id,
-			size_t& bdata_sz,
-			size_t& browptr_sz,
-			size_t& bcolinds_sz,
-			size_t& bnnz,
-			size_t& bnrows,
-			size_t& bncols) const
-	{
-		if(id < 0 || id > this->size())
-			throw std::domain_error("get_fact_bsr_info(BSR): index out of bounds.");
-		if(this->get_fact_type(id) != BSR)
-			throw std::runtime_error("get_fact_bsr_info(BSR): matrix requested is not a MatBSR.");
-		if(id == 0 || id == this->size()-1)
-		{
-			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
-			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
-		}
-		MatBSR<FPP, Cpu> *bmat = dynamic_cast<MatBSR<FPP, Cpu>*>(this->transform->data[id]);
-		bmat->get_buf_sizes(bdata_sz, browptr_sz, bcolinds_sz);
-		bnnz = bmat->getNBlocks();
-		bnrows = bmat->getNbBlockRow();
-		bncols = bmat->getNbBlockCol();
-	}
-
-
-template<typename FPP>
-	void TransformHelper<FPP,Cpu>::get_fact(const faust_unsigned_int id,
-			const int** rowptr,
-			const int** col_ids,
-			const FPP** elts,
-			faust_unsigned_int* nnz,
-			faust_unsigned_int* num_rows,
-			faust_unsigned_int* num_cols) const
-	{
- 		if(id == 0 || id == this->size()-1)
-		{
-			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
-			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
-		}
-		this->transform->get_fact(this->is_transposed?this->size()-id-1:id, rowptr, col_ids, elts, nnz, num_rows, num_cols);
-
-	}
-
-template<typename FPP>
-	void TransformHelper<FPP,Cpu>::get_fact(const faust_unsigned_int id,
-			int* rowptr,
-			int* col_ids,
-			FPP* elts,
-			faust_unsigned_int* nnz,
-			faust_unsigned_int* num_rows,
-			faust_unsigned_int* num_cols,
-			const bool transpose /* = false*/) const
-	{
-		if(id == 0 || id == this->size()-1)
-		{
-			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
-			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
-		}
-		this->transform->get_fact(this->is_transposed?this->size()-id-1:id, rowptr, col_ids, elts, nnz, num_rows, num_cols, this->is_transposed ^ transpose);
-		if(this->is_conjugate)
-			Faust::conjugate(elts, *nnz);
-	}
-
-template<typename FPP>
-	void TransformHelper<FPP,Cpu>::get_fact(const faust_unsigned_int id,
-			const FPP** elts,
-			faust_unsigned_int* num_rows,
-			faust_unsigned_int* num_cols) const
-	{
-		if(id == 0 || id == this->size()-1)
-		{
-			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
-			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
-		}
-		this->transform->get_fact(this->is_transposed?this->size()-id-1:id, elts, num_rows, num_cols);
-	}
-
-template<typename FPP>
-	MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::get_fact(faust_unsigned_int id) const
-	{
-		if(id == 0 || id == this->size()-1)
-		{
-			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
-			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
-		}
-		MatDense<FPP,Cpu> dense_factor;
-		MatGeneric<FPP,Cpu>* factor_generic;
-		factor_generic = this->transform->get_fact(this->is_transposed?size()-id-1:id);
-
-		switch (factor_generic->getType())
-		{
-			case MatType::Dense :
-				{
-					MatDense<FPP,Cpu>* factor_dense_ptr = dynamic_cast<MatDense<FPP,Cpu>* > (factor_generic);
-					dense_factor = (*factor_dense_ptr); //copy
-				}
-				break;
-
-			case MatType::Sparse :
-				{
-					MatSparse<FPP,Cpu>* factor_sparse_ptr = dynamic_cast<MatSparse<FPP,Cpu>* > (factor_generic);
-					dense_factor = (*factor_sparse_ptr); //copy
-				}
-				break;
-
-			default:
-				handleError("Faust::TransformHelper", "get_fact : unknown type of the factor matrix");
-		}
-		delete factor_generic;
-		if(this->is_transposed) dense_factor.transpose();
-		if(this->is_conjugate) dense_factor.conjugate();
-		return dense_factor;
-	}
-
-//TODO: delete this function when the specific bug in FaustCoreCpp (py. wrapper)
-// will be fixed (normally the parent function def. should be found, but the wrapper compilation fails anyway)
-template<typename FPP>
-	void TransformHelper<FPP,Cpu>::get_fact(const faust_unsigned_int &id,
-			FPP* elts,
-			faust_unsigned_int* num_rows,
-			faust_unsigned_int* num_cols,
-			const bool transpose /* default to false */) const
-	{
-		if(id == 0 || id == this->size()-1)
-		{
-			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
-			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
-		}
-		this->transform->get_fact(this->is_transposed?this->size()-id-1:id, elts, num_rows, num_cols, this->is_transposed ^ transpose);
-		if(this->is_conjugate)
-			Faust::conjugate(elts,*num_cols*(*num_rows));
-	}
-
-
-
-
-template<typename FPP>
-	MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::get_product(const int mul_order_opt_mode/*=-1*/) // const
-	{
-		this->eval_sliced_Transform();
-		this->eval_fancy_idx_Transform();
-		int old_FM_mul_mod = -1;
-		MatDense<FPP, Cpu> P;
-		// keep current mul mode to restore it on the function end
-		if(mul_order_opt_mode > -1 && mul_order_opt_mode != this->mul_order_opt_mode)
-		{
-			old_FM_mul_mod = this->mul_order_opt_mode;
-			this->set_FM_mul_mode(mul_order_opt_mode);
-		}
-		if(this->mul_order_opt_mode && this->size() > 1 /* no need to do something special if this is a single factor Faust*/)
-		{
-			if(this->mul_order_opt_mode == DYNPROG)
-			{
-				std::vector<Faust::MatGeneric<FPP,Cpu>*> data = this->transform->data;
-				if(this->is_transposed)
-					std::reverse(data.begin(), data.end());
-				P = std::move(dynprog_multiply(data, this->isTransposed2char()));
+				if(! (ds_fact = dynamic_cast<MatDense<FPP,Cpu>*>(fact)))
+					throw std::runtime_error("A dense factor can't be updated with a sparse factor");
+				*ds_fact = *ds_mat;
 			}
 			else
 			{
-				MatSparse<FPP,Cpu> Id(this->getNbCol(), this->getNbCol());
-				Id.setEyes();
-				P = this->multiply(Id);
+				throw std::runtime_error("Only MatSparse and MatDense are accepted by TransformHelper::update().");
+			}
+			fact->set_id(M.is_id());
+			update_total_nnz();
+		}
+
+	template<typename FPP>
+		void TransformHelper<FPP, Cpu>::convertToSparse()
+		{
+			this->eval_sliced_Transform();
+			this->eval_fancy_idx_Transform();
+			const MatDense<FPP,Cpu> * mat_dense;
+			const MatSparse<FPP,Cpu> * mat_sparse;
+			const MatBSR<FPP,Cpu> * mat_bsr;
+			for(int i=0;i<this->size();i++)
+			{
+				if(mat_dense = dynamic_cast<const MatDense<FPP,Cpu>*>(this->get_gen_fact(i)))
+				{
+					mat_sparse = new MatSparse<FPP,Cpu>(*mat_dense);
+					this->replace(mat_sparse, i);
+				}
+				else if(mat_bsr = dynamic_cast<const MatBSR<FPP,Cpu>*>(this->get_gen_fact(i)))
+				{
+					mat_sparse =  new MatSparse<FPP, Cpu>(mat_bsr->to_sparse()); // TODO: avoid the copy
+					this->replace(mat_sparse, i);
+				}
 			}
 		}
-		else
-			P = this->transform->get_product(this->isTransposed2char(), this->is_conjugate);
-		if(old_FM_mul_mod != - 1)
+
+
+	template<typename FPP>
+		bool TransformHelper<FPP, Cpu>::containsOnlySparseDense()
 		{
-			this->set_FM_mul_mode(old_FM_mul_mod);
-		}
-		return P;
-	}
-
-template<typename FPP>
-	void TransformHelper<FPP,Cpu>::get_product(Faust::MatDense<FPP,Cpu>& prod, const int mul_order_opt_mode/*=-1*/) //const
-	{
-		this->eval_sliced_Transform();
-		this->eval_fancy_idx_Transform();
-		if(mul_order_opt_mode != DEFAULT_L2R)
-			prod = this->get_product(mul_order_opt_mode);
-		else
-			this->transform->get_product(prod, this->isTransposed2char(), this->is_conjugate);
-	}
-
-template<typename FPP>
-	void TransformHelper<FPP,Cpu>::save_mat_file(const char* filepath) const
-	{
-		const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
-		const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
-		this->transform->save_mat_file(filepath, this->is_transposed, this->is_conjugate);
-	}
-
-template<typename FPP>
-	void TransformHelper<FPP,Cpu>::read_from_mat_file(const char* filepath)
-	{
-		this->transform->read_from_mat_file(filepath);
-	}
-
-template<typename FPP>
-	int TransformHelper<FPP,Cpu>::get_mat_file_type(const char* filepath)
-	{
-		return	Transform<FPP,Cpu>::get_mat_file_type(filepath);
-	}
-
-template<typename FPP>
-	double TransformHelper<FPP,Cpu>::spectralNorm(const int nbr_iter_max, double threshold, int &flag) const
-	{
-		const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
-		const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
-//			std::cout << "TransformHelper<FPP,Cpu>::spectralNorm" << std::endl;
-		vector <MatGeneric<FPP, Cpu>*>& orig_facts = this->transform->data;
-		int start_id, end_id;
-		this->transform->get_nonortho_interior_prod_ids(start_id, end_id);
-		//			cout << "start_id=" << start_id << "end_id=" << end_id << endl;
-		if(start_id < 0)
-			return 1.0;
-		else if(start_id == 0)
-			return this->transform->spectralNorm(nbr_iter_max, threshold, flag);
-		//			cout << "optimized norm2" << endl;
-		vector<MatGeneric<FPP,Cpu>*> non_ortho_start(orig_facts.begin()+start_id, orig_facts.end());
-		TransformHelper<FPP, Cpu> t(non_ortho_start, 1.0, false, false);
-		return t.transform->spectralNorm(nbr_iter_max, threshold, flag);
-	}
-
-template<typename FPP>
-	FPP Faust::TransformHelper<FPP,Cpu>::power_iteration(const faust_unsigned_int nbr_iter_max, const Real<FPP>& threshold, int & flag) const
-	{
-		const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
-		const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
-		return this->transform->power_iteration(nbr_iter_max, threshold, flag);
-	}
-
-template<typename FPP>
-	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::transpose()
-	{
-		return new TransformHelper<FPP,Cpu>(this, true, false);
-	}
-
-template<typename FPP>
-	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::conjugate()
-	{
-		return new TransformHelper<FPP,Cpu>(this, false, true);
-	}
-
-template<typename FPP>
-	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::adjoint() const
-	{
-		return new TransformHelper<FPP,Cpu>(this, true, true);
-	}
-
-
-template<typename FPP>
-	double TransformHelper<FPP,Cpu>::normL1(const bool full_array/*=true*/, const int batch_sz/*=1*/) const
-	{
-		const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
-		const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
-		return this->transform->normL1(this->is_transposed, full_array, batch_sz);
-	}
-
-template<typename FPP>
-	double TransformHelper<FPP,Cpu>::normInf(const bool full_array/*=true*/, const int batch_sz/*=1*/) const
-	{
-		const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
-		const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
-		return this->transform->normInf(this->is_transposed, full_array, batch_sz);
-	}
-
-template<typename FPP>
-	double TransformHelper<FPP,Cpu>::normFro(const bool full_array/*=true*/, const int batch_sz/*=1*/) const
-	{
-		const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
-		const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
-		vector <MatGeneric<FPP, Cpu>*>& orig_facts = this->transform->data;
-		int start_id, end_id;
-		this->transform->get_nonortho_interior_prod_ids(start_id, end_id);
-		if(start_id < 0)
-			return Faust::fabs(MatDense<FPP,Cpu>::eye(this->getNbCol(), this->getNbCol()).norm());
-		else if(start_id == 0)
-			return this->transform->normFro(full_array, batch_sz);
-		vector<MatGeneric<FPP,Cpu>*> non_ortho_start(orig_facts.begin()+start_id, orig_facts.end());
-		TransformHelper<FPP, Cpu> t(non_ortho_start, 1.0, false, false);
-		return t.transform->normFro(full_array, batch_sz);
-	}
-
-template<typename FPP>
-	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::normalize(const int meth /* 1 for 1-norm, 2 for 2-norm (2-norm), -1 for inf-norm */) const
-	{
-		const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
-		const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
-		unsigned int ncols = this->getNbCol();
-		unsigned int nrows = this->getNbRow();
-		//2-norm parameters
-		double precision =  FAUST_PRECISION;
-		faust_unsigned_int nbr_iter_max=100;
-		int flag;
-
-		vector<FPP> norm_invs(ncols);
-		FPP norm;
-		vector<int> coords(ncols);
-		TransformHelper<FPP,Cpu>* normalizedTh = nullptr;
-
-		for(faust_unsigned_int i=0;i<ncols;i++)
-		{
-
-			//TODO: we shouldn't have to const_cast, slice() must be const
-			const TransformHelper<FPP,Cpu> * col = const_cast<TransformHelper<FPP,Cpu> *>(this)->slice(0,nrows, i, i+1);
-			//				cout << "TransformHelper normalize, meth=" << meth << endl;
-			switch(meth)
+			for(auto gen_fac : this->transform->data)
 			{
-				case 1: //1-norm
-					//						cout << "normalize with 1-norm" << endl;
-					norm = col->normL1();
+				auto type = gen_fac->getType();
+				if(type != Sparse && type != Dense)
+					return false;
+			}
+			return true;
+		}
+
+	template<typename FPP>
+		bool TransformHelper<FPP, Cpu>::containsOnlyButterflyPerm()
+		{
+			for(auto gen_fac : this->transform->data)
+			{
+				auto type = gen_fac->getType();
+				auto csr_fac = dynamic_cast<MatSparse<FPP, Cpu>*>(gen_fac);
+				if(type != Butterfly && type != Perm && (csr_fac == nullptr || ! MatPerm<FPP, Cpu>::isPerm(*csr_fac, false)))
+					return false;
+			}
+			return true;
+		}
+
+	template<typename FPP>
+		bool TransformHelper<FPP, Cpu>::containsOnlyButterflySparse()
+		{
+			for(auto gen_fac : this->transform->data)
+			{
+				auto type = gen_fac->getType();
+				if(type != Butterfly && type != Sparse)
+					return false;
+			}
+			return true;
+		}
+
+	template<typename FPP>
+		void TransformHelper<FPP, Cpu>::convertToDense()
+		{
+			this->eval_sliced_Transform();
+			this->eval_fancy_idx_Transform();
+			const MatDense<FPP,Cpu> * mat_dense;
+			const MatSparse<FPP,Cpu> * mat_sparse;
+			const MatBSR<FPP,Cpu> * mat_bsr;
+			for(int i=0;i<this->size();i++)
+			{
+				if(mat_sparse = dynamic_cast<const MatSparse<FPP,Cpu>*>(this->get_gen_fact(i)))
+				{
+					mat_dense = new MatDense<FPP,Cpu>(*mat_sparse);
+					this->replace(mat_dense, i);
+				}
+				else if(mat_bsr = dynamic_cast<const MatBSR<FPP,Cpu>*>(this->get_gen_fact(i)))
+				{
+					mat_dense =  new MatDense<FPP, Cpu>(mat_bsr->to_sparse()); // TODO: avoid the copy
+					this->replace(mat_dense, i);
+				}
+			}
+		}
+
+	template<typename FPP>
+		void TransformHelper<FPP, Cpu>::replace(const MatGeneric<FPP, Cpu>* M, const faust_unsigned_int fact_id)
+		{
+			this->transform->replace(M, fact_id);
+		}
+
+	template<typename FPP>
+		unsigned long long TransformHelper<FPP,Cpu>::get_fact_addr(const faust_unsigned_int id) const
+		{
+			return (unsigned long long) this->transform->data[this->is_transposed?size()-id-1:id];
+		}
+
+	template<typename FPP>
+		void TransformHelper<FPP,Cpu>::get_fact(const faust_unsigned_int id,
+				FPP* bdata,
+				int* brow_ptr,
+				int* bcol_inds) const
+		{
+			if(id < 0 || id > this->size())
+				throw std::domain_error("get_fact(BSR): index out of bounds.");
+			if(this->get_fact_type(id) != BSR)
+				throw std::runtime_error("get_fact(BSR): matrix requested is not a MatBSR.");
+			if(id == 0 || id == this->size()-1)
+			{
+				const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
+				const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
+			}
+			MatBSR<FPP, Cpu> *bmat = dynamic_cast<MatBSR<FPP, Cpu>*>(this->transform->data[id]);
+			bmat->copy_bdata(bdata);
+			bmat->copy_browptr(brow_ptr);
+			bmat->copy_bcolinds(bcol_inds);
+		}
+
+	template<typename FPP>
+		void TransformHelper<FPP,Cpu>::get_fact_bsr_info(const faust_unsigned_int id,
+				size_t& bdata_sz,
+				size_t& browptr_sz,
+				size_t& bcolinds_sz,
+				size_t& bnnz,
+				size_t& bnrows,
+				size_t& bncols) const
+		{
+			if(id < 0 || id > this->size())
+				throw std::domain_error("get_fact_bsr_info(BSR): index out of bounds.");
+			if(this->get_fact_type(id) != BSR)
+				throw std::runtime_error("get_fact_bsr_info(BSR): matrix requested is not a MatBSR.");
+			if(id == 0 || id == this->size()-1)
+			{
+				const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
+				const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
+			}
+			MatBSR<FPP, Cpu> *bmat = dynamic_cast<MatBSR<FPP, Cpu>*>(this->transform->data[id]);
+			bmat->get_buf_sizes(bdata_sz, browptr_sz, bcolinds_sz);
+			bnnz = bmat->getNBlocks();
+			bnrows = bmat->getNbBlockRow();
+			bncols = bmat->getNbBlockCol();
+		}
+
+
+	template<typename FPP>
+		void TransformHelper<FPP,Cpu>::get_fact(const faust_unsigned_int id,
+				const int** rowptr,
+				const int** col_ids,
+				const FPP** elts,
+				faust_unsigned_int* nnz,
+				faust_unsigned_int* num_rows,
+				faust_unsigned_int* num_cols) const
+		{
+			if(id == 0 || id == this->size()-1)
+			{
+				const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
+				const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
+			}
+			this->transform->get_fact(this->is_transposed?this->size()-id-1:id, rowptr, col_ids, elts, nnz, num_rows, num_cols);
+
+		}
+
+	template<typename FPP>
+		void TransformHelper<FPP,Cpu>::get_fact(const faust_unsigned_int id,
+				int* rowptr,
+				int* col_ids,
+				FPP* elts,
+				faust_unsigned_int* nnz,
+				faust_unsigned_int* num_rows,
+				faust_unsigned_int* num_cols,
+				const bool transpose /* = false*/) const
+		{
+			if(id == 0 || id == this->size()-1)
+			{
+				const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
+				const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
+			}
+			this->transform->get_fact(this->is_transposed?this->size()-id-1:id, rowptr, col_ids, elts, nnz, num_rows, num_cols, this->is_transposed ^ transpose);
+			if(this->is_conjugate)
+				Faust::conjugate(elts, *nnz);
+		}
+
+	template<typename FPP>
+		void TransformHelper<FPP,Cpu>::get_fact(const faust_unsigned_int id,
+				const FPP** elts,
+				faust_unsigned_int* num_rows,
+				faust_unsigned_int* num_cols) const
+		{
+			if(id == 0 || id == this->size()-1)
+			{
+				const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
+				const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
+			}
+			this->transform->get_fact(this->is_transposed?this->size()-id-1:id, elts, num_rows, num_cols);
+		}
+
+	template<typename FPP>
+		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::get_fact(faust_unsigned_int id) const
+		{
+			if(id == 0 || id == this->size()-1)
+			{
+				const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
+				const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
+			}
+			MatDense<FPP,Cpu> dense_factor;
+			MatGeneric<FPP,Cpu>* factor_generic;
+			factor_generic = this->transform->get_fact(this->is_transposed?size()-id-1:id);
+
+			switch (factor_generic->getType())
+			{
+				case MatType::Dense :
+					{
+						MatDense<FPP,Cpu>* factor_dense_ptr = dynamic_cast<MatDense<FPP,Cpu>* > (factor_generic);
+						dense_factor = (*factor_dense_ptr); //copy
+					}
 					break;
-				case 2: //2-norm
-					//						cout << "normalize with 2-norm" << endl;
-					norm = col->spectralNorm(nbr_iter_max, precision, flag);
+
+				case MatType::Sparse :
+					{
+						MatSparse<FPP,Cpu>* factor_sparse_ptr = dynamic_cast<MatSparse<FPP,Cpu>* > (factor_generic);
+						dense_factor = (*factor_sparse_ptr); //copy
+					}
 					break;
-				case -2: // fro norm
-					//						cout << "normalize with fro-norm" << endl;
-					norm = col->normFro();
-					break;
-				case -1: //inf norm
-					//						cout << "normalize with inf-norm" << endl;
-					norm = col->normInf();
-					break;
+
 				default:
-					handleError("Faust::TransformHelper::normalize()", "order for the norm to use is not valid");
+					handleError("Faust::TransformHelper", "get_fact : unknown type of the factor matrix");
 			}
-			if(norm != FPP(0))
-				norm_invs[i] = (FPP)1./norm;
-			else
-				norm_invs[i] = 1;
-			coords[i] = i;
-			delete col;
+			delete factor_generic;
+			if(this->is_transposed) dense_factor.transpose();
+			if(this->is_conjugate) dense_factor.conjugate();
+			return dense_factor;
 		}
-		MatSparse<FPP,Cpu>* norm_diag = new MatSparse<FPP,Cpu>(coords, coords,
-				norm_invs, ncols, ncols);
-		//			norm_diag.Display();
-		vector<MatGeneric<FPP,Cpu>*> factors;
-		for(int i =0; (faust_unsigned_int)i < size(); i++)
-			//NOTE: about const cast: no problem, we know we won't write it
-			//NOTE: don't use get_gen_fact() to avoid transpose auto-handling
-			factors.push_back(const_cast<Faust::MatGeneric<FPP, Cpu>*>(this->transform->data[i]));
+
+	//TODO: delete this function when the specific bug in FaustCoreCpp (py. wrapper)
+	// will be fixed (normally the parent function def. should be found, but the wrapper compilation fails anyway)
+	template<typename FPP>
+		void TransformHelper<FPP,Cpu>::get_fact(const faust_unsigned_int &id,
+				FPP* elts,
+				faust_unsigned_int* num_rows,
+				faust_unsigned_int* num_cols,
+				const bool transpose /* default to false */) const
+		{
+			if(id == 0 || id == this->size()-1)
+			{
+				const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
+				const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
+			}
+			this->transform->get_fact(this->is_transposed?this->size()-id-1:id, elts, num_rows, num_cols, this->is_transposed ^ transpose);
+			if(this->is_conjugate)
+				Faust::conjugate(elts,*num_cols*(*num_rows));
+		}
+
+
+
+
+	template<typename FPP>
+		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::get_product(const int mul_order_opt_mode/*=-1*/) // const
+		{
+			this->eval_sliced_Transform();
+			this->eval_fancy_idx_Transform();
+			int old_FM_mul_mod = -1;
+			MatDense<FPP, Cpu> P;
+			// keep current mul mode to restore it on the function end
+			if(mul_order_opt_mode > -1 && mul_order_opt_mode != this->mul_order_opt_mode)
+			{
+				old_FM_mul_mod = this->mul_order_opt_mode;
+				this->set_FM_mul_mode(mul_order_opt_mode);
+			}
+			if(this->mul_order_opt_mode && this->size() > 1 /* no need to do something special if this is a single factor Faust*/)
+			{
+				if(this->mul_order_opt_mode == DYNPROG)
+				{
+					std::vector<Faust::MatGeneric<FPP,Cpu>*> data = this->transform->data;
+					if(this->is_transposed)
+						std::reverse(data.begin(), data.end());
+					P = std::move(dynprog_multiply(data, this->isTransposed2char()));
+				}
+				else
+				{
+					MatSparse<FPP,Cpu> Id(this->getNbCol(), this->getNbCol());
+					Id.setEyes();
+					P = this->multiply(Id);
+				}
+			}
+			else
+				P = this->transform->get_product(this->isTransposed2char(), this->is_conjugate);
+			if(old_FM_mul_mod != - 1)
+			{
+				this->set_FM_mul_mode(old_FM_mul_mod);
+			}
+			return P;
+		}
+
+	template<typename FPP>
+		void TransformHelper<FPP,Cpu>::get_product(Faust::MatDense<FPP,Cpu>& prod, const int mul_order_opt_mode/*=-1*/) //const
+		{
+			this->eval_sliced_Transform();
+			this->eval_fancy_idx_Transform();
+			if(mul_order_opt_mode != DEFAULT_L2R)
+				prod = this->get_product(mul_order_opt_mode);
+			else
+				this->transform->get_product(prod, this->isTransposed2char(), this->is_conjugate);
+		}
+
+	template<typename FPP>
+		void TransformHelper<FPP,Cpu>::save_mat_file(const char* filepath) const
+		{
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
+			this->transform->save_mat_file(filepath, this->is_transposed, this->is_conjugate);
+		}
+
+	template<typename FPP>
+		void TransformHelper<FPP,Cpu>::read_from_mat_file(const char* filepath)
+		{
+			this->transform->read_from_mat_file(filepath);
+		}
+
+	template<typename FPP>
+		int TransformHelper<FPP,Cpu>::get_mat_file_type(const char* filepath)
+		{
+			return	Transform<FPP,Cpu>::get_mat_file_type(filepath);
+		}
+
+	template<typename FPP>
+		double TransformHelper<FPP,Cpu>::spectralNorm(const int nbr_iter_max, double threshold, int &flag) const
+		{
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
+			//			std::cout << "TransformHelper<FPP,Cpu>::spectralNorm" << std::endl;
+			vector <MatGeneric<FPP, Cpu>*>& orig_facts = this->transform->data;
+			int start_id, end_id;
+			this->transform->get_nonortho_interior_prod_ids(start_id, end_id);
+			//			cout << "start_id=" << start_id << "end_id=" << end_id << endl;
+			if(start_id < 0)
+				return 1.0;
+			else if(start_id == 0)
+				return this->transform->spectralNorm(nbr_iter_max, threshold, flag);
+			//			cout << "optimized norm2" << endl;
+			vector<MatGeneric<FPP,Cpu>*> non_ortho_start(orig_facts.begin()+start_id, orig_facts.end());
+			TransformHelper<FPP, Cpu> t(non_ortho_start, 1.0, false, false);
+			return t.transform->spectralNorm(nbr_iter_max, threshold, flag);
+		}
+
+	template<typename FPP>
+		FPP Faust::TransformHelper<FPP,Cpu>::power_iteration(const faust_unsigned_int nbr_iter_max, const Real<FPP>& threshold, int & flag) const
+		{
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
+			return this->transform->power_iteration(nbr_iter_max, threshold, flag);
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::transpose()
+		{
+			return new TransformHelper<FPP,Cpu>(this, true, false);
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::conjugate()
+		{
+			return new TransformHelper<FPP,Cpu>(this, false, true);
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::adjoint() const
+		{
+			return new TransformHelper<FPP,Cpu>(this, true, true);
+		}
+
+
+	template<typename FPP>
+		double TransformHelper<FPP,Cpu>::normL1(const bool full_array/*=true*/, const int batch_sz/*=1*/) const
+		{
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
+			return this->transform->normL1(this->is_transposed, full_array, batch_sz);
+		}
+
+	template<typename FPP>
+		double TransformHelper<FPP,Cpu>::normInf(const bool full_array/*=true*/, const int batch_sz/*=1*/) const
+		{
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
+			return this->transform->normInf(this->is_transposed, full_array, batch_sz);
+		}
+
+	template<typename FPP>
+		double TransformHelper<FPP,Cpu>::normFro(const bool full_array/*=true*/, const int batch_sz/*=1*/) const
+		{
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
+			vector <MatGeneric<FPP, Cpu>*>& orig_facts = this->transform->data;
+			int start_id, end_id;
+			this->transform->get_nonortho_interior_prod_ids(start_id, end_id);
+			if(start_id < 0)
+				return Faust::fabs(MatDense<FPP,Cpu>::eye(this->getNbCol(), this->getNbCol()).norm());
+			else if(start_id == 0)
+				return this->transform->normFro(full_array, batch_sz);
+			vector<MatGeneric<FPP,Cpu>*> non_ortho_start(orig_facts.begin()+start_id, orig_facts.end());
+			TransformHelper<FPP, Cpu> t(non_ortho_start, 1.0, false, false);
+			return t.transform->normFro(full_array, batch_sz);
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::normalize(const int meth /* 1 for 1-norm, 2 for 2-norm (2-norm), -1 for inf-norm */) const
+		{
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
+			unsigned int ncols = this->getNbCol();
+			unsigned int nrows = this->getNbRow();
+			//2-norm parameters
+			double precision =  FAUST_PRECISION;
+			faust_unsigned_int nbr_iter_max=100;
+			int flag;
+
+			vector<FPP> norm_invs(ncols);
+			FPP norm;
+			vector<int> coords(ncols);
+			TransformHelper<FPP,Cpu>* normalizedTh = nullptr;
+
+			for(faust_unsigned_int i=0;i<ncols;i++)
+			{
+
+				//TODO: we shouldn't have to const_cast, slice() must be const
+				const TransformHelper<FPP,Cpu> * col = const_cast<TransformHelper<FPP,Cpu> *>(this)->slice(0,nrows, i, i+1);
+				//				cout << "TransformHelper normalize, meth=" << meth << endl;
+				switch(meth)
+				{
+					case 1: //1-norm
+							//						cout << "normalize with 1-norm" << endl;
+						norm = col->normL1();
+						break;
+					case 2: //2-norm
+							//						cout << "normalize with 2-norm" << endl;
+						norm = col->spectralNorm(nbr_iter_max, precision, flag);
+						break;
+					case -2: // fro norm
+							 //						cout << "normalize with fro-norm" << endl;
+						norm = col->normFro();
+						break;
+					case -1: //inf norm
+							 //						cout << "normalize with inf-norm" << endl;
+						norm = col->normInf();
+						break;
+					default:
+						handleError("Faust::TransformHelper::normalize()", "order for the norm to use is not valid");
+				}
+				if(norm != FPP(0))
+					norm_invs[i] = (FPP)1./norm;
+				else
+					norm_invs[i] = 1;
+				coords[i] = i;
+				delete col;
+			}
+			MatSparse<FPP,Cpu>* norm_diag = new MatSparse<FPP,Cpu>(coords, coords,
+					norm_invs, ncols, ncols);
+			//			norm_diag.Display();
+			vector<MatGeneric<FPP,Cpu>*> factors;
+			for(int i =0; (faust_unsigned_int)i < size(); i++)
+				//NOTE: about const cast: no problem, we know we won't write it
+				//NOTE: don't use get_gen_fact() to avoid transpose auto-handling
+				factors.push_back(const_cast<Faust::MatGeneric<FPP, Cpu>*>(this->transform->data[i]));
 #ifdef NON_OPT_FAUST_NORMALIZATION
-		if(this->is_transposed)
-			factors.insert(factors.begin(), norm_diag);
-		else
-			factors.push_back(norm_diag);
+			if(this->is_transposed)
+				factors.insert(factors.begin(), norm_diag);
+			else
+				factors.push_back(norm_diag);
 #else
-		MatGeneric<FPP,Cpu>* scaled_f0;
-		MatSparse<FPP, Cpu>* fs;
-		MatDense<FPP,Cpu>* fd;
+			MatGeneric<FPP,Cpu>* scaled_f0;
+			MatSparse<FPP, Cpu>* fs;
+			MatDense<FPP,Cpu>* fd;
 
-		if(this->is_transposed)
-		{
-			/** this approach is abandoned because casting approach (as below) is quicker than transposing */
-			// the faust is transposed
-			// that's why we compute (Faust[0]^T*norm_diag)^T
-			// (the Faust structure will transpose this factor again when necessary because of its this->is_transposed flag)
-			//				factors[0]->transpose();
-			//				factors[0]->multiplyRight(*norm_diag);
-			//				factors[0]->transpose();
-			/****************************************/
-			fs = dynamic_cast<MatSparse<FPP,Cpu>*>(factors[0]);
-			if(!fs)
+			if(this->is_transposed)
 			{
-				fd = dynamic_cast<MatDense<FPP,Cpu>*>(factors[0]);
-				scaled_f0 = new MatDense<FPP,Cpu>(*fd);
-				fd = (MatDense<FPP,Cpu>*)scaled_f0; // needed befause there is no prototype of multiply(MatGeneric,...)
-				norm_diag->multiply(*fd, 'N');
+				/** this approach is abandoned because casting approach (as below) is quicker than transposing */
+				// the faust is transposed
+				// that's why we compute (Faust[0]^T*norm_diag)^T
+				// (the Faust structure will transpose this factor again when necessary because of its this->is_transposed flag)
+				//				factors[0]->transpose();
+				//				factors[0]->multiplyRight(*norm_diag);
+				//				factors[0]->transpose();
+				/****************************************/
+				fs = dynamic_cast<MatSparse<FPP,Cpu>*>(factors[0]);
+				if(!fs)
+				{
+					fd = dynamic_cast<MatDense<FPP,Cpu>*>(factors[0]);
+					scaled_f0 = new MatDense<FPP,Cpu>(*fd);
+					fd = (MatDense<FPP,Cpu>*)scaled_f0; // needed befause there is no prototype of multiply(MatGeneric,...)
+					norm_diag->multiply(*fd, 'N');
+				}
+				else
+				{
+					scaled_f0 = new MatSparse<FPP,Cpu>(*fs);
+					fs = (MatSparse<FPP,Cpu>*) scaled_f0;
+					norm_diag->multiply(*fs, 'N');
+				}
+				factors[0] = scaled_f0;
 			}
 			else
 			{
-				scaled_f0 = new MatSparse<FPP,Cpu>(*fs);
-				fs = (MatSparse<FPP,Cpu>*) scaled_f0;
-				norm_diag->multiply(*fs, 'N');
-			}
-			factors[0] = scaled_f0;
-		}
-		else
-		{
-			//factors[size()-1]->multiplyRight(*norm_diag);
-			if((fs = dynamic_cast<MatSparse<FPP,Cpu>*>(factors[size()-1])))
-				scaled_f0 = new MatSparse<FPP,Cpu>(*fs);
-			else
-			{
-				fd = dynamic_cast<MatDense<FPP,Cpu>*>(factors[size()-1]);
-				scaled_f0 = new MatDense<FPP,Cpu>(*fd);
+				//factors[size()-1]->multiplyRight(*norm_diag);
+				if((fs = dynamic_cast<MatSparse<FPP,Cpu>*>(factors[size()-1])))
+					scaled_f0 = new MatSparse<FPP,Cpu>(*fs);
+				else
+				{
+					fd = dynamic_cast<MatDense<FPP,Cpu>*>(factors[size()-1]);
+					scaled_f0 = new MatDense<FPP,Cpu>(*fd);
 
+				}
+				scaled_f0->multiplyRight(*norm_diag);
+				factors[size()-1] = scaled_f0;
 			}
-			scaled_f0->multiplyRight(*norm_diag);
-			factors[size()-1] = scaled_f0;
-		}
 
-		delete norm_diag;
+			delete norm_diag;
 #endif
-		normalizedTh = new TransformHelper<FPP,Cpu>(factors, FPP(1.0), false, false);
-		normalizedTh->is_transposed = this->is_transposed;
-		//			normalizedTh->display();
-		return normalizedTh;
-	}
+			normalizedTh = new TransformHelper<FPP,Cpu>(factors, FPP(1.0), false, false);
+			normalizedTh->is_transposed = this->is_transposed;
+			//			normalizedTh->display();
+			return normalizedTh;
+		}
 
-template<typename FPP>
-	TransformHelper<FPP,Cpu>::~TransformHelper()
-	{
-		// transform is deleted auto. when no TransformHelper uses it (no more weak refs left)
+	template<typename FPP>
+		TransformHelper<FPP,Cpu>::~TransformHelper()
+		{
+			// transform is deleted auto. when no TransformHelper uses it (no more weak refs left)
 #ifdef FAUST_VERBOSE
-		cout << "Destroying Faust::TransformHelper object." << endl;
+			cout << "Destroying Faust::TransformHelper object." << endl;
 #endif
-	}
+		}
 
-template<typename FPP>
-	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density /* 1.f */, bool per_row /* true */, unsigned int seed/*=0*/)
-	{
-		return TransformHelper<FPP,Cpu>::randFaust(-1, -1, t, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row, seed);
-	}
-
-template<typename FPP>
-	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::randBSRFaust(unsigned int faust_nrows, unsigned int faust_ncols, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int bnrows, unsigned int bncols, float density/*=.1f*/)
-	{
-		if(faust_nrows != faust_ncols)
-			throw std::runtime_error("randBSRFaust: currently only random square BSR Faust can be generated.");
-		if(faust_nrows%bnrows || faust_ncols%bncols)
-			throw std::runtime_error("randBSRFaust: the size of blocks must evenly divide the size of Faust matrices");
-		unsigned int bnnz = (unsigned int) std::round(faust_nrows*faust_ncols/bnrows/bncols*density);
-		if(bnnz == 0)
-			throw std::runtime_error("randBSRFaust: the nonzero blocks are too large for this Faust/matrix size.");
-		// pick randomly the number of factors into {min_num_factors, ..., max_num_factors}
-		std::uniform_int_distribution<int> num_fac_distr(min_num_factors, max_num_factors);
-		int num_factors = num_fac_distr(generator);
-		// create factors
-		std::vector<MatGeneric<FPP,Cpu>*> factors(num_factors);
-		for(int i=0;i<num_factors;i++)
-			factors[i] = MatBSR<FPP, Cpu>::randMat(faust_nrows, faust_ncols, bnrows, bncols, bnnz);
-		// create the Faust
-		TransformHelper<FPP,Cpu>* randFaust = new TransformHelper<FPP, Cpu>(factors, 1.0, false, false);
-		return randFaust;
-	}
-
-template<typename FPP>
-	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::randFaust(int faust_nrows, int faust_ncols, RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density /* 1.f */, bool per_row /* true */, unsigned int seed/*=0*/)
-	{
-		unsigned int tmp;
-		if(!TransformHelper<FPP,Cpu>::seed_init || seed)
+	template<typename FPP>
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density /* 1.f */, bool per_row /* true */, unsigned int seed/*=0*/)
 		{
+			return TransformHelper<FPP,Cpu>::randFaust(-1, -1, t, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row, seed);
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::randBSRFaust(unsigned int faust_nrows, unsigned int faust_ncols, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int bnrows, unsigned int bncols, float density/*=.1f*/)
+		{
+			if(faust_nrows != faust_ncols)
+				throw std::runtime_error("randBSRFaust: currently only random square BSR Faust can be generated.");
+			if(faust_nrows%bnrows || faust_ncols%bncols)
+				throw std::runtime_error("randBSRFaust: the size of blocks must evenly divide the size of Faust matrices");
+			unsigned int bnnz = (unsigned int) std::round(faust_nrows*faust_ncols/bnrows/bncols*density);
+			if(bnnz == 0)
+				throw std::runtime_error("randBSRFaust: the nonzero blocks are too large for this Faust/matrix size.");
+			// pick randomly the number of factors into {min_num_factors, ..., max_num_factors}
+			std::uniform_int_distribution<int> num_fac_distr(min_num_factors, max_num_factors);
+			int num_factors = num_fac_distr(Faust::generator());
+			// create factors
+			std::vector<MatGeneric<FPP,Cpu>*> factors(num_factors);
+			for(int i=0;i<num_factors;i++)
+				factors[i] = MatBSR<FPP, Cpu>::randMat(faust_nrows, faust_ncols, bnrows, bncols, bnnz);
+			// create the Faust
+			TransformHelper<FPP,Cpu>* randFaust = new TransformHelper<FPP, Cpu>(factors, 1.0, false, false);
+			return randFaust;
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::randFaust(int faust_nrows, int faust_ncols, RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density /* 1.f */, bool per_row /* true */, unsigned int seed/*=0*/)
+		{
+			unsigned int tmp;
 			if(seed)
-				std::srand(seed);
+				Faust::seed(seed);
 			else
-				std::srand(std::time(NULL));
-			TransformHelper<FPP,Cpu>::seed_init = true;
-		}
-		// pick randomly the number of factors into {min_num_factors, ..., max_num_factors}
-		std::uniform_int_distribution<unsigned int> num_fac_distr(min_num_factors, max_num_factors);
-		if(min_dim_size > max_dim_size)
-		{
-			tmp = min_dim_size;
-			min_dim_size = max_dim_size;
-			max_dim_size = tmp;
-		}
-		std::uniform_int_distribution<int> dim_distr(min_dim_size, max_dim_size);
-		std::uniform_int_distribution<int> bin_distr(0,1);
-		num_fac_distr(generator); // workaround to always the same first number of factors even if srand is called before
-		unsigned int num_factors = num_fac_distr(generator);
-		// create factors randomly respecting the RandFaustType asked and dims interval
-		std::vector<MatGeneric<FPP,Cpu>*> factors((size_t) num_factors);
-		unsigned int num_rows, num_cols;
-		// if faust_nrows < 0 then the number of rows is random between min_dim_size and max_dim_size
-		if(faust_nrows < 0)
-			num_cols = dim_distr(generator);
-		else // fixed number of rows
-			num_cols = faust_nrows;
-		float fact_density;
-		for(unsigned int i=0;i<num_factors;i++) {
-			num_rows = num_cols;
-			// last faust factor number of columns is the faust number of columns
-			if(i < num_factors-1 || faust_ncols < 0)
-				// it is random for intermediary factors and also for last factor if faust_ncols < 0
-				num_cols = dim_distr(generator);
-			else
-				// the faust has a fixed number of columns
-				num_cols = faust_ncols;
-#ifdef FAUST_VERBOSE
-			cout << "TransformHelper<FPP,Cpu>::randFaust() per_row: " <<  per_row << endl;
-#endif
-			if(density == -1.)
-				fact_density = per_row?5./num_cols:5./num_rows;
-			else
-				fact_density = density;
-			switch(t){
-				case DENSE:
-					factors[i] = MatDense<FPP,Cpu>::randMat(num_rows, num_cols, fact_density, per_row);
-					break;
-				case SPARSE:
-					factors[i] = MatSparse<FPP,Cpu>::randMat(num_rows, num_cols, fact_density, per_row);
-					break;
-				case MIXED:
-					if(bin_distr(generator))
-						factors[i] = MatDense<FPP,Cpu>::randMat(num_rows, num_cols, fact_density, per_row);
-					else
-						factors[i] = MatSparse<FPP,Cpu>::randMat(num_rows, num_cols, fact_density, per_row);
-					break;
-				default:
-					handleError("Faust::TransformHelper", "randFaust(): Unknown RandFaustType");
-					break;
-
+			{
+				if(! Faust::seed())
+					// C PRNG not initialized yet
+					Faust::seed(std::time(NULL));
 			}
-			if(factors[i] == NULL) return NULL;
+			// pick randomly the number of factors into {min_num_factors, ..., max_num_factors}
+			std::uniform_int_distribution<unsigned int> num_fac_distr(min_num_factors, max_num_factors);
+			if(min_dim_size > max_dim_size)
+			{
+				tmp = min_dim_size;
+				min_dim_size = max_dim_size;
+				max_dim_size = tmp;
+			}
+			std::uniform_int_distribution<int> dim_distr(min_dim_size, max_dim_size);
+			std::uniform_int_distribution<int> bin_distr(0,1);
+			num_fac_distr(Faust::generator()); // workaround to always the same first number of factors even if srand is called before
+			unsigned int num_factors = num_fac_distr(Faust::generator());
+			// create factors randomly respecting the RandFaustType asked and dims interval
+			std::vector<MatGeneric<FPP,Cpu>*> factors((size_t) num_factors);
+			unsigned int num_rows, num_cols;
+			// if faust_nrows < 0 then the number of rows is random between min_dim_size and max_dim_size
+			if(faust_nrows < 0)
+				num_cols = dim_distr(Faust::generator());
+			else // fixed number of rows
+				num_cols = faust_nrows;
+			float fact_density;
+			for(unsigned int i=0;i<num_factors;i++) {
+				num_rows = num_cols;
+				// last faust factor number of columns is the faust number of columns
+				if(i < num_factors-1 || faust_ncols < 0)
+					// it is random for intermediary factors and also for last factor if faust_ncols < 0
+					num_cols = dim_distr(Faust::generator());
+				else
+					// the faust has a fixed number of columns
+					num_cols = faust_ncols;
+#ifdef FAUST_VERBOSE
+				cout << "TransformHelper<FPP,Cpu>::randFaust() per_row: " <<  per_row << endl;
+#endif
+				if(density == -1.)
+					fact_density = per_row?5./num_cols:5./num_rows;
+				else
+					fact_density = density;
+				switch(t){
+					case DENSE:
+						factors[i] = MatDense<FPP,Cpu>::randMat(num_rows, num_cols, fact_density, per_row);
+						break;
+					case SPARSE:
+						factors[i] = MatSparse<FPP,Cpu>::randMat(num_rows, num_cols, fact_density, per_row);
+						break;
+					case MIXED:
+						if(bin_distr(Faust::generator()))
+							factors[i] = MatDense<FPP,Cpu>::randMat(num_rows, num_cols, fact_density, per_row);
+						else
+							factors[i] = MatSparse<FPP,Cpu>::randMat(num_rows, num_cols, fact_density, per_row);
+						break;
+					default:
+						handleError("Faust::TransformHelper", "randFaust(): Unknown RandFaustType");
+						break;
+
+				}
+				if(factors[i] == NULL) return NULL;
+			}
+			TransformHelper<FPP,Cpu>* randFaust = new TransformHelper<FPP, Cpu>(factors,1.0,false,false);
+			return randFaust;
 		}
-		TransformHelper<FPP,Cpu>* randFaust = new TransformHelper<FPP, Cpu>(factors,1.0,false,false);
-		return randFaust;
-	}
 
 
-template<typename FPP>
-	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::hadamardFaust(unsigned int n, const bool norma)
-	{
-		TransformHelper<FPP,Cpu>* hadamardFaust = nullptr;
-		vector<MatGeneric<FPP,Cpu>*> factors;
-		bool cloning_fact = false; // big opt. allowed only because of the RefManager used in Transform class
-		//this opt. avoids to duplicate the same factor
-		try {
-			wht_factors(n, factors, cloning_fact, norma);
-			hadamardFaust = new TransformHelper<FPP, Cpu>(factors, 1.0, false, false);
-		}
-		catch(std::bad_alloc)
+	template<typename FPP>
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::hadamardFaust(unsigned int n, const bool norma)
 		{
-			// nothing to do, out of memory return nullptr
+			TransformHelper<FPP,Cpu>* hadamardFaust = nullptr;
+			vector<MatGeneric<FPP,Cpu>*> factors;
+			bool cloning_fact = false; // big opt. allowed only because of the RefManager used in Transform class
+									   //this opt. avoids to duplicate the same factor
+			try {
+				wht_factors(n, factors, cloning_fact, norma);
+				hadamardFaust = new TransformHelper<FPP, Cpu>(factors, 1.0, false, false);
+			}
+			catch(std::bad_alloc)
+			{
+				// nothing to do, out of memory return nullptr
+			}
+			return hadamardFaust;
 		}
-		return hadamardFaust;
-	}
 
-template<typename FPP>
-	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::fourierFaust(unsigned int n, const bool norma/*=true*/)
-	{
-
-		vector<MatGeneric<FPP,Cpu>*> factors(n+1);
-		TransformHelper<FPP,Cpu>* fourierFaust = nullptr;
-		try
+	template<typename FPP>
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::fourierFaust(unsigned int n, const bool norma/*=true*/)
 		{
-			fft_factors(n, factors);
-			FPP alpha = norma?FPP(1/sqrt((double)(1 << n))):FPP(1.0);
-			fourierFaust = new TransformHelper<FPP, Cpu>(factors, alpha, false, false, /* internal call */ true);
+
+			vector<MatGeneric<FPP,Cpu>*> factors(n+1);
+			TransformHelper<FPP,Cpu>* fourierFaust = nullptr;
+			try
+			{
+				fft_factors(n, factors);
+				FPP alpha = norma?FPP(1/sqrt((double)(1 << n))):FPP(1.0);
+				fourierFaust = new TransformHelper<FPP, Cpu>(factors, alpha, false, false, /* internal call */ true);
+			}
+			catch(std::bad_alloc e)
+			{
+				//nothing to do, out of memory, return nullptr
+			}
+			return fourierFaust;
 		}
-		catch(std::bad_alloc e)
+
+
+
+	template<typename FPP>
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::fourierFaustOpt(unsigned int n, const bool norma/*=true*/)
 		{
-			//nothing to do, out of memory, return nullptr
+			auto F = TransformHelper<FPP,Cpu>::fourierFaust(n, norma);
+			auto Fo = TransformHelper<FPP,Cpu>::optButterflyFaust(F);
+			delete F;
+			return Fo;
 		}
-		return fourierFaust;
-	}
 
 
-
-template<typename FPP>
-	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::fourierFaustOpt(unsigned int n, const bool norma/*=true*/)
-	{
-		auto F = TransformHelper<FPP,Cpu>::fourierFaust(n, norma);
-		auto Fo = TransformHelper<FPP,Cpu>::optButterflyFaust(F);
-		delete F;
-		return Fo;
-	}
-
-
-/** helper macro for optButterflyFaust:
- *  \param factors must be a vector<MatGeneric<FPP,Cpu>*> of all factors to transform to MatButterfly/MatPerm,
- *  has_perm a bool to say if the last factor is to be converted to a MatPerm */
+	/** helper macro for optButterflyFaust:
+	 *  \param factors must be a vector<MatGeneric<FPP,Cpu>*> of all factors to transform to MatButterfly/MatPerm,
+	 *  has_perm a bool to say if the last factor is to be converted to a MatPerm */
 #define optButterfly_factors(factors, has_perm, src_factors) \
-int n__ = has_perm?factors.size() - 1:factors.size(); \
-for(int i = 0; i < n__; i++)\
-{\
-	factors[i] = new MatButterfly<FPP, Cpu>(*dynamic_cast<MatSparse<FPP, Cpu>*>(src_factors[i]), i);\
-}\
-if(has_perm) factors[n__] = new MatPerm<FPP, Cpu>(*dynamic_cast<MatSparse<FPP, Cpu>*>(src_factors[n__]));\
+	int n__ = has_perm?factors.size() - 1:factors.size(); \
+	for(int i = 0; i < n__; i++)\
+	{\
+		factors[i] = new MatButterfly<FPP, Cpu>(*dynamic_cast<MatSparse<FPP, Cpu>*>(src_factors[i]), i);\
+	}\
+	if(has_perm) factors[n__] = new MatPerm<FPP, Cpu>(*dynamic_cast<MatSparse<FPP, Cpu>*>(src_factors[n__]));\
 
 	template<typename FPP>
 		TransformHelper<FPP, Cpu>* TransformHelper<FPP,Cpu>::optButterflyFaust(const TransformHelper<FPP, Cpu>* F)
@@ -1596,204 +1597,202 @@ if(has_perm) factors[n__] = new MatPerm<FPP, Cpu>(*dynamic_cast<MatSparse<FPP, C
 			return oF;
 		}
 
-template<typename FPP>
-	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::eyeFaust(unsigned int n, unsigned int m)
-	{
-		vector<MatGeneric<FPP,Cpu>*> factors(1);
-		TransformHelper<FPP,Cpu>* eyeFaust = nullptr;
-		try
+	template<typename FPP>
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::eyeFaust(unsigned int n, unsigned int m)
 		{
-			MatSparse<FPP,Cpu>* eye = MatSparse<FPP,Cpu>::eye(n, m);
-			factors[0] = eye;
-			eyeFaust = new TransformHelper<FPP, Cpu>(factors, 1.0, false, false);
+			vector<MatGeneric<FPP,Cpu>*> factors(1);
+			TransformHelper<FPP,Cpu>* eyeFaust = nullptr;
+			try
+			{
+				MatSparse<FPP,Cpu>* eye = MatSparse<FPP,Cpu>::eye(n, m);
+				factors[0] = eye;
+				eyeFaust = new TransformHelper<FPP, Cpu>(factors, 1.0, false, false);
+			}
+			catch(std::bad_alloc e)
+			{
+				//nothing to do, out of memory, return nullptr
+			}
+			return eyeFaust;
 		}
-		catch(std::bad_alloc e)
-		{
-			//nothing to do, out of memory, return nullptr
-		}
-		return eyeFaust;
-	}
 
-template<typename FPP>
-	Faust::transf_iterator<FPP> Faust::TransformHelper<FPP, Cpu>::begin() const
-	{
-		const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
-		const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
-		return this->transform->begin();
-	}
-
-template<typename FPP>
-	Faust::transf_iterator<FPP> Faust::TransformHelper<FPP, Cpu>::end() const
-	{
-		const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
-		const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
-		return this->transform->end();
-	}
-
-template<typename FPP>
-	void Faust::TransformHelper<FPP,Cpu>::pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id, const int mul_order_opt_mode/*=DEFAULT_L2R*/)
-	{
-		if(start_id == 0 || end_id == this->size()-1)
+	template<typename FPP>
+		Faust::transf_iterator<FPP> Faust::TransformHelper<FPP, Cpu>::begin() const
 		{
 			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
 			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
+			return this->transform->begin();
 		}
-		// else no end factors is concerned by the packing, keep the "virtual" slice as is
-		if(start_id < 0 || start_id >= size())
-			throw out_of_range("start_id is out of range.");
-		if(end_id < 0 || end_id >= size())
-			throw out_of_range("end_id is out of range.");
-		Faust::MatDense<FPP,Cpu> * packed_fac = nullptr;
-		if(end_id == start_id)
+
+	template<typename FPP>
+		Faust::transf_iterator<FPP> Faust::TransformHelper<FPP, Cpu>::end() const
 		{
-			//nothing to do except converting to MatDense if start_id
-			//factor is a MatSparse
-			packed_fac = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(*(begin()+start_id));
-			//TODO: and MatBSR, MatDiag ?
-			if(packed_fac == nullptr)
-			{// factor start_id is not at MatDense, convert it
-				packed_fac = new MatDense<FPP,Cpu>(*dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(*(begin()+start_id)));
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
+			return this->transform->end();
+		}
+
+	template<typename FPP>
+		void Faust::TransformHelper<FPP,Cpu>::pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id, const int mul_order_opt_mode/*=DEFAULT_L2R*/)
+		{
+			if(start_id == 0 || end_id == this->size()-1)
+			{
+				const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
+				const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
+			}
+			// else no end factors is concerned by the packing, keep the "virtual" slice as is
+			if(start_id < 0 || start_id >= size())
+				throw out_of_range("start_id is out of range.");
+			if(end_id < 0 || end_id >= size())
+				throw out_of_range("end_id is out of range.");
+			Faust::MatDense<FPP,Cpu> * packed_fac = nullptr;
+			if(end_id == start_id)
+			{
+				//nothing to do except converting to MatDense if start_id
+				//factor is a MatSparse
+				packed_fac = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(*(begin()+start_id));
+				//TODO: and MatBSR, MatDiag ?
+				if(packed_fac == nullptr)
+				{// factor start_id is not at MatDense, convert it
+					packed_fac = new MatDense<FPP,Cpu>(*dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(*(begin()+start_id)));
+				}
+				else
+				{
+					return; //no change
+				}
 			}
 			else
 			{
-				return; //no change
+				// we have to multiply factors from start_id to end_id into one matrix
+				// simple way to do, 1) create a overhead-free TransformHelper with these factors
+				// 2) call get_product() to override the start_id factors with the result on the end
+				// 3) erase factors from start_id to end_id and insert packed factor too to replace them (that's Transform object responsibility).
+				// 1)
+				std::vector<Faust::MatGeneric<FPP,Cpu>*> topack_factors(begin()+start_id, begin()+end_id+1);
+				Faust::TransformHelper<FPP,Cpu> t(topack_factors, 1.0, false, false, false);
+				t.set_FM_mul_mode(mul_order_opt_mode, /*silent*/ false);
+				// 2)
+				packed_fac = new MatDense<FPP,Cpu>(t.get_product());
 			}
+			// 3)
+			faust_unsigned_int i = end_id;
+			while(i>=start_id)
+			{
+				this->transform->erase(i);
+				if(i == 0) break;
+				i--;
+			}
+			this->transform->insert(start_id, packed_fac);
 		}
-		else
-		{
-			// we have to multiply factors from start_id to end_id into one matrix
-			// simple way to do, 1) create a overhead-free TransformHelper with these factors
-			// 2) call get_product() to override the start_id factors with the result on the end
-			// 3) erase factors from start_id to end_id and insert packed factor too to replace them (that's Transform object responsibility).
-			// 1)
-			std::vector<Faust::MatGeneric<FPP,Cpu>*> topack_factors(begin()+start_id, begin()+end_id+1);
-			Faust::TransformHelper<FPP,Cpu> t(topack_factors, 1.0, false, false, false);
-			t.set_FM_mul_mode(mul_order_opt_mode, /*silent*/ false);
-			// 2)
-			packed_fac = new MatDense<FPP,Cpu>(t.get_product());
-		}
-		// 3)
-		faust_unsigned_int i = end_id;
-		while(i>=start_id)
-		{
-			this->transform->erase(i);
-			if(i == 0) break;
-			i--;
-		}
-		this->transform->insert(start_id, packed_fac);
-	}
 
-template <typename FPP>
-	void TransformHelper<FPP,Cpu>::pack_factors(const int mul_order_opt_mode/*=DEFAULT_L2R*/)
-{
-	TransformHelperGen<FPP,Cpu>::pack_factors(mul_order_opt_mode/*=DEFAULT_L2R*/);
-}
+	template <typename FPP>
+		void TransformHelper<FPP,Cpu>::pack_factors(const int mul_order_opt_mode/*=DEFAULT_L2R*/)
+		{
+			TransformHelperGen<FPP,Cpu>::pack_factors(mul_order_opt_mode/*=DEFAULT_L2R*/);
+		}
 
-template<typename FPP>
-	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::swap_rows(const faust_unsigned_int id1,
-			const faust_unsigned_int id2,
-			const bool permutation/*=false*/,
-			const bool inplace/*=false*/,
-			const bool check_transpose/*=true*/)
-{
-	this->eval_sliced_Transform();
-	this->eval_fancy_idx_Transform();
-	if(check_transpose && this->is_transposed)
-		return swap_cols(id1, id2, permutation, inplace, false);
-	TransformHelper<FPP,Cpu>* t = nullptr;
-	if(inplace)
-		t = this;
-	else
-	{
-		t = new TransformHelper<FPP,Cpu>(this->transform->data, 1.0,
-				/* optimizedCopy*/ false, /* cloning_fact */ true, /* internal_call*/ true);
-		t->copy_transconj_state(*this);
-		t->copy_slice_state(*this);
-		t->copy_fancy_idx_state(*this);
-		t->copy_mul_mode_state(*this);
-	}
-	// don't use get_gen_fact_nonconst in case the the TransformHelper is transposed
-	auto last_fac = t->transform->data[0];
-	if(permutation)
-	{
-		auto P = MatSparse<FPP,Cpu>::swap_matrix(last_fac->getNbRow(), id1, id2);
-		t->push_first(P, /*optimizedCopy*/ false, /* copying*/ false);
-	}
-	else
-	{
-		// swap two columns id1, id2 of the last factors
-		auto dlast_fac = dynamic_cast<MatDense<FPP,Cpu>*>(last_fac);
-		if(dlast_fac)
+	template<typename FPP>
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::swap_rows(const faust_unsigned_int id1,
+				const faust_unsigned_int id2,
+				const bool permutation/*=false*/,
+				const bool inplace/*=false*/,
+				const bool check_transpose/*=true*/)
 		{
-			dlast_fac->swap_rows(id1, id2);
+			this->eval_sliced_Transform();
+			this->eval_fancy_idx_Transform();
+			if(check_transpose && this->is_transposed)
+				return swap_cols(id1, id2, permutation, inplace, false);
+			TransformHelper<FPP,Cpu>* t = nullptr;
+			if(inplace)
+				t = this;
+			else
+			{
+				t = new TransformHelper<FPP,Cpu>(this->transform->data, 1.0,
+						/* optimizedCopy*/ false, /* cloning_fact */ true, /* internal_call*/ true);
+				t->copy_transconj_state(*this);
+				t->copy_slice_state(*this);
+				t->copy_fancy_idx_state(*this);
+				t->copy_mul_mode_state(*this);
+			}
+			// don't use get_gen_fact_nonconst in case the the TransformHelper is transposed
+			auto last_fac = t->transform->data[0];
+			if(permutation)
+			{
+				auto P = MatSparse<FPP,Cpu>::swap_matrix(last_fac->getNbRow(), id1, id2);
+				t->push_first(P, /*optimizedCopy*/ false, /* copying*/ false);
+			}
+			else
+			{
+				// swap two columns id1, id2 of the last factors
+				auto dlast_fac = dynamic_cast<MatDense<FPP,Cpu>*>(last_fac);
+				if(dlast_fac)
+				{
+					dlast_fac->swap_rows(id1, id2);
+				}
+				else
+				{
+					auto slast_fac = dynamic_cast<MatSparse<FPP,Cpu>*>(last_fac);
+					slast_fac->swap_rows(id1, id2);
+				}
+			}
+			return t;
 		}
-		else
-		{
-			auto slast_fac = dynamic_cast<MatSparse<FPP,Cpu>*>(last_fac);
-			slast_fac->swap_rows(id1, id2);
-		}
-	}
-	return t;
-}
 
-template<typename FPP>
-	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::swap_cols(const faust_unsigned_int id1,
-			const faust_unsigned_int id2,
-			const bool permutation/*=false*/,
-			const bool inplace/*=false*/,
-			const bool check_transpose/*=true*/)
-{
-	this->eval_sliced_Transform();
-	this->eval_fancy_idx_Transform();
-	if(check_transpose && this->is_transposed)
-		return swap_rows(id1, id2, permutation, inplace, false);
-	TransformHelper<FPP,Cpu>* t = nullptr;
-	if(inplace)
-		t = this;
-	else
-	{
-		t = new TransformHelper<FPP,Cpu>(this->transform->data, 1.0,
-				/* optimizedCopy*/ false, /* cloning_fact */ true, /* internal_call*/ true);
-		t->copy_transconj_state(*this);
-		t->copy_slice_state(*this);
-		t->copy_fancy_idx_state(*this);
-		t->copy_mul_mode_state(*this);
-	}
-	// don't use get_gen_fact_nonconst in case the the TransformHelper is transposed
-	auto last_fac = t->transform->data[size()-1];
-	if(permutation)
-	{
-		auto P = MatSparse<FPP,Cpu>::swap_matrix(last_fac->getNbCol(), id1, id2);
-		t->push_back(P, /*optimizedCopy*/ false, /* copying*/ false, /* transpose */ false, /* conjugate */ false);
-	}
-	else
-	{
-		// swap two columns id1, id2 of the last factors
-		auto dlast_fac = dynamic_cast<MatDense<FPP,Cpu>*>(last_fac);
-		if(dlast_fac)
+	template<typename FPP>
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::swap_cols(const faust_unsigned_int id1,
+				const faust_unsigned_int id2,
+				const bool permutation/*=false*/,
+				const bool inplace/*=false*/,
+				const bool check_transpose/*=true*/)
 		{
-			dlast_fac->swap_cols(id1, id2);
+			this->eval_sliced_Transform();
+			this->eval_fancy_idx_Transform();
+			if(check_transpose && this->is_transposed)
+				return swap_rows(id1, id2, permutation, inplace, false);
+			TransformHelper<FPP,Cpu>* t = nullptr;
+			if(inplace)
+				t = this;
+			else
+			{
+				t = new TransformHelper<FPP,Cpu>(this->transform->data, 1.0,
+						/* optimizedCopy*/ false, /* cloning_fact */ true, /* internal_call*/ true);
+				t->copy_transconj_state(*this);
+				t->copy_slice_state(*this);
+				t->copy_fancy_idx_state(*this);
+				t->copy_mul_mode_state(*this);
+			}
+			// don't use get_gen_fact_nonconst in case the the TransformHelper is transposed
+			auto last_fac = t->transform->data[size()-1];
+			if(permutation)
+			{
+				auto P = MatSparse<FPP,Cpu>::swap_matrix(last_fac->getNbCol(), id1, id2);
+				t->push_back(P, /*optimizedCopy*/ false, /* copying*/ false, /* transpose */ false, /* conjugate */ false);
+			}
+			else
+			{
+				// swap two columns id1, id2 of the last factors
+				auto dlast_fac = dynamic_cast<MatDense<FPP,Cpu>*>(last_fac);
+				if(dlast_fac)
+				{
+					dlast_fac->swap_cols(id1, id2);
+				}
+				else
+				{
+					auto slast_fac = dynamic_cast<MatSparse<FPP,Cpu>*>(last_fac);
+					slast_fac->swap_cols(id1,id2);
+				}
+			}
+			return t;
 		}
-		else
-		{
-			auto slast_fac = dynamic_cast<MatSparse<FPP,Cpu>*>(last_fac);
-			slast_fac->swap_cols(id1,id2);
-		}
-	}
-	return t;
-}
 
 
 	template<typename FPP>
-FPP TransformHelper<FPP,Cpu>::get_item(faust_unsigned_int i, faust_unsigned_int j)
-{
-	MatDense<FPP, Cpu> M;
-	faust_unsigned_int out_id;
-	TransformHelperGen<FPP,Cpu>::get_item(i, j, M, out_id);
-	return M.getData()[out_id];
-}
-	template<typename FPP> bool TransformHelper<FPP,Cpu>::seed_init = false;
-	template<typename FPP> std::default_random_engine TransformHelper<FPP,Cpu>::generator(time(NULL));
+		FPP TransformHelper<FPP,Cpu>::get_item(faust_unsigned_int i, faust_unsigned_int j)
+		{
+			MatDense<FPP, Cpu> M;
+			faust_unsigned_int out_id;
+			TransformHelperGen<FPP,Cpu>::get_item(i, j, M, out_id);
+			return M.getData()[out_id];
+		}
 
 }
 
