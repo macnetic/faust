@@ -118,20 +118,16 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         the keyword arguments are set then filepath will be prioritary.
 
         Examples:
-            Example 1 -- Creating a Faust made of CSR matrices and numpy arrays:
+                >>> # Example 1 -- Creating a Faust made of CSR matrices and numpy arrays:
                 >>> from pyfaust import Faust
                 >>> import numpy as np
                 >>> from scipy import sparse
                 >>> factors = []
-                >>> is_sparse = False
-                >>> for i in range(0,5):
-                >>>     if(is_sparse):
-                >>>         factors += [ sparse.random(100,100, dtype=np.float64, format='csr',
-                >>>                                   density=0.1)]
-                >>>     else:
-                >>>         factors += [ np.random.rand(100, 100).astype(np.float64) ]
-                >>>     is_sparse = not is_sparse
-
+                >>> factors += [ sparse.random(100,100, dtype=np.float64, format='csr', density=0.1)]
+                >>> factors += [ np.random.rand(100, 100).astype(np.float64) ]
+                >>> factors += [ sparse.random(100,100, dtype=np.float64, format='csr', density=0.1)]
+                >>> factors += [ np.random.rand(100, 100).astype(np.float64) ]
+                >>> factors += [ sparse.random(100,100, dtype=np.float64, format='csr', density=0.1)]
                 >>> # define a Faust with those factors
                 >>> F = Faust(factors)
 
@@ -139,10 +135,13 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                 >>> # define a Faust from file
                 >>> H = Faust(filepath="F.mat") # F = Faust("F.mat") does the same
 
-                >>> Faust(np.random.rand(10,10)) # creating a Faust with only one
-                                                 # factor
+                >>> # creating a Faust with only one
+                >>> # factor
+                >>> Faust(np.random.rand(10,10))
+                Faust size 10x10, density 1, nnz_sum 100, 1 factor(s):
+                - FACTOR 0 (double) DENSE, size 10x10, density 1, nnz 100
 
-            Example 2 -- Creating a Faust containing one BSR matrix:
+                >>> # Example 2 -- Creating a Faust containing one BSR matrix:
                 >>> from scipy.sparse import bsr_matrix
                 >>> from pyfaust import Faust
                 >>> from numpy import allclose
@@ -153,17 +152,16 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                 >>> # create the single factor Faust
                 >>> F = Faust(B)
                 >>> F
-                Faust size 10x9, density 0.2, nnz_sum 18, 1 factor(s):<br/>
-                 FACTOR 0 (double) BSR, size 10x9, density 0.2, nnz 18
+                Faust size 10x9, density 0.2, nnz_sum 18, 1 factor(s):
+                - FACTOR 0 (double) BSR, size 10x9 (blocksize = 2x3), density 0.2, nnz 18 (nnz blocks: 3)
+
                 >>> allclose(F.toarray(), B.toarray())
                 True
                 >>> # of course it's ok to create a Faust with a BSR and another type of factors
                 >>> Faust([B, rand(9, 18)])
-                Faust size 10x18, density 1, nnz_sum 180, 2 factor(s): <br/>
-                  FACTOR 0 (double) BSR, size 10x9, density 0.2, nnz 18<br/>
-                  FACTOR 1 (double) DENSE, size 9x18, density 1, nnz 162
-                >>>
-
+                Faust size 10x18, density 1, nnz_sum 180, 2 factor(s):
+                - FACTOR 0 (double) BSR, size 10x9 (blocksize = 2x3), density 0.2, nnz 18 (nnz blocks: 3)
+                - FACTOR 1 (double) DENSE, size 9x18, density 1, nnz 162
 
         <b>See also</b> Faust.save, pyfaust.rand, pyfaust.dft, pyfaust.wht
         <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csr_matrix.html">csr_matrix, </a>
@@ -306,8 +304,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
     @property
     def shape(F):
-        """
-        Gives the shape of the Faust F.
+        """Gives the shape of the Faust F.
 
         This function is intended to be used as a property (see the examples).
 
@@ -341,8 +338,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
     @property
     def size(F):
-        """
-        Gives the size of the Faust F (that is F.shape[0]*F.shape[1]) .
+        """Gives the size of the Faust F (that is F.shape[0]*F.shape[1]) .
 
         It's equivalent to numpy.prod(F.shape)).
 
@@ -375,9 +371,10 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             >>> cpuF = pf.rand(5, 5, dev='cpu')
             >>> cpuF.device
             'cpu'
-            >>> gpuF = pf.rand(5, 5, dev='gpu')
-            >>> gpuF.device
-            'gpu'
+            >>> if pf.is_gpu_mod_enabled(): gpuF = pf.rand(5, 5, dev='gpu')
+            >>> gpuF.device if pf.is_gpu_mod_enabled() else None
+            >>> # it should print 'gpu' if it is available
+
         """
         return self.m_faust.device()
 
@@ -394,7 +391,11 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             <code>F.transpose().toarray() == F.toarray().transpose()</code>
 
         Examples:
+            >>> from pyfaust import rand, seed
+            >>> F = rand(10, 18)
             >>> tF = F.transpose()
+            >>> tF.shape
+            (18, 10)
 
         <b>See also</b> Faust.conj, Faust.getH, Faust.H, Faust.T
         """
@@ -417,7 +418,11 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             <code>F.T.toarray() == F.toarray().T</code>
 
         Examples:
+            >>> from pyfaust import rand
+            >>> F = rand(10, 23)
             >>> tF = F.T
+            >>> tF.shape
+            (23, 10)
 
         <b>See also</b> Faust.conj, Faust.getH, Faust.H, Faust.T
         """
@@ -496,8 +501,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
     @property
     def H(F):
-        """
-        Returns the conjugate transpose of F.
+        """Returns the conjugate transpose of F.
 
         This function is intended to be used as a property (see the examples).
 
@@ -531,13 +535,14 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             The optimized Faust.
 
         Example:
-			>>> from pyfaust import rand
-			>>> F = rand(1024, 1024, dim_sizes=[1, 1024], num_factors=32, fac_type='mixed')
+			>>> from pyfaust import rand, seed
+            >>> seed(42) # just for reproducibility
+			>>> F = rand(1024, 1024, dim_sizes=[1, 1024], num_factors=64, fac_type='mixed')
 			>>> pF = F.pruneout()
-			>>> F.nbytes
-			42875160
-			>>> pF.nbytes
-			38594468
+            >>> F.nbytes
+            49109760
+            >>> pF.nbytes
+            46535972
 
         <b>See also</b> Faust.optimize
         """
@@ -581,17 +586,22 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Examples:
             >>> from pyfaust import rand
             >>> F = rand(50, 50)
-            >>> F.__repr__()
-			'Faust size 50x50, density 0.5, nnz_sum 1250, 5 factor(s): \\n- FACTOR 0 (double) SPARSE, size 50x50, density 0.1, nnz 250, addr: 0x561269ddcc50\\n- FACTOR 1 (double) SPARSE, size 50x50, density 0.1, nnz 250, addr: 0x561269da9100\\n- FACTOR 2 (double) SPARSE, size 50x50, density 0.1, nnz 250, addr: 0x561269c6fca0\\n- FACTOR 3 (double) SPARSE, size 50x50, density 0.1, nnz 250, addr: 0x561269c702c0\\n- FACTOR 4 (double) SPARSE, size 50x50, density 0.1, nnz 250, addr: 0x561269c5f7b0\\n'
-            >>> # the same function is called when typing F in a terminal (but
-            >>> # the output is properly formatted with line feeds):
+            >>> print(F.__repr__())
+            Faust size 50x50, density 0.5, nnz_sum 1250, 5 factor(s):
+            - FACTOR 0 (double) SPARSE, size 50x50, density 0.1, nnz 250
+            - FACTOR 1 (double) SPARSE, size 50x50, density 0.1, nnz 250
+            - FACTOR 2 (double) SPARSE, size 50x50, density 0.1, nnz 250
+            - FACTOR 3 (double) SPARSE, size 50x50, density 0.1, nnz 250
+            - FACTOR 4 (double) SPARSE, size 50x50, density 0.1, nnz 250
+
+            >>> # the same function is called when typing F in a terminal:
             >>> F
             Faust size 50x50, density 0.5, nnz_sum 1250, 5 factor(s):
-                - FACTOR 0 (double) SPARSE, size 50x50, density 0.1, nnz 250
-                - FACTOR 1 (double) SPARSE, size 50x50, density 0.1, nnz 250
-                - FACTOR 2 (double) SPARSE, size 50x50, density 0.1, nnz 250
-                - FACTOR 3 (double) SPARSE, size 50x50, density 0.1, nnz 250
-                - FACTOR 4 (double) SPARSE, size 50x50, density 0.1, nnz 250
+            - FACTOR 0 (double) SPARSE, size 50x50, density 0.1, nnz 250
+            - FACTOR 1 (double) SPARSE, size 50x50, density 0.1, nnz 250
+            - FACTOR 2 (double) SPARSE, size 50x50, density 0.1, nnz 250
+            - FACTOR 3 (double) SPARSE, size 50x50, density 0.1, nnz 250
+            - FACTOR 4 (double) SPARSE, size 50x50, density 0.1, nnz 250
 
         <b>See also</b> Faust.nnz_sum, Faust.rcg, Faust.shape, Faust.factors,
         <b/>Faust.numfactors, Faust.display
@@ -618,20 +628,22 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             F: the Faust object.
 
         Examples:
-            >>> from pyfaust import rand
+            >>> from pyfaust import rand, seed
+            >>> seed(42) # just for reproducibility
             >>> F = rand(50, 100, [1, 2], [50, 100], .5)
             >>> F.display()
-            Faust size 50x100, density 0.94, nnz_sum 4700, 2 factor(s): <br/>
-            FACTOR 0 (real) SPARSE, size 50x63, density 0.492063, nnz 1550 <br/>
-            FACTOR 1 (real) SPARSE, size 63x100, density 0.5, nnz 3150 <br/>
+            Faust size 50x100, density 1.3, nnz_sum 6500, 2 factor(s):
+            - FACTOR 0 (double) SPARSE, size 50x87, density 0.494253, nnz 2150
+            - FACTOR 1 (double) SPARSE, size 87x100, density 0.5, nnz 4350
             >>> F
-            Faust size 50x100, density 0.94, nnz_sum 4700, 2 factor(s): <br/>
-            FACTOR 0 (real) SPARSE, size 50x63, density 0.492063, nnz 1550 <br/>
-            FACTOR 1 (real) SPARSE, size 63x100, density 0.5, nnz 3150 <br/>
+            Faust size 50x100, density 1.3, nnz_sum 6500, 2 factor(s):
+            - FACTOR 0 (double) SPARSE, size 50x87, density 0.494253, nnz 2150
+            - FACTOR 1 (double) SPARSE, size 87x100, density 0.5, nnz 4350
             >>> print(F)
-            Faust size 50x100, density 0.94, nnz_sum 4700, 2 factor(s): <br/>
-            FACTOR 0 (real) SPARSE, size 50x63, density 0.492063, nnz 1550 <br/>
-            FACTOR 1 (real) SPARSE, size 63x100, density 0.5, nnz 3150 <br/>
+            Faust size 50x100, density 1.3, nnz_sum 6500, 2 factor(s):
+            - FACTOR 0 (double) SPARSE, size 50x87, density 0.494253, nnz 2150
+            - FACTOR 1 (double) SPARSE, size 87x100, density 0.5, nnz 4350
+
 
         <b>See also</b> Faust.nnz_sum, Faust.density, Faust.shape, Faust.factors,
         <b/>Faust.numfactors, Faust.__repr__
@@ -668,82 +680,84 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             the sum as a Faust object.
 
         Example:
-			>>> import pyfaust
+			>>> import pyfaust as pf
 			>>> from numpy.linalg import norm
-			>>> F = pyfaust.rand(10, 12)
-			>>> F
-			Faust size 10x12, density 2.08333, nnz_sum 250, 5 factor(s):
-			- FACTOR 0 (double) SPARSE, size 10x11, density 0.454545, nnz 50
-			- FACTOR 1 (double) SPARSE, size 11x10, density 0.5, nnz 55
-			- FACTOR 2 (double) SPARSE, size 10x11, density 0.454545, nnz 50
-			- FACTOR 3 (double) SPARSE, size 11x10, density 0.5, nnz 55
-			- FACTOR 4 (double) SPARSE, size 10x12, density 0.333333, nnz 40
+            >>> pf.seed(42) # just for reproducibility
+			>>> F = pf.rand(10, 12)
+            >>> F
+            Faust size 10x12, density 2.04167, nnz_sum 245, 5 factor(s):
+            - FACTOR 0 (double) SPARSE, size 10x12, density 0.333333, nnz 40
+            - FACTOR 1 (double) SPARSE, size 12x10, density 0.5, nnz 60
+            - FACTOR 2 (double) SPARSE, size 10x11, density 0.454545, nnz 50
+            - FACTOR 3 (double) SPARSE, size 11x10, density 0.5, nnz 55
+            - FACTOR 4 (double) SPARSE, size 10x12, density 0.333333, nnz 40
 
-			>>> G = pyfaust.rand(10, 12)
+			>>> G = pf.rand(10, 12)
 			>>> G
 			Faust size 10x12, density 2.025, nnz_sum 243, 5 factor(s):
-			- FACTOR 0 (double) SPARSE, size 10x10, density 0.5, nnz 50
-			- FACTOR 1 (double) SPARSE, size 10x11, density 0.454545, nnz 50
-			- FACTOR 2 (double) SPARSE, size 11x10, density 0.5, nnz 55
+			- FACTOR 0 (double) SPARSE, size 10x11, density 0.454545, nnz 50
+			- FACTOR 1 (double) SPARSE, size 11x10, density 0.5, nnz 55
+			- FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
 			- FACTOR 3 (double) SPARSE, size 10x12, density 0.333333, nnz 40
 			- FACTOR 4 (double) SPARSE, size 12x12, density 0.333333, nnz 48
 
-			>>> F+G
-			Faust size 10x12, density 4.475, nnz_sum 537, 7 factor(s):
-			- FACTOR 0 (double) SPARSE, size 10x20, density 0.1, nnz 20
-			- FACTOR 1 (double) SPARSE, size 20x21, density 0.238095, nnz 100
-			- FACTOR 2 (double) SPARSE, size 21x21, density 0.238095, nnz 105
-			- FACTOR 3 (double) SPARSE, size 21x21, density 0.238095, nnz 105
-			- FACTOR 4 (double) SPARSE, size 21x22, density 0.205628, nnz 95
-			- FACTOR 5 (double) SPARSE, size 22x24, density 0.166667, nnz 88
-			- FACTOR 6 (double) SPARSE, size 24x12, density 0.0833333, nnz 24
+            >>> F+G
+            Faust size 10x12, density 4.43333, nnz_sum 532, 7 factor(s):
+            - FACTOR 0 (double) SPARSE, size 10x20, density 0.1, nnz 20
+            - FACTOR 1 (double) SPARSE, size 20x23, density 0.195652, nnz 90
+            - FACTOR 2 (double) SPARSE, size 23x20, density 0.25, nnz 115
+            - FACTOR 3 (double) SPARSE, size 20x21, density 0.238095, nnz 100
+            - FACTOR 4 (double) SPARSE, size 21x22, density 0.205628, nnz 95
+            - FACTOR 5 (double) SPARSE, size 22x24, density 0.166667, nnz 88
+            - FACTOR 6 (double) SPARSE, size 24x12, density 0.0833333, nnz 24
 
-			>>> norm((F+G).toarray() - F.toarray() - G.toarray())
-			8.09693699147347e-15
-			>>> F+2
-			Faust size 10x12, density 2.88333, nnz_sum 346, 7 factor(s):
-			- FACTOR 0 (double) SPARSE, size 10x20, density 0.1, nnz 20
-			- FACTOR 1 (double) SPARSE, size 20x21, density 0.142857, nnz 60
-			- FACTOR 2 (double) SPARSE, size 21x20, density 0.154762, nnz 65
-			- FACTOR 3 (double) SPARSE, size 20x21, density 0.142857, nnz 60
-			- FACTOR 4 (double) SPARSE, size 21x11, density 0.281385, nnz 65
-			- FACTOR 5 (double) SPARSE, size 11x24, density 0.19697, nnz 52
-			- FACTOR 6 (double) SPARSE, size 24x12, density 0.0833333, nnz 24
+            >>> norm((F+G).toarray() - F.toarray() - G.toarray())
+            5.975125014346798e-15
+            >>> F+2
+            Faust size 10x12, density 2.84167, nnz_sum 341, 7 factor(s):
+            - FACTOR 0 (double) SPARSE, size 10x20, density 0.1, nnz 20
+            - FACTOR 1 (double) SPARSE, size 20x22, density 0.113636, nnz 50
+            - FACTOR 2 (double) SPARSE, size 22x20, density 0.159091, nnz 70
+            - FACTOR 3 (double) SPARSE, size 20x21, density 0.142857, nnz 60
+            - FACTOR 4 (double) SPARSE, size 21x11, density 0.281385, nnz 65
+            - FACTOR 5 (double) SPARSE, size 11x24, density 0.19697, nnz 52
+            - FACTOR 6 (double) SPARSE, size 24x12, density 0.0833333, nnz 24
 
-			>>> norm((F+2).toarray() - F.toarray() - 2)
-			3.580361673049448e-15
-			>>> F+G+2
-			Faust size 10x12, density 5.44167, nnz_sum 653, 9 factor(s):
-			- FACTOR 0 (double) SPARSE, size 10x20, density 0.1, nnz 20
-			- FACTOR 1 (double) SPARSE, size 20x30, density 0.05, nnz 30
-			- FACTOR 2 (double) SPARSE, size 30x31, density 0.11828, nnz 110
-			- FACTOR 3 (double) SPARSE, size 31x31, density 0.119667, nnz 115
-			- FACTOR 4 (double) SPARSE, size 31x31, density 0.119667, nnz 115
-			- FACTOR 5 (double) SPARSE, size 31x32, density 0.105847, nnz 105
-			- FACTOR 6 (double) SPARSE, size 32x25, density 0.1225, nnz 98
-			- FACTOR 7 (double) SPARSE, size 25x24, density 0.06, nnz 36
-			- FACTOR 8 (double) SPARSE, size 24x12, density 0.0833333, nnz 24
+            >>> norm((F+2).toarray() - F.toarray() - 2)
+            1.85775845048325e-15
+            >>> F+G+2
+            Faust size 10x12, density 5.4, nnz_sum 648, 9 factor(s):
+            - FACTOR 0 (double) SPARSE, size 10x20, density 0.1, nnz 20
+            - FACTOR 1 (double) SPARSE, size 20x30, density 0.05, nnz 30
+            - FACTOR 2 (double) SPARSE, size 30x33, density 0.10101, nnz 100
+            - FACTOR 3 (double) SPARSE, size 33x30, density 0.126263, nnz 125
+            - FACTOR 4 (double) SPARSE, size 30x31, density 0.11828, nnz 110
+            - FACTOR 5 (double) SPARSE, size 31x32, density 0.105847, nnz 105
+            - FACTOR 6 (double) SPARSE, size 32x25, density 0.1225, nnz 98
+            - FACTOR 7 (double) SPARSE, size 25x24, density 0.06, nnz 36
+            - FACTOR 8 (double) SPARSE, size 24x12, density 0.0833333, nnz 24
+
 
 			>>> norm((F+G+2).toarray() - F.toarray() - G.toarray() - 2)
-			1.0082879011490611e-14
-			>>> F+G+F+2+F
-			Faust size 10x12, density 11.175, nnz_sum 1341, 13 factor(s):
-			- FACTOR 0 (double) SPARSE, size 10x20, density 0.1, nnz 20
-			- FACTOR 1 (double) SPARSE, size 20x30, density 0.05, nnz 30
-			- FACTOR 2 (double) SPARSE, size 30x40, density 0.0333333, nnz 40
-			- FACTOR 3 (double) SPARSE, size 40x50, density 0.025, nnz 50
-			- FACTOR 4 (double) SPARSE, size 50x51, density 0.0509804, nnz 130
-			- FACTOR 5 (double) SPARSE, size 51x52, density 0.0659879, nnz 175
-			- FACTOR 6 (double) SPARSE, size 52x51, density 0.0678733, nnz 180
-			- FACTOR 7 (double) SPARSE, size 51x54, density 0.0744372, nnz 205
-			- FACTOR 8 (double) SPARSE, size 54x54, density 0.0713306, nnz 208
-			- FACTOR 9 (double) SPARSE, size 54x36, density 0.063786, nnz 124
-			- FACTOR 10 (double) SPARSE, size 36x34, density 0.0743464, nnz 91
-			- FACTOR 11 (double) SPARSE, size 34x24, density 0.0784314, nnz 64
-			- FACTOR 12 (double) SPARSE, size 24x12, density 0.0833333, nnz 24
+			7.115828086306871e-15
+            >>> F+G+F+2+F
+            Faust size 10x12, density 11.05, nnz_sum 1326, 13 factor(s):
+            - FACTOR 0 (double) SPARSE, size 10x20, density 0.1, nnz 20
+            - FACTOR 1 (double) SPARSE, size 20x30, density 0.05, nnz 30
+            - FACTOR 2 (double) SPARSE, size 30x40, density 0.0333333, nnz 40
+            - FACTOR 3 (double) SPARSE, size 40x50, density 0.025, nnz 50
+            - FACTOR 4 (double) SPARSE, size 50x53, density 0.045283, nnz 120
+            - FACTOR 5 (double) SPARSE, size 53x52, density 0.0634978, nnz 175
+            - FACTOR 6 (double) SPARSE, size 52x51, density 0.0678733, nnz 180
+            - FACTOR 7 (double) SPARSE, size 51x55, density 0.0695187, nnz 195
+            - FACTOR 8 (double) SPARSE, size 55x54, density 0.0717172, nnz 213
+            - FACTOR 9 (double) SPARSE, size 54x36, density 0.063786, nnz 124
+            - FACTOR 10 (double) SPARSE, size 36x34, density 0.0743464, nnz 91
+            - FACTOR 11 (double) SPARSE, size 34x24, density 0.0784314, nnz 64
+            - FACTOR 12 (double) SPARSE, size 24x12, density 0.0833333, nnz 24
 
-			>>> norm((F+G+F+2+F).toarray() - 3*F.toarray() - G.toarray() - 2)
-			2.892210888531005e-14
+            >>> norm((F+G+F+2+F).toarray() - 3*F.toarray() - G.toarray() - 2)
+            2.7030225852818652e-14
 
 
         See also Faust.__sub__
@@ -836,82 +850,84 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             the difference as a Faust object.
 
         Example:
-            >>> import pyfaust
+            >>> import pyfaust as pf
             >>> from numpy.linalg import norm
-            >>> F = pyfaust.rand(10, 12)
+            >>> pf.seed(42) # just for reproducibility
+            >>> F = pf.rand(10, 12)
             >>> F
-            Faust size 10x12, density 2.075, nnz_sum 249, 5 factor(s):
-                - FACTOR 0 (double) SPARSE, size 10x12, density 0.333333, nnz 40
-                - FACTOR 1 (double) SPARSE, size 12x11, density 0.454545, nnz 60
-                - FACTOR 2 (double) SPARSE, size 11x10, density 0.5, nnz 55
-                - FACTOR 3 (double) SPARSE, size 10x11, density 0.454545, nnz 50
-                - FACTOR 4 (double) SPARSE, size 11x12, density 0.333333, nnz 44
+            Faust size 10x12, density 2.04167, nnz_sum 245, 5 factor(s):
+            - FACTOR 0 (double) SPARSE, size 10x12, density 0.333333, nnz 40
+            - FACTOR 1 (double) SPARSE, size 12x10, density 0.5, nnz 60
+            - FACTOR 2 (double) SPARSE, size 10x11, density 0.454545, nnz 50
+            - FACTOR 3 (double) SPARSE, size 11x10, density 0.5, nnz 55
+            - FACTOR 4 (double) SPARSE, size 10x12, density 0.333333, nnz 40
 
-            >>> G = pyfaust.rand(10, 12)
+            >>> G = pf.rand(10, 12)
             >>> G
-            Faust size 10x12, density 1.96667, nnz_sum 236, 5 factor(s):
-                - FACTOR 0 (double) SPARSE, size 10x12, density 0.333333, nnz 40
-                - FACTOR 1 (double) SPARSE, size 12x10, density 0.5, nnz 60
-                - FACTOR 2 (double) SPARSE, size 10x12, density 0.333333, nnz 40
-                - FACTOR 3 (double) SPARSE, size 12x12, density 0.333333, nnz 48
-                - FACTOR 4 (double) SPARSE, size 12x12, density 0.333333, nnz 48
+            Faust size 10x12, density 2.025, nnz_sum 243, 5 factor(s):
+            - FACTOR 0 (double) SPARSE, size 10x11, density 0.454545, nnz 50
+            - FACTOR 1 (double) SPARSE, size 11x10, density 0.5, nnz 55
+            - FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 3 (double) SPARSE, size 10x12, density 0.333333, nnz 40
+            - FACTOR 4 (double) SPARSE, size 12x12, density 0.333333, nnz 48
 
             >>> F-G
-            Faust size 10x12, density 4.40833, nnz_sum 529, 7 factor(s):
-                - FACTOR 0 (double) SPARSE, size 10x20, density 0.1, nnz 20
-                - FACTOR 1 (double) SPARSE, size 20x24, density 0.166667, nnz 80
-                - FACTOR 2 (double) SPARSE, size 24x21, density 0.238095, nnz 120
-                - FACTOR 3 (double) SPARSE, size 21x22, density 0.205628, nnz 95
-                - FACTOR 4 (double) SPARSE, size 22x23, density 0.193676, nnz 98
-                - FACTOR 5 (double) SPARSE, size 23x24, density 0.166667, nnz 92
-                - FACTOR 6 (double) DENSE, size 24x12, density 0.0833333, nnz 24
+            Faust size 10x12, density 4.43333, nnz_sum 532, 7 factor(s):
+            - FACTOR 0 (double) SPARSE, size 10x20, density 0.1, nnz 20
+            - FACTOR 1 (double) SPARSE, size 20x23, density 0.195652, nnz 90
+            - FACTOR 2 (double) SPARSE, size 23x20, density 0.25, nnz 115
+            - FACTOR 3 (double) SPARSE, size 20x21, density 0.238095, nnz 100
+            - FACTOR 4 (double) SPARSE, size 21x22, density 0.205628, nnz 95
+            - FACTOR 5 (double) SPARSE, size 22x24, density 0.166667, nnz 88
+            - FACTOR 6 (double) SPARSE, size 24x12, density 0.0833333, nnz 24
 
             >>> norm((F-G).toarray() - F.toarray() + G.toarray())
-            2.8527547341127496e-15
+            3.608651813623577e-15
             >>> F-2
-            Faust size 10x12, density 2.875, nnz_sum 345, 7 factor(s):
-                - FACTOR 0 (double) SPARSE, size 10x20, density 0.1, nnz 20
-                - FACTOR 1 (double) SPARSE, size 20x22, density 0.113636, nnz 50
-                - FACTOR 2 (double) SPARSE, size 22x21, density 0.151515, nnz 70
-                - FACTOR 3 (double) SPARSE, size 21x20, density 0.154762, nnz 65
-                - FACTOR 4 (double) SPARSE, size 20x12, density 0.25, nnz 60
-                - FACTOR 5 (double) SPARSE, size 12x24, density 0.194444, nnz 56
-                - FACTOR 6 (double) DENSE, size 24x12, density 0.0833333, nnz 24
+            Faust size 10x12, density 2.84167, nnz_sum 341, 7 factor(s):
+            - FACTOR 0 (double) SPARSE, size 10x20, density 0.1, nnz 20
+            - FACTOR 1 (double) SPARSE, size 20x22, density 0.113636, nnz 50
+            - FACTOR 2 (double) SPARSE, size 22x20, density 0.159091, nnz 70
+            - FACTOR 3 (double) SPARSE, size 20x21, density 0.142857, nnz 60
+            - FACTOR 4 (double) SPARSE, size 21x11, density 0.281385, nnz 65
+            - FACTOR 5 (double) SPARSE, size 11x24, density 0.19697, nnz 52
+            - FACTOR 6 (double) SPARSE, size 24x12, density 0.0833333, nnz 24
 
             >>> norm((F-2).toarray() - F.toarray() + 2)
             0.0
             >>> F-G-2
-            Faust size 10x12, density 5.375, nnz_sum 645, 9 factor(s):
-                - FACTOR 0 (double) SPARSE, size 10x20, density 0.1, nnz 20
-                - FACTOR 1 (double) SPARSE, size 20x30, density 0.05, nnz 30
-                - FACTOR 2 (double) SPARSE, size 30x34, density 0.0882353, nnz 90
-                - FACTOR 3 (double) SPARSE, size 34x31, density 0.12334, nnz 130
-                - FACTOR 4 (double) SPARSE, size 31x32, density 0.105847, nnz 105
-                - FACTOR 5 (double) SPARSE, size 32x33, density 0.102273, nnz 108
-                - FACTOR 6 (double) SPARSE, size 33x25, density 0.123636, nnz 102
-                - FACTOR 7 (double) SPARSE, size 25x24, density 0.06, nnz 36
-                - FACTOR 8 (double) DENSE, size 24x12, density 0.0833333, nnz 24
+            Faust size 10x12, density 5.4, nnz_sum 648, 9 factor(s):
+            - FACTOR 0 (double) SPARSE, size 10x20, density 0.1, nnz 20
+            - FACTOR 1 (double) SPARSE, size 20x30, density 0.05, nnz 30
+            - FACTOR 2 (double) SPARSE, size 30x33, density 0.10101, nnz 100
+            - FACTOR 3 (double) SPARSE, size 33x30, density 0.126263, nnz 125
+            - FACTOR 4 (double) SPARSE, size 30x31, density 0.11828, nnz 110
+            - FACTOR 5 (double) SPARSE, size 31x32, density 0.105847, nnz 105
+            - FACTOR 6 (double) SPARSE, size 32x25, density 0.1225, nnz 98
+            - FACTOR 7 (double) SPARSE, size 25x24, density 0.06, nnz 36
+            - FACTOR 8 (double) SPARSE, size 24x12, density 0.0833333, nnz 24
 
             >>> norm((F-G-2).toarray() - F.toarray() + G.toarray() + 2)
-            3.748544367384395e-15
+            4.834253232627814e-15
             >>> F-G-F-2-F
-            Faust size 10x12, density 11.0917, nnz_sum 1331, 13 factor(s):
-                - FACTOR 0 (double) SPARSE, size 10x20, density 0.1, nnz 20
-                - FACTOR 1 (double) SPARSE, size 20x30, density 0.05, nnz 30
-                - FACTOR 2 (double) SPARSE, size 30x40, density 0.0333333, nnz 40
-                - FACTOR 3 (double) SPARSE, size 40x50, density 0.025, nnz 50
-                - FACTOR 4 (double) SPARSE, size 50x54, density 0.0407407, nnz 110
-                - FACTOR 5 (double) SPARSE, size 54x53, density 0.0628931, nnz 180
-                - FACTOR 6 (double) SPARSE, size 53x53, density 0.0622998, nnz 175
-                - FACTOR 7 (double) SPARSE, size 53x55, density 0.0696398, nnz 203
-                - FACTOR 8 (double) SPARSE, size 55x56, density 0.0688312, nnz 212
-                - FACTOR 9 (double) SPARSE, size 56x35, density 0.0678571, nnz 133
-                - FACTOR 10 (double) SPARSE, size 35x35, density 0.0702041, nnz 86
-                - FACTOR 11 (double) SPARSE, size 35x24, density 0.0809524, nnz 68
-                - FACTOR 12 (double) DENSE, size 24x12, density 0.0833333, nnz 24
+            Faust size 10x12, density 11.05, nnz_sum 1326, 13 factor(s):
+            - FACTOR 0 (double) SPARSE, size 10x20, density 0.1, nnz 20
+            - FACTOR 1 (double) SPARSE, size 20x30, density 0.05, nnz 30
+            - FACTOR 2 (double) SPARSE, size 30x40, density 0.0333333, nnz 40
+            - FACTOR 3 (double) SPARSE, size 40x50, density 0.025, nnz 50
+            - FACTOR 4 (double) SPARSE, size 50x53, density 0.045283, nnz 120
+            - FACTOR 5 (double) SPARSE, size 53x52, density 0.0634978, nnz 175
+            - FACTOR 6 (double) SPARSE, size 52x51, density 0.0678733, nnz 180
+            - FACTOR 7 (double) SPARSE, size 51x55, density 0.0695187, nnz 195
+            - FACTOR 8 (double) SPARSE, size 55x54, density 0.0717172, nnz 213
+            - FACTOR 9 (double) SPARSE, size 54x36, density 0.063786, nnz 124
+            - FACTOR 10 (double) SPARSE, size 36x34, density 0.0743464, nnz 91
+            - FACTOR 11 (double) SPARSE, size 34x24, density 0.0784314, nnz 64
+            - FACTOR 12 (double) SPARSE, size 24x12, density 0.0833333, nnz 24
+
 
             >>> norm((F-G-F-2-F).toarray() - F.toarray() + 2*F.toarray() + G.toarray() + 2)
-            1.2631196225257117e-14
+            1.4546887564889487e-14
 
         <b>See also</b> Faust.__add__
         """
@@ -1063,16 +1079,9 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             - When either F or A is complex, G=F @ A is also complex.
 
         Raises: ValueError
-            The multiplying operand A is a scalar:
-            <code>
-            >>> from pyfaust import rand
-            >>> F = rand(5,50)
-            >>> F@2
-            ValueError Scalar operands are not allowed, use '*' instead
-            </code>
 
         Examples:
-            >>> from pyfaust import rand
+            >>> from pyfaust import rand, seed
             >>> import numpy as np
             >>> F = rand(50, 100)
             >>> A = np.random.rand(F.shape[1], 50)
@@ -1081,6 +1090,15 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             >>> G = rand(F.shape[1], 5)
             >>> H = F@G
             >>> # H is a Faust because F and G are
+
+            The multiplying operand A can't be a scalar:
+            >>> from pyfaust import rand
+            >>> F = rand(5,50)
+            >>> F@2
+            Traceback (most recent call last):
+            ...
+            ValueError: Scalar operands are not allowed, use '*' instead
+
 
         <b>See also</b> Faust.__init__, Faust.rcg, Faust.__mul__, Faust.__matmul__, Faust.dot
         """
@@ -1150,12 +1168,16 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Example:
             >>> import numpy as np
             >>> import pyfaust as pf
+            >>> pf.seed(42) # just for reproducibility
+            >>> np.random.seed(42)
             >>> F = pf.rand(10, 10)
             >>> x = np.random.rand(F.shape[1])
             >>> F@x
-            array([ 69.88213474,  80.99557416, 106.05274531,  55.55415099, 127.4286391 ,  43.72638629,  90.05175021, 105.05742936, 78.14695324,  98.79773085])
-            >>> F.matvec(F, x)
-            array([ 69.88213474,  80.99557416, 106.05274531,  55.55415099, 127.4286391 ,  43.72638629,  90.05175021, 105.05742936, 78.14695324,  98.79773085])
+            array([30.43795399, 55.16565252, 48.67306554, 34.64963666, 39.76690761,
+                   47.94326492, 24.18156012, 26.61375659, 43.28975657, 60.90302137])
+            >>> F.matvec(x)
+            array([30.43795399, 55.16565252, 48.67306554, 34.64963666, 39.76690761,
+                   47.94326492, 24.18156012, 26.61375659, 43.28975657, 60.90302137])
 
 
         <b>See also</b> Faust.dot, Faust.__matmul__
@@ -1178,12 +1200,6 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         vector or a scalar).
 
         Raises: TypeError
-            If the type of A is not supported:
-            <code>
-            >>> import numpy
-            >>> F*'a'
-            TypeError: * use is forbidden in this case. It is allowed only for Faust-scalar multiplication or Faust vector broadcasting.
-            </code>
 
         Examples:
             >>> from pyfaust import rand
@@ -1193,6 +1209,14 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             >>> B = F*v # Faust vector broadcasting
             >>> # is equivalent to B = F.__mul__(v)
             >>> F_times_two = F*2
+
+            If the type of A is not supported:
+            >>> import numpy
+            >>> F*'a'
+            Traceback (most recent call last):
+            ...
+            TypeError: * use is forbidden in this case. It is allowed only for Faust-scalar multiplication or Faust vector broadcasting.
+
 
         <b>See also</b> Faust.__rmul__
         """
@@ -1289,78 +1313,81 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
             Raises:
                 ValueError
-                The dimensions of the two Fausts must agree.
-                <code>
-                >>> from pyfaust import rand
-                >>> F = rand(2,51);
-                >>> G = rand(2,25);
-                >>> F.concatenate(G, 0)
-                </code>
-                ValueError
-                Axis must be 0 or 1.
-                <code>
-                >>> from pyfaust import rand
-                >>> F = rand(2,51);
-                >>> G = rand(2,25);
-                >>> F.concatenate(G, 5)
-                </code>
-                ValueError
-                You can't concatenate a Faust with something that is not a
-                Faust, a numpy array or a scipy sparse matrix.
-                <code>
-                >>> from pyfaust import rand
-                >>> F = rand(2,51);
-                >>> F.concatenate(['a', 'b', 'c'], 5)
-                </code>
+
 
             Examples:
-                >>> from pyfaust import rand
+                >>> from pyfaust import rand, seed
                 >>> F = rand(50, 50)
                 >>> G = rand(50, 50)
                 >>> F.concatenate(G) # equivalent to F.concatenate(G, 0)
-                Faust size 100x50, density 0.5634, nnz_sum 2817, 7 factor(s)<br/>
-                FACTOR 0 (real) SPARSE, size 100x100, density 0.0473, nnz 47<br/>
-                FACTOR 1 (real) SPARSE, size 100x100, density 0.0469, nnz 46<br/>
-                FACTOR 2 (real) SPARSE, size 100x100, density 0.0504, nnz 50<br/>
-                FACTOR 3 (real) SPARSE, size 100x100, density 0.0502, nnz 50<br/>
-                FACTOR 4 (real) SPARSE, size 100x100, density 0.0482, nnz 48<br/>
-                FACTOR 5 (real) SPARSE, size 100x100, density 0.0287, nnz 28<br/>
-                FACTOR 6 (real) SPARSE, size 100x50, density 0.02, nnz 10<br/>
+                Faust size 100x50, density 0.52, nnz_sum 2600, 6 factor(s):
+                - FACTOR 0 (double) SPARSE, size 100x100, density 0.05, nnz 500
+                - FACTOR 1 (double) SPARSE, size 100x100, density 0.05, nnz 500
+                - FACTOR 2 (double) SPARSE, size 100x100, density 0.05, nnz 500
+                - FACTOR 3 (double) SPARSE, size 100x100, density 0.05, nnz 500
+                - FACTOR 4 (double) SPARSE, size 100x100, density 0.05, nnz 500
+                - FACTOR 5 (double) SPARSE, size 100x50, density 0.02, nnz 100
+
                 >>> F.concatenate(G, axis=1)
-                Faust size 50x100, density 0.5634, nnz_sum 2817, 7 factor(s)<br/>
-                FACTOR 0 (real) SPARSE, size 50x100, density 0.02, nnz 10<br/>
-                FACTOR 1 (real) SPARSE, size 100x100, density 0.0286, nnz 28<br/>
-                FACTOR 2 (real) SPARSE, size 100x100, density 0.0469, nnz 46<br/>
-                FACTOR 3 (real) SPARSE, size 100x100, density 0.0504, nnz 50<br/>
-                FACTOR 4 (real) SPARSE, size 100x100, density 0.0504, nnz 50<br/>
-                FACTOR 5 (real) SPARSE, size 100x100, density 0.0479, nnz 47<br/>
-                FACTOR 6 (real) SPARSE, size 100x100, density 0.0475, nnz 47<br/>
+                Faust size 50x100, density 0.52, nnz_sum 2600, 6 factor(s):
+                - FACTOR 0 (double) SPARSE, size 50x100, density 0.02, nnz 100
+                - FACTOR 1 (double) SPARSE, size 100x100, density 0.05, nnz 500
+                - FACTOR 2 (double) SPARSE, size 100x100, density 0.05, nnz 500
+                - FACTOR 3 (double) SPARSE, size 100x100, density 0.05, nnz 500
+                - FACTOR 4 (double) SPARSE, size 100x100, density 0.05, nnz 500
+                - FACTOR 5 (double) SPARSE, size 100x100, density 0.05, nnz 500
+
                 >>> from numpy.random import rand
                 >>> F.concatenate(rand(34, 50), axis=0) # The random array is auto-converted to a Faust before the vertical concatenation
-                Faust size 84x50, density 0.558333, nnz_sum 2345, 6 factor(s): <br/>
-                FACTOR 0 (real) SPARSE, size 84x91, density 0.0549451, nnz 420<br/>
-                FACTOR 1 (real) SPARSE, size 91x92, density 0.0543478, nnz 455<br/>
-                FACTOR 2 (real) SPARSE, size 92x90, density 0.0555556, nnz 460<br/>
-                FACTOR 3 (real) SPARSE, size 90x92, density 0.0543478, nnz 450<br/>
-                FACTOR 4 (real) SPARSE, size 92x100, density 0.05, nnz 460<br/>
-                FACTOR 5 (real) SPARSE, size 100x50, density 0.02, nnz 100<br/>
+                Faust size 84x50, density 0.773809, nnz_sum 3250, 6 factor(s):
+                - FACTOR 0 (double) SPARSE, size 84x100, density 0.232143, nnz 1950
+                - FACTOR 1 (double) SPARSE, size 100x100, density 0.03, nnz 300
+                - FACTOR 2 (double) SPARSE, size 100x100, density 0.03, nnz 300
+                - FACTOR 3 (double) SPARSE, size 100x100, density 0.03, nnz 300
+                - FACTOR 4 (double) SPARSE, size 100x100, density 0.03, nnz 300
+                - FACTOR 5 (double) SPARSE, size 100x50, density 0.02, nnz 100
+
                 >>> from scipy.sparse import rand as sprand
                 >>> F.concatenate(sprand(50, 24, format='csr'), axis=1) # The sparse random matrix is auto-converted to a Faust before the horizontal concatenation
-                Faust size 50x74, density 0.412703, nnz_sum 1527, 6 factor(s):<br/>
-                FACTOR 0 (real) SPARSE, size 50x100, density 0.02, nnz 100<br/>
-                FACTOR 1 (real) SPARSE, size 100x100, density 0.0292, nnz 292<br/>
-                FACTOR 2 (real) SPARSE, size 100x100, density 0.0301, nnz 301<br/>
-                FACTOR 3 (real) SPARSE, size 100x100, density 0.0286, nnz 286<br/>
-                FACTOR 4 (real) SPARSE, size 100x100, density 0.0285, nnz 285<br/>
-                FACTOR 5 (real) SPARSE, size 100x74, density 0.0355405, nnz 263<br/>
+                Faust size 50x74, density 0.422162, nnz_sum 1562, 6 factor(s):
+                - FACTOR 0 (double) SPARSE, size 50x100, density 0.02, nnz 100
+                - FACTOR 1 (double) SPARSE, size 100x100, density 0.03, nnz 300
+                - FACTOR 2 (double) SPARSE, size 100x100, density 0.03, nnz 300
+                - FACTOR 3 (double) SPARSE, size 100x100, density 0.03, nnz 300
+                - FACTOR 4 (double) SPARSE, size 100x100, density 0.03, nnz 300
+                - FACTOR 5 (double) SPARSE, size 100x74, density 0.0354054, nnz 262
+
                 >>> F.concatenate(F, G, F, G, rand(34,50), F, G) # it's allowed to concatenate an arbitrary number of Fausts
-                Faust size 384x50, density 0.575521, nnz_sum 11050, 6 factor(s): <br/>
-                FACTOR 0 (double) SPARSE, size 384x400, density 0.0224609, nnz 3450<br/>
-                FACTOR 1 (double) SPARSE, size 400x400, density 0.01125, nnz 1800<br/>
-                FACTOR 2 (double) SPARSE, size 400x400, density 0.01125, nnz 1800<br/>
-                FACTOR 3 (double) SPARSE, size 400x400, density 0.01125, nnz 1800<br/>
-                FACTOR 4 (double) SPARSE, size 400x400, density 0.01125, nnz 1800<br/>
-                FACTOR 5 (double) SPARSE, size 400x50, density 0.02, nnz 400<br/>
+                Faust size 384x50, density 0.575521, nnz_sum 11050, 6 factor(s):
+                - FACTOR 0 (double) SPARSE, size 384x400, density 0.0224609, nnz 3450
+                - FACTOR 1 (double) SPARSE, size 400x400, density 0.01125, nnz 1800
+                - FACTOR 2 (double) SPARSE, size 400x400, density 0.01125, nnz 1800
+                - FACTOR 3 (double) SPARSE, size 400x400, density 0.01125, nnz 1800
+                - FACTOR 4 (double) SPARSE, size 400x400, density 0.01125, nnz 1800
+                - FACTOR 5 (double) SPARSE, size 400x50, density 0.02, nnz 400
+
+                >>> from pyfaust import rand
+                >>> F = rand(2, 51)
+                >>> G = rand(2, 25)
+                >>> F.concatenate(G, 0)
+                Traceback (most recent call last):
+                ...
+                ValueError: The dimensions of the two Fausts must agree.
+                >>> from pyfaust import rand
+                >>> F = rand(2, 50);
+                >>> G = rand(2, 50);
+                >>> F.concatenate(G, axis=5)
+                Traceback (most recent call last):
+                ...
+                ValueError: Axis must be 0 or 1.
+                >>> from pyfaust import rand
+                >>> F = rand(2,5);
+                >>> G = rand(2,5);
+                >>> F.concatenate(G, 'a')
+                Traceback (most recent call last):
+                ...
+                ValueError: You can't concatenate a Faust with something that is not a Faust, a numpy array or scipy sparse matrix.
+
 
         """
         if("axis" in kwargs.keys()):
@@ -1417,8 +1444,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         return C
 
     def toarray(F):
-        """
-        Returns a numpy array for the full matrix implemented by F.
+        """Returns a numpy array for the full matrix implemented by F.
 
         WARNING: Using this function is discouraged except for test purposes,
         as it loses the main potential interests of the Faust structure:
@@ -1438,13 +1464,15 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             >>> from pyfaust import rand
             >>> F = rand(10**5, 10**5, 2, 10**5, density=10**-4, fac_type='sparse')
             >>> F
-            FACTOR 0 (real) SPARSE, size 100000x100000, density 9e-05, nnz 900000<br/>
-            FACTOR 1 (real) SPARSE, size 100000x100000, density 9e-05, nnz 900000<br/>
+            Faust size 100000x100000, density 0.00018, nnz_sum 1800000, 2 factor(s):
+            - FACTOR 0 (double) SPARSE, size 100000x100000, density 9e-05, nnz 900000
+            - FACTOR 1 (double) SPARSE, size 100000x100000, density 9e-05, nnz 900000
             >>> # an attempt to convert F to a dense matrix is most likely to raise a memory error
             >>> # the sparse format is the only way to handle such a large Faust
             >>> F.toarray()
+            Traceback (most recent call last):
             ...
-            MemoryError
+            numpy.core._exceptions._ArrayMemoryError: Unable to allocate 74.5 GiB for an array with shape (100000, 100000) and data type float64
 
         <b>See also</b> Faust.todense
         """
@@ -1474,18 +1502,6 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         WARNING: this function is deprecated and might be deleted in future
         versions of pyfaust. Please use Faust.toarray instead.
-
-        Examples:
-            >>> from pyfaust import rand
-            >>> F = rand(10**5, 10**5, 2, 10**5, density=10**-4, fac_type='sparse')
-            >>> F
-            FACTOR 0 (real) SPARSE, size 100000x100000, density 9e-05, nnz 900000<br/>
-            FACTOR 1 (real) SPARSE, size 100000x100000, density 9e-05, nnz 900000<br/>
-            >>> # an attempt to convert F to a dense matrix is most likely to raise a memory error
-            >>> # the sparse format is the only way to handle such a large Faust
-            >>> F.toarray()
-            (...)
-            MemoryError
 
         <b>See also</b> Faust.toarray
         """
@@ -1525,34 +1541,114 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
 
         Examples:
-            >>> from pyfaust import rand
+            >>> from pyfaust import rand, seed
             >>> import numpy as np
-            >>> from random import randint
-
+            >>> from numpy.random import randint, seed as rseed
+            >>> seed(42) # just for reproducibility
+            >>> rseed(42)
             >>> F = rand(50, 100)
             >>> i1 = randint(1, min(F.shape)-1)
             >>> i2 = randint(1, min(F.shape)-1)
 
-            >>> F[i1,i2] # is the scalar element located at
-                         # at row i1, column i2 of the F's dense matrix
+            >>> # the scalar element located at
+            >>> # at row i1, column i2 of the F dense matrix
+            >>> F[i1,i2]
+            0.0
 
             >>> F[:, i2] # full column i2
+            Faust size 50x1, density 24.64, nnz_sum 1232, 5 factor(s):
+            - FACTOR 0 (double) SPARSE, size 50x87, density 0.045977, nnz 200
+            - FACTOR 1 (double) SPARSE, size 87x63, density 0.0793651, nnz 435
+            - FACTOR 2 (double) SPARSE, size 63x69, density 0.057971, nnz 252
+            - FACTOR 3 (double) SPARSE, size 69x60, density 0.0833333, nnz 345
+            - FACTOR 4 (double) SPARSE, size 60x1, density 0, nnz 0
 
-            >>> F[2:4, 1:4] # from row 2 to 3, each row containing
-                            # only elements from column 1 to 3
+            >>> # from row 2 to 3, each row containing
+            >>> # only elements from column 1 to 3
+            >>> F[2:4, 1:4]
+            Faust size 2x3, density 174.833, nnz_sum 1049, 5 factor(s):
+            - FACTOR 0 (double) SPARSE, size 2x87, density 0.045977, nnz 8
+            - FACTOR 1 (double) SPARSE, size 87x63, density 0.0793651, nnz 435
+            - FACTOR 2 (double) SPARSE, size 63x69, density 0.057971, nnz 252
+            - FACTOR 3 (double) SPARSE, size 69x60, density 0.0833333, nnz 345
+            - FACTOR 4 (double) SPARSE, size 60x3, density 0.05, nnz 9
 
-            >>> F[::, 4:-1] # from row 0 to end row, each row
-                            # containing only elements from column 4 to
-                            # column before the last one.
+            >>> # from row 0 to end row, each row
+            >>> # containing only elements from column 4 to
+            >>> # column before the last one.
+            >>> F[::, 4:-1]
+            Faust size 50x95, density 0.318947, nnz_sum 1515, 5 factor(s):
+            - FACTOR 0 (double) SPARSE, size 50x87, density 0.045977, nnz 200
+            - FACTOR 1 (double) SPARSE, size 87x63, density 0.0793651, nnz 435
+            - FACTOR 2 (double) SPARSE, size 63x69, density 0.057971, nnz 252
+            - FACTOR 3 (double) SPARSE, size 69x60, density 0.0833333, nnz 345
+            - FACTOR 4 (double) SPARSE, size 60x95, density 0.0496491, nnz 283
 
             >>> F[0:i1, ...] # equivalent to F[0:i1, ::]
+            Faust size 39x100, density 0.381538, nnz_sum 1488, 5 factor(s):
+            - FACTOR 0 (double) SPARSE, size 39x87, density 0.045977, nnz 156
+            - FACTOR 1 (double) SPARSE, size 87x63, density 0.0793651, nnz 435
+            - FACTOR 2 (double) SPARSE, size 63x69, density 0.057971, nnz 252
+            - FACTOR 3 (double) SPARSE, size 69x60, density 0.0833333, nnz 345
+            - FACTOR 4 (double) SPARSE, size 60x100, density 0.05, nnz 300
+
             >>> F[2::, :3:] # equivalent to F[2:F.shape[0],0:3]
+            Faust size 48x3, density 8.56944, nnz_sum 1234, 5 factor(s):
+            - FACTOR 0 (double) SPARSE, size 48x87, density 0.045977, nnz 192
+            - FACTOR 1 (double) SPARSE, size 87x63, density 0.0793651, nnz 435
+            - FACTOR 2 (double) SPARSE, size 63x69, density 0.057971, nnz 252
+            - FACTOR 3 (double) SPARSE, size 69x60, density 0.0833333, nnz 345
+            - FACTOR 4 (double) SPARSE, size 60x3, density 0.0555556, nnz 10
+
             >>> F[0:i2:2,:] # takes every row of even index until the row i2 (excluded)
+            Faust size 15x100, density 0.928, nnz_sum 1392, 5 factor(s):
+            - FACTOR 0 (double) SPARSE, size 15x87, density 0.045977, nnz 60
+            - FACTOR 1 (double) SPARSE, size 87x63, density 0.0793651, nnz 435
+            - FACTOR 2 (double) SPARSE, size 63x69, density 0.057971, nnz 252
+            - FACTOR 3 (double) SPARSE, size 69x60, density 0.0833333, nnz 345
+            - FACTOR 4 (double) SPARSE, size 60x100, density 0.05, nnz 300
+
             >>> F[-1:-3:-1,:] # takes the two last rows in reverse order
+            Faust size 2x100, density 6.7, nnz_sum 1340, 5 factor(s):
+            - FACTOR 0 (double) SPARSE, size 2x87, density 0.045977, nnz 8
+            - FACTOR 1 (double) SPARSE, size 87x63, density 0.0793651, nnz 435
+            - FACTOR 2 (double) SPARSE, size 63x69, density 0.057971, nnz 252
+            - FACTOR 3 (double) SPARSE, size 69x60, density 0.0833333, nnz 345
+            - FACTOR 4 (double) SPARSE, size 60x100, density 0.05, nnz 300
+
             >>> F[i2:0:-2,:] # starts from row i2 and goes backward to take one in two rows until the first one (reversing order of F)
+            Faust size 15x100, density 0.928, nnz_sum 1392, 5 factor(s):
+            - FACTOR 0 (double) SPARSE, size 15x87, density 0.045977, nnz 60
+            - FACTOR 1 (double) SPARSE, size 87x63, density 0.0793651, nnz 435
+            - FACTOR 2 (double) SPARSE, size 63x69, density 0.057971, nnz 252
+            - FACTOR 3 (double) SPARSE, size 69x60, density 0.0833333, nnz 345
+            - FACTOR 4 (double) SPARSE, size 60x100, density 0.05, nnz 300
+
             >>> F[[1,18,2],:] # takes in this order the rows 1, 18 and 2
+            Faust size 3x100, density 4.48, nnz_sum 1344, 5 factor(s):
+            - FACTOR 0 (double) SPARSE, size 3x87, density 0.045977, nnz 12
+            - FACTOR 1 (double) SPARSE, size 87x63, density 0.0793651, nnz 435
+            - FACTOR 2 (double) SPARSE, size 63x69, density 0.057971, nnz 252
+            - FACTOR 3 (double) SPARSE, size 69x60, density 0.0833333, nnz 345
+            - FACTOR 4 (double) SPARSE, size 60x100, density 0.05, nnz 300
+
             >>> F[:, [1,18,2]] # takes in this order the columns 1, 18 and 2
+            Faust size 50x3, density 8.27333, nnz_sum 1241, 5 factor(s):
+            - FACTOR 0 (double) SPARSE, size 50x87, density 0.045977, nnz 200
+            - FACTOR 1 (double) SPARSE, size 87x63, density 0.0793651, nnz 435
+            - FACTOR 2 (double) SPARSE, size 63x69, density 0.057971, nnz 252
+            - FACTOR 3 (double) SPARSE, size 69x60, density 0.0833333, nnz 345
+            - FACTOR 4 (double) SPARSE, size 60x3, density 0.05, nnz 9
+
             >>> F[[1,18,2]][:,[1,2]] # takes the rows 1, 18 and 2 but keeps only columns 1 and 2 in these rows
+            Faust size 3x2, density 175, nnz_sum 1050, 5 factor(s):
+            - FACTOR 0 (double) SPARSE, size 3x87, density 0.045977, nnz 12
+            - FACTOR 1 (double) SPARSE, size 87x63, density 0.0793651, nnz 435
+            - FACTOR 2 (double) SPARSE, size 63x69, density 0.057971, nnz 252
+            - FACTOR 3 (double) SPARSE, size 69x60, density 0.0833333, nnz 345
+            - FACTOR 4 (double) SPARSE, size 60x2, density 0.05, nnz 6
+
+
         """
         #TODO: refactor (by index when indices == tuple(2), error message,
         #      out_indices checking on the end)
@@ -1688,13 +1784,13 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Example:
 			>>> import pyfaust as pf
 			>>> F = pf.rand(1024, 1024)
-			>>> F
-			Faust size 1024x1024, density 0.0244141, nnz_sum 25600, 5 factor(s): 
-			- FACTOR 0 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
-			- FACTOR 1 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
-			- FACTOR 2 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
-			- FACTOR 3 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
-			- FACTOR 4 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+            >>> F
+            Faust size 1024x1024, density 0.0244141, nnz_sum 25600, 5 factor(s):
+            - FACTOR 0 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+            - FACTOR 1 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+            - FACTOR 2 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+            - FACTOR 3 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+            - FACTOR 4 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
 
 			>>> F.nnz_sum()
 			25600
@@ -1745,21 +1841,21 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Returns:
             the RCG value (float).
 
-        >>> from pyfaust import rand
-        >>> F = rand(1024, 1024)
-        >>> F.rcg()
-        40.96
-        >>> F
-        Faust size 1024x1024, density 0.0244141, nnz_sum 25600, 5 factor(s):
+        Examples:
+            >>> from pyfaust import rand
+            >>> F = rand(1024, 1024)
+            >>> F.rcg()
+            40.96
+            >>> F
+            Faust size 1024x1024, density 0.0244141, nnz_sum 25600, 5 factor(s):
             - FACTOR 0 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
             - FACTOR 1 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
             - FACTOR 2 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
             - FACTOR 3 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
             - FACTOR 4 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
 
-        >>> F.size/F.nnz_sum()
-        40.96
-
+            >>> F.size/F.nnz_sum()
+            40.96
 
         <b>See also</b>: Faust.density, Faust.nnz_sum, Faust.shape.
         """
@@ -1827,17 +1923,18 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
 
         Examples:
-            >>> from pyfaust import rand
+            >>> from pyfaust import rand, seed
             >>> import numpy as np
+            >>> seed(42) # just for reproducibility
             >>> F = rand(50, 100, [1, 2], density=.5)
             >>> F.norm()
-            23.55588891399667
+            388.2689201639318
             >>> F.norm(2)
-            5.929720822717308
+            382.3775910865066
             >>> F.norm('fro')
-            23.55588891399667
+            388.2689201639318
             >>> F.norm(np.inf)
-            18.509101197826254
+            624.0409076619496
 
         <b>See also</b>: Faust.normalize
         """
@@ -1847,6 +1944,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
     def power_iteration(self, threshold=1e-3, maxiter=100):
         """Performs the power iteration algorithm to compute the greatest eigenvalue of the Faust.
+
         For the algorithm to succeed the Faust should be diagonalizable
         (similar to a digonalizable Faust), ideally, a symmetric positive-definite Faust.
 
@@ -1858,11 +1956,12 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             The greatest eigenvalue approximate.
 
         Examples:
-            >>> from pyfaust import rand
+            >>> from pyfaust import rand, seed
+            >>> seed(42) # just for reproducibility
             >>> F = rand(50, 50)
             >>> F = F@F.H
-            >>> power_iteration(F)
-            14630.932668438209
+            >>> F.power_iteration()
+            12653.806783532553
 
         """
         return self.m_faust.power_iteration(threshold=threshold,
@@ -1888,49 +1987,51 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             the normalized Faust
 
         Example:
-			>>> from numpy.linalg import norm
+            >>> from numpy.linalg import norm
 			>>> import numpy as np
 			>>> import pyfaust as pf
+            >>> pf.seed(42) # just for reproducibility
 			>>> F = pf.rand(10, 10)
-			>>> F
-			Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
-			- FACTOR 0 (double) SPARSE, size 10x10, density 0.5, nnz 50
-			- FACTOR 1 (double) SPARSE, size 10x10, density 0.5, nnz 50
-			- FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
-			- FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
-			- FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            >>> F
+            Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
+            - FACTOR 0 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 1 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
 
 			>>> # normalize columns according to default fro-norm/2-norm
 			>>> # then test the second column is properly normalized
 			>>> nF2 = F.normalize()
-			>>> nF2
-			Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
-			- FACTOR 0 (double) SPARSE, size 10x10, density 0.5, nnz 50
-			- FACTOR 1 (double) SPARSE, size 10x10, density 0.5, nnz 50
-			- FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
-			- FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
-			- FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            >>> nF2
+            Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
+            - FACTOR 0 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 1 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
 
-			>>> norm(nF2[:,1].toarray() - F[:, 1].toarray()/F[:,1].norm())
-			1.2719202621569003e-16
+            >>> norm(nF2[:,1].toarray() - F[:, 1].toarray()/F[:,1].norm())
+            1.0385185452638061e-16
 			>>>
 			>>> # this time normalize rows using 1-norm and test the third row
 			>>> nF1 = F.normalize(ord=1, axis=0)
-			>>> nF1
-			Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
-			- FACTOR 0 (double) SPARSE, size 10x10, density 0.5, nnz 50
-			- FACTOR 1 (double) SPARSE, size 10x10, density 0.5, nnz 50
-			- FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
-			- FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
-			- FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            >>> nF1
+            Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
+            - FACTOR 0 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 1 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
 
-			>>> norm(nF1[2, :].toarray() - F[2, :].toarray()/F[2, :].norm(ord=1))
-			2.5438405243138006e-16
+
+            >>> norm(nF1[2, :].toarray() - F[2, :].toarray()/F[2, :].norm(ord=1))
+            2.5438405243138006e-16
 			>>>
 			>>> # and the same with inf-norm
 			>>> nFinf = F.normalize(ord=np.inf, axis=0)
-			>>> norm(nFinf[2, :].toarray() - F[2, :].toarray()/F[2, :].norm(ord=np.inf))
-			4.3885418357208765e-17
+            >>> norm(nFinf[2, :].toarray() - F[2, :].toarray()/F[2, :].norm(ord=np.inf))
+            5.238750013840908e-17
 
 
         <b>See also</b>: Faust.norm
@@ -1986,13 +2087,13 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             the number of factors.
 
         Examples:
-        >>> from pyfaust import rand
-        >>> F = rand(50, 100)
-        >>> nf = F.numfactors()
-        >>> nf
-        2
-        >>> nf == len(F)
-        True
+            >>> from pyfaust import rand
+            >>> F = rand(50, 100)
+            >>> nf = F.numfactors()
+            >>> nf
+            5
+            >>> nf == len(F)
+            True
 
         <b>See also</b> Faust.factors, Faust.numfactors
         """
@@ -2015,7 +2116,6 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             if indices is a single index and as_faust == False: a copy of the i-th factor.
             Otherwise a new Faust composed of the factors of F pointed by
             indices (no copy is made).
-
             For a single factor (with as_faust == False), the matrix type is:
                 - numpy.ndarray if it is a full storage matrix or,
                 - scipy.sparse.csc.matrix_csc if it's a sparse matrix of a
@@ -2023,6 +2123,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                 - scipy.sparse.csr.csr_matrix if it's a sparse matrix of a
                 non-transposed Faust.
                 - a scipy.sparse.bsr matrix if the factor is a BSR matrix.
+
 
         Raises:
             ValueError.
@@ -2049,8 +2150,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             return Faust(core_obj=F.m_faust.factors(indices))
 
     def right(F, i, as_faust=False):
-        """
-        Returns the right hand side factors of F from index i to F.numfactors()-1.
+        """Returns the right hand side factors of F from index i to F.numfactors()-1.
 
         Args:
             F: the Faust from which to extract right factors.
@@ -2064,21 +2164,24 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             a numpy array or a sparse matrix otherwise.
 
         Examples:
-            >>> from pyfaust import rand
+            >>> from pyfaust import rand, seed
+            >>> seed(42) # just for reproducibility
             >>> F = rand(5, 10, 5)
             >>> RF = F.right(2)
             >>> print(F)
-            Faust size 10x7, density 2.85714, nnz_sum 200, 5 factor(s):<br/>
-                 FACTOR 0 (real) SPARSE, size 10x10, density 0.5, nnz 50<br/>
-                 FACTOR 1 (real) DENSE,  size 10x10, density 0.5, nnz 50<br/>
-                 FACTOR 2 (real) SPARSE, size 10x5, density 1, nnz 50<br/>
-                 FACTOR 3 (real) DENSE,  size 5x5, density 1, nnz 25<br/>
-                 FACTOR 4 (real) SPARSE, size 5x7, density 0.714286, nnz 25<br/>
+            Faust size 5x10, density 2.98, nnz_sum 149, 5 factor(s):
+            - FACTOR 0 (double) SPARSE, size 5x9, density 0.555556, nnz 25
+            - FACTOR 1 (double) SPARSE, size 9x6, density 0.666667, nnz 36
+            - FACTOR 2 (double) SPARSE, size 6x7, density 0.714286, nnz 30
+            - FACTOR 3 (double) SPARSE, size 7x6, density 0.666667, nnz 28
+            - FACTOR 4 (double) SPARSE, size 6x10, density 0.5, nnz 30
+
             >>> print(RF)
-            Faust size 10x7, density 1.42857, nnz_sum 100, 3 factor(s):<br/>
-                 FACTOR 0 (real) SPARSE, size 10x5, density 1, nnz 50<br/>
-                 FACTOR 1 (real) DENSE,  size 5x5, density 1, nnz 25<br/>
-                 FACTOR 2 (real) SPARSE, size 5x7, density 0.714286, nnz 25<br/>
+            Faust size 6x10, density 1.46667, nnz_sum 88, 3 factor(s):
+            - FACTOR 0 (double) SPARSE, size 6x7, density 0.714286, nnz 30
+            - FACTOR 1 (double) SPARSE, size 7x6, density 0.666667, nnz 28
+            - FACTOR 2 (double) SPARSE, size 6x10, density 0.5, nnz 30
+
 
 
         See also:
@@ -2107,22 +2210,24 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             a numpy array or a sparse matrix otherwise.
 
         Examples:
-            >>> from pyfaust import rand
+            >>> from pyfaust import rand, seed
+            >>> seed(42) # just for reproducibility
             >>> F = rand(5, 10, 5)
             >>> LF = F.left(3)
             >>> print(F)
-            Faust size 6x10, density 3.25, nnz_sum 195, 5 factor(s):<br/>
-                FACTOR 0 (real) DENSE,  size 6x8, density 0.625, nnz 30<br/>
-                FACTOR 1 (real) DENSE,  size 8x9, density 0.555556, nnz 40<br/>
-                FACTOR 2 (real) SPARSE, size 9x10, density 0.5, nnz 45<br/>
-                FACTOR 3 (real) DENSE,  size 10x6, density 0.833333, nnz 50<br/>
-                FACTOR 4 (real) DENSE,  size 6x10, density 0.5, nnz 30<br/>
+            Faust size 5x10, density 2.98, nnz_sum 149, 5 factor(s):
+            - FACTOR 0 (double) SPARSE, size 5x9, density 0.555556, nnz 25
+            - FACTOR 1 (double) SPARSE, size 9x6, density 0.666667, nnz 36
+            - FACTOR 2 (double) SPARSE, size 6x7, density 0.714286, nnz 30
+            - FACTOR 3 (double) SPARSE, size 7x6, density 0.666667, nnz 28
+            - FACTOR 4 (double) SPARSE, size 6x10, density 0.5, nnz 30
+
             >>> print(LF)
-            Faust size 6x6, density 4.58333, nnz_sum 165, 4 factor(s):<br/>
-                FACTOR 0 (real) DENSE,  size 6x8, density 0.625, nnz 30<br/>
-                FACTOR 1 (real) DENSE,  size 8x9, density 0.555556, nnz 40<br/>
-                FACTOR 2 (real) SPARSE, size 9x10, density 0.5, nnz 45<br/>
-                FACTOR 3 (real) DENSE,  size 10x6, density 0.833333, nnz 50<br/>
+            Faust size 5x6, density 3.96667, nnz_sum 119, 4 factor(s):
+            - FACTOR 0 (double) SPARSE, size 5x9, density 0.555556, nnz 25
+            - FACTOR 1 (double) SPARSE, size 9x6, density 0.666667, nnz 36
+            - FACTOR 2 (double) SPARSE, size 6x7, density 0.714286, nnz 30
+            - FACTOR 3 (double) SPARSE, size 7x6, density 0.666667, nnz 28
 
 
         See also:
@@ -2170,6 +2275,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
     def save(F, filepath, format="Matlab"):
         """Saves the Faust F into a file.
+
         The file is saved in Matlab format version 5 (.mat extension).
 
         NOTE: storing F should typically use rcg(F) times less disk space than
@@ -2284,19 +2390,19 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             >>> F = rand(10, 10, dtype='float64')
             >>> F.astype('float32')
             Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
-                - FACTOR 0 (float) SPARSE, size 10x10, density 0.5, nnz 50
-                - FACTOR 1 (float) SPARSE, size 10x10, density 0.5, nnz 50
-                - FACTOR 2 (float) SPARSE, size 10x10, density 0.5, nnz 50
-                - FACTOR 3 (float) SPARSE, size 10x10, density 0.5, nnz 50
-                - FACTOR 4 (float) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 0 (float) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 1 (float) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 2 (float) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 3 (float) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 4 (float) SPARSE, size 10x10, density 0.5, nnz 50
 
             >>> F.astype("complex")
             Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
-                - FACTOR 0 (complex) SPARSE, size 10x10, density 0.5, nnz 50
-                - FACTOR 1 (complex) SPARSE, size 10x10, density 0.5, nnz 50
-                - FACTOR 2 (complex) SPARSE, size 10x10, density 0.5, nnz 50
-                - FACTOR 3 (complex) SPARSE, size 10x10, density 0.5, nnz 50
-                - FACTOR 4 (complex) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 0 (complex) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 1 (complex) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 2 (complex) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 3 (complex) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 4 (complex) SPARSE, size 10x10, density 0.5, nnz 50
 
         """
         #TODO: full list of numpy args or **kw_unknown
@@ -2329,8 +2435,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
     @property
     def imag(F):
-        """
-        Returns the imaginary part of F as a Faust.
+        """Returns the imaginary part of F as a Faust.
         """
         if F.dtype != 'complex':
             # return Faust(csr_matrix(F.shape)) # TODO: debug pyx code
@@ -2348,8 +2453,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
     @property
     def dtype(F):
-        """
-        Returns the dtype of the Faust.
+        """Returns the dtype of the Faust.
 
         This function is intended to be used as a property (see the examples).
 
@@ -2470,28 +2574,30 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Example:
 			>>> import pyfaust as pf
 			>>> F = pf.rand(10, 10, fac_type='sparse')
-			>>> F
-			Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
-			- FACTOR 0 (double) SPARSE, size 10x10, density 0.5, nnz 50
-			- FACTOR 1 (double) SPARSE, size 10x10, density 0.5, nnz 50
-			- FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
-			- FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
-			- FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            >>> F
+            Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
+            - FACTOR 0 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 1 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
 
 			>>> F.issparse()
 			True
 			>>> F.issparse(csr=True)
 			True
-			>>> F.issparse(csr=False)
-			ValueError: It doesn't make sense to set csr=False and bsr=False as the function will always return False
+            >>> F.issparse(csr=False)
+            Traceback (most recent call last):
+            ...
+            ValueError: It doesn't make sense to set csr=False and bsr=False as the function will always return False
 
 			>>> F = pf.rand_bsr(10, 10, 2, 2, 2, .1)
-			>>> F
-			Faust size 10x10, density 0.24, nnz_sum 24, 2 factor(s):
-			- FACTOR 0 (double) BSR, size 10x10 (blocksize = 2x2), density 0.12, nnz 12 (nnz blocks: 3)
-			- FACTOR 1 (double) BSR, size 10x10 (blocksize = 2x2), density 0.12, nnz 12 (nnz blocks: 3)
+            >>> F
+            Faust size 10x10, density 0.24, nnz_sum 24, 2 factor(s):
+            - FACTOR 0 (double) BSR, size 10x10 (blocksize = 2x2), density 0.12, nnz 12 (nnz blocks: 3)
+            - FACTOR 1 (double) BSR, size 10x10 (blocksize = 2x2), density 0.12, nnz 12 (nnz blocks: 3)
 
-            # default config. recognizes only csr
+            >>> # default config. recognizes only csr
             >>> F.issparse()
             False
             >>> F.issparse(bsr=True)
@@ -2499,6 +2605,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             >>> F = pf.rand(10, 10, fac_type='dense')
             >>> F.issparse()
             False
+
 
         <b>See also</b> Faust.isdense, pyfaust.rand, pyfaust.rand_bsr
         """
@@ -2514,6 +2621,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         Example:
             >>> import pyfaust as pf
+            >>> pf.seed(42) # just for reproducibility
             >>> F = pf.rand(10, 10, fac_type='sparse')
             >>> F
             Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
@@ -2539,11 +2647,11 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             >>> F = pf.rand(10, 10, fac_type='mixed')
             >>> F
             Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
-            - FACTOR 0 (double) DENSE, size 10x10, density 0.5, nnz 50
-            - FACTOR 1 (double) DENSE, size 10x10, density 0.5, nnz 50
-            - FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 0 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 1 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 2 (double) DENSE, size 10x10, density 0.5, nnz 50
             - FACTOR 3 (double) DENSE, size 10x10, density 0.5, nnz 50
-            - FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 4 (double) DENSE, size 10x10, density 0.5, nnz 50
 
             >>> F.isdense()
             False
@@ -2569,48 +2677,47 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             The column swapped Faust.
 
 		Example:
-			>>> from pyfaust import rand as frand
-			>>> F = frand(10, 10)
-			>>> G = F.swap_cols(2,4)
-			>>> G
-			Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s): 
-			- FACTOR 0 (real) SPARSE, size 10x10, density 0.5, nnz 50
-			- FACTOR 1 (real) DENSE,  size 10x10, density 0.5, nnz 50
-			- FACTOR 2 (real) SPARSE, size 10x10, density 0.5, nnz 50
-			- FACTOR 3 (real) DENSE,  size 10x10, density 0.5, nnz 50
-			- FACTOR 4 (real) DENSE,  size 10x10, density 0.5, nnz 50
-
-			>>> G[:, 2].toarray() == F[:, 4].toarray()
-			array([[ True],
-				   [ True],
-				   [ True],
-				   [ True],
-				   [ True],
-				   [ True],
-				   [ True],
-				   [ True],
-				   [ True],
-				   [ True]])
-			>>> G[:, 4].toarray() == F[:, 2].toarray()
-			array([[ True],
-				   [ True],
-				   [ True],
-				   [ True],
-				   [ True],
-				   [ True],
-				   [ True],
-				   [ True],
-				   [ True],
-				   [ True]])
-			>>> H  = F.swap_cols(2,4, permutation=True)
-			>>> H
-			Faust size 10x10, density 2.6, nnz_sum 260, 6 factor(s): 
-			- FACTOR 0 (real) SPARSE, size 10x10, density 0.5, nnz 50
-			- FACTOR 1 (real) DENSE,  size 10x10, density 0.5, nnz 50
-			- FACTOR 2 (real) SPARSE, size 10x10, density 0.5, nnz 50
-			- FACTOR 3 (real) DENSE,  size 10x10, density 0.5, nnz 50
-			- FACTOR 4 (real) DENSE,  size 10x10, density 0.5, nnz 50
-			- FACTOR 5 (real) SPARSE, size 10x10, density 0.1, nnz 10
+            >>> from pyfaust import rand as frand
+            >>> F = frand(10, 10)
+            >>> G = F.swap_cols(2,4)
+            >>> G
+            Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
+            - FACTOR 0 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 1 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            >>> G[:, 2].toarray() == F[:, 4].toarray()
+            array([[ True],
+                   [ True],
+                   [ True],
+                   [ True],
+                   [ True],
+                   [ True],
+                   [ True],
+                   [ True],
+                   [ True],
+                   [ True]])
+            >>> G[:, 4].toarray() == F[:, 2].toarray()
+            array([[ True],
+                   [ True],
+                   [ True],
+                   [ True],
+                   [ True],
+                   [ True],
+                   [ True],
+                   [ True],
+                   [ True],
+                   [ True]])
+            >>> H  = F.swap_cols(2,4, permutation=True)
+            >>> H
+            Faust size 10x10, density 2.6, nnz_sum 260, 6 factor(s):
+            - FACTOR 0 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 1 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 5 (double) SPARSE, size 10x10, density 0.1, nnz 10
 
         <b>See also</b> Faust.swap_rows
         """
@@ -2623,8 +2730,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         return F_swapped
 
     def swap_rows(F, id1, id2, permutation=True, inplace=False):
-        """
-        Swaps F rows of indices id1 and id2.
+        """Swaps F rows of indices id1 and id2.
 
         Args:
             id1: index of the first row of the swap.
@@ -2639,32 +2745,35 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             The rows swapped Faust.
 
 		Example:
-			>>> from pyfaust import rand as frand
-			>>> F = frand(10, 10)
-			>>> G = F.swap_rows(2,4)
-			>>> G
-			Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s): 
-			- FACTOR 0 (real) SPARSE, size 10x10, density 0.5, nnz 50
-			- FACTOR 1 (real) SPARSE, size 10x10, density 0.5, nnz 50
-			- FACTOR 2 (real) DENSE,  size 10x10, density 0.5, nnz 50
-			- FACTOR 3 (real) SPARSE, size 10x10, density 0.5, nnz 50
-			- FACTOR 4 (real) DENSE,  size 10x10, density 0.5, nnz 50
+            >>> from pyfaust import rand as frand
+            >>> F = frand(10, 10)
+            >>> G = F.swap_rows(2,4)
+            >>> G
+            Faust size 10x10, density 2.6, nnz_sum 260, 6 factor(s):
+            - FACTOR 0 (double) SPARSE, size 10x10, density 0.1, nnz 10
+            - FACTOR 1 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 5 (double) SPARSE, size 10x10, density 0.5, nnz 50
 
-			>>> G[2,:].toarray() == F[4,:].toarray()
-			array([[ True,  True,  True,  True,  True,  True,  True,  True,  True,
-					 True]])
-			>>> G[4,:].toarray() == F[2,:].toarray()
-			array([[ True,  True,  True,  True,  True,  True,  True,  True,  True,
-					 True]])
-			>>> H  = F.swap_rows(2,4, permutation=True)
-			>>> H
-			Faust size 10x10, density 2.6, nnz_sum 260, 6 factor(s): 
-			- FACTOR 0 (real) SPARSE, size 10x10, density 0.1, nnz 10
-			- FACTOR 1 (real) SPARSE, size 10x10, density 0.5, nnz 50
-			- FACTOR 2 (real) SPARSE, size 10x10, density 0.5, nnz 50
-			- FACTOR 3 (real) DENSE,  size 10x10, density 0.5, nnz 50
-			- FACTOR 4 (real) SPARSE, size 10x10, density 0.5, nnz 50
-			- FACTOR 5 (real) DENSE,  size 10x10, density 0.5, nnz 50
+            >>> G[2,:].toarray() == F[4,:].toarray()
+            array([[ True,  True,  True,  True,  True,  True,  True,  True,  True,
+                     True]])
+
+            >>> G[4,:].toarray() == F[2,:].toarray()
+            array([[ True,  True,  True,  True,  True,  True,  True,  True,  True,
+                     True]])
+
+            >>> H  = F.swap_rows(2,4, permutation=True)
+            >>> H
+            Faust size 10x10, density 2.6, nnz_sum 260, 6 factor(s):
+            - FACTOR 0 (double) SPARSE, size 10x10, density 0.1, nnz 10
+            - FACTOR 1 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 5 (double) SPARSE, size 10x10, density 0.5, nnz 50
 
         <b>See also</b> Faust.swap_cols
         """
@@ -2683,18 +2792,19 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             The optimized Faust.
 
         Example:
-            >>> from pyfaust import rand
+            >>> from pyfaust import rand, seed
+            >>> seed(42) # just for reproducibility
             >>> F = rand(1024, 1024, fac_type='mixed')
             >>> F
             Faust size 1024x1024, density 0.0244141, nnz_sum 25600, 5 factor(s):
-            - FACTOR 0 (double) DENSE, size 1024x1024, density 0.00488281, nnz 5120
-            - FACTOR 1 (double) DENSE, size 1024x1024, density 0.00488281, nnz 5120
+            - FACTOR 0 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
+            - FACTOR 1 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
             - FACTOR 2 (double) DENSE, size 1024x1024, density 0.00488281, nnz 5120
             - FACTOR 3 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
             - FACTOR 4 (double) SPARSE, size 1024x1024, density 0.00488281, nnz 5120
 
             >>> F.nbytes
-            25296904
+            8650768
             >>> pF = F.optimize_memory()
             >>> pF
             Faust size 1024x1024, density 0.0244141, nnz_sum 25600, 5 factor(s):
@@ -2706,7 +2816,6 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
             >>> pF.nbytes
             327700
-
 
         <b>See also</b> Faust.optimize
         """
@@ -2729,54 +2838,34 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Example:
 			This example shows how Faust.optimize can diminish the memory size and
 			speed up the Faust.toarray() and Faust-vector multiplication.
-			>>> from pyfaust import rand
-			>>> F = rand(1024, 1024, dim_sizes=[1, 1024], num_factors=32, fac_type='mixed')
-			>>> F.nbytes
-			24014520
-			>>> pF = F.optimize()
-			>>> pF.nbytes
-			911816
-			>>> from time import time
-			>>> t1 = time(); F.toarray(); print("F.toarray() time:", time()-t1)
-			array([[0.00000000e+00, 9.47768987e+07, 3.54841410e+07, ...,
-					5.02648254e+08, 1.69126326e+08, 6.60395426e+08],
-				   [0.00000000e+00, 4.53823851e+07, 1.69910070e+07, ...,
-					2.40685014e+08, 8.09834069e+07, 3.16219690e+08],
-				   [0.00000000e+00, 7.05413763e+07, 2.64104431e+07, ...,
-					3.74115410e+08, 1.25878813e+08, 4.91524836e+08],
-				   ...,
-				   [0.00000000e+00, 6.19890617e+07, 2.32084866e+07, ...,
-					3.28758359e+08, 1.10617488e+08, 4.31933316e+08],
-				   [0.00000000e+00, 1.05375223e+08, 3.94521173e+07, ...,
-					5.58856367e+08, 1.88038697e+08, 7.34243484e+08],
-				   [0.00000000e+00, 1.04672252e+08, 3.91889277e+07, ...,
-					5.55128177e+08, 1.86784271e+08, 7.29345296e+08]])
-			F.toarray() time: 0.3663349151611328
-			>>> t1 = time(); pF.toarray(); print("pF.toarray() time:", time()-t1)
-			array([[0.00000000e+00, 9.47768987e+07, 3.54841410e+07, ...,
-					5.02648254e+08, 1.69126326e+08, 6.60395426e+08],
-				   [0.00000000e+00, 4.53823851e+07, 1.69910070e+07, ...,
-					2.40685014e+08, 8.09834069e+07, 3.16219690e+08],
-				   [0.00000000e+00, 7.05413763e+07, 2.64104431e+07, ...,
-					3.74115410e+08, 1.25878813e+08, 4.91524836e+08],
-				   ...,
-				   [0.00000000e+00, 6.19890617e+07, 2.32084866e+07, ...,
-					3.28758359e+08, 1.10617488e+08, 4.31933316e+08],
-				   [0.00000000e+00, 1.05375223e+08, 3.94521173e+07, ...,
-					5.58856367e+08, 1.88038697e+08, 7.34243484e+08],
-				   [0.00000000e+00, 1.04672252e+08, 3.91889277e+07, ...,
-					5.55128177e+08, 1.86784271e+08, 7.29345296e+08]])
-			pF.toarray() time: 0.10646939277648926
 			>>> import numpy as np
+			>>> from pyfaust import rand, seed
+            >>> seed(42) # just for reproducibility
+			>>> F = rand(1024, 1024, dim_sizes=[1, 1024], num_factors=32, fac_type='mixed')
+            >>> F.nbytes
+            13991076
+			>>> pF = F.optimize()
+            >>> pF.nbytes
+            910368
+			>>> from time import time
+			>>> t1 = time(); M = F.toarray(); print("F.toarray() time:", time()-t1) # doctest:+ELLIPSIS
+			F.toarray() time: ...
+            >>> # e.g: F.toarray() time: 0.2779221534729004
+			>>> t1 = time(); M_ = pF.toarray(); print("pF.toarray() time:", time()-t1) # doctest:+ELLIPSIS
+			pF.toarray() time: ...
+            >>> # e.g:pF.toarray() time: 0.2017652988433838
+            >>> np.allclose(M_, M)
+            True
 			>>> v = np.random.rand(F.shape[1])
-			>>> t1 = time(); F@v;print("F@v time:", time()-t1)
-			array([2.79905047e+11, 1.34028007e+11, 2.08330156e+11, ...,
-				   1.83072593e+11, 3.11205142e+11, 3.09129061e+11])
-			F@v time: 0.003871440887451172
-			>>> t1 = time(); pF@v; print("pF@v time:", time()-t1)
-			array([2.79905047e+11, 1.34028007e+11, 2.08330156e+11, ...,
-				   1.83072593e+11, 3.11205142e+11, 3.09129061e+11])
-			pF@v time: 0.0013530254364013672
+			>>> t1 = time(); Fv = F@v;print("F@v time:", time()-t1) # doctest:+ELLIPSIS
+			F@v time: ...
+            >>> # e.g: F@v time: 0.0016832351684570312
+			>>> t1 = time(); Fv_ = pF@v; print("pF@v time:", time()-t1) # doctest:+ELLIPSIS
+			pF@v time: ...
+            >>> # e.g: pF@v time: 0.0002257823944091797
+            >>> np.allclose(Fv_, Fv)
+            True
+
 
         <b>See also</b> Faust.optimize_time, Faust.optimize_memory, Faust.pruneout, Faust.nbytes, <a href="https://faust.inria.fr/tutorials/pyfaust-jupyter-notebooks/faust-optimizations-with-pyfaust/">Jupyter notebook about Faust optimizations</a>
         """
@@ -2811,42 +2900,21 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             The optimized Faust.
 
         Example:
-			>>> from pyfaust import rand
+			>>> from pyfaust import rand, seed
 			>>> from time import time
-			>>> F = rand(1024, 1024, dim_sizes=[1, 1024], num_factors=32, fac_type='dense')
+            >>> import numpy as np
+            >>> seed(42) # just for reproducibility
+			>>> F = rand(1024, 1024, dim_sizes=[1, 1024], num_factors=32, fac_type='dense', density=.5)
 			>>> oF = F.optimize_time()
-			best method measured in time on operation Faust-toarray is: DYNPROG
-			>>> t1 = time(); F.toarray(); print("F.toarray() time:", time()-t1)
-			array([[1.08456293e+08, 9.06809253e+08, 2.14092678e+08, ...,
-					2.39420597e+08, 1.73687901e+08, 1.48511336e+08],
-				   [1.45686856e+08, 1.21809603e+09, 2.87585796e+08, ...,
-					3.21608188e+08, 2.33310996e+08, 1.99491872e+08],
-				   [1.37868515e+08, 1.15272644e+09, 2.72152397e+08, ...,
-					3.04348964e+08, 2.20790272e+08, 1.88786066e+08],
-				   ...,
-				   [1.60235010e+08, 1.33973397e+09, 3.16303847e+08, ...,
-					3.53723686e+08, 2.56609207e+08, 2.19412950e+08],
-				   [1.24235524e+08, 1.03874022e+09, 2.45240878e+08, ...,
-					2.74253715e+08, 1.98957633e+08, 1.70118148e+08],
-				   [1.19470236e+08, 9.98897401e+08, 2.35834204e+08, ...,
-					2.63734204e+08, 1.91326235e+08, 1.63592947e+08]])
-			F.toarray() time: 0.2891380786895752
-			>>> t1 = time(); oF.toarray(); print("oF.toarray() time:", time()-t1)
-			array([[1.08456293e+08, 9.06809253e+08, 2.14092678e+08, ...,
-					2.39420597e+08, 1.73687901e+08, 1.48511336e+08],
-				   [1.45686856e+08, 1.21809603e+09, 2.87585796e+08, ...,
-					3.21608188e+08, 2.33310996e+08, 1.99491872e+08],
-				   [1.37868515e+08, 1.15272644e+09, 2.72152397e+08, ...,
-					3.04348964e+08, 2.20790272e+08, 1.88786066e+08],
-				   ...,
-				   [1.60235010e+08, 1.33973397e+09, 3.16303847e+08, ...,
-					3.53723686e+08, 2.56609207e+08, 2.19412950e+08],
-				   [1.24235524e+08, 1.03874022e+09, 2.45240878e+08, ...,
-					2.74253715e+08, 1.98957633e+08, 1.70118148e+08],
-				   [1.19470236e+08, 9.98897401e+08, 2.35834204e+08, ...,
-					2.63734204e+08, 1.91326235e+08, 1.63592947e+08]])
-			oF.toarray() time: 0.0172119140625
-
+            >>> # possible outout: best method measured in time on operation Faust-toarray is: DYNPROG
+			>>> t1 = time(); M = F.toarray(); print("F.toarray() time:", time()-t1) # doctest:+ELLIPSIS
+			F.toarray() time:...
+            >>> # F.toarray() time: 0.2891380786895752
+			>>> t1 = time(); M_ = oF.toarray(); print("oF.toarray() time:", time()-t1) # doctest:+ELLIPSIS
+			oF.toarray() time:...
+            >>> # example: oF.toarray() 0.0172119140625
+            >>> np.allclose(M, M_)
+            True
 
         <b>See also</b> Faust.optimize, pyfaust.FaustMulMode
 
@@ -2878,22 +2946,22 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             The Faust clone.
 
         Example:
-            >>> from pyfaust import rand
+            >>> from pyfaust import rand, is_gpu_mod_enabled
             >>> F = rand(10, 10)
             >>> F.clone()
             Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
-                - FACTOR 0 (double) SPARSE, size 10x10, density 0.5, nnz 50
-                - FACTOR 1 (double) SPARSE, size 10x10, density 0.5, nnz 50
-                - FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
-                - FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
-                - FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 0 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 1 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
 
-            >>> F.clone(dev='gpu') # only if a NVIDIA compatible GPU is available
-			- GPU FACTOR 0 (double) SPARSE size 10 x 10, addr: 0x2c85390, density 0.500000, nnz 50
-			- GPU FACTOR 1 (double) SPARSE size 10 x 10, addr: 0x7ff00c0, density 0.500000, nnz 50
-			- GPU FACTOR 2 (double) SPARSE size 10 x 10, addr: 0x977f280, density 0.500000, nnz 50
-			- GPU FACTOR 3 (double) SPARSE size 10 x 10, addr: 0x9780120, density 0.500000, nnz 50
-			- GPU FACTOR 4 (double) SPARSE size 10 x 10, addr: 0x9780fc0, density 0.500000, nnz 50
+            >>> if is_gpu_mod_enabled(): F.clone(dev='gpu') # only if a NVIDIA compatible GPU is available
+			>>> #- GPU FACTOR 0 (double) SPARSE size 10 x 10, addr: 0x2c85390, density 0.500000, nnz 50
+			>>> #- GPU FACTOR 1 (double) SPARSE size 10 x 10, addr: 0x7ff00c0, density 0.500000, nnz 50
+			>>> #- GPU FACTOR 2 (double) SPARSE size 10 x 10, addr: 0x977f280, density 0.500000, nnz 50
+			>>> #- GPU FACTOR 3 (double) SPARSE size 10 x 10, addr: 0x9780120, density 0.500000, nnz 50
+			>>> #- GPU FACTOR 4 (double) SPARSE size 10 x 10, addr: 0x9780fc0, density 0.500000, nnz 50
 
         """
         if dev == None:
@@ -2937,40 +3005,43 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             The Faust sum.
 
         Example:
-            >>> from pyfaust import rand as frand
+            >>> from pyfaust import rand as frand, seed
+            >>> seed(42) # just for reproducibility
             >>> F = frand(10, 10)
             >>> F.sum()
-            Faust size 1x10, density 26, nnz_sum 260, 6 factor(s): 
-                - FACTOR 0 (real) DENSE,  size 1x10, density 1, nnz 10
-                - FACTOR 1 (real) SPARSE, size 10x10, density 0.5, nnz 50
-                - FACTOR 2 (real) SPARSE, size 10x10, density 0.5, nnz 50
-                - FACTOR 3 (real) SPARSE, size 10x10, density 0.5, nnz 50
-                - FACTOR 4 (real) SPARSE, size 10x10, density 0.5, nnz 50
-                - FACTOR 5 (real) SPARSE, size 10x10, density 0.5, nnz 50
+            Faust size 1x1, density 270, nnz_sum 270, 7 factor(s):
+            - FACTOR 0 (double) DENSE, size 1x10, density 1, nnz 10
+            - FACTOR 1 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 5 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 6 (double) DENSE, size 10x1, density 1, nnz 10
 
             >>> F.sum(axis=0).toarray()
-            array([[135.62885806,  86.91727358, 212.40112068, 186.06476227,
-                             68.74097449,  88.63216727,  64.38497784,  58.51572934,
-                             91.05523782, 196.79601819]])
+            array([[ 80.49374154,  45.09382766,  78.8607646 , 136.65920307,
+                    115.25872767,  62.70720879,  90.48774161,  62.26010951,
+                      0.        , 158.34355964]])
             >>> F.sum(axis=1)
-            Faust size 10x1, density 26, nnz_sum 260, 6 factor(s): 
-                - FACTOR 0 (real) SPARSE, size 10x10, density 0.5, nnz 50
-                - FACTOR 1 (real) SPARSE, size 10x10, density 0.5, nnz 50
-                - FACTOR 2 (real) SPARSE, size 10x10, density 0.5, nnz 50
-                - FACTOR 3 (real) SPARSE, size 10x10, density 0.5, nnz 50
-                - FACTOR 4 (real) SPARSE, size 10x10, density 0.5, nnz 50
-                - FACTOR 5 (real) DENSE,  size 10x1, density 1, nnz 10
+            Faust size 10x1, density 26, nnz_sum 260, 6 factor(s):
+            - FACTOR 0 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 1 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 5 (double) DENSE, size 10x1, density 1, nnz 10
             >>> F.sum(axis=1).toarray()
-            array([[ 78.7358253 ],
-                  [122.06237092],
-                  [171.60995629],
-                  [110.86003948],
-                  [147.82414116],
-                  [100.35211187],
-                  [123.56100581],
-                  [104.49754233],
-                  [ 99.99809178],
-                  [129.63603461]])
+            array([[ 60.96835408],
+                   [112.00753373],
+                   [ 97.28363377],
+                   [ 69.45346776],
+                   [ 80.20182354],
+                   [ 96.1022012 ],
+                   [ 48.61063623],
+                   [ 54.15081295],
+                   [ 88.20644303],
+                   [123.1799778 ]])
+
 
         """
         if axis == None:
@@ -3022,26 +3093,26 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Example:
 			>>> from pyfaust import Faust
 			>>> import numpy as np
-			>>> data = np.arange(1, 5)
+			>>> data = np.arange(1, 5).astype('double')
 			>>> data
-			array([1, 2, 3, 4])
+			array([1., 2., 3., 4.])
 			>>> F = Faust(data.reshape(1,data.shape[0]))
 			>>> FA = F.average()
-			>>> FA
-			Faust size 1x1, density 9, nnz_sum 9, 3 factor(s): 
-			- FACTOR 0 (real) DENSE,  size 1x1, density 1, nnz 1
-			- FACTOR 1 (real) DENSE,  size 1x4, density 1, nnz 4
-			- FACTOR 2 (real) DENSE,  size 4x1, density 1, nnz 4
+            >>> FA
+            Faust size 1x1, density 9, nnz_sum 9, 3 factor(s):
+            - FACTOR 0 (double) DENSE, size 1x1, density 1, nnz 1
+            - FACTOR 1 (double) DENSE, size 1x4, density 1, nnz 4
+            - FACTOR 2 (double) DENSE, size 4x1, density 1, nnz 4
 
-			>>> FA.toarray()
-			array([[2.5]])
-			>>> 
-			>>> data2 = np.arange(6).reshape((3,2))
+            >>> FA.toarray()
+            array([[2.5]])
+			>>> data2 = np.arange(6).reshape((3,2)).astype('double')
 			>>> F2 = Faust(data2)
-			>>> F2.average(axis=1, weights=[1./4, 3./4]).toarray()
-			array([[0.75],
-				   [2.75],
-				   [4.75]])
+            >>> F2.average(axis=1, weights=[1./4, 3./4]).toarray()
+            array([[0.75],
+                   [2.75],
+                   [4.75]])
+
 
         """
         if axis == None:
@@ -3197,9 +3268,17 @@ def concatenate(_tuple, *args, axis=0, **kwargs):
 
     Example:
         >>> from pyfaust import *
+        >>> seed(42) # just for reproducibility
         >>> F1 = rand(5,50)
         >>> F2 = rand(5,50)
         >>> concatenate((F1, F2), axis=0)
+        Faust size 10x50, density 2.17, nnz_sum 1085, 6 factor(s):
+        - FACTOR 0 (double) SPARSE, size 10x67, density 0.0746269, nnz 50
+        - FACTOR 1 (double) SPARSE, size 67x33, density 0.151515, nnz 335
+        - FACTOR 2 (double) SPARSE, size 33x31, density 0.16129, nnz 165
+        - FACTOR 3 (double) SPARSE, size 31x56, density 0.0892857, nnz 155
+        - FACTOR 4 (double) SPARSE, size 56x100, density 0.05, nnz 280
+        - FACTOR 5 (double) SPARSE, size 100x50, density 0.02, nnz 100
 
     <b>See also</b> numpy.concatenate
     """
@@ -3231,11 +3310,17 @@ def hstack(_tuple):
 
     Example:
         >>> from pyfaust import *
+        >>> seed(42) # just for reproducibility
         >>> F1 = rand(5,50)
         >>> F2 = rand(5,50)
         >>> hstack((F1, F2))
-
-
+        Faust size 5x100, density 1.99, nnz_sum 995, 6 factor(s):
+        - FACTOR 0 (double) SPARSE, size 5x10, density 0.2, nnz 10
+        - FACTOR 1 (double) SPARSE, size 10x67, density 0.0746269, nnz 50
+        - FACTOR 2 (double) SPARSE, size 67x33, density 0.151515, nnz 335
+        - FACTOR 3 (double) SPARSE, size 33x31, density 0.16129, nnz 165
+        - FACTOR 4 (double) SPARSE, size 31x56, density 0.0892857, nnz 155
+        - FACTOR 5 (double) SPARSE, size 56x100, density 0.05, nnz 280
     """
     return pyfaust.concatenate(_tuple, axis=1)
 
@@ -3247,10 +3332,17 @@ def vstack(_tuple):
 
     Example:
         >>> from pyfaust import *
+        >>> seed(42) # just for reproducibility
         >>> F1 = rand(5,50)
         >>> F2 = rand(5,50)
         >>> vstack((F1, F2))
-
+        Faust size 10x50, density 2.17, nnz_sum 1085, 6 factor(s):
+        - FACTOR 0 (double) SPARSE, size 10x67, density 0.0746269, nnz 50
+        - FACTOR 1 (double) SPARSE, size 67x33, density 0.151515, nnz 335
+        - FACTOR 2 (double) SPARSE, size 33x31, density 0.16129, nnz 165
+        - FACTOR 3 (double) SPARSE, size 31x56, density 0.0892857, nnz 155
+        - FACTOR 4 (double) SPARSE, size 56x100, density 0.05, nnz 280
+        - FACTOR 5 (double) SPARSE, size 100x50, density 0.02, nnz 100
     """
     return pyfaust.concatenate(_tuple, axis=0)
 
@@ -3284,18 +3376,42 @@ def wht(n, normed=True, dev="cpu", dtype='float64'):
       >>> from pyfaust import wht
       >>> wht(1024)
       Faust size 1024x1024, density 0.0195312, nnz_sum 20480, 10 factor(s):
-          - FACTOR 0 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
-          - FACTOR 1 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
-          - FACTOR 2 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
-          - FACTOR 3 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
-          - FACTOR 4 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
-          - FACTOR 5 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
-          - FACTOR 6 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
-          - FACTOR 7 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
-          - FACTOR 8 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
-          - FACTOR 9 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+      - FACTOR 0 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+      - FACTOR 1 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+      - FACTOR 2 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+      - FACTOR 3 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+      - FACTOR 4 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+      - FACTOR 5 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+      - FACTOR 6 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+      - FACTOR 7 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+      - FACTOR 8 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+      - FACTOR 9 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048\n
+
       >>> wht(1024, normed=True) # is equiv. to next call
+      Faust size 1024x1024, density 0.0195312, nnz_sum 20480, 10 factor(s):
+      - FACTOR 0 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+      - FACTOR 1 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+      - FACTOR 2 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+      - FACTOR 3 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+      - FACTOR 4 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+      - FACTOR 5 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+      - FACTOR 6 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+      - FACTOR 7 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+      - FACTOR 8 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+      - FACTOR 9 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+
       >>> wht(1024, normed=False).normalize() # which is less optimized though
+      Faust size 1024x1024, density 0.0195312, nnz_sum 20480, 10 factor(s):
+      - FACTOR 0 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+      - FACTOR 1 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+      - FACTOR 2 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+      - FACTOR 3 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+      - FACTOR 4 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+      - FACTOR 5 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+      - FACTOR 6 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+      - FACTOR 7 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+      - FACTOR 8 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+      - FACTOR 9 (double) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
 
     <b>See also:</b> scipy.linalg.hadamard, pyfaust.dft, pyfaust.fact.butterfly
     """
@@ -3352,9 +3468,9 @@ def bitrev(inds):
 
     Example:
         >>> import numpy as np
-        >>> from pyfaust.tools import bitrev
+        >>> from pyfaust import bitrev
         >>> bitrev(np.arange(4))
-        >>> array([0, 2, 1, 3])
+        array([0, 2, 1, 3])
 
     See also: https://en.wikipedia.org/wiki/Bit-reversal_permutation.
     """
@@ -3403,7 +3519,32 @@ def dft(n, normed=True, dev='cpu', diag_opt=False):
         - FACTOR 10 (complex) SPARSE, size 1024x1024, density 0.000976562, nnz 1024
 
         >>> dft(1024, normed=True) # is equiv. to next call
+        Faust size 1024x1024, density 0.0205078, nnz_sum 21504, 11 factor(s):
+        - FACTOR 0 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+        - FACTOR 1 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+        - FACTOR 2 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+        - FACTOR 3 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+        - FACTOR 4 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+        - FACTOR 5 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+        - FACTOR 6 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+        - FACTOR 7 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+        - FACTOR 8 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+        - FACTOR 9 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+        - FACTOR 10 (complex) SPARSE, size 1024x1024, density 0.000976562, nnz 1024
+
         >>> dft(1024, normed=False).normalize()
+        Faust size 1024x1024, density 0.0205078, nnz_sum 21504, 11 factor(s):
+        - FACTOR 0 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+        - FACTOR 1 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+        - FACTOR 2 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+        - FACTOR 3 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+        - FACTOR 4 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+        - FACTOR 5 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+        - FACTOR 6 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+        - FACTOR 7 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+        - FACTOR 8 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+        - FACTOR 9 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+        - FACTOR 10 (complex) SPARSE, size 1024x1024, density 0.000976562, nnz 1024
 
     <b>See also:</b> pyfaust.tools.bitrev, pyfaust.wht, pyfaust.dct, pyfaust.dst, scipy.fft.fft, pyfaust.fact.butterfly, pyfaust.rand_butterfly.
     """
@@ -3444,14 +3585,14 @@ def dct(n, normed=True, dev='cpu', dtype='float64'):
         >>> from pyfaust import dct
         >>> from scipy.fft import dct as scipy_dct
         >>> import numpy as np
-        >>> DCT8 = dct(8)
-        >>> x = np.arange(8)
+        >>> DCT8 = dct(8, normed=False)
+        >>> x = np.arange(8).astype('double')
         >>> np.real(DCT8@x)
         array([ 56.        , -25.76929209,   0.        ,  -2.6938192 ,
-               0.        ,  -0.80361161,   0.        ,  -0.20280929])
+                 0.        ,  -0.80361161,   0.        ,  -0.20280929])
         >>> scipy_dct(x)
         array([ 56.        , -25.76929209,   0.        ,  -2.6938192 ,
-               0.        ,  -0.80361161,   0.        ,  -0.20280929])
+                 0.        ,  -0.80361161,   0.        ,  -0.20280929])
         >>> np.allclose(DCT8@x, scipy_dct(x))
         True
         >>> # check the density with a larger DCT Faust of size 1024
@@ -3558,15 +3699,14 @@ def dst(n, normed=True, dev='cpu', dtype='float64'):
         >>> from pyfaust import dst
         >>> from scipy.fft import dst as scipy_dst
         >>> import numpy as np
-        >>> DST8 = dst(8)
+        >>> DST8 = dst(8, normed=False)
         >>> x = np.ones(8)
         >>> np.real(DST8@x)
-        array([1.02516618e+01, 4.93038066e-32, 3.59990489e+00, 1.97215226e-31,
-               2.40537955e+00, 9.86076132e-32, 2.03918232e+00,
-               0.00000000e+00])
+        array([1.02516618e+01, 4.93038066e-32, 3.59990489e+00, 3.94430453e-31,
+               2.40537955e+00, 9.86076132e-32, 2.03918232e+00, 0.00000000e+00])
         >>> scipy_dst(x)
         array([10.25166179,  0.        ,  3.59990489,  0.        ,  2.40537955,
-                       0.        ,  2.03918232,  0.        ])
+                0.        ,  2.03918232,  0.        ])
         >>> np.allclose(DST8@x, scipy_dst(x))
         True
         >>> # check the density with a larger DST Faust of size 1024
@@ -3654,12 +3794,12 @@ def circ(c, dev='cpu', diag_opt=False):
         >>> C = circ(c)
         >>> C
         Faust size 8x8, density 1.5, nnz_sum 96, 6 factor(s):
-        - FACTOR 0 (complex) SPARSE, size 8x8, density 0.25, nnz 16, addr: 0x55d65e391e00
-        - FACTOR 1 (complex) SPARSE, size 8x8, density 0.25, nnz 16, addr: 0x55d65e2f2030
-        - FACTOR 2 (complex) SPARSE, size 8x8, density 0.25, nnz 16, addr: 0x55d65d7e8920
-        - FACTOR 3 (complex) SPARSE, size 8x8, density 0.25, nnz 16, addr: 0x55d65e0a10b0
-        - FACTOR 4 (complex) SPARSE, size 8x8, density 0.25, nnz 16, addr: 0x55d65e09ff40
-        - FACTOR 5 (complex) SPARSE, size 8x8, density 0.25, nnz 16, addr: 0x55d65e278dc0
+        - FACTOR 0 (complex) SPARSE, size 8x8, density 0.25, nnz 16
+        - FACTOR 1 (complex) SPARSE, size 8x8, density 0.25, nnz 16
+        - FACTOR 2 (complex) SPARSE, size 8x8, density 0.25, nnz 16
+        - FACTOR 3 (complex) SPARSE, size 8x8, density 0.25, nnz 16
+        - FACTOR 4 (complex) SPARSE, size 8x8, density 0.25, nnz 16
+        - FACTOR 5 (complex) SPARSE, size 8x8, density 0.25, nnz 16
 
         >>> np.allclose(C.toarray()[:, 0], c)
         True
@@ -3732,13 +3872,13 @@ def anticirc(c, dev='cpu', diag_opt=False):
         >>> c = [1, 2, 3, 4, 5, 6, 7, 8]
         >>> A = anticirc(c)
         >>> A
-		Faust size 8x8, density 1.5, nnz_sum 96, 6 factor(s):
-		- FACTOR 0 (complex) SPARSE, size 8x8, density 0.25, nnz 16, addr: 0x55cc8b57c9a0
-		- FACTOR 1 (complex) SPARSE, size 8x8, density 0.25, nnz 16, addr: 0x55cc8be86d70
-		- FACTOR 2 (complex) SPARSE, size 8x8, density 0.25, nnz 16, addr: 0x55cc8bd33400
-		- FACTOR 3 (complex) SPARSE, size 8x8, density 0.25, nnz 16, addr: 0x55cc8bef01d0
-		- FACTOR 4 (complex) SPARSE, size 8x8, density 0.25, nnz 16, addr: 0x55cc8bf63e50
-		- FACTOR 5 (complex) SPARSE, size 8x8, density 0.25, nnz 16, addr: 0x55cc8bf64ba0
+        Faust size 8x8, density 1.5, nnz_sum 96, 6 factor(s):
+        - FACTOR 0 (complex) SPARSE, size 8x8, density 0.25, nnz 16
+        - FACTOR 1 (complex) SPARSE, size 8x8, density 0.25, nnz 16
+        - FACTOR 2 (complex) SPARSE, size 8x8, density 0.25, nnz 16
+        - FACTOR 3 (complex) SPARSE, size 8x8, density 0.25, nnz 16
+        - FACTOR 4 (complex) SPARSE, size 8x8, density 0.25, nnz 16
+        - FACTOR 5 (complex) SPARSE, size 8x8, density 0.25, nnz 16
 
         >>> np.allclose(A.toarray()[:, -1], c)
         True
@@ -3789,75 +3929,72 @@ def toeplitz(c, r=None, dev='cpu', diag_opt=False):
         The toeplitz Faust.
 
     Example:
-        >>> from pyfaust import toeplitz
-        >>> import numpy as np
-        >>> c = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        >>> T = toeplitz(c)
-        >>> T
-            Faust size 10x10, density 5.52 nnz_sum 552, 10 factor(s):
-            - FACTOR 0 (complex) SPARSE, size 10x32, density 0.0625, nnz 20
-            - FACTOR 1 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
-            - FACTOR 2 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
-            - FACTOR 3 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
-            - FACTOR 4 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
-            - FACTOR 5 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
-            - FACTOR 6 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
-            - FACTOR 7 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
-            - FACTOR 8 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
-            - FACTOR 9 (complex) SPARSE, size 32x10, density 0.0625, nnz 20
+		>>> from pyfaust import toeplitz
+		>>> import numpy as np
+		>>> c = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+		>>> T = toeplitz(c)
+		>>> T
+		Faust size 10x10, density 5.52, nnz_sum 552, 10 factor(s):
+		- FACTOR 0 (complex) SPARSE, size 10x32, density 0.0625, nnz 20
+		- FACTOR 1 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+		- FACTOR 2 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+		- FACTOR 3 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+		- FACTOR 4 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+		- FACTOR 5 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+		- FACTOR 6 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+		- FACTOR 7 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+		- FACTOR 8 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+		- FACTOR 9 (complex) SPARSE, size 32x10, density 0.0625, nnz 20
 
-        >>> np.allclose(T.toarray()[:, 0], c)
-        True
-        >>> np.allclose(T.toarray()[0, :], c)
-        True
-        >>> np.real(T.toarray())
-        array([[ 1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9., 10.],
-               [ 2.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.],
-               [ 3.,  2.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.],
-               [ 4.,  3.,  2.,  1.,  2.,  3.,  4.,  5.,  6.,  7.],
-               [ 5.,  4.,  3.,  2.,  1.,  2.,  3.,  4.,  5.,  6.],
-               [ 6.,  5.,  4.,  3.,  2.,  1.,  2.,  3.,  4.,  5.],
-               [ 7.,  6.,  5.,  4.,  3.,  2.,  1.,  2.,  3.,  4.],
-               [ 8.,  7.,  6.,  5.,  4.,  3.,  2.,  1.,  2.,  3.],
-               [ 9.,  8.,  7.,  6.,  5.,  4.,  3.,  2.,  1.,  2.],
-               [10.,  9.,  8.,  7.,  6.,  5.,  4.,  3.,  2.,  1.]])
+		>>> np.allclose(T.toarray()[:, 0], c)
+		True
+		>>> np.allclose(T.toarray()[0, :], c)
+		True
+		>>> np.real(T.toarray())
+		array([[ 1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9., 10.],
+		       [ 2.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.],
+		       [ 3.,  2.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.],
+		       [ 4.,  3.,  2.,  1.,  2.,  3.,  4.,  5.,  6.,  7.],
+		       [ 5.,  4.,  3.,  2.,  1.,  2.,  3.,  4.,  5.,  6.],
+		       [ 6.,  5.,  4.,  3.,  2.,  1.,  2.,  3.,  4.,  5.],
+		       [ 7.,  6.,  5.,  4.,  3.,  2.,  1.,  2.,  3.,  4.],
+		       [ 8.,  7.,  6.,  5.,  4.,  3.,  2.,  1.,  2.,  3.],
+		       [ 9.,  8.,  7.,  6.,  5.,  4.,  3.,  2.,  1.,  2.],
+		       [10.,  9.,  8.,  7.,  6.,  5.,  4.,  3.,  2.,  1.]])
+		>>> r = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+		>>> T2 = toeplitz(c, r)
+		>>> T2
+		Faust size 10x10, density 5.52, nnz_sum 552, 10 factor(s):
+		- FACTOR 0 (complex) SPARSE, size 10x32, density 0.0625, nnz 20
+		- FACTOR 1 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+		- FACTOR 2 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+		- FACTOR 3 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+		- FACTOR 4 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+		- FACTOR 5 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+		- FACTOR 6 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+		- FACTOR 7 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+		- FACTOR 8 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+		- FACTOR 9 (complex) SPARSE, size 32x10, density 0.0625, nnz 20
 
-        >>> r = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
-        >>> T2 = toeplitz(c, r)
-        >>> T2
-        Faust size 10x10, density 6.16, nnz_sum 616, 12 factor(s):
-            - FACTOR 0 (complex) SPARSE, size 10x32, density 0.0625, nnz 20
-            - FACTOR 1 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
-            - FACTOR 2 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
-            - FACTOR 3 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
-            - FACTOR 4 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
-            - FACTOR 5 (complex) SPARSE, size 32x32, density 0.03125, nnz 32
-            - FACTOR 6 (complex) SPARSE, size 32x32, density 0.03125, nnz 32
-            - FACTOR 7 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
-            - FACTOR 8 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
-            - FACTOR 9 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
-            - FACTOR 10 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
-            - FACTOR 11 (complex) SPARSE, size 32x10, density 0.0625, nnz 20
-
-        >>> np.allclose(T2.toarray()[0, :], np.hstack((c[0:1], r[1:])))
-        True
-        >>> np.allclose(T2.toarray()[:, 0], c)
-        True
-        >>> np.real(T2.toarray())
-        array([[ 1., 12., 13., 14., 15., 16., 17., 18., 19., 20.],
-               [ 2.,  1., 12., 13., 14., 15., 16., 17., 18., 19.],
-               [ 3.,  2.,  1., 12., 13., 14., 15., 16., 17., 18.],
-               [ 4.,  3.,  2.,  1., 12., 13., 14., 15., 16., 17.],
-               [ 5.,  4.,  3.,  2.,  1., 12., 13., 14., 15., 16.],
-               [ 6.,  5.,  4.,  3.,  2.,  1., 12., 13., 14., 15.],
-               [ 7.,  6.,  5.,  4.,  3.,  2.,  1., 12., 13., 14.],
-               [ 8.,  7.,  6.,  5.,  4.,  3.,  2.,  1., 12., 13.],
-               [ 9.,  8.,  7.,  6.,  5.,  4.,  3.,  2.,  1., 12.],
-               [10.,  9.,  8.,  7.,  6.,  5.,  4.,  3.,  2.,  1.]])
-        >>> # Look at the density of a larger Toeplitz Faust
-        >>> # it indicates a speedup of the Faust-matrix/vector product
-        >>> toeplitz(np.random.rand(1024), np.random.rand(1024)).density()
-        0.08203125
+		>>> np.allclose(T2.toarray()[0, :], np.hstack((c[0:1], r[1:])))
+		True
+		>>> np.allclose(T2.toarray()[:, 0], c)
+		True
+		>>> np.real(T2.toarray())
+		array([[ 1., 12., 13., 14., 15., 16., 17., 18., 19., 20.],
+		       [ 2.,  1., 12., 13., 14., 15., 16., 17., 18., 19.],
+		       [ 3.,  2.,  1., 12., 13., 14., 15., 16., 17., 18.],
+		       [ 4.,  3.,  2.,  1., 12., 13., 14., 15., 16., 17.],
+		       [ 5.,  4.,  3.,  2.,  1., 12., 13., 14., 15., 16.],
+		       [ 6.,  5.,  4.,  3.,  2.,  1., 12., 13., 14., 15.],
+		       [ 7.,  6.,  5.,  4.,  3.,  2.,  1., 12., 13., 14.],
+		       [ 8.,  7.,  6.,  5.,  4.,  3.,  2.,  1., 12., 13.],
+		       [ 9.,  8.,  7.,  6.,  5.,  4.,  3.,  2.,  1., 12.],
+		       [10.,  9.,  8.,  7.,  6.,  5.,  4.,  3.,  2.,  1.]])
+		>>> # Look at the density of a larger Toeplitz Faust
+		>>> # it indicates a speedup of the Faust-matrix/vector product
+		>>> toeplitz(np.random.rand(1024), np.random.rand(1024)).density()
+		0.08203125
 
     See also <a
     href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.linalg.toeplitz.htm">scipy.linalg.toeplitz</a>, pyfaust.circ, pyfaust.anticirc
@@ -3888,14 +4025,19 @@ def eye(m, n=None, dtype='float64',  dev="cpu"):
         Examples:
             >>> from pyfaust import eye
             >>> eye(5)
-            Faust size 5x5, density 0.2, nnz_sum 5, 1 factor(s):<br/>
-            FACTOR 0 (real) SPARSE, size 5x5, density 0.2, nnz 5<br/>
+            Faust size 5x5, density 0.2, nnz_sum 5, 1 factor(s):
+            - FACTOR 0 (double) SPARSE, size 5x5, density 0.2, nnz 5
+             identity matrix flag
+
             >>> eye(5, 4)
-            Faust size 5x4, density 0.2, nnz_sum 4, 1 factor(s):<br/>
-            FACTOR 0 (real) SPARSE, size 5x4, density 0.2, nnz 4<br/>
+            Faust size 5x4, density 0.2, nnz_sum 4, 1 factor(s):
+            - FACTOR 0 (double) SPARSE, size 5x4, density 0.2, nnz 4
+             identity matrix flag
+
             >>> eye(5, dtype='complex')
-            Faust size 5x4, density 0.2, nnz_sum 4, 1 factor(s):<br/>
-            FACTOR 0 (complex) SPARSE, size 5x4, density 0.2, nnz 4<br/>
+            Faust size 5x5, density 0.2, nnz_sum 5, 1 factor(s):
+            - FACTOR 0 (complex) SPARSE, size 5x5, density 0.2, nnz 5
+             identity matrix flag
     """
     check_dev(dev)
     if(n == None): n = m
@@ -3951,14 +4093,14 @@ def rand_bsr(num_rows, num_cols, bnrows, bncols, num_factors=None, density=.1,
 
     Example:
         >>> from pyfaust import rand_bsr
-        >>> rand_bsr(100,100, 20, 10, num_factors=6)
+        >>> rand_bsr(100, 100, 20, 10, num_factors=6)
         Faust size 100x100, density 0.6, nnz_sum 6000, 6 factor(s):
-            - FACTOR 0 (double) BSR, size 100x100, density 0.1, nnz 1000
-            - FACTOR 1 (double) BSR, size 100x100, density 0.1, nnz 1000
-            - FACTOR 2 (double) BSR, size 100x100, density 0.1, nnz 1000
-            - FACTOR 3 (double) BSR, size 100x100, density 0.1, nnz 1000
-            - FACTOR 4 (double) BSR, size 100x100, density 0.1, nnz 1000
-            - FACTOR 5 (double) BSR, size 100x100, density 0.1, nnz 1000
+        - FACTOR 0 (double) BSR, size 100x100 (blocksize = 20x10), density 0.1, nnz 1000 (nnz blocks: 5)
+        - FACTOR 1 (double) BSR, size 100x100 (blocksize = 20x10), density 0.1, nnz 1000 (nnz blocks: 5)
+        - FACTOR 2 (double) BSR, size 100x100 (blocksize = 20x10), density 0.1, nnz 1000 (nnz blocks: 5)
+        - FACTOR 3 (double) BSR, size 100x100 (blocksize = 20x10), density 0.1, nnz 1000 (nnz blocks: 5)
+        - FACTOR 4 (double) BSR, size 100x100 (blocksize = 20x10), density 0.1, nnz 1000 (nnz blocks: 5)
+        - FACTOR 5 (double) BSR, size 100x100 (blocksize = 20x10), density 0.1, nnz 1000 (nnz blocks: 5)
 
     <b>See also:</b> <a
     href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.bsr_matrix.html">bsr_matrix</a>, Faust.__init__, pyfaust.rand
@@ -4088,19 +4230,24 @@ def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
         the random Faust.
 
     Examples:
-        >>> from pyfaust import rand
-        >>> F = rand(2, 10, .5, dtype='complex')
-        >>> G = rand([2, 5], [10, 20], .5, fac_type="dense")
-        >>> F
-        Faust size 10x10, density 0.99, nnz_sum 99, 2 factors:<br/>
-        FACTOR 0 (complex) SPARSE, size 10x10, density 0.4, nnz 40<br/>
-        FACTOR 1 (complex) DENSE, size 10x10, density 0.59, nnz 59<br/>
-        >>> G
-        Faust size 19x16, density 1.37171, nnz_sum 417, 4 factors:<br/>
-        FACTOR 0 (real) DENSE, size 19x17, density 0.49226, nnz 159<br/>
-        FACTOR 1 (real) DENSE, size 17x10, density 0.517647, nnz 88<br/>
-        FACTOR 2 (real) DENSE, size 10x13, density 0.515385, nnz 67<br/>
-        FACTOR 3 (real) DENSE, size 13x16, density 0.495192, nnz 103<br/>
+		>>> from pyfaust import rand, seed
+		>>> seed(42)
+		>>> F = rand(2, 10, density=.5, dtype='complex')
+		>>> G = rand(10, 20, num_factors=[2, 5], density=.5, fac_type="dense")
+		>>> F
+		Faust size 2x10, density 2.6, nnz_sum 52, 5 factor(s):
+		- FACTOR 0 (complex) SPARSE, size 2x8, density 0.5, nnz 8
+		- FACTOR 1 (complex) SPARSE, size 8x4, density 0.5, nnz 16
+		- FACTOR 2 (complex) SPARSE, size 4x5, density 0.4, nnz 8
+		- FACTOR 3 (complex) SPARSE, size 5x3, density 0.333333, nnz 5
+		- FACTOR 4 (complex) SPARSE, size 3x10, density 0.5, nnz 15
+
+		>>> G
+		Faust size 10x20, density 1.65, nnz_sum 330, 4 factor(s):
+		- FACTOR 0 (double) DENSE, size 10x15, density 0.466667, nnz 70
+		- FACTOR 1 (double) DENSE, size 15x12, density 0.5, nnz 90
+		- FACTOR 2 (double) DENSE, size 12x11, density 0.454545, nnz 60
+		- FACTOR 3 (double) DENSE, size 11x20, density 0.5, nnz 110
 
     <b>See also</b> Faust.__init__, pyfaust.rand_bsr
     """
@@ -4356,6 +4503,29 @@ def _cplx2real_op(op):
         imag_part = horzcat((iop, rop))
         return vertcat((real_part, imag_part))
 
+def seed(s):
+    """(Re)Initializes the pyfaust pseudo-random generator.
+
+    It is useful to reproduce some code based for example on pyfaust.rand or
+    pyfaust.rand_bsr.
+
+    Example:
+        >>> from pyfaust import rand, seed
+        >>> seed(42) # just for reproducibility
+        >>> F = rand(1024, 1024, dim_sizes=[1, 1024], num_factors=5, fac_type='mixed')
+        >>> # F will always be the same
+        >>> F
+        Faust size 1024x1024, density 0.017313, nnz_sum 18154, 5 factor(s):
+        - FACTOR 0 (double) SPARSE, size 1024x754, density 0.0066313, nnz 5120
+        - FACTOR 1 (double) SPARSE, size 754x386, density 0.0129534, nnz 3770
+        - FACTOR 2 (double) DENSE, size 386x1000, density 0.004, nnz 1544
+        - FACTOR 3 (double) SPARSE, size 1000x544, density 0.00919118, nnz 5000
+        - FACTOR 4 (double) SPARSE, size 544x1024, density 0.00488281, nnz 2720
+
+
+
+    """
+    _FaustCorePy.FaustCoreGenDblCPU.set_seed(s)
 
 # experimental block start
 # @PYTORCH_EXP_CODE@
@@ -4371,12 +4541,41 @@ class FaustMulMode:
     Faust.optimize_time() but the access is left open for experimental purpose.
 
     Examples:
-        >>> from pyfaust import rand as frand
-        >>> from numpy.random import rand
+        >>> from pyfaust import rand as frand, seed as fseed, FaustMulMode
+        >>> from numpy.random import rand, seed
+        >>> fseed(42) # just for reproducibility
+        >>> seed(42)
         >>> F = frand(100, 100, 5, [100, 1024])
         >>> F.m_faust.set_FM_mul_mode(FaustMulMode.DYNPROG) # method used to compute Faust-matrix product or Faust.toarray()
-        >>> F*rand(F.shape[1], 512) # Faust-matrix mul. using method DYNPROG
+        >>> F @ rand(F.shape[1], 512) # Faust-matrix mul. using method DYNPROG
+        array([[34.29346113, 33.5135258 , 31.83862847, ..., 32.89901332,
+                36.90417709, 32.20140406],
+               [45.40983901, 42.52512058, 42.14810308, ..., 44.2648802 ,
+                48.4027215 , 40.55809844],
+               [27.12859996, 28.26596387, 25.898984  , ..., 27.47460378,
+                29.35053152, 25.24167465],
+               ...,
+               [48.42899773, 47.4001851 , 43.96370573, ..., 47.25218683,
+                53.03379773, 46.12690926],
+               [39.9583232 , 40.778263  , 36.65671168, ..., 40.69390161,
+                43.55280684, 40.37781963],
+               [26.92859133, 28.40176389, 24.73304576, ..., 27.72648267,
+                28.78612539, 25.82727371]])
         >>> F.toarray() # using the same method
+        array([[1.13340453, 0.94853857, 0.60713635, ..., 1.29155048, 0.98107444,
+                0.30254208],
+               [1.92753189, 0.45268035, 0.72474175, ..., 0.43439703, 1.21532731,
+                0.50115957],
+               [1.35028724, 0.30557493, 0.15632569, ..., 0.80602032, 0.56741856,
+                0.58193385],
+               ...,
+               [0.63172715, 1.0883051 , 1.2760964 , ..., 0.45745425, 0.85951258,
+                0.25173183],
+               [0.85748924, 0.68716077, 0.96293286, ..., 1.09480206, 0.8219215 ,
+                0.83602967],
+               [0.5461995 , 0.36918089, 0.4556373 , ..., 0.57842966, 0.52784458,
+                0.30465166]])
+
     """
     ## \brief The default method, it computes the product from the right to the left.
     DEFAULT_L2R=0
