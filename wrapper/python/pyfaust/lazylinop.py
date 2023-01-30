@@ -41,16 +41,16 @@ def aslazylinearoperator(obj, shape=None):
         >>> lM = aslazylinearoperator(M)
         >>> twolM = lM + lM
         >>> twolM
-        <pyfaust.lazylinop.LazyLinearOp at 0x7fcd7d7750f0>
+        <10x12 LazyLinearOp with unspecified dtype>
         >>> import pyfaust as pf
         >>> F = pf.rand(10, 12)
         >>> lF = aslazylinearoperator(F)
         >>> twolF = lF + lF
         >>> twolF
-        <pyfaust.lazylinop.LazyLinearOp at 0x7fcd7d774730>
-		>>> # To illustrate the use of the optional “shape” parameter, let us consider implementing a lazylinearoperator associated with the pylops.Symmetrize linear operator, 
+        <10x12 LazyLinearOp with unspecified dtype>
+		>>> # To illustrate the use of the optional “shape” parameter, let us consider implementing a lazylinearoperator associated with the pylops.Symmetrize linear operator,
 		>>> # https://pylops.readthedocs.io/en/latest/api/generated/pylops.Symmetrize.html
-		>>> which is designed to symmetrize a vector, or a matrix, along some coordinate axis
+		>>> # which is designed to symmetrize a vector, or a matrix, along some coordinate axis
 		>>> from pylops import Symmetrize
 		>>> M = np.random.rand(22, 2)
 		>>> # Here the matrix M is of shape(22, 2) and we want to symmetrize it vertically (axis == 0), so we build the corresponding symmetrizing operator Sop
@@ -59,8 +59,8 @@ def aslazylinearoperator(obj, shape=None):
 		>>> (Sop @ M).shape
 		(43, 2)
 		>>> # Since it maps matrices with 22 rows to matrices with 43 rows, the “shape” of Sop should be (43,22) however, the “shape” as provided by pylops is inconsistent
-		>>> Sop.shape
-		(86, 44)    
+        >>> Sop.shape
+        (86, 44)
 		>>> # To exploit Sop as a LazyLinearOperator we cannot rely on the “shape” given by pylops (otherwise the LazyLinearOp-matrix product wouldn't be properly defined, and would fail on a "dimensions must agree" exception)
 		>>> # Thanks to the optional “shape” parameter of aslazylinearoperator, this can be fixed
 		>>> lSop = aslazylinearoperator(Sop, shape=(43, 22))
@@ -72,6 +72,7 @@ def aslazylinearoperator(obj, shape=None):
 		>>> # Besides, Sop @ M is equal to lSop @ M, so all is fine !
 		>>> np.allclose(lSop @ M, Sop @ M)
 		True
+
 
 
 
@@ -1065,10 +1066,12 @@ def kron(A, B):
         >>> print(np.allclose(AxB@x, lAxB@x))
         True
         >>> from timeit import timeit
-        >>> timeit(lambda: AxB @ x, number=10)
-        0.4692082800902426
-        >>> timeit(lambda: lAxB @ x, number=10)
-        0.03464869409799576
+        >>> timeit(lambda: AxB @ x, number=10) # doctest:+ELLIPSIS
+        0...
+        >>> # example: 0.4692082800902426
+        >>> timeit(lambda: lAxB @ x, number=10) # doctest:+ELLIPSIS
+        0...
+        >>> # example 0.03464869409799576
 
     <b>See also:</b> numpy.kron.
     """
@@ -1146,37 +1149,37 @@ def eye(m, n=None, k=0, dtype='float'):
         <5x5 LazyLinearOp with unspecified dtype>
         >>> le1.toarray()
         array([[1., 0., 0., 0., 0.],
-              [0., 1., 0., 0., 0.],
-              [0., 0., 1., 0., 0.],
-              [0., 0., 0., 1., 0.],
-              [0., 0., 0., 0., 1.]])
+               [0., 1., 0., 0., 0.],
+               [0., 0., 1., 0., 0.],
+               [0., 0., 0., 1., 0.],
+               [0., 0., 0., 0., 1.]])
         >>> le2 = eye(5, 2)
         >>> le2
         <5x2 LazyLinearOp with unspecified dtype>
         >>> le2.toarray()
         array([[1., 0.],
-              [0., 1.],
-              [0., 0.],
-              [0., 0.],
-              [0., 0.]])
+               [0., 1.],
+               [0., 0.],
+               [0., 0.],
+               [0., 0.]])
         >>> le3 = eye(5, 3, 1)
         >>> le3
         <5x3 LazyLinearOp with unspecified dtype>
         >>> le3.toarray()
         array([[0., 1., 0.],
-              [0., 0., 1.],
-              [0., 0., 0.],
-              [0., 0., 0.],
-              [0., 0., 0.]])
+               [0., 0., 1.],
+               [0., 0., 0.],
+               [0., 0., 0.],
+               [0., 0., 0.]])
         >>> le4 = eye(5, 3, -1)
         >>> le4
         <5x3 LazyLinearOp with unspecified dtype>
         >>> le4.toarray()
         array([[0., 0., 0.],
-              [1., 0., 0.],
-              [0., 1., 0.],
-              [0., 0., 1.],
-              [0., 0., 0.]])
+               [1., 0., 0.],
+               [0., 1., 0.],
+               [0., 0., 1.],
+               [0., 0., 0.]])
 
     <b>See also:</b> scipy.sparse.eye.
     """
@@ -1248,32 +1251,32 @@ def diag(v, k=0):
         <5x5 LazyLinearOp with unspecified dtype>
         >>> ld1.toarray()
         array([[1., 0., 0., 0., 0.],
-                      [0., 2., 0., 0., 0.],
-                      [0., 0., 3., 0., 0.],
-                      [0., 0., 0., 4., 0.],
-                      [0., 0., 0., 0., 5.]])
+               [0., 2., 0., 0., 0.],
+               [0., 0., 3., 0., 0.],
+               [0., 0., 0., 4., 0.],
+               [0., 0., 0., 0., 5.]])
         >>> ld2 = diag(v, -2)
         >>> ld2
         <7x7 LazyLinearOp with unspecified dtype>
         >>> ld2.toarray()
         array([[0., 0., 0., 0., 0., 0., 0.],
-                      [0., 0., 0., 0., 0., 0., 0.],
-                      [1., 0., 0., 0., 0., 0., 0.],
-                      [0., 2., 0., 0., 0., 0., 0.],
-                      [0., 0., 3., 0., 0., 0., 0.],
-                      [0., 0., 0., 4., 0., 0., 0.],
-                      [0., 0., 0., 0., 5., 0., 0.]])
+               [0., 0., 0., 0., 0., 0., 0.],
+               [1., 0., 0., 0., 0., 0., 0.],
+               [0., 2., 0., 0., 0., 0., 0.],
+               [0., 0., 3., 0., 0., 0., 0.],
+               [0., 0., 0., 4., 0., 0., 0.],
+               [0., 0., 0., 0., 5., 0., 0.]])
         >>> ld3 = diag(v, 2)
         >>> ld3
         <7x7 LazyLinearOp with unspecified dtype>
         >>> ld3.toarray()
         array([[0., 0., 1., 0., 0., 0., 0.],
-                      [0., 0., 0., 2., 0., 0., 0.],
-                      [0., 0., 0., 0., 3., 0., 0.],
-                      [0., 0., 0., 0., 0., 4., 0.],
-                      [0., 0., 0., 0., 0., 0., 5.],
-                      [0., 0., 0., 0., 0., 0., 0.],
-                      [0., 0., 0., 0., 0., 0., 0.]])
+               [0., 0., 0., 2., 0., 0., 0.],
+               [0., 0., 0., 0., 3., 0., 0.],
+               [0., 0., 0., 0., 0., 4., 0.],
+               [0., 0., 0., 0., 0., 0., 5.],
+               [0., 0., 0., 0., 0., 0., 0.],
+               [0., 0., 0., 0., 0., 0., 0.]])
     """
     if v.ndim > 1 or v.ndim == 0:
         raise ValueError("v must be a 1-dim vector.")
@@ -1326,7 +1329,7 @@ def sum(*lops, mt=False, af=False):
         >>> nt = 10
         >>> d = 64
         >>> v = np.random.rand(d)
-        >>> terms = [dft(d) @ Faust(diags(v, format='csr')) @ dft(d)) for _ in range(nt)]
+        >>> terms = [dft(d) @ Faust(diags(v, format='csr')) @ dft(d) for _ in range(nt)]
         >>> ls = sum(*terms) # ls is the LazyLinearOp sum of terms
     """
     lAx = lambda A, x: A @ x
