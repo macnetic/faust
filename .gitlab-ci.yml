@@ -291,6 +291,10 @@ pages:
           # test that the doc generation works well (at least that html files for the pyfaust and matfaust namespaces exist)
           # in order to avoid publishing an empty API doc
         - if [ ! -r doc/html/namespacepyfaust.html -o ! -r doc/html/namespacematfaust.html ]; then echo "error with doxygen doc generation" 2>&1 && exit 1; fi
+        # verify the pyfaust root with doctest (no go on failure)
+        - cd wrapper/python
+        - if ! python3 -m doctest -v pyfaust/__init__.py; then echo "error with doctest verification of pyfaust doc" 2>&1 && exit 2;fi
+        - cd ../..
         - mkdir -p ../public/last-doc
         - cp -Rf doc/html ../public/last-doc/
         - mkdir -p ../public/packages
