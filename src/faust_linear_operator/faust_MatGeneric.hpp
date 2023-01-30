@@ -132,7 +132,7 @@ Faust::MatGeneric<FPP,DEVICE>::~MatGeneric()
 template<typename FPP,FDevice DEVICE>
 void Faust::MatGeneric<FPP,DEVICE>::Display() const
 {
-	std::cout << to_string();
+	std::cout << to_string() << std::endl;
 }
 
 template<typename FPP,FDevice DEVICE>
@@ -210,8 +210,8 @@ std::string Faust::MatGeneric<FPP,DEVICE>::to_string(int32_t nrows, int32_t ncol
 	str << ", density "<< density <<", nnz "<< nnz; 
 	if(type == BSR)
 		str <<  " (nnz blocks: " << dynamic_cast<const MatBSR<FPP, Cpu>*>(this)->getNBlocks() << ")";
-	str << ", addr: " << this;
-	str <<std::endl;
+//	str << ", addr: " << this;
+	str << std::endl;
 	if (is_identity)
 		str <<" identity matrix flag" << std::endl;
 	return str.str();
