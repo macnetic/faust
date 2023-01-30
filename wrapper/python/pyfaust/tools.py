@@ -20,7 +20,7 @@ def omp(y, D, maxiter=None, tol=0, relerr=True, verbose=False):
         D: the dictionary as a numpy array or a Faust.
         maxiter: the maximum number of iterations of the algorithm.
         By default (None) it's y's dimension: max(y.shape).
-        tol: the tolerance error under what the algorithm stops. By default,
+        tol: the tolerance error to reach for the algorithm to stop. By default,
         it's zero for not stopping on error criterion.
         relerr: the type of error stopping criterion. Default to
         True to use relative error, otherwise (False) the absolute error is used.
@@ -31,10 +31,20 @@ def omp(y, D, maxiter=None, tol=0, relerr=True, verbose=False):
 
     Example:
         >>> from pyfaust.tools import omp
-        >>> # generate yours y and D and maxiter then call omp:
+        >>> from scipy.sparse import random
+        >>> from pyfaust import rand, seed
+        >>> import numpy as np
+        >>> np.random.seed(42) # just for reproducibility
+        >>> seed(42)
+        >>> D = rand(1024, 1024)
+        >>> x0 = random(1024, 1, .01)
+        >>> y = D @ x0
+        >>> maxiter = 17
         >>> x = omp(y, D, maxiter, tol=10**-16)
+        Stopping. Exact signal representation found!
         >>> # omp() runs at most maxiter iterations until the error tolerance is
         >>> # reached
+
     """
     from pyfaust import Faust
     # check y is a numpy.ndarray (or a matrix_csr ?)
