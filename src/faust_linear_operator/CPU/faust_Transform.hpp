@@ -1878,7 +1878,7 @@ std::string Faust::Transform<FPP,Cpu>::to_string(const bool transpose /* default
 			str << this->getNbCol() << "x" << this->getNbRow();
 		else
 			str << this->getNbRow()<<"x"<<this->getNbCol();
-		str <<", density "<<1.0/getRCG()<< ", nnz_sum "<<this->get_total_nnz() << ", " << size() << " factor(s): "<< std::endl;
+		str <<", density "<<1.0/getRCG()<< ", nnz_sum "<<this->get_total_nnz() << ", " << size() << " factor(s):" << std::endl;
 		int j;
 		for (int i=0 ; i<size() ; i++)
 		{
@@ -1887,7 +1887,8 @@ std::string Faust::Transform<FPP,Cpu>::to_string(const bool transpose /* default
 			else
 				j = i;
 			str << "- FACTOR " << i;
-			str << data[j]->to_string(transpose, displaying_small_mat_elts);
+			auto mat_str = data[j]->to_string(transpose, displaying_small_mat_elts);
+			str << mat_str.substr(0, i == size() - 1?mat_str.size() - 1: mat_str.size());
 		}
 	}
 	return str.str();
