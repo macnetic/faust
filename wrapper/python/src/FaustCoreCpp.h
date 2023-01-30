@@ -150,6 +150,8 @@ class FaustCoreCpp
     bool save_mat_file(const char* filepath) const;
     static FaustCoreCpp<FPP, DEV>* read_from_mat_file(const char* filepath);
     static int get_mat_file_type(const char* filepath);
+    static void set_seed(unsigned int seed) {Faust::seed(seed);};
+    static unsigned int get_seed() {return Faust::seed();};
     FaustCoreCpp<FPP,DEV>* swap_cols(const unsigned int id1, const unsigned int id2,
             const bool permutation, const bool inplace);
     FaustCoreCpp<FPP,DEV>* swap_rows(const unsigned int id1, const unsigned int id2,

@@ -431,7 +431,7 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
 
     def power_iteration(self, threshold, max_num_its):
         cdef @TYPE@[:]  _lambda_view
-        _lambda = np.empty((1,), dtype=np.complex)
+        _lambda = np.empty((1,), dtype=type2dtype('@TYPE@'))
         _lambda_view = _lambda
         self.@CORE_OBJ@.power_iteration(&_lambda_view[0], threshold, max_num_its)
         return _lambda[0]
@@ -702,6 +702,12 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
         PyMem_Free(cfilepath)
         return _type
 
+    @staticmethod
+    def set_seed(seed):
+        if not np.isreal(seed) or np.floor(seed) != seed:
+            raise ValueError("seed must be an integer")
+        seed = int(seed)
+        FaustCoreCy.@CPP_CORE_CLASS@[@TYPE@].set_seed(seed)
 
     def transpose(self):
         core = @CORE_CLASS@(core=True)
