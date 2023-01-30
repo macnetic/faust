@@ -291,10 +291,6 @@ pages:
           # test that the doc generation works well (at least that html files for the pyfaust and matfaust namespaces exist)
           # in order to avoid publishing an empty API doc
         - if [ ! -r doc/html/namespacepyfaust.html -o ! -r doc/html/namespacematfaust.html ]; then echo "error with doxygen doc generation" 2>&1 && exit 1; fi
-        # verify the pyfaust root with doctest (no go on failure)
-        - cd wrapper/python
-        - if ! python3 -m doctest -v pyfaust/__init__.py; then echo "error with doctest verification of pyfaust doc" 2>&1 && exit 2;fi
-        - cd ../..
         - mkdir -p ../public/last-doc
         - cp -Rf doc/html ../public/last-doc/
         - mkdir -p ../public/packages
@@ -439,6 +435,12 @@ pkg_macos_purepy_release_torch_linked:
 pkg_linux_purepy_release:
     extends: .pkg_purepy_release
     variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: $LINUX_MATIO_SLIB_PATH, Z_STATIC_LIB_PATH: $LINUX_ZLIB_SLIB_PATH, HDF5_STATIC_LIB_PATH: $LINUX_HDF5_SLIB_PATH, BUILD_MULTITHREAD: "ON", NOPY2: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "../gpu_mod", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", CMAKE_CXX_COMPILER: "clang++", PYTHON_PATH: '/usr/local/bin/python3.9', JOB_PYTHON: 'python3.9'}
+    after_script:
+        # verify the pyfaust root with doctest (no go on failure)
+        - if [[ ! $(basename $PWD) = 'build' ]]; then  cd build;fi
+        - cd wrapper/python
+        - if ! python3 -m doctest -v pyfaust/__init__.py; then echo "error with doctest verification of pyfaust doc" 2>&1 && exit 1;fi
+        - cd ../..
     tags:
         - linux
         - tux_packager
