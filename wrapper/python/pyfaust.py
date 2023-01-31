@@ -1281,7 +1281,8 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         """
         if(isinstance(lhs_op, (np.ndarray, csr_matrix, dia_matrix))):
             if(F.dtype == 'complex' or lhs_op.dtype == 'complex'):
-                return (F.T.conj().__matmul__(lhs_op.T.conj())).T.conj()
+                #return (F.H.__matmul__(lhs_op.T.conj())).T.conj()
+                return (Faust([F.H.factors(i) for i in range(len(F))]).__matmul__(lhs_op.T.conj())).T.conj()
             else: # real Faust and real lhs_op
                 return (F.T.__matmul__(lhs_op.T)).T
         else:
