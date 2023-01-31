@@ -78,14 +78,14 @@ def svdtj2(M, nGivens, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
                    nGivens_per_fac, verbosity, enable_large_Faust)
     D2, W2 = eigtj(M.T.conj().dot(M), nGivens, tol, 'undef', relerr,  nGivens_per_fac,
                    verbosity, enable_large_Faust)
-    S = diag((W1.T.conj()*M)*W2)
+    S = diag((W1.T.conj() @ M) @ W2)
     I = argsort(abs(S))[::-1]
     sign_S = spdiags(sign(S[I]), [0], S.shape[0], S.shape[0])
     S = spdiags(S[I], [0], S.shape[0], S.shape[0])
     S *= sign_S
     Id = eye(S.shape[0])
-    U = W1[:,0:S.shape[0]]*Faust([Id[:,I],sign_S.toarray()])
-    V = W2[:,0:S.shape[0]]*Faust(Id[:,I])
+    U = W1[:,0:S.shape[0]] @ Faust([Id[:,I],sign_S.toarray()])
+    V = W2[:,0:S.shape[0]] @ Faust(Id[:,I])
     return U,S,V
 # experimental block end
 
