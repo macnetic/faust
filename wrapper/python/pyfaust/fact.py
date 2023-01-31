@@ -89,6 +89,8 @@ def svdtj2(M, nGivens, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
     return U,S,V
 # experimental block end
 
+
+# TODO: order argument is not used, remove it or implement it
 def svdtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
           nGivens_per_fac=None, enable_large_Faust=False, **kwargs):
     """
@@ -108,8 +110,7 @@ def svdtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
 
         Returns:
             The tuple U,S,V: such that U*numpy.diag(S)*V.H is the approximate of M.
-                - (np.array vector) S the singular values in
-                descending order.
+                - (np.array vector) S the singular values in descending order.
                 - (Faust objects) U,V unitary transforms.
 
 
@@ -217,7 +218,7 @@ def eigtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
         tol: (float) the tolerance error at which the algorithm stops. The
         default value is zero so that stopping is based on reaching the
         targeted nGivens (this argument is optional only if nGivens is set).
-        order: (int) order of eigenvalues, possible choices are ‘ascend,
+        order: order of eigenvalues, possible choices are ‘ascend,
         'descend' or 'undef' (to avoid a sorting operation and save some time).
         nGivens_per_fac: (int) targeted number of Givens rotations per factor
         of V. Must be an integer between 1 to floor(M.shape[0]/2) (the default
@@ -276,8 +277,7 @@ def eigtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
         >>> # (200 factors)
         >>> # Dhat the eigenvalues diagonal matrix approx.
         >>> print("err: ", norm(Lap-Uhat@np.diag(Dhat)@Uhat.H)/norm(Lap)) # about 6.5e-3
-        >>> print(Uhat)
-        >>> print(Dhat)
+        err:  0.006494660956003688
         >>> Dhat2, Uhat2 = eigtj(Lap, tol=0.01)
         >>> assert(norm(Lap-Uhat2@np.diag(Dhat2)@Uhat2.H)/norm(Lap) < .011)
         >>> # and then asking for an absolute error
@@ -562,9 +562,9 @@ def palm4msa(M, p, ret_lambda=False, backend=2016, on_gpu=False):
         >>> param = ParamsPalm4MSA(cons, stop_crit)
         >>> F = palm4msa(M, param)
         >>> F
-        Faust size 500x32, density 0.22025, nnz_sum 3524, 2 factor(s):<br/>
-        FACTOR 0 (real) SPARSE, size 500x32, density 0.15625, nnz 2500<br/>
-        FACTOR 1 (real) SPARSE, size 32x32, density 1, nnz 1024<br/>
+        Faust size 500x32, density 0.22025, nnz_sum 3524, 2 factor(s):
+        - FACTOR 0 (double) SPARSE, size 500x32, density 0.15625, nnz 2500
+        - FACTOR 1 (double) DENSE, size 32x32, density 1, nnz 1024
 
     See also pyfaust.factparams.ParamsPalm4msaWHT to factorize a Hadamard matrix using the SKPERM projector.
     """
@@ -635,6 +635,7 @@ def palm4msa_mhtp(M, palm4msa_p, mhtp_p, ret_lambda=False, on_gpu=False):
 		>>> from pyfaust.factparams import ParamsPalm4MSA, StoppingCriterion, MHTPParams
 		>>> import numpy as np
 		>>> from pyfaust.proj import splin, normcol
+        >>> np.random.seed(42) # just for reproducibility
 		>>> M = np.random.rand(500, 32)
 		>>> cons = [ splin((500,32), 5), normcol((32,32), 1.0)]
 		>>> stop_crit = StoppingCriterion(num_its=200)
@@ -642,10 +643,10 @@ def palm4msa_mhtp(M, palm4msa_p, mhtp_p, ret_lambda=False, on_gpu=False):
 		>>> # MHTP will run every 100 iterations of PALM4MSA (that is 2 times) for 50 iterations on each factor
 		>>> mhtp_param = MHTPParams(num_its=50, palm4msa_period=100)
 		>>> G = palm4msa_mhtp(M, param, mhtp_param)
-		>>> G
-		Faust size 500x32, density 0.21625, nnz_sum 3460, 2 factor(s):
-		- FACTOR 0 (real) SPARSE, size 500x32, density 0.15625, nnz 2500
-		- FACTOR 1 (real) SPARSE, size 32x32, density 1, nnz 1024
+        >>> G
+        Faust size 500x32, density 0.22025, nnz_sum 3524, 2 factor(s):
+        - FACTOR 0 (double) SPARSE, size 500x32, density 0.15625, nnz 2500
+        - FACTOR 1 (double) DENSE, size 32x32, density 1, nnz 1024
 
     <b/> See also pyfaust.factparams.MHTPParams
     <b/> See also pyfaust.fact.palm4msa
@@ -808,18 +809,14 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
         >>> stop_crit2 = StoppingCriterion(num_its=200)
         >>> param = ParamsHierarchical(fact_cons, res_cons, stop_crit1, stop_crit2)
         >>> F = hierarchical(M, param)
-        factorization 1/3<br/>
-        factorization 2/3<br/>
-        factorization 3/3<br/>
         >>> F
         Faust size 500x32, density 0.189063, nnz_sum 3025, 4 factor(s):
-            - FACTOR 0 (real) SPARSE, size 500x32, density 0.15625, nnz 2500
-            - FACTOR 1 (real) SPARSE, size 32x32, density 0.09375, nnz 96
-            - FACTOR 2 (real) SPARSE, size 32x32, density 0.09375, nnz 96
-            - FACTOR 3 (real) SPARSE, size 32x32, density 0.325195, nnz 333
+        - FACTOR 0 (double) SPARSE, size 500x32, density 0.15625, nnz 2500
+        - FACTOR 1 (double) SPARSE, size 32x32, density 0.09375, nnz 96
+        - FACTOR 2 (double) SPARSE, size 32x32, density 0.09375, nnz 96
+        - FACTOR 3 (double) SPARSE, size 32x32, density 0.325195, nnz 333
 
         <b>2. Simplified Parameters for Hadamard Factorization</b>
-
         >>> from pyfaust import wht
         >>> from pyfaust.fact import hierarchical
         >>> from numpy.linalg import norm
@@ -830,21 +827,22 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
         >>> FH2 = hierarchical(H, 'hadamard');
         >>> # test the relative error
         >>> (FH-FH2).norm('fro')/FH.norm('fro') # the result is about 1e-16, the factorization is accurate
+        1.6883057247219393e-16
         >>> FH
         Faust size 32x32, density 0.3125, nnz_sum 320, 5 factor(s):
-        - FACTOR 0 (real) SPARSE, size 32x32, density 0.0625, nnz 64
-        - FACTOR 1 (real) SPARSE, size 32x32, density 0.0625, nnz 64
-        - FACTOR 2 (real) SPARSE, size 32x32, density 0.0625, nnz 64
-        - FACTOR 3 (real) SPARSE, size 32x32, density 0.0625, nnz 64
-        - FACTOR 4 (real) SPARSE, size 32x32, density 0.0625, nnz 64
-
+        - FACTOR 0 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+        - FACTOR 1 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+        - FACTOR 2 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+        - FACTOR 3 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+        - FACTOR 4 (double) SPARSE, size 32x32, density 0.0625, nnz 64
         >>> FH2
         Faust size 32x32, density 0.3125, nnz_sum 320, 5 factor(s):
-            - FACTOR 0 (real) SPARSE, size 32x32, density 0.0625, nnz 64
-            - FACTOR 1 (real) SPARSE, size 32x32, density 0.0625, nnz 64
-            - FACTOR 2 (real) SPARSE, size 32x32, density 0.0625, nnz 64
-            - FACTOR 3 (real) SPARSE, size 32x32, density 0.0625, nnz 64
-            - FACTOR 4 (real) SPARSE, size 32x32, density 0.0625, nnz 64
+        - FACTOR 0 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+        - FACTOR 1 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+        - FACTOR 2 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+        - FACTOR 3 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+        - FACTOR 4 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+
 
        <br/>
        See also pyfaust.factparams.ParamsHierarchicalWHT
@@ -856,6 +854,7 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
        >>> from pyfaust.fact import hierarchical
        >>> from scipy.io import loadmat
        >>> from pyfaust.demo import get_data_dirpath
+       >>> import numpy as np
        >>> d = loadmat(get_data_dirpath()+'/matrix_MEG.mat')
        >>> MEG = d['matrix'].T
        >>> num_facts = 9
@@ -864,22 +863,22 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
        >>> MEG16 = hierarchical(MEG, ['rectmat', num_facts, k, s])
        >>> MEG16
        Faust size 204x8193, density 0.0631655, nnz_sum 105573, 9 factor(s):
-           - FACTOR 0 (real) SPARSE, size 204x204, density 0.293613, nnz 12219
-           - FACTOR 1 (real) SPARSE, size 204x204, density 0.0392157, nnz 1632
-           - FACTOR 2 (real) SPARSE, size 204x204, density 0.0392157, nnz 1632
-           - FACTOR 3 (real) SPARSE, size 204x204, density 0.0392157, nnz 1632
-           - FACTOR 4 (real) SPARSE, size 204x204, density 0.0392157, nnz 1632
-           - FACTOR 5 (real) SPARSE, size 204x204, density 0.0392157, nnz 1632
-           - FACTOR 6 (real) SPARSE, size 204x204, density 0.0392157, nnz 1632
-           - FACTOR 7 (real) SPARSE, size 204x204, density 0.0392157, nnz 1632
-           - FACTOR 8 (real) SPARSE, size 204x8193, density 0.0490196, nnz 81930
-
+       - FACTOR 0 (double) SPARSE, size 204x204, density 0.293613, nnz 12219
+       - FACTOR 1 (double) SPARSE, size 204x204, density 0.0392157, nnz 1632
+       - FACTOR 2 (double) SPARSE, size 204x204, density 0.0392157, nnz 1632
+       - FACTOR 3 (double) SPARSE, size 204x204, density 0.0392157, nnz 1632
+       - FACTOR 4 (double) SPARSE, size 204x204, density 0.0392157, nnz 1632
+       - FACTOR 5 (double) SPARSE, size 204x204, density 0.0392157, nnz 1632
+       - FACTOR 6 (double) SPARSE, size 204x204, density 0.0392157, nnz 1632
+       - FACTOR 7 (double) SPARSE, size 204x204, density 0.0392157, nnz 1632
+       - FACTOR 8 (double) SPARSE, size 204x8193, density 0.0490196, nnz 81930
        >>> # verify the constraint k == 10, on column 4
-       >>> count_nonzero(MEG16.factors(8)[:,4].toarray())
+       >>> np.count_nonzero(MEG16.factors(8)[:,4].toarray())
        10
        >>> # now verify the s constraint is respected on MEG16 factor 1
-       >>> count_nonzero(MEG16.factors(1).toarray())/MEG16.shape[0]
+       >>> np.count_nonzero(MEG16.factors(1).toarray())/MEG16.shape[0]
        8.0
+
 
        <br/>
        See also pyfaust.factparams.ParamsHierarchicalRectMat
@@ -896,22 +895,23 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
        >>> FDFT2 = hierarchical(DFT, 'dft');
        >>> # test the relative error
        >>> (FDFT-FDFT2).norm('fro')/FDFT.norm('fro') # the result is about 1e-16, the factorization is accurate
+       1.5867087530782683e-16
        >>> FDFT
        Faust size 32x32, density 0.34375, nnz_sum 352, 6 factor(s):
-           - FACTOR 0 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
-           - FACTOR 1 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
-           - FACTOR 2 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
-           - FACTOR 3 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
-           - FACTOR 4 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
-           - FACTOR 5 (complex) SPARSE, size 32x32, density 0.03125, nnz 32
-       >>> DFT2
+       - FACTOR 0 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+       - FACTOR 1 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+       - FACTOR 2 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+       - FACTOR 3 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+       - FACTOR 4 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+       - FACTOR 5 (complex) SPARSE, size 32x32, density 0.03125, nnz 32
+       >>> FDFT2
        Faust size 32x32, density 0.34375, nnz_sum 352, 6 factor(s):
-           - FACTOR 0 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
-           - FACTOR 1 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
-           - FACTOR 2 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
-           - FACTOR 3 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
-           - FACTOR 4 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
-           - FACTOR 5 (complex) SPARSE, size 32x32, density 0.03125, nnz 32
+       - FACTOR 0 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+       - FACTOR 1 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+       - FACTOR 2 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+       - FACTOR 3 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+       - FACTOR 4 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+       - FACTOR 5 (complex) SPARSE, size 32x32, density 0.03125, nnz 32
 
        See also pyfaust.factparams.ParamsHierarchicalDFT
        <br/>
@@ -934,13 +934,14 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
         >>> FH2 = hierarchical(H, 'hadamard_simple', backend=2020);
         >>> # test the relative error
         >>> (FH-FH2).norm('fro')/FH.norm('fro') # the result is about 1e-16, the factorization is accurate
+        7.85046215906392e-16
         >>> FH2
         Faust size 32x32, density 0.3125, nnz_sum 320, 5 factor(s):
-        - FACTOR 0 (real) SPARSE, size 32x32, density 0.0625, nnz 64
-        - FACTOR 1 (real) SPARSE, size 32x32, density 0.0625, nnz 64
-        - FACTOR 2 (real) SPARSE, size 32x32, density 0.0625, nnz 64
-        - FACTOR 3 (real) SPARSE, size 32x32, density 0.0625, nnz 64
-        - FACTOR 4 (real) SPARSE, size 32x32, density 0.0625, nnz 64
+        - FACTOR 0 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+        - FACTOR 1 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+        - FACTOR 2 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+        - FACTOR 3 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+        - FACTOR 4 (double) SPARSE, size 32x32, density 0.0625, nnz 64
 
        <br/>
        See also pyfaust.factparams.ParamsHierarchicalWHTNoResCons
@@ -962,19 +963,20 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
        be as efficient.
 
         >>> from scipy.io import loadmat
+        >>> from pyfaust import Faust
         >>> from pyfaust.fact import hierarchical
         >>> from pyfaust.demo import get_data_dirpath
         >>> MEG = loadmat(get_data_dirpath()+'/matrix_MEG.mat')['matrix'].T
         >>> F1 = hierarchical(MEG, ['MEG', 5, 10, 8], backend=2020)
         >>> F2 = hierarchical(MEG, ['MEG_SIMPLE', 5, 10, 8], backend=2020)
-        # compare the errors:
+        >>> # compare the errors:
         >>> (F2 - MEG).norm() / Faust(MEG).norm()
         0.13033595653237676
         >>> (F1 - MEG).norm() / Faust(MEG).norm()
         0.12601709513741005
 
        <br/>
-       See also pyfaust.factparams.ParamsHierarchicalRectMatNoResCons
+       <b>See also</b>  pyfaust.factparams.ParamsHierarchicalRectMatNoResCons
        <br/>
 
     <b/> See also pyfaust.factparams.ParamsHierarchicalRectMat, pyfaust.factparams.ParamsHierarchicalSquareMat, pyfaust.factparams.ParamsHierarchicalDFT
@@ -1363,31 +1365,32 @@ def butterfly(M, type="bbtree", perm=None, diag_opt=False):
     Note: Below is an example of how to create a permutation scipy CSR matrix from a permutation list
     of indices (as defined by the perm argument) and conversely how to convert
     a permutation matrix to a list of indices of permutation.
+
     >>> from scipy.sparse import random, csr_matrix
     >>> from numpy.random import permutation
     >>> import numpy as np
+    >>> np.random.seed(42)
     >>> I = permutation(8)  # random permutation as a list of indices
     >>> I
-    array([2, 5, 6, 7, 1, 4, 0, 3])
+    array([1, 5, 0, 7, 2, 4, 3, 6])
     >>> n = len(I)
     >>> # convert a permutation as indices to a csr_matrix
     >>> P = csr_matrix((np.ones(n), (I, np.arange(n))))
     >>> P.toarray()
-    array([[0., 0., 0., 0., 0., 0., 1., 0.],
-           [0., 0., 0., 0., 1., 0., 0., 0.],
+    array([[0., 0., 1., 0., 0., 0., 0., 0.],
            [1., 0., 0., 0., 0., 0., 0., 0.],
-           [0., 0., 0., 0., 0., 0., 0., 1.],
+           [0., 0., 0., 0., 1., 0., 0., 0.],
+           [0., 0., 0., 0., 0., 0., 1., 0.],
            [0., 0., 0., 0., 0., 1., 0., 0.],
            [0., 1., 0., 0., 0., 0., 0., 0.],
-           [0., 0., 1., 0., 0., 0., 0., 0.],
+           [0., 0., 0., 0., 0., 0., 0., 1.],
            [0., 0., 0., 1., 0., 0., 0., 0.]])
     >>> # convert a permutation as a list of indices to a permutation matrix P as a csr_matrix
     >>> I_ = P.T.nonzero()[1]
     >>> I_
-    array([2, 5, 6, 7, 1, 4, 0, 3], dtype=int32)
+    array([1, 5, 0, 7, 2, 4, 3, 6], dtype=int32)
     >>> np.allclose(I_, I)
     True
-
 
     Returns:
         The Faust F which is an approximation of M according to a butterfly support.
@@ -1401,7 +1404,7 @@ def butterfly(M, type="bbtree", perm=None, diag_opt=False):
         >>> F = butterfly(H, type='bbtree')
         >>> # compute the error
         >>> (F-H).norm()/Faust(H).norm()
-        1.0272844187006565e-15
+        1.2560739454502295e-15
         >>> # the same can be done with dft in place of wht
         >>> # all you need is to specify the bit-reversal permutation
         >>> # since the Discrete Fourier Transform is the product of a butterfly factors with this particular permutation
@@ -1410,6 +1413,7 @@ def butterfly(M, type="bbtree", perm=None, diag_opt=False):
         >>> # compute the error
         >>> (F-DFT).norm()/Faust(DFT).norm()
         1.1427230601405052e-15
+
 
         Use simple permutations:
         >>> import numpy as np
@@ -1430,6 +1434,9 @@ def butterfly(M, type="bbtree", perm=None, diag_opt=False):
 
         Use butterfly with a permutation defined by a list of indices J:
         >>> import numpy as np
+        >>> from pyfaust.fact import butterfly
+        >>> from pyfaust import Faust, wht, dft
+        >>> H = wht(8).toarray()
         >>> J = np.arange(7, -1, -1)
         >>> F = butterfly(H, type='bbtree', perm=J)
         >>> # this is equivalent to passing a list containing a single permutation :
