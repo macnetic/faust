@@ -73,19 +73,29 @@ def svdtj2(M, nGivens, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
     from scipy.sparse import spdiags
     from scipy import diag
     from pyfaust import Faust
-    from numpy import argsort,sign,eye
-    D1, W1 = eigtj(M.dot(M.T.conj()), nGivens, tol, 'undef', relerr,
+    from numpy import argsort,sign,eye, sort
+    D1, W1 = eigtj(M.dot(M.T.conj()), nGivens, tol, 'descend', relerr,
                    nGivens_per_fac, verbosity, enable_large_Faust)
-    D2, W2 = eigtj(M.T.conj().dot(M), nGivens, tol, 'undef', relerr,  nGivens_per_fac,
-                   verbosity, enable_large_Faust)
-    S = diag((W1.T.conj() @ M) @ W2)
+    D2, W2 = eigtj(M.T.conj().dot(M), nGivens, tol, 'descend', relerr,
+                   nGivens_per_fac, verbosity, enable_large_Faust)
+    S = diag(W1.T.conj() @ M @ W2)
     I = argsort(abs(S))[::-1]
-    sign_S = spdiags(sign(S[I]), [0], S.shape[0], S.shape[0])
-    S = spdiags(S[I], [0], S.shape[0], S.shape[0])
-    S *= sign_S
-    Id = eye(S.shape[0])
-    U = W1[:,0:S.shape[0]] @ Faust([Id[:,I],sign_S.toarray()])
-    V = W2[:,0:S.shape[0]] @ Faust(Id[:,I])
+    sign_S = spdiags(sign(S[I]), [0], W1.shape[1], W1.shape[1])
+    S = spdiags(S[I] * sign(S[I]), [0], W1.shape[1], W2.shape[1])
+    if len(I) == W1.shape[1]:
+        PU = eye(len(I))[:, I]
+    else:
+        # W1.shape[1] > len(I)
+        J = np.hstack((I, np.arange(len(I), W1.shape[1])))
+        PU = eye((W1.shape[1]))[:,J]
+    if len(I) == W2.shape[1]:
+        PV = eye(len(I))[:, I]
+    else:
+        # W2.shape[0] > len(I)
+        J = np.hstack((I, np.arange(len(I), W2.shape[1])))
+        PV = eye((W2.shape[1]))[:,J]
+    U = W1.left(len(W1)-2) @ Faust(W1.factors(len(W1)-1) @ PU @ sign_S.toarray())
+    V = W2.left(len(W2)-2) @ Faust(W2.factors(len(W2)-1) @ PV)
     return U,S,V
 # experimental block end
 
