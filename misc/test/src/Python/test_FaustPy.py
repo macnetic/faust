@@ -39,6 +39,17 @@ class TestFaustPy(unittest.TestCase):
         self.r = r
         self.num_factors = num_factors
 
+    def test_issue296(self):
+        """
+        Cf. gitlab issue #296
+        """
+        import pyfaust
+        import numpy as np
+        a = np.arange(16).reshape(4, 4)
+        dft = pyfaust.dft(a.shape[0], normed=True)
+        self.assertTrue(np.allclose(a@dft.T, a@dft.toarray().T))
+
+
     def testSave(self):
         print("testSave()")
         tmp_dir = tempfile.gettempdir()+os.sep
