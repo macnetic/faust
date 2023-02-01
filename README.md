@@ -18,16 +18,6 @@ project: [FAµST website](http://faust.inria.fr)
 
 ---
 
-Installation
-============
-
-Please refer to the document "./gettingStartedFAuST-version2_0.pdf"
-to install the FAUST toolbox.
-The FAUST toolbox has been tested on the following environments:
-- LINUX (fedora 24 - 33 / centos 7 / Ubuntu)
-- MACOS X
-- WINDOWS (windows 10)
-
 Dependencies
 ============
 - libxml2 (Optional, needed with CMake BUILD_READ_XML_FILE).
@@ -36,7 +26,7 @@ Dependencies
 
 ---
 
-Quick install on UNIX
+Quick build on UNIX
 =====================
 
 	Unpack the directory.
@@ -46,22 +36,33 @@ Quick install on UNIX
 	make
 	make install
 
-**Warning**:
+**Warning 1**:
 The Matlab interface of FAuST requires compiling mex files. The mex compiler
 compatible with specific versions of gcc depending on the platform used.
 For more information, please refer to the [Mathworks website](http://fr.mathworks.com/support/compilers/R2016a/index.html).
 
+**Warning 2**:
+Many CMake build options are available (cf. [CMakeLists.txt](./CMakeLists.txt)). It might be quite complicated to deal with them at start (refer to gitlab ci building scripts in [./misc/continuous\_integration/jobs/](./misc/continuous_integration/jobs/) or the [.gitlab-ci.yml](.gitlab-ci.yml) root script to get some insight).
+
 ---
 
-Quickest Install on Linux, Windows and macOS
+Quickest Install on Linux, Windows and macOS (pre-built pakages)
 ============================================
+
+Please refer to the document [Installation guides](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/md_README.html)
+to install the FAUST toolbox.
+The FAUST toolbox has been tested on the following environments:
+- LINUX (fedora 35 - 37 / centos 7, 8 / Ubuntu)
+- MACOS X
+- WINDOWS (windows 10)
 
 Pre-compiled packages from Gitlab Continuous Integration are also available. Except of course PIP packages, all packages include matlab and python wrappers, below are the latest release links.  
 - [macOS (.pkg) installer](https://gitlab.inria.fr/faustgrp/faust/-/jobs/artifacts/master/download?job=package_macos_release)  
 - [Windows (.exe) NSI installer](https://gitlab.inria.fr/faustgrp/faust/-/jobs/artifacts/master/download?job=package_win_release)  
 - [Linux (.rpm, .deb) packages](https://gitlab.inria.fr/faustgrp/faust/-/jobs/artifacts/master/download?job=package_linux_release)  
 - [Linux (.rpm, .deb) packages with embedded static matio library](https://gitlab.inria.fr/faustgrp/faust/-/jobs/artifacts/master/download?job=package_linux_release)  
-- Python PIP (pre-compiled) packages: for [Linux](https://gitlab.inria.fr/faustgrp/faust/-/jobs/artifacts/master/download?job=package_linux_purepy_release), [macOS](https://gitlab.inria.fr/faustgrp/faust/-/jobs/artifacts/master/download?job=package_macos_purepy_release) and [Windows 10](https://gitlab.inria.fr/faustgrp/faust/-/jobs/artifacts/master/download?job=package_win_purepy_release)  
+- Python PIP (pre-compiled) packages: for [Linux](https://gitlab.inria.fr/faustgrp/faust/-/jobs/artifacts/master/download?job=package_linux_purepy_release), [macOS](https://gitlab.inria.fr/faustgrp/faust/-/jobs/artifacts/master/download?job=package_macos_purepy_release) and [Windows 10](https://gitlab.inria.fr/faustgrp/faust/-/jobs/artifacts/master/download?job=package_win_purepy_release). Or preferably, refer to [pypi pyfaust](https://pypi.org/project/pyfaust) or [anaconda pyfaust](https://anaconda.org/pyfaust/pyfaust).
+============
 
 ---
 License
