@@ -74,6 +74,10 @@ def svdtj2(M, nGivens, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
     from scipy import diag
     from pyfaust import Faust
     from numpy import argsort,sign,eye, sort
+    if verbosity > 1:
+        print("input eigtj nGivens, tol, order, relerr, "
+              "nGivens_per_fac, verbosity, enable_large_Faust:" , nGivens, tol,
+              'descend', relerr, nGivens_per_fac, verbosity, enable_large_Faust)
     D1, W1 = eigtj(M.dot(M.T.conj()), nGivens, tol, 'descend', relerr,
                    nGivens_per_fac, verbosity, enable_large_Faust)
     D2, W2 = eigtj(M.T.conj().dot(M), nGivens, tol, 'descend', relerr,
