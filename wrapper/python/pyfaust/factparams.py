@@ -1742,8 +1742,12 @@ class ParamsHierarchicalRectMatNoResCons(ParamsHierarchicalRectMat):
             P: cf. ParamsHierarchicalRectMat.__init__
         """
         from pyfaust.proj import proj_id
-        super(ParamsHierarchicalRectMatNoResCons,
-              self).__init__(m, n, j, k, s, rho, P, **kwargs)
+        if P is not None:
+            super(ParamsHierarchicalRectMatNoResCons,
+                  self).__init__(m, n, j, k, s, rho, P, **kwargs)
+        else:
+            super(ParamsHierarchicalRectMatNoResCons,
+                  self).__init__(m, n, j, k, s, rho, **kwargs)
         n_cons = len(self.constraints)
         # Remove all constraints on residuals factors except the last one
         for i in range(0, n_cons//2-1):
