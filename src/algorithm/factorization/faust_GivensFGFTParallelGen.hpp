@@ -5,8 +5,28 @@
 #endif
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-GivensFGFTParallelGen<FPP,DEVICE,FPP2,FPP4>::GivensFGFTParallelGen(int t, Faust::GivensFGFTGen<FPP, DEVICE, FPP2, FPP4> & alg) : alg(alg), t(t), fact_nrots(0) 
+GivensFGFTParallelGen<FPP,DEVICE,FPP2,FPP4>::GivensFGFTParallelGen(int t, Faust::GivensFGFTGen<FPP, DEVICE, FPP2, FPP4> & alg) : alg(alg), t(t), fact_nrots(0)
 {
+
+	if(alg.verbosity > 1)
+	{
+		std::cout << "GivensFGFTGenParallelGen ctor:" << std::endl;
+		std::cout << "J: " << alg.J << std::endl;
+		std::cout << "tol: " << alg.stoppingError << std::endl;
+		std::cout << "stopcrit is error: " << alg.stoppingCritIsError << std::endl;
+		std::cout << "relErr: " << alg.errIsRel << std::endl;
+		std::cout << "order: " << alg.D_order_dir << std::endl;
+		std::cout << "enable_large_Faust: " << alg.enable_large_Faust << std::endl;
+		auto dLap = dynamic_cast<MatDense<FPP, DEVICE>*>(&alg.Lap);
+		if(dLap)
+			std::cout << "matrix norm: " << dLap->norm() << std::endl;
+		else
+		{
+			auto sLap = dynamic_cast<MatSparse<FPP, DEVICE>*>(&alg.Lap);
+			if(sLap)
+				std::cout << "matrix norm: " << sLap->norm() << std::endl;
+		}
+	}
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>

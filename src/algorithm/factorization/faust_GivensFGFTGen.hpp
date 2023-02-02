@@ -66,6 +66,8 @@ const vector<int>& GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_ord_indices()
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::compute_facts()
 {
+
+
 	is_D_ordered = false; // facts (re)computed then D must be reordered
 	ite = 0;
 	bool stopping = false;
@@ -85,6 +87,16 @@ void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::compute_facts()
 			facts.resize(ite);
 			break;
 		}
+	}
+	if(verbosity > 1)
+	{
+		std::cout << "GivensFGFTGen::compute_facts() end" << std::endl;
+		std::cout << "J: " << J << std::endl;
+		std::cout << "tol: " << stoppingError << std::endl;
+		std::cout << "stopcrit is error: " << stoppingCritIsError << std::endl;
+		std::cout << "relErr: " << errIsRel << std::endl;
+		std::cout << "order: " << is_D_ordered << std::endl;
+		std::cout << "enable_large_Faust: " << enable_large_Faust << std::endl;
 	}
 }
 
