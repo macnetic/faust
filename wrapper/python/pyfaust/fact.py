@@ -131,8 +131,13 @@ def svdtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
         Examples:
             >>> from pyfaust.fact import svdtj
             >>> from numpy.random import rand
-            >>> M = rand(128,128)
-            >>> U,S,V = svdtj(M, 1024, nGivens_per_fac=64)
+            >>> import numpy as np
+            >>> from scipy.sparse import spdiags
+            >>> M = rand(16, 32)
+            >>> U, S, V = svdtj(M, 4096, enable_large_Faust=True)
+            >>> S_ = spdiags(S, [0], U.shape[0], V.shape[0])
+            >>> np.allclose(U@S_@V.H, M)
+            True
 
         If we call svdtj on the matrix M, it makes two internal calls to eigtj.
 
