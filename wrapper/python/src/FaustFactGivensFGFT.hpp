@@ -58,7 +58,7 @@ FaustCoreCpp<FPP>* fact_givens_fgft_generic(GivensFGFT<FPP, Cpu, FPP2>* algo, FP
         //copy ordered diagonal in buffer D (allocated from the outside)
         algo->get_D(D, order);
 
-        return new FaustCoreCpp<FPP>(th);
+        fc = new FaustCoreCpp<FPP>(th);
     }
     catch(out_of_range e)
     {

@@ -6,6 +6,8 @@
 #include "faust_constant.h"
 namespace Faust
 {
+
+	//TODO document the prototypes
 	template<typename FPP, FDevice DEVICE, typename FPP2 = float>
 		void svdtj(MatDense<FPP, DEVICE> & M, int J, int t, FPP2 tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust,TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Vect<FPP,DEVICE> ** S);
 	template<typename FPP, FDevice DEVICE, typename FPP2 = float>
