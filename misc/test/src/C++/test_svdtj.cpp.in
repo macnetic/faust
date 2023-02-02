@@ -1,0 +1,89 @@
+
+#include "faust_TransformHelper.h"
+#include "faust_GivensFGFTGen.h"
+#include "faust_SVDTJ.h"
+#include <cstdlib>
+
+typedef @TEST_FPP@ FPP;
+using namespace std;
+using namespace Faust;
+
+/**
+ * This test verifies the SVD factorization of an random matrix of size m x n.
+ * We authorize large Fausts for U and V (a lot of Givens factors) because we want to test if it works well.
+ */
+
+int main(int argc, char **argv)
+{
+	// input
+	int m, n, min_mn;
+	m = 16;
+	n = 32;
+	auto J = 1024; // nGivens
+	if(argc >= 3)
+	{
+		m = std::atoi(argv[1]);
+		n = std::atoi(argv[2]);
+		if(argc >= 4)
+			J = std::atoi(argv[3]);
+	}
+	cout << "A size m x n: " << m << " x " << n << endl;
+	cout << "J: " << J << endl;
+	min_mn = m > n?n:m;
+	auto A = MatDense<FPP, Cpu>::randMat(m, n);
+//	auto DFT = TransformHelper<std::complex<double>, Cpu>::fourierFaust(4, false);
+//	auto A = new MatDense<FPP, Cpu>(DFT->real<double>()->get_product()); // in the heap to match the delete in the end (needed for randMat generated A)
+//	delete DFT;
+#if DEBUG_SVDTJ
+	A->save_to_mat_file("/tmp/A_cpp.mat", "A");
+#endif
+	auto t =  m / 2; // nGivens per factor
+	if(t > J)
+		throw runtime_error("t > J"); // TODO: the check should be in eigtj C++ code
+	bool relErr = true; // use relative error instead of absolute error if tol is not 0
+	Real<FPP> tol = 0; // not the stopping criterion
+	int verb = 0;
+	int order = -1;
+	bool enable_large_Faust = true;
+	// output
+	TransformHelper<FPP,Cpu> *U, *V;
+	Faust::Vect<FPP,Cpu> * S_;
+// input svdtj nGivens, tol, order, relerr, nGivens_per_fac, verbosity, enable_large_Faust: 4096 0 descend True None 0 True
+//
+//void Faust::svdtj(MatDense<FPP, DEVICE> & dM, int J, int t, FPP2 tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Faust::Vect<FPP,DEVICE> ** S_)
+	MatDense<FPP, Cpu> err(*A);
+	// warning *A is modified by the svdtj
+	svdtj(*A, J, t, tol, verb, relErr, order, enable_large_Faust, &U, &V, &S_);
+	cout << "U, V number of factors: " << U->size() << ", " << V->size() << endl;
+	cout << "U, V RCGs: " << double(m * m) / U->get_total_nnz() << " " << double(n * n) / V->get_total_nnz() << endl;
+	MatDense<FPP, Cpu> S(m, n);
+	S.setZeros();
+	for(int i=0; i < min_mn; i++)
+		S.getData()[i * m + i] = (*S_)(i);
+	// compute the error
+	MatDense<FPP, Cpu> US = U->multiply(S);
+
+#if DEBUG_SVDTJ
+	US.save_to_mat_file("/tmp/US_cpp.mat", "US_cpp");
+#endif
+	auto USV_ = V->get_product();
+	USV_.adjoint();
+	US.multiply(USV_, 'N');
+#if DEBUG_SVDTJ
+	USV_.save_to_mat_file("/tmp/USV_cpp.mat", "USV_cpp");
+	err.save_to_mat_file("/tmp/err.mat", "err");
+#endif
+	err -= USV_;
+	cout << "svdtj err: " << err.norm() / A->norm() << endl;
+#if DEBUG_SVDTJ
+	U->save_mat_file("/tmp/U_cpp.mat");
+	V->save_mat_file("/tmp/V_cpp.mat");
+	S.save_to_mat_file("/tmp/S_cpp.mat", "S");
+#endif
+	delete A;
+	delete U;
+	delete V;
+	delete S_;
+	return EXIT_SUCCESS;
+}
+
