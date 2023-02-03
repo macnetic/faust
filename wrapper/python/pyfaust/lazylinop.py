@@ -116,6 +116,28 @@ def vstack(tup):
     else:
         raise TypeError('lop must be a LazyLinearOp')
 
+def _binary_dtype(A_dtype, B_dtype):
+    if isinstance(A_dtype, str):
+        A_dtype = np.dtype(A_dtype)
+    if isinstance(B_dtype, str):
+        B_dtype = np.dtype(B_dtype)
+    if A_dtype is None:
+        return B_dtype
+    if B_dtype is None:
+        return A_dtype
+    if A_dtype is None and B_dtype is None:
+        return None
+    kinds = [A_dtype.kind, B_dtype.kind]
+    if A_dtype.kind == B_dtype.kind:
+        dtype = A_dtype if A_dtype.itemsize > B_dtype.itemsize else B_dtype
+    elif 'c' in [A_dtype.kind, B_dtype.kind]:
+        dtype = 'complex'
+    elif 'f' in kinds:
+        dtype = 'double'
+    else:
+        dtype = A_dtype
+    return dtype
+
 class LazyLinearOp(LinearOperator):
     """
     This class implements a lazy linear operator. A LazyLinearOp is a
@@ -512,7 +534,9 @@ class LazyLinearOp(LinearOperator):
             elif op.ndim > 2:
                 from itertools import product
                 # op.ndim > 2
-                res = np.empty((*op.shape[:-2], self.shape[0], op.shape[-1]))
+                dtype = _binary_dtype(self.dtype, op.dtype)
+                res = np.empty((*op.shape[:-2], self.shape[0], op.shape[-1]),
+                               dtype=dtype)
                 idl = [ list(range(op.shape[i])) for i in range(op.ndim-2) ]
                 for t in product(*idl):
                     tr = (*t, slice(0, res.shape[-2]), slice(0, res.shape[-1]))
@@ -1026,12 +1050,14 @@ def LazyLinearOperator(shape, **kwargs):
                          ' passed in kwargs.')
 
     def _matmat(M, _matvec):
+        nonlocal dtype
         if M.ndim == 1:
             return _matvec(M)
-
-        out = np.empty((shape[0], M.shape[1]), dtype=dtype if dtype is not None
-                      else M.dtype)
-        for i in range(M.shape[1]):
+        first_col = _matvec(M[:, 0])
+        dtype = first_col.dtype
+        out = np.empty((shape[0], M.shape[1]), dtype=dtype)
+        out[:, 0] = first_col
+        for i in range(1, M.shape[1]):
             out[:, i] = _matvec(M[:,i])
         return out
 
@@ -1096,7 +1122,8 @@ def kron(A, B):
                 one_dim = True
             else:
                 one_dim = False
-            res = np.empty((shape[0], op.shape[1]))
+            dtype = _binary_dtype(A.dtype, B.dtype)
+            res = np.empty((shape[0], op.shape[1]), dtype=dtype)
             def out_col(j, ncols):
                 for j in range(j, min(j + ncols, op.shape[1])):
                     op_mat = op[:, j].reshape((A.shape[1], B.shape[1]))
