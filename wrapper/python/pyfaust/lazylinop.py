@@ -247,10 +247,10 @@ class LazyLinearOp(LinearOperator):
             l['H'] = None
             l['slice'] = None
 
-        lop = LazyLinearOp(lambdas, shape, dtype)
-        lopT = LazyLinearOp(lambdasT, (shape[1], shape[0]), dtype)
-        lopH = LazyLinearOp(lambdasH, (shape[1], shape[0]), dtype)
-        lopC = LazyLinearOp(lambdasC, shape, dtype)
+        lop = LazyLinearOp(lambdas, shape, dtype=dtype)
+        lopT = LazyLinearOp(lambdasT, (shape[1], shape[0]), dtype=dtype)
+        lopH = LazyLinearOp(lambdasH, (shape[1], shape[0]), dtype=dtype)
+        lopC = LazyLinearOp(lambdasC, shape, dtype=dtype)
 
         lambdas['T'] = lambda: lopT
         lambdas['H'] = lambda: lopH
