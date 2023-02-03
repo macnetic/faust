@@ -60,7 +60,8 @@ class StoppingCriterion(object):
 
         Example:
             >>> from pyfaust.factparams import StoppingCriterion
-            >>> from numpy.random import rand
+            >>> from numpy.random import rand, seed
+            >>> seed(42) # just for reproducibility
             >>> s = StoppingCriterion()
             >>> print(s)
             num_its: 500, maxiter: 10000
@@ -69,10 +70,10 @@ class StoppingCriterion(object):
             num_its: 5, maxiter: 10000
             >>> s = StoppingCriterion(tol=.5)
             >>> print(s)
-            tol: 0.5 relerr: False, maxiter: 10000
+            tol: 0.5, relerr: False, maxiter: 10000
             >>> s = StoppingCriterion(tol=.2, relerr=True, relmat=rand(10,10))
             >>> print(s)
-            tol: 1.1123924064125228, relerr: True, maxiter: 10000
+            tol: 1.1111883397755122, relerr: True, maxiter: 10000
 
         """
         self.tol = tol
@@ -133,6 +134,10 @@ class ConstraintName:
         SUPP: Designates a constraint by a support matrix S (element-wisely multiplying the matrix to constrain to obtain a matrix for which the 2-norm equals 1, see: ConstraintMat.project()).
         SKPERM: SKPERM prox/constraint.
         ID: Identity prox/constraint.
+        BLKDIAG: Designates a constraint to produce a block-diagonal matrix (cf. pyfaust.proj.blockdiag).
+        CIRC: Designates a constraint to produce a circulant matrix (cf. pyfaust.proj.circ).
+        HANKEL: Designates a constraint to produce an anti-circulant matrix (cf. pyfaust.proj.hankel).
+        TOEPLITZ: Designates a constraint to produce a toeplitz matrix (cf. pyfaust.proj.toeplitz).
         name: The name of the constraint (actually an integer among the valid constants).
 
     Example:
@@ -140,24 +145,27 @@ class ConstraintName:
         >>> # This constraint doesn't necessarily
         >>> # lead to a  image matrix with asked sparsity respected
         >>> # both for columns and rows
-        >>> from numpy.random import rand
+        >>> from numpy.random import rand, seed
         >>> from numpy.linalg import norm
+        >>> from pyfaust.factparams import ConstraintInt
+        >>> import numpy as np
         >>> n = 10; m = 10; v = 2;
+        >>> seed(42) # just for reproducibility
         >>> M = rand(10,10)
         >>> Mspcol = ConstraintInt('spcol', n, m, v).project(M)
         >>> Msplin = ConstraintInt('splin', n, m, v).project(M)
         >>> Mp = ConstraintInt('splincol', n, m, v).project(M)
-        >>> Mp_ = Mspcol + np.where(Mspcol != 0, 0, Msplin) # the sum of Mspcol and Msplin minus their non-zero matrix intersection
+        >>> Mp_ = Mspcol + np.where(Mspcol != 0, 0, Msplin) # the sum of Mspcol and Msplin minus their nonzero intersection matrix
         >>> Mp_/= norm(Mp_)
         >>> # Mp is approximately equal to Mp_
-        >>> print(norm(Mp-Mp_,2)/norm(Mp_), 2)
-        0.00769281206496
+        >>> print(norm(Mp-Mp_,2)/norm(Mp_, 2))
+        0.0041532733089187064
         >>> from numpy import count_nonzero
         >>> count_nonzero(Mp[:,1])
-        3
+        2
         >>> # sparsity value v is not respected
         >>> count_nonzero(Mp_[:,1])
-        3
+        2
         >>> count_nonzero(Mp_[1,:])
         2
         >>> count_nonzero(Mp[1,:])
@@ -239,6 +247,9 @@ class ConstraintName:
         return ConstraintName._arg_is_mat_const(self.name)
 
     def name_str(self):
+        """
+            Returns the str constant name of this constraint.
+        """
         return ConstraintName.name_int2str(self.name)
 
     @staticmethod
@@ -339,9 +350,7 @@ class ConstraintGeneric(ABC):
     instance (as a container for the factorization parameters).
     It's also possible to set a list of constraints with the ConstraintList class.
 
-    <b/> See also: ConstraintInt, ConstraintReal, ConstraintMat,
-    pyfaust.fact.palm4msa, pyfaust.fact.hierarchical, ParamsPalm4MSA,
-    ParamsHierarchical.
+    <b/> See also: ConstraintInt, ConstraintReal, ConstraintMat, pyfaust.fact.palm4msa, pyfaust.fact.hierarchical, ParamsPalm4MSA, ParamsHierarchical.
 
     Attributes:
         _name: The name of the constraint applied to the factor (ConstraintName instance).
@@ -428,7 +437,7 @@ class ConstraintGeneric(ABC):
             raise ValueError("The dimensions must agree.")
 
     def __repr__(self):
-        return self._name.name_str()+"("+str(self._num_rows)+","+ \
+        return self._name.name_str()+"("+str(self._num_rows)+", "+ \
                 str(self._num_cols) + (", "+str(self._cons_value) + ")" if not
                                            self.is_mat_constraint()
                                            else ")")
@@ -536,10 +545,11 @@ class ConstraintMat(ConstraintGeneric):
 
         Example:
             >>> from pyfaust.factparams import ConstraintMat
-            >>> from numpy.random import rand
+            >>> from numpy.random import rand, seed
             >>> from numpy import eye
             >>> from numpy.linalg import norm
             >>> cons = ConstraintMat('supp', eye(10))
+            >>> seed(42) # just for reproducibility
             >>> M = rand(10,10)
             >>> from numpy import count_nonzero
             >>> count_nonzero(M)
@@ -548,13 +558,13 @@ class ConstraintMat(ConstraintGeneric):
             10
             >>> from numpy import diag
             >>> diag(M)
-            array([ 0.77861201,  0.88512726,  0.56276019,  0.89159211,  0.85893333,
-                           0.59919467,  0.02603014,  0.16725741,  0.20578577,  0.40803648])
+            array([0.37454012, 0.96990985, 0.29214465, 0.94888554, 0.25877998,
+                   0.92187424, 0.14092422, 0.07404465, 0.88721274, 0.10789143])
             >>> diag(cons.project(M))
-            array([ 0.39756071,  0.4519476 ,  0.28734638,  0.45524856,  0.43857293,
-                           0.30594989,  0.01329104,  0.08540194,  0.10507459,  0.20834417])
+            array([0.19194101, 0.49705083, 0.14971571, 0.48627647, 0.13261728,
+                   0.47243396, 0.0722196 , 0.03794575, 0.45467094, 0.05529124])
             >>> norm(cons.project(M))
-            0.99999999999999989
+            1.0
 
         """
         if not cons_value is None:
@@ -651,15 +661,15 @@ class ConstraintReal(ConstraintGeneric):
 
         Example:
             >>> from pyfaust.factparams import ConstraintReal
-            >>> from numpy.random import rand
+            >>> from numpy.random import rand, seed
             >>> from numpy.linalg import norm
+            >>> seed(42) # just for reproducibility
             >>> cons = ConstraintReal('normcol', 10, 10, 2.) # a short for ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 10, 10, 2.)
             >>> M = rand(10,10)*10
             >>> norm(M[:,2])
-            17.041462424512272
+            18.91380623771181
             >>> norm(cons.project(M)[:,2])
-            2.0
-
+            1.9999999999999998
 
             <b/> See also: ConstraintGeneric.__init__
         """
@@ -766,15 +776,14 @@ class ConstraintList(object):
 
         Examples:
             >>> from pyfaust.factparams import *
-            >>> l1 = ConstraintList('normcol', 1, 32, 32, 'sp', 128, 32, 32,
-                                    'sp', 128, 32, 32)
+            >>> l1 = ConstraintList('normcol', 1, 32, 32, 'sp', 128, 32, 32, 'sp', 128, 32, 32)
             >>> l2 = ConstraintList('sp', 128, 32, 32, 'sp', 128, 32, 32)
-            >>> l1 + l2
-
+            >>> l1 + l2 # doctest:+ELLIPSIS
+            <pyfaust.factparams.ConstraintList object at ...>
         """
         if(not isinstance(other, ConstraintList)):
-           raise TypeError("Can't concatenate a ConstraintList with something"
-                           " else.")
+            raise TypeError("Can't concatenate a ConstraintList with something"
+                            " else.")
         return ConstraintList(*(self.clist + other.clist))
 
     def __getitem__(self, ind):
@@ -785,13 +794,14 @@ class ConstraintList(object):
                 >>> from pyfaust.factparams import *
                 >>> cl = ConstraintList('sp', 128, 32, 32, 'sp', 128, 32, 32)
                 >>> cl[1]
-                <pyfaust.factparams.ConstraintInt at 0x7f13a78fd3c8>
+                sp(32, 32, 128)
+
         """
         return self.clist.__getitem__(ind)
 
 class MHTPParams:
     """
-    This class defines the set of parameters to run the MHTP-PAL4MSA algorithm.
+    This class defines the set of parameters to run the MHTP-PALM4MSA algorithm.
 
     <b/> See also pyfaust.fact.palm4msa_mhtp, pyfaust.fact.hierarchical_mhtp
     """
@@ -799,23 +809,22 @@ class MHTPParams:
                  constant_step_size=False, step_size=1e-3,
                  palm4msa_period=1000,
                  updating_lambda=True):
-        """
-        Constructor of the MHTPParams class.
+        """Constructor of the MHTPParams class.
 
-        <b/> See also pyfaust.fact.palm4msa_mhtp, pyfaust.fact.hierarchical_mhtp
+            Args:
+                num_its: (int, optional) the number of iterations to run the MHTP algorithm.
+                constant_step_size: (bool, optional) True to use a constant step
+                for the gradient descent, False otherwise. If False the step size
+                is computed dynamically along the iterations (according to a Lipschitz criterion).
+                step_size: (float, optional) The step size used when constant_step_size==True.
+                palm4msa_period: (int, optional) The period (in term of iterations)
+                according to the MHTP algorithm is ran (i.e.: 0 <= i < N being the PALM4MSA
+                iteration, MHTP is launched every i = 0 (mod palm4msa_period).
+                Hence the algorithm is ran one time at least -- at PALM4MSA iteration 0).
+                updating_lambda: (bool, optional) if True then the scale factor of the Faust resulting of the factorization is updated after each iteration of MHTP (otherwise it never changes during the whole MHTP execution).
 
-        Args:
-            num_its: (int, optional) the number of iterations to run the MHTP algorithm.
-            constant_step_size: (bool, optional) True to use a constant step
-            for the gradient descent, False otherwise. If False the step size
-            is computed dynamically along the iterations (according to a Lipschitz criterion).
-            step_size: (float, optional) The step size used when constant_step_size==True. 
-            palm4msa_period: (int, optional) The period (in term of iterations)
-            according to the MHTP algorithm is ran (i.e.: 0 <= i < N being the PALM4MSA
-            iteration, MHTP is launched every i = 0 (mod palm4msa_period).
-            Hence the algorithm is ran one time at least -- at PALM4MSA iteration 0).
-            updating_lambda: (bool, optional) if True then the scale factor of the Faust resulting of the factorization is updated after each iteration of MHTP (otherwise it never changes during the whole MHTP execution).
 
+            <b/> See also pyfaust.fact.palm4msa_mhtp, pyfaust.fact.hierarchical_mhtp
         """
         stop_crit = StoppingCriterion(num_its=num_its)
         if not isinstance(stop_crit, StoppingCriterion):
@@ -844,6 +853,11 @@ class MHTPParams:
                 "palm4msa_period: "+str(self.palm4msa_period)+"\r\n"+
                 "updating_lambda: " +str(self.updating_lambda)+"\r\n")
 
+    """
+
+    """
+
+
 
 class ParamsFact(ABC):
     """
@@ -867,6 +881,9 @@ class ParamsFact(ABC):
                  norm2_threshold=1e-6,
                  grad_calc_opt_mode=EXTERNAL_OPT,
                  **kwargs):
+        """
+        <b/> See ParamsHierarchical.__init__, ParamsPalm4MSA.__init__
+        """
         self.num_facts = num_facts
         self.is_update_way_R2L = is_update_way_R2L
         self.init_lambda = init_lambda
@@ -1130,11 +1147,11 @@ class ParamsHierarchical(ParamsFact):
                 M.shape[1] == self.data_num_cols
 
     def are_constraints_consistent(self, M):
-        """
-        This method verifies that the constraints are shape-consistent to the
+        """This method verifies that the constraints are shape-consistent to the
         matrix/array M to factorize and with each other.
 
-        Returns: True if the constraints are consistent, raises a ValueError otherwise.
+            Returns:
+                True if the constraints are consistent, raises a ValueError otherwise.
         """
         cons_not_ok = False
         cs = self.constraints
@@ -1254,7 +1271,6 @@ class ParamsHierarchicalNoResCons(ParamsHierarchical):
         This example shows two parameterizations that are equivalent. The first one,
         p1, is defined trough a ParamsHierarchical instance while the second one,
         p2, is defined using a ParamsHierarchicalNoResCons instance.
-
         >>> from pyfaust import wht
         >>> from pyfaust.proj import skperm, proj_id
         >>> from pyfaust.factparams import ParamsHierarchical, ParamsHierarchicalNoResCons, StoppingCriterion
@@ -1265,55 +1281,39 @@ class ParamsHierarchicalNoResCons(ParamsHierarchical):
         >>> H = wht(32).toarray()
         >>> d = H.shape[0]
         >>> n = int(log2(d))
-        >>> res_projs = [];
-        >>> fac_projs = [];
-        >>> for i in range(n-1):
-        >>>     if i == n-2:
-        >>>         res_projs += [ skperm((d,d), int(d/2**(i+1)), normalized=True) ]
-        >>>     else:
-        >>>         res_projs += [ proj_id((d,d)) ]
-        >>>     fac_projs += [ skperm((d,d), 2, normalized=True) ]
+        >>> res_projs = [skperm((d,d), int(d/2**(i+1)), normalized=True) if i == n-2 else proj_id((d,d)) for i in range(n-1)]
+        >>> fac_projs = [skperm((d,d), 2, normalized=True) for i in range(n-1)]
         >>> stop_crit = StoppingCriterion(num_its=30)
         >>> p1 = ParamsHierarchical(fac_projs, res_projs, stop_crit, stop_crit, is_update_way_R2L=True, packing_RL=False)
         >>> simple_projs = fac_projs+[res_projs[-1]]
         >>> p2 = ParamsHierarchicalNoResCons(simple_projs, stop_crit, stop_crit, is_update_way_R2L=True, packing_RL=False)
         >>> # p1 and p2 are exactly the same set of parameters for hierarchical
         >>> # let's verify the results
-        >>> print("factorizing with p1 (ParamsHierarchical) into Faust F1")
+        >>> # factorizing with p1 (ParamsHierarchical) into Faust F1
         >>> F1 = hierarchical(H, p1, backend=2020)
         >>> # factorizing with p2 (ParamsHierarchicalNoResCons)
         >>> print("F1=", F1)
+        F1= Faust size 32x32, density 0.3125, nnz_sum 320, 5 factor(s):
+        - FACTOR 0 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+        - FACTOR 1 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+        - FACTOR 2 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+        - FACTOR 3 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+        - FACTOR 4 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+
         >>> print("F1 error =", (F1-H).norm()/norm(H))
-        >>> print("factorizing with p2 (ParamsHierarchicalNoResCons) into Faust F2")
+        F1 error = 7.850462159063938e-16
+        >>> # factorizing with p2 (ParamsHierarchicalNoResCons) into Faust F2
         >>> F2 = hierarchical(H, p2, backend=2020)
         >>> print("F2=", F2)
-        >>> print("F2 error =", (F2-H).norm()/norm(H))
+        F2= Faust size 32x32, density 0.3125, nnz_sum 320, 5 factor(s):
+        - FACTOR 0 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+        - FACTOR 1 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+        - FACTOR 2 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+        - FACTOR 3 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+        - FACTOR 4 (double) SPARSE, size 32x32, density 0.0625, nnz 64
 
-        Output:
-            factorizing with p1 (ParamsHierarchical) into Faust F1<br/>
-            hierarchical: 1/4<br/>
-            hierarchical: 2/4<br/>
-            hierarchical: 3/4<br/>
-            hierarchical: 4/4<br/>
-            F1= Faust size 32x32, density 0.3125, nnz_sum 320, 5 factor(s): <br/>
-            FACTOR 0 (double) SPARSE, size 32x32, density 0.0625, nnz 64<br/>
-            FACTOR 1 (double) SPARSE, size 32x32, density 0.0625, nnz 64<br/>
-            FACTOR 2 (double) SPARSE, size 32x32, density 0.0625, nnz 64<br/>
-            FACTOR 3 (double) SPARSE, size 32x32, density 0.0625, nnz 64<br/>
-            FACTOR 4 (double) SPARSE, size 32x32, density 0.0625, nnz 64<br/>
-            F1 error = 7.850462159063938e-16<br/>
-            factorizing with p2 (ParamsHierarchicalNoResCons) into Faust F2<br/>
-            hierarchical: 1/4<br/>
-            hierarchical: 2/4<br/>
-            hierarchical: 3/4<br/>
-            hierarchical: 4/4<br/>
-            F2= Faust size 32x32, density 0.3125, nnz_sum 320, 5 factor(s): <br/>
-            FACTOR 0 (double) SPARSE, size 32x32, density 0.0625, nnz 64<br/>
-            FACTOR 1 (double) SPARSE, size 32x32, density 0.0625, nnz 64<br/>
-            FACTOR 2 (double) SPARSE, size 32x32, density 0.0625, nnz 64<br/>
-            FACTOR 3 (double) SPARSE, size 32x32, density 0.0625, nnz 64<br/>
-            FACTOR 4 (double) SPARSE, size 32x32, density 0.0625, nnz 64<br/>
-            F2 error = 7.850462159063938e-16<br/>
+        >>> print("F2 error =", (F2-H).norm()/norm(H))
+        F2 error = 7.850462159063938e-16
 
     """
     def __init__(self, fact_constraints, stop_crit1,
@@ -1443,7 +1443,8 @@ class ParamsHierarchicalDFT(ParamsHierarchical):
         """
         Generates the DFT supports with the additional bit-reversal permutation matrix.
 
-        n: the log2(size) of the DFT (of size 2^n x 2^n).
+        Args:
+            n: the log2(size) of the DFT (of size 2^n x 2^n).
         """
         size = 2 ** n
         supports = []
@@ -1706,6 +1707,8 @@ class ParamsHierarchicalRectMat(ParamsHierarchical):
 
         Example:
             >>> from pyfaust.factparams import ParamsHierarchicalRectMat
+            >>> from numpy.random import rand, seed
+            >>> seed(42) # just for reproducibility
             >>> num_facts = 9
             >>> k = 10
             >>> s = 8
@@ -1713,6 +1716,7 @@ class ParamsHierarchicalRectMat(ParamsHierarchical):
             >>> rho = 1.2
             >>> P = 1.5
             >>> p2 = ParamsHierarchicalRectMat.createParams(rand(256, 1024), [['rectmat', num_facts, k, s], {'rho': rho, 'P': P}])
+
         """
         # caller is responsible to check if name in p is really 'rectmat'
         p = ParamsHierarchicalRectMat._parse_p(p)
@@ -1766,11 +1770,13 @@ class ParamsHierarchicalRectMatNoResCons(ParamsHierarchicalRectMat):
 
         Example:
             >>> from pyfaust.factparams import ParamsHierarchicalRectMat
+            >>> from numpy.random import rand, seed
+            >>> seed(42) # just for reproducibility
             >>> num_facts = 9
             >>> k = 10
             >>> s = 8
-            >>> p = ParamsHierarchicalRectMat.createParams(rand(256, 1024),
-                                                           ['rectmat_simple', num_facts, k, s])
+            >>> p = ParamsHierarchicalRectMat.createParams(rand(256, 1024), ['rectmat_simple', num_facts, k, s])
+
         """
         # caller is responsible to check if name in p is really
         # 'rectmat_simple' or 'meg_simple'
@@ -1871,7 +1877,8 @@ class ParamsPalm4MSA(ParamsFact):
         This method verifies that the constraints are shape-consistent to the
         matrix/array M to factorize and with each other.
 
-        Returns: True if the constraints are consistent, raises a ValueError otherwise.
+        Returns:
+            True if the constraints are consistent, raises a ValueError otherwise.
         """
         if not hasattr(M, 'shape'):
             raise TypeError('M must be an array-like object, with at least the'
@@ -1992,11 +1999,9 @@ class ParamsFactFactory:
     """
         The factory for creating simplified FAuST hierarchical algorithm parameters (ParamsHierarchical).
 
-        Note: this factory is not related to ParamsPalm4MSA, it only creates
-        ParamsHierarchical instances.
+        Note: this factory is not related to ParamsPalm4MSA, it only creates ParamsHierarchical instances.
 
-        <b/> See also  ParamsHierarchicalRectMat,
-        ParamsHierarchicalWHT, pyfaust.fact.hierarchical()
+        <b/> See also  ParamsHierarchicalRectMat, ParamsHierarchicalWHT, pyfaust.fact.hierarchical()
     """
     SIMPLIFIED_PARAM_NAMES = [
         [ "squaremat", "hadamard"], #TODO: delete squaremat
@@ -2016,7 +2021,7 @@ class ParamsFactFactory:
         """
 
         Args:
-            p:
+            p: a list ot create a parameter instance.
         """
         from pyfaust.factparams import \
         (ParamsHierarchicalWHT,
