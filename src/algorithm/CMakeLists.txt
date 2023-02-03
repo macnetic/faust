@@ -1,5 +1,5 @@
 foreach(REAL_TYPE IN ITEMS float double)
-  if(REAL_TYPE MATCHES double)
+  if(REAL_TYPE MATCHES double|float)
     set(SVD_COMPLEX 1)
   else()
     set(SVD_COMPLEX 0)
