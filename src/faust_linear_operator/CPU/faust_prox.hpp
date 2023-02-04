@@ -473,43 +473,30 @@ template<typename FPP> void Faust::prox_circ(Faust::MatDense<FPP, Cpu> & M, cons
 	if(M.getNbRow() != M.getNbCol()) throw out_of_range("circulant projector applies only on square matrices");
 	FPP mi, mj, m;
 	int dli, dlj, j;
+	auto n = M.getNbRow();
 	vector<int> I, J;
 	if(pos) Faust::pre_prox_pos(M);
-	Faust::MatDense<FPP,Cpu> P(M.getNbRow(), M.getNbCol());
-	for(int i=0;i<M.getNbRow();i++)
+	Faust::MatDense<FPP,Cpu> P(n, M.getNbCol());
+	// we compute the mean of each pair of diagonals
+	// (0, 0), (1, 1 - n), ... (i, i - n) forall 0 <= i <= n (n the number of rows of the matrix
+	// the mean of the two diagonals is used to set the corresponding two diagonals of the output
+	for(int i=0;i<n;i++)
 	{
-		j = i - M.getNbRow();
-		dli = M.getNbRow()-i;
-		dlj = M.getNbRow()+j;
+		j = i - n;
+		dli = n - i;
+		dlj = n + j;
 		mi =  M.diagonal(i).mean();
 		if(i == 0)
 			mj = mi;
 		else
 			mj = M.diagonal(j).mean();
 		m = (FPP(dli)*mi+FPP(dlj)*mj)/(FPP(dli)+FPP(dlj));
-		I.clear();
-		J.clear();
-		//TODO: remove vectors and directly use indices to add elts
-		//edit diag i
-		for(int k=0;k < dli; k++)
-			I.push_back(k);
-		for(int k=i;k<dli+i;k++)
-			J.push_back(k);
-		for(int k = 0; k < dli; k++)
-		{
-			P.getData()[J[k]*M.getNbRow()+I[k]] = m;
-		}
-		//edit diag j
-		I.clear();
-		J.clear();
-		for(int k = -j; k < dlj-j; k++)
-			I.push_back(k);
-		for(int k = 0; k < dlj; k++)
-			J.push_back(k);
-		for(int k = 0; k <dlj; k++)
-		{
-			P.getData()[J[k]*M.getNbRow()+I[k]] = m;
-		}
+		// edit diag i
+		for(auto ij: P.get_diag_indices(i))
+			P[ij.second * n + ij.first] = m;
+		// edit diag j
+		for(auto ij: P.get_diag_indices(j))
+			P[ij.second * n + ij.first] = m;
 	}
 	M = P;
 	if(normalized) M.normalize();
