@@ -18,19 +18,18 @@ from warnings import warn
 """
 
 class StoppingCriterion(object):
-    """
-        This class defines a StoppingCriterion for PALM4MSA algorithms.
+    """This class defines a StoppingCriterion for PALM4MSA algorithms.
 
-        A stopping criterion can be of two kinds:
-            - number of iterations,
-            - error threshold.
+    A stopping criterion can be of two kinds:
+        - number of iterations,
+        - error threshold.
 
-        Attributes:
-            num_its: see pyfaust.factparams.StoppingCriterion.__init__.
-            maxiter: see pyfaust.factparams.StoppingCriterion.__init__.
-            relerr: see pyfaust.factparams.StoppingCriterion.__init__.
-            relmat: see pyfaust.factparams.StoppingCriterion.__init__.
-            tol: see pyfaust.factparams.StoppingCriterion.__init__.
+    Attributes:
+        num_its: see pyfaust.factparams.StoppingCriterion.__init__.
+        maxiter: see pyfaust.factparams.StoppingCriterion.__init__.
+        relerr: see pyfaust.factparams.StoppingCriterion.__init__.
+        relmat: see pyfaust.factparams.StoppingCriterion.__init__.
+        tol: see pyfaust.factparams.StoppingCriterion.__init__.
     """
     DEFAULT_MAXITER=10000
     DEFAULT_TOL=0.3
