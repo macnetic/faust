@@ -199,6 +199,13 @@ namespace Faust
 		M = cpuM;
 	}
 
+	template<typename FPP> void prox_anticirc(MatDense<FPP, GPU2> & M, const bool normalized /*= true*/, const bool pos /*= false*/)
+	{
+		MatDense<FPP,Cpu> cpuM = M.tocpu();
+		prox_anticirc(cpuM, normalized, pos);
+		M = cpuM;
+	}
+
 	template<typename FPP>
 		void prox_skperm(MatDense<FPP, GPU2> & M,const unsigned int k,  const bool normalized/*=true*/, const bool pos/*=false*/)
 		{

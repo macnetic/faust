@@ -59,6 +59,7 @@ bool PyxConstraintGeneric::is_mat_constraint()
         case CONSTRAINT_NAME_BLKDIAG:
         case CONSTRAINT_NAME_TOEPLITZ:
         case CONSTRAINT_NAME_CIRC:
+        case CONSTRAINT_NAME_ANTICIRC:
         case CONSTRAINT_NAME_HANKEL:
         case CONSTRAINT_NAME_ID:
             return true;
@@ -130,6 +131,10 @@ int prox_mat(unsigned int cons_type, FPP* cons_param, unsigned long cons_param_s
                 return ret;
             case CONSTRAINT_NAME_CIRC:
                 Faust::prox_circ(fmat, normalized, pos);//, Faust::MatDense<FPP,Cpu>(cons_param, num_rows, num_cols), normalized, pos);
+                memcpy(mat_out, fmat.getData(), sizeof(FPP)*num_rows*num_cols);
+                return ret;
+            case CONSTRAINT_NAME_ANTICIRC:
+                Faust::prox_anticirc(fmat, normalized, pos);//, Faust::MatDense<FPP,Cpu>(cons_param, num_rows, num_cols), normalized, pos);
                 memcpy(mat_out, fmat.getData(), sizeof(FPP)*num_rows*num_cols);
                 return ret;
             case CONSTRAINT_NAME_HANKEL:

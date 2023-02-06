@@ -135,6 +135,7 @@ class ConstraintName:
         ID: Identity prox/constraint.
         BLKDIAG: Designates a constraint to produce a block-diagonal matrix (cf. pyfaust.proj.blockdiag).
         CIRC: Designates a constraint to produce a circulant matrix (cf. pyfaust.proj.circ).
+        ANTICIRC: Designates a constraint to produce an anti-circulant matrix (cf. pyfaust.proj.anticirc).
         HANKEL: Designates a constraint to produce an anti-circulant matrix (cf. pyfaust.proj.hankel).
         TOEPLITZ: Designates a constraint to produce a toeplitz matrix (cf. pyfaust.proj.toeplitz).
         name: The name of the constraint (actually an integer among the valid constants).
@@ -184,9 +185,10 @@ class ConstraintName:
     NORMLIN = 9 # Real Constraint
     TOEPLITZ = 10 # Mat Constraint
     CIRC = 11 # Mat constraint
-    HANKEL = 12 # Mat cons.
-    SKPERM = 13 # Int constraint
-    ID = 14 # Mat cons.
+    ANTICIRC = 12 # Mat constraint
+    HANKEL = 13 # Mat cons.
+    SKPERM = 14 # Int constraint
+    ID = 15 # Mat cons.
 
     def __init__(self, name):
         """
@@ -207,7 +209,8 @@ class ConstraintName:
                                  "ConstraintName.SPLINCOL, ConstraintName.CONST,"
                                  "ConstraintName.SP_POS," # ConstraintName.BLKDIAG,
                                  "ConstraintName.SUPP, ConstraintName.NORMLIN, "
-                                 "ConstraintName.TOEPLITZ, ConstraintName.CIRC")
+                                 "ConstraintName.TOEPLITZ, ConstraintName.CIRC,"
+                                 " ConstraintName.ANTICIRC")
         self.name = name
 
     @staticmethod
@@ -225,7 +228,7 @@ class ConstraintName:
         return name in [ConstraintName.SUPP, ConstraintName.CONST,
                         ConstraintName.CIRC, ConstraintName.TOEPLITZ,
                         ConstraintName.HANKEL, ConstraintName.BLKDIAG,
-                        ConstraintName.ID]
+                        ConstraintName.ID, ConstraintName.ANTICIRC]
 
     def is_int_constraint(self):
         """
@@ -283,6 +286,8 @@ class ConstraintName:
             _str =  'const'
         elif(_id == ConstraintName.CIRC):
             _str =  'circ'
+        elif(_id == ConstraintName.ANTICIRC):
+            _str =  'anticirc'
         elif(_id == ConstraintName.TOEPLITZ):
             _str =  'toeplitz'
         elif(_id == ConstraintName.HANKEL):
@@ -327,6 +332,8 @@ class ConstraintName:
             id = ConstraintName.CONST
         elif(_str == 'circ'):
             id = ConstraintName.CIRC
+        elif(_str == 'anticirc'):
+            id = ConstraintName.ANTICIRC
         elif(_str == 'toeplitz'):
             id = ConstraintName.TOEPLITZ
         elif(_str == 'hankel'):
@@ -531,7 +538,7 @@ class ConstraintMat(ConstraintGeneric):
 
         Args:
             name: must be a ConstraintName instance set with a value among
-            ID, SUPP, CONST, TOEPLITZ or CIRC(ULANT) (cf. ConstraintName) or it can also be one of the
+            ID, SUPP, CONST, TOEPLITZ or (AANTI)CIRC(ULANT) (cf. ConstraintName) or it can also be one of the
             more handy str aliases which are respectively: 'supp' and 'const'.
             cons_value: the value of the constraint, it must be a numpy.array
             shape: (optional) the shape of the matrix (only useful for identity prox,
@@ -594,7 +601,8 @@ class ConstraintMat(ConstraintGeneric):
                             'ConstraintName with a matrix type name '
                             '(name.is_mat_constraint() must return True)')
         no_mandatory_cons_value = [ConstraintName.ID, ConstraintName.TOEPLITZ,
-                                  ConstraintName.HANKEL, ConstraintName.CIRC]
+                                   ConstraintName.HANKEL, ConstraintName.CIRC,
+                                   ConstraintName.ANTICIRC]
         if self._name.name not in no_mandatory_cons_value and cons_value is None:
             raise ValueError('you must specify a matrix as cons_value except if'
                              ' the ConstraintName is ID.')

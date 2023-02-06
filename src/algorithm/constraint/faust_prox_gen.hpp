@@ -88,6 +88,18 @@ template<typename FPP, FDevice DEV> Faust::MatGeneric<FPP,DEV>* Faust::prox_circ
 		return new Faust::MatSparse<FPP,DEV>(M);
 }
 
+template<typename FPP, FDevice DEV> Faust::MatGeneric<FPP,DEV>* Faust::prox_anticirc_gen(Faust::MatDense<FPP, DEV> & M, const bool normalized /*= true*/, const bool pos /*= false*/, const MatType forcedType/*=None*/)
+{
+	const faust_unsigned_int dim1 = M.getNbRow();
+	const faust_unsigned_int dim2 = M.getNbCol();
+	prox_anticirc(M, normalized, pos);
+	auto out_is_dense = Faust::sparse_size<FPP>(M.getNonZeros(), dim1) > Faust::dense_size<FPP>(dim1, dim2) && forcedType == None || forcedType == Dense;
+	if(out_is_dense)
+		return new Faust::MatDense<FPP,DEV>(M);
+	else
+		return new Faust::MatSparse<FPP,DEV>(M);
+}
+
 	template<typename FPP, FDevice DEV>
 Faust::MatGeneric<FPP,DEV>* Faust::prox_skperm_gen(Faust::MatDense<FPP, DEV> & M, const unsigned int k,  const bool normalized/*=true*/, const bool pos/*=false*/, const MatType forcedType/*=None*/)
 {

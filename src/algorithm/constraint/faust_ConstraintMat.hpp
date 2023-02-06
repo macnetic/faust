@@ -107,6 +107,7 @@ void Faust::ConstraintMat<FPP,DEVICE>::check_constraint_name()const
       case CONSTRAINT_NAME_CONST:
       case CONSTRAINT_NAME_SUPP:
 	  case CONSTRAINT_NAME_CIRC:
+	  case CONSTRAINT_NAME_ANTICIRC:
 	  case CONSTRAINT_NAME_TOEPLITZ:
 	  case CONSTRAINT_NAME_HANKEL:
 	  case CONSTRAINT_NAME_BLKDIAG:
@@ -157,6 +158,9 @@ void Faust::ConstraintMat<FPP,DEVICE>::project(Faust::MatDense<FPP,DEVICE> & mat
 	  case CONSTRAINT_NAME_CIRC:
 		 Faust::prox_circ(mat, normalizing, pos);
 		 break;
+	  case CONSTRAINT_NAME_ANTICIRC:
+		 Faust::prox_anticirc(mat, normalizing, pos);
+		 break;
 	  case CONSTRAINT_NAME_HANKEL:
 		 Faust::prox_hankel(mat, normalizing, pos);
 		 break;
@@ -188,6 +192,8 @@ Faust::MatGeneric<FPP,DEVICE>* Faust::ConstraintMat<FPP,DEVICE>::project_gen(Fau
 		 return Faust::prox_toeplitz_gen(mat, normalizing, pos);
 	  case CONSTRAINT_NAME_CIRC:
 		 return Faust::prox_circ_gen(mat, normalizing, pos);
+	  case CONSTRAINT_NAME_ANTICIRC:
+		 return Faust::prox_anticirc_gen(mat, normalizing, pos);
 	  case CONSTRAINT_NAME_HANKEL:
 		 return Faust::prox_hankel_gen(mat, normalizing, pos);
 	  case CONSTRAINT_NAME_BLKDIAG:

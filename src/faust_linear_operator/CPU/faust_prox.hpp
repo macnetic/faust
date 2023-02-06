@@ -405,21 +405,6 @@ void Faust::prox_const(Faust::MatDense<FPP,Cpu> & M,const Faust::MatDense<FPP,Cp
 
 template<typename FPP> void Faust::prox_hankel(Faust::MatDense<FPP, Cpu> & M, const bool normalized /* default to true*/, const bool pos/* default to false */)
 {
-//	FPP m, m_;
-//	int dl;
-//	Faust::MatDense<FPP,Cpu> P(M.getNbRow(), M.getNbCol());
-//	for(int i=0;i<M.getNbRow();i++)
-//	{
-//		m = M.adiagonal(i).mean();
-//		m_ = M.adiagonal(-i).mean();
-//		dl = M.getNbRow()-i;
-//		for(int j=0;j<dl;j++)
-//		{
-//			*(P.getData()+M.getNbRow()-i-j-1+M.getNbRow()*j) = m_;
-//			*(P.getData()+M.getNbRow()-j-1+M.getNbRow()*(j+i)) = m_;
-//		}
-//	}
-//	M = P;
 	FPP m;
 	if(pos) Faust::pre_prox_pos(M);
 	Faust::MatDense<FPP,Cpu> P(M.getNbRow(), M.getNbCol());
@@ -496,6 +481,41 @@ template<typename FPP> void Faust::prox_circ(Faust::MatDense<FPP, Cpu> & M, cons
 			P[ij.second * n + ij.first] = m;
 		// edit diag j
 		for(auto ij: P.get_diag_indices(j))
+			P[ij.second * n + ij.first] = m;
+	}
+	M = P;
+	if(normalized) M.normalize();
+}
+
+
+template<typename FPP> void Faust::prox_anticirc(Faust::MatDense<FPP, Cpu> & M, const bool normalized /* default to true*/, const bool pos/* default to false */)
+{
+	if(M.getNbRow() != M.getNbCol()) throw out_of_range("anti-circulant projector applies only on square matrices");
+	FPP mi, mj, m;
+	int dli, dlj, j;
+	auto n = M.getNbRow();
+	vector<int> I, J;
+	if(pos) Faust::pre_prox_pos(M);
+	Faust::MatDense<FPP,Cpu> P(n, M.getNbCol());
+	// we compute the mean of each pair of anti-diagonals
+	// (0, 0), (1, 1 - n), ... (i, i - n) forall 0 <= i <= n (n the number of rows of the matrix
+	// the mean of the two anti-diagonals is used to set the corresponding two anti-diagonals of the output
+	for(int i=0;i<n;i++)
+	{
+		j = i - n;
+		dli = n - i;
+		dlj = n + j;
+		mi =  M.adiagonal(i).mean();
+		if(i == 0)
+			mj = mi;
+		else
+			mj = M.adiagonal(j).mean();
+		m = (FPP(dli)*mi+FPP(dlj)*mj)/(FPP(dli)+FPP(dlj));
+		// edit antidiag i
+		for(auto ij: P.get_antidiag_indices(i))
+			P[ij.second * n + ij.first] = m;
+		// edit antidiag j
+		for(auto ij: P.get_antidiag_indices(j))
 			P[ij.second * n + ij.first] = m;
 	}
 	M = P;

@@ -42,6 +42,7 @@ classdef ConstraintMat < matfaust.factparams.ConstraintGeneric
 					pos = false;
 				case {ConstraintName.TOEPLITZ,
 					ConstraintName.CIRC,
+					ConstraintName.ANTICIRC,
 					ConstraintName.HANKEL,
 					ConstraintName.SUPP,
 					ConstraintName.BLKDIAG}

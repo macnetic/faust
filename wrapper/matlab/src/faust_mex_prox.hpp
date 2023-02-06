@@ -80,6 +80,9 @@ void faust_prox(const mxArray **prhs, const int nrhs, mxArray **plhs, const int 
 			case CONSTRAINT_NAME_CIRC:
 				Faust::prox_circ(mat, normalized, pos);
 				break;
+			case CONSTRAINT_NAME_ANTICIRC:
+				Faust::prox_anticirc(mat, normalized, pos);
+				break;
 			case CONSTRAINT_NAME_TOEPLITZ:
 				Faust::prox_toeplitz(mat, normalized, pos);
 				break;

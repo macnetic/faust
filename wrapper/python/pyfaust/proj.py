@@ -120,6 +120,47 @@ class circ(proj_gen):
         self.constraint = ConstraintMat('circ', shape=shape,
                                         normalized=normalized, pos=pos)
 
+
+class anticirc(proj_gen):
+    """
+    Functor for the anticirculant projector.
+
+
+    Example:
+        >>> from pyfaust.proj import circ
+        >>> import numpy as np
+        >>> from numpy.random import rand, seed
+        >>> seed(43) # for reproducibility
+        >>> M = (rand(5, 5)*10).astype('int').astype('double')
+        >>> M
+        array([[1., 6., 1., 2., 3.],
+               [8., 6., 5., 0., 7.],
+               [3., 8., 2., 0., 8.],
+               [2., 4., 3., 0., 8.],
+               [8., 9., 3., 9., 4.]])
+        >>> p = anticirc(M.shape, normalized=False)
+        >>> p(M)
+        array([[4. , 5. , 5.4, 4.2, 3.4],
+               [5. , 5.4, 4.2, 3.4, 4. ],
+               [5.4, 4.2, 3.4, 4. , 5. ],
+               [4.2, 3.4, 4. , 5. , 5.4],
+               [3.4, 4. , 5. , 5.4, 4.2]])
+
+
+    """
+    def __init__(self, shape, normalized=True, pos=False):
+        """
+        Args:
+            shape: the size of the input matrix.
+            normalized: True to normalize the projection image according to its Frobenius norm.
+            pos: True to skip negative values (replaced by zero) of the matrix to project.
+
+
+        """
+        super(anticirc, self).__init__(shape)
+        self.constraint = ConstraintMat('anticirc', shape=shape,
+                                        normalized=normalized, pos=pos)
+
 class hankel(proj_gen):
     """
     Functor for the HANKEL projector.

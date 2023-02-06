@@ -95,6 +95,7 @@ bool Faust::ConstraintGeneric::is_constraint_parameter_int()const
 		case CONSTRAINT_NAME_TOEPLITZ:
 		case CONSTRAINT_NAME_HANKEL:
 		case CONSTRAINT_NAME_CIRC:
+		case CONSTRAINT_NAME_ANTICIRC:
 			return false;
 		default:
 			handleError(m_className,"is_constraint_parameter_int : Unknown type of constraint");
@@ -144,6 +145,7 @@ bool Faust::ConstraintGeneric::is_constraint_parameter_real()const
 		case CONSTRAINT_NAME_TOEPLITZ:
 		case CONSTRAINT_NAME_HANKEL:
 		case CONSTRAINT_NAME_CIRC:
+		case CONSTRAINT_NAME_ANTICIRC:
 			return false;
 		default:
 			handleError(m_className,"is_constraint_parameter_real : Unknown type of constraint");
@@ -193,6 +195,7 @@ bool Faust::ConstraintGeneric::is_constraint_parameter_mat()const
 		case CONSTRAINT_NAME_TOEPLITZ:
 		case CONSTRAINT_NAME_HANKEL:
 		case CONSTRAINT_NAME_CIRC:
+		case CONSTRAINT_NAME_ANTICIRC:
 		case CONSTRAINT_NAME_ID:
 			return true;
 		default:

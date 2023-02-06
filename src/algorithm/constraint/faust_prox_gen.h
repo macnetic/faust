@@ -101,6 +101,7 @@ namespace Faust
 	template<typename FPP, FDevice DEV> MatGeneric<FPP,DEV>* prox_hankel_gen(MatDense<FPP, DEV> & M, const bool normalized = true, const bool pos = false, const MatType forcedType=None);
 	template<typename FPP, FDevice DEV> MatGeneric<FPP,DEV>* prox_toeplitz_gen(MatDense<FPP, DEV> & M, const bool normalized = true, const bool pos = false, const MatType forcedType=None);
 	template<typename FPP, FDevice DEV> MatGeneric<FPP,DEV>* prox_circ_gen(MatDense<FPP, DEV> & M, const bool normalized = true, const bool pos = false, const MatType forcedType=None);
+	template<typename FPP, FDevice DEV> MatGeneric<FPP,DEV>* prox_anticirc_gen(MatDense<FPP, DEV> & M, const bool normalized = true, const bool pos = false, const MatType forcedType=None);
 
 	template<typename FPP, FDevice DEV>
 		MatGeneric<FPP,DEV>* prox_supp_gen(MatDense<FPP,DEV> & M, const MatDense<FPP,DEV> & supp, const bool normalized=true, const bool pos=false,  const MatType forcedType=None);

@@ -98,6 +98,7 @@ namespace Faust
 	template<typename FPP> void prox_hankel(MatDense<FPP, Cpu> & M, const bool normalized = true, const bool pos = false);
 	template<typename FPP> void prox_toeplitz(MatDense<FPP, Cpu> & M, const bool normalized = true, const bool pos = false);
 	template<typename FPP> void prox_circ(MatDense<FPP, Cpu> & M, const bool normalized = true, const bool pos = false);
+	template<typename FPP> void prox_anticirc(MatDense<FPP, Cpu> & M, const bool normalized = true, const bool pos = false);
 	template<typename FPP>
 		void prox_skperm(MatDense<FPP, Cpu> & M,const unsigned int k,  const bool normalized=true, const bool pos=false);
 
