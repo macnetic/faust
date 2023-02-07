@@ -693,13 +693,13 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             - FACTOR 4 (double) SPARSE, size 10x12, density 0.333333, nnz 40
 
 			>>> G = pf.rand(10, 12)
-			>>> G
-			Faust size 10x12, density 2.025, nnz_sum 243, 5 factor(s):
-			- FACTOR 0 (double) SPARSE, size 10x11, density 0.454545, nnz 50
-			- FACTOR 1 (double) SPARSE, size 11x10, density 0.5, nnz 55
-			- FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
-			- FACTOR 3 (double) SPARSE, size 10x12, density 0.333333, nnz 40
-			- FACTOR 4 (double) SPARSE, size 12x12, density 0.333333, nnz 48
+            >>> G
+            Faust size 10x12, density 2.025, nnz_sum 243, 5 factor(s):
+            - FACTOR 0 (double) SPARSE, size 10x11, density 0.454545, nnz 50
+            - FACTOR 1 (double) SPARSE, size 11x10, density 0.5, nnz 55
+            - FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
+            - FACTOR 3 (double) SPARSE, size 10x12, density 0.333333, nnz 40
+            - FACTOR 4 (double) SPARSE, size 12x12, density 0.333333, nnz 48
 
             >>> F+G
             Faust size 10x12, density 4.43333, nnz_sum 532, 7 factor(s):
@@ -785,8 +785,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                 G = float(G)
             elif not isinstance(G, (float, complex)):
                 raise TypeError("scalar must be int, float or complex")
-            G, Gdtype = (float(G), np.float) if (isinstance(G, np.float) and
-                                                 F.dtype != 'complex') else (complex(G), 'complex')
+            G, Gdtype = (float(G), np.float64) if (isinstance(G, (np.float64, float)) and F.dtype != 'complex') else (complex(G), np.complex128)
             return Faust([np.ones((F.shape[0], 1), dtype=F.dtype)*G,
                           np.ones((1, F.shape[1]), dtype=F.dtype).astype(Gdtype)],
                          dev=F.device)
@@ -4318,7 +4317,7 @@ def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
     if(isinstance(dim_sizes, (list, tuple)) and len(dim_sizes) == 2):
         min_dim_size = dim_sizes[0]
         max_dim_size = dim_sizes[1]
-    elif(isinstance(dim_sizes, (int, np.long))):
+    elif(isinstance(dim_sizes, (int, np.int64))):
         min_dim_size = max_dim_size = dim_sizes
     else:
         raise ValueError("rand(): dim_sizes argument must be an "

@@ -200,7 +200,7 @@ class ConstraintName:
         """
         if(isinstance(name,str)):
             name = ConstraintName.str2name_int(name)
-            if(not isinstance(name, np.int) or not
+            if(not isinstance(name, int) or not
                ConstraintName._arg_is_int_const(name) \
                and not ConstraintName._arg_is_real_const(name) \
                and not ConstraintName._arg_is_mat_const(name)):
@@ -490,7 +490,7 @@ class ConstraintInt(ConstraintGeneric):
         """
         super(ConstraintInt, self).__init__(name, num_rows, num_cols,
                                             cons_value, normalized, pos)
-        if(not isinstance(cons_value, np.int)):
+        if(not isinstance(cons_value, int)):
             raise TypeError('ConstraintInt must receive a int as cons_value '
                             'argument.')
         if(not isinstance(self._name, ConstraintName) or not self._name.is_int_constraint()):
@@ -682,7 +682,7 @@ class ConstraintReal(ConstraintGeneric):
         """
         super(ConstraintReal, self).__init__(name, num_rows, num_cols,
                                              cons_value, normalized=False, pos=False)
-        if(not isinstance(cons_value, np.float) and not isinstance(cons_value, np.int)):
+        if(not np.isreal(cons_value) and not isinstance(cons_value, int)):
             raise TypeError('ConstraintReal must receive a float as cons_value '
                             'argument.')
         self._cons_value = float(self._cons_value)
@@ -1656,8 +1656,8 @@ class ParamsHierarchicalRectMat(ParamsHierarchical):
         from math import ceil
         #test args
         for arg,aname in zip([m, n, j, k, s],["m","n","j","k","s"]):
-            if(not isinstance(m, int) and not isinstance(m, np.integer)):
-                raise TypeError(aname+" must be an integer.")
+            if not isinstance(m, int) and not m - np.floor(m) > 0:
+                raise TypeError(aname+" must be a positive integer.")
         if(not isinstance(rho, float)):
             raise TypeError('rho must be a float')
         if not isinstance(P, float):

@@ -69,9 +69,9 @@ class TestFaust(unittest.TestCase):
             nnz = sfac.nnz
             nrows = sfac.shape[0]
             size = nnz*int_size+(nrows+1)*int_size
-            if sfac.dtype == np.complex:
+            if sfac.dtype == np.complex128:
                 size += cplx_size*nnz
-            elif sfac.dtype == np.float:
+            elif sfac.dtype == np.float64:
                 size += double_size*nnz
             return size
         Fsize = 0
@@ -291,10 +291,10 @@ class TestFaust(unittest.TestCase):
     def test_astype(self):
         print("test Faust.astype, Faust.dtype")
         try:
-            if self.F.dtype == np.float:
-                self.assertEqual(self.F.astype(np.complex).dtype, np.complex)
+            if self.F.dtype == np.float64:
+                self.assertEqual(self.F.astype(np.complex128).dtype, np.complex128)
             else:
-                self.assertEqual(self.F.astype(np.float).dtype, np.float)
+                self.assertEqual(self.F.astype(np.float64).dtype, np.float64)
         except ValueError:
             # complex > float not yet supported
             pass

@@ -86,10 +86,10 @@ def omp(y, D, maxiter=None, tol=0, relerr=True, verbose=False):
 
     r_count = 0
     # initialize
-    s_initial = zeros((m,1)).astype(np.complex)
+    s_initial = zeros((m,1)).astype(np.complex128)
     residual = y
     s = s_initial
-    R = empty((maxiter+1,maxiter+1)).astype(np.complex)
+    R = empty((maxiter+1,maxiter+1)).astype(np.complex128)
     oldErr = y.T.conj()@y
     # err_mse = []
 
@@ -184,7 +184,7 @@ def UpdateCholeskyFull(R,P,Pt,index,m):
 
 
     if(li == 1):
-        R = np.sqrt(new_vector.T.conj()@new_vector.astype(np.complex))
+        R = np.sqrt(new_vector.T.conj()@new_vector.astype(np.complex128))
     else:
         Pt_new_vector = Pt(new_vector)
         # linsolve_options_transpose.UT = true;
@@ -193,7 +193,7 @@ def UpdateCholeskyFull(R,P,Pt,index,m):
         new_col = lstsq(R.T.conj(), Pt_new_vector[index[0:-1]], rcond=-1)[0] # solve() only works
         # for full rank square matrices, that's why we use ltsq
         R_ii = np.sqrt(new_vector.T.conj()@new_vector -
-                       new_col.T.conj()@new_col.astype(np.complex))
+                       new_col.T.conj()@new_col.astype(np.complex128))
         R = cat((
                 cat((R,new_col),axis=1),
                 cat((zeros((1, R.shape[1])), R_ii),axis=1)
@@ -227,7 +227,7 @@ def UpdateCholeskySparse(R,P,Pt,index,m):
     new_vector = P(mask)
 
     if(li == 1):
-        R = np.sqrt(new_vector.T.conj()@new_vector.astype(np.complex))
+        R = np.sqrt(new_vector.T.conj()@new_vector.astype(np.complex128))
     else:
         Pt_new_vector = Pt(new_vector)
         # linsolve_options_transpose.UT = true;
@@ -235,7 +235,7 @@ def UpdateCholeskySparse(R,P,Pt,index,m):
         # matlab opts for linsolve() are respected here
         new_col = spsolve_triangular(R.T.conj(), Pt_new_vector[index[0:-1]])
         R_ii = np.sqrt(new_vector.T.conj()@new_vector -
-                       new_col.T.conj()@new_col.astype(np.complex))
+                       new_col.T.conj()@new_col.astype(np.complex128))
         R = vstack((hstack((R, new_col)), hstack((csr_matrix((1, R.shape[1])),
                                                  R_ii))))
 
@@ -250,12 +250,12 @@ def _sanitize_dtype(dtype):
     Returns:
         one of the str of the dtype (float32, float64, complex).
     """
-    if dtype in [np.float, np.float64, np.double, float, 'float',
+    if dtype in [np.float64, np.float64, np.double, float, 'float',
                  'double', 'float64']:
         return 'float64'
     elif dtype in [np.float32, 'float32']:
         return 'float32'
-    elif dtype in [np.complex, np.complex128, 'complex', 'complex128']:
+    elif dtype in [np.complex128, np.complex128, 'complex', 'complex128']:
         return 'complex'
     else:
         raise TypeError(str(dtype)+' is not a dtype compatible with pyfaust'

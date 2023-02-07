@@ -181,7 +181,7 @@ class TestFaustPy(unittest.TestCase):
                         ref_full_NF[:,i]/norm(ref_full_NF[:,i:i+1], ord)
             else:
                 continue
-            if(F.dtype == np.complex):
+            if(F.dtype == np.complex128):
                 places=1 # accuracy is less good with complex
             else:
                 places=3
@@ -545,7 +545,7 @@ class TestFaustPy(unittest.TestCase):
         print("testPlus()")
         print("addition of a Faust-scalar")
         scals = [ self.r.random()*100,
-                 np.complex(self.r.random()*100,self.r.random()*100),
+                 np.complex128(self.r.random()*100 + self.r.random()*100j),
                  self.r.randint(1,100)]
         F = self.F
         for s in scals:
@@ -570,7 +570,7 @@ class TestFaustPy(unittest.TestCase):
         print("testMinus()")
         print("subtraction of a Faust-scalar")
         scals = [ self.r.random()*100,
-                 np.complex(self.r.random()*100,self.r.random()*100),
+                 np.complex128(self.r.random()*100+self.r.random()*100j),
                  self.r.randint(1,100)]
         F = self.F
         for s in scals:
@@ -593,7 +593,7 @@ class TestFaustPy(unittest.TestCase):
     def testScalDiv(self):
         print("test div by a scalar: real and complex.")
         scals = [ self.r.random()*100,
-                 np.complex(self.r.random()*100,self.r.random()*100),
+                 np.complex128(self.r.random()*100+self.r.random()*100j),
                  self.r.randint(1,100)]
         F = self.F
         for s in scals:
@@ -643,7 +643,7 @@ class TestFaustPy(unittest.TestCase):
         test_prod = self.F.dot(rmat)
         self.assertProdEq(prod, test_prod)
         print("test mul by a full complex matrix")
-        j = np.complex(0,1)
+        j = np.complex128(0+1j)
         rand = np.random.rand
         cmat = rand(rmat.shape[0], rmat.shape[1]) + j*rand(rmat.shape[0],
                                                            rmat.shape[1])
@@ -661,7 +661,7 @@ class TestFaustPy(unittest.TestCase):
         self.assertLess(norm((self.F.H*r).toarray()-self.F.toarray().T.conj()*r)/norm(self.F.toarray().T.conj()*r),1**-5)
 
         print("test mul by a complex scalar")
-        c = np.complex(r, random.random()*100)
+        c = np.complex128(r+ random.random()*100j)
         test_prod = self.F*c
         ref_prod = self.mulFactors()*c
         self.assertLess(norm(test_prod.toarray()-ref_prod)/norm(ref_prod),
@@ -691,12 +691,12 @@ class TestFaustPy(unittest.TestCase):
         self.assertTrue(np.allclose(test_prod, F.toarray().dot(D.toarray())))
         print("test mul of a Faust by a complex dia_matrix")
         D = \
-        dia_matrix((np.random.rand(1,F.shape[1])+np.random.rand(1,F.shape[1])*np.complex(0,1),np.array([0])),
+        dia_matrix((np.random.rand(1,F.shape[1])+np.random.rand(1,F.shape[1])*np.complex128(0+1j),np.array([0])),
                        shape=(F.shape[1],F.shape[1]))
         test_prod = F@D
         self.assertTrue(np.allclose(test_prod, F.toarray().dot(D.toarray())))
         Mr = csr_matrix(rand(F.shape[1],10))
-        Mc = csr_matrix(rand(F.shape[1],10)+np.complex(0,1)*rand(F.shape[1],10))
+        Mc = csr_matrix(rand(F.shape[1],10)+np.complex128(0+1j)*rand(F.shape[1],10))
         print("test mul Faust-csr_matrix")
         self.assertTrue(np.allclose(F@Mr, F.toarray().dot(Mr.toarray())))
         print("test mul Faust-complex csr_matrix")
@@ -1075,17 +1075,17 @@ class TestFaustPyCplx(TestFaustPy):
             for i in range(0, num_factors):
                 d1, d2 = d2, r.randint(TestFaustPy.MIN_DIM_SIZE, TestFaustPy.MAX_DIM_SIZE)
                 if(r.randint(0,1) > 0): # generate a dense complex matrix
-                    factors += [np.random.rand(d1, d2).astype(np.complex)]
+                    factors += [np.random.rand(d1, d2).astype(np.complex128)]
                     factors[i].imag = [np.random.rand(d1, d2)]
                 else:
                     # generate a sparse matrix
                     # we can't use scipy.sparse.random directly because only float type is
                     # supported for random sparse matrix generation
                     factors += [sparse.random(d1, d2, dtype=np.float64, format='csr',
-                                       density=min(r.random()+.5,1)).astype(np.complex)]
+                                       density=min(r.random()+.5,1)).astype(np.complex128)]
                     #print("setUp() i=",i, "d1=",d1, "d2=", d2, "factor.shape[0]=",
                     #      factors[i].shape[0])
-                    factors[i] *= np.complex(r.random(), r.random())*5 # 5 is
+                    factors[i] *= np.complex128(r.random()+ r.random()*1j)*5 # 5 is
                     # arbitrary
             self.F = Faust(factors)
             self.factors = factors
@@ -1330,7 +1330,7 @@ class TestFaustFactory(unittest.TestCase):
         #M = np.random.rand(500, 32)
         M = \
         loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/matrix_hierarchical_fact.mat")['matrix']
-        M = M + np.complex(0,1)*M
+        M = M + np.complex128(0+1j)*M
         # default step_size
         fact0_cons = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5)
         fact1_cons = ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 96)
@@ -1369,7 +1369,7 @@ class TestFaustFactory(unittest.TestCase):
         #M = np.random.rand(500, 32)
         M = \
         loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/config_compared_palm2.mat")['data']
-        M = M + np.complex(0,1)*M
+        M = M + np.complex128(0+1j)*M
         # default step_size
         cons1 = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5)
         cons2 = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32,
@@ -1627,7 +1627,7 @@ class TestFaustFactory(unittest.TestCase):
         self.assertAlmostEqual(norm(M-U@np.diag(D)@U.T), err, places=3 )
         L = loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['Lap']
         L = L.astype(np.float64)
-        M_cplx = L*np.complex(1,0) + L*np.complex(0,1)
+        M_cplx = L*np.complex128(1+0j) + L*np.complex128(0+1j)
         M_cplx = M_cplx.dot(np.matrix(M_cplx).H)
         err=.1
         D,U = eigtj(M_cplx, tol=err, relerr=False, verbosity=0)
@@ -1641,7 +1641,7 @@ class TestFaustFactory(unittest.TestCase):
         M = M.dot(M.T)
         D,U = eigtj(M, tol=err)
         self.assertLessEqual(norm(M-U@np.diag(D)@U.T)/norm(M), err)
-        M_cplx = M + rand(128,128)*np.complex(0,1)
+        M_cplx = M + rand(128,128)*np.complex128(0+1j)
         M_cplx = M_cplx.dot(np.matrix(M_cplx).H)
         D,U = eigtj(M_cplx, tol=err)
         self.assertLessEqual(norm(M_cplx-U@np.diag(D)@U.H)/norm(M_cplx), err)

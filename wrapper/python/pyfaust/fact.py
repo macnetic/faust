@@ -609,7 +609,7 @@ def palm4msa(M, p, ret_lambda=False, backend=2016, on_gpu=False):
             else: # M.dtype == 'float32': ensured by _check_fact_mat
                 core_obj, _lambda = _FaustCorePy.FaustAlgoGenFlt.palm4msa2020(M, p, on_gpu)
         else:
-            if M.dtype == np.complex and p.factor_format != 'dense':
+            if M.dtype == np.complex128 and p.factor_format != 'dense':
                 p.factor_format = 'dense'
                 warnings.warn("forcing the factor_format parameter to 'dense'")
             core_obj, _lambda = _FaustCorePy.FaustAlgoGenCplxDbl.palm4msa2020(M, p)
@@ -1027,7 +1027,7 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
                 core_obj, _lambda = _FaustCorePy.FaustAlgoGenFlt.hierarchical2020(M, p,
                                                                                   on_gpu)
         else:
-#            if M.dtype == np.complex and p.factor_format != 'dense':
+#            if M.dtype == np.complex128 and p.factor_format != 'dense':
 #                p.factor_format = 'dense'
 #                warnings.warn("forcing the factor_format parameter to 'dense'")
             core_obj, _lambda = _FaustCorePy.FaustAlgoGenCplxDbl.hierarchical2020(M, p,

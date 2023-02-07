@@ -2,6 +2,8 @@ def type2dtype(type):
     """
     Returns dtype('float32'), dtype('float64') or dtype('complex128')
     """
+    if type == 'complex':
+        return np.dtype('complex128')
     return np.dtype('float32') if type == 'float' else np.dtype(type)
 
 cdef class FaustCoreGen@TYPE_NAME@@PROC@:
@@ -117,7 +119,7 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
         x_data = X.data
         nbrow = self.@CORE_OBJ@.getNbRow()
         if(self.@CORE_OBJ@.getNbCol() != X.shape[0]): raise e
-        y_data_arr = np.empty((nbrow,nbcol), dtype=np.@TYPE@, order='F') # we don't know beforehand Y nnz
+        y_data_arr = np.empty((nbrow,nbcol), dtype=type2dtype('@TYPE@'), order='F') # we don't know beforehand Y nnz
         y_data = y_data_arr
         self.@CORE_OBJ@.multiply(&y_data[0,0], nbrow, nbcol,
                                   &x_data[0], &x_indptr[0],
@@ -169,7 +171,7 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
 
         if(len(d1_ids) != x.shape[0]): raise ValueError("Dimensions"
                                                     " must agree")
-        y_data_arr = np.empty((nbrow, x_ncols), dtype=np.@TYPE@, order='F') # we don't know beforehand Y nnz
+        y_data_arr = np.empty((nbrow, x_ncols), dtype=type2dtype('@TYPE@'), order='F') # we don't know beforehand Y nnz
         y_data = y_data_arr
         if no_d0:
             self.@CORE_OBJ@.indexMultiply(NULL, 0, &d1_ids_view[0],

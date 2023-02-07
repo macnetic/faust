@@ -1156,15 +1156,15 @@ class bsl:
         # keep matlab demo version names for mat file
         savemat(output_dir+os.sep+"results_BSL_user.mat", { 'resDist' :
                                                            resDist, 'Sparsity'
-                                                           : np.float(sparsity),
+                                                           : np.float64(sparsity),
                                                            'RCG_list' :
                                                            array(MEG_Faust_rcgs),
                                                            'compute_Times':
                                                            compute_times,
                                                            'Ntraining':
-                                                           np.float(Ntraining),
+                                                           np.float64(Ntraining),
                                                            'nb_MEG_matrix':
-                                                           np.float(len(MEGs))})
+                                                           np.float64(len(MEGs))})
 
     @staticmethod
     def fig(input_dir=DEFT_RESULTS_DIR, output_dir=DEFT_FIG_DIR):
