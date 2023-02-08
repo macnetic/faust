@@ -7,7 +7,7 @@ variables:
     DFILE: "faust_data.zip"
     JOB_PYTHON: "python3.9" # if set again in job, it hides this one (precedence: https://docs.gitlab.com/13.6/ee/ci/variables/#priority-of-environment-variables)
     WIN_PY_VER: '3.10' # default python version used to build python wrapper on windows (for both whl package and nsis .exe)
-    NIX_PY_VER: '3.10' # default python version used to build python wrapper for "unix" system packages (pkg/macos, rpm/deb/linux)
+    NIX_PY_VER: '3.11' # default python version used to build python wrapper for "unix" system packages (pkg/macos, rpm/deb/linux)
     GEN_EGG: 'OFF'
     USE_OPENBLASO: 'OFF' # by default any pip whl pkg doesn't use openblas-openmp (eigen blas backend)
     PYFAUST_PKG_NAME: 'pyfaust' # default package name, it can change for openblas-openmp whl package # only used in test_unix_purepy_pkg job
@@ -447,7 +447,7 @@ pkg_linux_purepy_release:
 
 pkg_linux_purepy_release_extra_pyver:
     extends: .pkg_purepy_release
-    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: $LINUX_MATIO_SLIB_PATH, Z_STATIC_LIB_PATH: $LINUX_ZLIB_SLIB_PATH, HDF5_STATIC_LIB_PATH: $LINUX_HDF5_SLIB_PATH, BUILD_MULTITHREAD: "ON", NOPY2: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "../gpu_mod", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", PYTHON_PATH: '/usr/local/bin/python3.10', JOB_PYTHON: 'python3.10', CMAKE_CXX_COMPILER: "clang++"}
+    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: $LINUX_MATIO_SLIB_PATH, Z_STATIC_LIB_PATH: $LINUX_ZLIB_SLIB_PATH, HDF5_STATIC_LIB_PATH: $LINUX_HDF5_SLIB_PATH, BUILD_MULTITHREAD: "ON", NOPY2: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "../gpu_mod", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", PYTHON_PATH: '/usr/local/bin/python3.11', JOB_PYTHON: 'python3.11', CMAKE_CXX_COMPILER: "clang++"}
     tags:
         - linux
         - tux_packager
@@ -668,7 +668,7 @@ test_nux_purepy_release:
     - linux
 
 test_nux_purepy_release_extra_pyver:
-  variables: {JOB_PYTHON: 'python3.10'}
+  variables: {JOB_PYTHON: 'python3.11'}
   extends: .test_unix_purepy_pkg
   needs:
     - job: pkg_linux_purepy_release_extra_pyver
@@ -778,7 +778,7 @@ conda_linux_pub:
   script:
     - misc/continuous_integration/conda_pkg/conda_build_upload_pyfaust.sh linux 3.9 misc/continuous_integration/conda_pkg/meta.yaml.in
     - conda env remove -n build_upload_pyfaust_venv_39
-    - misc/continuous_integration/conda_pkg/conda_build_upload_pyfaust.sh linux 3.10 misc/continuous_integration/conda_pkg/meta.yaml.in
+    - misc/continuous_integration/conda_pkg/conda_build_upload_pyfaust.sh linux 3.11 misc/continuous_integration/conda_pkg/meta.yaml.in
     - conda env remove -n build_upload_pyfaust_venv_310
   only:
     - tags
