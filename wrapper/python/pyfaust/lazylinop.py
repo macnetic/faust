@@ -1508,3 +1508,41 @@ def block_diag(*lops, mt=False):
     return LazyLinearOperator((coffsets[-1], roffsets[-1]), matmat=lambda x:
                               matmat(x, lAx, roffsets),
                               rmatmat=lambda x: matmat(x, lAHx, coffsets))
+
+def zeros(shape):
+    """
+    Returns a zeros LazyLinearOp.
+
+    Args:
+        shape: the shape of the operator.
+
+    Example:
+        >>> from pyfaust.lazylinop import zeros
+        >>> import numpy as np
+        >>> Lz = zeros((10, 12))
+        >>> x = np.random.rand(12)
+        >>> Lz @ x
+        array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0.])
+
+    """
+    def _matmat(op, shape):
+        if not hasattr(op, 'shape') or not hasattr(op, 'ndim'):
+            raise TypeError('Zero LazyLinearOp can\'t be multiplied by'
+                            ' something without a shape or a ndim')
+        if op.shape[0] != shape[1]:
+            raise ValueError('Dimensions must agree')
+        if LazyLinearOp.isLazyLinearOp(op):
+            return zeros((shape[0], op.shape[1]))
+        # TODO: another output type than numpy array?
+        elif op.ndim == 2:
+            return np.zeros((shape[0], op.shape[1]), dtype=op.dtype)
+        elif op.ndim > 2:
+            return np.zeros((*op.shape[:-2], shape[0], op.shape[-1]),
+                            dtype=op.dtype)
+        else:
+            # op.ndim == 1
+            return np.zeros((shape[0],))
+    return LazyLinearOperator(shape, matmat=lambda x:
+                              _matmat(x, shape),
+                              rmatmat=lambda x: _matmat(x, (shape[1],
+                                                             shape[0])))
