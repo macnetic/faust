@@ -8,7 +8,7 @@ variables:
     JOB_PYTHON: "python3.9" # if set again in job, it hides this one (precedence: https://docs.gitlab.com/13.6/ee/ci/variables/#priority-of-environment-variables)
     WIN_PY_VER: '3.10' # default python version used to build python wrapper on windows (for both whl package and nsis .exe)
     NUX_PY_VER: '3.11' # default python version used for linux system packages (.rpm and .deb)
-    MACOS_PY_VER: '3.10' # default python version used for macOS system packages (.pkg)
+    MACOS_PY_VER: '3.11' # default python version used for macOS system packages (.pkg)
     GEN_EGG: 'OFF'
     USE_OPENBLASO: 'OFF' # by default any pip whl pkg doesn't use openblas-openmp (eigen blas backend)
     PYFAUST_PKG_NAME: 'pyfaust' # default package name, it can change for openblas-openmp whl package # only used in test_unix_purepy_pkg job
@@ -420,7 +420,7 @@ pkg_macos_purepy_release:
 
 pkg_macos_purepy_release_extra_pyver:
     extends: pkg_macos_purepy_release
-    variables: {MATIO_STATIC_LIB_PATH: $MACOS_MATIO_SLIB_PATH, Z_STATIC_LIB_PATH: $MACOS_ZLIB_SLIB_PATH, HDF5_STATIC_LIB_PATH: $MACOS_HDF5_SLIB_PATH, BUILD_MULTITHREAD: "ON", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", NOPY2: "ON", PYTHON_PATH: '/opt/local/bin/python3.10', JOB_PYTHON: 'python3.10', CMAKE_CXX_COMPILER: "/opt/local/bin/clang++-mp-8.0"}
+    variables: {MATIO_STATIC_LIB_PATH: $MACOS_MATIO_SLIB_PATH, Z_STATIC_LIB_PATH: $MACOS_ZLIB_SLIB_PATH, HDF5_STATIC_LIB_PATH: $MACOS_HDF5_SLIB_PATH, BUILD_MULTITHREAD: "ON", FAUST_TORCH: "OFF", EXPERIMENTAL_PKG: "OFF", NOPY2: "ON", PYTHON_PATH: '/opt/local/bin/python3.11', JOB_PYTHON: 'python3.11', CMAKE_CXX_COMPILER: "/opt/local/bin/clang++-mp-8.0"}
     tags:
         - macos
 
@@ -650,7 +650,7 @@ test_macos_purepy_release: # take care to keep this variable consistent with the
     - macos_pkg_tester
 
 test_macos_purepy_release_extra_pyver:
-  variables: {JOB_PYTHON: 'python3.10'} # take care to keep this variable consistent with the version used in pkg_macos_purepy_release_extra_pyver
+  variables: {JOB_PYTHON: 'python3.11'} # take care to keep this variable consistent with the version used in pkg_macos_purepy_release_extra_pyver
   extends: .test_unix_purepy_pkg
   needs:
     - job: pkg_macos_purepy_release_extra_pyver
