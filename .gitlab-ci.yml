@@ -7,7 +7,8 @@ variables:
     DFILE: "faust_data.zip"
     JOB_PYTHON: "python3.9" # if set again in job, it hides this one (precedence: https://docs.gitlab.com/13.6/ee/ci/variables/#priority-of-environment-variables)
     WIN_PY_VER: '3.10' # default python version used to build python wrapper on windows (for both whl package and nsis .exe)
-    NIX_PY_VER: '3.11' # default python version used to build python wrapper for "unix" system packages (pkg/macos, rpm/deb/linux)
+    NUX_PY_VER: '3.11' # default python version used for linux system packages (.rpm and .deb)
+    MACOS_PY_VER: '3.10' # default python version used for macOS system packages (.pkg)
     GEN_EGG: 'OFF'
     USE_OPENBLASO: 'OFF' # by default any pip whl pkg doesn't use openblas-openmp (eigen blas backend)
     PYFAUST_PKG_NAME: 'pyfaust' # default package name, it can change for openblas-openmp whl package # only used in test_unix_purepy_pkg job
@@ -259,7 +260,7 @@ pkg_linux_release_static:
     stage: pkg
     script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - export PYTHON_PATH=$(which python$NIX_PY_VER)
+        - export PYTHON_PATH=$(which python$NUX_PY_VER)
         - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_FILE_NAME=faust-$CI_COMMIT_TAG-static -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DEXCLUDE_FAUST_LIB_INSTALL=ON -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=$LINUX_MATIO_SLIB_PATH -DZ_STATIC_LIB_PATH=$LINUX_ZLIB_SLIB_PATH -DHDF5_STATIC_LIB_PATH=$LINUX_HDF5_SLIB_PATH -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DBUILD_MULTITHREAD=ON -DNOPY2=ON -DUSE_GPU_MOD=ON -DCMAKE_PREFIX_PATH=$PWD/../gpu_mod -DBUILD_FLOAT_PYX=ON -DBUILD_FLOAT_MEX=ON ..'
         - make
         - cpack -G RPM -C CPackConfig.cmake
@@ -563,8 +564,8 @@ test_macos_pkg_release:
   script:
     - sudo installer -pkg build/faust-$CI_COMMIT_TAG.pkg -target /
     - matlab -nojvm -nodisplay -r "disp(matfaust.version());disp(full(matfaust.rand(5,5))); exit;" | tee /tmp/faust && grep $CI_COMMIT_TAG /tmp/faust
-    - python$NIX_PY_VER -c "import pyfaust; print(pyfaust.version()); print(pyfaust.rand(5,5).toarray());"
-    - python$NIX_PY_VER -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'real')"
+    - python$MACOS_PY_VER -c "import pyfaust; print(pyfaust.version()); print(pyfaust.rand(5,5).toarray());"
+    - python$MACOS_PY_VER -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'real')"
   only:
     - tags
   tags:
@@ -581,13 +582,13 @@ test_linux_pkg_release:
   script:
     - sudo rpm -i --nodeps build/faust-$CI_COMMIT_TAG-x86_64.rpm
     - matlab -nojvm -nodisplay -r "disp(matfaust.version());disp(full(matfaust.rand(5,5))); exit;" | tee /tmp/faust && grep $CI_COMMIT_TAG /tmp/faust
-    - python$NIX_PY_VER -c "import pyfaust; print(pyfaust.version()); print(pyfaust.rand(5,5).toarray());"
-    - python$NIX_PY_VER -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'real')"
+    - python$NUX_PY_VER -c "import pyfaust; print(pyfaust.version()); print(pyfaust.rand(5,5).toarray());"
+    - python$NUX_PY_VER -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'real')"
     - sudo rpm -e faust
     - sudo rpm -i --nodeps build/faust-$CI_COMMIT_TAG-static-x86_64.rpm
     - matlab -nojvm -nodisplay -r "disp(matfaust.version());disp(full(matfaust.rand(5,5))); exit;" | tee /tmp/faust && grep $CI_COMMIT_TAG /tmp/faust
-    - python$NIX_PY_VER -c "import pyfaust; print(pyfaust.version()); print(pyfaust.rand(5,5).toarray());"
-    - python$NIX_PY_VER -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'real')"
+    - python$NUX_PY_VER -c "import pyfaust; print(pyfaust.version()); print(pyfaust.rand(5,5).toarray());"
+    - python$NUX_PY_VER -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'real')"
     - sudo rpm -e faust
   only:
     - tags

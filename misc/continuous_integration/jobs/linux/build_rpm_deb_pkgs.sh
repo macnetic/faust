@@ -2,7 +2,7 @@
 
 # needed env. variables: FAUST_VERSION, DURL, DFILE, EXPERIMENTAL_PKG, NYX_PY_VER
 
-export PYTHON_PATH=$(which python$NIX_PY_VER)
+export PYTHON_PATH=$(which python$NUX_PY_VER)
 if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
         # build python and matlab wrappers separately to use clang for python and gcc for matlab
 cmake -DBUILD_WRAPPER_PYTHON=OFF -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$FAUST_VERSION -DCPACK_PACKAGE_FILE_NAME=faust-$FAUST_VERSION -DCPACK_PACKAGE_VERSION=$FAUST_VERSION -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DEXPERIMENTAL_PKG=$EXPERIMENTAL_PKG -DNOPY2=ON -DUSE_GPU_MOD=ON -DCMAKE_PREFIX_PATH=$PWD/../gpu_mod -DBUILD_FLOAT_PYX=ON ..
