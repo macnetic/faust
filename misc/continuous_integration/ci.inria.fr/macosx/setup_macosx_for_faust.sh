@@ -49,7 +49,7 @@ port select --set pip pip39
 ln -sf /opt/local/bin/python3.9 /opt/local/bin/python3
 yes | port install py39-cython
 yes | port select --set cython cython39
-yes |pip install doxypypy chardet wheel pygsp 'numpy==1.22'
+yes |pip install doxypypy chardet wheel pygsp numpy
 # get dest dir before downloading because otherwise it would be the current path
 DOXYPYPY_DIR=$(dirname $(python3 -c "import doxypypy; print(doxypypy.__file__)"))
 wget https://raw.githubusercontent.com/Feneric/doxypypy/master/doxypypy/doxypypy.py
@@ -69,7 +69,7 @@ echo "ABOUT SUDO: add this line in /etc/sudoers: ci ALL=(ALL:ALL) NOPASSWD: ALL 
 echo "matio should be reinstalled too because the version from MacPorts is 1.5.21, not compatible with FAµST (at least because of the type mat_sparse_t which contain fields of different types compared to previous version). The version to install is matio-1.5.19 in /usr/local or another way is to copy files /usr/local/matio_pub.h /usr/local/matio.h and /usr/local/lib/libmatio*from faust2-macosx-2019
 echo ===== manually install concurrent version of python, eg.:
 echo port install py310 py310-cython py310-pip
-echo pip-3.10 install doxypypy chardet wheel pygsp 'numpy==1.22'
+echo pip-3.10 install doxypypy chardet wheel pygsp numpy
 echo DOXYPYPY_DIR=$(dirname $(python3.10 -c "import doxypypy; print(doxypypy.__file__)"))
 echo wget https://raw.githubusercontent.com/Feneric/doxypypy/master/doxypypy/doxypypy.py
 echo sudo mv doxypypy.py ${DOXYPYPY_DIR}
