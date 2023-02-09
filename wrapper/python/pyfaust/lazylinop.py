@@ -1511,7 +1511,7 @@ def block_diag(*lops, mt=False):
 
 def zeros(shape):
     """
-    Returns a zeros LazyLinearOp.
+    Returns a zero LazyLinearOp.
 
     Args:
         shape: the shape of the operator.
@@ -1526,9 +1526,7 @@ def zeros(shape):
 
     """
     def _matmat(op, shape):
-        if not hasattr(op, 'shape') or not hasattr(op, 'ndim'):
-            raise TypeError('Zero LazyLinearOp can\'t be multiplied by'
-                            ' something without a shape or a ndim')
+        _sanitize_op(op)
         if op.shape[0] != shape[1]:
             raise ValueError('Dimensions must agree')
         if LazyLinearOp.isLazyLinearOp(op):
@@ -1546,3 +1544,95 @@ def zeros(shape):
                               _matmat(x, shape),
                               rmatmat=lambda x: _matmat(x, (shape[1],
                                                              shape[0])))
+
+def zpad(op, z_sizes):
+    """
+    Returns a LazyLinearOp of op padded with zeros on one or two dimensions.
+
+    Args:
+        op: the array/matrix/operator to pad with zeros.
+        z_sizes: a tuple/list of tuples/pairs of integers. It can be one tuple only if op is
+        one-dimensional or a tuple two tuples if op two-dimensional.
+
+    Example:
+        >>> from pyfaust.lazylinop import zpad
+        >>> from numpy import arange
+        >>> A = arange(18*2).reshape((18, 2))
+        >>> A
+        array([[ 0,  1],
+               [ 2,  3],
+               [ 4,  5],
+               [ 6,  7],
+               [ 8,  9],
+               [10, 11],
+               [12, 13],
+               [14, 15],
+               [16, 17],
+               [18, 19],
+               [20, 21],
+               [22, 23],
+               [24, 25],
+               [26, 27],
+               [28, 29],
+               [30, 31],
+               [32, 33],
+               [34, 35]])
+        >>> lz = zpad(A, ((2, 3), (4, 1)))
+        >>> lz
+        <23x7 LazyLinearOp with unspecified dtype>
+        >>> np.round(lz.toarray(), decimals=2)
+        array([[ 0.,  0.,  0.,  0.,  0.,  0.,  0.],
+               [ 0.,  0.,  0.,  0.,  0.,  0.,  0.],
+               [ 0.,  0.,  0.,  0.,  0.,  1.,  0.],
+               [ 0.,  0.,  0.,  0.,  2.,  3.,  0.],
+               [ 0.,  0.,  0.,  0.,  4.,  5.,  0.],
+               [ 0.,  0.,  0.,  0.,  6.,  7.,  0.],
+               [ 0.,  0.,  0.,  0.,  8.,  9.,  0.],
+               [ 0.,  0.,  0.,  0., 10., 11.,  0.],
+               [ 0.,  0.,  0.,  0., 12., 13.,  0.],
+               [ 0.,  0.,  0.,  0., 14., 15.,  0.],
+               [ 0.,  0.,  0.,  0., 16., 17.,  0.],
+               [ 0.,  0.,  0.,  0., 18., 19.,  0.],
+               [ 0.,  0.,  0.,  0., 20., 21.,  0.],
+               [ 0.,  0.,  0.,  0., 22., 23.,  0.],
+               [ 0.,  0.,  0.,  0., 24., 25.,  0.],
+               [ 0.,  0.,  0.,  0., 26., 27.,  0.],
+               [ 0.,  0.,  0.,  0., 28., 29.,  0.],
+               [ 0.,  0.,  0.,  0., 30., 31.,  0.],
+               [ 0.,  0.,  0.,  0., 32., 33.,  0.],
+               [ 0.,  0.,  0.,  0., 34., 35.,  0.],
+               [ 0.,  0.,  0.,  0.,  0.,  0.,  0.],
+               [ 0.,  0.,  0.,  0.,  0.,  0.,  0.],
+               [ 0.,  0.,  0.,  0.,  0.,  0.,  0.]])
+
+    """
+    _sanitize_op(op, 'op')
+    z_sizes = np.array(z_sizes)
+    if op.ndim != z_sizes.ndim:
+        raise ValueError('z_sizes must contain as many tuples as op.ndim.')
+    if op.ndim == 1:
+        op.reshape((op.size, 1))
+    if z_sizes.shape[0] > 2:
+        raise ValueError('Cannot pad zeros on more than two dimensions')
+    if not LazyLinearOp.isLazyLinearOp(op):
+        op = aslazylinearoperator(op)
+    out = op
+    for i in range(z_sizes.shape[0]):
+        bz = z_sizes[i][0]
+        az = z_sizes[i][1]
+        if bz > 0:
+            if i == 0:
+                out = vstack((zeros((bz, out.shape[1])), out))
+            else: #i == 1:
+                out = hstack((zeros((out.shape[0], bz)), out))
+        if az > 0:
+            if i == 0:
+                out = vstack((out, zeros((az, out.shape[1]))))
+            else: #i == 1:
+                out = hstack((out, zeros((out.shape[0], az))))
+    return out
+
+def _sanitize_op(op, op_name='op'):
+    if not hasattr(op, 'shape') or not hasattr(op, 'ndim'):
+        raise TypeError(op_name+' must have shape and ndim attributes')
+
