@@ -428,7 +428,7 @@ classdef LazyLinearOp < handle % needed to use references on objects
 
             function mul = hstack_mul(L, op, o)
                 % TODO: check dimensions
-                mul = L * o(1:size(L, 2), :) + op * o(size(L,2)+1:size(o, 2), :)
+                mul = L * o(1:size(L, 2), :) + op * o(size(L,2)+1:size(o, 1), :);
             end
 
             function HI = hstack_id(L, op, S)
