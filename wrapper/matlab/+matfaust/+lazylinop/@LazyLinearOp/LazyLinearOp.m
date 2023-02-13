@@ -252,6 +252,11 @@ classdef LazyLinearOp < handle % needed to use references on objects
         %>
         %=============================================================
         function PM = pagemtimes(L, op)
+            sop = size(op);
+            if numel(sop) < 3
+                PM = mtimes(L, op);
+                return;
+            end
 			function C = product(varargin)
 				[F{1:nargin}] = ndgrid(varargin{:});
 				for i=nargin:-1:1
@@ -259,7 +264,6 @@ classdef LazyLinearOp < handle % needed to use references on objects
 				end
 				C = unique(G , 'rows');
 			end
-            sop = size(op);
             sopc = num2cell(sop);
             PM = zeros(size(L, 1), size(op, 2), sopc{3:end});
             idl = cell(1, numel(sop) - 2);
