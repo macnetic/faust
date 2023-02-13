@@ -1527,7 +1527,7 @@ def zeros(shape):
     """
     def _matmat(op, shape):
         _sanitize_op(op)
-        if op.shape[0] != shape[1]:
+        if op.shape[-2] != shape[1]:
             raise ValueError('Dimensions must agree')
         if LazyLinearOp.isLazyLinearOp(op):
             return zeros((shape[0], op.shape[1]))
