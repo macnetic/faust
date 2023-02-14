@@ -12,6 +12,8 @@ from glob import glob
 
 version = '@CPACK_PACKAGE_VERSION@'
 
+LINUX_DEFAULT_COMPILER_FOR_PYTHON = '@LINUX_DEFAULT_COMPILER_FOR_PYTHON@'
+
 if(version == ''):
     version = '0.0.0' # typically when compiling just for testing
                     # (not for packaging with a proper version)
@@ -21,12 +23,13 @@ from sys import platform
 lib_ext = 'so'
 extra_link_args = [@FAUST_SETUP_PY_LFLAGS@]
 extra_objects = @PYTHON_EXT_EXTRA_OBJECTS@
-if platform == "linux":# or platform == "darwin":
-    # compile with clang on Linux (and MacOS X, this is the default choice)
-    from distutils import sysconfig
-    sysconfig.get_config_vars()['CC'] = 'clang++'
-    sysconfig.get_config_vars()['CXX'] = 'clang++'
-    sysconfig.get_config_vars()['LDCXXSHARED'] = 'clang++ -shared -fopenmp'
+if platform == "linux":
+    if LINUX_DEFAULT_COMPILER_FOR_PYTHON == 'OFF':# or platform == "darwin":
+        # compile with clang on Linux (and MacOS X, this is the default choice)
+        from distutils import sysconfig
+        sysconfig.get_config_vars()['CC'] = 'clang++'
+        sysconfig.get_config_vars()['CXX'] = 'clang++'
+        sysconfig.get_config_vars()['LDCXXSHARED'] = 'clang++ -shared -fopenmp'
     for opt in [@FAUST_SETUP_PY_LFLAGS@]+[]:
         if '-fopenmp' not in extra_link_args and opt.find('-fopenmp'):
             extra_link_args.append('-fopenmp') # because the LDCXXSHARED modif above is not enough (distutils ignores the -fopenmp flag)

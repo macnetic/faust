@@ -81,6 +81,7 @@ Quick Build of the python wrappers (pyfaust) on UNIX (without MATLAB and MATIO)
 	mkdir build
 	cd build
 	cmake -DBUILD_WRAPPER_PYTHON=ON -DNO_MATIO=ON -DNOCPPTESTS=ON ..
+    # on Linux if clang compiler is not installed add the cmake option -DLINUX_DEFAULT_COMPILER_FOR_PYTHON=ON to defaulty use gcc
 	make faust_python
 
 ---
