@@ -1636,3 +1636,37 @@ def _sanitize_op(op, op_name='op'):
     if not hasattr(op, 'shape') or not hasattr(op, 'ndim'):
         raise TypeError(op_name+' must have shape and ndim attributes')
 
+def fft(n, backend='scipy', **kwargs):
+    """
+    Returns a LazyLinearOp for the DFT of size n.
+
+    Args:
+        backend: 'scipy' (default) or 'pyfaust' for the underlying computation of the DFT.
+        kwargs: any key-value pair arguments to pass to the <a
+        href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.fft.html">scipy</a> or pyfaust.dft backends.
+
+    Example:
+        >>> from pyfaust.lazylinop import fft
+        >>> import numpy as np
+        >>> lfft1 = fft(32, norm='ortho')
+        >>> lfft2 = fft(32, backend='pyfaust')
+        >>> x = np.random.rand(32)
+        >>> np.allclose(lfft1 @ x, lfft2 @ x)
+        True
+        >>> y = lfft1 @ x
+        >>> np.allclose(lfft1.H @ y, x)
+        True
+        >>> np.allclose(lfft2.H @ y, x)
+        True
+
+    """
+    from scipy.fft import fft, ifft
+    if backend == 'scipy':
+        lfft = LazyLinearOperator(matmat=lambda x: fft(x, axis=0, **kwargs), rmatmat=lambda
+                                  x: ifft(x, axis=0, **kwargs), shape=(n, n))
+    elif backend == 'pyfaust':
+        from pyfaust import dft
+        lfft = aslazylinearoperator(dft(n, **kwargs))
+    else:
+        raise ValueError('backend '+str(backend)+' is unknown')
+    return lfft
