@@ -56,7 +56,9 @@
 #include "faust_constant.h"
 #include <cassert>
 #include <Eigen/SVD>
+#ifndef NO_MATIO
 #include "faust_init_from_matio.h"
+#endif
 
 #include <Eigen/Eigenvalues>
 
@@ -1037,6 +1039,9 @@ void MatDense<FPP,Cpu>::init_from_file(const char* filename)
 	template<typename FPP>
 void MatDense<FPP, Cpu>::from_matio_var(matvar_t *var)
 {
+#ifdef NO_MATIO
+	throw std::runtime_error("Sorry but NO_MATIO option was enabled at compiling time, so MAT-IO library wasn't enabled and you can't read this matio variable.");
+#else
 	matio_classes matio_class;
 	if(std::is_same<FPP, float>::value)
 		matio_class = MAT_C_SINGLE;
@@ -1062,19 +1067,27 @@ void MatDense<FPP, Cpu>::from_matio_var(matvar_t *var)
 			((Real<FPP>*)this->getData())[i*2+1] = ((Real<FPP>*)c_data.Im)[i];
 		}
 	}
-
+#endif
 }
 
 template<typename FPP>
 void MatDense<FPP, Cpu>::read_from_mat_file(const char *filepath, const char *variable_name)
 {
+
+#ifdef NO_MATIO
+	throw std::runtime_error("Sorry but NO_MATIO option was enabled at compiling time, so MAT-IO library wasn't enabled and you can't read this matio variable.");
+#else
 	matvar_t* matvar = faust_matio_read_variable(filepath, variable_name);
 	from_matio_var(matvar);
+#endif
 }
 
 template<typename FPP>
 void MatDense<FPP, Cpu>::save_to_mat_file(const char *filepath, const char *var_name)
 {
+#ifdef NO_MATIO
+	throw std::runtime_error("Sorry but NO_MATIO option was enabled at compiling time, so MAT-IO library wasn't enabled and the matrix can't be saved.");
+#else
 	int ret;
 	matvar_t* matvar = toMatIOVar(false, false, var_name);
 	mat_t* matfp = Mat_CreateVer(filepath, NULL, MAT_FT_MAT5);
@@ -1086,11 +1099,16 @@ void MatDense<FPP, Cpu>::save_to_mat_file(const char *filepath, const char *var_
 		handleError("Faust::MatDense::save_to_mat_file", (std::string("Failed writing the MatDense to a Matlab file error code: ")+std::to_string(ret)).c_str());
 	Mat_VarFree(matvar);
 	Mat_Close(matfp);
+#endif
 }
 
 template<typename FPP>
 matvar_t* MatDense<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate, const char *var_name/*=nullptr*/) const
 {
+
+#ifdef NO_MATIO
+	throw std::runtime_error("Sorry but NO_MATIO option was enabled at compiling time, so MAT-IO library wasn't enabled and the matrix can't be saved.");
+#else
 	matvar_t *var = nullptr;
 	size_t dims[2];
 	int opt = typeid(mat(0,0))==typeid(std::complex<Real<FPP>>(1.0,1.0))?MAT_F_COMPLEX:0;
@@ -1153,6 +1171,7 @@ matvar_t* MatDense<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate, const c
 		}
 	}
 	return var;
+#endif
 }
 
 template<typename FPP>

@@ -400,7 +400,7 @@ bool FaustCoreCpp<FPP,DEV>::save_mat_file(const char* filepath) const
     }
     catch(exception& e)
     {
-        //cerr << e.what() << endl;
+        cerr << e.what() << endl;
         return false;
     }
 }

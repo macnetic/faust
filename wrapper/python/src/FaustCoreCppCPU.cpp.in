@@ -134,6 +134,7 @@ FaustCoreCpp<@TYPE@,Cpu>* FaustCoreCpp<@TYPE@,Cpu>::read_from_mat_file(const cha
             delete core;
             core = nullptr;
         }
+        cerr << e.what() << endl;
     }
     return core;
 }

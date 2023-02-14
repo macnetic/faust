@@ -22,6 +22,11 @@ types::ndarray<T, types::pshape<long>> arrayFromBuf1D(T* fPtr, long size)
 
 
 #include "faust_constant.h"
+#ifdef NO_MATIO
+#define matvar_t void
+#else
+#include "matio.h"
+#endif
 #include <Eigen/Core>
 #include <memory> // shared_ptr
 

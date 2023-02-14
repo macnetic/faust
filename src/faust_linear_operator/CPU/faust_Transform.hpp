@@ -51,11 +51,14 @@
 #include <iostream>
 #include "faust_exception.h"
 #include <fstream>
-#include "matio.h"
-#include "faust_init_from_matio.h"
 #include "faust_MatBSR.h"
 #include "faust_MatPerm.h"
 #include "faust_MatButterfly.h"
+#ifndef NO_MATIO
+#include "matio.h"
+#include "faust_init_from_matio.h"
+#endif
+
 
 
 
@@ -430,6 +433,10 @@ void Faust::Transform<FPP,Cpu>::print_file(const char* filename) const
 template<typename FPP>
 void Faust::Transform<FPP, Cpu>::save_mat_file(const char* filename, bool transpose, bool conjugate) const
 {
+
+#ifdef NO_MATIO
+	throw std::runtime_error("Sorry but NO_MATIO option was enabled at compiling time, so MAT-IO library wasn't enabled and the Faust can't be saved.");
+#else
 	// save the FAuST as a matlab cell array (respecting what is done in matlab wrapper)
 	matvar_t *faust_matvar;
 	size_t dims[2];
@@ -467,11 +474,16 @@ void Faust::Transform<FPP, Cpu>::save_mat_file(const char* filename, bool transp
 	Mat_VarFree(faust_matvar);
 	Mat_Close(matfp);
 	delete[] faust_factor_matvars;
+#endif
 }
 
 template<typename FPP>
 void Faust::Transform<FPP, Cpu>::read_from_mat_file(const char *filepath)
 {
+
+#ifdef NO_MATIO
+	throw std::runtime_error("Sorry but NO_MATIO option was enabled at compiling time, so MAT-IO library wasn't enabled and you can't read this mat(io) file.");
+#else
 	clear();
 	matvar_t* cell_matvar = faust_matio_read_variable(filepath, "faust_factors");
 	if(cell_matvar->class_type != MAT_C_CELL || cell_matvar->rank != 2)
@@ -498,11 +510,16 @@ void Faust::Transform<FPP, Cpu>::read_from_mat_file(const char *filepath)
 		push_back(gmat, false, false, false, /*copying*/ false);
 	}
 	this->update_total_nnz();
+#endif
 }
 
 template<typename FPP>
 int Faust::Transform<FPP, Cpu>::get_mat_file_type(const char *filepath)
 {
+
+#ifdef NO_MATIO
+	throw std::runtime_error("Sorry but NO_MATIO option was enabled at compiling time, so MAT-IO library wasn't enabled and you can't read this mat(io) file.");
+#else
 	matvar_t* cell_matvar = faust_matio_read_variable(filepath, "faust_factors");
 	int ret_type = -1;
 	if(cell_matvar->class_type != MAT_C_CELL || cell_matvar->rank != 2)
@@ -528,6 +545,7 @@ int Faust::Transform<FPP, Cpu>::get_mat_file_type(const char *filepath)
 	}
 	Mat_VarFree(cell_matvar);
 	return ret_type;
+#endif
 }
 
 	template<typename FPP>
@@ -1483,7 +1501,8 @@ Faust::Vect<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::Vect<FPP,C
 #endif
 
 	if (size() == 0)
-		handleWarning("Faust::Transform<FPP,Cpu> : multiply : empty Faust::Transform<FPP,Cpu>");
+//		handleError("Faust::Transform<FPP,Cpu> : multiply : empty Faust::Transform<FPP,Cpu>");
+		throw std::runtime_error("Faust::Transform<FPP,Cpu> : multiply : empty Faust::Transform<FPP,Cpu>");
 
 	Faust::Vect<FPP,Cpu> vec(x);
 
@@ -1551,7 +1570,8 @@ template<typename FPP>
 Faust::MatSparse<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::MatSparse<FPP,Cpu> &A,const char opThis) const
 {
 	if (size() == 0)
-		handleWarning("Faust::Transform<FPP,Cpu> : multiply : empty Faust::Transform<FPP,Cpu>");
+		throw std::runtime_error("Faust::Transform<FPP,Cpu> : multiply : empty Faust::Transform<FPP,Cpu>");
+//		handleWarning("Faust::Transform<FPP,Cpu> : multiply : empty Faust::Transform<FPP,Cpu>");
 
 	Faust::MatSparse<FPP,Cpu> mat(A);
 
@@ -1796,7 +1816,8 @@ Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const MatDense<FPP,
 
 
 	if (size() == 0)
-		handleWarning("Faust::Transform<FPP,Cpu> : multiply : empty Faust::Transform<FPP,Cpu>");
+		throw std::runtime_error("Faust::Transform<FPP,Cpu> : multiply : empty Faust::Transform<FPP,Cpu>");
+//		handleWarning("Faust::Transform<FPP,Cpu> : multiply : empty Faust::Transform<FPP,Cpu>");
 
 	Faust::MatDense<FPP,Cpu> mat(A);
 

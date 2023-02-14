@@ -244,6 +244,7 @@ option(DISABLE_ALGO_PYX "If OFF the algorithms (pyfaust.fact, pyfaust.poly etc.)
 option(BUILD_EIGTJ_SVDTJ "if OFF the eigjt and svdtj C++ implementations are not built." ON)
 option(MATLAB_2017_API "if ON the deprecated Matlab API will be used to build -- including separate complex API instead of new interleaved complex (R2018a)" OFF)
 option(VCOMPLIB_PATH "Set the library path of OpenMP which comes from the Visual Studio environment, e.g. C:/Program Files (x86)/Microsoft Visual Studio/*/vcomp140.dll")
+option(NO_MATIO "Avoid using MAT-IO library to implement reading/writing of FAµST matrices." OFF)
 
 if (BUILD_USE_SINGLEPRECISION)
 	message(STATUS "**********SINGLEPRECISION ACTIF************")
@@ -572,6 +573,10 @@ endif()
 include(CMake/findExternalLibs.cmake)
 #########################################
 #########################################
+
+if(NO_MATIO)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNO_MATIO")
+endif()
 
 if(USE_GPU_MOD)
 	# GPU2

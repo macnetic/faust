@@ -46,7 +46,9 @@
 #include <iomanip>
 #include <complex>
 #include <cstdlib>
+#ifndef NO_MATIO
 #include "faust_init_from_matio_mat.h"
+#endif
 #include "faust_scipy.h"
 
 using namespace std;
@@ -753,6 +755,10 @@ matvar_t* Faust::MatSparse<FPP, Cpu>::toMatIOVarDense(bool transpose, bool conju
 template<typename FPP>
 matvar_t* Faust::MatSparse<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate, const char* var_name/*=nullptr*/) const
 {
+
+#ifdef NO_MATIO
+	throw std::runtime_error("Sorry but NO_MATIO option was enabled at compiling time, so MAT-IO library wasn't enabled and the matrix can't be saved.");
+#else
 	//TODO: refactor this function because it is a bit too long
 	matvar_t* var = NULL;
 	Eigen::SparseMatrix<FPP,Eigen::RowMajor> mat_;
@@ -854,24 +860,36 @@ matvar_t* Faust::MatSparse<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate,
 	if(!opt)
 		delete[] data;
 	return var;
+#endif
 }
 //!  \brief Creates a MatSparse from at matio variable
 template<typename FPP>
 void Faust::MatSparse<FPP, Cpu>::from_matio_var(matvar_t* var)
 {
+#ifdef NO_MATIO
+	throw std::runtime_error("Sorry but NO_MATIO option was enabled at compiling time, so MAT-IO library wasn't enabled and you can't read this matio variable.");
+#else
 	init_spmat_from_matvar(*this, var);
+#endif
 }
 //!  \brief Creates a MatSparse from at .mat file
 template<typename FPP>
 void Faust::MatSparse<FPP, Cpu>::read_from_mat_file(const char *filepath, const char *var_name)
 {
+#ifdef NO_MATIO
+	throw std::runtime_error("Sorry but NO_MATIO option was enabled at compiling time, so MAT-IO library wasn't enabled and you can't read this matio file.");
+#else
 	init_faust_spmat_from_matio(*this, filepath, var_name);
+#endif
 }
 
 //!  \brief Saves a MatSparse to a .mat file
 template<typename FPP>
 void Faust::MatSparse<FPP, Cpu>::save_to_mat_file(const char *filepath, const char *var_name)
 {
+#ifdef NO_MATIO
+	throw std::runtime_error("Sorry but NO_MATIO option was enabled at compiling time, so MAT-IO library wasn't enabled and the matrix can't be saved.");
+#else
 	//TODO: refactor with MatDense::save_to_mat_file
 	int ret;
 	matvar_t* matvar = toMatIOVar(false, false, var_name);
@@ -884,6 +902,7 @@ void Faust::MatSparse<FPP, Cpu>::save_to_mat_file(const char *filepath, const ch
 		handleError("Faust::MatSparse::save_to_mat_file", (std::string("Failed writing the MatSparse to a Matlab file error code: ")+std::to_string(ret)).c_str());
 	Mat_VarFree(matvar);
 	Mat_Close(matfp);
+#endif
 }
 
 template<typename FPP>

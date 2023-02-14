@@ -67,8 +67,7 @@ Faust::MatGeneric<FPP,Cpu>* Faust::MatDiag<FPP>::Clone(const bool isOptimize) co
 template<typename FPP>
 matvar_t* Faust::MatDiag<FPP>::toMatIOVar(bool transpose, bool conjugate, const char* var_name/*=nullptr*/) const
 {
-	//TODO
-	return nullptr;
+	throw std::runtime_error("MatDiag::toMatIOVar is not yet implemented");
 }
 
 template<typename FPP>

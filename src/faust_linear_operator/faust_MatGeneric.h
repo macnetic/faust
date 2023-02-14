@@ -45,7 +45,11 @@
 #include "faust_LinearOperator.h"
 #include "faust_Vect.h"
 #include "faust_MatDense.h"
+#ifndef NO_MATIO
 #include "matio.h"
+#else
+#define matvar_t void
+#endif
 #include "Eigen/Core"
 #include <list>
 #include <utility>

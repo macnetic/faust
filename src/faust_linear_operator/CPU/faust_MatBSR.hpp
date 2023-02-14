@@ -349,7 +349,7 @@ namespace Faust
 	}
 
 	template <typename FPP>
-	void MatBSR<FPP,Cpu>::print_bufs() 
+	void MatBSR<FPP,Cpu>::print_bufs()
 	{
 		this->bmat.print_bufs();
 	}
@@ -386,6 +386,10 @@ namespace Faust
 	template <typename FPP>
 		matvar_t* MatBSR<FPP,Cpu>::toMatIOVar(bool transpose, bool conjugate, const char* var_name/*=nullptr*/) const
 		{
+
+#ifdef NO_MATIO
+	throw std::runtime_error("Sorry but NO_MATIO option was enabled at compiling time, so MAT-IO library wasn't enabled and the matrix can't be saved.");
+#else
 			//			MatSparse<FPP, Cpu> smat(this->dim1, this->dim2);
 			//			smat.mat = bmat.to_sparse();
 			//			return smat.toMatIOVar(transpose, conjugate);
@@ -476,6 +480,7 @@ namespace Faust
 //			Mat_Close(mat);
 			bsr_cell = Mat_VarCreate("bsr_cell", MAT_C_CELL, MAT_T_CELL, 2, cell_dims, matvars, 0);
 			return bsr_cell;
+#endif
 		}
 
 	template <typename FPP>

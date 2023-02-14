@@ -1,6 +1,8 @@
 #ifndef __FAUST_MAT_DIAG__
 #define __FAUST_MAT_DIAG__
-#include "matio.h"
+#ifndef NO_MATIO
+#include "matio.h" // otherwise matvar_t is defined as void from MatGeneric header
+#endif
 #include <Eigen/Core>
 #include "faust_constant.h"
 #include "faust_Vect.h"

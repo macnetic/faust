@@ -60,7 +60,9 @@
 #include "faust_Transform.h"
 
 #include "faust_linear_algebra.h"
-#include "matio.h"
+#ifndef NO_MATIO
+#include "matio.h"  // otherwise matvar_t is defined as void from MatGeneric header
+#endif
 #include <random>
 /*! \class Faust::MatDense MatDenseDense.h
 * \brief Class template representing dense matrix <br>

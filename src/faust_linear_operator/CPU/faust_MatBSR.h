@@ -1,7 +1,9 @@
 #ifndef __BSR_MAT__
 #define __BSR_MAT__
 #include <Eigen/SparseCore>
-#include "matio.h"
+#ifndef NO_MATIO
+#include "matio.h"  // otherwise matvar_t is defined as void from MatGeneric header
+#endif
 #include <Eigen/Dense>
 #include <list>
 #include <utility>
