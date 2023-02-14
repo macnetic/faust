@@ -20,7 +20,7 @@ project: [FAµST website](http://faust.inria.fr)
 
 Dependencies
 ============
-- cuda 11 ( >= 11.6, preferably the latest cuda 11 version available). There is a known bug on cuda 11.4 (issue #302).
+- cuda 11 ( >= 11.6, preferably the latest cuda 11 version available). There is a known bug on cuda 11.4 (issue #305).
 - Eigen 3.4.x.
 - [matio](https://github.com/tbeu/matio) version >= 1.5.7 (guaranteed) and <= 1.5.17 (potentially), and its own dependencies, as hdf5. This dependency can be disabled through cmake option ``NO_MATIO``.
 - Python3 (with numpy, scipy and cython) to build the python wrappers.
