@@ -20,8 +20,13 @@ project: [FAµST website](http://faust.inria.fr)
 
 Dependencies
 ============
-- libxml2 (Optional, needed with CMake BUILD_READ_XML_FILE).
-- TODO
+- cuda 11 ( >= 11.6, preferably the latest cuda 11 version available). There is a known bug on cuda 11.4 (issue #302).
+- Eigen 3.4.x.
+- [matio](https://github.com/tbeu/matio) version >= 1.5.7 (guaranteed) and <= 1.5.17 (potentially), and its own dependencies, as hdf5. This dependency can be disabled through cmake option ``NO_MATIO``.
+- Python3 (with numpy, scipy and cython) to build the python wrappers.
+- MATLAB (>= R2017b) to build the matlab wrappers.
+- libxml2 (Optional, needed with CMake ``BUILD_READ_XML_FILE``).
+- TODO: other?
 
 
 ---
@@ -29,7 +34,11 @@ Dependencies
 Cloning the project
 ============
 
-The project git binary objects are heavy (it can take up to ~ 1.5 Gio of data). If your connection is unstable don't download the whole history (using the ``--depth`` option -- issue #294).
+```
+git clone git@gitlab.inria.fr:faustgrp/faust.git faust
+```
+
+**NOTE**: The project git binary objects are heavy (it can take up to ~ 1.5 Gio of data). If your connection is unstable don't download the whole history (using the ``--depth`` option -- issue #294).
 
 ```
 git clone git@gitlab.inria.fr:faustgrp/faust.git --depth=1 --single-branch faust
@@ -43,7 +52,7 @@ git fetch --unshallow
 ```
 
 ---
-Quick build on UNIX
+Build on UNIX
 =====================
 
 	Unpack the directory.
@@ -60,6 +69,19 @@ For more information, please refer to the [Mathworks website](http://fr.mathwork
 
 **Warning 2**:
 Many CMake build options are available (cf. [CMakeLists.txt](./CMakeLists.txt)). It might be quite complicated to deal with them at start (refer to gitlab ci building scripts in [./misc/continuous\_integration/jobs/](./misc/continuous_integration/jobs/) or the [.gitlab-ci.yml](.gitlab-ci.yml) root script to get some insight).
+
+---
+Quick Build of the python wrappers (pyfaust) on UNIX (without MATLAB and MATIO)
+=========================================================
+
+(With Eigen, Python3 with Cython, numpy and scipy installed)
+
+	git clone git@gitlab.inria.fr:faustgrp/faust.git --depth=1  faust_no_matio
+	cd faust_no_matio/
+	mkdir build
+	cd build
+	cmake -DBUILD_WRAPPER_PYTHON=ON -DNO_MATIO=ON -DNOCPPTESTS=ON ..
+	make faust_python
 
 ---
 
@@ -79,7 +101,6 @@ Pre-compiled packages from Gitlab Continuous Integration are also available. Exc
 - [Linux (.rpm, .deb) packages](https://gitlab.inria.fr/faustgrp/faust/-/jobs/artifacts/master/download?job=package_linux_release)  
 - [Linux (.rpm, .deb) packages with embedded static matio library](https://gitlab.inria.fr/faustgrp/faust/-/jobs/artifacts/master/download?job=package_linux_release)  
 - Python PIP (pre-compiled) packages: for [Linux](https://gitlab.inria.fr/faustgrp/faust/-/jobs/artifacts/master/download?job=package_linux_purepy_release), [macOS](https://gitlab.inria.fr/faustgrp/faust/-/jobs/artifacts/master/download?job=package_macos_purepy_release) and [Windows 10](https://gitlab.inria.fr/faustgrp/faust/-/jobs/artifacts/master/download?job=package_win_purepy_release). Or preferably, refer to [pypi pyfaust](https://pypi.org/project/pyfaust) or [anaconda pyfaust](https://anaconda.org/pyfaust/pyfaust).
-============
 
 ---
 License
