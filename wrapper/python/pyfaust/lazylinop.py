@@ -1671,3 +1671,44 @@ def fft(n, backend='scipy', **kwargs):
     else:
         raise ValueError('backend '+str(backend)+' is unknown')
     return lfft
+
+def fft2(shape, backend='scipy', **kwargs):
+    """Returns a LazyLinearOp for the 2D DFT of size n.
+
+    Args:
+        backend: 'scipy' (default) or 'pyfaust' for the underlying computation of the 2D DFT.
+        kwargs: any key-value pair arguments to pass to the <a
+        href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.fft2.html">scipy</a> or pyfaust.dft backends.
+
+    Example:
+
+        >>> from pyfaust.lazylinop import fft2
+        >>> import numpy as np
+        >>> lfft2_scipy = fft2((32, 32), norm='ortho')
+        >>> lfft2_pyfaust = fft2((32, 32), backend='pyfaust')
+        >>> x = np.random.rand(32, 32)
+        >>> np.allclose(lfft2_scipy @ x, lfft2_pyfaust @ x)
+        True
+        >>> y = lfft2_scipy @ x
+        >>> np.allclose(lfft2_scipy.H @ y, x)
+        True
+        >>> np.allclose(lfft2_pyfaust.H @ y, x)
+        True
+
+    """
+    if backend == 'scipy':
+        from scipy.fft import fft2, ifft2
+        sp = np.prod(shape)
+        return LazyLinearOperator(
+            shape,
+            matmat=lambda x: fft2(x, **kwargs),
+            rmatmat=lambda x: ifft2(x, **kwargs))
+    elif backend == 'pyfaust':
+        from pyfaust import dft
+        K = kron(dft(shape[0], **kwargs), dft(shape[1], **kwargs))
+        return LazyLinearOperator(shape, matmat=lambda x: (K @
+                                                           x.ravel()).reshape(shape),
+                                  rmatmat=lambda x: (K.H @
+                                                     x.ravel()).reshape(shape))
+    else:
+        raise ValueError('backend '+str(backend)+' is unknown')
