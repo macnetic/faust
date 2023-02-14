@@ -6,7 +6,7 @@ variables:
     DURL: "https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/"
     DFILE: "faust_data.zip"
     JOB_PYTHON: "python3.9" # if set again in job, it hides this one (precedence: https://docs.gitlab.com/13.6/ee/ci/variables/#priority-of-environment-variables)
-    WIN_PY_VER: '3.10' # default python version used to build python wrapper on windows (for both whl package and nsis .exe)
+    WIN_PY_VER: '3.11' # default python version used to build python wrapper on windows (for both whl package and nsis .exe)
     NUX_PY_VER: '3.11' # default python version used for linux system packages (.rpm and .deb)
     MACOS_PY_VER: '3.11' # default python version used for macOS system packages (.pkg)
     GEN_EGG: 'OFF'
@@ -547,7 +547,7 @@ pkg_win_purepy_release:
 
 pkg_win_purepy_release_extra_pyver:
     extends: .pkg_win_purepy
-    variables: {BUILD_CONFIG: "Release", GIT_SUBMODULE_STRATEGY: recursive, EXPERIMENTAL_PKG: "OFF", WIN_PY_VER: '3.10'}
+    variables: {BUILD_CONFIG: "Release", GIT_SUBMODULE_STRATEGY: recursive, EXPERIMENTAL_PKG: "OFF", WIN_PY_VER: '3.11'}
     before_script:
         - 'set VERSION=%CI_COMMIT_TAG%'
     artifacts:
@@ -710,7 +710,7 @@ test_win_purepy_pkg:
 
 test_win_purepy_pkg_extra_pyver:
   extends: test_win_purepy_pkg
-  variables: {JOB_PYTHON: 'py', WIN_PY_VER: '3.10'}
+  variables: {JOB_PYTHON: 'py', WIN_PY_VER: '3.11'}
   needs:
     - job: pkg_win_purepy_release_extra_pyver
       artifacts: true
@@ -794,7 +794,7 @@ conda_linux_pub:
   stage: conda_pkgs
   script:
     - start /wait git-bash -c "misc/continuous_integration/conda_pkg/conda_build_upload_pyfaust.sh win 3.9 misc/continuous_integration/conda_pkg/meta.yaml.in"
-    - start /wait git-bash -c "misc/continuous_integration/conda_pkg/conda_build_upload_pyfaust.sh win 3.10 misc/continuous_integration/conda_pkg/meta.yaml.in"
+    - start /wait git-bash -c "misc/continuous_integration/conda_pkg/conda_build_upload_pyfaust.sh win 3.11 misc/continuous_integration/conda_pkg/meta.yaml.in"
   only:
     - tags
   tags:
