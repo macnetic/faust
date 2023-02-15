@@ -568,6 +568,9 @@ if(NOT "$ENV{MATIO_INC_DIR}" MATCHES "^$")
 endif()
 ############################################
 
+if(NO_MATIO AND BUILD_READ_MAT_FILE)
+	message(WARNING "NO_MATIO option is enabled, BUILD_READ_MAT_FILE should be OFF")
+endif()
 
 #########################################
 ###### FIND EXTERNALS LIBRARY  ##########
@@ -680,6 +683,9 @@ if(NOT BUILD_EIGTJ_SVDTJ)
 		message(STATUS "remove ${FILE} from build list of cpp files")
 		list(REMOVE_ITEM CPP_FILES ${FILE})
 	endforeach()
+endif()
+if(NO_MATIO)
+	list(REMOVE_ITEM CPP_FILES ${FAUST_SRC_DIR}/utils/matio/faust_init_from_matio.cpp)
 endif()
 if(NOT FAUST_TORCH)
 	list(REMOVE_ITEM CPP_FILES ${FAUST_SRC_LINEAR_OPERATOR_DIR}/CPU/faust_torch.cpp)
