@@ -38,7 +38,7 @@
 ##      Remi Gribonval  : remi.gribonval@inria.fr                           ##
 ##############################################################################
 if(UNIX)
-	find_package(Eigen3 3.3 REQUIRED)
+	find_package(Eigen3 3.4 REQUIRED)
 	if(EIGEN3_INCLUDE_DIR)
 		set(EIGEN_INC_DIR ${EIGEN3_INCLUDE_DIR})
 		message(STATUS "Eigen library is available here: ${EIGEN_INC_DIR}")
