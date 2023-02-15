@@ -92,7 +92,7 @@ fi
 
 WHL_URL=$(curl  $PYPI_FILES_URL | sed -ne 's/.*"\([^"]\{1,\}\.whl\)".*/\1/p' | grep $SYSTEM | grep cp$PYVER_NODOT)
 
-[[ -z "$WHL_URL" ]] && echo "No wheel package found on pypi.org for the system $SYSTEM_ERROR and the python version $PYVER" && exit 3
+[[ -z "$WHL_URL" ]] && echo "No wheel package found on pypi.org for the system $SYSTEM, $SYSTEM_ERROR and the python version $PYVER" && exit 3
 
 [[ -n "$DEBUG" ]] && echo WHEEL_URL=${WHL_URL}
 
