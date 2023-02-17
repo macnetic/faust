@@ -1546,14 +1546,17 @@ def zeros(shape):
                               rmatmat=lambda x: _matmat(x, (shape[1],
                                                              shape[0])))
 
-def zpad(op, z_sizes):
+def zpad(z_sizes, x_shape, ret_unpad=False):
     """
-    Returns a LazyLinearOp of op padded with zeros on one or two dimensions.
+    Returns a LazyLinearOp to pad any compatible object x of shape x_shape with zeros on one or two dimensions.
 
     Args:
-        op: the array/matrix/operator to pad with zeros.
-        z_sizes: a tuple/list of tuples/pairs of integers. It can be one tuple only if op is
-        one-dimensional or a tuple two tuples if op two-dimensional.
+        z_sizes: a tuple/list of tuples/pairs of integers. It can be one tuple
+        only if x is one-dimensional or a tuple two tuples if x two-dimensional.
+        x_shape: shape of x to apply the zero padding to.
+        ret_unpad: by default (False) the function returns only the zero-padding
+        LazyLinearOp. If True it returns a tuple of the zero-padding operator and its
+        inverse (the operator which undoes the padding on a padded x).
 
     Example:
         >>> from pyfaust.lazylinop import zpad
@@ -1578,10 +1581,10 @@ def zpad(op, z_sizes):
                [30, 31],
                [32, 33],
                [34, 35]])
-        >>> lz = zpad(A, ((2, 3), (4, 1)))
+        >>> lz = zpad(((2, 3), (4, 1)), A.shape)
         >>> lz
-        <23x7 LazyLinearOp with unspecified dtype>
-        >>> np.round(lz.toarray(), decimals=2)
+        <23x18 LazyLinearOp with unspecified dtype>
+        >>> np.round(lz @ A, decimals=2)
         array([[ 0.,  0.,  0.,  0.,  0.,  0.,  0.],
                [ 0.,  0.,  0.,  0.,  0.,  0.,  0.],
                [ 0.,  0.,  0.,  0.,  0.,  1.,  0.],
@@ -1607,31 +1610,44 @@ def zpad(op, z_sizes):
                [ 0.,  0.,  0.,  0.,  0.,  0.,  0.]])
 
     """
-    _sanitize_op(op, 'op')
     z_sizes = np.array(z_sizes)
-    if op.ndim != z_sizes.ndim:
-        raise ValueError('z_sizes must contain as many tuples as op.ndim.')
-    if op.ndim == 1:
-        op.reshape((op.size, 1))
-    if z_sizes.shape[0] > 2:
+    if z_sizes.shape[0] > 2 or z_sizes.shape[1] > 2:
         raise ValueError('Cannot pad zeros on more than two dimensions')
-    if not LazyLinearOp.isLazyLinearOp(op):
-        op = aslazylinearoperator(op)
-    out = op
-    for i in range(z_sizes.shape[0]):
-        bz = z_sizes[i][0]
-        az = z_sizes[i][1]
-        if bz > 0:
-            if i == 0:
-                out = vstack((zeros((bz, out.shape[1])), out))
-            else: #i == 1:
-                out = hstack((zeros((out.shape[0], bz)), out))
-        if az > 0:
-            if i == 0:
-                out = vstack((out, zeros((az, out.shape[1]))))
-            else: #i == 1:
-                out = hstack((out, zeros((out.shape[0], az))))
-    return out
+    if len(x_shape) != z_sizes.ndim:
+        raise ValueError('z_sizes must contain as many tuples as op.ndim.')
+    def mul(op):
+        _sanitize_op(op, 'op')
+        if op.ndim == 1:
+            op.reshape((op.size, 1))
+        out = op
+        for i in range(z_sizes.shape[0]):
+            bz = z_sizes[i][0]
+            az = z_sizes[i][1]
+            if bz > 0:
+                if i == 0:
+                    out = vstack((zeros((bz, out.shape[1])), out))
+                else: #i == 1:
+                    out = hstack((zeros((out.shape[0], bz)), out))
+            if az > 0:
+                if i == 0:
+                    out = vstack((out, zeros((az, out.shape[1]))))
+                else: #i == 1:
+                    out = hstack((out, zeros((out.shape[0], az))))
+        if isinstance(op, np.ndarray) or issparse(op):
+            return out.toarray()
+        else:
+            return out
+    def rmul(op):
+        r_offset = z_sizes[0][0]
+        c_offset = z_sizes[1][0]
+        return op[r_offset:r_offset + x_shape[0],
+                  c_offset:c_offset + x_shape[1]]
+    ret = LazyLinearOperator((z_sizes[1][0] + z_sizes[1][1] + x_shape[0],
+                               x_shape[0]), matmat=lambda op: mul(op))
+    if ret_unpad:
+        ret2 = LazyLinearOperator((x_shape[0], z_sizes[1][0] + z_sizes[1][1] + x_shape[0]), matmat=lambda op: rmul(op))
+        ret = (ret, ret2)
+    return ret
 
 def _sanitize_op(op, op_name='op'):
     if not hasattr(op, 'shape') or not hasattr(op, 'ndim'):
