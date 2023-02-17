@@ -1193,7 +1193,12 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         Args:
             F: the Faust object.
-            A: is a scalar number or a (vector) numpy.ndarray
+            A: is a scalar number or a (vector) numpy.ndarray or a Faust for
+            the elementwise multiplication.
+
+        NOTE: to compute the elementwise multiplication F * A
+        column-by-column (hence avoiding calling toarray(), which consumes more
+        memory) enable the environment variable PYFAUST_ELT_WISE_MUL_BY_COL.
 
         Returns: The result of the multiplication as a Faust (either A is a
         vector or a scalar).
@@ -1208,6 +1213,9 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             >>> B = F*v # Faust vector broadcasting
             >>> # is equivalent to B = F.__mul__(v)
             >>> F_times_two = F*2
+
+            Compute elementwise F * F, gives an array:
+            >>> FFarray = F * F
 
             If the type of A is not supported:
             >>> import numpy
@@ -1230,7 +1238,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                 if F.dtype == 'complex':
                     A = complex(A)
             return Faust(core_obj=F.m_faust.multiply_scal(A))
-        elif(isinstance(A, np.ndarray)):
+        elif isinstance(A, np.ndarray) and A.shape != F.shape:
             if(A.size == 1):
                 if A.dtype == 'complex':
                     return F*(A.squeeze().astype('complex'))
@@ -1239,10 +1247,77 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             if A.ndim == 1 and A.size == F.shape[1] \
             or A.ndim == 2 and A.shape[0] == 1:
                 return F@Faust(np.diag(A.squeeze()), dev=F.device)
-        # A is a Faust, a numpy.ndarray (eg. numpy.matrix) or anything
+        # A is a Faust or anything
+        elif isinstance(A, (Faust, np.ndarray)) or issparse(A):
+            return F._eltwise_mul(A)
         raise TypeError("* use is forbidden in this case. It is allowed only"
                         " for Faust-scalar multiplication or Faust vector"
                         " broadcasting.")
+
+    def _eltwise_mul(F, A):
+        if A.shape != F.shape:
+            raise ValueError("Dimensions must be the same for an"
+                             " elementwise multiplication of two Fausts.")
+        if not isinstance(A, Faust):
+            A = Faust(A) # handy but should be handled directly as an array/matrix
+        k = "PYFAUST_ELT_WISE_MUL_BY_COL"
+        if k in environ:
+            out = np.empty(F.shape, dtype='complex' if F.dtype == 'complex'
+                          or A.dtype == 'complex' else 'double')
+            parallel = environ[k].startswith('parallel')
+            thread_or_proc = environ[k].endswith('thread')
+            def out_col(j, ncols=1):
+                for i in range(ncols):
+                    F_col = F[:,j+i].toarray()
+                    A_col = A[:,j+i].toarray()
+                    out[:,j+i] = (F_col * A_col).reshape(F.shape[0])
+            def out_col_proc(F, A, pipe):
+                out = np.empty((F.shape[0], F.shape[1]), dtype='complex' if F.dtype == 'complex'
+                               or A.dtype == 'complex' else 'double')
+                for i in range(F.shape[1]):
+                    F_col = F[:, i]
+                    A_col = A[:, i]
+                    out[:, i] = (F_col * A_col).reshape(F.shape[0])
+                pipe[0].send(out)
+            if parallel:
+                from threading import Thread
+                from multiprocessing import Process, Pipe
+                nthreads = 4
+                cols_per_thread = F.shape[1] // nthreads
+                rem_cols = F.shape[1] - cols_per_thread * nthreads
+                t = []
+                p = []
+                os = []
+                col_offset = 0
+                while len(t) < nthreads:
+                    n = cols_per_thread + (1 if len(t) < rem_cols
+                                                    else 0)
+                    if thread_or_proc:
+                        t.append(Thread(target=out_col, args=(col_offset, n)))
+                    else:
+                        p += [Pipe()]
+                        o = col_offset
+                        t.append(Process(target=out_col_proc,
+                                         args=(F[o:o+n].toarray(),
+                                               A[o:o+n].toarray(),
+                                               p[-1])))
+                        os += [o]
+                    t[-1].start()
+                    col_offset += n
+
+                for j in range(nthreads):
+                    if not thread_or_proc:
+                        if j < nthreads -1:
+                            out[os[j]:os[j+1]] = p[j][1].recv()
+                        else:
+                            out[os[j]:] = p[j][1].recv()
+                    t[j].join()
+            else:
+                for j in range(F.shape[1]):
+                    out_col(j)
+            return out
+        else:
+            return F.toarray() * A.toarray()
 
     def __rmul__(F, lhs_op):
         """ lhs_op*F
