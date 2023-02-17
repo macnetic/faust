@@ -64,6 +64,7 @@ PyFaust = Extension('_FaustCorePy',
 setup(
     name = 'pyfaust@PYFAUST_PKG_SUFFIX@',
     version = version, # cf. header
+    include_dirs = numpy.get_include(),
     ext_modules = cythonize(PyFaust, compiler_directives={'language_level': sys.version_info.major }),
     packages = [ 'pyfaust', 'pyfaust.tests' ],
     url = 'https://faust.inria.fr',
