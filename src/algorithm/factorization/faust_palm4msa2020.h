@@ -95,6 +95,8 @@ namespace Faust
 	template<typename FPP, FDevice DEVICE>
 		Real<FPP> calc_rel_err(const TransformHelper<FPP,DEVICE>& S, const MatDense<FPP,DEVICE> &A, const Real<FPP> &lambda=1, const Real<FPP>* A_norm=nullptr);
 
+  template<typename FPP, FDevice DEVICE> Real<FPP> compute_rel_change(const TransformHelper<FPP,DEVICE>& previousS, const Real<FPP>& previouslambda , const TransformHelper<FPP,DEVICE>& currentS, const Real<FPP>& currentlambda);
+
 	/**
 	 * \brief This function performs the (scaling factor) lambda update of the PALM4MSA algorithm (palm4msa2).
 	 *

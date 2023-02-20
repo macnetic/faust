@@ -43,6 +43,16 @@ Real<FPP> Faust::calc_rel_err(const TransformHelper<FPP,DEVICE>& S, const MatDen
 	return err.norm() / *A_norm;
 }
 
+template<typename FPP, FDevice DEVICE> Real<FPP> Faust::compute_rel_change(const TransformHelper<FPP,DEVICE>& previousS, const Real<FPP>& previouslambda, const TransformHelper<FPP,DEVICE>& currentS, const Real<FPP>& currentlambda)
+{
+  MatDense<FPP, DEVICE> m1 = const_cast<TransformHelper<FPP, DEVICE>&>(previousS).get_product();
+  m1 *= FPP(previouslambda);
+  MatDense<FPP, DEVICE> dm = const_cast<TransformHelper<FPP, DEVICE>&>(currentS).get_product();
+  dm *= FPP(currentlambda);
+  dm -= m1;
+  return dm.norm() / m1.norm();
+}
+
 template <typename FPP, FDevice DEVICE>
 void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 		std::vector<Faust::ConstraintGeneric*> & constraints,
@@ -235,12 +245,18 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 		is_last_fac_updated = [&f_id, &nfacts]() {return f_id == nfacts-1;};
 	}
 
+	// to compute relative change
+	Faust::TransformHelper<FPP,DEVICE> previousS;
+	Real<FPP> previouslambda;
+
 	while(sc.do_continue(i, error))
 	{
 //		std::cout << "i: " <<  i << std::endl;
 //		std::cout << "nfacts:" << nfacts << std::endl;
 
 		init_ite();
+		if(i == 0)
+		  previousS = S;
 		while(updating_facs())
 		{
 			//						std::cout << "#f_id: " << f_id << std::endl;
@@ -277,6 +293,20 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 				std::cout << " (call id: " << id << ")" << std::endl;
 				std::cout << " lambda=" << lambda << std::endl;
 			}
+		}
+		// check if solution changes, if not stop while
+		if(i == 0){
+		  previousS = S;
+		  previouslambda = lambda;
+		}else{
+		  auto rel_change = compute_rel_change(previousS, previouslambda, S, lambda);
+		  std::cout << "relative change: " << rel_change << std::endl;
+		  if(rel_change < 1e-6){
+		    cout << "relative change is < 1e-6, stop iterations at " << i << std::endl;
+		    break;
+		  }
+		  previousS = S;
+		  previouslambda = lambda;
 		}
 		i++;
 	}
@@ -475,7 +505,7 @@ void Faust::update_lambda(Faust::TransformHelper<FPP,DEVICE>& S, std::vector<Tra
 			return;
 		}
 		else
-			throw std::runtime_error("Error in update_lambda: S Frobenius norm is zero, can't compute lambda.");
+			throw std::runtime_error("Error in update_lambda: S Frobenius norm is zero, can't compute lambda.\nIf you are using 'sp' constraint think about increasing the number of non-zeros elements.");
 	if(std::isnan(std::real(tr)) || std::isnan(nS))
 		if(no_lambda_error)
 		{
