@@ -1696,6 +1696,7 @@ def fft2(shape, backend='scipy', **kwargs):
     """Returns a LazyLinearOp for the 2D DFT of size n.
 
     Args:
+        shape: the signal shape to apply the fft2 to.
         backend: 'scipy' (default) or 'pyfaust' for the underlying computation of the 2D DFT.
         kwargs: any key-value pair arguments to pass to the <a
         href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.fft2.html">scipy</a> or pyfaust.dft backends.
