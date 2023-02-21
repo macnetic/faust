@@ -608,7 +608,7 @@ namespace Faust
 	template<typename FPP>
 		void TransformHelper<FPP,GPU2>::operator=(TransformHelper<FPP,GPU2>& th)
 		{
-			copy_state(th); // it copies the underlying Transform object too
+			this->copy_state(th); // it copies the underlying Transform object too
 		}
 
 	template<typename FPP>
