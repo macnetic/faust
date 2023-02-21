@@ -823,7 +823,9 @@ class LazyLinearOp(LinearOperator):
 
     def _vstack_slice(self, op, indices):
         rslice = indices[0]
-        if rslice.step is not None:
+        if isinstance(rslice, int):
+            rslice = slice(rslice, rslice+1, 1)
+        if rslice.step is not None and rslice.step != 1:
             raise ValueError('Can\'t handle non-contiguous slice -- step > 1')
         if rslice.start == None:
             rslice = slice(0, rslice.stop, rslice.step)
@@ -841,7 +843,7 @@ class LazyLinearOp(LinearOperator):
         else:
             # the slice is overlapping self and op
             self_slice = self._slice((slice(rslice.start, self.shape[0]), indices[1]))
-            op_slice = self._slice((slice(0, rslice.end - self.shape[0]), indices[1]))
+            op_slice = self._slice((slice(0, rslice.stop - self.shape[0]), indices[1]))
             return lambda: self_slice.vstack(op_slice)
 
     def _vstack_mul_lambda(self, op, o):
@@ -875,7 +877,9 @@ class LazyLinearOp(LinearOperator):
 
     def _hstack_slice(self, op, indices):
         cslice = indices[1]
-        if cslice.step is not None:
+        if isinstance(cslice, int):
+            cslice = slice(cslice, cslice+1, 1)
+        if cslice.step is not None and cslice.step != 1:
             raise ValueError('Can\'t handle non-contiguous slice -- step > 1')
         if cslice.stop > self.shape[1] + op.shape[1]:
             raise ValueError('Slice overflows the row dimension')
@@ -889,7 +893,7 @@ class LazyLinearOp(LinearOperator):
         else:
             # the slice is overlapping self and op
             self_slice = self._slice((indices[0], slice(cslice.start, self.shape[1])))
-            op_slice = self._slice((indices[0], slice(0, cslice.end - self.shape[1])))
+            op_slice = self._slice((indices[0], slice(0, cslice.stop - self.shape[1])))
             return lambda: self_slice.vstack(op_slice)
 
     def _hstack_mul_lambda(self, op, o):
@@ -1714,7 +1718,6 @@ def fft2(shape, backend='scipy', **kwargs):
     """
     if backend == 'scipy':
         from scipy.fft import fft2, ifft2
-        sp = np.prod(shape)
         return LazyLinearOperator(
             shape,
             matmat=lambda x: fft2(x, **kwargs),
