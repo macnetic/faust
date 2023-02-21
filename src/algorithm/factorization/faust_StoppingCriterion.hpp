@@ -52,7 +52,7 @@ template<typename T>
 const char * Faust::StoppingCriterion<T>::m_className="Faust::StoppingCriterion::";
 
 template<typename T>
-Faust::StoppingCriterion<T>::StoppingCriterion(bool isCriterionError_) : isCriterionError(isCriterionError_)
+Faust::StoppingCriterion<T>::StoppingCriterion(bool isCriterionError_) : isCriterionError(isCriterionError_), epsErr(-1)
 {
    if (isCriterionError_)
    {
@@ -64,8 +64,8 @@ Faust::StoppingCriterion<T>::StoppingCriterion(bool isCriterionError_) : isCrite
 }
 
 template<typename T>
-Faust::StoppingCriterion<T>::StoppingCriterion(int nb_it, bool isCriterionError, T errorThreshold, int maxIteration /* default 10000 */):
-	isCriterionError(isCriterionError),nb_it(nb_it), errorThreshold(errorThreshold), maxIteration(maxIteration)
+Faust::StoppingCriterion<T>::StoppingCriterion(int nb_it, bool isCriterionError, T errorThreshold, int maxIteration /* default 10000 */, T epsErr/*=-1*/):
+	isCriterionError(isCriterionError),nb_it(nb_it), errorThreshold(errorThreshold), maxIteration(maxIteration), epsErr(epsErr), lastErr(-1)
 {
 	check_validity();
 }
@@ -95,8 +95,25 @@ template<typename T>
 bool Faust::StoppingCriterion<T>::do_continue(int current_ite, T current_error /* = NO_ERROR_PASSED */)const
 {
 
+	if(epsErr > -1)
+	{
+
+		// the stopping criterion compares the error delta between two calls
+		if(lastErr > -1)
+		{
+			// it is not the first time the function is call (not the first iteration of the algorithm behind)
+			auto edelta = lastErr - current_error;
+			if(edelta < epsErr)
+			{
+				std::cout << "error delta between last two iterations " << edelta << " < "<< epsErr << " the algorithm should stop." << std::endl;
+				return false;
+			}
+		}
+		const_cast<Faust::StoppingCriterion<T>*>(this)->lastErr = current_error; // harmless
+	}
+
 	if (!isCriterionError) // if criterion is number of iteration, current_error does not matter
-		return current_ite<nb_it ? true : false;
+		return current_ite<nb_it;
 	else if (isCriterionError && current_error >= 0)
 		if (current_error < errorThreshold)
 			return false;

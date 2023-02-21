@@ -52,19 +52,21 @@ namespace Faust
     class StoppingCriterion
     {
        public:
-          StoppingCriterion():
-             isCriterionError(false),
-             nb_it(500){}
+		   StoppingCriterion():
+			   isCriterionError(false),
+			   nb_it(500),
+			   epsErr(-1),
+			   lastErr(-1){}
 
           StoppingCriterion(int nb_it_):
              isCriterionError(false),nb_it(nb_it_){check_validity();}
 
           StoppingCriterion(T errorThreshold_, int maxIteration_=10000):
-             isCriterionError(true),errorThreshold(errorThreshold_),maxIteration(maxIteration_){check_validity();}
+             isCriterionError(true),errorThreshold(errorThreshold_),maxIteration(maxIteration_), epsErr(-1), lastErr(-1) {check_validity();}
 
           StoppingCriterion(bool isCriterionError_);
 
-          StoppingCriterion(int nb_it, bool isCriterionError, T errorThreshold, int maxIteration=10000);
+          StoppingCriterion(int nb_it, bool isCriterionError, T errorThreshold, int maxIteration=10000, T epsErr=-1);
 
 
           ~StoppingCriterion(){}
@@ -72,6 +74,13 @@ namespace Faust
           bool do_continue(int current_ite, T error=-2.0)const;
           int get_crit() const{return nb_it;}
 		  bool isCriterionErr() const {return isCriterionError;}
+		  bool isCriterionEpsErr() const {return epsErr > -1;}
+		  /**
+		   * Set the epsilon error.
+		   *
+		   * This function also reinitializes lastErr so the same StoppingCriterion can be reused on multiple algorithm executions.
+		   */
+		  void setCriterionEpsErr(const T& epsErr) {this->epsErr = epsErr; lastErr = -1;}
 		  void Display() const;
 		  string to_string() const;
 		  static const T NO_ERROR_PASSED;
@@ -83,6 +92,8 @@ namespace Faust
           bool  isCriterionError;
           int nb_it;   // number of iterations if !isCriterionError
           T errorThreshold;
+		  T epsErr;
+		  T lastErr;
           int maxIteration;
           // only used as stopping criterion, if isCriterionError, when error is still greater than
           static const char * m_className;
