@@ -1731,3 +1731,88 @@ def fft2(shape, backend='scipy', **kwargs):
                                                      x.ravel()).reshape(shape))
     else:
         raise ValueError('backend '+str(backend)+' is unknown')
+
+def convolve2d(signal_shape, kernel, backend='scipy'):
+    """
+    Builds the LazyLinearOp to convolves a kernel and a signal of shape signal_shape in 2D.
+
+    Args:
+        signal_shape: the shape of the signal this operator will convolves.
+        kernel: (numpy array) the kernel to convolve.
+        backend: 'pyfaust' or 'scipy'.
+
+    Returns:
+        The LazyLinearOp for the 2D convolution.
+
+    Example:
+        >>> import numpy as np
+        >>> from pyfaust.lazylinop import convolve2d
+        >>> from scipy.signal import convolve2d as sconvolve2d
+        >>> X =  np.random.rand(64, 64)
+        >>> K = np.random.rand(4, 4)
+        >>> C1 = convolve2d(X.shape, K, backend='scipy')
+        >>> C2 = convolve2d(X.shape, K, backend='pyfaust')
+        >>> np.allclose(C1 @ X, sconvolve2d(X, K, 'same'))
+        True
+        >>> np.allclose(C2 @ X, sconvolve2d(X, K, 'same'))
+        True
+
+    """
+    # Compute the extended shape for input and kernel to overlap
+    new_shape = np.array(signal_shape) + np.array(kernel.shape) - 1
+    # It must be a power of two
+    new_shape = 2 ** (1 + np.int64(np.log2(new_shape)))
+
+    # Input will be centered in the extended shpae
+    lpad_x, rlpad_x = zpad([
+        [(new_shape[0] - signal_shape[0])//2, (new_shape[0] - signal_shape[0])//2],
+        [(new_shape[1] - signal_shape[1])//2, (new_shape[1] - signal_shape[1])//2]
+    ], signal_shape, ret_unpad=True)
+
+    # Kernel is spread at corners in the extended shape
+    w_h = kernel.shape[0] // 2
+    w_topleft = kernel[w_h-1:, w_h-1:]
+    w_topright = kernel[w_h-1:, :w_h-1]
+    w_bottomleft = kernel[:w_h-1, w_h-1:]
+    w_bottomright = kernel[:w_h-1, :w_h-1]
+
+    # not useful at least if kernel dims are power of two
+    w_topright = np.vstack((w_topright, np.zeros((w_topleft.shape[0]-w_topright.shape[0], w_topright.shape[1]))))
+    w_bottomleft = np.vstack((np.zeros((w_topleft.shape[0]-w_bottomleft.shape[0], w_bottomleft.shape[1])), w_bottomleft))
+    w_bottomright = np.vstack((np.zeros((w_topleft.shape[0]-w_bottomright.shape[0], w_bottomright.shape[1])), w_bottomright))
+
+
+    z0 = zeros((w_topleft.shape[0], new_shape[1]-w_topleft.shape[1]-w_topright.shape[1]))
+    z1 = zeros((new_shape[0]-w_topleft.shape[0]-w_bottomleft.shape[0], new_shape[1]))
+    z2 = zeros((w_bottomleft.shape[0], new_shape[1]-w_bottomleft.shape[1]-w_bottomright.shape[1]))
+
+    W_padded = vstack((
+        hstack((aslazylinearoperator(w_topleft), z0, w_topright)),
+        z1,
+        hstack((aslazylinearoperator(w_bottomleft), z2, w_bottomright))
+        ))
+
+    #dft2_ = fft2(new_shape, mode='ortho')
+    if backend == 'pyfaust':
+        dft2_ = fft2(new_shape, backend=backend, normed=True)
+    elif backend == 'scipy':
+        dft2_ = fft2(new_shape, backend=backend, norm='ortho')
+    else:
+        raise ValueError('Unknown backend')
+    # For Fourier normalization
+    n = new_shape.prod()
+
+    dft2_W = (dft2_ @ W_padded).toarray()
+
+    return LazyLinearOperator(
+        signal_shape,
+        matmat=lambda x: (rlpad_x @ (1 / np.sqrt(n) * dft2_.H @ (n * dft2_W *
+                                                                  (dft2_ @
+                                                                   lpad_x @
+                                                                   x)))).reshape(signal_shape),
+        rmatmat=lambda x: rlpad_x @ (1 / np.sqrt(n) * np.fliplr(np.flipud(dft2_.H @ (n * dft2_W
+                                                                    * (dft2_ @
+                                                                     np.fliplr(np.flipud(lpad_x @
+                                                                       x)))
+                                                                 ))))
+    )
