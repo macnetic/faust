@@ -49,7 +49,7 @@ namespace Faust
 				/** lambda output, intialized from outside */
 				Real<FPP>& lambda,
 				//const unsigned int nites,
-				const StoppingCriterion<Real<FPP>>& sc,
+				StoppingCriterion<Real<FPP>>& sc,
 				const bool is_update_way_R2L=false,
 				const FactorsFormat factors_format=AllDynamic,
 				const bool packing_RL=true,
@@ -94,8 +94,6 @@ namespace Faust
 
 	template<typename FPP, FDevice DEVICE>
 		Real<FPP> calc_rel_err(const TransformHelper<FPP,DEVICE>& S, const MatDense<FPP,DEVICE> &A, const Real<FPP> &lambda=1, const Real<FPP>* A_norm=nullptr);
-
-  template<typename FPP, FDevice DEVICE> Real<FPP> compute_rel_change(const TransformHelper<FPP,DEVICE>& previousS, const Real<FPP>& previouslambda , const TransformHelper<FPP,DEVICE>& currentS, const Real<FPP>& currentlambda);
 
 	/**
 	 * \brief This function performs the (scaling factor) lambda update of the PALM4MSA algorithm (palm4msa2).
