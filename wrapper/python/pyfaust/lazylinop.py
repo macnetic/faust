@@ -1073,7 +1073,7 @@ def LazyLinearOperator(shape, **kwargs):
 
     return LazyLinearOp.create_from_funcs(matmat, rmatmat, shape, dtype=dtype)
 
-def kron(A, B):
+def kron(A, B, use_pylops=True):
     """
     Returns the LazyLinearOp(Kron) for the Kronecker product A x B.
 
@@ -1083,6 +1083,7 @@ def kron(A, B):
     Args:
         A: LinearOperator (scaling factor),
         B: LinearOperator (block factor).
+        use_pylops: if True (default) use the Kronecker implementation of pylops.
 
     Example:
         >>> from pyfaust.lazylinop import kron as lkron
@@ -1105,6 +1106,10 @@ def kron(A, B):
 
     <b>See also:</b> numpy.kron.
     """
+    if use_pylops:
+        from pylops import Kronecker
+        return Kronecker(aslazylinearoperator(A),
+                          aslazylinearoperator(B))
     def _kron(A, B, shape, op):
         from threading import Thread
         from multiprocessing import cpu_count
@@ -1550,7 +1555,7 @@ def zeros(shape):
                               rmatmat=lambda x: _matmat(x, (shape[1],
                                                              shape[0])))
 
-def zpad(z_sizes, x_shape, ret_unpad=False):
+def zpad(z_sizes, x_shape, ret_unpad=False, use_pylops=True):
     """
     Returns a LazyLinearOp to pad any compatible object x of shape x_shape with zeros on one or two dimensions.
 
@@ -1561,6 +1566,7 @@ def zpad(z_sizes, x_shape, ret_unpad=False):
         ret_unpad: by default (False) the function returns only the zero-padding
         LazyLinearOp. If True it returns a tuple of the zero-padding operator and its
         inverse (the operator which undoes the padding on a padded x).
+        use_pylops: if True (default) use the pylops.Pad implementation.
 
     Example:
         >>> from pyfaust.lazylinop import zpad
@@ -1588,7 +1594,7 @@ def zpad(z_sizes, x_shape, ret_unpad=False):
         >>> lz = zpad(((2, 3), (4, 1)), A.shape)
         >>> lz
         <23x18 LazyLinearOp with unspecified dtype>
-        >>> np.round(lz @ A, decimals=2)
+        >>> np.round(lz @ A, decimals=2).astype('double')
         array([[ 0.,  0.,  0.,  0.,  0.,  0.,  0.],
                [ 0.,  0.,  0.,  0.,  0.,  0.,  0.],
                [ 0.,  0.,  0.,  0.,  0.,  1.,  0.],
@@ -1646,11 +1652,24 @@ def zpad(z_sizes, x_shape, ret_unpad=False):
         c_offset = z_sizes[1][0]
         return op[r_offset:r_offset + x_shape[0],
                   c_offset:c_offset + x_shape[1]]
-    ret = LazyLinearOperator((z_sizes[1][0] + z_sizes[1][1] + x_shape[0],
-                               x_shape[0]), matmat=lambda op: mul(op))
-    if ret_unpad:
-        ret2 = LazyLinearOperator((x_shape[0], z_sizes[1][0] + z_sizes[1][1] + x_shape[0]), matmat=lambda op: rmul(op))
-        ret = (ret, ret2)
+    if use_pylops:
+        from pylops import Pad
+        pad = Pad(dims=x_shape, pad=z_sizes)
+        ret = LazyLinearOperator((z_sizes[1][0] + z_sizes[1][1] + x_shape[0],
+                                   x_shape[0]), matmat=lambda op: pad @ op)
+        if ret_unpad:
+            ret2 = LazyLinearOperator((x_shape[0], z_sizes[1][0] +
+                                       z_sizes[1][1] + x_shape[0]),
+                                      matmat=lambda op: pad.H @ op)
+            return ret, ret2
+        else:
+            return ret
+    else:
+        ret = LazyLinearOperator((z_sizes[1][0] + z_sizes[1][1] + x_shape[0],
+                                   x_shape[0]), matmat=lambda op: mul(op))
+        if ret_unpad:
+            ret2 = LazyLinearOperator((x_shape[0], z_sizes[1][0] + z_sizes[1][1] + x_shape[0]), matmat=lambda op: rmul(op))
+            ret = (ret, ret2)
     return ret
 
 def _sanitize_op(op, op_name='op'):
@@ -1793,9 +1812,8 @@ def convolve2d(signal_shape, kernel, backend='scipy'):
         hstack((aslazylinearoperator(w_bottomleft), z2, w_bottomright))
         ))
 
-    #dft2_ = fft2(new_shape, mode='ortho')
     if backend == 'pyfaust':
-        dft2_ = fft2(new_shape, backend=backend, normed=True)
+        dft2_ = fft2(new_shape, backend=backend, normed=True, diag_opt=True)
     elif backend == 'scipy':
         dft2_ = fft2(new_shape, backend=backend, norm='ortho')
     else:
