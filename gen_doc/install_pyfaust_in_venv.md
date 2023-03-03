@@ -52,7 +52,7 @@ Create the virtual environment:
 
     conda create -n pyfaust_venv python==3.9
 
-Add conda-forge channel (it is necessary for pyfaust dependencies on Mac OS X and Windows):
+Add conda-forge channel (it is necessary for the pyfaust dependencies):
 
     conda config --add channels conda-forge
 
@@ -74,4 +74,4 @@ Try if it works:
     - FACTOR 4 (double) SPARSE, size 5x5, density 1, nnz 25
 
 
-Fore further information please rely on the documentation [here](https://docs.conda.io/en/latest/) or about the specific conda-create command please look here: [conda-create](https://docs.conda.io/projects/conda/en/latest/commands/create.html).
+For further information please rely on the documentation [here](https://docs.conda.io/en/latest/) or about the specific conda-create command please look here: [conda-create](https://docs.conda.io/projects/conda/en/latest/commands/create.html).
