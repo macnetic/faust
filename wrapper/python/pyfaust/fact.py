@@ -117,7 +117,7 @@ def svdtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
             or complex128 (the dtype might have a large impact on performance).
             nGivens: see fact.eigtj
             tol: see fact.eigtj (the error tolerance is not exactly for
-            the svd but for the subsequent eigtj calls).
+            the SVD but for the subsequent eigtj calls).
             relerr: see fact.eigtj
             nGivens_per_fac: see fact.eigtj
 
@@ -136,7 +136,7 @@ def svdtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
             >>> M = rand(16, 32)
             >>> U, S, V = svdtj(M, 4096, enable_large_Faust=True)
             >>> S_ = spdiags(S, [0], U.shape[0], V.shape[0])
-            >>> np.allclose(U@S_@V.H, M)
+            >>> np.allclose(U @ S_ @ V.H, M)
             True
 
         If we call svdtj on the matrix M, it makes two internal calls to eigtj.
