@@ -37,7 +37,7 @@ class StoppingCriterion(object):
     def __init__(self, num_its = DEFAULT_NUMITS,
                  tol = None,
                  maxiter = DEFAULT_MAXITER,
-                relerr = False, relmat=None):
+                 relerr = False, relmat=None, erreps=None):
         """
         Class constructor.
 
@@ -55,6 +55,10 @@ class StoppingCriterion(object):
             value to the corresponding absolute error).
             relmat: (optional) The matrix against which is defined the relative error.
             if relerr is True, this argument is mandatory.
+            erreps: (optional) defines the epsilon on the approximation error
+            between two PALM4MSA iterations. If the error doesn't improve more
+            than erreps then the algorithm stops (warning: this argument is
+            only supported by the 2020 backend of PALM4MSA implementations).
 
 
         Example:
@@ -87,7 +91,7 @@ class StoppingCriterion(object):
                                           StoppingCriterion.DEFAULT_MAXITER or
                                           tol != None)):
             raise ValueError("The choice between tol and num_its arguments is exclusive.")
-        if(relerr and (not isinstance(relmat, np.ndarray))):
+        if relerr and not isinstance(relmat, np.ndarray):
             raise ValueError("when error is relative (relerr == true) the "
                              "reference matrix 'relmat' must be specified")
         self.relerr = relerr
@@ -96,6 +100,10 @@ class StoppingCriterion(object):
         else:
             if(relerr):
                 self.tol *= np.linalg.norm(relmat)
+        if erreps is not None:
+            self.erreps = erreps
+        else:
+            self.erreps = -1
 
     def __str__(self):
         """

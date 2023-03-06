@@ -78,7 +78,7 @@ MHTPParams<Real<FPP>> convPyxMHTPParams2FaustMHTPParams(const PyxMHTPParams<Real
     _MHTP_params.updating_lambda = MHTP_params.updating_lambda;
     _MHTP_params.palm4msa_period = MHTP_params.palm4msa_period;
     auto sc = MHTP_params.stop_crit;
-    Faust::StoppingCriterion<Real<FPP>> sc_(sc.num_its, sc.is_criterion_error, sc.error_threshold, sc.max_num_its);
+    Faust::StoppingCriterion<Real<FPP>> sc_(sc.num_its, sc.is_criterion_error, sc.error_threshold, sc.max_num_its, sc.erreps);
     _MHTP_params.sc = sc_;
     return _MHTP_params;
 }
@@ -348,7 +348,7 @@ FaustCoreCpp<FPP>* fact_palm4MSA_gen(FPP* mat, unsigned int num_rows, unsigned i
     }
     // set all constructor arguments because they could be at non-default
     // values
-    Faust::StoppingCriterion<FPP2> crit(p->stop_crit.num_its, p->stop_crit.is_criterion_error, p->stop_crit.error_threshold, p->stop_crit.max_num_its);
+    Faust::StoppingCriterion<FPP2> crit(p->stop_crit.num_its, p->stop_crit.is_criterion_error, p->stop_crit.error_threshold, p->stop_crit.max_num_its, p->stop_crit.erreps);
 
     if(p_fft = dynamic_cast<PyxParamsFactPalm4MSAFFT<FPP,FPP2>*>(p))
     {
@@ -475,8 +475,8 @@ FaustCoreCpp<FPP>* fact_hierarchical_gen(FPP* mat, FPP* mat2, unsigned int num_r
 
     // set all constructor arguments because they could be at non-default
     // values
-    Faust::StoppingCriterion<FPP2> crit0(p->stop_crits[0].num_its, p->stop_crits[0].is_criterion_error,p->stop_crits[0].error_threshold, p->stop_crits[0].max_num_its); //2 facts
-    Faust::StoppingCriterion<FPP2> crit1(p->stop_crits[1].num_its, p->stop_crits[1].is_criterion_error, p->stop_crits[1].error_threshold, p->stop_crits[1].max_num_its); //global
+    Faust::StoppingCriterion<FPP2> crit0(p->stop_crits[0].num_its, p->stop_crits[0].is_criterion_error,p->stop_crits[0].error_threshold, p->stop_crits[0].max_num_its, p->stop_crits[0].erreps); //2 facts
+    Faust::StoppingCriterion<FPP2> crit1(p->stop_crits[1].num_its, p->stop_crits[1].is_criterion_error, p->stop_crits[1].error_threshold, p->stop_crits[1].max_num_its, p->stop_crits[1].erreps); //global
 
     for(int i=0;i<p->num_facts-1;i++)
         fact_cons.push_back(cons[i]);
@@ -636,7 +636,7 @@ TransformHelper<FPP, DEV>* palm4msa2020_gen(FPP* mat, unsigned int num_rows, uns
     }
 
 
-    Faust::StoppingCriterion<FPP2> sc0(sc.num_its, sc.is_criterion_error, sc.error_threshold, sc.max_num_its);
+    Faust::StoppingCriterion<FPP2> sc0(sc.num_its, sc.is_criterion_error, sc.error_threshold, sc.max_num_its, sc.erreps);
     Faust::palm4msa2(inMat, fact_cons, *th, out_buf[0], sc0, is_update_way_R2L,
             static_cast<FactorsFormat>(factor_format),
             packing_RL,
@@ -799,8 +799,8 @@ Faust::TransformHelper<FPP,DEV>* hierarchical2020_gen(FPP* mat, unsigned int num
     if(norm2_max_iter == 0)
         norm2_max_iter = FAUST_NORM2_MAX_ITER;
 
-    Faust::StoppingCriterion<FPP2> sc0(sc[0].num_its, sc[0].is_criterion_error, sc[0].error_threshold, sc[0].max_num_its);
-    Faust::StoppingCriterion<FPP2> sc1(sc[1].num_its, sc[1].is_criterion_error, sc[1].error_threshold, sc[1].max_num_its);
+    Faust::StoppingCriterion<FPP2> sc0(sc[0].num_its, sc[0].is_criterion_error, sc[0].error_threshold, sc[0].max_num_its, sc[0].erreps);
+    Faust::StoppingCriterion<FPP2> sc1(sc[1].num_its, sc[1].is_criterion_error, sc[1].error_threshold, sc[1].max_num_its, sc[1].erreps);
     //        vector<Faust::StoppingCriterion<FPP2>> sc_ = {sc[0].num_its, sc[1].num_its};
     vector<Faust::StoppingCriterion<FPP2>> sc_ = {sc0, sc1};
     auto th = Faust::hierarchical(inMat, sc_, fact_cons, residuum_cons, inout_lambda[0], is_update_way_R2L,

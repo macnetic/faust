@@ -44,6 +44,7 @@ cdef class FaustAlgoGen@TYPE_NAME@:
         cpp_stop_crit.error_threshold = p.stop_crit.tol
         cpp_stop_crit.num_its = p.stop_crit.num_its
         cpp_stop_crit.max_num_its = p.stop_crit.maxiter
+        cpp_stop_crit.erreps = p.stop_crit.erreps
 
         calling_fft_algo = isinstance(init_D, np.ndarray)
 
@@ -208,10 +209,12 @@ cdef class FaustAlgoGen@TYPE_NAME@:
         cpp_stop_crits[0].error_threshold = p.stop_crits[0].tol
         cpp_stop_crits[0].num_its = p.stop_crits[0].num_its
         cpp_stop_crits[0].max_num_its = p.stop_crits[0].maxiter
+        cpp_stop_crits[0].erreps = p.stop_crits[0].erreps
         cpp_stop_crits[1].is_criterion_error = p.stop_crits[1]._is_criterion_error
         cpp_stop_crits[1].error_threshold = p.stop_crits[1].tol
         cpp_stop_crits[1].num_its = p.stop_crits[1].num_its
         cpp_stop_crits[1].max_num_its = p.stop_crits[1].maxiter
+        cpp_stop_crits[1].erreps = p.stop_crits[1].erreps
 
 
         calling_fft_algo = isinstance(init_D, np.ndarray)
@@ -343,6 +346,7 @@ cdef class FaustAlgoGen@TYPE_NAME@:
         cpp_stop_crit.error_threshold = p.stop_crit.tol
         cpp_stop_crit.num_its = p.stop_crit.num_its
         cpp_stop_crit.max_num_its = p.stop_crit.maxiter
+        cpp_stop_crit.erreps = p.stop_crit.erreps
 
         # use_MHTP is either False or a MHTPParams instance
         if p.use_MHTP != False:
@@ -352,6 +356,7 @@ cdef class FaustAlgoGen@TYPE_NAME@:
             cpp_MHTPParams.stop_crit.error_threshold = mhtpp.stop_crit.tol
             cpp_MHTPParams.stop_crit.num_its = mhtpp.stop_crit.num_its
             cpp_MHTPParams.stop_crit.max_num_its = mhtpp.stop_crit.maxiter
+            cpp_MHTPParams.stop_crit.erreps = mhtpp.stop_crit.erreps
             cpp_MHTPParams.constant_step_size = mhtpp.constant_step_size
             cpp_MHTPParams.step_size = mhtpp.step_size
             cpp_MHTPParams.updating_lambda = mhtpp.updating_lambda
@@ -476,10 +481,12 @@ cdef class FaustAlgoGen@TYPE_NAME@:
         cpp_stop_crits[0].error_threshold = p.stop_crits[0].tol
         cpp_stop_crits[0].num_its = p.stop_crits[0].num_its
         cpp_stop_crits[0].max_num_its = p.stop_crits[0].maxiter
+        cpp_stop_crits[0].erreps = p.stop_crits[0].erreps
         cpp_stop_crits[1].is_criterion_error = p.stop_crits[1]._is_criterion_error
         cpp_stop_crits[1].error_threshold = p.stop_crits[1].tol
         cpp_stop_crits[1].num_its = p.stop_crits[1].num_its
         cpp_stop_crits[1].max_num_its = p.stop_crits[1].maxiter
+        cpp_stop_crits[1].erreps = p.stop_crits[1].erreps
 
         # use_MHTP is either False or a MHTPParams instance
         if p.use_MHTP != False:
@@ -489,6 +496,7 @@ cdef class FaustAlgoGen@TYPE_NAME@:
             cpp_MHTPParams.stop_crit.error_threshold = mhtpp.stop_crit.tol
             cpp_MHTPParams.stop_crit.num_its = mhtpp.stop_crit.num_its
             cpp_MHTPParams.stop_crit.max_num_its = mhtpp.stop_crit.maxiter
+            cpp_MHTPParams.stop_crit.erreps = mhtpp.stop_crit.erreps
             cpp_MHTPParams.constant_step_size = mhtpp.constant_step_size
             cpp_MHTPParams.step_size = mhtpp.step_size
             cpp_MHTPParams.updating_lambda = mhtpp.updating_lambda

@@ -235,9 +235,6 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 		is_last_fac_updated = [&f_id, &nfacts]() {return f_id == nfacts-1;};
 	}
 
-	// to stop on small error change between two iterations
-	sc.setCriterionEpsErr(1e-6);
-
 	while(sc.do_continue(i, error))
 	{
 //		std::cout << "i: " <<  i << std::endl;

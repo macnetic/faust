@@ -66,6 +66,7 @@ class PyxStoppingCriterion
         int num_its;
         FPP error_threshold;
         unsigned long max_num_its;
+        FPP erreps;
 };
 
 template<typename FPP, typename FPP2 = double>

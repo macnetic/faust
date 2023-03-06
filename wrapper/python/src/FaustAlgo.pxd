@@ -54,6 +54,7 @@ cdef extern from "FaustFact.h":
         int num_its
         FPP error_threshold
         unsigned long max_num_its
+        FPP erreps
 
     cdef cppclass PyxParamsFact[FPP,FPP2]:
         int num_facts
