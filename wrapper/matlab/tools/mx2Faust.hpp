@@ -740,6 +740,7 @@ const Params<SCALAR, Cpu, FPP2>* mxArray2FaustParams(const mxArray* matlab_param
 	bool is_criterion_error = false;
 	int num_its = 500;
 	FPP2 error_treshold = 0.3;
+	FPP2 erreps = -1; // defaultly disabled
 	int max_num_its = 10000;
 	if(presentFields[NITER1])
 	{
@@ -760,12 +761,18 @@ const Params<SCALAR, Cpu, FPP2>* mxArray2FaustParams(const mxArray* matlab_param
 		mxCurrentField = mxGetField(matlab_params, 0, mat_field_type2str(SC_MAX_NUM_ITS).c_str());
 		max_num_its = (int) mxGetScalar(mxCurrentField);
 	}
-	Faust::StoppingCriterion<FPP2> crit1(num_its, is_criterion_error, error_treshold, max_num_its);
+	if(presentFields[SC_ERREPS])
+	{
+		mxCurrentField = mxGetField(matlab_params, 0, mat_field_type2str(SC_ERREPS).c_str());
+		erreps = (FPP2) mxGetScalar(mxCurrentField);
+	}
+	Faust::StoppingCriterion<FPP2> crit1(num_its, is_criterion_error, error_treshold, max_num_its, erreps);
 	//TODO: replace by default values as constants from StoppingCriterion class
 	is_criterion_error = false;
 	num_its = 500;
 	error_treshold = 0.3;
 	max_num_its = 10000;
+	erreps = -1;
 	if(presentFields[NITER2])
 	{
 		mxCurrentField = mxGetField(matlab_params, 0, mat_field_type2str(NITER2).c_str());
@@ -785,7 +792,12 @@ const Params<SCALAR, Cpu, FPP2>* mxArray2FaustParams(const mxArray* matlab_param
 		mxCurrentField = mxGetField(matlab_params, 0, mat_field_type2str(SC_MAX_NUM_ITS2).c_str());
 		max_num_its = (int) mxGetScalar(mxCurrentField);
 	}
-	Faust::StoppingCriterion<FPP2> crit2(num_its, is_criterion_error, error_treshold, max_num_its);
+	if(presentFields[SC_ERREPS2])
+	{
+		mxCurrentField = mxGetField(matlab_params, 0, mat_field_type2str(SC_ERREPS2).c_str());
+		erreps = (FPP2) mxGetScalar(mxCurrentField);
+	}
+	Faust::StoppingCriterion<FPP2> crit2(num_its, is_criterion_error, error_treshold, max_num_its, erreps);
 	//init_facts
 	std::vector<Faust::MatDense<SCALAR,Cpu> > init_facts;
 	if (presentFields[INIT_FACTS])
@@ -1017,6 +1029,7 @@ const ParamsPalm<SCALAR,Cpu,FPP2>* mxArray2FaustParamsPALM4MSA(const mxArray* ma
 	int num_its = 500;
 	FPP2 error_treshold = 0.3;
 	int max_num_its = 10000;
+	FPP2 erreps = -1;
 	if(presentFields[3])
 	{
 		mxCurrentField = mxGetField(matlab_params, 0, "niter");
@@ -1036,7 +1049,12 @@ const ParamsPalm<SCALAR,Cpu,FPP2>* mxArray2FaustParamsPALM4MSA(const mxArray* ma
 		mxCurrentField = mxGetField(matlab_params, 0, "sc_max_num_its");
 		max_num_its = (int) mxGetScalar(mxCurrentField);
 	}
-	Faust::StoppingCriterion<FPP2> crit1(num_its, is_criterion_error, error_treshold, max_num_its);
+	if(presentFields[20])
+	{
+		mxCurrentField = mxGetField(matlab_params, 0, "sc_erreps");
+		erreps = (FPP2) mxGetScalar(mxCurrentField);
+	}
+	Faust::StoppingCriterion<FPP2> crit1(num_its, is_criterion_error, error_treshold, max_num_its, erreps);
 	//	crit1.Display();
 	//init_facts
 	std::vector<Faust::MatDense<SCALAR,Cpu> > init_facts;

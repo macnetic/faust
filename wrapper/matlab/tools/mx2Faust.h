@@ -187,9 +187,11 @@ enum MAT_FIELD_TYPE
 	SC_IS_CRITERION_ERROR,
 	SC_ERROR_TRESHOLD,
 	SC_MAX_NUM_ITS,
+	SC_ERREPS,
 	SC_IS_CRITERION_ERROR2,
 	SC_ERROR_TRESHOLD2,
 	SC_MAX_NUM_ITS2,
+	SC_ERREPS2,
 	INIT_FACTS,
 	INIT_D, //only for FactHierarchicalF(G)FT
 	NORM2_MAX_ITER,
@@ -206,7 +208,7 @@ enum MAT_FIELD_TYPE
 const string mat_field_type2str(MAT_FIELD_TYPE f);
 const MAT_FIELD_TYPE mat_field_str2type(const string& fstr);
 
-const unsigned int MAT_FIELD_TYPE_LEN = 27; // must be the number of fields in MAT_FIELD_TYPE
+const unsigned int MAT_FIELD_TYPE_LEN = 29; // must be the number of fields in MAT_FIELD_TYPE
 
 void testCoherence(const mxArray* params,std::vector<bool> & presentFields);
 
@@ -225,12 +227,3 @@ void mxArray2FaustMHTPParams(const mxArray* matlab_params, Faust::MHTPParams<SCA
 
 
 #endif
-
-
-
-
-
-
-
-
-

@@ -155,7 +155,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 		auto inMat = Faust::MatDense<SCALAR,GPU2>(params->data);
 
-		Faust::palm4msa2<SCALAR,GPU2>(inMat, noconst_cons, *F, lambda, const_cast<StoppingCriterion<FPP2>&>(params->stop_crit), params->isUpdateWayR2L,
+		Faust::palm4msa2<SCALAR,GPU2>(inMat, noconst_cons, *F, lambda, params->stop_crit, params->isUpdateWayR2L,
 				params->factors_format, params->packing_RL, params->no_normalization, params->no_lambda, mhtp_params, /* compute_2norm_on_array */ false, params->norm2_threshold,
 				params->norm2_max_iter, params->isConstantStepSize, params->step_size);
 

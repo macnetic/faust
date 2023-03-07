@@ -17,6 +17,8 @@ classdef StoppingCriterion
 		maxiter
 		%> see matfaust.factparams.StoppingCriterion
 		relerr
+		%> see matfaust.factparams.StoppingCriterion
+		erreps
 	end
 	properties(SetAccess = private)
 		is_criterion_error
@@ -40,6 +42,7 @@ classdef StoppingCriterion
 				fprintf('num_its: %d\n', self.num_its)
 				fprintf('maxiter: %d\n', self.maxiter)
 			end
+			fprintf('erreps: %d\n', self.erreps)
 		end
 		% =========================================================
 		%>	@brief Constructor.
@@ -82,6 +85,7 @@ classdef StoppingCriterion
 			maxiter = matfaust.factparams.StoppingCriterion.DEFAULT_MAXITER;
 			relerr = false;
 			matrix = [];
+			erreps = -1;
 			if(nargin < 1)
 				error('matfaust.factparams.StoppingCriterion needs at least one argument.')
 			else
@@ -136,6 +140,12 @@ classdef StoppingCriterion
 									varargin{i+1} = 0; % erase matrix in args because switch can't evaluate a matrix
 									% so otherwise it would fail the next ite
 								end
+							case 'erreps'
+								if(nargin == i || ~ isscalar(varargin{i+1}))
+									error('erreps keyword arg. is not followed by a number')
+								else
+									erreps = real(varargin{i+1}); % real in case of cplx num
+								end
 							end
 						end
 					end
@@ -151,6 +161,7 @@ classdef StoppingCriterion
 					stop_crit.maxiter = maxiter;
 					stop_crit.tol = tol;
 					stop_crit.relerr = relerr;
+					stop_crit.erreps = erreps;
 				end
 			end
 		end

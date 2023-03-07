@@ -49,7 +49,7 @@ namespace Faust
 				/** lambda output, intialized from outside */
 				Real<FPP>& lambda,
 				//const unsigned int nites,
-				StoppingCriterion<Real<FPP>>& sc,
+				const StoppingCriterion<Real<FPP>>& sc,
 				const bool is_update_way_R2L=false,
 				const FactorsFormat factors_format=AllDynamic,
 				const bool packing_RL=true,

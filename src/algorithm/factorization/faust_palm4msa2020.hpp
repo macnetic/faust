@@ -49,7 +49,7 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 		Faust::TransformHelper<FPP,DEVICE>& S,
 		Real<FPP>& lambda, //TODO: FPP lambda ? is it useful to have a complex lamdba ?
 		//const unsigned int nites,
-		StoppingCriterion<Real<FPP>>& sc,
+		const StoppingCriterion<Real<FPP>>& sc,
 		const bool is_update_way_R2L,
 		const FactorsFormat factors_format,
 		const bool packing_RL,

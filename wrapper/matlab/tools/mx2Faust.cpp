@@ -122,6 +122,10 @@ const string mat_field_type2str(MAT_FIELD_TYPE f)
 			return "step_size";
 		case GRAD_CALC_OPT_MODE:
 			return "grad_calc_opt_mode";
+		case SC_ERREPS:
+			return "sc_erreps";
+		case SC_ERREPS2:
+			return "sc_erreps2";
 	}
 }
 
@@ -246,6 +250,8 @@ void testCoherencePALM4MSA(const mxArray* params,std::vector<bool> & presentFiel
 			presentFields[18] = true;
 		else if(strcmp(fieldName, "no_lambda") == 0)
 			presentFields[19] = true;
+		else if(strcmp(fieldName, "sc_erreps") == 0)
+			presentFields[20] = true;
 	}
 
 }

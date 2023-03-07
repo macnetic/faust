@@ -133,7 +133,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 //				(dynamic_cast<Faust::ConstraintMat<SCALAR,Cpu>*>(*(noconst_cons.end()-1)))->Display();
 //
 		}
-		palm4msa2(params->data, noconst_cons, *F, lambda, const_cast<StoppingCriterion<FPP2>&>(params->stop_crit), params->isUpdateWayR2L,
+		palm4msa2(params->data, noconst_cons, *F, lambda, params->stop_crit, params->isUpdateWayR2L,
 				params->factors_format, params->packing_RL, params->no_normalization, params->no_lambda, mhtp_params, /* compute_2norm_on_array */ false, params->norm2_threshold,
 				params->norm2_max_iter, params->isConstantStepSize, params->step_size, false /* on_gpu*/, params->isVerbose);
 		Faust::MatDense<FPP2,Cpu> mat1x1Lambda = Faust::MatDense<FPP2, Cpu>(&lambda, 1, 1);
