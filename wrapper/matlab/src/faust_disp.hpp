@@ -10,6 +10,6 @@ void faust_disp(const mxArray **prhs, const int nrhs, mxArray **plhs, const int 
 	//core_ptr->display(); // doesn't work on windows,
 	// matlab terminal doesn't receive the mex lib std output
 	// we must use mexPrintf() to display content
-	mexPrintf(core_ptr->to_string().c_str());
+	mexPrintf((core_ptr->to_string()+"\r\n").c_str());
 }
 
