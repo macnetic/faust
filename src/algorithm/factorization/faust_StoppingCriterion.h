@@ -68,11 +68,14 @@ namespace Faust
 
           StoppingCriterion(int nb_it, bool isCriterionError, T errorThreshold, int maxIteration=10000, T epsErr=-1);
 
+		  StoppingCriterion(const StoppingCriterion& s);
+		  StoppingCriterion& operator=(const StoppingCriterion& s);
+
 
           ~StoppingCriterion(){}
 
           bool do_continue(int current_ite, T error=-2.0)const;
-          int get_crit() const{return nb_it;}
+          int get_crit() const{return nb_it;} //TODO: rename this function, this is misleading (should be get_nb_its or something similar)
 		  bool isCriterionErr() const {return isCriterionError;}
 		  bool isCriterionEpsErr() const {return epsErr > -1;}
 		  /**

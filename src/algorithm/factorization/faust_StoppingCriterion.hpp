@@ -51,6 +51,22 @@ const T Faust::StoppingCriterion<T>::NO_ERROR_PASSED = -10000;
 template<typename T>
 const char * Faust::StoppingCriterion<T>::m_className="Faust::StoppingCriterion::";
 
+	template<typename T>
+Faust::StoppingCriterion<T>::StoppingCriterion(const StoppingCriterion& s)
+{
+	*this = s;
+}
+
+	template<typename T>
+Faust::StoppingCriterion<T>& Faust::StoppingCriterion<T>::operator=(const StoppingCriterion& s)
+{
+	isCriterionError = s.isCriterionError;
+	nb_it = s.nb_it;
+	epsErr = s.epsErr;
+	lastErr = s.lastErr;
+	return *this;
+}
+
 template<typename T>
 Faust::StoppingCriterion<T>::StoppingCriterion(bool isCriterionError_) : isCriterionError(isCriterionError_), epsErr(-1)
 {
@@ -150,6 +166,8 @@ string Faust::StoppingCriterion<T>::to_string() const
 	else
 		s += "nb_it :"+std::to_string(nb_it)+"\r\n";
 	s += "maxIteration: "+std::to_string(maxIteration);
+	if(epsErr > -1)
+		s += +"\r\nerreps: "+std::to_string(epsErr);
 	return s;
 }
 
