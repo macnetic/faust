@@ -81,7 +81,7 @@ classdef FaustCore < handle
 					nf = call_mex(this, 'numfactors');
 					facts = cell(1, nf);
 					for i=1:nf
-						facts{i} = call_mex(this, 'factors', i);
+						facts{i} = call_mex(this, 'factors', uint64([i-1]));
 					end
 					this = FaustCore(facts, 1.0, false, this.isRealFlag, this.dev, this.dtype);
 				end
