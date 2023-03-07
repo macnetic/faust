@@ -21,6 +21,7 @@
 [2.5. Why this no_normalization parameter for PALM4MSA and hierarchical factorization?](#py_five)  
 [2.6. How to fix the Segmentation Fault issue when using Torch with pyfaust on Mac OS X?](#py_six)  
 [2.7 Why the Faust F[I, J] indexing operation is not implemented in pyfaust?](#py_seven)  
+[2.8 How to fix conda pyfaust install error about glibc](#py_eight)  
 
 
 **3. About CUDA (for GPU FAµST API support)**  
@@ -511,6 +512,52 @@ Obviously, doing the same operation with a Faust would need to compute the full 
 So now, let's explain why the error suggests to use rather F[I][:, J] instead of F[I, J] whereas they are not the same operation at all.
 The reason is because of Matlab! In Matlab M(I, J), with M a matrix, doesn't mean the same thing as in Python. It actually means to return the submatrix of M composed of the rows of M indexed in I (in the same order) and to keep in those rows only the entries whose the columns are indexed in J (in the same order again). More formally if subM = M(I, J) then subM is a matrix of size N = numel(I) x P = numel(J) such that for every pair (i,j) in {1, ..., N} x {1, ..., M}, subM(i, j) == M(I(i), J(j)).
 Back to numpy, you can write this Matlab way of indexing with the simple expression F[I][: J] which is totally feasible on a Faust, without having to compute the full array. Hence the error suggests to do that in case the user would confuse the semantics of Matlab (Faust-compatible) and Python (not Faust-compatible). In short, that's just an hint for using a supported operation which is near from an unsupported operation.
+
+
+\anchor py_eight
+
+## 2.8 How to fix conda pyfaust install error about glibc
+
+Trying a to install pyfaust in a conda environment, an error about glibc might happen.
+A message similar to following one might pop up after a ``conda install -c pyfaust pyfaust``.
+
+```
+UnsatisfiableError: The following specifications were found
+to be incompatible with the existing python installation in your environment:
+
+Specifications:
+
+  - pyfaust -> python[version='>=2.7,<2.8.0a0|>=3.5,<3.6.0a0|>=3.6,<3.7.0a0|>=3.7,<3.8.0a0|>=3.8,<3.9.0a0']
+
+Your python: python==3.9.0
+
+If python is on the left-most side of the chain, that's the version you've asked for.
+When python appears to the right, that indicates that the thing on the left is somehow
+not available for the python version you are constrained to. Note that conda will not
+change your python version to a different minor version unless you explicitly specify
+that.
+
+The following specifications were found to be incompatible with your system:
+
+  - feature:/linux-64::__glibc==2.35=0
+  - python==3.9.0 -> libgcc-ng[version='>=7.3.0'] -> __glibc[version='>=2.17']
+
+Your installed version is: 2.35
+```
+
+Take care to add the conda-forge channel to your environment before installing pyfaust.  
+In this goal, please follow the install guide [here](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/install_pyfaust_in_venv.html#anaconda).  
+In order to verify you don't already have conda-forge set in your channels, use the follwing command:  
+
+      conda config --show channels
+
+If it returns a list containing 'conda-forge' as in the example of output below, then your all set.
+
+```
+channels:
+  - conda-forge
+  - defaults
+```
 
 # 3. About CUDA (for GPU FAµST API support)
 
