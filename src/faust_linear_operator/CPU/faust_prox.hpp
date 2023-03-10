@@ -708,4 +708,105 @@ void Faust::prox_id(Faust::MatDense<FPP,Cpu> & M, const bool normalized /* deft 
 	if(pos) pre_prox_pos(M);
 	if(normalized) M.normalize();
 }
+
+template<typename FPP>
+void Faust::prox_triu_sp(Faust::MatDense<FPP, Cpu> & M, faust_unsigned_int k, const bool normalized /* true by default */, const bool pos)
+{
+  Faust::prox_tri_sp(M, k, true, normalized, pos);
+}
+
+template<typename FPP>
+void Faust::prox_tril_sp(Faust::MatDense<FPP, Cpu> & M, faust_unsigned_int k, const bool normalized /* true by default */, const bool pos)
+{
+  Faust::prox_tri_sp(M, k, false, normalized, pos);
+}
+
+template<typename FPP>
+void Faust::prox_tri_sp(Faust::MatDense<FPP, Cpu> & M, faust_unsigned_int k, bool upper, const bool normalized /* true by default */, const bool pos)
+{
+  int count = 0, tri_count = 0;
+  const faust_unsigned_int dim1 = M.getNbRow();
+  const faust_unsigned_int dim2 = M.getNbCol();
+  const faust_unsigned_int nb_elt_mat = dim1*dim2;
+  if(pos)
+    Faust::pre_prox_pos(M);
+  if(k<=0) // it can't be < 0, k is a faust_unsigned_int
+    M.setZeros();
+  else
+    {
+      if(k<nb_elt_mat /* && k < M.getNonZeros()*/)
+	{
+	  std::vector<FPP> tri(dim1*dim2);
+	  std::vector<unsigned int> itri(dim1*dim2);
+	  if(upper)
+	    {
+	      // keep upper triangular part of the matrix
+	      for(int r=0;r<dim1;r++)
+		{
+		  for(int c=0;c<r;c++)
+		    {
+		      M.getData()[c*dim1+r]=.0;
+		      count++;
+		    }
+		  for(int c=r;c<dim2;c++)
+		    {
+		      // tri[count]=M.getData()[c*dim1+r];
+		      // itri[tri_count]=count;
+		      tri[c*dim1+r]=M.getData()[c*dim1+r];
+		      itri[tri_count]=c*dim1+r;
+		      tri_count++;
+		      count++;
+		    }
+		}
+	    }
+	  else
+	    {
+	      // keep lower triangular part of the matrix
+	      for(int r=0;r<dim1;r++)
+		{
+		  for(int c=0;c<=r;c++)
+		    {
+		      // tri[count]=M.getData()[c*dim1+r];
+		      // itri[tri_count]=count;
+		      tri[c*dim1+r]=M.getData()[c*dim1+r];
+		      itri[tri_count]=c*dim1+r;
+		      tri_count++;
+		      count++;
+		    }
+		  for(int c=(r+1);c<dim2;c++)
+		    {
+		      M.getData()[c*dim1+r]=.0;
+		      count++;
+		    }
+		}
+	    }
+
+	  // remove the triangular part that has been set to zero
+	  std::vector<FPP> vec(tri_count);
+	  for(int i=0;i<tri_count;i++)
+	    vec[i]=tri[itri[i]];
+
+	  // make pair (index, value)
+	  std::vector<std::pair<int, FPP> > vec_pair(tri_count);
+	  for(int i=0;i<tri_count;i++)
+	    vec_pair[i]=std::make_pair(i,vec[i]);
+
+	  // partial sort
+	  std::partial_sort(vec_pair.begin(),vec_pair.begin()+k,vec_pair.end(),Faust::partial_sort_comp<FPP>);
+	  // get index such that vec_pair is sorted
+	  std::vector<int> index(k);
+	  for(int i=0;i<k;i++)
+	    index[i]=vec_pair[i].first;
+	  index.erase(index.begin()+k,index.end());
+
+	  // new matrix M
+	  M.setZeros();
+	  for(int i=0;i<index.size();i++)
+	    M.getData()[itri[index[i]]]=vec[index[i]];
+	}
+    }
+  if(normalized)
+    M.normalize();
+}
+
 #endif

@@ -135,6 +135,8 @@ class ConstraintName:
         SPLIN: Designates a sparsity/0-norm constraint on the rows of a matrix.
         SPLINCOL: Designates a constraint that imposes both SPLIN and SPCOL constraints (see example above for clarification).
         SP_POS: Designates a constraint that imposes a SP constraints and besides set to zero the negative coefficients (it doesn't apply to complex matrices).
+        TRIU_SP : Designates a constraint on the sparsity/0-norm of upper triangular part of a matrix.
+        TRIL_SP : Designates a constraint on the sparsity/0-norm of lower triangular part of a matrix.
         NORMCOL: Designates a 2-norm constraint on each column of a matrix.
         NORMLIN: Designates a 2-norm constraint on each row of a matrix.
         CONST: Designates a constraint imposing to a matrix to be constant.
@@ -197,6 +199,8 @@ class ConstraintName:
     HANKEL = 13 # Mat cons.
     SKPERM = 14 # Int constraint
     ID = 15 # Mat cons.
+    TRIU_SP = 16 # Upper triangular matrix + Int Constraint
+    TRIL_SP = 17 # Lower triangular matrix + Int Constraint
 
     def __init__(self, name):
         """
@@ -218,14 +222,14 @@ class ConstraintName:
                                  "ConstraintName.SP_POS," # ConstraintName.BLKDIAG,
                                  "ConstraintName.SUPP, ConstraintName.NORMLIN, "
                                  "ConstraintName.TOEPLITZ, ConstraintName.CIRC,"
-                                 " ConstraintName.ANTICIRC")
+                                 "ConstraintName.ANTICIRC, ConstraintName.TRIU_SP, ConstraintName.TRIL_SP")
         self.name = name
 
     @staticmethod
     def _arg_is_int_const(name):
         return name in [ConstraintName.SP, ConstraintName.SPCOL,
                         ConstraintName.SPLIN, ConstraintName.SPLINCOL,
-                        ConstraintName.SP_POS, ConstraintName.SKPERM]
+                        ConstraintName.SP_POS, ConstraintName.SKPERM, ConstraintName.TRIU_SP, ConstraintName.TRIL_SP]
 
     @staticmethod
     def _arg_is_real_const(name):
@@ -304,6 +308,10 @@ class ConstraintName:
             _str =  'blockdiag'
         elif _id == ConstraintName.ID:
             _str =  'id'
+        elif _id == ConstraintName.TRIU_SP:
+            _str =  'triu_sp'
+        elif _id == ConstraintName.TRIL_SP:
+            _str =  'tril_sp'
         else:
             raise ValueError(err_msg)
         return _str
@@ -350,6 +358,10 @@ class ConstraintName:
             id = ConstraintName.BLKDIAG
         elif(_str == 'id'):
             id = ConstraintName.ID
+        elif(_str == 'triu_sp'):
+            id = ConstraintName.TRIU_SP
+        elif(_str == 'tril_sp'):
+            id = ConstraintName.TRIL_SP
         else:
             raise ValueError(err_msg)
         return id
@@ -476,7 +488,7 @@ class ConstraintInt(ConstraintGeneric):
     def __init__(self, name, num_rows, num_cols, cons_value, normalized=True, pos=False):
         """
             Args:
-                name: must be a ConstraintName instance set with a value among SP_POS, SP, SPLIN, SPCOL, SPLINCOL (cf. ConstraintName) or it can also be one of the more handy str aliases which are respectively: 'sppos', 'sp', 'splin', 'spcol', 'splincol'.
+                name: must be a ConstraintName instance set with a value among SP_POS, SP, SPLIN, SPCOL, SPLINCOL, TRIU_SP, TRIL_SP (cf. ConstraintName) or it can also be one of the more handy str aliases which are respectively: 'sppos', 'sp', 'splin', 'spcol', 'splincol', 'triu_sp', 'tril_sp'.
                 num_rows: the number of rows of the constrained matrix.
                 num_cols: the number of columns of the constrained matrix.
                 cons_value: the integer value of the constraint (the 0-norm as
