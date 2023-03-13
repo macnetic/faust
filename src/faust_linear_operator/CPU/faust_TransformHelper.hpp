@@ -1222,20 +1222,36 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::transpose()
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::transpose(const bool inplace/*=false*/)
 		{
+			if(inplace)
+			{
+				this->is_transposed = ! this->is_transposed;
+				return this;
+			}
 			return new TransformHelper<FPP,Cpu>(this, true, false);
 		}
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::conjugate()
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::conjugate(const bool inplace/*=false*/)
 		{
+			if(inplace)
+			{
+				this->is_conjugate = ! this->is_conjugate;
+				return this;
+			}
 			return new TransformHelper<FPP,Cpu>(this, false, true);
 		}
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::adjoint() const
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::adjoint(const bool inplace/*=false*/)
 		{
+			if(inplace)
+			{
+				this->is_transposed = ! this->is_transposed;
+				this->is_conjugate = ! this->is_conjugate;
+				return this;
+			}
 			return new TransformHelper<FPP,Cpu>(this, true, true);
 		}
 

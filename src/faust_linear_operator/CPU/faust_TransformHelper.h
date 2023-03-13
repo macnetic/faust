@@ -186,9 +186,9 @@ namespace Faust
             static int get_mat_file_type(const char* filepath);
 			virtual double spectralNorm(const int nbr_iter_max, double threshold, int &flag) const;
 			FPP power_iteration(const faust_unsigned_int nbr_iter_max, const Real<FPP>& threshold, int & flag) const;
-			virtual TransformHelper<FPP,Cpu>* transpose();
-			TransformHelper<FPP,Cpu>* conjugate();
-			TransformHelper<FPP,Cpu>* adjoint() const;
+			virtual TransformHelper<FPP,Cpu>* transpose(const bool inplace=false);
+			TransformHelper<FPP,Cpu>* conjugate(const bool inplace=false);
+			TransformHelper<FPP,Cpu>* adjoint(const bool inplace=false);
 			virtual TransformHelper<FPP,Cpu>* vertcat(const TransformHelper<FPP,Cpu>*);
 			virtual TransformHelper<FPP,Cpu>* horzcat(const TransformHelper<FPP,Cpu>*);
 			virtual double normL1(const bool full_array=true, const int batch_size=1) const;
