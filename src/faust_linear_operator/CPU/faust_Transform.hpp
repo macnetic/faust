@@ -1012,6 +1012,7 @@ void Faust::Transform<FPP,Cpu>::operator=(const Transform<FPP,Cpu>&  f)
 
 	this->totalNonZeros = f.totalNonZeros;
 	this->is_zero = f.is_zero;
+	this->dtor_disabled = f.dtor_disabled;
 
 }
 
