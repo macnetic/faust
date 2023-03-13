@@ -41,10 +41,11 @@ void GivensFGFTParallel<FPP,DEVICE,FPP2>::next_step()
 	for(int i=0;i<sizeof(substep)/sizeof(substep_fun);i++)
 	{
 #ifdef DEBUG_GIVENS
-		cout << "GivensFGFTParallel ite=" << this->ite << " substep i=" << i << endl;
+		std::cout << "GivensFGFTParallel ite=" << this->ite << " substep i=" << i << std::endl;
 #endif
 		(this->*substep[i])();
 	}
+	this->ite++;
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2>
@@ -75,7 +76,7 @@ void GivensFGFTParallel<FPP,DEVICE,FPP2>::update_fact()
 	this->fact_mod_row_ids.push_back(this->q);
 	this->fact_mod_col_ids.push_back(this->q);
 	this->fact_mod_values.push_back(cos(this->theta));
-	if(this->J == 0) this->facts.resize(this->ite+1);
+	if(this->J <= this->ite+1) this->facts.resize(this->ite+1);
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2>

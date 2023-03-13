@@ -3,57 +3,40 @@
 #include "faust_GivensFGFTGen.h"
 #include "faust_SVDTJ.h"
 #include <cstdlib>
+#include <string>
+#include <unistd.h>
 
 typedef @TEST_FPP@ FPP;
 using namespace std;
 using namespace Faust;
 
-/**
- * This test verifies the SVD factorization of an random matrix of size m x n.
- * We authorize large Fausts for U and V (a lot of Givens factors) because we want to test if it works well.
- */
-
-int main(int argc, char **argv)
+Real<FPP> svdtj_and_error(MatDense<FPP, Cpu>* A, int J, int t, Real<FPP> tol, bool relErr, int order, bool enable_large_Faust, int verb, TransformHelper<FPP,Cpu> **U_=nullptr, TransformHelper<FPP, Cpu> **V_=nullptr, Vect<FPP,Cpu> **S__=nullptr, bool del=true)
 {
-	// input
-	int m, n, min_mn;
-	m = 16;
-	n = 32;
-	auto J = 1024; // nGivens
-	if(argc >= 3)
-	{
-		m = std::atoi(argv[1]);
-		n = std::atoi(argv[2]);
-		if(argc >= 4)
-			J = std::atoi(argv[3]);
-	}
-	cout << "A size m x n: " << m << " x " << n << endl;
-	cout << "J: " << J << endl;
-	min_mn = m > n?n:m;
-	auto A = MatDense<FPP, Cpu>::randMat(m, n);
-//	auto DFT = TransformHelper<std::complex<double>, Cpu>::fourierFaust(4, false);
-//	auto A = new MatDense<FPP, Cpu>(DFT->real<double>()->get_product()); // in the heap to match the delete in the end (needed for randMat generated A)
-//	delete DFT;
-#if DEBUG_SVDTJ
-	A->save_to_mat_file("/tmp/A_cpp.mat", "A");
-#endif
-	auto t =  m / 2; // nGivens per factor
-	if(t > J)
-		throw runtime_error("t > J"); // TODO: the check should be in eigtj C++ code
-	bool relErr = true; // use relative error instead of absolute error if tol is not 0
-	Real<FPP> tol = 0; // not the stopping criterion
-	int verb = 0;
-	int order = -1;
-	bool enable_large_Faust = true;
+
+	int m = A->getNbRow(), n = A->getNbCol();
+	auto min_mn = m > n?n:m;
 	// output
-	TransformHelper<FPP,Cpu> *U, *V;
-	Faust::Vect<FPP,Cpu> * S_;
 // input svdtj nGivens, tol, order, relerr, nGivens_per_fac, verbosity, enable_large_Faust: 4096 0 descend True None 0 True
 //
 //void Faust::svdtj(MatDense<FPP, DEVICE> & dM, int J, int t, FPP2 tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Faust::Vect<FPP,DEVICE> ** S_)
 	MatDense<FPP, Cpu> err(*A);
 	// warning *A is modified by the svdtj
-	svdtj(*A, J, t, tol, verb, relErr, order, enable_large_Faust, &U, &V, &S_);
+	Vect<FPP, Cpu> * S_;
+	TransformHelper<FPP, Cpu> * U, *V;
+
+	if(! S__)
+		S__ = &S_;
+	if(! U_)
+		U_ = &U;
+	if(! V_)
+		V_ = &V;
+
+	svdtj(*A, J, t, tol, verb, relErr, order, enable_large_Faust, U_, V_, S__);
+
+	U = *U_;
+	V = *V_;
+	S_ = *S__;
+
 	cout << "U, V number of factors: " << U->size() << ", " << V->size() << endl;
 	cout << "U, V RCGs: " << double(m * m) / U->get_total_nnz() << " " << double(n * n) / V->get_total_nnz() << endl;
 	MatDense<FPP, Cpu> S(m, n);
@@ -75,15 +58,219 @@ int main(int argc, char **argv)
 #endif
 	err -= USV_;
 	cout << "svdtj err: " << err.norm() / A->norm() << endl;
+	Real<FPP> norm_err = (A->norm() - S.norm());
+	if (relErr)  norm_err /= A->norm();
+	cout << "svdtj norm err: " << norm_err << endl;
 #if DEBUG_SVDTJ
 	U->save_mat_file("/tmp/U_cpp.mat");
 	V->save_mat_file("/tmp/V_cpp.mat");
 	S.save_to_mat_file("/tmp/S_cpp.mat", "S");
 #endif
-	delete A;
+
+	if(del)
+	{
+		delete U;
+		delete V;
+		delete S_;
+	}
+
+	return norm_err;
+}
+
+void auto_tests()
+{
+
+	int m, n, min_mn;
+	int J, t, order;
+	Real<FPP> tol;
+	bool verb, relErr, enable_large_Faust;
+
+	// first test
+	m = 128;
+	n = 64;
+	J = 1024; // nGivens
+	tol = 0; // not the stopping criterion if 0
+	relErr = true; // use relative error instead of absolute error if tol is not 0
+	t = -1; // nGivens per factor // -1 for automatic (diff for U and V)
+	verb = 1;
+	order = -1; // not yet implemented
+	enable_large_Faust = false;
+
+	auto A = MatDense<FPP, Cpu>::randMat(m, n);
+
+	TransformHelper<FPP,Cpu> *U, *V;
+	Vect<FPP,Cpu> * S_;
+
+	cout << string(20, '=') << " test 1: J limit" << endl;
+	auto norm_err = svdtj_and_error(A, J, t, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
+	assert(U->size() == 16); // auto-computed t = 64 for U, 64 * 16 == 1024 == J
+
 	delete U;
 	delete V;
 	delete S_;
+
+	cout << string(20, '=') << " test 2: rel. error" << endl;
+	J = 0;
+	tol = 1e-3;
+	norm_err = svdtj_and_error(A, J, t, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
+	assert(norm_err <= tol);
+
+	delete U;
+	delete V;
+	delete S_;
+
+
+	cout << string(20, '=') << " test 3: abs. error" << endl;
+	J = 0;
+	tol = 1e-3;
+	relErr = false;
+	norm_err = svdtj_and_error(A, J, t, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
+	assert(norm_err <= tol);
+
+	delete U;
+	delete V;
+	delete S_;
+
+
+	cout << string(20, '=') << " test 4: concurrent J and rel. error" << endl;
+	J = 128;
+	tol = 1e-3;
+	relErr = true;
+	norm_err = svdtj_and_error(A, J, t, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
+	assert(norm_err <= tol || U->size() * m / 2  <= J); //automatic t = m / 2 for U
+
+	cout << string(20, '=') << " test 5: J limit, t=1" << endl;
+	t = 1;
+	J = 100;
+	norm_err = svdtj_and_error(A, J, t, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
+	assert(U->size() == J); // auto-computed t = 1
+
+	delete U;
+	delete V;
+	delete S_;
+
+	cout << string(20, '=') << " test 6: rel. error" << endl;
+	J = 0;
+	tol = 1e-3;
+	relErr = true;
+	enable_large_Faust = true; //otherwise it doesn't work
+	norm_err = svdtj_and_error(A, J, t, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
+	assert(norm_err <= tol);
+
+	delete U;
+	delete V;
+	delete S_;
+
+
+	cout << string(20, '=') << " test 3: abs. error" << endl;
+	J = 0;
+	tol = 1e-3;
+	relErr = false;
+	enable_large_Faust = true; //otherwise it doesn't work
+	norm_err = svdtj_and_error(A, J, t, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
+	assert(norm_err <= tol);
+
+	delete U;
+	delete V;
+	delete S_;
+
+
+	cout << string(20, '=') << " test 4: concurrent J and rel. error" << endl;
+	J = 128;
+	tol = 1e-3;
+	relErr = true;
+	norm_err = svdtj_and_error(A, J, t, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
+	assert(norm_err <= tol || U->size() == J); //automatic t = m / 2 for U
+	delete A;
+
+}
+
+/**
+ * This test verifies the SVD factorization of an random matrix of size m x n.
+ * We authorize large Fausts for U and V (a lot of Givens factors) because we want to test if it works well.
+ */
+int main(int argc, char **argv)
+{
+	// default input
+	int m, n, min_mn;
+	m = 128;
+	n = 64;
+	auto J = 1024; // nGivens
+	Real<FPP> tol = 0; // not the stopping criterion if 0
+	bool relErr = true; // use relative error instead of absolute error if tol is not 0
+	auto t = -1; // nGivens per factor // -1 for automatic (diff for U and V)
+	int verb = 0;
+	int order = -1; // not yet implemented
+	bool enable_large_Faust = false;
+
+	if(argc == 1)
+	{
+		auto_tests();
+		return EXIT_SUCCESS;
+	}
+
+
+	int opt;
+	const char *optstr = "m:n:J:t:ralo:ve:";
+	const char *optspec = "-m Anrows -n Ancols -J <int> -t <int> -r(elerr)|-a(bserr) -l(largeFaust) -o <1|-1|0> -v(erbose)";
+
+	while ((opt = getopt(argc, argv, optstr)) != -1)
+	{
+		switch (opt)
+		{
+			case 'n':
+				n = atoi(optarg);
+				break;
+			case 'm':
+				m = atoi(optarg);
+				break;
+			case 'J':
+				J = atoi(optarg);
+				break;
+			case 't':
+				t = atoi(optarg);
+				break;
+			case 'o':
+				order = atoi(optarg);
+				break;
+			case 'r':
+				relErr = true;
+				break;
+			case 'a':
+				relErr = false;
+				break;
+			case 'l':
+				enable_large_Faust = true;
+				break;
+			case 'v':
+				verb = 1;
+				break;
+			case 'e':
+				tol = atof(optarg);
+				break;
+			default: /* '?' */
+				fprintf(stderr, "Usage: %s %s\n",
+						argv[0], optspec);
+				exit(EXIT_FAILURE);
+		}
+	}
+
+
+	cout << "A size m x n: " << m << " x " << n << endl;
+	cout << "J: " << J << endl;
+	cout << "t: " << t << endl;
+	cout << "relErr: " << relErr << endl;
+	cout << "enable_large_Faust: " << enable_large_Faust << endl;
+	std::cout << "error target (stop crit if not 0):" << tol << std::endl;
+	min_mn = m > n?n:m;
+	auto A = MatDense<FPP, Cpu>::randMat(m, n);
+#if DEBUG_SVDTJ
+	A->save_to_mat_file("/tmp/A_cpp.mat", "A");
+#endif
+	if(J != 0 && t > J)
+		throw runtime_error("t > J"); // TODO: the check should be in eigtj C++ code
+	svdtj_and_error(A, J, t, tol, relErr, order, enable_large_Faust, verb);
+	delete A;
 	return EXIT_SUCCESS;
 }
 

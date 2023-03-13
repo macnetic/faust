@@ -47,6 +47,7 @@ void GivensFGFTParallelComplex<FPP,DEVICE,FPP2>::next_step()
 #endif
 		(this->*substep[i])();
 	}
+	this->ite++;
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2>
@@ -97,7 +98,7 @@ void GivensFGFTParallelComplex<FPP,DEVICE,FPP2>::update_fact()
 	this->fact_mod_row_ids.push_back(this->q);
 	this->fact_mod_col_ids.push_back(this->q);
 	this->fact_mod_values.push_back(c_qq);
-	if(this->J == 0) this->facts.resize(this->ite+1);
+	if(this->J <= this->ite+1) this->facts.resize(this->ite+1);
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2>

@@ -19,6 +19,7 @@ void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::update_D()
 	D.Display();
 	cout << "D fro. norm: " << D.norm() << endl;
 #endif
+	is_D_ordered = false;
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
@@ -79,7 +80,6 @@ void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::compute_facts()
 	while(! stopping && (J == 0 || ite < facts.size())) // when J == 0 the stopping criterion is the error against Lap
 	{
 		next_step();
-		ite++;
 		if(stopping = (ite > 1 && stoppingCritIsError && errs.size() > 2 && errs[ite-1]-errs[ite-2] > FLT_EPSILON))
 			/*if(verbosity>0) */cerr << "WARNING: the eigtj algorithm stopped because the last error is greater than the previous one." << endl;
 		if(stopping || stoppingCritIsError && errs.size() > 0 && (*(errs.end()-1) - stoppingError ) < FLT_EPSILON)
@@ -102,7 +102,7 @@ void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::compute_facts()
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::GivensFGFTGen(MatGeneric<FPP4,DEVICE>* Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust /* deft to false */) :
-facts(J>0?(J*4<Lap->getNbRow()*Lap->getNbRow()||enable_large_Faust?J:0):1 /* don't allocate if the complexity doesn't worth it and enable_large_Faust is false*/), q_candidates(new int[Lap->getNbRow()]), J(J), D(Lap->getNbRow()), errs(0), coord_choices(0), Lap(*Lap), dim_size(Lap->getNbRow()), Lap_squared_fro_norm(0), last_fact_permuted(false), is_D_ordered(false), verbosity(verbosity), stoppingCritIsError(stoppingError != 0.0), stoppingError(stoppingError), errIsRel(errIsRel), enable_large_Faust(enable_large_Faust)
+facts(J>0?(J*4<Lap->getNbRow()*Lap->getNbRow()||enable_large_Faust?J:0):0 /* don't allocate if the complexity doesn't worth it and enable_large_Faust is false*/), q_candidates(new int[Lap->getNbRow()]), J(J), D(Lap->getNbRow()), errs(0), coord_choices(0), Lap(*Lap), dim_size(Lap->getNbRow()), Lap_squared_fro_norm(0), is_D_ordered(false), verbosity(verbosity), stoppingCritIsError(stoppingError != 0.0), stoppingError(stoppingError), errIsRel(errIsRel), enable_large_Faust(enable_large_Faust), ite(0)
 {
 	if(Lap->getNbCol() != Lap->getNbRow())
 		handleError("Faust::GivensFGFTComplex", "Laplacian must be a square matrix.");
@@ -257,44 +257,83 @@ const vector<Faust::MatSparse<FPP4,DEVICE>>& GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-Faust::Transform<FPP4,DEVICE> GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_transform(bool ord)
+Faust::Transform<FPP4,DEVICE> GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_transform(const bool ord)
 {
 	return get_transform(ord?1:0);
 }
 
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-Faust::Transform<FPP4,DEVICE> GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_transform(int ord)
+Faust::Transform<FPP4,DEVICE> GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_transform(const int ord, const bool copy/*=true*/, const int first_nfacts/*=-1*/)
 {
-	//TODO: an optimization is possible by changing type of facts to vector<MatGeneric*> it would avoid copying facts into Transform and rather use them directly. It will need a destructor that deletes them eventually if they weren't transfered to a Transform object before.
+	//TODO: facts should be a Transform or a TransformHelper to avoid the risk of memory leak in caller code when ord == true and copy == false
 	if(facts.size() == 0)
 		throw out_of_range("The transform is empty. The algorithm stopped before computing any factor.");
-	MatSparse<FPP4,DEVICE> & last_fact = *(facts.end()-1);
-	MatSparse<FPP4,DEVICE> P(last_fact.getNbCol(), last_fact.getNbCol()); //last_fact permutation matrix
-	// (to reorder eigenvector transform according to ordered D)
 
-	if(last_fact_permuted)
-	{
-		// get back to undefined order
-		for(int i=0;i<inv_ord_indices.size();i++)
-			P.setCoeff(inv_ord_indices[i],i, FPP4(1.0));
-		last_fact.multiplyRight(P);
-		last_fact_permuted = false;
-	}
+	std::vector<MatGeneric<FPP4, DEVICE>*> facts;
+	int end_id;
+
+	size_t nfacts;
+	if(first_nfacts < 0)
+		// we want only effectively computed facts
+		nfacts = this->ite;
+	else
+		// we want the number of facts asked by the caller
+		nfacts = first_nfacts;
+
+	if (ord)
+		// we process the last factor separately because the columns must be reordered
+		end_id = nfacts - 1;
+	else
+		end_id = nfacts;
+
+	for(int i=0; i < end_id; i++)
+		facts.push_back(&this->facts[i]);
+
+	auto t = Faust::Transform<FPP4,DEVICE>(facts, /* lambda */ FPP4(1.0), /* optimizedCopy */false, /* cloning_fact */ copy);
+
+	if(! copy)
+		t.disable_dtor(); // don't want to free facts when t is out of scope because we might still need them in this object
 
 	if(ord)
 	{
+		// (reorder eigenvector transform according to ordered D)
+		MatSparse<FPP4,DEVICE> & last_fact = *(this->facts.begin() + end_id);
+		auto P = new MatSparse<FPP4, DEVICE>(last_fact.getNbCol(), last_fact.getNbCol()); //last_fact permutation matrix
 		if(!is_D_ordered || ord != D_order_dir)
 			order_D(ord);
 		for(int i=0;i<ord_indices.size();i++)
-			P.setCoeff(ord_indices[i],i, FPP4(1.0));
+			P->setCoeff(ord_indices[i],i, FPP4(1.0));
 		//		P.set_orthogonal(true);
 		//		facts.push_back(P); // we prefer to directly multiply the last factor by P
-		last_fact_permuted = true;
-		last_fact.multiplyRight(P);
+//		last_fact.multiplyRight(P);
+		last_fact.multiply(*P, 'N');
+		t.push_back(P, false, false, false, copy); //default to optimizedCopy=false, transpose=false, conjugate=false, copying=false, verify_dims_agree=true
+		if(copy) delete P;
+		// Warning: if copy == false the caller is responsible to free the P
 	}
-	Faust::Transform<FPP4,DEVICE> t = Faust::Transform<FPP4,DEVICE>(facts);
-	//	// remove the permutation factor if added temporarily for reordering
-	//	return ord?facts.erase(facts.end()-1),t:t;
+
 	return t;
+
+}
+
+
+template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
+FPP2 GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::calc_err()
+{
+
+	FPP2 err = 0, err_d;
+	for(int i=0;i<this->D.size();i++)
+		err += /*Faust::fabs(*/this->D(i)*this->D(i)/*)*/;
+	if(this->Lap_squared_fro_norm == FPP2(0))
+	{
+		err_d = Faust::fabs(this->Lap.norm());
+		err_d = err_d*err_d;
+		this->Lap_squared_fro_norm = err_d;
+	}
+	else
+		err_d = Faust::fabs(this->Lap_squared_fro_norm);
+	err = Faust::fabs(err_d - err);
+	if(this->errIsRel) err /= err_d;
+	return err;
 }

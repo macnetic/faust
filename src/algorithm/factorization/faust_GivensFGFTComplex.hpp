@@ -20,6 +20,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::next_step()
 #endif
 		(this->*substep[i])();
 	}
+	this->ite++;
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2>
@@ -207,7 +208,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_fact()
 	this->fact_mod_row_ids.push_back(this->q);
 	this->fact_mod_col_ids.push_back(this->q);
 	this->fact_mod_values.push_back(c_qq);
-	if(this->J == 0) this->facts.resize(this->ite+1);
+	if(this->J <= this->ite+1) this->facts.resize(this->ite+1);
 	this->facts[this->ite] = MatSparse<FPP,DEVICE>(this->fact_mod_row_ids, this->fact_mod_col_ids, this->fact_mod_values, n, n);
 	this->facts[this->ite].set_orthogonal(true);
 #ifdef DEBUG_GIVENS
@@ -420,19 +421,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_err()
 	//
 	if(!((this->ite+1)%GivensFGFTComplex<FPP,DEVICE,FPP2>::ERROR_CALC_PERIOD) || this->stoppingCritIsError || this->verbosity > 1)
 	{
-		FPP2 err = 0, err_d;
-		for(int i=0;i<this->D.size();i++)
-			err += /*Faust::fabs(*/this->D(i)*this->D(i)/*)*/;
-		if(this->Lap_squared_fro_norm == FPP2(0))
-		{
-			err_d = Faust::fabs(this->Lap.norm());
-			err_d = err_d*err_d;
-			this->Lap_squared_fro_norm = err_d;
-		}
-		else
-			err_d = Faust::fabs(this->Lap_squared_fro_norm);
-		err = Faust::fabs(err_d - err);
-		if(this->errIsRel) err /= err_d;
+		auto err = this->calc_err();
 		if(this->verbosity)
 		{
 			cout << "factor : "<< this->ite <<  ", " << ((this->errIsRel)?"relative ":"absolute ") << "err.: " << err;

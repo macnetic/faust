@@ -39,7 +39,7 @@ namespace Faust
 			//			Vect<FPP4,DEVICE> C_min_row;
 			protected:
 				/** \brief Fourier matrix/eigenvectors factorization matrices (Givens matrices). */
-				vector<MatSparse<FPP4,DEVICE>> facts;
+				std::vector<MatSparse<FPP4,DEVICE>> facts;
 
 				/** \brief L iteration factor:  L_i = S^T L_{i-1} S, initialized from Lap (with S being facts[i]). */
 				MatGeneric<FPP4, DEVICE>* L;
@@ -80,8 +80,6 @@ namespace Faust
 
 				/** \brief inverse permutation of ord_indices (needed to retrieve start undefined order). */
 				vector<int> inv_ord_indices;
-				/** \brief True is the last fact (of facts) has been permuted */
-				bool last_fact_permuted;
 				/** \brief Cache for the ordered D. */
 				Vect<FPP,DEVICE> ordered_D;
 				/** \brief true if D has already been ordered (order_D() was called). */
@@ -231,6 +229,12 @@ namespace Faust
 			public:
 
 				/**
+				 *  Computes the error norm of D compared to L.
+				 *  It can be relative or absolute depending on this->errIsRel.
+				 */
+				FPP2 calc_err();
+
+				/**
 				 * Returns the ordered indices of D to get increasing eigenvalues along the diagonal.
 				 *
 				 * @see order_D()
@@ -316,17 +320,29 @@ namespace Faust
 				 */
 				const vector<MatSparse<FPP4,DEVICE>>& get_facts() const;
 
+				/**
+				 * Number of Givens factors used for the eigenvector approximate so far.
+				 */
+				const size_t nfacts() const
+				{
+					return this->get_facts().size();
+				}
+
 
 				/**
 				 * Returns a Transform object with copy of facts into it.
 				 *
-				 * \param ord true to get the Transform's facts ordering the last one columns according to ascendant eigenvalues, false to let facts as they went out from the algorithm (without reordering).
+				 * \param ord true to get the Transform's facts ordering the last one columns according to ascending eigenvalues, false to let facts as they went out from the algorithm (without reordering).
 				 */
-				Transform<FPP4,DEVICE> get_transform(bool ord);
+				Transform<FPP4,DEVICE> get_transform(const bool ord);
 				/**
+				 * Returns the eigen vectors as a Transform t of Givens matrices.
+				 *
 				 * \param ord -1 for descending order, 1 for ascending order.
+				 *
+				 * Warning: if copy == false and ord == true the caller is responsible to free the last permuted factor of t.
 				 */
-				Transform<FPP4,DEVICE> get_transform(int ord);
+				Transform<FPP4,DEVICE> get_transform(const int ord, const bool copy=true, const int first_nfacts=-1);
 
 
 		};
