@@ -29,17 +29,22 @@ void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::order_D()
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::order_D(const int order /* -1 for descending order, 1 for ascending order */)
+void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::order_D(const int order /* -1 for descending order, 1 for ascending order, 0 no order*/)
 {
 	ordered_D = Faust::Vect<FPP,DEVICE>(D.size());
 	ord_indices.resize(0);
 	for(int i=0;i<D.size();i++)
 		ord_indices.push_back(i);
-	sort(ord_indices.begin(), ord_indices.end(), [this, &order](int i, int j) {
-			return order>0?D.getData()[i] < D.getData()[j]:(order <0?D.getData()[i] > D.getData()[j]:0);
-			});
+	if(order)
+		sort(ord_indices.begin(), ord_indices.end(), [this, &order](int i, int j) {
+				auto di = std::abs(D.getData()[i]);
+				auto dj = std::abs(D.getData()[j]);
+				return order>0? di < dj:(order <0?di > dj:0);
+				});
+	// order == 0, no order
 	for(int i=0;i<ord_indices.size();i++)
 		ordered_D.getData()[i] = D.getData()[ord_indices[i]];
+
 	// compute inverse permutation to keep easily possible retrieving undefined order
 	inv_ord_indices.resize(ord_indices.size());
 	int j = 0, i = 0;
@@ -56,10 +61,10 @@ void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::order_D(const int order /* -1 for desc
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-const vector<int>& GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_ord_indices()
+const vector<int>& GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_ord_indices(const int order/*=1*/)
 {
-	if(! is_D_ordered)
-		order_D();
+	if(! is_D_ordered || D_order_dir != order)
+		order_D(order);
 	return ord_indices;
 }
 
@@ -102,7 +107,7 @@ void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::compute_facts()
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::GivensFGFTGen(MatGeneric<FPP4,DEVICE>* Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust /* deft to false */) :
-facts(J>0?(J*4<Lap->getNbRow()*Lap->getNbRow()||enable_large_Faust?J:0):0 /* don't allocate if the complexity doesn't worth it and enable_large_Faust is false*/), q_candidates(new int[Lap->getNbRow()]), J(J), D(Lap->getNbRow()), errs(0), coord_choices(0), Lap(*Lap), dim_size(Lap->getNbRow()), Lap_squared_fro_norm(0), is_D_ordered(false), verbosity(verbosity), stoppingCritIsError(stoppingError != 0.0), stoppingError(stoppingError), errIsRel(errIsRel), enable_large_Faust(enable_large_Faust), ite(0)
+facts(J>0?(J*4<Lap->getNbRow()*Lap->getNbRow()||enable_large_Faust?J:0):0 /* don't allocate if the complexity doesn't worth it and enable_large_Faust is false*/), q_candidates(new int[Lap->getNbRow()]), J(J), D(Lap->getNbRow()), errs(0), coord_choices(0), Lap(*Lap), dim_size(Lap->getNbRow()), Lap_squared_fro_norm(0), is_D_ordered(false), D_order_dir(0), verbosity(verbosity), stoppingCritIsError(stoppingError != 0.0), stoppingError(stoppingError), errIsRel(errIsRel), enable_large_Faust(enable_large_Faust), ite(0)
 {
 	if(Lap->getNbCol() != Lap->getNbRow())
 		handleError("Faust::GivensFGFTComplex", "Laplacian must be a square matrix.");

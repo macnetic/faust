@@ -239,7 +239,7 @@ namespace Faust
 				 *
 				 * @see order_D()
 				 */
-				const vector<int>& get_ord_indices();
+				const vector<int>& get_ord_indices(const int order=1);
 
 
 				/**
