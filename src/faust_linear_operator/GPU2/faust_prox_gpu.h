@@ -87,6 +87,11 @@ namespace Faust
 
 	template<typename FPP> void prox_skperm(MatDense<FPP, GPU2> & M,const unsigned int k,  const bool normalized=true, const bool pos=false);
 
+  template<typename FPP>
+  void prox_triu_sp(MatDense<FPP,GPU2> & M,faust_unsigned_int k, const bool normalized=true, const bool pos=false, const bool pure_gpu=true);
+  template<typename FPP>
+  void prox_tril_sp(MatDense<FPP,GPU2> & M,faust_unsigned_int k, const bool normalized=true, const bool pos=false, const bool pure_gpu=true);
+
 }
 #include "faust_prox_gpu.hpp"
 
