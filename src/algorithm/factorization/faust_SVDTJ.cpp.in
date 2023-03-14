@@ -3,6 +3,7 @@
 #include "faust_GivensFGFTParallelComplex.h"
 #include "faust_GivensFGFTComplex.h"
 #include "faust_SVDTJ.h"
+#include "faust_TransformHelper.h"
 #include <complex>
 namespace Faust
 {
@@ -22,6 +23,15 @@ namespace Faust
 				*algoW2 = new GivensFGFTParallelComplex<complex<@REAL_TYPE@>,Cpu,@REAL_TYPE@>(dM_M, J2, t2, verbosity, tol, relErr, enable_large_Faust);
 
 		}
+
+	template<>
+		void svdtj_sign_W1_S<complex<@REAL_TYPE@>, Cpu>(const faust_unsigned_int &m, const faust_unsigned_int &n, const int order, const Vect<complex<@REAL_TYPE@>, Cpu> &S, Vect<complex<@REAL_TYPE@>, Cpu> **S_, TransformHelper<complex<@REAL_TYPE@>, Cpu> &thW1)
+		{
+			// there is no sense to sign complex singular values
+			// only copy S
+			*S_ = new Vect<complex<@REAL_TYPE@>,Cpu>(S);
+		}
+
 #endif
 
 	template<>
@@ -38,4 +48,51 @@ namespace Faust
 			else
 				*algoW2 = new GivensFGFTParallel<@REAL_TYPE@,Cpu,@REAL_TYPE@>(dM_M, J2, t2, verbosity, tol, relErr, enable_large_Faust);
 		}
+
+	template<>
+		void svdtj_sign_W1_S<@REAL_TYPE@, Cpu>(const faust_unsigned_int &m, const faust_unsigned_int &n, const int order, const Vect<@REAL_TYPE@, Cpu> &S, Vect<@REAL_TYPE@, Cpu> **S_, TransformHelper<@REAL_TYPE@, Cpu> &thW1)
+		{
+			// change the sign of W1 vector when the matching D value is negative
+			// it gives a signed identity matrix IS
+			assert(order != 0); // can't build the signed identity matrix without knowning the order of singular values and left singular vectors
+			// S is ordered in order (-1 descending, 1 ascending)
+			// thW1 are also ordered accordingly
+			// but only min_mn greatest magnitude singular values are in S
+			vector<int> ord_indices, indices;
+			Vect<@REAL_TYPE@,Cpu>* abs_S = new Vect<@REAL_TYPE@,Cpu>(S.size());
+			auto min_mn = m > n?n:m;
+			MatSparse<@REAL_TYPE@, Cpu> IS(m, m); // zeros
+			IS.setEyes();
+			auto IS_ones = IS.getValuePtr();
+			for(int i=0;i<min_mn;i++)
+			{
+				if(S[i] < Real<@REAL_TYPE@>(0))
+				{
+					abs_S->getData()[i] = -1 * S[i];
+					if(order < 0)
+						IS_ones[i] = -1;
+					else if(order > 0)
+						IS_ones[m - min_mn + i] = -1; // non nullspace eigenvectors are at the end of thW1
+				}
+				else
+				{
+					abs_S->getData()[i] = S[i];
+					if(order < 0)
+						IS_ones[i] = 1;
+					else if(order > 0)
+						IS_ones[m - min_mn + i] = 1;
+				}
+			}
+			MatGeneric<@REAL_TYPE@,Cpu>* lf = (MatGeneric<@REAL_TYPE@,Cpu>*)(thW1.get_fact_addr(thW1.size()-1));
+			lf->multiplyRight(IS);
+
+			*S_ = abs_S;
+
+#if DEBUG_SVDTJ
+			MatDense<@REAL_TYPE@, Cpu> So_mat((*S_)->size(), 1, (*S_)->getData());
+			So_mat.save_to_mat_file("/tmp/Sa_cpp.mat", "Sa_cpp");
+#endif
+		}
+
 }
+

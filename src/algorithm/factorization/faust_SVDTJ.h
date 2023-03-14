@@ -22,30 +22,35 @@ namespace Faust
 	 * \brief Wrapper for blind and step versions of SVDTJ.
 	 */
 	template<typename FPP, FDevice DEVICE, typename FPP2 = float>
-		void svdtj_core_gen(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM, MatDense<FPP,DEVICE> &dM_M, MatDense<FPP,DEVICE> &dMM_, int J, int t, FPP2 tol, unsigned int verbosity, bool relErr, int order /* ignored anyway, kept here just in case */, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Vect<FPP,DEVICE> ** S_, const bool by_step=true);
+		void svdtj_core_gen(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM, MatDense<FPP,DEVICE> &dM_M, MatDense<FPP,DEVICE> &dMM_, int J, int t, FPP2 tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Vect<FPP,DEVICE> ** S_, const bool by_step=true);
 
 	/**
 	 * This version runs two eigtjs step by step until the tol error or the number of Givens J is reached.
 	 */
 	template<typename FPP, FDevice DEVICE, typename FPP2 = float>
-		void svdtj_core_gen_step(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM, MatDense<FPP,DEVICE> &dM_M, MatDense<FPP,DEVICE> &dMM_, int J, int t, FPP2 tol, unsigned int verbosity, bool relErr, int order /* ignored anyway, kept here just in case */, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Vect<FPP,DEVICE> ** S_);
+		void svdtj_core_gen_step(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM, MatDense<FPP,DEVICE> &dM_M, MatDense<FPP,DEVICE> &dMM_, int J, int t, FPP2 tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Vect<FPP,DEVICE> ** S_);
 
 	/**
 	 * This version runs two eigtjs blindly until they reach the tol error for the eigen decomposition or the number of Givens is reached.
 	 */
 	template<typename FPP, FDevice DEVICE, typename FPP2 = float>
-		void svdtj_core_gen_blind(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM, MatDense<FPP,DEVICE> &dM_M, MatDense<FPP,DEVICE> &dMM_, int J, int t, FPP2 tol, unsigned int verbosity, bool relErr, int order /* ignored anyway, kept here just in case */, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Vect<FPP,DEVICE> ** S_);
+		void svdtj_core_gen_blind(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM, MatDense<FPP,DEVICE> &dM_M, MatDense<FPP,DEVICE> &dMM_, int J, int t, FPP2 tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Vect<FPP,DEVICE> ** S_);
 
 	template<typename FPP, FDevice DEVICE, typename FPP2>
 		void instantiate_algos(GivensFGFTGen<Real<FPP>, Cpu, FPP2, FPP>** algoW1, GivensFGFTGen<Real<FPP>, Cpu, FPP2, FPP>** algoW2, Faust::MatDense<FPP,DEVICE> &dM_M, Faust::MatDense<FPP,DEVICE> &dMM_, int J1, int J2, int t1, int t2, unsigned int verbosity, FPP2 tol, bool relErr, bool enable_large_Faust);
 
 	/**
-	 * \brief Order S in descending order and permute columns of thW1 and thW2 consequently.
+	 * \brief Move signs of S in matching singular vector of W1 (U).
 	 *
-	 * \param order: not yet impl., only descending (-1) order is handled. //TODO
+	 * \param m: the number of rows of the matrix we compute SVD.
+	 * \param n: the number of columns of the matrix we compute SVD.
+	 * \param order: the order according to S has already been sorted (before call). The affected W1 "vectors" depend of that order.
+	 * \param S: the ordered singular values.
+	 * \param S_: the output for absolute singular values.
+	 * \param thW1: the input/output of the left singular vectors (W1 / U).
 	 */
 	template<typename FPP, FDevice DEVICE>
-		void svdtj_order_W1_W2_S(const faust_unsigned_int &m, const faust_unsigned_int &n, const int order, const Vect<FPP, DEVICE> &S, Vect<FPP, DEVICE> **S_, TransformHelper<FPP, DEVICE> &thW1, TransformHelper<FPP, DEVICE> &thW2);
+		void svdtj_sign_W1_S(const faust_unsigned_int &m, const faust_unsigned_int &n, const int order, const Vect<FPP, DEVICE> &S, Vect<FPP, DEVICE> **S_, TransformHelper<FPP, DEVICE> &thW1);
 
 	/**
 	 * Utility function of svdtj_core_gen_step for computing U'MV (or W1' M W2), method 1 (the simplest way).
@@ -61,8 +66,6 @@ namespace Faust
 	 */
 	template<typename FPP, FDevice DEVICE>
 		MatDense<FPP,DEVICE> svdtj_compute_W1H_M_W2_meth1(MatDense<FPP,DEVICE> &dM, bool &dM_adj, const Transform<FPP, DEVICE> &tW1, const Transform<FPP, DEVICE> &tW2);
-
-
 
 	/**
 	 * Utility function of svdtj_core_gen_step for computing U'MV (or W1' M W2), method 2 (not faster than method 1, just a sketching of method 3).

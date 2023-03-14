@@ -87,8 +87,11 @@ namespace Faust
 		}
 
 	template<typename FPP, FDevice DEVICE, typename FPP2>
-		void svdtj_core_gen_blind(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM, MatDense<FPP,DEVICE> &dM_M, MatDense<FPP,DEVICE> &dMM_, int J, int t, FPP2 tol, unsigned int verbosity, bool relErr, int order /* ignored anyway, kept here just in case */, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Vect<FPP,DEVICE> ** S_)
+		void svdtj_core_gen_blind(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM, MatDense<FPP,DEVICE> &dM_M, MatDense<FPP,DEVICE> &dMM_, int J, int t, FPP2 tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Vect<FPP,DEVICE> ** S_)
 		{
+
+			assert(order != 0);  // we need to use a specific order of singular values/vectors approximates to know where to get the singular values in W1' M W2 matrix
+
 			GivensFGFTGen<Real<FPP>, DEVICE, FPP2, FPP>* algoW1;
 			GivensFGFTGen<Real<FPP>, DEVICE, FPP2, FPP>* algoW2;
 
@@ -116,10 +119,10 @@ namespace Faust
 				Vect<FPP,DEVICE> S(min_mn); // zero-initialized
 
 
-				Transform<FPP,DEVICE> transW1 = std::move(algoW1->get_transform(/*order*/ -1)); // 0 for no order, -1 descending order
+				Transform<FPP,DEVICE> transW1 = std::move(algoW1->get_transform(order)); // 0 for no order, -1 descending order
 
 
-				Transform<FPP,DEVICE> transW2 = std::move(algoW2->get_transform(/* order*/ -1));
+				Transform<FPP,DEVICE> transW2 = std::move(algoW2->get_transform(order));
 
 
 				// compute S = W1'*M*W2 = W1'*(W2'*M')'
@@ -128,9 +131,13 @@ namespace Faust
 				MW2.adjoint();
 				MatDense<FPP,DEVICE> W1_MW2 = transW1.multiply(MW2, 'H');
 
-				// set diagonal vector
-				for(int i=0;i<S.size();i++) //TODO: OpenMP?
-					S.getData()[i] = W1_MW2(i,i);
+				// set singular values
+				if(order < 0)
+					for(int i=0;i<min_mn;i++) //TODO: OpenMP?
+						S[i] = W1_MW2(i,i);
+				else if (order >= 0)
+					for(int i=0;i<min_mn;i++) //TODO: OpenMP?
+						S[i] = W1_MW2(m - min_mn + i,n - min_mn + i);
 
 #if DEBUG_SVDTJ
 				MatDense<FPP, Cpu> S1_mat(S.size(), 1, S.getData());
@@ -143,6 +150,7 @@ namespace Faust
 				TransformHelper<FPP,DEVICE> *thW2 = new TransformHelper<FPP,DEVICE>(transW2, true); // the same
 
 #if DEBUG_SVDTJ
+				dM.save_to_mat_file("/tmp/M.mat", "M");
 				thW1->save_mat_file("/tmp/W1_cpp.mat");
 				thW2->save_mat_file("/tmp/W2_cpp.mat");
 
@@ -150,7 +158,7 @@ namespace Faust
 
 				W1_MW2.save_to_mat_file("/tmp/W1_MW2_cpp.mat", "W1_MW2_cpp");
 #endif
-				svdtj_order_W1_W2_S(m, n, order, S, S_, *thW1, *thW2);
+				svdtj_sign_W1_S(m, n, order, S, S_, *thW1);
 
 				*U = thW1;
 				*V = thW2;
@@ -304,11 +312,12 @@ namespace Faust
 		}
 
 	template<typename FPP, FDevice DEVICE, typename FPP2>
-		void svdtj_core_gen_step(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM, MatDense<FPP,DEVICE> &dM_M, MatDense<FPP,DEVICE> &dMM_, int J, int t, FPP2 tol, unsigned int verbosity, bool relErr, int order /* ignored anyway, kept here just in case */, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Vect<FPP,DEVICE> ** S_)
+		void svdtj_core_gen_step(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM, MatDense<FPP,DEVICE> &dM_M, MatDense<FPP,DEVICE> &dMM_, int J, int t, FPP2 tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Vect<FPP,DEVICE> ** S_)
 		{
 
 			// algorithm main idea: run two eigtj for U and V step by step until the target error is verified or the limit number of Givens is reached
 
+			assert(order != 0);  // we need to use a specific order of singular values/vectors approximates to know where to get the singular values in W1' M W2 matrix
 			GivensFGFTGen<Real<FPP>, DEVICE, FPP2, FPP>* algoW1;
 			GivensFGFTGen<Real<FPP>, DEVICE, FPP2, FPP>* algoW2;
 
@@ -450,8 +459,8 @@ namespace Faust
 					if(tol != FPP2(0) && verif_err_ite || ! loop)
 					{
 						// we have either to verify the error of approximate or to finish the algorithm (compute S based on W1 and W2)
-						tW1 = std::move(algoW1->get_transform(/*order*/ -1, /* copy */ false, /*nfacts*/ better_W1?-1:algoW1->nfacts() - err_step_period));
-						tW2 = std::move(algoW2->get_transform(/* order*/ -1, false, /*nfacts*/ better_W2?-1:algoW2->nfacts() - err_step_period));
+						tW1 = std::move(algoW1->get_transform(/*order*/ order, /* copy */ false, /*nfacts*/ better_W1?-1:algoW1->nfacts() - err_step_period));
+						tW2 = std::move(algoW2->get_transform(/* order*/ order, /* copy */ false, /*nfacts*/ better_W2?-1:algoW2->nfacts() - err_step_period));
 						// compute S = W1'*M*W2 = W1'*(W2'*M')'
 
 						//				//	method 1
@@ -465,8 +474,13 @@ namespace Faust
 						{
 							W1_MW2 = svdtj_compute_W1H_M_W2_meth3(dM, tW1, tW2, W1_MW2_, err_step_period, k1, k2, t1, t2, new_W1, new_W2);
 
-							for(int i=0;i<min_mn;i++) //TODO: OpenMP?
-								S[i] = W1_MW2(i,i);
+							if(order < 0)
+								for(int i=0;i<min_mn;i++) //TODO: OpenMP?
+									S[i] = W1_MW2(i,i);
+							else if (order >= 0)
+								for(int i=0;i<min_mn;i++) //TODO: OpenMP?
+									S[i] = W1_MW2(m - min_mn + i,n - min_mn + i);
+
 							// compute error
 							auto Sd_norm = S.norm();
 							err = (M_norm - Sd_norm);
@@ -479,23 +493,27 @@ namespace Faust
 							}
 
 						}
-						tW1.erase(tW1.size()-1);
-						tW2.erase(tW2.size()-1);
+						if(order)
+						{
+							tW1.erase(tW1.size()-1);
+							tW2.erase(tW2.size()-1);
+						}
 						// re-evaluate the stopping criterion (because of the error update)
 						loop = stop_crit();
 					}
 				}
 
 				// don't use tW1 and tW2 here because we want an independent copy (not linked to algoW1 and algoW2 internal data)
-				Transform<FPP,DEVICE> transW1 = std::move(algoW1->get_transform(/*order*/ -1, /*copy*/ true, /*nfacts*/ better_W1?-1:algoW1->nfacts() - err_step_period));
+				Transform<FPP,DEVICE> transW1 = std::move(algoW1->get_transform(/*order*/ order, /*copy*/ true, /*nfacts*/ better_W1?-1:algoW1->nfacts() - err_step_period));
 
-				Transform<FPP,DEVICE> transW2 = std::move(algoW2->get_transform(/*order*/ -1, /*copy*/ true, /*nfacts*/ better_W2?-1:algoW2->nfacts() - err_step_period));
+				Transform<FPP,DEVICE> transW2 = std::move(algoW2->get_transform(/*order*/ order, /*copy*/ true, /*nfacts*/ better_W2?-1:algoW2->nfacts() - err_step_period));
 
 				TransformHelper<FPP,DEVICE> *thW1 = new TransformHelper<FPP,DEVICE>(transW1, true); // true is for moving and not copying the Transform object into TransformHelper (optimization possible cause we know the original object won't be used later)
 
 				TransformHelper<FPP,DEVICE> *thW2 = new TransformHelper<FPP,DEVICE>(transW2, true); // the same
 
 #if DEBUG_SVDTJ
+				dM.save_to_mat_file("/tmp/M.mat", "M");
 				thW1->save_mat_file("/tmp/W1_cpp.mat");
 				thW2->save_mat_file("/tmp/W2_cpp.mat");
 
@@ -505,7 +523,7 @@ namespace Faust
 				S1_mat.save_to_mat_file("/tmp/S1_cpp.mat", "S1_cpp");
 #endif
 
-				svdtj_order_W1_W2_S(m, n, order, S, S_, *thW1, *thW2);
+				svdtj_sign_W1_S(m, n, order, S, S_, *thW1);
 
 				*U = thW1;
 				*V = thW2;
@@ -520,64 +538,6 @@ namespace Faust
 			delete algoW2;
 
 		}
-
-	template<typename FPP, FDevice DEVICE>
-		void svdtj_order_W1_W2_S(const faust_unsigned_int &m, const faust_unsigned_int &n, const int order /* not yet impl*/, const Vect<FPP, DEVICE> &S, Vect<FPP, DEVICE> **S_, TransformHelper<FPP, DEVICE> &thW1, TransformHelper<FPP, DEVICE> &thW2)
-		{
-			// order D descendingly according to the abs values
-			// and change the sign when the value is negative
-			// it gives a signed permutation matrix PS to multiply to W1, and a permutation P is multiplied to W2
-			vector<int> ord_indices, indices;
-			Vect<FPP,DEVICE>* ordered_S = new Vect<FPP,DEVICE>(S.size());
-			auto min_mn = m > n?n:m;
-			vector<FPP> values(m, 0);
-			vector<FPP> values2(n, 0);
-			vector<int> col_ids(m);
-			vector<int> col_ids2(n);
-			std::iota(col_ids.begin(), col_ids.end(), 0);
-			std::iota(col_ids2.begin(), col_ids2.end(), 0);
-			ord_indices.resize(S.size());
-			std::iota(ord_indices.begin(), ord_indices.end(), 0);
-			sort(ord_indices.begin(), ord_indices.end(), [S, &order](int i, int j) {
-					return Faust::fabs(S.getData()[i]) > Faust::fabs(S.getData()[j]);
-					});
-			vector<int> row_ids(m);
-			vector<int> row_ids2(n);
-			std::copy(ord_indices.begin(), ord_indices.end(), row_ids.begin());
-			std::copy(ord_indices.begin(), ord_indices.end(), row_ids2.begin());
-			std::iota(row_ids.begin()+min_mn, row_ids.end(), min_mn); // min_mn == S.size()
-			std::iota(row_ids2.begin()+min_mn, row_ids2.end(), min_mn);
-			for(int i=0;i<ord_indices.size();i++)
-			{
-				ordered_S->getData()[i] = Faust::fabs(S.getData()[ord_indices[i]]);
-				if(complex<float>(S.getData()[ord_indices[i]]).real() < 0)
-				{
-					values[i] = -1;
-				}
-				else
-					values[i] = 1;
-				values2[i] = 1;
-			}
-			MatSparse<FPP, DEVICE>* PS = new MatSparse<FPP, DEVICE>(row_ids, col_ids, values, m, m);
-			MatGeneric<FPP,Cpu>* lf = (MatGeneric<FPP,Cpu>*)(thW1.get_fact_addr(thW1.size()-1));
-			lf->multiplyRight(*PS);
-			//		thW1.push_back(PS); // multiplying is more efficient than pushing a new factor
-
-			MatSparse<FPP, DEVICE>* P = new MatSparse<FPP, DEVICE>(row_ids2, col_ids2, values2, n, n);
-			lf = (MatGeneric<FPP,Cpu>*)(thW2.get_fact_addr(thW2.size()-1));
-			lf->multiplyRight(*P);
-			// thW2.push_back(P);
-			delete PS;
-			delete P;
-
-			*S_ = ordered_S;
-
-#if DEBUG_SVDTJ
-				MatDense<FPP, Cpu> So_mat(ordered_S->size(), 1, ordered_S->getData());
-				So_mat.save_to_mat_file("/tmp/So_cpp.mat", "So_cpp");
-#endif
-		}
-
 
 	template<typename FPP, FDevice DEVICE, typename FPP2>
 		void svdtj_core_gen(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM, MatDense<FPP,DEVICE> &dM_M, MatDense<FPP,DEVICE> &dMM_, int J, int t, FPP2 tol, unsigned int verbosity, bool relErr, int order /* ignored anyway, kept here just in case */, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Vect<FPP,DEVICE> ** S_, const bool by_step/*=true*/)
