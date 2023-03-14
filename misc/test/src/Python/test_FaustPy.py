@@ -1701,7 +1701,7 @@ class TestFaustFactory(unittest.TestCase):
         U = \
         loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/HierarchicalFactFFT_test_U_L_params.mat")['U']
         Lap = \
-        loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/HierarchicalFactFFT_test_U_L_params.mat")['Lap'].astype(np.float)
+        loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/HierarchicalFactFFT_test_U_L_params.mat")['Lap'].astype(np.float64)
         init_D = \
         loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/HierarchicalFactFFT_test_U_L_params.mat")['init_D']
         params_struct = \
