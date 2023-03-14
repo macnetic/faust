@@ -16,9 +16,9 @@ Real<FPP> svdtj_and_error(MatDense<FPP, Cpu>* A, int J, int t, Real<FPP> tol, bo
 	int m = A->getNbRow(), n = A->getNbCol();
 	auto min_mn = m > n?n:m;
 	// output
-// input svdtj nGivens, tol, order, relerr, nGivens_per_fac, verbosity, enable_large_Faust: 4096 0 descend True None 0 True
-//
-//void Faust::svdtj(MatDense<FPP, DEVICE> & dM, int J, int t, FPP2 tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Faust::Vect<FPP,DEVICE> ** S_)
+	// input svdtj nGivens, tol, order, relerr, nGivens_per_fac, verbosity, enable_large_Faust: 4096 0 descend True None 0 True
+	//
+	//void Faust::svdtj(MatDense<FPP, DEVICE> & dM, int J, int t, FPP2 tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Faust::Vect<FPP,DEVICE> ** S_)
 	MatDense<FPP, Cpu> err(*A);
 	// warning *A is modified by the svdtj
 	Vect<FPP, Cpu> * S_;
@@ -42,11 +42,20 @@ Real<FPP> svdtj_and_error(MatDense<FPP, Cpu>* A, int J, int t, Real<FPP> tol, bo
 	MatDense<FPP, Cpu> S(m, n);
 	S.setZeros();
 	for(int i=0; i < min_mn; i++)
-		S.getData()[i * m + i] = (*S_)(i);
+	{
+		cout << (*S_)(i) << " // ";
+		if(order < 0)
+			S.getData()[i * m + i] = (*S_)(i);
+		else if(order >= 0)
+			//			CS(m - min_mn + i, n - min_mn + i) = (*S_)(i);
+			S.getData()[m - min_mn + i /*row_id*/ + (n - min_mn + i) /* col_id */ * m] = (*S_)(i);
+	}
+	cout << endl;
 	// compute the error
 	MatDense<FPP, Cpu> US = U->multiply(S);
 
 #if DEBUG_SVDTJ
+	A->save_to_mat_file("/tmp/A.mat", "A");
 	US.save_to_mat_file("/tmp/US_cpp.mat", "US_cpp");
 #endif
 	auto USV_ = V->get_product();
@@ -93,7 +102,7 @@ void auto_tests()
 	relErr = true; // use relative error instead of absolute error if tol is not 0
 	t = -1; // nGivens per factor // -1 for automatic (diff for U and V)
 	verb = 1;
-	order = -1; // not yet implemented
+	order = -1;
 	enable_large_Faust = false;
 
 	auto A = MatDense<FPP, Cpu>::randMat(m, n);
@@ -101,13 +110,16 @@ void auto_tests()
 	TransformHelper<FPP,Cpu> *U, *V;
 	Vect<FPP,Cpu> * S_;
 
+#define delUSV() \
+	delete U; \
+	delete V; \
+	delete S_
+
 	cout << string(20, '=') << " test 1: J limit" << endl;
 	auto norm_err = svdtj_and_error(A, J, t, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
 	assert(U->size() == 16); // auto-computed t = 64 for U, 64 * 16 == 1024 == J
 
-	delete U;
-	delete V;
-	delete S_;
+	delUSV();
 
 	cout << string(20, '=') << " test 2: rel. error" << endl;
 	J = 0;
@@ -115,9 +127,7 @@ void auto_tests()
 	norm_err = svdtj_and_error(A, J, t, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
 	assert(norm_err <= tol);
 
-	delete U;
-	delete V;
-	delete S_;
+	delUSV();
 
 
 	cout << string(20, '=') << " test 3: abs. error" << endl;
@@ -127,9 +137,7 @@ void auto_tests()
 	norm_err = svdtj_and_error(A, J, t, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
 	assert(norm_err <= tol);
 
-	delete U;
-	delete V;
-	delete S_;
+	delUSV();
 
 
 	cout << string(20, '=') << " test 4: concurrent J and rel. error" << endl;
@@ -145,9 +153,7 @@ void auto_tests()
 	norm_err = svdtj_and_error(A, J, t, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
 	assert(U->size() == J); // auto-computed t = 1
 
-	delete U;
-	delete V;
-	delete S_;
+	delUSV();
 
 	cout << string(20, '=') << " test 6: rel. error" << endl;
 	J = 0;
@@ -157,9 +163,7 @@ void auto_tests()
 	norm_err = svdtj_and_error(A, J, t, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
 	assert(norm_err <= tol);
 
-	delete U;
-	delete V;
-	delete S_;
+	delUSV();
 
 
 	cout << string(20, '=') << " test 3: abs. error" << endl;
@@ -170,10 +174,7 @@ void auto_tests()
 	norm_err = svdtj_and_error(A, J, t, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
 	assert(norm_err <= tol);
 
-	delete U;
-	delete V;
-	delete S_;
-
+	delUSV();
 
 	cout << string(20, '=') << " test 4: concurrent J and rel. error" << endl;
 	J = 128;
