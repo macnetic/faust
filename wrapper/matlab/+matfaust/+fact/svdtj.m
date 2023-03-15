@@ -77,9 +77,6 @@ function [U,S,V] = svdtj(M, varargin)
 %	if(~ ismatrix(M) || ~ isreal(M))
 %		error('M must be a real matrix.')
 %	end
-	if(size(M,1) ~= size(M,2))
-		error('M must be square')
-	end
 	bad_arg_err = 'bad number of arguments.';
 	nGivens_per_fac = floor(size(M,1)/2); % default value
 	nGivens = 0;
@@ -156,12 +153,12 @@ function [U,S,V] = svdtj(M, varargin)
 	end
 	if(strcmp(class(M), 'single'))
 		[core_obj1, S, core_obj2] = mexsvdtjRealFloat(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, order, enable_large_Faust);
-		S = sparse(diag(real(double(S))));
+		S = spdiags(double(S), 0, size(M, 1), size(M, 2)); % matlab doesn't support single precision sparse matrix
 		U = Faust(core_obj1, isreal(M), 'cpu', 'float');
 		V = Faust(core_obj2, isreal(M), 'cpu', 'float');
 	else
 		[core_obj1, S, core_obj2] = mexsvdtjReal(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, order, enable_large_Faust);
-		S = sparse(diag(real(S)));
+		S = spdiags(double(S), 0, size(M, 1), size(M, 2));
 		U = Faust(core_obj1, isreal(M));
 		V = Faust(core_obj2, isreal(M));
 	end
