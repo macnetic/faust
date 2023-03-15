@@ -335,7 +335,7 @@ namespace Faust
 			// J == 1 to prevent exception raising in eigtj when J == 0 and tol == 0
 			// tol == 0 because the error criterion is handled in this function if it is the stopping criterion (otherwise this is the iteration number determined by J and t)
 
-#define stop_crit() \
+#define continue_loop() \
 			(J == 0 || k1 < J && k2 < J) && (tol == FPP2(0) || tol < err) && (new_W1 || new_W2)
 			// three scenarii:
 			// 1) stopping only on error criterion : J == 0, 0 < tol (<= 1), stop if err <= tol
@@ -414,7 +414,7 @@ namespace Faust
 
 					k1 += t1;
 					k2 += t2;
-					loop = stop_crit();
+					loop = continue_loop();
 
 					bool verif_err_ite = ! (k1 % (err_step_period * t1));
 
@@ -453,7 +453,7 @@ namespace Faust
 							new_W2 = better_W2;
 
 						// if both U and V are not enhancing, it's time to stop the loop
-						loop = stop_crit();
+						loop = continue_loop();
 					}
 
 					if(tol != FPP2(0) && verif_err_ite || ! loop)
@@ -499,7 +499,7 @@ namespace Faust
 							tW2.erase(tW2.size()-1);
 						}
 						// re-evaluate the stopping criterion (because of the error update)
-						loop = stop_crit();
+						loop = continue_loop();
 					}
 				}
 
