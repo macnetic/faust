@@ -1,4 +1,5 @@
 #ifdef USE_GPU_MOD
+#include <climits>
 #include "faust_linear_algebra_gpu.h"
 #endif
 namespace Faust
@@ -137,7 +138,7 @@ namespace Faust
 					init_fac_type_bools(factors[j], rf_dense, rf_sparse, rf_bsr);
 
 					k = i;
-					c[i][j] = std::numeric_limits<int>::max();
+					c[i][j] = INT_MAX;
 					auto lf_nrows = factors[i]->getNbRow();
 					auto lf_ncols = factors[i]->getNbCol();
 					auto rf_nrows = factors[j]->getNbRow();

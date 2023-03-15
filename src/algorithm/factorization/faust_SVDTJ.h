@@ -2,6 +2,7 @@
 #define __FAUST_SVDTJ__
 #include "faust_MatDense.h"
 #include "faust_MatSparse.h"
+#define NOMINMAX // avoids VS min/max issue with std::min/max
 
 #include "faust_constant.h"
 namespace Faust

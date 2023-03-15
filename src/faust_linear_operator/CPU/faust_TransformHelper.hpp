@@ -46,6 +46,8 @@
 #include <chrono>
 #include <cstdlib>
 #include "faust_prng.h"
+#include <climits>
+#include <cfloat>
 
 namespace Faust
 {
@@ -470,7 +472,7 @@ namespace Faust
 			{
 				if(std::find(std::begin(disabled_meths), std::end(disabled_meths), i) != std::end(disabled_meths))
 				{
-					times[i] = std::chrono::duration<double>(numeric_limits<double>::max());
+					times[i] = std::chrono::duration<double>(DBL_MAX);
 					continue;
 				}
 				this->set_FM_mul_mode(i);
