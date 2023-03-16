@@ -246,6 +246,7 @@ namespace Faust
 			static Faust::Timer t_prox_normcol;
 	  static Faust::Timer t_prox_triu_sp;
 	  static Faust::Timer t_prox_tril_sp;
+	  static Faust::Timer t_prox_symm_sp;
 
 			static int nb_call_prox_const;
 			static int nb_call_prox_sp;
@@ -254,6 +255,7 @@ namespace Faust
 			static int nb_call_prox_normcol;
 	  static int nb_call_prox_triu_sp;
 	  static int nb_call_prox_tril_sp;
+	  static int nb_call_prox_symm_sp;
 
 
 

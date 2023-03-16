@@ -113,6 +113,8 @@ namespace Faust
   void prox_triu_sp(MatDense<FPP, Cpu> & M, faust_unsigned_int k, const bool normalized=true, const bool pos=false);
   template<typename FPP>
   void prox_tril_sp(MatDense<FPP, Cpu> & M, faust_unsigned_int k, const bool normalized=true, const bool pos=false);
+  template<typename FPP>
+  void prox_symm_sp(MatDense<FPP, Cpu> & M, faust_unsigned_int k, const bool normalized=true, const bool pos=false);
 
 }
 

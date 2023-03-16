@@ -835,6 +835,7 @@ template<typename FPP,FDevice DEVICE,typename FPP2> Faust::Timer Faust::Palm4MSA
 template<typename FPP,FDevice DEVICE,typename FPP2> Faust::Timer Faust::Palm4MSA<FPP,DEVICE,FPP2>::t_prox_normcol;
 template<typename FPP,FDevice DEVICE,typename FPP2> Faust::Timer Faust::Palm4MSA<FPP,DEVICE,FPP2>::t_prox_triu_sp;
 template<typename FPP,FDevice DEVICE,typename FPP2> Faust::Timer Faust::Palm4MSA<FPP,DEVICE,FPP2>::t_prox_tril_sp;
+template<typename FPP,FDevice DEVICE,typename FPP2> Faust::Timer Faust::Palm4MSA<FPP,DEVICE,FPP2>::t_prox_symm_sp;
 
 template<typename FPP,FDevice DEVICE,typename FPP2> int Faust::Palm4MSA<FPP,DEVICE,FPP2>::nb_call_prox_const;
 template<typename FPP,FDevice DEVICE,typename FPP2> int Faust::Palm4MSA<FPP,DEVICE,FPP2>::nb_call_prox_sp;
@@ -843,6 +844,7 @@ template<typename FPP,FDevice DEVICE,typename FPP2> int Faust::Palm4MSA<FPP,DEVI
 template<typename FPP,FDevice DEVICE,typename FPP2> int Faust::Palm4MSA<FPP,DEVICE,FPP2>::nb_call_prox_normcol;
 template<typename FPP,FDevice DEVICE,typename FPP2> int Faust::Palm4MSA<FPP,DEVICE,FPP2>::nb_call_prox_triu_sp;
 template<typename FPP,FDevice DEVICE,typename FPP2> int Faust::Palm4MSA<FPP,DEVICE,FPP2>::nb_call_prox_tril_sp;
+template<typename FPP,FDevice DEVICE,typename FPP2> int Faust::Palm4MSA<FPP,DEVICE,FPP2>::nb_call_prox_symm_sp;
 
 
 

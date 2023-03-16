@@ -24,20 +24,21 @@
 
 bool PyxConstraintGeneric::is_int_constraint()
 {
-    switch(static_cast<faust_constraint_name>(this->name))
-	{
-		case CONSTRAINT_NAME_SP:
-		case CONSTRAINT_NAME_SPCOL:
-		case CONSTRAINT_NAME_SPLIN:
-		case CONSTRAINT_NAME_SPLINCOL:
-		case CONSTRAINT_NAME_SP_POS:
-		case CONSTRAINT_NAME_SKPERM:
-	case CONSTRAINT_NAME_TRIU_SP:
-	case CONSTRAINT_NAME_TRIL_SP:
-		  return true;
-		default:
-			return false;
-	}
+  switch(static_cast<faust_constraint_name>(this->name))
+    {
+    case CONSTRAINT_NAME_SP:
+    case CONSTRAINT_NAME_SPCOL:
+    case CONSTRAINT_NAME_SPLIN:
+    case CONSTRAINT_NAME_SPLINCOL:
+    case CONSTRAINT_NAME_SP_POS:
+    case CONSTRAINT_NAME_SKPERM:
+    case CONSTRAINT_NAME_TRIU_SP:
+    case CONSTRAINT_NAME_TRIL_SP:
+    case CONSTRAINT_NAME_SYMM_SP:
+      return true;
+    default:
+      return false;
+    }
 }
 
 bool PyxConstraintGeneric::is_real_constraint()
@@ -197,8 +198,11 @@ int prox_int(unsigned int cons_type, unsigned long cons_param, FPP* mat_in, unsi
 	case CONSTRAINT_NAME_TRIL_SP:
 	  Faust::prox_tril_sp(fmat, (faust_unsigned_int) cons_param, normalized, pos);
 	  break;
-            default:
-                throw invalid_argument("PyxConstraintInt::project() inconsistent constraint name");
+	case CONSTRAINT_NAME_SYMM_SP:
+	  Faust::prox_symm_sp(fmat, (faust_unsigned_int) cons_param, normalized, pos);
+	  break;
+	default:
+	  throw invalid_argument("PyxConstraintInt::project() inconsistent constraint name");
         }
         memcpy(mat_out, fmat.getData(), sizeof(FPP)*num_rows*num_cols);
     }

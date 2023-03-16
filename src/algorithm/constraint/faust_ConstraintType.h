@@ -68,8 +68,9 @@ namespace Faust
 		  typedef const  Faust::ConstraintInt<FPP,DEVICE> ConstraintTypeSpPos;
 		  typedef const  Faust::ConstraintMat<FPP,DEVICE> ConstraintTypeBlkdiag;
 		  typedef const Faust::ConstraintMat<FPP, DEVICE> ConstraintTypeId;
-		  typedef const  Faust::ConstraintInt<FPP,DEVICE> ConstraintTypeTriuSp;
-		  typedef const  Faust::ConstraintInt<FPP,DEVICE> ConstraintTypeTrilSp;
+		  typedef const Faust::ConstraintInt<FPP,DEVICE> ConstraintTypeTriuSp;
+		  typedef const Faust::ConstraintInt<FPP,DEVICE> ConstraintTypeTrilSp;
+		  typedef const Faust::ConstraintInt<FPP,DEVICE> ConstraintTypeSymmSp;
 		};
 }
 

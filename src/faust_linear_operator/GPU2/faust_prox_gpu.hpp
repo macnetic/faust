@@ -217,26 +217,37 @@ namespace Faust
   template<typename FPP>
   void prox_triu_sp(MatDense<FPP,GPU2> & M, faust_unsigned_int k, const bool normalized/*=true*/, const bool pos/*=false*/, const bool pure_gpu/*=true*/)
   {
-    prox_tri_sp(M, k, true, normalized, pos, pure_gpu)
+    prox_tri_sp(M, k, true, normalized, pos, pure_gpu);
   }
 
   template<typename FPP>
   void prox_tril_sp(MatDense<FPP,GPU2> & M, faust_unsigned_int k, const bool normalized/*=true*/, const bool pos/*=false*/, const bool pure_gpu/*=true*/)
   {
-    prox_tri_sp(M, k, false, normalized, pos, pure_gpu)
+    prox_tri_sp(M, k, false, normalized, pos, pure_gpu);
   }
 
   template<typename FPP>
   void prox_tri_sp(MatDense<FPP,GPU2> & M, faust_unsigned_int k, bool upper, const bool normalized/*=true*/, const bool pos/*=false*/, const bool pure_gpu/*=true*/)
   {
     if(pure_gpu)
-      {
-	M.prox_tri_sp(k, upper, normalized, pos);
-      }
+      M.prox_tri_sp(k, upper, normalized, pos);
     else
       {
 	MatDense<FPP,Cpu> cpuM = M.tocpu();
 	prox_tri_sp(cpuM, k, upper, normalized, pos);
+	M = cpuM;
+      }
+  }
+
+  template<typename FPP>
+  void prox_symm_sp(MatDense<FPP,GPU2> & M, faust_unsigned_int k, const bool normalized/*=true*/, const bool pos/*=false*/, const bool pure_gpu/*=true*/)
+  {
+    if(pure_gpu)
+      M.prox_symm_sp(k, upper, normalized, pos);
+    else
+      {
+	MatDense<FPP,Cpu> cpuM = M.tocpu();
+	prox_symm_sp(cpuM, k, upper, normalized, pos);
 	M = cpuM;
       }
   }

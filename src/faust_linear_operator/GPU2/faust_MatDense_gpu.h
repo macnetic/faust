@@ -175,6 +175,7 @@ namespace Faust
 				void prox_splin(int32_t k, bool normalized=false, bool pos=false) const;
 		  void prox_triu_sp(int32_t k, bool normalized=false, bool pos=false) const;
 		  void prox_tril_sp(int32_t k, bool normalized=false, bool pos=false) const;
+		  void prox_symm_sp(int32_t k, bool normalized=false, bool pos=false) const;
 				void real(MatDense<Real<FPP>, GPU2>& real_mat) const;
 				template<typename FPP2>
 					MatDense<Real<FPP2>, GPU2> to_real() const;

@@ -756,3 +756,43 @@ class tril_sp(proj_gen):
         """
         super(sp, self).__init__(shape)
         self.constraint = ConstraintInt('tril_sp', shape[0], shape[1], k, normalized, pos)
+
+class symm_sp(proj_gen):
+    """
+    Functor for the SYMM SP projector.
+
+    A, the image matrix, is such that A is symmetric and \f$ \| A \|_0 = k,  \| A\|_F = 1 \f$ (if normalized == True).
+
+
+    Example: TODO
+        >>> from pyfaust.proj import sp
+        >>> from numpy.random import rand, seed
+        >>> import numpy as np
+        >>> seed(42) # just for reproducibility
+        >>> M = np.round(rand(5,5), decimals=2)
+        >>> M
+        array([[0.37, 0.95, 0.73, 0.6 , 0.16],
+               [0.16, 0.06, 0.87, 0.6 , 0.71],
+               [0.02, 0.97, 0.83, 0.21, 0.18],
+               [0.18, 0.3 , 0.52, 0.43, 0.29],
+               [0.61, 0.14, 0.29, 0.37, 0.46]])
+        >>> p = triu_sp(M.shape, 3, normalized=False)
+        >>> p(M)
+        array([[0.  , 0.95, 0.  , 0.  , 0.  ],
+               [0.  , 0.  , 0.87, 0.  , 0.  ],
+               [0.  , 0.97, 0.  , 0.  , 0.  ],
+               [0.  , 0.  , 0.  , 0.  , 0.  ],
+               [0.  , 0.  , 0.  , 0.  , 0.  ]])
+    """
+
+    def __init__(self, shape, k, normalized=True, pos=False):
+        """
+
+        Args:
+            k: the number of nonzeros of the projection image.
+            normalized: True to normalize the projection image according to its Frobenius norm.
+            pos: True to skip negative values (replaced by zero) of the matrix to project.
+
+        """
+        super(sp, self).__init__(shape)
+        self.constraint = ConstraintInt('symm_sp', shape[0], shape[1], k, normalized, pos)

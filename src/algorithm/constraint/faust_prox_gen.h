@@ -114,6 +114,8 @@ namespace Faust
   MatGeneric<FPP,DEV>* prox_triu_sp_gen(MatDense<FPP,DEV> & M, faust_unsigned_int k, const bool normalized=true, const bool pos=false, const MatType forcedType=None);
   template<typename FPP, FDevice DEV>
   MatGeneric<FPP,DEV>* prox_tril_sp_gen(MatDense<FPP,DEV> & M, faust_unsigned_int k, const bool normalized=true, const bool pos=false, const MatType forcedType=None);
+  template<typename FPP, FDevice DEV>
+  MatGeneric<FPP,DEV>* prox_symm_sp_gen(MatDense<FPP,DEV> & M, faust_unsigned_int k, const bool normalized=true, const bool pos=false, const MatType forcedType=None);
 
 }
 

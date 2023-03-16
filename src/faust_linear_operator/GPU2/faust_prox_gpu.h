@@ -51,46 +51,48 @@
 
 namespace Faust
 {
-	template<typename FPP>
-		void prox_sp(MatDense<FPP,GPU2> & M,faust_unsigned_int k, const bool normalized=true, const bool pos=false, const bool pure_gpu=true);
-	template<typename FPP>
-		void prox_sp_pos(MatDense<FPP, GPU2> & M,faust_unsigned_int k, const bool normalized=true, const bool pos=false );
-	template<typename FPP>
-		void prox_spcol(MatDense<FPP,GPU2> & M,faust_unsigned_int k, const bool normalized=true, const bool pos=false, const bool pure_gpu=true);
-	template<typename FPP>
-		void prox_splin(MatDense<FPP,GPU2> & M,faust_unsigned_int k, const bool normalized=true, const bool pos=false, const bool pure_gpu=true);
-	template<typename FPP>
-		void prox_splincol(MatDense<FPP,GPU2> &M,faust_unsigned_int k, const bool normalized=true, const bool pos=false);
-	template<typename FPP>
-		void prox_supp(MatDense<FPP,GPU2> & M, const MatDense<FPP,GPU2> & supp, const bool normalized=true, const bool pos=false);
-	template<typename FPP>
-		void prox_const(MatDense<FPP,GPU2> & M, const MatDense<FPP,GPU2> & supp, const bool normalized=false, const bool pos=false);
-	template<typename FPP>
-		void prox_id(MatDense<FPP,GPU2> & M, const bool normalized=false, const bool pos=false);
-
-	template<typename FPP, typename FPP2>
-		void prox_normcol(MatDense<FPP,GPU2> & M,FPP2 s, const bool normalized=false, const bool pos=false);
-	template<typename FPP, typename FPP2>
-		void prox_normlin(MatDense<FPP,GPU2> & M,FPP2 s, const bool normalized=false, const bool pos=false);
-	//    template<typename FPP>
-	//    void prox_blkdiag(MatDense<FPP,GPU2> & M,faust_unsigned_int k);
-	template<typename FPP>
-		void prox_blockdiag(MatDense<FPP,GPU2> & M, std::vector<faust_unsigned_int>& m_vec, std::vector<faust_unsigned_int>& n_vec, const bool normalized = false, const bool pos = false);
-	template<typename FPP>
-		void prox_blockdiag(MatDense<FPP,GPU2> & M, MatDense<FPP,GPU2> mn_vec, const bool normalized=true, const bool pos=false);
-
-	template<typename FPP> void pre_prox_pos(MatDense<FPP,GPU2> & M);
-	template<typename FPP> void prox_hankel(MatDense<FPP, GPU2> & M, const bool normalized = true, const bool pos = false);
-	template<typename FPP> void prox_toeplitz(MatDense<FPP, GPU2> & M, const bool normalized = true, const bool pos = false);
-	template<typename FPP> void prox_circ(MatDense<FPP, GPU2> & M, const bool normalized = true, const bool pos = false);
-	template<typename FPP> void prox_anticirc(MatDense<FPP, GPU2> & M, const bool normalized = true, const bool pos = false);
-
-	template<typename FPP> void prox_skperm(MatDense<FPP, GPU2> & M,const unsigned int k,  const bool normalized=true, const bool pos=false);
-
   template<typename FPP>
-  void prox_triu_sp(MatDense<FPP,GPU2> & M,faust_unsigned_int k, const bool normalized=true, const bool pos=false, const bool pure_gpu=true);
+  void prox_sp(MatDense<FPP,GPU2> & M,faust_unsigned_int k, const bool normalized=true, const bool pos=false, const bool pure_gpu=true);
   template<typename FPP>
-  void prox_tril_sp(MatDense<FPP,GPU2> & M,faust_unsigned_int k, const bool normalized=true, const bool pos=false, const bool pure_gpu=true);
+  void prox_sp_pos(MatDense<FPP, GPU2> & M,faust_unsigned_int k, const bool normalized=true, const bool pos=false );
+  template<typename FPP>
+  void prox_spcol(MatDense<FPP,GPU2> & M,faust_unsigned_int k, const bool normalized=true, const bool pos=false, const bool pure_gpu=true);
+  template<typename FPP>
+  void prox_splin(MatDense<FPP,GPU2> & M,faust_unsigned_int k, const bool normalized=true, const bool pos=false, const bool pure_gpu=true);
+  template<typename FPP>
+  void prox_splincol(MatDense<FPP,GPU2> &M,faust_unsigned_int k, const bool normalized=true, const bool pos=false);
+  template<typename FPP>
+  void prox_supp(MatDense<FPP,GPU2> & M, const MatDense<FPP,GPU2> & supp, const bool normalized=true, const bool pos=false);
+  template<typename FPP>
+  void prox_const(MatDense<FPP,GPU2> & M, const MatDense<FPP,GPU2> & supp, const bool normalized=false, const bool pos=false);
+  template<typename FPP>
+  void prox_id(MatDense<FPP,GPU2> & M, const bool normalized=false, const bool pos=false);
+  
+  template<typename FPP, typename FPP2>
+  void prox_normcol(MatDense<FPP,GPU2> & M,FPP2 s, const bool normalized=false, const bool pos=false);
+  template<typename FPP, typename FPP2>
+  void prox_normlin(MatDense<FPP,GPU2> & M,FPP2 s, const bool normalized=false, const bool pos=false);
+  //    template<typename FPP>
+  //    void prox_blkdiag(MatDense<FPP,GPU2> & M,faust_unsigned_int k);
+  template<typename FPP>
+  void prox_blockdiag(MatDense<FPP,GPU2> & M, std::vector<faust_unsigned_int>& m_vec, std::vector<faust_unsigned_int>& n_vec, const bool normalized = false, const bool pos = false);
+  template<typename FPP>
+  void prox_blockdiag(MatDense<FPP,GPU2> & M, MatDense<FPP,GPU2> mn_vec, const bool normalized=true, const bool pos=false);
+  
+  template<typename FPP> void pre_prox_pos(MatDense<FPP,GPU2> & M);
+  template<typename FPP> void prox_hankel(MatDense<FPP, GPU2> & M, const bool normalized = true, const bool pos = false);
+  template<typename FPP> void prox_toeplitz(MatDense<FPP, GPU2> & M, const bool normalized = true, const bool pos = false);
+  template<typename FPP> void prox_circ(MatDense<FPP, GPU2> & M, const bool normalized = true, const bool pos = false);
+  template<typename FPP> void prox_anticirc(MatDense<FPP, GPU2> & M, const bool normalized = true, const bool pos = false);
+  
+  template<typename FPP> void prox_skperm(MatDense<FPP, GPU2> & M,const unsigned int k,  const bool normalized=true, const bool pos=false);
+  
+  template<typename FPP>
+  void prox_triu_sp(MatDense<FPP,GPU2> & M, faust_unsigned_int k, const bool normalized=true, const bool pos=false, const bool pure_gpu=true);
+  template<typename FPP>
+  void prox_tril_sp(MatDense<FPP,GPU2> & M, faust_unsigned_int k, const bool normalized=true, const bool pos=false, const bool pure_gpu=true);
+  template<typename FPP>
+  void prox_symm_sp(MatDense<FPP,GPU2> & M, faust_unsigned_int k, const bool normalized=true, const bool pos=false, const bool pure_gpu=true);
 
 }
 #include "faust_prox_gpu.hpp"

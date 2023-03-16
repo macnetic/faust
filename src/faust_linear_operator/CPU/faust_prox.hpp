@@ -727,82 +727,180 @@ void Faust::prox_tri_sp(Faust::MatDense<FPP, Cpu> & M, faust_unsigned_int k, boo
   int count = 0, tri_count = 0;
   const faust_unsigned_int dim1 = M.getNbRow();
   const faust_unsigned_int dim2 = M.getNbCol();
-  const faust_unsigned_int nb_elt_mat = dim1*dim2;
+  if(dim1 != dim2)
+    handleError("prox: ", "Faust::prox_tri_sp: input matrix must be square");
+  const faust_unsigned_int nb_elt_mat = dim1 * dim2;
+  bool full_diag = false && k > dim1 && dim1 == dim2;
   if(pos)
     Faust::pre_prox_pos(M);
-  if(k<=0) // it can't be < 0, k is a faust_unsigned_int
+  if(k <= 0) // it can't be < 0, k is a faust_unsigned_int
     M.setZeros();
   else
     {
-      if(k<nb_elt_mat /* && k < M.getNonZeros()*/)
+      if(k < nb_elt_mat /* && k < M.getNonZeros()*/)
 	{
-	  std::vector<FPP> tri(dim1*dim2);
-	  std::vector<unsigned int> itri(dim1*dim2);
+	  std::vector<FPP> tri(dim1 * dim2);
+	  std::vector<unsigned int> itri(dim1 * dim2);
+	  std::vector<FPP> diag(dim1);
 	  if(upper)
 	    {
 	      // keep upper triangular part of the matrix
-	      for(int r=0;r<dim1;r++)
+	      for(int r=0; r<dim1; r++)
 		{
-		  for(int c=0;c<r;c++)
+		  for(int c=0; c<r; c++)
+		    M.getData()[c * dim1 + r] = .0;
+		  for(int c=r; c<dim2; c++)
 		    {
-		      M.getData()[c*dim1+r]=.0;
-		      count++;
-		    }
-		  for(int c=r;c<dim2;c++)
-		    {
-		      // tri[count]=M.getData()[c*dim1+r];
-		      // itri[tri_count]=count;
-		      tri[c*dim1+r]=M.getData()[c*dim1+r];
-		      itri[tri_count]=c*dim1+r;
-		      tri_count++;
-		      count++;
+		      if(c == r && full_diag)
+			diag[c] = M.getData()[c * dim1 + r];
+		      else
+			{
+			  tri[c * dim1 + r] = M.getData()[c * dim1 + r];
+			  itri[tri_count] = c * dim1 + r;
+			  M.getData()[c * dim1 + r] = .0;
+			  tri_count++;
+			}
 		    }
 		}
 	    }
 	  else
 	    {
 	      // keep lower triangular part of the matrix
-	      for(int r=0;r<dim1;r++)
+	      for(int r=0; r<dim1; r++)
 		{
-		  for(int c=0;c<=r;c++)
+		  for(int c=0; c<=r; c++)
 		    {
-		      // tri[count]=M.getData()[c*dim1+r];
-		      // itri[tri_count]=count;
-		      tri[c*dim1+r]=M.getData()[c*dim1+r];
-		      itri[tri_count]=c*dim1+r;
-		      tri_count++;
-		      count++;
+		      if(c == r && full_diag)
+			diag[c] = M.getData()[c * dim1 + r];
+		      else
+			{
+			  tri[c * dim1 + r] = M.getData()[c * dim1 + r];
+			  itri[tri_count] = c * dim1 + r;
+			  M.getData()[c * dim1 + r] = .0;
+			  tri_count++;
+			}
 		    }
-		  for(int c=(r+1);c<dim2;c++)
-		    {
-		      M.getData()[c*dim1+r]=.0;
-		      count++;
-		    }
+		  for(int c=(r+1); c<dim2; c++)
+		    M.getData()[c * dim1 + r] = .0;
 		}
 	    }
 
 	  // remove the triangular part that has been set to zero
 	  std::vector<FPP> vec(tri_count);
-	  for(int i=0;i<tri_count;i++)
-	    vec[i]=tri[itri[i]];
+	  for(int i=0; i<tri_count; i++)
+	    vec[i] = tri[itri[i]];
 
 	  // make pair (index, value)
 	  std::vector<std::pair<int, FPP> > vec_pair(tri_count);
-	  for(int i=0;i<tri_count;i++)
-	    vec_pair[i]=std::make_pair(i,vec[i]);
+	  for(int i=0; i<tri_count; i++)
+	    vec_pair[i] = std::make_pair(i, vec[i]);
+	  std::vector<std::pair<int, FPP> > diag_pair(dim1);
+	  if(full_diag)
+	    {
+	      for(int i=0; i<dim1; i++)
+		diag_pair[i] = std::make_pair(i, diag[i]);
+	    }
 
 	  // partial sort
-	  std::partial_sort(vec_pair.begin(),vec_pair.begin()+k,vec_pair.end(),Faust::partial_sort_comp<FPP>);
+	  std::partial_sort(vec_pair.begin(), vec_pair.begin() + k, vec_pair.end(), Faust::partial_sort_comp<FPP>);
+	  if(full_diag)
+	    std::partial_sort(diag_pair.begin(), diag_pair.begin() + dim1, diag_pair.end(), Faust::partial_sort_comp<FPP>);
+
 	  // get index such that vec_pair is sorted
 	  std::vector<int> index(k);
-	  for(int i=0;i<k;i++)
-	    index[i]=vec_pair[i].first;
-	  index.erase(index.begin()+k,index.end());
+	  for(int i=0; i<k; i++)
+	    index[i] = vec_pair[i].first;
+	  index.erase(index.begin() + k - dim1 * (int)full_diag, index.end());
+	  std::vector<int> dindex(dim1);
+	  if(full_diag)
+	    {
+	      for(int i=0; i<dim1; i++)
+		dindex[i] = diag_pair[i].first;
+	      dindex.erase(dindex.begin() + dim1, dindex.end());
+	    }
+
+	  // new square matrix M (dim1=dim2)
+	  if(full_diag)
+	    for(int i=0; i<dim2; i++)
+	      M.getData()[i * dim1 + i] = diag[dindex[i]];
+	  for(int i=0; i<index.size(); i++)
+	    M.getData()[itri[index[i]]] = vec[index[i]];
+	}
+    }
+  if(normalized)
+    M.normalize();
+}
+
+template<typename FPP>
+void Faust::prox_symm_sp(Faust::MatDense<FPP, Cpu> & M, faust_unsigned_int k, const bool normalized /* true by default */, const bool pos)
+{
+  int row, col, ii, count = 0, symm_count = 0;
+  const faust_unsigned_int dim1 = M.getNbRow();
+  const faust_unsigned_int dim2 = M.getNbCol();
+  const faust_unsigned_int nb_elt_mat = dim1*dim2;
+  if(pos)
+    Faust::pre_prox_pos(M);
+  if(k <= 0) // it can't be < 0, k is a faust_unsigned_int
+    M.setZeros();
+  else
+    {
+      if(k < nb_elt_mat /* && k < M.getNonZeros()*/)
+	{
+	  // work-in-progress
+	  // std::vector<FPP> symm(dim1 * dim2);
+	  std::vector<unsigned int> isymm(dim1 * dim2);
+	  // keep everything except the diagonal
+	  // for(int r=0; r<dim1; r++)
+	  //   {
+	  //     for(int c=0; c<dim2; c++)
+	  // 	{
+	  // 	  if(1 || c != r)
+	  // 	    {
+	  // 	      symm[c * dim1 + r] = M.getData()[c * dim1 + r];
+	  // 	      isymm[symm_count] = c * dim1 + r;
+	  // 	      symm_count++;
+	  // 	    }
+	  // 	}
+	  //   }
+	  symm_count = nb_elt_mat;
+
+	  // remove diagonal
+	  // make pair (index, value)
+	  std::vector<std::pair<int, FPP> > vec_pair(symm_count);
+	  std::vector<FPP> vec(symm_count);
+	  for(int i=0; i<symm_count; i++)
+	    {
+	      vec[i] = M.getData()[i];//symm[isymm[i]];
+	      vec_pair[i] = std::make_pair(i, vec[i]);
+	    }
+
+	  // partial sort
+	  std::partial_sort(vec_pair.begin(), vec_pair.begin() + k, vec_pair.end(), Faust::partial_sort_comp<FPP>);
+	  // get index such that vec_pair is sorted
+	  std::vector<int> index(k);
+	  for(int i=0; i<k; i++)
+	    index[i] = vec_pair[i].first;
+	  index.erase(index.begin() + k, index.end());
 
 	  // new matrix M
 	  M.setZeros();
-	  for(int i=0;i<index.size();i++)
-	    M.getData()[itri[index[i]]]=vec[index[i]];
+	  for(int i=0; i<index.size(); i++)
+	    {
+	      ii = index[i];
+	      row = ii % dim1;
+	      col = (ii - row) / dim1;
+	      // symmetric matrix
+	      // std::cout<<i<<" "<<index.size()<<" "<<ii<<" "<<col<<" "<<row<<endl;
+	      if(M.getData()[col * dim1 + row] == .0 && M.getData()[row * dim1 + col] == .0)
+		{
+		  M.getData()[col * dim1 + row] = vec[ii];
+		  M.getData()[row * dim1 + col] = vec[ii];
+		  // count one more element if it is on the diagonal
+		  count+=(row == col)?1:2;
+		  if(count >= k)
+		    break;
+		}
+	    }
 	}
     }
   if(normalized)

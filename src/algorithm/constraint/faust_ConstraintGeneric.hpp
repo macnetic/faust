@@ -97,14 +97,16 @@ bool Faust::ConstraintGeneric::is_constraint_parameter_int()const
 		case CONSTRAINT_NAME_CIRC:
 		case CONSTRAINT_NAME_ANTICIRC:
 			return false;
-	 case CONSTRAINT_NAME_TRIU_SP:
+	case CONSTRAINT_NAME_TRIU_SP:
 	  return (typeid(typename ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeTriuSp)==typeid(Faust::ConstraintInt<FPP,DEVICE>)?true:false);
 	case CONSTRAINT_NAME_TRIL_SP:
 	  return (typeid(typename ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeTrilSp)==typeid(Faust::ConstraintInt<FPP,DEVICE>)?true:false);
-		break;
-		default:
-			handleError(m_className,"is_constraint_parameter_int : Unknown type of constraint");
-		break;
+	case CONSTRAINT_NAME_SYMM_SP:
+	  return (typeid(typename ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSymmSp)==typeid(Faust::ConstraintInt<FPP,DEVICE>)?true:false);
+	  break;
+	default:
+	  handleError(m_className,"is_constraint_parameter_int : Unknown type of constraint");
+	  break;
 	}
     return false;
 }
@@ -156,10 +158,12 @@ bool Faust::ConstraintGeneric::is_constraint_parameter_real()const
 	  return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeTriuSp)==typeid(Faust::ConstraintFPP<FPP,DEVICE,FPP2>)?true:false);
 	case CONSTRAINT_NAME_TRIL_SP:
 	  return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeTrilSp)==typeid(Faust::ConstraintFPP<FPP,DEVICE,FPP2>)?true:false);
-		break;
-		default:
-			handleError(m_className,"is_constraint_parameter_real : Unknown type of constraint");
-		break;
+	case CONSTRAINT_NAME_SYMM_SP:
+	  return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSymmSp)==typeid(Faust::ConstraintFPP<FPP,DEVICE,FPP2>)?true:false);
+	  break;
+	default:
+	  handleError(m_className,"is_constraint_parameter_real : Unknown type of constraint");
+	  break;
 	}
         return false;
 }
@@ -212,10 +216,12 @@ bool Faust::ConstraintGeneric::is_constraint_parameter_mat()const
 	  return (typeid(typename ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeTriuSp)==typeid(Faust::ConstraintMat<FPP,DEVICE>)?true:false);
 	case CONSTRAINT_NAME_TRIL_SP:
 	  return (typeid(typename ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeTrilSp)==typeid(Faust::ConstraintMat<FPP,DEVICE>)?true:false);
-		break;
-		default:
-			handleError(m_className,"is_constraint_parameter_mat : Unknown type of constraint");
-		break;
+	case CONSTRAINT_NAME_SYMM_SP:
+	  return (typeid(typename ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSymmSp)==typeid(Faust::ConstraintMat<FPP,DEVICE>)?true:false);
+	  break;
+	default:
+	  handleError(m_className,"is_constraint_parameter_mat : Unknown type of constraint");
+	  break;
 	}
         return false;
 }
