@@ -1751,14 +1751,15 @@ def fft2(shape, backend='scipy', **kwargs):
     else:
         raise ValueError('backend '+str(backend)+' is unknown')
 
-def convolve2d(signal_shape, kernel, backend='scipy'):
+def convolve2d(signal_shape, kernel, backend='full_scipy'):
     """
     Builds the LazyLinearOp to convolves a kernel and a signal of shape signal_shape in 2D.
 
     Args:
         signal_shape: the shape of the signal this operator will convolves.
         kernel: (numpy array) the kernel to convolve.
-        backend: 'pyfaust' or 'scipy'.
+        backend: 'pyfaust' or 'scipy' to use lazylinop.fft2(backend='scipy') or 'full_scipy' to use
+        scipy.signal.convolve2d.
 
     Returns:
         The LazyLinearOp for the 2D convolution.
@@ -1771,14 +1772,27 @@ def convolve2d(signal_shape, kernel, backend='scipy'):
         >>> K = np.random.rand(4, 4)
         >>> C1 = convolve2d(X.shape, K, backend='scipy')
         >>> C2 = convolve2d(X.shape, K, backend='pyfaust')
+        >>> C3 = convolve2d(X.shape, K, backend='full_scipy')
         >>> np.allclose((C1 @ X.ravel()).reshape(64, 64), sconvolve2d(X, K, 'same'))
         True
         >>> np.allclose((C2 @ X.ravel()).reshape(64, 64), sconvolve2d(X, K, 'same'))
         True
+        >>> np.allclose((C3 @ X.ravel()).reshape(64, 64), sconvolve2d(X, K, 'same'))
+        True
 
     """
+
     import pylops
     signal_shape = np.array(signal_shape)
+    if 'full_scipy'== backend:
+        from scipy.signal import convolve2d as sconvolve2d, correlate2d
+        return \
+                LazyLinearOperator(shape=(signal_shape.prod(),signal_shape.prod()),
+                                   matvec=lambda x:
+                                   sconvolve2d(x.reshape(signal_shape), kernel,
+                                              'same').ravel(),
+                                   rmatvec=lambda x: correlate2d(x.reshape(signal_shape), kernel,
+                                              'same').ravel())
     # Compute the extended shape for input and kernel to overlap
     new_shape = np.array(signal_shape) + np.array(kernel.shape) - 1
     # It must be a power of two
