@@ -1727,28 +1727,27 @@ def fft2(shape, backend='scipy', **kwargs):
         >>> lfft2_scipy = fft2((32, 32), norm='ortho')
         >>> lfft2_pyfaust = fft2((32, 32), backend='pyfaust')
         >>> x = np.random.rand(32, 32)
-        >>> np.allclose(lfft2_scipy @ x, lfft2_pyfaust @ x)
+        >>> np.allclose(lfft2_scipy @ x.ravel(), lfft2_pyfaust @ x.ravel())
         True
-        >>> y = lfft2_scipy @ x
-        >>> np.allclose(lfft2_scipy.H @ y, x)
+        >>> y = lfft2_scipy @ x.ravel()
+        >>> np.allclose(lfft2_scipy.H @ y, x.ravel())
         True
-        >>> np.allclose(lfft2_pyfaust.H @ y, x)
+        >>> np.allclose(lfft2_pyfaust.H @ y, x.ravel())
         True
 
     """
+    s = shape[0] * shape[1]
     if backend == 'scipy':
         from scipy.fft import fft2, ifft2
         return LazyLinearOperator(
-            shape,
-            matmat=lambda x: fft2(x, **kwargs),
-            rmatmat=lambda x: ifft2(x, **kwargs))
+            (s, s),
+            matvec=lambda x: fft2(x.reshape(shape), **kwargs).ravel(),
+            rmatvec=lambda x: ifft2(x.reshape(shape), **kwargs).ravel())
     elif backend == 'pyfaust':
         from pyfaust import dft
         K = kron(dft(shape[0], **kwargs), dft(shape[1], **kwargs))
-        return LazyLinearOperator(shape, matmat=lambda x: (K @
-                                                           x.ravel()).reshape(shape),
-                                  rmatmat=lambda x: (K.H @
-                                                     x.ravel()).reshape(shape))
+        return LazyLinearOperator((s, s), matvec=lambda x: K @ x,
+                                  rmatvec=lambda x: K.H @ x)
     else:
         raise ValueError('backend '+str(backend)+' is unknown')
 
@@ -1772,46 +1771,48 @@ def convolve2d(signal_shape, kernel, backend='scipy'):
         >>> K = np.random.rand(4, 4)
         >>> C1 = convolve2d(X.shape, K, backend='scipy')
         >>> C2 = convolve2d(X.shape, K, backend='pyfaust')
-        >>> np.allclose(C1 @ X, sconvolve2d(X, K, 'same'))
+        >>> np.allclose((C1 @ X.ravel()).reshape(64, 64), sconvolve2d(X, K, 'same'))
         True
-        >>> np.allclose(C2 @ X, sconvolve2d(X, K, 'same'))
+        >>> np.allclose((C2 @ X.ravel()).reshape(64, 64), sconvolve2d(X, K, 'same'))
         True
 
     """
+    import pylops
+    signal_shape = np.array(signal_shape)
     # Compute the extended shape for input and kernel to overlap
     new_shape = np.array(signal_shape) + np.array(kernel.shape) - 1
     # It must be a power of two
     new_shape = 2 ** (1 + np.int64(np.log2(new_shape)))
 
     # Input will be centered in the extended shpae
-    lpad_x, rlpad_x = zpad([
-        [(new_shape[0] - signal_shape[0])//2, (new_shape[0] - signal_shape[0])//2],
-        [(new_shape[1] - signal_shape[1])//2, (new_shape[1] - signal_shape[1])//2]
-    ], signal_shape, ret_unpad=True)
+    pad_x = pylops.Pad(
+        dims=signal_shape,
+        pad=(
+            ((new_shape[0] - signal_shape[0])//2, (new_shape[0] - signal_shape[0])//2),
+            ((new_shape[1] - signal_shape[1])//2, (new_shape[1] - signal_shape[1])//2)
+            )
+    )
 
     # Kernel is spread at corners in the extended shape
-    w_h = kernel.shape[0] // 2
-    w_topleft = kernel[w_h-1:, w_h-1:]
-    w_topright = kernel[w_h-1:, :w_h-1]
-    w_bottomleft = kernel[:w_h-1, w_h-1:]
-    w_bottomright = kernel[:w_h-1, :w_h-1]
+    # TODO: Not sure of what I am doing...
+    w_topleft = kernel[kernel.shape[0]//2-1:, kernel.shape[0]//2-1:]
+    w_topright = kernel[kernel.shape[0]//2-1:, :kernel.shape[0]//2-1]
+    w_bottomleft = kernel[:kernel.shape[0]//2-1, kernel.shape[0]//2-1:]
+    w_bottomright = kernel[:kernel.shape[0]//2-1, :kernel.shape[0]//2-1]
 
-    # not useful at least if kernel dims are power of two
     w_topright = np.vstack((w_topright, np.zeros((w_topleft.shape[0]-w_topright.shape[0], w_topright.shape[1]))))
     w_bottomleft = np.vstack((np.zeros((w_topleft.shape[0]-w_bottomleft.shape[0], w_bottomleft.shape[1])), w_bottomleft))
     w_bottomright = np.vstack((np.zeros((w_topleft.shape[0]-w_bottomright.shape[0], w_bottomright.shape[1])), w_bottomright))
 
+    W_padded = np.vstack((
+        np.hstack((w_topleft, np.zeros((w_topleft.shape[0], new_shape[1]-w_topleft.shape[1]-w_topright.shape[1])), w_topright)),
+        np.zeros((new_shape[0]-w_topleft.shape[0]-w_bottomleft.shape[0], new_shape[1])),
+        np.hstack((w_bottomleft, np.zeros((w_bottomleft.shape[0], new_shape[1]-w_bottomleft.shape[1]-w_bottomright.shape[1])), w_bottomright))
+        )).ravel()
+    # TODO: This make lazylinop crash
+    #W_padded = scipy.sparse.csc_array(W_padded).reshape((-1, 1))
 
-    z0 = zeros((w_topleft.shape[0], new_shape[1]-w_topleft.shape[1]-w_topright.shape[1]))
-    z1 = zeros((new_shape[0]-w_topleft.shape[0]-w_bottomleft.shape[0], new_shape[1]))
-    z2 = zeros((w_bottomleft.shape[0], new_shape[1]-w_bottomleft.shape[1]-w_bottomright.shape[1]))
-
-    W_padded = vstack((
-        hstack((aslazylinearoperator(w_topleft), z0, w_topright)),
-        z1,
-        hstack((aslazylinearoperator(w_bottomleft), z2, w_bottomright))
-        ))
-
+    #dft2_ = dft2(new_shape)
     if backend == 'pyfaust':
         dft2_ = fft2(new_shape, backend=backend, normed=True, diag_opt=True)
     elif backend == 'scipy':
@@ -1821,17 +1822,36 @@ def convolve2d(signal_shape, kernel, backend='scipy'):
     # For Fourier normalization
     n = new_shape.prod()
 
-    dft2_W = (dft2_ @ W_padded).toarray()
+    dft2_W = dft2_ @ W_padded
+
+    # TODO: Make it more efficient using sparse or operator?
 
     return LazyLinearOperator(
-        signal_shape,
-        matmat=lambda x: (rlpad_x @ (1 / np.sqrt(n) * dft2_.H @ (n * dft2_W *
-                                                                  (dft2_ @
-                                                                   lpad_x @
-                                                                   x)))).reshape(signal_shape),
-        rmatmat=lambda x: rlpad_x @ (1 / np.sqrt(n) * np.fliplr(np.flipud(dft2_.H @ (n * dft2_W
-                                                                    * (dft2_ @
-                                                                     np.fliplr(np.flipud(lpad_x @
-                                                                       x)))
-                                                                 ))))
+        (signal_shape.prod(), signal_shape.prod()),
+        matvec=lambda x: pad_x.H @ (1 / np.sqrt(n) * dft2_.H @ (n * dft2_W * (dft2_ @ pad_x @ x))),
+                       # pad_x.H is used to reproject from the extended shpae to the original one
+        rmatvec=lambda x: (pad_x.H @ (1 / np.sqrt(n) * dft2_.H @ (n * dft2_W * (dft2_ @ pad_x @ x[::-1]) )))[::-1]
+         # TODO: something clever for the adjoint?
     )
+
+
+def check_op(op):
+    """
+    Verifies validity assertions on any LazyLinearOp.
+
+    """
+    u = np.random.randn(op.shape[1])
+    v = np.random.randn(op.shape[0])
+    X = np.random.randn(op.shape[1], 5)
+    # Check operator - vector product dimension
+    if (op @ u).shape != (op.shape[0],):
+        raise Exception("Wrong operator dimension")
+    # Check operator adjoint - vector product dimension
+    if (op.H @ v).shape != (op.shape[1],):
+        raise Exception("Wrong operator adjoint dimension")
+    # Check operator - matrix product consistency
+    if not np.allclose(op @ X, np.hstack([(op @ X[:, i]).reshape(-1, 1) for i in range(X.shape[1])])):
+        raise Exception("Wrong operator")
+    # Dot test to check forward - adjoint consistency
+    if not np.allclose(((op @ u).conj().T) @ v, u.T @ (op.H @ v)):
+        raise Exception("Operator and its adjoint do not match")
