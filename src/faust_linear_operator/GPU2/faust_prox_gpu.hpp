@@ -230,7 +230,8 @@ namespace Faust
   void prox_tri_sp(MatDense<FPP,GPU2> & M, faust_unsigned_int k, bool upper, const bool normalized/*=true*/, const bool pos/*=false*/, const bool pure_gpu/*=true*/)
   {
     if(pure_gpu)
-      M.prox_tri_sp(k, upper, normalized, pos);
+//      M.prox_tri_sp(k, upper, normalized, pos);
+		throw std::runtime_error("prox_tri_sp is not implemented on GPU");
     else
       {
 	MatDense<FPP,Cpu> cpuM = M.tocpu();
@@ -243,11 +244,12 @@ namespace Faust
   void prox_symm_sp(MatDense<FPP,GPU2> & M, faust_unsigned_int k, const bool normalized/*=true*/, const bool pos/*=false*/, const bool pure_gpu/*=true*/)
   {
     if(pure_gpu)
-      M.prox_symm_sp(k, upper, normalized, pos);
+//      M.prox_symm_sp(k, normalized, pos);
+		throw std::runtime_error("prox_symm_sp is not implemented on GPU");
     else
       {
 	MatDense<FPP,Cpu> cpuM = M.tocpu();
-	prox_symm_sp(cpuM, k, upper, normalized, pos);
+	prox_symm_sp(cpuM, k, normalized, pos);
 	M = cpuM;
       }
   }
