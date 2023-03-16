@@ -684,8 +684,8 @@ class triu_sp(proj_gen):
     A, the image matrix, is such that the lower triangular part is 0 and \f$ \| A \|_0 = k,  \| A\|_F = 1 \f$ (if normalized == True).
 
 
-    Example: TODO
-        >>> from pyfaust.proj import sp
+    Example:
+        >>> from pyfaust.proj import triu_sp
         >>> from numpy.random import rand, seed
         >>> import numpy as np
         >>> seed(42) # just for reproducibility
@@ -700,9 +700,14 @@ class triu_sp(proj_gen):
         >>> p(M)
         array([[0.  , 0.95, 0.  , 0.  , 0.  ],
                [0.  , 0.  , 0.87, 0.  , 0.  ],
-               [0.  , 0.97, 0.  , 0.  , 0.  ],
+               [0.  , 0.  , 0.83, 0.  , 0.  ],
                [0.  , 0.  , 0.  , 0.  , 0.  ],
                [0.  , 0.  , 0.  , 0.  , 0.  ]])
+        >>> np.linalg.norm(np.tril(p(M), -1)) == 0
+        True
+
+
+    <b>See also:</b> pyfaust.proj.tril_sp
     """
 
     def __init__(self, shape, k, normalized=True, pos=False):
@@ -714,7 +719,7 @@ class triu_sp(proj_gen):
             pos: True to skip negative values (replaced by zero) of the matrix to project.
 
         """
-        super(sp, self).__init__(shape)
+        super(triu_sp, self).__init__(shape)
         self.constraint = ConstraintInt('triu_sp', shape[0], shape[1], k, normalized, pos)
 
 class tril_sp(proj_gen):
@@ -724,8 +729,8 @@ class tril_sp(proj_gen):
     A, the image matrix, is such that the upper triangular part is 0 and \f$ \| A \|_0 = k,  \| A\|_F = 1 \f$ (if normalized == True).
 
 
-    Example: TODO
-        >>> from pyfaust.proj import sp
+    Example:
+        >>> from pyfaust.proj import tril_sp
         >>> from numpy.random import rand, seed
         >>> import numpy as np
         >>> seed(42) # just for reproducibility
@@ -736,13 +741,18 @@ class tril_sp(proj_gen):
                [0.02, 0.97, 0.83, 0.21, 0.18],
                [0.18, 0.3 , 0.52, 0.43, 0.29],
                [0.61, 0.14, 0.29, 0.37, 0.46]])
-        >>> p = triu_sp(M.shape, 3, normalized=False)
+        >>> p = tril_sp(M.shape, 3, normalized=False)
         >>> p(M)
-        array([[0.  , 0.95, 0.  , 0.  , 0.  ],
-               [0.  , 0.  , 0.87, 0.  , 0.  ],
-               [0.  , 0.97, 0.  , 0.  , 0.  ],
+        array([[0.  , 0.  , 0.  , 0.  , 0.  ],
                [0.  , 0.  , 0.  , 0.  , 0.  ],
-               [0.  , 0.  , 0.  , 0.  , 0.  ]])
+               [0.  , 0.97, 0.83, 0.  , 0.  ],
+               [0.  , 0.  , 0.  , 0.  , 0.  ],
+               [0.61, 0.  , 0.  , 0.  , 0.  ]])
+        >>> np.linalg.norm(np.triu(p(M), 1)) == 0
+        True
+
+
+    <b>See also:</b> pyfaust.proj.triu_sp
     """
 
     def __init__(self, shape, k, normalized=True, pos=False):
@@ -754,7 +764,7 @@ class tril_sp(proj_gen):
             pos: True to skip negative values (replaced by zero) of the matrix to project.
 
         """
-        super(sp, self).__init__(shape)
+        super(tril_sp, self).__init__(shape)
         self.constraint = ConstraintInt('tril_sp', shape[0], shape[1], k, normalized, pos)
 
 class symm_sp(proj_gen):
@@ -764,8 +774,8 @@ class symm_sp(proj_gen):
     A, the image matrix, is such that A is symmetric and \f$ \| A \|_0 = k,  \| A\|_F = 1 \f$ (if normalized == True).
 
 
-    Example: TODO
-        >>> from pyfaust.proj import sp
+    Example:
+        >>> from pyfaust.proj import symm_sp
         >>> from numpy.random import rand, seed
         >>> import numpy as np
         >>> seed(42) # just for reproducibility
@@ -776,13 +786,16 @@ class symm_sp(proj_gen):
                [0.02, 0.97, 0.83, 0.21, 0.18],
                [0.18, 0.3 , 0.52, 0.43, 0.29],
                [0.61, 0.14, 0.29, 0.37, 0.46]])
-        >>> p = triu_sp(M.shape, 3, normalized=False)
+        >>> p = symm_sp(M.shape, 3, normalized=False)
         >>> p(M)
         array([[0.  , 0.95, 0.  , 0.  , 0.  ],
-               [0.  , 0.  , 0.87, 0.  , 0.  ],
+               [0.95, 0.  , 0.97, 0.  , 0.  ],
                [0.  , 0.97, 0.  , 0.  , 0.  ],
                [0.  , 0.  , 0.  , 0.  , 0.  ],
                [0.  , 0.  , 0.  , 0.  , 0.  ]])
+        >>> np.linalg.norm(p(M) - p(M).T) == 0
+        True
+
     """
 
     def __init__(self, shape, k, normalized=True, pos=False):
@@ -794,5 +807,5 @@ class symm_sp(proj_gen):
             pos: True to skip negative values (replaced by zero) of the matrix to project.
 
         """
-        super(sp, self).__init__(shape)
+        super(symm_sp, self).__init__(shape)
         self.constraint = ConstraintInt('symm_sp', shape[0], shape[1], k, normalized, pos)
