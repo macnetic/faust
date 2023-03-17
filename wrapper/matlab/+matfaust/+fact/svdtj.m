@@ -7,7 +7,7 @@
 %> @b Usage
 %>
 %> &nbsp;&nbsp;&nbsp; @b Primary examples of calls include:<br/>
-%> &nbsp;&nbsp;&nbsp; @b <b>[U,S,V] = svdtj(M, ‘nGivens’,n) </b> outputs U,V as Faust objects made of n elementary Givens rotations grouped into factors. By default each factor gathers (up to) m = floor(size(M,1)/2) such rotations. By default vector S contains the approximate singular values in descending order.<br/>
+%> &nbsp;&nbsp;&nbsp; @b <b>[U,S,V] = svdtj(M, ‘nGivens’,n) </b> outputs U,V as Faust objects made of n elementary Givens rotations grouped into factors. By default each factor gathers (up to) m = floor(size(M,1)/2) such rotations. Vector S contains the approximate singular values in descending order.<br/>
 %> &nbsp;&nbsp;&nbsp; @b    <b>[U,S,V] = svdtj(M,’tol’,0.01)</b> same as above with n determined adaptively by a relative approximation error 0.01<br/>
 %> &nbsp;&nbsp;&nbsp; @b       <b>[U,S,V] = svdtj(M,’tol’,0.01,’relerr’,false)</b> same as above with an absolute approximation error<br/>
 %> &nbsp;&nbsp;&nbsp; @b       <b>[U,S,V] = svdtj(M,’nGivens’,n,’tol’,0.01)</b> same as above with a number of elementary Givens bounded by n even if the targeted approximation error is not achieved<br/>
@@ -22,7 +22,7 @@
 %> @param 'enable_large_Faust',bool see fact.eigtj
 %>
 %> @retval [U,S,V]: such that U*S*V' is the approximate of M with:
-%>      - S: (sparse real diagonal matrix) the singular values in descendant order.
+%>      - S: (sparse real diagonal matrix) the singular values in descending order.
 %>      - U, V: (Faust objects) unitary transforms.
 %>
 %> @Example
@@ -151,6 +151,7 @@ function [U,S,V] = svdtj(M, varargin)
 	if(nGivens > 0)
 		nGivens_per_fac = min(nGivens_per_fac, nGivens);
 	end
+    % order must be -1 or singular values won't be on diagonal
 	if(strcmp(class(M), 'single'))
 		[core_obj1, S, core_obj2] = mexsvdtjRealFloat(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, order, enable_large_Faust);
 		S = spdiags(double(S), 0, size(M, 1), size(M, 2)); % matlab doesn't support single precision sparse matrix

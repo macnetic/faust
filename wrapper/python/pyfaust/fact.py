@@ -104,8 +104,7 @@ def svdtj2(M, nGivens, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
 # experimental block end
 
 
-# TODO: order argument is not used, remove it or implement it
-def svdtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
+def svdtj(M, nGivens=None, tol=0, relerr=True,
           nGivens_per_fac=None, enable_large_Faust=False, **kwargs):
     """
         Performs a singular value decomposition and returns the left and right singular vectors as Faust transforms.

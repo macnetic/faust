@@ -135,7 +135,7 @@ void svdtj(FaustCoreCpp<FPP>** U, FaustCoreCpp<FPP> **V, FPP* S, /*start of inpu
     Faust::MatDense<FPP,Cpu> M(M_data, (faust_unsigned_int) num_rows, (faust_unsigned_int) num_cols);
     TransformHelper<FPP,Cpu> *U_ = nullptr,  *V_ = nullptr;
     Faust::Vect<FPP,Cpu> * S_ = nullptr;
-    svdtj(M, J, t, stoppingError, verbosity, errIsRel, -1 /* order (useless) */, enable_large_Faust ,&U_, &V_, &S_);
+    svdtj(M, J, t, stoppingError, verbosity, errIsRel, -1 /* descending order */, enable_large_Faust ,&U_, &V_, &S_);
     create_svdtj_output(U_, V_, U, V, S, S_);
 }
 
@@ -145,7 +145,7 @@ void svdtj_sparse(FaustCoreCpp<FPP>** U, FaustCoreCpp<FPP> **V, FPP* S, /*start 
     Faust::MatSparse<FPP, Cpu> M(nnz, nrows, ncols, data, id_col, row_ptr);
     TransformHelper<FPP,Cpu> *U_ = nullptr,  *V_ = nullptr;
     Faust::Vect<FPP,Cpu> * S_ = nullptr;
-    svdtj(M, J, t, stoppingError, verbosity, errIsRel, -1 /* order (useless) */, enable_large_Faust, &U_, &V_, &S_);
+    svdtj(M, J, t, stoppingError, verbosity, errIsRel, -1 /* descending order */, enable_large_Faust, &U_, &V_, &S_);
     create_svdtj_output(U_, V_, U, V, S, S_);
 }
 
@@ -155,7 +155,7 @@ void svdtj_cplx(FaustCoreCpp<FPP>** U, FaustCoreCpp<FPP> **V, FPP* S, /*start of
     Faust::MatDense<FPP,Cpu> M(M_data, (faust_unsigned_int) num_rows, (faust_unsigned_int) num_cols);
     TransformHelper<FPP,Cpu> *U_ = nullptr,  *V_ = nullptr;
     Faust::Vect<FPP,Cpu> * S_ = nullptr;
-    svdtj_cplx(M, J, t, stoppingError, verbosity, errIsRel, -1 /* order (useless) */, enable_large_Faust, &U_, &V_, &S_);
+    svdtj_cplx(M, J, t, stoppingError, verbosity, errIsRel, -1 /* descending order */, enable_large_Faust, &U_, &V_, &S_);
     create_svdtj_output(U_, V_, U, V, S, S_);
 }
 
@@ -165,7 +165,7 @@ void svdtj_sparse_cplx(FaustCoreCpp<FPP>** U, FaustCoreCpp<FPP> **V, FPP* S, /*s
     Faust::MatSparse<FPP, Cpu> M(nnz, nrows, ncols, data, id_col, row_ptr);
     TransformHelper<FPP,Cpu> *U_ = nullptr,  *V_ = nullptr;
     Faust::Vect<FPP,Cpu> * S_ = nullptr;
-    svdtj_cplx(M, J, t, stoppingError, verbosity, errIsRel, -1 /* order (useless) */, enable_large_Faust, &U_, &V_, &S_);
+    svdtj_cplx(M, J, t, stoppingError, verbosity, errIsRel, -1 /* descending order */, enable_large_Faust, &U_, &V_, &S_);
     create_svdtj_output(U_, V_, U, V, S, S_);
 }
 
