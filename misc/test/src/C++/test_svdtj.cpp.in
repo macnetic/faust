@@ -10,7 +10,7 @@ typedef @TEST_FPP@ FPP;
 using namespace std;
 using namespace Faust;
 
-Real<FPP> svdtj_and_error(MatDense<FPP, Cpu>* A, int J, int t, Real<FPP> tol, bool relErr, int order, bool enable_large_Faust, int verb, TransformHelper<FPP,Cpu> **U_=nullptr, TransformHelper<FPP, Cpu> **V_=nullptr, Vect<FPP,Cpu> **S__=nullptr, bool del=true)
+Real<FPP> svdtj_and_error(MatDense<FPP, Cpu>* A, int J1, int J2, int t1, int t2, Real<FPP> tol, bool relErr, int order, bool enable_large_Faust, int verb, TransformHelper<FPP,Cpu> **U_=nullptr, TransformHelper<FPP, Cpu> **V_=nullptr, Vect<FPP,Cpu> **S__=nullptr, bool del=true)
 {
 
 	int m = A->getNbRow(), n = A->getNbCol();
@@ -18,7 +18,7 @@ Real<FPP> svdtj_and_error(MatDense<FPP, Cpu>* A, int J, int t, Real<FPP> tol, bo
 	// output
 	// input svdtj nGivens, tol, order, relerr, nGivens_per_fac, verbosity, enable_large_Faust: 4096 0 descend True None 0 True
 	//
-	//void Faust::svdtj(MatDense<FPP, DEVICE> & dM, int J, int t, FPP2 tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Faust::Vect<FPP,DEVICE> ** S_)
+	//void Faust::svdtj(MatDense<FPP, DEVICE> & dM, int J1, int J2, int t1, int t2, FPP2 tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Faust::Vect<FPP,DEVICE> ** S_)
 	MatDense<FPP, Cpu> err(*A);
 	// warning *A is modified by the svdtj
 	Vect<FPP, Cpu> * S_;
@@ -31,7 +31,7 @@ Real<FPP> svdtj_and_error(MatDense<FPP, Cpu>* A, int J, int t, Real<FPP> tol, bo
 	if(! V_)
 		V_ = &V;
 
-	svdtj(*A, J, t, tol, verb, relErr, order, enable_large_Faust, U_, V_, S__);
+	svdtj(*A, J1, J2, t1, t2, tol, verb, relErr, order, enable_large_Faust, U_, V_, S__);
 
 	U = *U_;
 	V = *V_;
@@ -90,17 +90,17 @@ void auto_tests()
 {
 
 	int m, n, min_mn;
-	int J, t, order;
+	int J1, J2, t1, t2, order;
 	Real<FPP> tol;
 	bool verb, relErr, enable_large_Faust;
 
 	// first test
 	m = 128;
 	n = 64;
-	J = 1024; // nGivens
+	J1 = J2 = 1024; // nGivens
 	tol = 0; // not the stopping criterion if 0
 	relErr = true; // use relative error instead of absolute error if tol is not 0
-	t = -1; // nGivens per factor // -1 for automatic (diff for U and V)
+	t1 = t2 = -1; // nGivens per factor // -1 for automatic (diff for U and V)
 	verb = 1;
 	order = -1;
 	enable_large_Faust = false;
@@ -116,72 +116,73 @@ void auto_tests()
 	delete S_
 
 	cout << string(20, '=') << " test 1: J limit" << endl;
-	auto norm_err = svdtj_and_error(A, J, t, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
-	assert(U->size() == 16); // auto-computed t = 64 for U, 64 * 16 == 1024 == J
+	auto norm_err = svdtj_and_error(A, J1, J2, t1, t2, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
+	assert(U->size() == 16); // auto-computed t1 = t2 = 64 for U, 64 * 16 == 1024 == J
 
 	delUSV();
 
 	cout << string(20, '=') << " test 2: rel. error" << endl;
-	J = 0;
+	J1 = J2 = 0;
 	tol = 1e-3;
-	norm_err = svdtj_and_error(A, J, t, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
+	norm_err = svdtj_and_error(A, J1, J2, t1, t2, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
 	assert(norm_err <= tol);
 
 	delUSV();
 
 
 	cout << string(20, '=') << " test 3: abs. error" << endl;
-	J = 0;
+	J1 = J2 = 0;
 	tol = 1e-3;
 	relErr = false;
-	norm_err = svdtj_and_error(A, J, t, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
+	norm_err = svdtj_and_error(A, J1, J2, t1, t2, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
 	assert(norm_err <= tol);
 
 	delUSV();
 
 
 	cout << string(20, '=') << " test 4: concurrent J and rel. error" << endl;
-	J = 128;
+	J1 = J2 = 128;
 	tol = 1e-3;
 	relErr = true;
-	norm_err = svdtj_and_error(A, J, t, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
-	assert(norm_err <= tol || U->size() * m / 2  <= J); //automatic t = m / 2 for U
+	norm_err = svdtj_and_error(A, J1, J2, t1, t2, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
+	assert(norm_err <= tol || U->size() * m / 2  <= J1); //automatic t1 = m / 2 for U
+	assert(norm_err <= tol || V->size() * n / 2  <= J2); //automatic t2 = n / 2 for V
 
 	cout << string(20, '=') << " test 5: J limit, t=1" << endl;
-	t = 1;
-	J = 100;
-	norm_err = svdtj_and_error(A, J, t, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
-	assert(U->size() == J); // auto-computed t = 1
+	t1 = t2 = 1;
+	J1 = J2 = 100;
+	norm_err = svdtj_and_error(A, J1, J2, t1, t2, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
+	assert(U->size() == J1); // auto-computed t1 = t2 = 1
 
 	delUSV();
 
 	cout << string(20, '=') << " test 6: rel. error" << endl;
-	J = 0;
+	J1 = J2 = 0;
 	tol = 1e-3;
 	relErr = true;
 	enable_large_Faust = true; //otherwise it doesn't work
-	norm_err = svdtj_and_error(A, J, t, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
+	norm_err = svdtj_and_error(A, J1, J2, t1, t2, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
 	assert(norm_err <= tol);
 
 	delUSV();
 
 
 	cout << string(20, '=') << " test 3: abs. error" << endl;
-	J = 0;
+	J1 = J2 = 0;
 	tol = 1e-3;
 	relErr = false;
 	enable_large_Faust = true; //otherwise it doesn't work
-	norm_err = svdtj_and_error(A, J, t, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
+	norm_err = svdtj_and_error(A, J1, J2, t1, t2, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
 	assert(norm_err <= tol);
 
 	delUSV();
 
 	cout << string(20, '=') << " test 4: concurrent J and rel. error" << endl;
-	J = 128;
+	J1 = J2 = 128;
 	tol = 1e-3;
 	relErr = true;
-	norm_err = svdtj_and_error(A, J, t, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
-	assert(norm_err <= tol || U->size() == J); //automatic t = m / 2 for U
+	norm_err = svdtj_and_error(A, J1, J2, t1, t2, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
+	assert(norm_err <= tol || U->size() == J1); //automatic t1 = t2 = m (or n) / 2 for U (resp V)
 	delete A;
 
 }
@@ -196,10 +197,10 @@ int main(int argc, char **argv)
 	int m, n, min_mn;
 	m = 128;
 	n = 64;
-	auto J = 1024; // nGivens
+	int J1 = 1024, J2 = 1024; // nGivens
 	Real<FPP> tol = 0; // not the stopping criterion if 0
 	bool relErr = true; // use relative error instead of absolute error if tol is not 0
-	auto t = -1; // nGivens per factor // -1 for automatic (diff for U and V)
+	int t1 = -1, t2 = -1; // nGivens per factor // -1 for automatic (diff for U and V)
 	int verb = 0;
 	int order = -1; // not yet implemented
 	bool enable_large_Faust = false;
@@ -226,10 +227,10 @@ int main(int argc, char **argv)
 				m = atoi(optarg);
 				break;
 			case 'J':
-				J = atoi(optarg);
+				J2 = J1 = atoi(optarg);
 				break;
 			case 't':
-				t = atoi(optarg);
+				t1 = t2 = atoi(optarg);
 				break;
 			case 'o':
 				order = atoi(optarg);
@@ -258,8 +259,8 @@ int main(int argc, char **argv)
 
 
 	cout << "A size m x n: " << m << " x " << n << endl;
-	cout << "J: " << J << endl;
-	cout << "t: " << t << endl;
+	cout << "J1, J2: " << J1 << ", " << J2 << endl;
+	cout << "t1, t2: " << t1 << ", " << t2 << endl;
 	cout << "relErr: " << relErr << endl;
 	cout << "enable_large_Faust: " << enable_large_Faust << endl;
 	std::cout << "error target (stop crit if not 0):" << tol << std::endl;
@@ -268,9 +269,9 @@ int main(int argc, char **argv)
 #if DEBUG_SVDTJ
 	A->save_to_mat_file("/tmp/A_cpp.mat", "A");
 #endif
-	if(J != 0 && t > J)
+	if(J1 != 0 && t1 > J1 || J2 != 0 && t2 > J2)
 		throw runtime_error("t > J"); // TODO: the check should be in eigtj C++ code
-	svdtj_and_error(A, J, t, tol, relErr, order, enable_large_Faust, verb);
+	svdtj_and_error(A, J1, J2, t1, t2, tol, relErr, order, enable_large_Faust, verb);
 	delete A;
 	return EXIT_SUCCESS;
 }

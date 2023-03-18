@@ -125,6 +125,24 @@ cdef class FaustAlgoGenGivens@TYPE_NAME@:
         return D, core_obj
 
     @staticmethod
+    def svdtj_Jt_to_J1J2_t1t2(J, t):
+        # J and t should have been verified in fact.svdtj
+        if isinstance(J, (tuple, list)):
+            J1 = J[0]
+            J2 = J[1]
+        else:
+            # J is an integer
+            J1 = J2 = J
+
+        if isinstance(t, (tuple, list)):
+            t1 = t[0]
+            t2 = t[1]
+        else:
+            # t is an integer
+            t1 = t2 = t
+        return J1, J2, t1, t2
+
+    @staticmethod
     def svdtj(M, J, t, verbosity=0, stoppingError = 0.0,
               errIsRel=True, enable_large_Faust=False):
 
@@ -137,19 +155,21 @@ cdef class FaustAlgoGenGivens@TYPE_NAME@:
         M_view = M
         S = np.empty(M.shape[0], dtype=M.dtype)
         S_view = S
-        stoppingError *= stoppingError # the C++ impl. works on squared norms to measure errors
+
+        J1, J2, t1, t2 = FaustAlgoGenGivens@TYPE_NAME@.svdtj_Jt_to_J1J2_t1t2(J, t)
 
         coreU = @CORE_CLASS@(core=True)
         coreV = @CORE_CLASS@(core=True)
         FaustCoreCy.svdtj@FUNC_TYPE_SUFFIX@[@TYPE@,@REAL_TYPE@](&(coreU.@CORE_OBJ@),
-                                          &(coreV.@CORE_OBJ@),
-                                          &S_view[0],
-                                          &M_view[0,0],
-                                          M_num_rows,
-                                          M_num_cols, int(J), int(t),
-                                          verbosity,
-                                          stoppingError,
-                                          errIsRel, enable_large_Faust)
+                                                                &(coreV.@CORE_OBJ@),
+                                                                &S_view[0],
+                                                                &M_view[0,0],
+                                                                M_num_rows,
+                                                                M_num_cols,
+                                                                J1, J2, t1, t2,
+                                                                verbosity,
+                                                                stoppingError,
+                                                                errIsRel, enable_large_Faust)
 
         #from scipy.sparse import spdiags
         #S_spdiag = spdiags(S, [0], M.shape[0], M.shape[0])
@@ -177,7 +197,8 @@ cdef class FaustAlgoGenGivens@TYPE_NAME@:
 
         S = np.empty(M.shape[0], dtype=M.dtype)
         S_view = S
-        stoppingError *= stoppingError # the C++ impl. works on squared norms to measure errors
+
+        J1, J2, t1, t2 = FaustAlgoGenGivens@TYPE_NAME@.svdtj_Jt_to_J1J2_t1t2(J, t)
 
         coreU = @CORE_CLASS@(core=True)
         coreV = @CORE_CLASS@(core=True)
@@ -190,7 +211,8 @@ cdef class FaustAlgoGenGivens@TYPE_NAME@:
             &indptr[0],
             M.nnz,
             M_num_rows,
-            M_num_cols, J, t,
+            M_num_cols,
+            J1, J2, t1, t2,
             verbosity,
             stoppingError,
             errIsRel, enable_large_Faust)

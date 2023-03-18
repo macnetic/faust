@@ -130,42 +130,42 @@ FaustCoreCpp<FPP>* fact_givens_fgft_generic_cplx(GivensFGFTComplex<FPP, Cpu, FPP
 }
 
 template<typename FPP, typename FPP2>
-void svdtj(FaustCoreCpp<FPP>** U, FaustCoreCpp<FPP> **V, FPP* S, /*start of input parameters*/ const FPP* M_data, unsigned int num_rows, unsigned int num_cols, unsigned int J, unsigned int t, unsigned int verbosity, const FPP2 stoppingError, const bool errIsRel, const bool enable_large_Faust)
+void svdtj(FaustCoreCpp<FPP>** U, FaustCoreCpp<FPP> **V, FPP* S, /*start of input parameters*/ const FPP* M_data, unsigned int num_rows, unsigned int num_cols, unsigned int J1, unsigned int J2, unsigned int t1, unsigned int t2, unsigned int verbosity, const FPP2 stoppingError, const bool errIsRel, const bool enable_large_Faust)
 {
     Faust::MatDense<FPP,Cpu> M(M_data, (faust_unsigned_int) num_rows, (faust_unsigned_int) num_cols);
     TransformHelper<FPP,Cpu> *U_ = nullptr,  *V_ = nullptr;
     Faust::Vect<FPP,Cpu> * S_ = nullptr;
-    svdtj(M, J, t, stoppingError, verbosity, errIsRel, -1 /* descending order */, enable_large_Faust ,&U_, &V_, &S_);
+    svdtj(M, J1, J2, t1, t2, stoppingError, verbosity, errIsRel, -1 /* descending order */, enable_large_Faust ,&U_, &V_, &S_);
     create_svdtj_output(U_, V_, U, V, S, S_);
 }
 
 template<typename FPP, typename FPP2>
-void svdtj_sparse(FaustCoreCpp<FPP>** U, FaustCoreCpp<FPP> **V, FPP* S, /*start of input parameters*/ const FPP* data, int* row_ptr, int* id_col, int nnz, int nrows, int ncols, unsigned int J, unsigned int t, unsigned int verbosity, const FPP2 stoppingError, const bool errIsRel, const bool enable_large_Faust)
+void svdtj_sparse(FaustCoreCpp<FPP>** U, FaustCoreCpp<FPP> **V, FPP* S, /*start of input parameters*/ const FPP* data, int* row_ptr, int* id_col, int nnz, int nrows, int ncols, unsigned int J1, unsigned int J2, unsigned int t1, unsigned int t2, unsigned int verbosity, const FPP2 stoppingError, const bool errIsRel, const bool enable_large_Faust)
 {
     Faust::MatSparse<FPP, Cpu> M(nnz, nrows, ncols, data, id_col, row_ptr);
     TransformHelper<FPP,Cpu> *U_ = nullptr,  *V_ = nullptr;
     Faust::Vect<FPP,Cpu> * S_ = nullptr;
-    svdtj(M, J, t, stoppingError, verbosity, errIsRel, -1 /* descending order */, enable_large_Faust, &U_, &V_, &S_);
+    svdtj(M, J1, J2, t1, t2, stoppingError, verbosity, errIsRel, -1 /* descending order */, enable_large_Faust, &U_, &V_, &S_);
     create_svdtj_output(U_, V_, U, V, S, S_);
 }
 
 template<typename FPP, typename FPP2>
-void svdtj_cplx(FaustCoreCpp<FPP>** U, FaustCoreCpp<FPP> **V, FPP* S, /*start of input parameters*/ const FPP* M_data, unsigned int num_rows, unsigned int num_cols, unsigned int J, unsigned int t, unsigned int verbosity, const FPP2 stoppingError, const bool errIsRel, const bool enable_large_Faust)
+void svdtj_cplx(FaustCoreCpp<FPP>** U, FaustCoreCpp<FPP> **V, FPP* S, /*start of input parameters*/ const FPP* M_data, unsigned int num_rows, unsigned int num_cols, unsigned int J1, unsigned int J2, unsigned int t1, unsigned int t2, unsigned int verbosity, const FPP2 stoppingError, const bool errIsRel, const bool enable_large_Faust)
 {
     Faust::MatDense<FPP,Cpu> M(M_data, (faust_unsigned_int) num_rows, (faust_unsigned_int) num_cols);
     TransformHelper<FPP,Cpu> *U_ = nullptr,  *V_ = nullptr;
     Faust::Vect<FPP,Cpu> * S_ = nullptr;
-    svdtj_cplx(M, J, t, stoppingError, verbosity, errIsRel, -1 /* descending order */, enable_large_Faust, &U_, &V_, &S_);
+    svdtj_cplx(M, J1, J2, t1, t2, stoppingError, verbosity, errIsRel, -1 /* descending order */, enable_large_Faust, &U_, &V_, &S_);
     create_svdtj_output(U_, V_, U, V, S, S_);
 }
 
 template<typename FPP, typename FPP2>
-void svdtj_sparse_cplx(FaustCoreCpp<FPP>** U, FaustCoreCpp<FPP> **V, FPP* S, /*start of input parameters*/ const FPP* data, int* row_ptr, int* id_col, int nnz, int nrows, int ncols, unsigned int J, unsigned int t, unsigned int verbosity, const FPP2 stoppingError, const bool errIsRel, const bool enable_large_Faust)
+void svdtj_sparse_cplx(FaustCoreCpp<FPP>** U, FaustCoreCpp<FPP> **V, FPP* S, /*start of input parameters*/ const FPP* data, int* row_ptr, int* id_col, int nnz, int nrows, int ncols, unsigned int J1, unsigned int J2, unsigned int t1, unsigned int t2, unsigned int verbosity, const FPP2 stoppingError, const bool errIsRel, const bool enable_large_Faust)
 {
     Faust::MatSparse<FPP, Cpu> M(nnz, nrows, ncols, data, id_col, row_ptr);
     TransformHelper<FPP,Cpu> *U_ = nullptr,  *V_ = nullptr;
     Faust::Vect<FPP,Cpu> * S_ = nullptr;
-    svdtj_cplx(M, J, t, stoppingError, verbosity, errIsRel, -1 /* descending order */, enable_large_Faust, &U_, &V_, &S_);
+    svdtj_cplx(M, J1, J2, t1, t2, stoppingError, verbosity, errIsRel, -1 /* descending order */, enable_large_Faust, &U_, &V_, &S_);
     create_svdtj_output(U_, V_, U, V, S, S_);
 }
 

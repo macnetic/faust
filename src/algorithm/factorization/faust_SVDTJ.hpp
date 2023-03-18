@@ -10,7 +10,7 @@ namespace Faust
 {
 
 	template<typename FPP, FDevice DEVICE, typename FPP2>
-		void svdtj(MatDense<FPP, DEVICE> & dM, int J, int t, FPP2 tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Vect<FPP,DEVICE> ** S_)
+		void svdtj(MatDense<FPP, DEVICE> & dM, int J1, int J2, int t1, int t2, FPP2 tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Vect<FPP,DEVICE> ** S_)
 		{
 			MatGeneric<FPP,DEVICE>* M;
 			MatDense<FPP, DEVICE> dM_M, dMM_; // M'*M, M*M'
@@ -23,8 +23,10 @@ namespace Faust
 			if(verbosity)
 			{
 				std::cout << "svdtj input conf:" << std::endl;
-				std::cout << " J: " << J << std::endl;
-				std::cout << " t: " << t << std::endl;
+				std::cout << " J1: " << J1 << std::endl;
+				std::cout << " J2: " << J2 << std::endl;
+				std::cout << " t1: " << t1 << std::endl;
+				std::cout << " t2: " << t2 << std::endl;
 				std::cout << " tol: " << tol << std::endl;
 				std::cout << " relErr: " << relErr << std::endl;
 				std::cout << " order: " << order << std::endl;
@@ -32,11 +34,11 @@ namespace Faust
 				std::cout << " matrix norm: " << dM.norm() << std::endl;
 			}
 
-			svdtj_core_gen<FPP,DEVICE,FPP2>(M, dM, dM_M, dMM_, J, t, tol, verbosity, relErr, order, enable_large_Faust, U, V, S_);
+			svdtj_core_gen<FPP,DEVICE,FPP2>(M, dM, dM_M, dMM_, J1, J2, t1, t2, tol, verbosity, relErr, order, enable_large_Faust, U, V, S_);
 		}
 
 	template<typename FPP, FDevice DEVICE, typename FPP2>
-		void svdtj(MatSparse<FPP, DEVICE> & sM, int J, int t, FPP2 tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Vect<FPP,DEVICE> ** S_)
+		void svdtj(MatSparse<FPP, DEVICE> & sM, int J1, int J2, int t1, int t2, FPP2 tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Vect<FPP,DEVICE> ** S_)
 		{
 			MatGeneric<FPP,DEVICE>* M;
 			MatDense<FPP,DEVICE> dM;
@@ -50,11 +52,11 @@ namespace Faust
 			spgemm(sM, dM, dM_M, FPP(1.0), FPP(0.0), 'H', 'N');
 			spgemm(sM, dM, dMM_, FPP(1.0), FPP(0.0), 'N', 'H');
 			M = &sM;
-			svdtj_core_gen<FPP,DEVICE, FPP2>(M, dM, dM_M, dMM_, J, t, tol, verbosity, relErr, order, enable_large_Faust, U, V, S_);
+			svdtj_core_gen<FPP,DEVICE, FPP2>(M, dM, dM_M, dMM_, J1, J2, t1, t2, tol, verbosity, relErr, order, enable_large_Faust, U, V, S_);
 		}
 
 	template<typename FPP, FDevice DEVICE, typename FPP2>
-		void svdtj_cplx(MatDense<FPP, DEVICE> & dM, int J, int t, FPP2 tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Vect<FPP,DEVICE> ** S_)
+		void svdtj_cplx(MatDense<FPP, DEVICE> & dM, int J1, int J2, int t1, int t2, FPP2 tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Vect<FPP,DEVICE> ** S_)
 		{
 			MatGeneric<FPP,DEVICE>* M;
 			MatDense<FPP, DEVICE> dM_M, dMM_; // M'*M, M*M'
@@ -64,13 +66,13 @@ namespace Faust
 			gemm(dM, dM, dMM_, FPP(1.0), FPP(0.0), 'N', 'H');
 			M = &dM;
 
-			//	svdtj_core_cplx(M, dM, dM_M, dMM_, J, t, tol, verbosity, relErr, order, enable_large_Faust, U, V, S_);
-			svdtj_core_gen<FPP,DEVICE,FPP2>(M, dM, dM_M, dMM_, J, t, tol, verbosity, relErr, order, enable_large_Faust, U, V, S_);
+			//	svdtj_core_cplx(M, dM, dM_M, dMM_, J1, J2, t1, t2, tol, verbosity, relErr, order, enable_large_Faust, U, V, S_);
+			svdtj_core_gen<FPP,DEVICE,FPP2>(M, dM, dM_M, dMM_, J1, J2, t1, t2, tol, verbosity, relErr, order, enable_large_Faust, U, V, S_);
 
 		}
 
 	template<typename FPP, FDevice DEVICE, typename FPP2>
-		void svdtj_cplx(MatSparse<FPP, DEVICE> & sM, int J, int t, FPP2 tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Vect<FPP,DEVICE> ** S_)
+		void svdtj_cplx(MatSparse<FPP, DEVICE> & sM, int J1, int J2, int t1, int t2, FPP2 tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Vect<FPP,DEVICE> ** S_)
 		{
 			MatGeneric<FPP,DEVICE>* M;
 			MatDense<FPP,DEVICE> dM;
@@ -82,12 +84,12 @@ namespace Faust
 			spgemm(sM, dM, dM_M, FPP(1.0), FPP(0.0), 'H', 'N');
 			spgemm(sM, dM, dMM_, FPP(1.0), FPP(0.0), 'N', 'H');
 			M = &sM;
-			//	svdtj_core_cplx(M, dM, dM_M, dMM_, J, t, tol, verbosity, relErr, order, enable_large_Faust, U, V, S_);
-			svdtj_core_gen<FPP,DEVICE,FPP2>(M, dM, dM_M, dMM_, J, t, tol, verbosity, relErr, order, enable_large_Faust, U, V, S_);
+			//	svdtj_core_cplx(M, dM, dM_M, dMM_, J1, J2, t1, t2, tol, verbosity, relErr, order, enable_large_Faust, U, V, S_);
+			svdtj_core_gen<FPP,DEVICE,FPP2>(M, dM, dM_M, dMM_, J1, J2, t1, t2, tol, verbosity, relErr, order, enable_large_Faust, U, V, S_);
 		}
 
 	template<typename FPP, FDevice DEVICE, typename FPP2>
-		void svdtj_core_gen_blind(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM, MatDense<FPP,DEVICE> &dM_M, MatDense<FPP,DEVICE> &dMM_, int J, int t, FPP2 tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Vect<FPP,DEVICE> ** S_)
+		void svdtj_core_gen_blind(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM, MatDense<FPP,DEVICE> &dM_M, MatDense<FPP,DEVICE> &dMM_, int J1, int J2, int t1, int t2, FPP2 tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Vect<FPP,DEVICE> ** S_)
 		{
 
 			assert(order != 0);  // we need to use a specific order of singular values/vectors approximates to know where to get the singular values in W1' M W2 matrix
@@ -95,16 +97,13 @@ namespace Faust
 			GivensFGFTGen<Real<FPP>, DEVICE, FPP2, FPP>* algoW1;
 			GivensFGFTGen<Real<FPP>, DEVICE, FPP2, FPP>* algoW2;
 
-			auto t1 = t;
-			auto t2 = t;
-			if (t <= 0)
-			{
-				//automatic t
+			if (t1 <= 0)
+				//automatic t1
 				t1 = dMM_.getNbRow() / 2;
+			if (t2 <= 0)
 				t2 = dM_M.getNbRow() / 2;
-			}
 
-			instantiate_algos(&algoW1, &algoW2, dM_M, dMM_, J, J, t1, t2, verbosity, tol, relErr, enable_large_Faust);
+			instantiate_algos(&algoW1, &algoW2, dM_M, dMM_, J1, J2, t1, t2, verbosity, tol, relErr, enable_large_Faust);
 
 			try {
 
@@ -312,7 +311,7 @@ namespace Faust
 		}
 
 	template<typename FPP, FDevice DEVICE, typename FPP2>
-		void svdtj_core_gen_step(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM, MatDense<FPP,DEVICE> &dM_M, MatDense<FPP,DEVICE> &dMM_, int J, int t, FPP2 tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Vect<FPP,DEVICE> ** S_)
+		void svdtj_core_gen_step(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM, MatDense<FPP,DEVICE> &dM_M, MatDense<FPP,DEVICE> &dMM_, int J1, int J2, int t1, int t2, FPP2 tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Vect<FPP,DEVICE> ** S_)
 		{
 
 			// algorithm main idea: run two eigtj for U and V step by step until the target error is verified or the limit number of Givens is reached
@@ -321,22 +320,19 @@ namespace Faust
 			GivensFGFTGen<Real<FPP>, DEVICE, FPP2, FPP>* algoW1;
 			GivensFGFTGen<Real<FPP>, DEVICE, FPP2, FPP>* algoW2;
 
-			auto t1 = t;
-			auto t2 = t;
-			if (t <= 0)
-			{
-				//automatic t
+			if (t1 <= 0)
+				//automatic t1
 				t1 = dMM_.getNbRow() / 2;
+
+			if (t2 <= 0)
 				t2 = dM_M.getNbRow() / 2;
-			}
-			t = t1 < t2? t1:t2;
 
 			instantiate_algos(&algoW1, &algoW2, dM_M, dMM_, /*J*/ 1, 1, t1, t2, verbosity, /*tol*/ FPP2(0), relErr, enable_large_Faust);
 			// J == 1 to prevent exception raising in eigtj when J == 0 and tol == 0
 			// tol == 0 because the error criterion is handled in this function if it is the stopping criterion (otherwise this is the iteration number determined by J and t)
 
 #define continue_loop() \
-			(J == 0 || k1 < J && k2 < J) && (tol == FPP2(0) || tol < err) && (new_W1 || new_W2)
+			((J1 == 0 || k1 < J1) && (J2 == 0 || k2 < J2)) && (tol == FPP2(0) || tol < err) && (new_W1 || new_W2)
 			// three scenarii:
 			// 1) stopping only on error criterion : J == 0, 0 < tol (<= 1), stop if err <= tol
 			// 2) stopping only when a certain number of Givens are built: J > 0, t Givens built per iteration/factor for both U/W1 and V/W2, stop if k (the number of Givens built on each side) is greater or equal to J
@@ -378,9 +374,9 @@ namespace Faust
 					W2_max_size = n * n / 4;
 				}
 
-				assert(tol > FPP2(0) || J > 0);
-				assert(J == 0 || J > t1);
-				assert(J == 0 || J > t2);
+				assert(tol > FPP2(0) || J1 > 0 && J2 > 0);
+				assert(J1 == 0 || J1 > t1);
+				assert(J2 == 0 || J2 > t2);
 //				assert(J1 == 0 || J1 > t1);
 //				assert(J2 == 0 || J2 > t2);
 				while(loop) // if the error is not a stop crit then tol is normally 0
@@ -540,11 +536,11 @@ namespace Faust
 		}
 
 	template<typename FPP, FDevice DEVICE, typename FPP2>
-		void svdtj_core_gen(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM, MatDense<FPP,DEVICE> &dM_M, MatDense<FPP,DEVICE> &dMM_, int J, int t, FPP2 tol, unsigned int verbosity, bool relErr, int order /* ignored anyway, kept here just in case */, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Vect<FPP,DEVICE> ** S_, const bool by_step/*=true*/)
+		void svdtj_core_gen(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM, MatDense<FPP,DEVICE> &dM_M, MatDense<FPP,DEVICE> &dMM_, int J1, int J2, int t1, int t2, FPP2 tol, unsigned int verbosity, bool relErr, int order /* ignored anyway, kept here just in case */, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Vect<FPP,DEVICE> ** S_, const bool by_step/*=true*/)
 		{
 			if(by_step)
-				svdtj_core_gen_step(M, dM, dM_M, dMM_, J, t, tol, verbosity, relErr, order, enable_large_Faust, U, V, S_);
+				svdtj_core_gen_step(M, dM, dM_M, dMM_, J1, J2, t1, t2, tol, verbosity, relErr, order, enable_large_Faust, U, V, S_);
 			else
-				svdtj_core_gen_blind(M, dM, dM_M, dMM_, J, t, tol, verbosity, relErr, order, enable_large_Faust, U, V, S_);
+				svdtj_core_gen_blind(M, dM, dM_M, dMM_, J1, J2, t1, t2, tol, verbosity, relErr, order, enable_large_Faust, U, V, S_);
 		}
 }

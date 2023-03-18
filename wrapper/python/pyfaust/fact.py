@@ -114,33 +114,96 @@ def svdtj(M, nGivens=None, tol=0, relerr=True,
         Args:
             M: a real matrix (np.ndarray or scipy.sparse.csr_matrix). The dtype must be float32, float64
             or complex128 (the dtype might have a large impact on performance).
-            nGivens: see fact.eigtj
-            tol: see fact.eigtj (the error tolerance is not exactly for
-            the SVD but for the subsequent eigtj calls).
-            relerr: see fact.eigtj
-            nGivens_per_fac: see fact.eigtj
+            nGivens: (int or tuple(int, int)) defines the number of Givens rotations
+            that will be used at most to compute U and V.
+            If it is an integer, it will apply both to U and V.
+            If it is a tuple of two integers as nGivens = (JU, JV), JU
+            will be the limit number of rotations for U and JV the same for V.
+            nGivens argument is optional if tol is set but becomes mandatory otherwise.
+            tol: (float) this is the error target on the norm of S relatively to M.
+            if error <= tol, the algorithm stops. See relerr below for the error formula.
+            This argument is optional if nGivens is set, otherwise it becomes mandatory.
+            relerr: (bool) if False the norm error computed at iteration i is e_i =
+            norm(S_i, 'fro') - norm(M, 'fro'), with S_i the vector of singular
+            values produced at iteration i.
+            If relerr is False, the error is e_i / norm(M, 'fro').
+            nGivens_per_fac: (int or tuple(int, int)) this argument is the number of Givens
+            rotations to set at most by factor of U and V.
+            If this is an integer it will be the same number of U and V.
+            Otherwise, if it is a tuple of integers (tU, tV), tU will be the number
+            of Givens rotations per factor for U and tV the same for V.
+            By default, this parameter is maximized for U and V,
+            i.e. tU = M.shape[0] / 2, tV = M.shape[1] / 2.
 
 
         Returns:
             The tuple U,S,V: such that U*numpy.diag(S)*V.H is the approximate of M.
-                - (np.array vector) S the singular values in descending order.
-                - (Faust objects) U,V unitary transforms.
-
-
+            - (np.array vector) S the singular values in descending order.
+            - (Faust objects) U,V unitary transforms.
+        <br/>
         Examples:
             >>> from pyfaust.fact import svdtj
-            >>> from numpy.random import rand
+            >>> from numpy.random import rand, seed
             >>> import numpy as np
             >>> from scipy.sparse import spdiags
+            >>> seed(42) # just for reproducibility
             >>> M = rand(16, 32)
-            >>> U, S, V = svdtj(M, 4096, enable_large_Faust=True)
-            >>> S_ = spdiags(S, [0], U.shape[0], V.shape[0])
-            >>> np.allclose(U @ S_ @ V.H, M)
+            >>> # Factoring by specifying the number of Givens rotations
+            >>> U1, S1, V1 = svdtj(M, 4096, enable_large_Faust=True)
+            >>> S1_ = spdiags(S1, [0], U1.shape[0], V1.shape[0])
+            >>> np.allclose(U1 @ S1_ @ V1.H, M)
             True
+            >>> # Specifying a different number of rotations for U and V
+            >>> # Because U is smaller it should need less rotations
+            >>> U2, S2, V2 = svdtj(M, (2400, 3200), enable_large_Faust=True)
+            >>> S2_ = spdiags(S2, [0], U2.shape[0], V2.shape[0])
+            >>> np.allclose(U2 @ S2_ @ V2.H, M)
+            True
+            >>> # Factoring according to an approximate accuracy target
+            >>> U3, S3, V3 = svdtj(M, tol=1e-12, enable_large_Faust=False)
+            >>> S3_ = spdiags(S3, [0], U3.shape[0], V3.shape[0])
+            >>> np.allclose(U3 @ S3_ @ V3.H, M)
+            True
+            >>> # verify the relative error is lower than 1e-12
+            >>> np.abs(np.linalg.norm(S3) - np.linalg.norm(M)) / np.linalg.norm(M)
+            6.72718428324719e-16
+            >>> # try with an absolute tolerance (the previous one was relative to M norm)
+            >>> U4, S4, V4 = svdtj(M, tol=1e-12, relerr=False, enable_large_Faust=False)
+            >>> S4_ = spdiags(S4, [0], U4.shape[0], V4.shape[0])
+            >>> np.allclose(U4 @ S4_ @ V4.H, M)
+            True
+            >>> # verify the absolute error is lower than 1e-12
+            >>> np.abs(np.linalg.norm(S4) - np.linalg.norm(M))
+            8.881784197001252e-15
+            >>> # try a less accurate approximate to get less factors
+            >>> U5, S5, V5 = svdtj(M, nGivens=(256, 512), tol=1e-3, enable_large_Faust=False)
+            >>> S5_ = spdiags(S5, [0], U5.shape[0], V5.shape[0])
+            >>> # verify the absolute error is lower than 1e-3
+            >>> np.abs(np.linalg.norm(S5) - np.linalg.norm(M)) / np.linalg.norm(M)
+            0.0043824217142030475
+            >>> # We are not exactly lower, it means that the nGivens stoppign criterion
+            >>> # has been reached before tol's
+            >>> ### Let's see the lengths of the different U, V Fausts
+            >>> len(V1) # it should be 4096 / nGivens_per_fac, which is (M.shape[1] // 2) = 256
+            256
+            >>> len(U1) # it should be 4096 / nGivens_per_fac, which is (M.shape[0] // 2) = 512
+            100
+            >>> # but it is not, svdtj stopped automatically to add factors to U1 because the error stopped enhancing
+            >>> # (it can be verified with verbosity=1)
+            >>> (len(U3), len(V3))
+            (64, 200)
+            >>> (len(U2), len(V2))
+            (100, 200)
+            >>> (len(U4), len(V4))
+            (64, 200)
+            >>> # not suprisingly U5 and V5 use the smallest number of factors (nGivens and tol were the smallest)
+            >>> (len(U5), len(V5))
+            (32, 32)
 
-        If we call svdtj on the matrix M, it makes two internal calls to eigtj.
+        Explanations:
 
-        In Python it would be:
+        If we call svdtj on the matrix M, it makes two internal calls to eigtj. In Python it would be:
+
         1.  D1, W1 = eigtj(M.dot(M.H), next_args...)
         2.  D2, W2 = eigtj(M.H.dot(M), next_args...)
 
@@ -157,9 +220,14 @@ def svdtj(M, nGivens=None, tol=0, relerr=True,
         It allows to identify the left singular vectors of M to W1,
         and likewise the right singular vectors to W2.
 
-        To compute a consistent approximation of S we observe that U and V are orthogonal/unitary hence \f$ S  = U^* M V \f$ so we ignore the off-diagonal coefficients of the approximation and take \f$ S = diag(U^* M V)  \approx diag(W_1^* M W_2)\f$
+        To compute a consistent approximation of S we observe that U and V are orthogonal hence \f$ S  = U^* M V \f$ so we ignore the off-diagonal coefficients of the approximation and take \f$ S = diag(U^* M V)  \approx diag(W_1^* M W_2)\f$
 
-        The last step performed by svdtj() is to sort the singular values of S in descending order and build a signed permutation matrix to order the left singular vectors of W1 accordingly. The -1 elements of the signed permutation matrix allow to change the sign of each negative values of S by reporting it on the corresponding left singular vector (\f$ \sigma v_i = (-\sigma_i) (-v_i )\f$).<br/>
+        The last step performed by svdtj() is to sort the singular values of S
+        in descending order and build a signed permutation matrix to order the
+        left singular vectors of W1 accordingly. The -1 elements of the signed
+        permutation matrix allow to change the sign of each negative values of
+        S by reporting it on the corresponding left singular vector (\f$
+        \sigma_i v_i = (-\sigma_i) (-v_i )\f$).<br/>
         To sum up W1 is replaced by W1 P and W2 by W2 abs(P) (because W2 also
         needs to be ordered), with P the signed permutation resulting of the
         descending sort of S. The resulting transforms/Fausts W1 and W2 are
@@ -170,12 +238,35 @@ def svdtj(M, nGivens=None, tol=0, relerr=True,
      See also:
         eigtj
     """
+
+    # for nGivens_per_fac and nGivens checking
+    def pair_of_posreals_or_posreal(v):
+        return isinstance(v, (tuple, list)) and \
+                len(v) == 2 and \
+                (np.isreal(v[0]) and v[0] > 0) and \
+                (np.isreal(v[1]) and v[1] > 0) or \
+                np.isreal(v) and v > 0
+
     if(nGivens == None):
         if(tol == 0):
             raise Exception("You must specify nGivens or tol argument"
                             " (to define a stopping  criterion)")
         nGivens = 0
-    if(nGivens_per_fac == None): nGivens_per_fac = int(M.shape[0]/2)
+    else:
+        # verify user value
+        if not pair_of_posreals_or_posreal(nGivens):
+            raise ValueError('nGivens must be a tuple of two positive integers '
+                             'or an integer')
+
+    if(nGivens_per_fac == None):
+        # default nGivens_per_fac
+        nGivens_per_fac = (int(M.shape[0] // 2),
+                           int(M.shape[1] // 2))
+    else:
+        # verify user value
+        if not pair_of_posreals_or_posreal(nGivens_per_fac):
+            raise ValueError('nGivens_per_fac must be a tuple of two positive integers '
+                             'or an integer')
     if('verbosity' in kwargs.keys()):
         verbosity = kwargs['verbosity']
         if(not isinstance(verbosity, int)): raise TypeError('verbosity must be'

@@ -198,25 +198,51 @@ cdef extern from "FaustFactGivensFGFT.h":
                                                                     const bool enable_large_Faust)
 
     cdef void svdtj[FPP, FPP2](FaustCoreCppCPU[FPP]** U, FaustCoreCppCPU[FPP] **V, FPP* S,
-                         const FPP* M_data, unsigned int num_rows, unsigned int
-                         num_cols, unsigned int J, unsigned int t, unsigned int
-                         verbosity, const FPP2 stoppingError, const bool errIsRel, const bool enable_large_Faust)
+                               const FPP* M_data,
+                               unsigned int num_rows,
+                               unsigned int num_cols,
+                               unsigned int J1, unsigned int J2,
+                               unsigned int t1, unsigned int t2,
+                               unsigned int verbosity,
+                               const FPP2 stoppingError,
+                               const bool errIsRel,
+                               const bool enable_large_Faust)
 
     cdef void svdtj_sparse[FPP, FPP2](FaustCoreCppCPU[FPP]** U, FaustCoreCppCPU[FPP] **V, FPP* S,
-                                      const FPP* data, int* row_ptr, int* id_col, int
-                                      nnz, int nrows, int ncols, unsigned int J,
-                                      unsigned int t, unsigned int verbosity,
-                                      const FPP2 stoppingError, const bool errIsRel, const bool enable_large_Faust)
+                                      const FPP* data,
+                                      int* row_ptr,
+                                      int* id_col,
+                                      int nnz,
+                                      int nrows,
+                                      int ncols,
+                                      unsigned int J1, unsigned int J2,
+                                      unsigned int t1, unsigned int t2,
+                                      unsigned int verbosity,
+                                      const FPP2 stoppingError,
+                                      const bool errIsRel,
+                                      const bool enable_large_Faust)
 
     cdef void svdtj_cplx[FPP, FPP2](FaustCoreCppCPU[FPP]** U, FaustCoreCppCPU[FPP] **V, FPP* S,
-                         const FPP* M_data, unsigned int num_rows, unsigned int
-                         num_cols, unsigned int J, unsigned int t, unsigned int
-                         verbosity, const FPP2 stoppingError, const bool errIsRel, const bool enable_large_Faust)
+                                    const FPP* M_data,
+                                    unsigned int num_rows,
+                                    unsigned int num_cols,
+                                    unsigned int J1, unsigned int J2,
+                                    unsigned int t1, unsigned int t2,
+                                    unsigned int verbosity,
+                                    const FPP2 stoppingError,
+                                    const bool errIsRel,
+                                    const bool enable_large_Faust)
 
     cdef void svdtj_sparse_cplx[FPP, FPP2](FaustCoreCppCPU[FPP]** U, FaustCoreCppCPU[FPP] **V, FPP* S,
-                                      const FPP* data, int* row_ptr, int* id_col, int
-                                      nnz, int nrows, int ncols, unsigned int J,
-                                      unsigned int t, unsigned int verbosity,
-                                      const FPP2 stoppingError, const bool errIsRel, const bool enable_large_Faust)
-
-
+                                           const FPP* data,
+                                           int* row_ptr,
+                                           int* id_col,
+                                           int nnz,
+                                           int nrows,
+                                           int ncols,
+                                           unsigned int J1, unsigned int J2,
+                                           unsigned int t1, unsigned int t2,
+                                           unsigned int verbosity,
+                                           const FPP2 stoppingError,
+                                           const bool errIsRel,
+                                           const bool enable_large_Faust)
