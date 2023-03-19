@@ -891,7 +891,7 @@ void Faust::prox_symm_sp(Faust::MatDense<FPP, Cpu> & M, faust_unsigned_int k, co
 	      col = (ii - row) / dim1;
 	      // symmetric matrix
 	      // std::cout<<i<<" "<<index.size()<<" "<<ii<<" "<<col<<" "<<row<<endl;
-	      if(M.getData()[col * dim1 + row] == .0 && M.getData()[row * dim1 + col] == .0)
+	      if(M.getData()[col * dim1 + row] == FPP(.0) && M.getData()[row * dim1 + col] == FPP(.0))
 		{
 		  M.getData()[col * dim1 + row] = vec[ii];
 		  M.getData()[row * dim1 + col] = vec[ii];
