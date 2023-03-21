@@ -206,7 +206,8 @@ cdef extern from "FaustFactGivensFGFT.h":
                                unsigned int verbosity,
                                const FPP2 stoppingError,
                                const bool errIsRel,
-                               const bool enable_large_Faust)
+                               const bool enable_large_Faust,
+                               const int err_period)
 
     cdef void svdtj_sparse[FPP, FPP2](FaustCoreCppCPU[FPP]** U, FaustCoreCppCPU[FPP] **V, FPP* S,
                                       const FPP* data,
@@ -220,7 +221,8 @@ cdef extern from "FaustFactGivensFGFT.h":
                                       unsigned int verbosity,
                                       const FPP2 stoppingError,
                                       const bool errIsRel,
-                                      const bool enable_large_Faust)
+                                      const bool enable_large_Faust,
+                                      const int err_period)
 
     cdef void svdtj_cplx[FPP, FPP2](FaustCoreCppCPU[FPP]** U, FaustCoreCppCPU[FPP] **V, FPP* S,
                                     const FPP* M_data,
@@ -231,7 +233,8 @@ cdef extern from "FaustFactGivensFGFT.h":
                                     unsigned int verbosity,
                                     const FPP2 stoppingError,
                                     const bool errIsRel,
-                                    const bool enable_large_Faust)
+                                    const bool enable_large_Faust,
+                                    const int err_period)
 
     cdef void svdtj_sparse_cplx[FPP, FPP2](FaustCoreCppCPU[FPP]** U, FaustCoreCppCPU[FPP] **V, FPP* S,
                                            const FPP* data,
@@ -245,4 +248,5 @@ cdef extern from "FaustFactGivensFGFT.h":
                                            unsigned int verbosity,
                                            const FPP2 stoppingError,
                                            const bool errIsRel,
-                                           const bool enable_large_Faust)
+                                           const bool enable_large_Faust,
+                                           const int err_period)

@@ -144,7 +144,7 @@ cdef class FaustAlgoGenGivens@TYPE_NAME@:
 
     @staticmethod
     def svdtj(M, J, t, verbosity=0, stoppingError = 0.0,
-              errIsRel=True, enable_large_Faust=False):
+              errIsRel=True, enable_large_Faust=False, err_period=100):
 
         cdef unsigned int M_num_rows=M.shape[0]
         cdef unsigned int M_num_cols=M.shape[1]
@@ -169,7 +169,9 @@ cdef class FaustAlgoGenGivens@TYPE_NAME@:
                                                                 J1, J2, t1, t2,
                                                                 verbosity,
                                                                 stoppingError,
-                                                                errIsRel, enable_large_Faust)
+                                                                errIsRel,
+                                                                enable_large_Faust,
+                                                                err_period)
 
         #from scipy.sparse import spdiags
         #S_spdiag = spdiags(S, [0], M.shape[0], M.shape[0])
@@ -181,7 +183,7 @@ cdef class FaustAlgoGenGivens@TYPE_NAME@:
 
     @staticmethod
     def svdtj_sparse(M, J, t, verbosity=0, stoppingError = 0.0,
-                     errIsRel=True, enable_large_Faust=False):
+                     errIsRel=True, enable_large_Faust=False, err_period=100):
         from scipy.sparse import spdiags
         cdef @TYPE@ [:] data1d #only for csr mat factor
         cdef int [:] indices # only for csr mat
@@ -215,7 +217,9 @@ cdef class FaustAlgoGenGivens@TYPE_NAME@:
             J1, J2, t1, t2,
             verbosity,
             stoppingError,
-            errIsRel, enable_large_Faust)
+            errIsRel,
+            enable_large_Faust,
+            err_period)
 
         coreU._isReal = coreV._isReal = False
         #D_spdiag = spdiags(D, [0], M.shape[0], M.shape[0])

@@ -104,7 +104,7 @@ def svdtj2(M, nGivens, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
 # experimental block end
 
 
-def svdtj(M, nGivens=None, tol=0, relerr=True,
+def svdtj(M, nGivens=None, tol=0, err_period=100, relerr=True,
           nGivens_per_fac=None, enable_large_Faust=False, **kwargs):
     """
         Performs a singular value decomposition and returns the left and right singular vectors as Faust transforms.
@@ -123,6 +123,10 @@ def svdtj(M, nGivens=None, tol=0, relerr=True,
             tol: (float) this is the error target on the norm of S relatively to M.
             if error <= tol, the algorithm stops. See relerr below for the error formula.
             This argument is optional if nGivens is set, otherwise it becomes mandatory.
+            err_period: (int) it defines the period, in number of factors of U
+            or V, the S norm error is compared to tol (reducing the period spares
+            some factors but increases slightly the computational cost because the error
+            is computed more often).
             relerr: (bool) if False the norm error computed at iteration i is e_i =
             norm(S_i, 'fro') - norm(M, 'fro'), with S_i the vector of singular
             values produced at iteration i.
@@ -181,7 +185,7 @@ def svdtj(M, nGivens=None, tol=0, relerr=True,
             >>> # verify the absolute error is lower than 1e-3
             >>> np.abs(np.linalg.norm(S5) - np.linalg.norm(M)) / np.linalg.norm(M)
             0.0043824217142030475
-            >>> # We are not exactly lower, it means that the nGivens stoppign criterion
+            >>> # We are not exactly lower, it means that the nGivens stopping criterion
             >>> # has been reached before tol's
             >>> ### Let's see the lengths of the different U, V Fausts
             >>> len(V1) # it should be 4096 / nGivens_per_fac, which is (M.shape[1] // 2) = 256
@@ -196,9 +200,23 @@ def svdtj(M, nGivens=None, tol=0, relerr=True,
             (100, 200)
             >>> (len(U4), len(V4))
             (64, 200)
-            >>> # not suprisingly U5 and V5 use the smallest number of factors (nGivens and tol were the smallest)
+            >>> # not surprisingly U5 and V5 use the smallest number of factors (nGivens and tol were the smallest)
             >>> (len(U5), len(V5))
             (32, 32)
+            >>> # Another example about err_period
+            >>> # We can spare many factors in U3 and V3 if we verify the norm
+            >>> # error more often
+            >>> U3, S3, V3 = svdtj(M, tol=1e-12, enable_large_Faust=False, err_period=1)
+            >>> S3_ = spdiags(S3, [0], U3.shape[0], V3.shape[0])
+            >>> # verify the relative error is lower than 1e-12
+            >>> np.abs(np.linalg.norm(S3) - np.linalg.norm(M)) / np.linalg.norm(M)
+            8.043021529050339e-13
+            >>> len(U3)
+            53
+            >>> # instead of 64 factors with default value of err_period
+            >>> len(V3)
+            102
+            >>> # instead of 200 factors with default value of err_period
 
         Explanations:
 
@@ -277,26 +295,31 @@ def svdtj(M, nGivens=None, tol=0, relerr=True,
     is_real = np.empty((1,))
     M = _check_fact_mat('svdtj()', M, is_real)
 
+    assert np.isreal(err_period)
+    err_period = int(err_period)
+
+    svdtj_args = [M, nGivens, nGivens_per_fac, verbosity, tol, relerr,
+                  enable_large_Faust, err_period]
     if is_real:
         is_float = M.dtype == 'float32'
         if(isinstance(M, np.ndarray)):
             if is_float:
-                Ucore, S, Vcore =  _FaustCorePy.FaustAlgoGenGivensFlt.svdtj(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
+                Ucore, S, Vcore =  _FaustCorePy.FaustAlgoGenGivensFlt.svdtj(*svdtj_args)
             else:
-                Ucore, S, Vcore =  _FaustCorePy.FaustAlgoGenGivensDbl.svdtj(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
+                Ucore, S, Vcore =  _FaustCorePy.FaustAlgoGenGivensDbl.svdtj(*svdtj_args)
         elif(isinstance(M, csr_matrix)):
             if is_float:
-                Ucore, S, Vcore =  _FaustCorePy.FaustAlgoGenGivensFlt.svdtj_sparse(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
+                Ucore, S, Vcore =  _FaustCorePy.FaustAlgoGenGivensFlt.svdtj_sparse(*svdtj_args)
             else:
-                Ucore, S, Vcore =  _FaustCorePy.FaustAlgoGenGivensDbl.svdtj_sparse(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
+                Ucore, S, Vcore =  _FaustCorePy.FaustAlgoGenGivensDbl.svdtj_sparse(*svdtj_args)
         else:
             raise ValueError("invalid type for M (first argument): only np.ndarray "
                              "or scipy.sparse.csr_matrix are supported.")
     else:
         if(isinstance(M, np.ndarray)):
-            Ucore, S, Vcore =  _FaustCorePy.FaustAlgoGenGivensCplxDbl.svdtj(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
+            Ucore, S, Vcore =  _FaustCorePy.FaustAlgoGenGivensCplxDbl.svdtj(*svdtj_args)
         elif(isinstance(M, csr_matrix)):
-            Ucore, S, Vcore =  _FaustCorePy.FaustAlgoGenGivensCplxDbl.svdtj_sparse(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
+            Ucore, S, Vcore =  _FaustCorePy.FaustAlgoGenGivensCplxDbl.svdtj_sparse(*svdtj_args)
         else:
             raise ValueError("invalid type for M (first argument): only np.ndarray "
                              "or scipy.sparse.csr_matrix are supported.")
