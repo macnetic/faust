@@ -31,9 +31,6 @@ namespace Faust
 			MatDense<FPP, DEVICE> dM_M, dMM_; // M'*M, M*M'
 											  //	MatDense<FPP, DEVICE> sM_M, sMM_; // M'*M, M*M'
 
-			GivensFGFT<FPP, DEVICE, FPP2>* algoW1;
-			GivensFGFT<FPP, DEVICE, FPP2>* algoW2;
-
 			dM = sM;
 			spgemm(sM, dM, dM_M, FPP(1.0), FPP(0.0), 'H', 'N');
 			spgemm(sM, dM, dMM_, FPP(1.0), FPP(0.0), 'N', 'H');
@@ -52,9 +49,7 @@ namespace Faust
 			gemm(dM, dM, dMM_, FPP(1.0), FPP(0.0), 'N', 'H');
 			M = &dM;
 
-			//	svdtj_core_cplx(M, dM, dM_M, dMM_, J1, J2, t1, t2, tol, verbosity, relErr, order, enable_large_Faust, U, V, S_);
 			svdtj_core_gen<FPP,DEVICE,FPP2>(M, dM, dM_M, dMM_, J1, J2, t1, t2, tol, verbosity, relErr, order, enable_large_Faust, U, V, S_, err_period);
-
 		}
 
 	template<typename FPP, FDevice DEVICE, typename FPP2>
@@ -332,16 +327,20 @@ namespace Faust
 				auto min_mn = m > n?n:m;
 
 				Vect<FPP,DEVICE> S(min_mn); // zero-initialized
+				Vect<FPP,DEVICE> prev_S(min_mn); // zero-initialized
 				int k1 = 0, k2 = 0; // k counts the number of Givens built (t per factor) on each side (for U (W1) and V (W2))
 				auto M_norm = dM.norm();
 				bool dM_adj = false; //cf. svdtj_compute_W1H_M_W2_meth1
 				Real<FPP> err = 1; // relative error of the SVDTJ on norms
+				Real<FPP> prev_err = -1;
 				Transform<FPP, DEVICE> tW1, tW2;
 				bool loop = true;
 				MatDense<FPP, DEVICE> W1_MW2_; // previous computation of W1' M W2 (initialization at M; no Givens yet, in svdtj_compute_W1H_M_W2_meth3)
 				MatDense<FPP, DEVICE> W1_MW2;
 
 				bool better_W1 = true, better_W2 = true;
+
+				bool better_S = true;
 
 				auto W1_last_err = FPP2(-1);
 				auto W2_last_err = FPP2(-1);
@@ -400,7 +399,6 @@ namespace Faust
 
 					bool verif_err_ite = ! (k1 % (err_period * t1)) && k1 >= 2 * t1;
 
-
 					if(verif_err_ite)
 					{
 						if(better_W1)
@@ -413,15 +411,15 @@ namespace Faust
 						if(better_W1 && W1_last_err >= 0)
 						{
 							better_W1 = W1_last_err > W1_err;
-							if(verbosity > 0 && ! better_W1)
-								std::cout << "Warning: U approximate accuracy is not increasing anymore, stopped eigtj tunning for U." << std::endl;
+							if(verbosity > 0 && ! better_W1 && ! W1_too_long)
+								std::cerr << "Warning: U approximate accuracy is not increasing anymore, stopped eigtj tunning for U." << std::endl;
 						}
 
 						if(better_W2 && W2_last_err >= 0)
 						{
 							better_W2 = W2_last_err > W2_err;
-							if(verbosity > 0 && ! better_W2)
-								std::cout << "Warning: V approximate accuracy is not increasing anymore, stopped eigtj tunning for V." << std::endl;
+							if(verbosity > 0 && ! better_W2 && ! W2_too_long)
+								std::cerr << "Warning: V approximate accuracy is not increasing anymore, stopped eigtj tunning for V." << std::endl;
 						}
 
 						if(better_W1)
@@ -452,29 +450,51 @@ namespace Faust
 						//				// method 2
 						//				auto W1_MW2 = svdtj_compute_W1H_M_W2_meth2(dM, tW1, tW2);
 
+
 						// method 3
 						if(new_W1 || new_W2 || ! W1_MW2_.getNbRow())
 						{
 							W1_MW2 = svdtj_compute_W1H_M_W2_meth3(dM, tW1, tW2, W1_MW2_, err_period, k1, k2, t1, t2, new_W1, new_W2);
 
+							prev_S = S; //TODO: shouldn't be store be recomputed if needed (when better_S becomes false which is rare)
+
+							// extract S from W1_MW2
 							if(order < 0)
-								for(int i=0;i<min_mn;i++) //TODO: OpenMP?
+								for(int i=0;i<min_mn;i++)
 									S[i] = W1_MW2(i,i);
 							else if (order >= 0)
-								for(int i=0;i<min_mn;i++) //TODO: OpenMP?
+								for(int i=0;i<min_mn;i++)
 									S[i] = W1_MW2(m - min_mn + i,n - min_mn + i);
 
 							// compute error
 							auto Sd_norm = S.norm();
 							err = (M_norm - Sd_norm);
 							if(relErr) err /= M_norm;
-							// erase permuted factors because algoW1/W2 doesn't keep account for them (cf. GivensFGFTGen::get_transform with ord == true and copy == false
+
 							if(verbosity)
 							{
 								std::cout << "computing the error at iteration k: " << int(k1 / t1) << " t1, t2: " << t1 << ", " << t2 << std::endl;
 								std::cout << "norm err: " << err << std::endl;
 							}
 
+							if(prev_err > 0 && err > prev_err && err / prev_err >= 10)
+							{
+								// too bad, S has not enhanced
+								// stop the algorithm with the last best result
+
+								better_S = false;
+								if(verbosity)
+								{
+									std::cerr << "Singular values has stopped to improve, rollback the algorithm to previous iteration and stop." << std::endl;
+									S = prev_S;
+									err = prev_err;
+									std::cout << "norm err: " << err << std::endl;
+								}
+								break;
+							}
+
+							prev_err = err;
+							// erase permuted factors because algoW1/W2 doesn't keep account for them (cf. GivensFGFTGen::get_transform with ord == true and copy == false
 						}
 						if(order)
 						{
@@ -487,9 +507,9 @@ namespace Faust
 				}
 
 				// don't use tW1 and tW2 here because we want an independent copy (not linked to algoW1 and algoW2 internal data)
-				Transform<FPP,DEVICE> transW1 = std::move(algoW1->get_transform(/*order*/ order, /*copy*/ true, /*nfacts*/ better_W1?-1:algoW1->nfacts() - err_period));
+				Transform<FPP,DEVICE> transW1 = std::move(algoW1->get_transform(/*order*/ order, /*copy*/ true, /*nfacts*/ better_W1 && better_S?-1:algoW1->nfacts() - err_period));
 
-				Transform<FPP,DEVICE> transW2 = std::move(algoW2->get_transform(/*order*/ order, /*copy*/ true, /*nfacts*/ better_W2?-1:algoW2->nfacts() - err_period));
+				Transform<FPP,DEVICE> transW2 = std::move(algoW2->get_transform(/*order*/ order, /*copy*/ true, /*nfacts*/ better_W2 && better_S?-1:algoW2->nfacts() - err_period));
 
 				TransformHelper<FPP,DEVICE> *thW1 = new TransformHelper<FPP,DEVICE>(transW1, true); // true is for moving and not copying the Transform object into TransformHelper (optimization possible cause we know the original object won't be used later)
 
