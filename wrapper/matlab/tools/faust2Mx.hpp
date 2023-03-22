@@ -188,13 +188,12 @@ mxArray*  FaustVec2mxArray(const Faust::Vect<std::complex<FPP>,Cpu>& v)
 	mxArray * mxMat;
 	int row,col;
 	row = v.size();
-        col = 1;
-		
-  
+    col = 1;
+
 	const mwSize dims[2]={(mwSize)row,(mwSize)col};
-	mxMat = helperCreateNumMxArray<FPP>(dims);
+	mxMat = helperCreateNumMxArray<std::complex<FPP>>(dims);
 #ifdef MX_HAS_INTERLEAVED_COMPLEX
-	copyComplexDataToMxArray(v.getData(), sizeof(complex<FPP>)*row*col, mxMat);
+	copyComplexDataToMxArray(v.getData(), row*col, mxMat);
 #else
 
 	FPP*    ptr_real_data = static_cast<FPP*> (mxGetData(mxMat));
