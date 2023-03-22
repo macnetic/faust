@@ -38,92 +38,95 @@ namespace Faust
 			/** \brief Column vector for the rowwise minimization of C (i.e. maximization of L). */
 			//			Vect<FPP4,DEVICE> C_min_row;
 			protected:
-				/** \brief Fourier matrix/eigenvectors factorization matrices (Givens matrices). */
-				std::vector<MatSparse<FPP4,DEVICE>> facts;
+			/** \brief Fourier matrix/eigenvectors factorization matrices (Givens matrices). */
+			std::vector<MatSparse<FPP4,DEVICE>> facts;
 
-				/** \brief L iteration factor:  L_i = S^T L_{i-1} S, initialized from Lap (with S being facts[i]). */
-				MatGeneric<FPP4, DEVICE>* L;
-				/** \brief Pivot candidates q coordinates. */
-				int* q_candidates;  /* default IndexType for underlying eigen matrix is int. */
+			/** \brief L iteration factor:  L_i = S^T L_{i-1} S, initialized from Lap (with S being facts[i]). */
+			MatGeneric<FPP4, DEVICE>* L;
+			/** \brief Pivot candidates q coordinates. */
+			int* q_candidates;  /* default IndexType for underlying eigen matrix is int. */
 
-				/** \brief The number of targeted transform factors (when only one Givens rotation is stored per factor).*/
-				int J;
-				/** \brief approximate eigenvalues vector. */
-				Vect<FPP,DEVICE> D;
-				/** \brief Queue of errors (cf. update_err()). */
-				vector<FPP2> errs;
-				/** \brief Pivot choices (p, q) coordinates. */
-				vector<pair<int,int>> coord_choices;
-				/** \brief Graph Laplacian to diagonalize/approximate. */
-				MatGeneric<FPP4, DEVICE>& Lap;
-				/** \brief Laplacian dimension */
-				unsigned int dim_size;
-				/** \brief Laplacian Frobenius norm */
-				FPP2 Lap_squared_fro_norm;
-				/** \brief Rotation angle theta for the current iteration's Givens matrix. */
-				//				FPP2 theta;
+			/** \brief The number of targeted transform factors (when only one Givens rotation is stored per factor).*/
+			int J;
+			/** \brief approximate eigenvalues vector. */
+			Vect<FPP,DEVICE> D;
+			/** \brief Queue of errors (cf. update_err()). */
+			vector<FPP2> errs;
+			/** \brief Pivot choices (p, q) coordinates. */
+			vector<pair<int,int>> coord_choices;
+			/** \brief Graph Laplacian to diagonalize/approximate. */
+			MatGeneric<FPP4, DEVICE>& Lap;
+			/** \brief Laplacian dimension */
+			unsigned int dim_size;
+			/** \brief Laplacian Frobenius norm */
+			FPP2 Lap_squared_fro_norm;
+			/** \brief Rotation angle theta for the current iteration's Givens matrix. */
+			//				FPP2 theta;
 
-				/* Precomputed model identity matrix to init. facts[ite] before update.
-				 * Identity matrix is completed later with cos/sin coefficients (in update_fact()).
-				 */
+			/* Precomputed model identity matrix to init. facts[ite] before update.
+			 * Identity matrix is completed later with cos/sin coefficients (in update_fact()).
+			 */
 
-				/** \brief Defines the rows of facts[ite]. */
-				vector<int> fact_mod_row_ids;
-				/** \brief Defines the columns of facts[ite]. */
-				vector<int> fact_mod_col_ids;
-				/** \brief Defines the coefficients of facts[ite]. */
-				vector<FPP4> fact_mod_values;
+			/** \brief Defines the rows of facts[ite]. */
+			vector<int> fact_mod_row_ids;
+			/** \brief Defines the columns of facts[ite]. */
+			vector<int> fact_mod_col_ids;
+			/** \brief Defines the coefficients of facts[ite]. */
+			vector<FPP4> fact_mod_values;
 
 
-				/** \brief Ordered indices of D to get increasing eigenvalues along the diagonal. */
-				vector<int> ord_indices;
+			/** \brief Ordered indices of D to get increasing eigenvalues along the diagonal. */
+			vector<int> ord_indices;
 
-				/** \brief inverse permutation of ord_indices (needed to retrieve start undefined order). */
-				vector<int> inv_ord_indices;
-				/** \brief Cache for the ordered D. */
-				Vect<FPP,DEVICE> ordered_D;
-				/** \brief true if D has already been ordered (order_D() was called). */
-				bool is_D_ordered;
-				/** \brief 1 if eigenvalues has been ordered in ascending order -1 ortherwise (other values is for undefined order). */
-				int D_order_dir;
+			/** \brief inverse permutation of ord_indices (needed to retrieve start undefined order). */
+			vector<int> inv_ord_indices;
+			/** \brief Cache for the ordered D. */
+			Vect<FPP,DEVICE> ordered_D;
+			/** \brief true if D has already been ordered (order_D() was called). */
+			bool is_D_ordered;
+			/** \brief 1 if eigenvalues has been ordered in ascending order -1 ortherwise (other values is for undefined order). */
+			int D_order_dir;
 
-				/** \brief The level of verbosity (0 for nothing, 1 for iteration numbers,...) */
-				unsigned int verbosity;
+			/** \brief The level of verbosity (0 for nothing, 1 for iteration numbers,...) */
+			unsigned int verbosity;
+
+			/**
+			 * \brief Row index for the selected pivot in L.
+			 */
+			int p,
+				/**
+				 * \brief Column index for the selected pivot in L.
+				 */q;
 
 				/**
-				 * \brief Row index for the selected pivot in L.
+				 * \brief Current iteration number (and index to the current factor to update).
 				 */
-				int p,
-					/**
-					 * \brief Column index for the selected pivot in L.
-					 */q;
+				unsigned int ite;
 
-					/**
-					 * \brief Current iteration number (and index to the current factor to update).
-					 */
-					unsigned int ite;
-
-				/** \brief true if the stopping criterion is error (otherwise it's the number of iterations/number of Givens matrices) */
-				bool stoppingCritIsError;
-				/** \brief error value according to algorithm stops if stoppingCritIsError == true */
-				double stoppingError;
-				/** \brief true if the stopping error is taken as relative error (absolute otherwise). */
-				bool errIsRel;
-				/** \brief (false to default) true to force the computation of the transform even if it doesn't worth it in term of complexity */
-				bool enable_large_Faust;
+			/** \brief true if the stopping criterion is error (otherwise it's the number of iterations/number of Givens matrices) */
+			bool stoppingCritIsError;
+			/** \brief error value according to algorithm stops if stoppingCritIsError == true */
+			double stoppingError;
+			/** \brief true if the stopping error is taken as relative error (absolute otherwise). */
+			bool errIsRel;
+			/** \brief (false to default) true to force the computation of the transform even if it doesn't worth it in term of complexity */
+			bool enable_large_Faust;
+			/** \brief Period (in number of iterations) according to the error is calculated (it applies if stoppingCritIsError == true or verbosity > 2)
+			*/
+			int err_period;
 
 			public:
 
-				//				const static unsigned int ERROR_CALC_PERIOD = 100;
 				/** Algorithm class constructor.
 				 * \param Lap The Laplacian matrix to approximate/diagonalize.
 				 * \param J The number of iterations, Givens rotations factors.
 				 * TODO: complete argument list
 				 * */
-				GivensFGFTGen(MatGeneric<FPP4,DEVICE>* Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust = false);
+				// the MatSparse/MatDense constructor rely on this one
+				GivensFGFTGen(MatGeneric<FPP4,DEVICE>* Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust = false, const int err_period=100);
 
-				GivensFGFTGen(MatSparse<FPP4, DEVICE> & Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust = false);
-				GivensFGFTGen(MatDense<FPP4, DEVICE> & Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust = false);
+				GivensFGFTGen(MatSparse<FPP4, DEVICE> & Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust = false, const int err_period=100);
+				GivensFGFTGen(MatDense<FPP4, DEVICE> & Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust = false, const int err_period=100);
 
 				/** Destructor */
 				virtual ~GivensFGFTGen() {delete[] q_candidates; delete L;};
@@ -211,7 +214,7 @@ namespace Faust
 				 * Computes the error of approximation for the current iteration.
 				 *
 				 */
-				virtual void update_err()=0;
+				virtual void update_err();
 
 				/**
 				 * Sort D in descending order into ordered_D and keeps ordered indices in ord_indices.

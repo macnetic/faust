@@ -1,7 +1,7 @@
 using namespace Faust; //TODO: remove, not advisable in a header
 
 template<typename FPP, FDevice DEVICE, typename FPP2>
-GivensFGFTParallel<FPP,DEVICE,FPP2>::GivensFGFTParallel(Faust::MatDense<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity, const double stoppingError, const bool errIsRel, const bool enable_large_Faust) : GivensFGFT<FPP,DEVICE,FPP2>(Lap, J, verbosity, stoppingError, errIsRel, enable_large_Faust), /*t(t), fact_nrots(0)*/ GivensFGFTParallelGen<FPP, DEVICE, FPP2>(t, *this)
+GivensFGFTParallel<FPP,DEVICE,FPP2>::GivensFGFTParallel(Faust::MatDense<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity, const double stoppingError, const bool errIsRel, const bool enable_large_Faust, const int err_period/*=100*/) : GivensFGFT<FPP,DEVICE,FPP2>(Lap, J, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period), /*t(t), fact_nrots(0)*/ GivensFGFTParallelGen<FPP, DEVICE, FPP2>(t, *this)
 {
 	if(J > 0) this->facts.resize(round(J/(float)t));
 	this->always_theta2 = true;
@@ -10,7 +10,7 @@ GivensFGFTParallel<FPP,DEVICE,FPP2>::GivensFGFTParallel(Faust::MatDense<FPP,DEVI
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2>
-GivensFGFTParallel<FPP,DEVICE,FPP2>::GivensFGFTParallel(Faust::MatSparse<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity, const double stoppingError, const bool errIsRel, const bool enable_large_Faust) : GivensFGFT<FPP,DEVICE,FPP2>(Lap, J, verbosity, stoppingError, errIsRel, enable_large_Faust),/* t(t), fact_nrots(0)*/ GivensFGFTParallelGen<FPP, DEVICE, FPP2>(t, *this)
+GivensFGFTParallel<FPP,DEVICE,FPP2>::GivensFGFTParallel(Faust::MatSparse<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity, const double stoppingError, const bool errIsRel, const bool enable_large_Faust, const int err_period/*=100*/) : GivensFGFT<FPP,DEVICE,FPP2>(Lap, J, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period),/* t(t), fact_nrots(0)*/ GivensFGFTParallelGen<FPP, DEVICE, FPP2>(t, *this)
 {
 	if(J > 0) this->facts.resize(round(J/(float)t));
 	this->always_theta2 = true;

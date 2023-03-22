@@ -408,39 +408,14 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L_first(Eigen::SparseMatrix<FPP,
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2>
-void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_err()
-{
-	// Matlab ref. code:
-	//        if mod(j,100)==0
-	//            %err(j) = norm(D-L,'fro')^2/norm(L,'fro')^2;
-	//            err(j) = norm(D-L,'fro')^2/norm(Lap,'fro')^2;
-	//            %err(j) = norm(D-L)/norm(Lap);
-	//            disp(['Iter ' num2str(j) ', error = ' num2str(err(j))])
-	//            %    disp(['Number of edges: ' num2str(N_edges)])
-	//        end
-	//
-	if(!((this->ite+1)%GivensFGFTComplex<FPP,DEVICE,FPP2>::ERROR_CALC_PERIOD) || this->stoppingCritIsError || this->verbosity > 1)
-	{
-		auto err = this->calc_err();
-		if(this->verbosity)
-		{
-			std::cout << "factor : "<< this->ite <<  ", " << ((this->errIsRel)?"relative ":"absolute ") << "err.: " << err;
-			if(this->stoppingCritIsError) std::cout << " stoppingError: " << this->stoppingError << ")";
-			std::cout << std::endl;
-		}
-		this->errs.push_back(err);
-	}
-}
-
-template<typename FPP, FDevice DEVICE, typename FPP2>
-GivensFGFTComplex<FPP,DEVICE,FPP2>::GivensFGFTComplex(Faust::MatSparse<FPP,DEVICE>& Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError /* default to 0.0 */, const bool errIsRel, const bool enable_large_Faust) : Faust::GivensFGFTGen<typename FPP::value_type, DEVICE, FPP2, FPP>(Lap, J, verbosity, stoppingError, errIsRel, enable_large_Faust), C(Lap.getNbRow(), Lap.getNbCol())
+GivensFGFTComplex<FPP,DEVICE,FPP2>::GivensFGFTComplex(Faust::MatSparse<FPP,DEVICE>& Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError /* default to 0.0 */, const bool errIsRel, const bool enable_large_Faust, const int err_period/*=100*/) : Faust::GivensFGFTGen<typename FPP::value_type, DEVICE, FPP2, FPP>(Lap, J, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period), C(Lap.getNbRow(), Lap.getNbCol())
 {
 	//see parent ctor
 	this->C.setZeros();
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2>
-GivensFGFTComplex<FPP,DEVICE,FPP2>::GivensFGFTComplex(Faust::MatDense<FPP,DEVICE>& Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust) : Faust::GivensFGFTGen<typename FPP::value_type, DEVICE, FPP2, FPP>(Lap, J, verbosity, stoppingError, errIsRel, enable_large_Faust), C(Lap.getNbRow(), Lap.getNbCol())
+GivensFGFTComplex<FPP,DEVICE,FPP2>::GivensFGFTComplex(Faust::MatDense<FPP,DEVICE>& Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust, const int err_period/*=100*/) : Faust::GivensFGFTGen<typename FPP::value_type, DEVICE, FPP2, FPP>(Lap, J, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period), C(Lap.getNbRow(), Lap.getNbCol())
 {
 	// see parent ctor
 	this->C.setZeros();

@@ -342,32 +342,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_L_first(Eigen::SparseMatrix<FPP, Eigen:
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2>
-void GivensFGFT<FPP,DEVICE,FPP2>::update_err()
-{
-	// Matlab ref. code:
-	//        if mod(j,100)==0
-	//            %err(j) = norm(D-L,'fro')^2/norm(L,'fro')^2;
-	//            err(j) = norm(D-L,'fro')^2/norm(Lap,'fro')^2;
-	//            %err(j) = norm(D-L)/norm(Lap);
-	//            disp(['Iter ' num2str(j) ', error = ' num2str(err(j))])
-	//            %    disp(['Number of edges: ' num2str(N_edges)])
-	//        end
-	//
-	if(!((this->ite+1)%GivensFGFT<FPP,DEVICE,FPP2>::ERROR_CALC_PERIOD) || this->stoppingCritIsError || this->verbosity > 1)
-	{
-		auto err = this->calc_err();
-		if(this->verbosity)
-		{
-			cout << "factor : "<< this->ite <<  ", " << ((this->errIsRel)?"relative ":"absolute ") << "err.: " << err;
-			if(this->stoppingCritIsError) cout << " stoppingError: " << this->stoppingError << ")";
-			cout << endl;
-		}
-		this->errs.push_back(err);
-	}
-}
-
-template<typename FPP, FDevice DEVICE, typename FPP2>
-GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatSparse<FPP,DEVICE>& Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError /* default to 0.0 */, const bool errIsRel, const bool enable_large_Faust/* deft to false */) :  GivensFGFTGen<FPP,DEVICE,FPP2>(Lap, J, verbosity, stoppingError, errIsRel, enable_large_Faust), C(Lap.getNbRow(), Lap.getNbCol()), always_theta2(false)
+GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatSparse<FPP,DEVICE>& Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError /* default to 0.0 */, const bool errIsRel, const bool enable_large_Faust/* deft to false */, const int err_period/*=100*/) :  GivensFGFTGen<FPP,DEVICE,FPP2>(Lap, J, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period), C(Lap.getNbRow(), Lap.getNbCol()), always_theta2(false)
 {
 	//see parent ctor
 	C.setOnes();
@@ -375,7 +350,7 @@ GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatSparse<FPP,DEVICE>& Lap, int J
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2>
-GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust/* deft to false */) : GivensFGFTGen<FPP,DEVICE,FPP2>(Lap, J, verbosity, stoppingError, errIsRel, enable_large_Faust), C(Lap.getNbRow(), Lap.getNbCol()), always_theta2(false)
+GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust/* deft to false */, const int err_period/*=100*/) : GivensFGFTGen<FPP,DEVICE,FPP2>(Lap, J, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period), C(Lap.getNbRow(), Lap.getNbCol()), always_theta2(false)
 {
 	// see parent ctor
 	C.setOnes();

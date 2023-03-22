@@ -54,8 +54,8 @@ namespace Faust
 			public:
 
 				const static unsigned int ERROR_CALC_PERIOD = 100;
-				GivensFGFTComplex(MatSparse<FPP,DEVICE>& Lap, int J, unsigned int verbosity = 0, const double stoppingError = 0.0, const bool errIsRel = true, const bool enable_large_Faust = false);
-				GivensFGFTComplex(MatDense<FPP,DEVICE>& Lap, int J, unsigned int verbosity = 0, const double stoppingError = 0.0, const bool errIsRel = true, const bool enable_large_Faust = false);
+				GivensFGFTComplex(MatSparse<FPP,DEVICE>& Lap, int J, unsigned int verbosity = 0, const double stoppingError = 0.0, const bool errIsRel = true, const bool enable_large_Faust = false, const int err_period=100);
+				GivensFGFTComplex(MatDense<FPP,DEVICE>& Lap, int J, unsigned int verbosity = 0, const double stoppingError = 0.0, const bool errIsRel = true, const bool enable_large_Faust = false, const int err_period=100);
 
 				virtual void next_step();
 
@@ -93,8 +93,6 @@ namespace Faust
 
 				void update_L_first(Eigen::SparseMatrix<FPP, Eigen::RowMajor> & L_vec_p, Eigen::SparseMatrix<FPP, Eigen::RowMajor>& L_vec_q, const FPP& c_pp, const FPP& c_pq, const FPP& c_qp, const FPP& c_qq, int p, int q, MatSparse<FPP,DEVICE> & L);
 				void update_L_second(Eigen::SparseMatrix<FPP, Eigen::RowMajor> & L_vec_p, Eigen::SparseMatrix<FPP, Eigen::RowMajor>& L_vec_q, const FPP& c_pp, const FPP& c_pq, const FPP& c_qp, const FPP& c_qq, int p, int q, MatSparse<FPP,DEVICE> & L);
-
-				void update_err();
 
 			public:
 

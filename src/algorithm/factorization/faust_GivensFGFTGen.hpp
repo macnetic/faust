@@ -100,14 +100,15 @@ void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::compute_facts()
 		std::cout << "tol: " << stoppingError << std::endl;
 		std::cout << "stopcrit is error: " << stoppingCritIsError << std::endl;
 		std::cout << "relErr: " << errIsRel << std::endl;
+		std::cout << "err_period: " << err_period << std::endl;
 		std::cout << "order: " << is_D_ordered << std::endl;
 		std::cout << "enable_large_Faust: " << enable_large_Faust << std::endl;
 	}
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::GivensFGFTGen(MatGeneric<FPP4,DEVICE>* Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust /* deft to false */) :
-facts(J>0?(J*4<Lap->getNbRow()*Lap->getNbRow()||enable_large_Faust?J:0):0 /* don't allocate if the complexity doesn't worth it and enable_large_Faust is false*/), q_candidates(new int[Lap->getNbRow()]), J(J), D(Lap->getNbRow()), errs(0), coord_choices(0), Lap(*Lap), dim_size(Lap->getNbRow()), Lap_squared_fro_norm(0), is_D_ordered(false), D_order_dir(0), verbosity(verbosity), stoppingCritIsError(stoppingError != 0.0), stoppingError(stoppingError), errIsRel(errIsRel), enable_large_Faust(enable_large_Faust), ite(0)
+GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::GivensFGFTGen(MatGeneric<FPP4,DEVICE>* Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust /* deft to false */, const int err_period/*=100*/) :
+facts(J>0?(J*4<Lap->getNbRow()*Lap->getNbRow()||enable_large_Faust?J:0):0 /* don't allocate if the complexity doesn't worth it and enable_large_Faust is false*/), q_candidates(new int[Lap->getNbRow()]), J(J), D(Lap->getNbRow()), errs(0), coord_choices(0), Lap(*Lap), dim_size(Lap->getNbRow()), Lap_squared_fro_norm(0), is_D_ordered(false), D_order_dir(0), verbosity(verbosity), stoppingCritIsError(stoppingError != 0.0), stoppingError(stoppingError), errIsRel(errIsRel), enable_large_Faust(enable_large_Faust), ite(0), err_period(err_period)
 {
 	if(Lap->getNbCol() != Lap->getNbRow())
 		handleError("Faust::GivensFGFTComplex", "Laplacian must be a square matrix.");
@@ -126,13 +127,13 @@ facts(J>0?(J*4<Lap->getNbRow()*Lap->getNbRow()||enable_large_Faust?J:0):0 /* don
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::GivensFGFTGen(Faust::MatSparse<FPP4, DEVICE> & Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust/* deft to false */) :  GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>(&Lap, J, verbosity, stoppingError, errIsRel, enable_large_Faust)
+GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::GivensFGFTGen(Faust::MatSparse<FPP4, DEVICE> & Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust/* deft to false */, const int err_period/*=100*/) :  GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>(&Lap, J, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period)
 {
 	L = new MatSparse<FPP4,DEVICE>(Lap);
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::GivensFGFTGen(Faust::MatDense<FPP4, DEVICE> & Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust/* deft to false */) : GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>(&Lap, J, verbosity, stoppingError, errIsRel,  enable_large_Faust)
+GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::GivensFGFTGen(Faust::MatDense<FPP4, DEVICE> & Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust/* deft to false */, const int err_period/*=100*/) : GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>(&Lap, J, verbosity, stoppingError, errIsRel,  enable_large_Faust, err_period)
 {
 	L = new MatDense<FPP4,DEVICE>(Lap);
 }
@@ -341,4 +342,20 @@ FPP2 GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::calc_err()
 	err = Faust::fabs(err_d - err);
 	if(this->errIsRel) err /= err_d;
 	return err;
+}
+
+
+template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
+void GivensFGFTGen<FPP, DEVICE, FPP2, FPP4>::update_err()
+{
+	if(!(this->ite % this->err_period) && this->stoppingCritIsError || this->verbosity > 1)
+	{
+		auto err = this->calc_err();
+		if(this->verbosity)
+		{
+			std::cout << "factor : "<< this->ite <<  ", " << ((this->errIsRel)?"relative ":"absolute ") << "err.: " << err;
+			std::cout << std::endl;
+		}
+		this->errs.push_back(err);
+	}
 }

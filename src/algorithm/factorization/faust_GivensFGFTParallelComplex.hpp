@@ -1,7 +1,7 @@
 using namespace Faust; //TODO: remove, not advisable in a header
 
 template<typename FPP, FDevice DEVICE, typename FPP2>
-GivensFGFTParallelComplex<FPP,DEVICE,FPP2>::GivensFGFTParallelComplex(Faust::MatDense<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity, const double stoppingError, const bool errIsRel,  const bool enable_large_Faust) : GivensFGFTComplex<FPP,DEVICE,FPP2>(Lap, J, verbosity, stoppingError, errIsRel, enable_large_Faust), /*t(t), fact_nrots(0)*/ GivensFGFTParallelGen<typename FPP::value_type, DEVICE, FPP2, FPP>(t, *this)
+GivensFGFTParallelComplex<FPP,DEVICE,FPP2>::GivensFGFTParallelComplex(Faust::MatDense<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity, const double stoppingError, const bool errIsRel,  const bool enable_large_Faust, const int err_period/*=100*/) : GivensFGFTComplex<FPP,DEVICE,FPP2>(Lap, J, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period), /*t(t), fact_nrots(0)*/ GivensFGFTParallelGen<typename FPP::value_type, DEVICE, FPP2, FPP>(t, *this)
 {
 	if(J > 0) this->facts.resize(round(J/(float)t));
 	this->coord_choices.resize(0);
@@ -9,7 +9,7 @@ GivensFGFTParallelComplex<FPP,DEVICE,FPP2>::GivensFGFTParallelComplex(Faust::Mat
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2>
-GivensFGFTParallelComplex<FPP,DEVICE,FPP2>::GivensFGFTParallelComplex(Faust::MatSparse<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity, const double stoppingError, const bool errIsRel, const bool enable_large_Faust) : GivensFGFTComplex<FPP,DEVICE,FPP2>(Lap, J, verbosity, stoppingError, errIsRel, enable_large_Faust), /* t(t), fact_nrots(0) */ GivensFGFTParallelGen<typename FPP::value_type, DEVICE, FPP2, FPP>(t, *this)
+GivensFGFTParallelComplex<FPP,DEVICE,FPP2>::GivensFGFTParallelComplex(Faust::MatSparse<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity, const double stoppingError, const bool errIsRel, const bool enable_large_Faust, const int err_period/*=100*/) : GivensFGFTComplex<FPP,DEVICE,FPP2>(Lap, J, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period), /* t(t), fact_nrots(0) */ GivensFGFTParallelGen<typename FPP::value_type, DEVICE, FPP2, FPP>(t, *this)
 {
 	if(J > 0) this->facts.resize(round(J/(float)t));
 	this->coord_choices.resize(0);

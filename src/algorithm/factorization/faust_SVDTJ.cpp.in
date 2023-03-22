@@ -10,17 +10,17 @@ namespace Faust
 
 #if(@SVD_COMPLEX@==1)
 	template<>
-		void instantiate_algos<complex<@REAL_TYPE@>, Cpu, @REAL_TYPE@>(GivensFGFTGen<Real<complex<@REAL_TYPE@>>, Cpu, @REAL_TYPE@, complex<@REAL_TYPE@>>** algoW1, GivensFGFTGen<Real<complex<@REAL_TYPE@>>, Cpu, @REAL_TYPE@, complex<@REAL_TYPE@>>** algoW2, Faust::MatDense<complex<@REAL_TYPE@>,Cpu> &dM_M, Faust::MatDense<complex<@REAL_TYPE@>,Cpu> &dMM_,int J1, int J2, int t1, int t2, unsigned int verbosity, @REAL_TYPE@ tol, bool relErr, bool enable_large_Faust)
+		void instantiate_algos<complex<@REAL_TYPE@>, Cpu, @REAL_TYPE@>(GivensFGFTGen<Real<complex<@REAL_TYPE@>>, Cpu, @REAL_TYPE@, complex<@REAL_TYPE@>>** algoW1, GivensFGFTGen<Real<complex<@REAL_TYPE@>>, Cpu, @REAL_TYPE@, complex<@REAL_TYPE@>>** algoW2, Faust::MatDense<complex<@REAL_TYPE@>,Cpu> &dM_M, Faust::MatDense<complex<@REAL_TYPE@>,Cpu> &dMM_,int J1, int J2, int t1, int t2, unsigned int verbosity, @REAL_TYPE@ tol, bool relErr, bool enable_large_Faust, const int err_period)
 		{
 			if(t1 <= 1)
-				*algoW1 = new GivensFGFTComplex<complex<@REAL_TYPE@>,Cpu,@REAL_TYPE@>(dMM_, J1, verbosity, tol, relErr, enable_large_Faust);
+				*algoW1 = new GivensFGFTComplex<complex<@REAL_TYPE@>,Cpu,@REAL_TYPE@>(dMM_, J1, verbosity, tol, relErr, enable_large_Faust, err_period);
 			else
-				*algoW1 = new GivensFGFTParallelComplex<complex<@REAL_TYPE@>, Cpu, @REAL_TYPE@>(dMM_, J1, t1, verbosity, tol, relErr, enable_large_Faust);
+				*algoW1 = new GivensFGFTParallelComplex<complex<@REAL_TYPE@>, Cpu, @REAL_TYPE@>(dMM_, J1, t1, verbosity, tol, relErr, enable_large_Faust, err_period);
 
 			if(t2 <= 1)
-				*algoW2 = new GivensFGFTComplex<complex<@REAL_TYPE@>,Cpu,@REAL_TYPE@>(dM_M, J2, verbosity, tol, relErr, enable_large_Faust);
+				*algoW2 = new GivensFGFTComplex<complex<@REAL_TYPE@>,Cpu,@REAL_TYPE@>(dM_M, J2, verbosity, tol, relErr, enable_large_Faust, err_period);
 			else
-				*algoW2 = new GivensFGFTParallelComplex<complex<@REAL_TYPE@>,Cpu,@REAL_TYPE@>(dM_M, J2, t2, verbosity, tol, relErr, enable_large_Faust);
+				*algoW2 = new GivensFGFTParallelComplex<complex<@REAL_TYPE@>,Cpu,@REAL_TYPE@>(dM_M, J2, t2, verbosity, tol, relErr, enable_large_Faust, err_period);
 
 		}
 
@@ -35,18 +35,18 @@ namespace Faust
 #endif
 
 	template<>
-		void instantiate_algos<@REAL_TYPE@, Cpu, @REAL_TYPE@>(GivensFGFTGen<@REAL_TYPE@, Cpu, @REAL_TYPE@, @REAL_TYPE@>** algoW1, GivensFGFTGen<@REAL_TYPE@, Cpu, @REAL_TYPE@, @REAL_TYPE@>** algoW2, Faust::MatDense<@REAL_TYPE@,Cpu> &dM_M, Faust::MatDense<@REAL_TYPE@,Cpu> &dMM_,int J1, int J2, int t1, int t2, unsigned int verbosity, @REAL_TYPE@ tol, bool relErr, bool enable_large_Faust)
+		void instantiate_algos<@REAL_TYPE@, Cpu, @REAL_TYPE@>(GivensFGFTGen<@REAL_TYPE@, Cpu, @REAL_TYPE@, @REAL_TYPE@>** algoW1, GivensFGFTGen<@REAL_TYPE@, Cpu, @REAL_TYPE@, @REAL_TYPE@>** algoW2, Faust::MatDense<@REAL_TYPE@,Cpu> &dM_M, Faust::MatDense<@REAL_TYPE@,Cpu> &dMM_,int J1, int J2, int t1, int t2, unsigned int verbosity, @REAL_TYPE@ tol, bool relErr, bool enable_large_Faust, const int err_period)
 		{
 
 			if(t1 <= 1)
-				*algoW1 = new GivensFGFT<@REAL_TYPE@,Cpu,@REAL_TYPE@>(dMM_, J1, verbosity, tol, relErr, enable_large_Faust);
+				*algoW1 = new GivensFGFT<@REAL_TYPE@,Cpu,@REAL_TYPE@>(dMM_, J1, verbosity, tol, relErr, enable_large_Faust, err_period);
 			else
-				*algoW1 = new GivensFGFTParallel<@REAL_TYPE@,Cpu,@REAL_TYPE@>(dMM_, J1, t1, verbosity, tol, relErr, enable_large_Faust);
+				*algoW1 = new GivensFGFTParallel<@REAL_TYPE@,Cpu,@REAL_TYPE@>(dMM_, J1, t1, verbosity, tol, relErr, enable_large_Faust, err_period);
 
 			if(t2 <= 1)
-				*algoW2 = new GivensFGFT<@REAL_TYPE@,Cpu,@REAL_TYPE@>(dM_M, J2, verbosity, tol, relErr, enable_large_Faust);
+				*algoW2 = new GivensFGFT<@REAL_TYPE@,Cpu,@REAL_TYPE@>(dM_M, J2, verbosity, tol, relErr, enable_large_Faust, err_period);
 			else
-				*algoW2 = new GivensFGFTParallel<@REAL_TYPE@,Cpu,@REAL_TYPE@>(dM_M, J2, t2, verbosity, tol, relErr, enable_large_Faust);
+				*algoW2 = new GivensFGFTParallel<@REAL_TYPE@,Cpu,@REAL_TYPE@>(dM_M, J2, t2, verbosity, tol, relErr, enable_large_Faust, err_period);
 		}
 
 	template<>

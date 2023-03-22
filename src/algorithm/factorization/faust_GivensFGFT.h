@@ -60,8 +60,8 @@ namespace Faust
 				 * \param Lap The Laplacian matrix to approximate/diagonalize.
 				 * \param J The number of iterations, Givens rotations factors.
 				 * */
-				GivensFGFT(MatSparse<FPP,DEVICE>& Lap, int J, unsigned int verbosity = 0, const double stoppingError = 0.0, const bool errIsRel = true, const bool enable_large_Faust = false);
-				GivensFGFT(MatDense<FPP,DEVICE>& Lap, int J, unsigned int verbosity = 0, const double stoppingError = 0.0, const bool errIsRel = true, const bool enable_large_Faust = false);
+				GivensFGFT(MatSparse<FPP,DEVICE>& Lap, int J, unsigned int verbosity = 0, const double stoppingError = 0.0, const bool errIsRel = true, const bool enable_large_Faust = false, const int err_period=100);
+				GivensFGFT(MatDense<FPP,DEVICE>& Lap, int J, unsigned int verbosity = 0, const double stoppingError = 0.0, const bool errIsRel = true, const bool enable_large_Faust = false, const int err_period=100);
 				/** Destructor */
 				virtual ~GivensFGFT() {/*delete[] q_candidates; delete L;*/};
 
@@ -108,8 +108,6 @@ namespace Faust
 
 				void update_L_first(Eigen::SparseMatrix<FPP, Eigen::RowMajor> & L_vec_p, Eigen::SparseMatrix<FPP, Eigen::RowMajor>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q, MatSparse<FPP,DEVICE> & L);
 				void update_L_second(Eigen::SparseMatrix<FPP, Eigen::RowMajor> & L_vec_p, Eigen::SparseMatrix<FPP, Eigen::RowMajor>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q, MatSparse<FPP,DEVICE> & L);
-
-				void update_err();
 
 			public:
 

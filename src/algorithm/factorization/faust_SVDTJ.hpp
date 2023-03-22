@@ -85,7 +85,7 @@ namespace Faust
 				t2 = dM_M.getNbRow() / 2;
 
 			//TODO: err_period to use in algoW1/algoW2
-			instantiate_algos(&algoW1, &algoW2, dM_M, dMM_, J1, J2, t1, t2, verbosity, tol, relErr, enable_large_Faust);
+			instantiate_algos(&algoW1, &algoW2, dM_M, dMM_, J1, J2, t1, t2, verbosity, tol, relErr, enable_large_Faust, err_period);
 
 			try {
 
@@ -309,8 +309,9 @@ namespace Faust
 			if (t2 <= 0)
 				t2 = dM_M.getNbRow() / 2;
 
-			instantiate_algos(&algoW1, &algoW2, dM_M, dMM_, /*J*/ 1, 1, t1, t2, verbosity, /*tol*/ FPP2(0), relErr, enable_large_Faust);
-			// J == 1 to prevent exception raising in eigtj when J == 0 and tol == 0
+			instantiate_algos(&algoW1, &algoW2, dM_M, dMM_, /*J*/ 1, 1, t1, t2, verbosity, /*tol*/ FPP2(1), relErr, enable_large_Faust, err_period);
+			// J == 1, and tol == 1 but there is no incidence on their stoppingCriterion
+			// svdtj control everything of algoW1/W2 here, iteration per iteration (modulo err_period)
 			// tol == 0 because the error criterion is handled in this function if it is the stopping criterion (otherwise this is the iteration number determined by J and t)
 
 #define continue_loop() \

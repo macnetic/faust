@@ -63,8 +63,8 @@ namespace Faust
 		 * \param stoppingError defines a stopping criterion based on error (absolute relative error).
 		 *
 		 */
-		GivensFGFTParallelComplex(MatDense<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity = 0, const double stoppingCritIsError = 0.0,  const bool errIsRel = true, const bool enable_large_Faust = false);
-		GivensFGFTParallelComplex(MatSparse<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity = 0, const double stoppingCritIsError = 0.0, const bool errIsRel = true, const bool enable_large_Faust = false);
+		GivensFGFTParallelComplex(MatDense<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity = 0, const double stoppingCritIsError = 0.0,  const bool errIsRel = true, const bool enable_large_Faust = false, const int err_period=100);
+		GivensFGFTParallelComplex(MatSparse<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity = 0, const double stoppingCritIsError = 0.0, const bool errIsRel = true, const bool enable_large_Faust = false, const int err_period=100);
 	};
 
 #include "faust_GivensFGFTParallelComplex.hpp"
