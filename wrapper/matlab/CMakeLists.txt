@@ -155,11 +155,11 @@ foreach(SCALAR_AND_FSUFFIX IN LISTS MEX_TYPES_AND_SUFFIXES) # TODO: complex<floa
 		file(REMOVE ${FAUST_MATLAB_MEX_SRC_DIR}/mexHierarchical2020_gpu2${FSUFFIX}.cpp)  # delete a possible previous file generated with USE_GPU_MOD = ON (because otherwise it fails the building)
 	endif()
 
-	# Givens FGFT is only for double and float scalars
-	if(NOT ${FAUST_SCALAR} MATCHES "complex")
-		configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexfgftgivens.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexfgftgivens${FSUFFIX}.cpp @ONLY)
-		configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexsvdtj.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexsvdtj${FSUFFIX}.cpp @ONLY)
-	endif()
+    # Truncated Jacobi eigtj and svdtj
+    if(NOT ${FAUST_SCALAR} MATCHES "complex")
+        configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexfgftgivens.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexfgftgivens${FSUFFIX}.cpp @ONLY)
+        configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexsvdtj.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexsvdtj${FSUFFIX}.cpp @ONLY)
+    endif()
 	# copy the *.m for factorization now, because we have the FSUFFIX in hands
 	configure_file(${FAUST_MATLAB_DOC_SRC_DIR}/mexHierarchical_fact.m.in ${FAUST_MATLAB_DOC_SRC_DIR}/mexHierarchical_fact${FSUFFIX}.m COPYONLY)
 	configure_file(${FAUST_MATLAB_DOC_SRC_DIR}/mexPalm4MSA.m.in ${FAUST_MATLAB_DOC_SRC_DIR}/mexPalm4MSA${FSUFFIX}.m COPYONLY)

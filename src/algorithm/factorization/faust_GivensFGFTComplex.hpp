@@ -424,9 +424,9 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_err()
 		auto err = this->calc_err();
 		if(this->verbosity)
 		{
-			cout << "factor : "<< this->ite <<  ", " << ((this->errIsRel)?"relative ":"absolute ") << "err.: " << err;
-			if(this->stoppingCritIsError) cout << " stoppingError: " << this->stoppingError << ")";
-			cout << endl;
+			std::cout << "factor : "<< this->ite <<  ", " << ((this->errIsRel)?"relative ":"absolute ") << "err.: " << err;
+			if(this->stoppingCritIsError) std::cout << " stoppingError: " << this->stoppingError << ")";
+			std::cout << std::endl;
 		}
 		this->errs.push_back(err);
 	}

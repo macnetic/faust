@@ -109,10 +109,10 @@ def svdtj(M, nGivens=None, tol=0, err_period=100, relerr=True,
     """
         Performs a singular value decomposition and returns the left and right singular vectors as Faust transforms.
 
-        NOTE: this function is based on fact.eigtj. See below the example for further details on how svdtj is defined using eigtj.
+        NOTE: this function is based on fact.eigtj which relies on the truncated Jacobi algorithm, hence the 'tj' in the name. See below the examples for further details on how svdtj is defined using eigtj.
 
         Args:
-            M: a real matrix (np.ndarray or scipy.sparse.csr_matrix). The dtype must be float32, float64
+            M: a real or complex matrix (np.ndarray or scipy.sparse.csr_matrix). The dtype must be float32, float64
             or complex128 (the dtype might have a large impact on performance).
             nGivens: (int or tuple(int, int)) defines the number of Givens rotations
             that will be used at most to compute U and V.
@@ -138,12 +138,13 @@ def svdtj(M, nGivens=None, tol=0, err_period=100, relerr=True,
             of Givens rotations per factor for U and tV the same for V.
             By default, this parameter is maximized for U and V,
             i.e. tU = M.shape[0] / 2, tV = M.shape[1] / 2.
+            enable_large_Faust: see eigtj.
 
 
         Returns:
             The tuple U,S,V: such that U*numpy.diag(S)*V.H is the approximate of M.
             - (np.array vector) S the singular values in descending order.
-            - (Faust objects) U,V unitary transforms.
+            - (Faust objects) U,V orthonormal Fausts.
         <br/>
         Examples:
             >>> from pyfaust.fact import svdtj
@@ -187,12 +188,12 @@ def svdtj(M, nGivens=None, tol=0, err_period=100, relerr=True,
             0.0043824217142030475
             >>> # We are not exactly lower, it means that the nGivens stopping criterion
             >>> # has been reached before tol's
-            >>> ### Let's see the lengths of the different U, V Fausts
+            >>> ### Now Let's see the lengths of the different U, V Fausts
             >>> len(V1) # it should be 4096 / nGivens_per_fac, which is (M.shape[1] // 2) = 256
             256
             >>> len(U1) # it should be 4096 / nGivens_per_fac, which is (M.shape[0] // 2) = 512
             100
-            >>> # but it is not, svdtj stopped automatically to add factors to U1 because the error stopped enhancing
+            >>> # but it is not, svdtj stopped automatically on U1 because its error stopped enhancing
             >>> # (it can be verified with verbosity=1)
             >>> (len(U3), len(V3))
             (64, 200)

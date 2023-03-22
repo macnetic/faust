@@ -15,7 +15,7 @@ namespace Faust
 			if(t1 <= 1)
 				*algoW1 = new GivensFGFTComplex<complex<@REAL_TYPE@>,Cpu,@REAL_TYPE@>(dMM_, J1, verbosity, tol, relErr, enable_large_Faust);
 			else
-				*algoW1 = new GivensFGFTParallelComplex<complex<@REAL_TYPE@>,Cpu,@REAL_TYPE@>(dMM_, J1, t1, verbosity, tol, relErr, enable_large_Faust);
+				*algoW1 = new GivensFGFTParallelComplex<complex<@REAL_TYPE@>, Cpu, @REAL_TYPE@>(dMM_, J1, t1, verbosity, tol, relErr, enable_large_Faust);
 
 			if(t2 <= 1)
 				*algoW2 = new GivensFGFTComplex<complex<@REAL_TYPE@>,Cpu,@REAL_TYPE@>(dM_M, J2, verbosity, tol, relErr, enable_large_Faust);
@@ -35,7 +35,7 @@ namespace Faust
 #endif
 
 	template<>
-		void instantiate_algos<@REAL_TYPE@, Cpu, @REAL_TYPE@>(GivensFGFTGen<Real<@REAL_TYPE@>, Cpu, @REAL_TYPE@, @REAL_TYPE@>** algoW1, GivensFGFTGen<Real<@REAL_TYPE@>, Cpu, @REAL_TYPE@, @REAL_TYPE@>** algoW2, Faust::MatDense<@REAL_TYPE@,Cpu> &dM_M, Faust::MatDense<@REAL_TYPE@,Cpu> &dMM_,int J1, int J2, int t1, int t2, unsigned int verbosity, @REAL_TYPE@ tol, bool relErr, bool enable_large_Faust)
+		void instantiate_algos<@REAL_TYPE@, Cpu, @REAL_TYPE@>(GivensFGFTGen<@REAL_TYPE@, Cpu, @REAL_TYPE@, @REAL_TYPE@>** algoW1, GivensFGFTGen<@REAL_TYPE@, Cpu, @REAL_TYPE@, @REAL_TYPE@>** algoW2, Faust::MatDense<@REAL_TYPE@,Cpu> &dM_M, Faust::MatDense<@REAL_TYPE@,Cpu> &dMM_,int J1, int J2, int t1, int t2, unsigned int verbosity, @REAL_TYPE@ tol, bool relErr, bool enable_large_Faust)
 		{
 
 			if(t1 <= 1)
