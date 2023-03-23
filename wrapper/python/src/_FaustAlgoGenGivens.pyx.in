@@ -11,7 +11,8 @@ cdef class FaustAlgoGenGivens@TYPE_NAME@:
 
     @staticmethod
     def fact_givens_fgft@FUNC_TYPE_SUFFIX@(Lap, J, t, verbosity=0, stoppingError = 0.0,
-                         errIsRel=True, order=1, enable_large_Faust=False):
+                         errIsRel=True, order=1, enable_large_Faust=False,
+                                           err_period=100):
         if(order == 'ascend'): order = 1
         elif(order == 'descend'): order = -1
         elif(order == 'undef'): order = 0
@@ -36,7 +37,8 @@ cdef class FaustAlgoGenGivens@TYPE_NAME@:
                                                                       stoppingError,
                                                                       errIsRel,
                                                                       int(order),
-                                                                      enable_large_Faust)
+                                                                      enable_large_Faust,
+                                                                      err_period)
 
         #from scipy.sparse import spdiags
         #D_spdiag = spdiags(D, [0], Lap.shape[0], Lap.shape[0])
@@ -50,7 +52,7 @@ cdef class FaustAlgoGenGivens@TYPE_NAME@:
     @staticmethod
     def fact_givens_fgft_sparse(Lap, J, t, verbosity=0, stoppingError = 0.0,
                                      errIsRel=True, order='ascend',
-                                     enable_large_Faust=False):
+                                     enable_large_Faust=False, err_period=100):
         from scipy.sparse import spdiags
         cdef @TYPE@[:] data1d #only for csr mat factor
         cdef int [:] indices # only for csr mat
@@ -83,7 +85,8 @@ cdef class FaustAlgoGenGivens@TYPE_NAME@:
                                                                   stoppingError,
                                                                   errIsRel,
                                                                   int(order),
-                                                                  enable_large_Faust)
+                                                                  enable_large_Faust,
+                                                                  err_period)
 
         #D_spdiag = spdiags(D, [0], Lap.shape[0], Lap.shape[0])
         #return core, D_spdiag
@@ -94,8 +97,8 @@ cdef class FaustAlgoGenGivens@TYPE_NAME@:
         return core, D
 
     @staticmethod
-    def eigtj(M, nGivens=None, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
-          order='ascend', enable_large_Faust=False):
+    def eigtj(M, nGivens=None, tol=0, relerr=True, nGivens_per_fac=None, verbosity=0,
+          order='ascend', enable_large_Faust=False, err_period=100):
         if nGivens == None:
             if tol == 0:
                 raise Exception("You must specify nGivens or tol argument"
@@ -114,11 +117,11 @@ cdef class FaustAlgoGenGivens@TYPE_NAME@:
         if isinstance(M, np.ndarray):
             core_obj,D = FaustAlgoGenGivens@TYPE_NAME@.fact_givens_fgft@FUNC_TYPE_SUFFIX@(M, nGivens, nGivens_per_fac,
                     verbosity, tol,
-                    relerr, order, enable_large_Faust)
+                    relerr, order, enable_large_Faust, err_period)
         elif isinstance(M, csr_matrix):
             core_obj,D = FaustAlgoGenGivens@TYPE_NAME@.fact_givens_fgft_sparse@FUNC_TYPE_SUFFIX@(M, nGivens, nGivens_per_fac,
                     verbosity, tol,
-                    relerr, order, enable_large_Faust)
+                    relerr, order, enable_large_Faust, err_period)
         else:
             raise TypeError("The matrix to diagonalize must be a"
                             " scipy.sparse.csr_matrix or a numpy array.")

@@ -85,7 +85,7 @@ void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::compute_facts()
 	while(! stopping && (J == 0 || ite < facts.size())) // when J == 0 the stopping criterion is the error against Lap
 	{
 		next_step();
-		if(stopping = (ite > 1 && stoppingCritIsError && errs.size() > 2 && errs[ite-1]-errs[ite-2] > FLT_EPSILON))
+		if(stopping = (ite > 1 && stoppingCritIsError && errs.size() > 2 && errs[errs.size()-1]-errs[errs.size()-2] > FLT_EPSILON))
 			/*if(verbosity>0) */cerr << "WARNING: the eigtj algorithm stopped because the last error is greater than the previous one." << endl;
 		if(stopping || stoppingCritIsError && errs.size() > 0 && (*(errs.end()-1) - stoppingError ) < FLT_EPSILON)
 		{
@@ -348,7 +348,7 @@ FPP2 GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::calc_err()
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 void GivensFGFTGen<FPP, DEVICE, FPP2, FPP4>::update_err()
 {
-	if(!(this->ite % this->err_period) && this->stoppingCritIsError || this->verbosity > 1)
+	if(!((this->ite+1) % this->err_period) && this->stoppingCritIsError || this->verbosity > 1)
 	{
 		auto err = this->calc_err();
 		if(this->verbosity)

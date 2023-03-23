@@ -329,7 +329,7 @@ def svdtj(M, nGivens=None, tol=0, err_period=100, relerr=True,
     V = Faust(core_obj=Vcore)
     return U, S, V
 
-def eigtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
+def eigtj(M, nGivens=None, tol=0, err_period=100, order='ascend', relerr=True,
           nGivens_per_fac=None, verbosity=0, enable_large_Faust=False):
     """
     Performs an approximate eigendecomposition of M and returns the eigenvalues in W along with the corresponding normalized right eigenvectors (as the columns of the Faust object V).
@@ -351,6 +351,10 @@ def eigtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
         tol: (float) the tolerance error at which the algorithm stops. The
         default value is zero so that stopping is based on reaching the
         targeted nGivens (this argument is optional only if nGivens is set).
+        err_period: (int) it defines the period, in number of factors of V
+        the error is compared to tol (reducing the period spares
+        some factors but increases slightly the computational cost because the error
+        is computed more often).
         order: order of eigenvalues, possible choices are ‘ascend,
         'descend' or 'undef' (to avoid a sorting operation and save some time).
         nGivens_per_fac: (int) targeted number of Givens rotations per factor
@@ -431,19 +435,17 @@ def eigtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
 
     M_dtype = _sanitize_dtype(M.dtype)
 
+    eigtj_args = [M, nGivens, tol, relerr,
+                  nGivens_per_fac, verbosity, order,
+                  enable_large_Faust,
+                  err_period]
     if M_dtype == 'float32':
-        D, core_obj = _FaustCorePy.FaustAlgoGenGivensFlt.eigtj(M, nGivens, tol, relerr,
-                                                         nGivens_per_fac, verbosity, order,
-                                                         enable_large_Faust)
+        D, core_obj = _FaustCorePy.FaustAlgoGenGivensFlt.eigtj(*eigtj_args)
 
     elif M_dtype == 'float64':
-        D, core_obj = _FaustCorePy.FaustAlgoGenGivensDbl.eigtj(M, nGivens, tol, relerr,
-                                                         nGivens_per_fac, verbosity, order,
-                                                         enable_large_Faust)
+        D, core_obj = _FaustCorePy.FaustAlgoGenGivensDbl.eigtj(*eigtj_args)
     else: # M_dtype == 'complex'
-        D, core_obj = _FaustCorePy.FaustAlgoGenGivensCplxDbl.eigtj(M, nGivens, tol, relerr,
-                                                   nGivens_per_fac, verbosity, order,
-                                                   enable_large_Faust)
+        D, core_obj = _FaustCorePy.FaustAlgoGenGivensCplxDbl.eigtj(*eigtj_args)
     return D, Faust(core_obj=core_obj)
 
 def _check_fact_mat(funcname, M, is_real=None):

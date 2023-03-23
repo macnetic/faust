@@ -164,7 +164,8 @@ cdef extern from "FaustFactGivensFGFT.h":
                                                        const FPP2 stoppingError,
                                                        const bool errIsRel,
                                                        const int order,
-                                                       const bool enable_large_Faust)
+                                                       const bool enable_large_Faust,
+                                                       const int err_period)
 
     cdef FaustCoreCppCPU[FPP]* fact_givens_fgft_sparse[FPP,FPP2](const FPP* data, int* row_ptr,
                                                               int* id_col, int nnz, unsigned int num_rows,
@@ -174,17 +175,18 @@ cdef extern from "FaustFactGivensFGFT.h":
                                                               const FPP2 stoppingError,
                                                               const bool errIsRel,
                                                               const int order,
-                                                              const bool enable_large_Faust)
+                                                              const bool enable_large_Faust,
+                                                              const int err_period)
 
-    cdef FaustCoreCppCPU[FPP]* fact_givens_fgft_cplx[FPP,FPP2](const
-                                                            FPP* Lap, unsigned int num_rows,
+    cdef FaustCoreCppCPU[FPP]* fact_givens_fgft_cplx[FPP,FPP2](const FPP* Lap, unsigned int num_rows,
                                                             unsigned int num_cols, unsigned int J,
                                                             unsigned int t,
                                                             FPP2* D, unsigned int verbosity,
                                                             const FPP2 stoppingError,
                                                             const bool errIsRel,
                                                             const int order,
-                                                            const bool enable_large_Faust)
+                                                            const bool enable_large_Faust,
+                                                            const int err_period)
 
     cdef FaustCoreCppCPU[FPP]* fact_givens_fgft_sparse_cplx[FPP, FPP2](const FPP* data, int* row_ptr,
                                                                     int* id_col, int nnz, unsigned int num_rows,
@@ -195,7 +197,8 @@ cdef extern from "FaustFactGivensFGFT.h":
                                                                     const FPP2 stoppingError,
                                                                     const bool errIsRel,
                                                                     const int order,
-                                                                    const bool enable_large_Faust)
+                                                                    const bool enable_large_Faust,
+                                                                    const int err_period)
 
     cdef void svdtj[FPP, FPP2](FaustCoreCppCPU[FPP]** U, FaustCoreCppCPU[FPP] **V, FPP* S,
                                const FPP* M_data,
