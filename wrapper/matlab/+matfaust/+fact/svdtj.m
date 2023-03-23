@@ -42,7 +42,7 @@
 %> is computed more often).
 %>
 %> @retval [U,S,V]: such that U*S*V' is the approximate of M with:
-%>      - S: (sparse real diagonal matrix) the singular values in descendant order.
+%>      - S: (sparse real diagonal matrix) the singular values in descending order.
 %>      - U, V: (Faust objects) orthonormal transforms.
 %>
 %> @b Example

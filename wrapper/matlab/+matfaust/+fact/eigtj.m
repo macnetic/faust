@@ -22,6 +22,9 @@
 %> @param nGivens, integer [optional if tol is set] targeted number of Givens rotations.
 %> The number of rotations per factor of V is defined by nGivens_per_fac.
 %> @param 'tol', number [optional if nGivens is set] the tolerance error at which the algorithm stops. The default value is zero so that stopping is based on reaching the targeted nGivens.
+%> @param 'err_period', int:  it defines the period, in number of factors of V,
+%> the error is compared to tol (reducing the period spares some factors but increases slightly the computational cost because the error
+%> is computed more often).
 %> @param 'order', char [optional, default is ‘ascend’] order of eigenvalues, possible choices are ‘ascend, 'descend' or 'undef' (to avoid a sorting operation and save some time).
 %> @param 'nGivens_per_fac', integer [optional, default is <code>floor(size(M, 1)/2)</code>] targeted number of Givens rotations per factor of V. Must be an integer between 1 to <code>floor(size(M, 1)/2)</code>.
 %> @param 'relerr', bool [optional, default is true] the type of error used as stopping criterion. (true) for the relative error norm(V*D*V'-M, 'fro')/norm(M, 'fro'), (false) for the absolute error norm(V*D*V'-M, 'fro').
@@ -92,8 +95,9 @@ function [V,D] = eigtj(M, varargin)
 	enable_large_Faust = false;
 	argc = length(varargin);
 	order = 1; % ascending order
+	err_period = 100;
 	if(argc > 0)
-		for i=1:argc
+		for i=1:2:argc
 			switch(varargin{i})
 				case 'enable_large_Faust'
 					if(argc == i || ~ islogical(varargin{i+1}))
@@ -144,6 +148,12 @@ function [V,D] = eigtj(M, varargin)
 							order = 0;
 						end
 					end
+				case 'err_period'
+					if(argc == i || ~ isscalar(varargin{i+1}))
+						error('err_period keyword argument is not followed by a number')
+					else
+						err_period = floor(real(varargin{i+1}));
+					end
 				otherwise
 					if(isstr(varargin{i}) && (~ strcmp(varargin{i}, 'ascend') && ~ strcmp(varargin{i}, 'descend') && ~ strcmp(varargin{i}, 'undef')) )
 						error([ varargin{i} ' unrecognized argument'])
@@ -158,11 +168,11 @@ function [V,D] = eigtj(M, varargin)
 		nGivens_per_fac = min(nGivens_per_fac, nGivens);
 	end
 	if(strcmp(class(M), 'single'))
-		[core_obj, D] = mexfgftgivensRealFloat(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, order, enable_large_Faust);
+		[core_obj, D] = mexfgftgivensRealFloat(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, order, enable_large_Faust, err_period);
 		D = sparse(diag(real(double(D))));
 		V = Faust(core_obj, isreal(M), 'cpu', 'float');
 	else
-		[core_obj, D] = mexfgftgivensReal(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, order, enable_large_Faust);
+		[core_obj, D] = mexfgftgivensReal(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, order, enable_large_Faust, err_period);
 		D = sparse(diag(real(D)));
 		V = Faust(core_obj, isreal(M));
 	end

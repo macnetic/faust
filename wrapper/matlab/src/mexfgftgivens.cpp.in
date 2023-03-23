@@ -55,9 +55,9 @@ typedef @FACT_FPP@ FPP2;
 
 using namespace Faust;
 
-void fgft_givens(const mxArray* matlab_matrix, int J, int t, Real<SCALAR> tol, unsigned int verbosity, bool rel_err,  int order, const bool enable_large_Faust, mxArray **plhs);
+void fgft_givens(const mxArray* matlab_matrix, int J, int t, Real<SCALAR> tol, unsigned int verbosity, bool rel_err,  int order, const bool enable_large_Faust, const int err_period, mxArray **plhs);
 
-void fgft_givens_cplx(const mxArray* matlab_matrix, int J, int t, double tol, unsigned int verbosity, bool rel_err, int order, const bool enable_large_Faust, mxArray **plhs);
+void fgft_givens_cplx(const mxArray* matlab_matrix, int J, int t, double tol, unsigned int verbosity, bool rel_err, int order, const bool enable_large_Faust, const int err_period, mxArray **plhs);
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
@@ -69,8 +69,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	bool rel_err = true;
 	bool enable_large_Faust = false;
 	int order;
+    int err_period = 100;
 
-	if(nrhs < 2 || nrhs > 8)
+	if(nrhs < 2 || nrhs > 9)
 		mexErrMsgTxt("Bad number of input arguments");
 
 	J = (int) mxGetScalar(prhs[1]);
@@ -86,19 +87,21 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		order = (int) mxGetScalar(prhs[6]); //eigenvalues order
 	if(nrhs >= 8)
 		enable_large_Faust = (bool) mxGetScalar(prhs[7]);
+    if(nrhs >= 9)
+        err_period = (int) mxGetScalar(prhs[8]);
 
 	tol *= tol; // C++ backend works with squared norm error
 
 	const mxArray* matlab_matrix = prhs[0]; // Laplacian
 
 	if(mxIsComplex(matlab_matrix))
-		fgft_givens_cplx(matlab_matrix, J, t, tol, verbosity, rel_err, order, enable_large_Faust, plhs);
+		fgft_givens_cplx(matlab_matrix, J, t, tol, verbosity, rel_err, order, enable_large_Faust, err_period, plhs);
 	else
-		fgft_givens(matlab_matrix, J, t, tol, verbosity, rel_err,  order, enable_large_Faust, plhs);
+		fgft_givens(matlab_matrix, J, t, tol, verbosity, rel_err,  order, enable_large_Faust, err_period, plhs);
 
 }
 
-void fgft_givens(const mxArray* matlab_matrix, int J, int t, Real<SCALAR> tol, unsigned int verbosity, bool rel_err, int order, const bool enable_large_Faust, mxArray **plhs)
+void fgft_givens(const mxArray* matlab_matrix, int J, int t, Real<SCALAR> tol, unsigned int verbosity, bool rel_err, int order, const bool enable_large_Faust, const int err_period, mxArray **plhs)
 {
 	// initialization of the matrix that will be factorized
 	Faust::MatGeneric<SCALAR,Cpu>* Lap;
@@ -113,18 +116,18 @@ void fgft_givens(const mxArray* matlab_matrix, int J, int t, Real<SCALAR> tol, u
 			mxArray2FaustspMat(matlab_matrix,sLap);
 			Lap = &sLap;
 			if(t <= 1)
-				algo = new GivensFGFT<SCALAR,Cpu,FPP2>(sLap, J, verbosity, tol, rel_err, enable_large_Faust);
+				algo = new GivensFGFT<SCALAR,Cpu,FPP2>(sLap, J, verbosity, tol, rel_err, enable_large_Faust, err_period);
 			else
-				algo = new GivensFGFTParallel<SCALAR,Cpu,FPP2>(sLap, J, t, verbosity, tol, rel_err, enable_large_Faust);
+				algo = new GivensFGFTParallel<SCALAR,Cpu,FPP2>(sLap, J, t, verbosity, tol, rel_err, enable_large_Faust, err_period);
 
 		}else
 		{
 			mxArray2FaustMat(matlab_matrix,dLap);
 			Lap = &dLap;
 			if(t <= 1)
-				algo = new GivensFGFT<SCALAR,Cpu,FPP2>(dLap, J, verbosity, tol, rel_err, enable_large_Faust);
+				algo = new GivensFGFT<SCALAR,Cpu,FPP2>(dLap, J, verbosity, tol, rel_err, enable_large_Faust, err_period);
 			else
-				algo = new GivensFGFTParallel<SCALAR,Cpu,FPP2>(dLap, J, t, verbosity, tol, rel_err, enable_large_Faust);
+				algo = new GivensFGFTParallel<SCALAR,Cpu,FPP2>(dLap, J, t, verbosity, tol, rel_err, enable_large_Faust, err_period);
 		}
 
 
@@ -153,7 +156,7 @@ void fgft_givens(const mxArray* matlab_matrix, int J, int t, Real<SCALAR> tol, u
 
 }
 
-void fgft_givens_cplx(const mxArray* matlab_matrix, int J, int t, double tol, unsigned int verbosity, bool rel_err, int order, const bool enable_large_Faust, mxArray **plhs)
+void fgft_givens_cplx(const mxArray* matlab_matrix, int J, int t, double tol, unsigned int verbosity, bool rel_err, int order, const bool enable_large_Faust, const int err_period, mxArray **plhs)
 {
 	// initialization of the matrix that will be factorized
 	Faust::MatGeneric<complex<SCALAR>,Cpu>* Lap;
@@ -168,18 +171,18 @@ void fgft_givens_cplx(const mxArray* matlab_matrix, int J, int t, double tol, un
 			mxArray2FaustspMat(matlab_matrix,sLap);
 			Lap = &sLap;
 			if(t <= 1)
-				algo = new GivensFGFTComplex<complex<SCALAR>,Cpu,FPP2>(sLap, J, verbosity, tol, rel_err, enable_large_Faust);
+				algo = new GivensFGFTComplex<complex<SCALAR>,Cpu,FPP2>(sLap, J, verbosity, tol, rel_err, enable_large_Faust, err_period);
 			else
-				algo = new GivensFGFTParallelComplex<complex<SCALAR>,Cpu,FPP2>(sLap, J, t, verbosity, tol, rel_err, enable_large_Faust);
+				algo = new GivensFGFTParallelComplex<complex<SCALAR>,Cpu,FPP2>(sLap, J, t, verbosity, tol, rel_err, enable_large_Faust, err_period);
 
 		}else
 		{
 			mxArray2FaustMat(matlab_matrix,dLap);
 			Lap = &dLap;
 			if(t <= 1)
-				algo = new GivensFGFTComplex<complex<SCALAR>,Cpu,FPP2>(dLap, J, verbosity, tol, rel_err, enable_large_Faust);
+				algo = new GivensFGFTComplex<complex<SCALAR>,Cpu,FPP2>(dLap, J, verbosity, tol, rel_err, enable_large_Faust, err_period);
 			else
-				algo = new GivensFGFTParallelComplex<complex<SCALAR>,Cpu,FPP2>(dLap, J, t, verbosity, tol, rel_err, enable_large_Faust);
+				algo = new GivensFGFTParallelComplex<complex<SCALAR>,Cpu,FPP2>(dLap, J, t, verbosity, tol, rel_err, enable_large_Faust, err_period);
 		}
 
 		algo->compute_facts();
