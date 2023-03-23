@@ -408,19 +408,26 @@ namespace Faust
 						if(better_W2)
 							W2_err = algoW2->calc_err();
 
+
 						// check the errors obtained so far
 						if(better_W1 && W1_last_err >= 0)
 						{
 							better_W1 = W1_last_err > W1_err;
 							if(verbosity > 0 && ! better_W1 && ! W1_too_long)
+							{
 								std::cerr << "Warning: U approximate accuracy is not increasing anymore, stopped eigtj tunning for U." << std::endl;
+								std::cerr << "\tU current error: " << W1_err << ", previous error: " << W1_last_err << std::endl;
+							}
 						}
 
 						if(better_W2 && W2_last_err >= 0)
 						{
 							better_W2 = W2_last_err > W2_err;
 							if(verbosity > 0 && ! better_W2 && ! W2_too_long)
+							{
 								std::cerr << "Warning: V approximate accuracy is not increasing anymore, stopped eigtj tunning for V." << std::endl;
+								std::cerr << "\tV current error: " << W2_err << ", previous error: " << W2_last_err << std::endl;
+							}
 						}
 
 						if(better_W1)
@@ -457,7 +464,7 @@ namespace Faust
 						{
 							W1_MW2 = svdtj_compute_W1H_M_W2_meth3(dM, tW1, tW2, W1_MW2_, err_period, k1, k2, t1, t2, new_W1, new_W2);
 
-							prev_S = S; //TODO: shouldn't be store be recomputed if needed (when better_S becomes false which is rare)
+							prev_S = S; //TODO: shouldn't be stored and be recomputed if needed (when better_S becomes false which is rare)
 
 							// extract S from W1_MW2
 							if(order < 0)
