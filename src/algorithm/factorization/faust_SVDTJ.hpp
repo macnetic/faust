@@ -310,6 +310,7 @@ namespace Faust
 				t2 = dM_M.getNbRow() / 2;
 
 			instantiate_algos(&algoW1, &algoW2, dM_M, dMM_, /*J*/ 1, 1, t1, t2, verbosity, /*tol*/ FPP2(1), relErr, enable_large_Faust, err_period);
+
 			// J == 1, and tol == 1 but there is no incidence on their stoppingCriterion
 			// svdtj control everything of algoW1/W2 here, iteration per iteration (modulo err_period)
 			// tol == 0 because the error criterion is handled in this function if it is the stopping criterion (otherwise this is the iteration number determined by J and t)
@@ -480,10 +481,7 @@ namespace Faust
 							if(relErr) err /= M_norm;
 
 							if(verbosity)
-							{
-								std::cout << "computing the error at iteration k: " << int(k1 / t1) << " t1, t2: " << t1 << ", " << t2 << std::endl;
-								std::cout << "norm err: " << err << std::endl;
-							}
+								std::cout << "SVDTJ iteration: " << int(k1 / t1) << " approximate singular values norm error: " << err << std::endl;
 
 							if(prev_err > 0 && err > prev_err && err / prev_err >= 10)
 							{

@@ -22,6 +22,8 @@ namespace Faust
 			else
 				*algoW2 = new GivensFGFTParallelComplex<complex<@REAL_TYPE@>,Cpu,@REAL_TYPE@>(dM_M, J2, t2, verbosity, tol, relErr, enable_large_Faust, err_period);
 
+			(*algoW1)->set_tag("U");
+			(*algoW2)->set_tag("V");
 		}
 
 	template<>
@@ -47,6 +49,9 @@ namespace Faust
 				*algoW2 = new GivensFGFT<@REAL_TYPE@,Cpu,@REAL_TYPE@>(dM_M, J2, verbosity, tol, relErr, enable_large_Faust, err_period);
 			else
 				*algoW2 = new GivensFGFTParallel<@REAL_TYPE@,Cpu,@REAL_TYPE@>(dM_M, J2, t2, verbosity, tol, relErr, enable_large_Faust, err_period);
+
+			(*algoW1)->set_tag("U");
+			(*algoW2)->set_tag("V");
 		}
 
 	template<>

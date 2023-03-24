@@ -115,6 +115,9 @@ namespace Faust
 			*/
 			int err_period;
 
+			/** \brief An arbitrary tag to identify more particularly this instance of the algorithm in output */
+			std::string tag;
+
 			public:
 
 				/** Algorithm class constructor.
@@ -329,6 +332,16 @@ namespace Faust
 				const size_t nfacts() const
 				{
 					return this->get_facts().size();
+				}
+
+				void set_tag(const std::string &tag)
+				{
+					this->tag = tag;
+				}
+
+				std::string get_tag() const
+				{
+					return tag;
 				}
 
 
