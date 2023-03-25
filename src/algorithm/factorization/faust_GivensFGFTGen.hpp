@@ -327,7 +327,10 @@ Faust::Transform<FPP4,DEVICE> GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_transform
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 FPP2 GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::calc_err()
 {
-
+	// please read: https://gitlab.inria.fr/faustgrp/faust/-/issues/316
+	// for proofs that the function computes the squared absolute error
+	// i.e. \| Lap -  get_transform() * D  get_transform()' \|_F^2
+	// (resp. the squared relative error if this->errIsRel is true)
 	FPP2 err = 0, err_d;
 	for(int i=0;i<this->D.size();i++)
 		err += /*Faust::fabs(*/this->D(i)*this->D(i)/*)*/;
