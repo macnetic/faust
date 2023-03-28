@@ -433,6 +433,8 @@ namespace Faust
 			FPP sum_col(faust_unsigned_int id) const;
 			/** \brief Returns the sum of the row of index id. */
 			FPP sum_row(faust_unsigned_int id) const;
+			// \brief: sum all entries of this.
+			FPP sum() const { return mat.sum();};
 			void delete_col(int offset);
 			void delete_row(int offset);
 

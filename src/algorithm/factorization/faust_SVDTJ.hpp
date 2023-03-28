@@ -293,6 +293,33 @@ namespace Faust
 		}
 
 	template<typename FPP, FDevice DEVICE, typename FPP2>
+		MatDense<FPP, DEVICE> calc_USV_(GivensFGFTGen<Real<FPP>, DEVICE, FPP2, FPP>* algoW1, GivensFGFTGen<Real<FPP>, DEVICE, FPP2, FPP>* algoW2, size_t nfacts_W1, size_t nfacts_W2, const Vect<FPP, DEVICE> & S)
+		{
+
+			auto order = -1; // otherwise dS won't be a diagonal matrix
+			auto t1_ = std::move(algoW1->get_transform(/*order*/ order, /*copy*/ false, /*nfacts*/ nfacts_W1));
+			auto t2_ = std::move(algoW2->get_transform(/*order*/ order, /*copy*/ true, /*nfacts*/ nfacts_W2));
+			t2_.adjoint();
+			TransformHelper<FPP,DEVICE> t1(t1_, true);
+			TransformHelper<FPP,DEVICE> t2(t2_, true);
+			t1.disable_dtor();
+			t2.disable_dtor();
+			size_t m, n, min_mn;
+			m = t1.getNbRow();
+			n = t2.getNbRow();
+			min_mn = m < n?m:n;
+			MatSparse<FPP, Cpu> dS(m, n);
+			dS.setEyes();
+			for(int i=0;i<min_mn;i++)
+				dS.getValuePtr()[i] = S[i];
+			auto vec_dS = {&dS};
+			TransformHelper<FPP,DEVICE> USV_(t1, vec_dS, t2);
+			USV_.disable_dtor();
+			auto USV_prod = USV_.get_product();
+			return USV_prod;
+		}
+
+	template<typename FPP, FDevice DEVICE, typename FPP2>
 		void svdtj_core_gen_step(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM, MatDense<FPP,DEVICE> &dM_M, MatDense<FPP,DEVICE> &dMM_, int J1, int J2, int t1, int t2, FPP2 tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Vect<FPP,DEVICE> ** S_, const int err_period/*=100*/)
 		{
 
@@ -316,7 +343,7 @@ namespace Faust
 			// tol == 0 because the error criterion is handled in this function if it is the stopping criterion (otherwise this is the iteration number determined by J and t)
 
 #define continue_loop() \
-			((J1 == 0 || k1 < J1) && (J2 == 0 || k2 < J2)) && (tol == FPP2(0) || tol < err) && (new_W1 || new_W2)
+			((J1 == 0 || k1 < J1) && (J2 == 0 || k2 < J2)) && (tol == FPP2(0) || tol < terr) && (new_W1 || new_W2)
 			// three scenarii:
 			// 1) stopping only on error criterion : J == 0, 0 < tol (<= 1), stop if err <= tol
 			// 2) stopping only when a certain number of Givens are built: J > 0, t Givens built per iteration/factor for both U/W1 and V/W2, stop if k (the number of Givens built on each side) is greater or equal to J
@@ -333,8 +360,10 @@ namespace Faust
 				int k1 = 0, k2 = 0; // k counts the number of Givens built (t per factor) on each side (for U (W1) and V (W2))
 				auto M_norm = dM.norm();
 				bool dM_adj = false; //cf. svdtj_compute_W1H_M_W2_meth1
-				Real<FPP> err = 1; // relative error of the SVDTJ on norms
-				Real<FPP> prev_err = -1;
+				Real<FPP> aerr = 1; //  squared error approximate
+				Real<FPP> terr = 1; // true error (absolute or relative)
+				bool terr_enabled = false;
+				Real<FPP> prev_aerr = -1;
 				Transform<FPP, DEVICE> tW1, tW2;
 				bool loop = true;
 				MatDense<FPP, DEVICE> W1_MW2_; // previous computation of W1' M W2 (initialization at M; no Givens yet, in svdtj_compute_W1H_M_W2_meth3)
@@ -366,6 +395,16 @@ namespace Faust
 				assert(J2 == 0 || J2 > t2);
 //				assert(J1 == 0 || J1 > t1);
 //				assert(J2 == 0 || J2 > t2);
+				auto E = FPP(2 * tol / std::sqrt(m * n));
+				auto sum_M = dM.sum();
+				E *= sum_M;
+
+				// environment variable for testing
+				// if set the exact error will be computed for all iterations
+				char* str_all_true_err = getenv("SVDTJ_ALL_TRUE_ERR");
+				if(str_all_true_err)
+					terr_enabled = bool(std::atoi(str_all_true_err));
+
 				while(loop)
 				{
 
@@ -443,7 +482,6 @@ namespace Faust
 							new_W2 = better_W2;
 
 						// if both U and V are not enhancing, it's time to stop the loop
-						loop = continue_loop();
 					}
 
 					if(tol != FPP2(0) && verif_err_ite || ! loop)
@@ -476,14 +514,35 @@ namespace Faust
 									S[i] = W1_MW2(m - min_mn + i,n - min_mn + i);
 
 							// compute error
-							auto Sd_norm = S.norm();
-							err = (M_norm - Sd_norm);
-							if(relErr) err /= M_norm;
+							if(! terr_enabled)
+							{
+								auto Sd_norm = S.norm();
+								aerr = Faust::fabs(M_norm * M_norm - Sd_norm * Sd_norm);
+								terr_enabled = Faust::fabs(tol * tol - aerr) < Faust::fabs(E);
+							}
+							else
+							{ // true error enabled
+								auto USV_prod = calc_USV_(algoW1, algoW2, better_W1 && better_S?-1:algoW1->nfacts() - err_period, better_W2 && better_S?-1:algoW2->nfacts() - err_period, S);
+								USV_prod -= dM;
+								terr = USV_prod.norm();
+								if(relErr) terr /= M_norm;
+								if(verbosity)
+								{
+									std::cout << "SVDTJ ";
+									if(relErr)
+										std::cout << "relative ";
+									else
+										std::cout << "absolute ";
+									std::cout << "error: ";
+									std::cout << terr << std::endl;
+								}
+							}
+
 
 							if(verbosity)
-								std::cout << "SVDTJ iteration: " << int(k1 / t1) << " approximate singular values norm error: " << err << std::endl;
+								std::cout << "SVDTJ iteration: " << int(k1 / t1) << " singular values approximate square norm error: " << aerr << std::endl;
 
-							if(prev_err > 0 && err > prev_err && err / prev_err >= 10)
+							if(prev_aerr > 0 && aerr > prev_aerr && aerr / prev_aerr >= 10)
 							{
 								// too bad, S has not enhanced
 								// stop the algorithm with the last best result
@@ -493,13 +552,13 @@ namespace Faust
 								{
 									std::cerr << "Singular values has stopped to improve, rollback the algorithm to previous iteration and stop." << std::endl;
 									S = prev_S;
-									err = prev_err;
-									std::cout << "norm err: " << err << std::endl;
+									aerr = prev_aerr;
+									std::cout << "approximate err: " << aerr << std::endl;
 								}
 								break;
 							}
 
-							prev_err = err;
+							prev_aerr = aerr;
 							// erase permuted factors because algoW1/W2 doesn't keep account for them (cf. GivensFGFTGen::get_transform with ord == true and copy == false
 						}
 						if(order)

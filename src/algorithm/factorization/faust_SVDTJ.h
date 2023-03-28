@@ -32,6 +32,21 @@ namespace Faust
 		void svdtj_core_gen_step(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM, MatDense<FPP,DEVICE> &dM_M, MatDense<FPP,DEVICE> &dMM_, int J1, int J2, int t1, int t2, FPP2 tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Vect<FPP,DEVICE> ** S_, const int err_period=100);
 
 	/**
+	 * Computes the U S V' matrix.
+	 *
+	 * \param algo_W1: the algo computing U approximate.
+	 * \param algo_W2: the algo computing V approximate.
+	 * \param nfacts_W1: the number of first facts of W1/U that will be used in product.
+	 * \param nfacts_W2: the number of first facts of W2/V that will be used in product.
+	 * \param S: the vector of approximate singular values.
+	 *
+	 * \return the USV' product as dense matrix.
+	 */
+	template<typename FPP, FDevice DEVICE, typename FPP2>
+		MatDense<FPP, DEVICE> calc_USV_(GivensFGFTGen<Real<FPP>, DEVICE, FPP2, FPP>* algoW1, GivensFGFTGen<Real<FPP>, DEVICE, FPP2, FPP>* algoW2, size_t nfacts_W1, size_t nfacts_W2, const Vect<FPP, DEVICE> & S);
+
+
+	/**
 	 * This version runs two eigtjs blindly until they reach the tol error for the eigen decomposition or the number of Givens is reached.
 	 */
 	template<typename FPP, FDevice DEVICE, typename FPP2 = float>

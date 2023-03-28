@@ -702,7 +702,7 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		void TransformHelper<FPP,Cpu>::push_back(const FPP* data, int nrows, int ncols, const bool optimizedCopy/*=famse*/, const bool transpose/*=famse*/, const bool conjugate/*=famse*/)
+		void TransformHelper<FPP,Cpu>::push_back(const FPP* data, int nrows, int ncols, const bool optimizedCopy/*=false*/, const bool transpose/*=false*/, const bool conjugate/*=false*/)
 		{
 			this->eval_sliced_Transform();
 			this->eval_fancy_idx_Transform();
