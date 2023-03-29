@@ -123,6 +123,16 @@ namespace Faust
 	template<typename FPP, FDevice DEVICE>
 		MatDense<FPP,DEVICE> svdtj_compute_W1H_M_W2_meth3(const MatDense<FPP,DEVICE> &dM, const Transform<FPP, DEVICE> &tW1, const Transform<FPP, DEVICE> &tW2, MatDense<FPP, DEVICE> & prev_W1H_M_W2, const int err_period, const int k1, const int k2, const int t1, const int t2, const bool new_W1, const bool new_W2);
 
+
+	/**
+	 * Computes the error of PINVTJ (pseudo-inverse) with W1_MW2 the precomputed product of U'MW2 approximate and S the approximation of singular values.
+	 *
+	 * \param relErr: true to compute relative error else otherwise error is computed.
+	 * \param verbosity: true to print a message including the error.
+	 *
+	 */
+	template<typename FPP, FDevice DEVICE>
+		Real<FPP> calc_err_pinvtj(const Vect<FPP, DEVICE> &S, MatDense<FPP, DEVICE> &W1_MW2, const bool relErr, const bool verbosity);
 }
 
 #include "faust_SVDTJ.hpp"
