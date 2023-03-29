@@ -120,7 +120,7 @@ def svdtj(M, nGivens=None, tol=0, err_period=100, relerr=True,
             If it is a tuple of two integers as nGivens = (JU, JV), JU
             will be the limit number of rotations for U and JV the same for V.
             nGivens argument is optional if tol is set but becomes mandatory otherwise.
-            tol: (float) this is the error target on the norm of S relatively to M.
+            tol: (float) this is the error target on U S V' against M.
             if error <= tol, the algorithm stops. See relerr below for the error formula.
             This argument is optional if nGivens is set, otherwise it becomes mandatory.
             err_period: (int) it defines the period, in number of factors of U
@@ -128,8 +128,8 @@ def svdtj(M, nGivens=None, tol=0, err_period=100, relerr=True,
             some factors but increases slightly the computational cost because the error
             is computed more often).
             relerr: (bool) if False the norm error computed at iteration i is e_i =
-            norm(S_i, 'fro') - norm(M, 'fro'), with S_i the vector of singular
-            values produced at iteration i.
+            norm(U @ S_i @ V.H - M, 'fro'), with S_i the diagonal matrix formed
+            of the singular values produced at iteration i (completed with enough zeros).
             If relerr is False, the error is e_i / norm(M, 'fro').
             nGivens_per_fac: (int or tuple(int, int)) this argument is the number of Givens
             rotations to set at most by factor of U and V.
@@ -170,54 +170,38 @@ def svdtj(M, nGivens=None, tol=0, err_period=100, relerr=True,
             >>> np.allclose(U3 @ S3_ @ V3.H, M)
             True
             >>> # verify the relative error is lower than 1e-12
-            >>> np.abs(np.linalg.norm(S3) - np.linalg.norm(M)) / np.linalg.norm(M)
-            6.72718428324719e-16
-            >>> # try with an absolute tolerance (the previous one was relative to M norm)
-            >>> U4, S4, V4 = svdtj(M, tol=1e-12, relerr=False, enable_large_Faust=False)
+            >>> np.linalg.norm(U3 @ S3_ @ V3.H - M) / np.linalg.norm(M)
+            9.122446623891136e-13
+            >>> # try with an absolute tolerance (the previous one was relative to M)
+            >>> U4, S4, V4 = svdtj(M, tol=1e-6, relerr=False, enable_large_Faust=False)
             >>> S4_ = spdiags(S4, [0], U4.shape[0], V4.shape[0])
             >>> np.allclose(U4 @ S4_ @ V4.H, M)
             True
-            >>> # verify the absolute error is lower than 1e-12
-            >>> np.abs(np.linalg.norm(S4) - np.linalg.norm(M))
-            8.881784197001252e-15
+            >>> # verify the absolute error is lower than 1e-6
+            >>> np.linalg.norm(U4 @ S4_ @ V4.H - M)
+            1.2044207331117425e-11
             >>> # try a less accurate approximate to get less factors
-            >>> U5, S5, V5 = svdtj(M, nGivens=(256, 512), tol=1e-3, enable_large_Faust=False)
+            >>> U5, S5, V5 = svdtj(M, nGivens=(256, 512), tol=1e-1, relerr=True, enable_large_Faust=False)
             >>> S5_ = spdiags(S5, [0], U5.shape[0], V5.shape[0])
             >>> # verify the absolute error is lower than 1e-3
-            >>> np.abs(np.linalg.norm(S5) - np.linalg.norm(M)) / np.linalg.norm(M)
-            0.0043824217142030475
-            >>> # We are not exactly lower, it means that the nGivens stopping criterion
-            >>> # has been reached before tol's
-            >>> ### Now Let's see the lengths of the different U, V Fausts
+            >>> np.linalg.norm(U5 @ S5_ @ V5.H - M) / np.linalg.norm(M)
+            0.09351811486725303
+            >>> ### Let's see the lengths of the different U, V Fausts
             >>> len(V1) # it should be 4096 / nGivens_per_fac, which is (M.shape[1] // 2) = 256
             256
             >>> len(U1) # it should be 4096 / nGivens_per_fac, which is (M.shape[0] // 2) = 512
             100
-            >>> # but it is not, svdtj stopped automatically on U1 because its error stopped enhancing
+            >>> # but it is not, svdtj stopped automatically extending U1 because the error stopped enhancing
             >>> # (it can be verified with verbosity=1)
-            >>> (len(U3), len(V3))
-            (64, 200)
             >>> (len(U2), len(V2))
             (100, 200)
+            >>> (len(U3), len(V3))
+            (64, 200)
             >>> (len(U4), len(V4))
             (64, 200)
             >>> # not surprisingly U5 and V5 use the smallest number of factors (nGivens and tol were the smallest)
             >>> (len(U5), len(V5))
             (32, 32)
-            >>> # Another example about err_period
-            >>> # We can spare many factors in U3 and V3 if we verify the norm
-            >>> # error more often
-            >>> U3, S3, V3 = svdtj(M, tol=1e-12, enable_large_Faust=False, err_period=1)
-            >>> S3_ = spdiags(S3, [0], U3.shape[0], V3.shape[0])
-            >>> # verify the relative error is lower than 1e-12
-            >>> np.abs(np.linalg.norm(S3) - np.linalg.norm(M)) / np.linalg.norm(M)
-            8.043021529050339e-13
-            >>> len(U3)
-            53
-            >>> # instead of 64 factors with default value of err_period
-            >>> len(V3)
-            102
-            >>> # instead of 200 factors with default value of err_period
 
         Explanations:
 
@@ -328,6 +312,50 @@ def svdtj(M, nGivens=None, tol=0, err_period=100, relerr=True,
     U = Faust(core_obj=Ucore)
     V = Faust(core_obj=Vcore)
     return U, S, V
+
+def pinvtj(M, nGivens=None, tol=0, err_period=100, relerr=True,
+           nGivens_per_fac=None, enable_large_Faust=False, **kwargs):
+    """
+    Computes the pseudoinverse of M using svdtj.
+
+    Args:
+        M: the matrix from which to compute the pseudoinverse.
+        nGivens: cf. svdtj
+        tol:  cf. svdtj (here the error is computed on U.H S^+ V).
+        err_period: cf. svdtj
+        relerr: cf. svdtj
+        nGivens_per_fac: cf. svdtj
+        enable_large_Faust: see svdtj.
+
+    Returns:
+        The tuple V,Sp,Uh: such that V*numpy.diag(Sp)*Uh is the approximate of M^+.
+        - (np.array vector) Sp the inverses of the min(m, n) nonzero singular values
+        in ascending order. Note however that zeros might occur if M is rank r < min(*M.shape).
+        - (Faust objects) V, Uh orthonormal Fausts.
+
+
+    Example:
+        >>> from pyfaust.fact import pinvtj
+        >>> from scipy.sparse import spdiags
+        >>> import numpy as np
+        >>> from numpy.random import rand, seed
+        >>> seed(42)
+        >>> M = np.random.rand(128, 64)
+        >>> V, Sp, Uh = pinvtj(M, tol=1e-3)
+        >>> scipy_Sp = spdiags(Sp, [0], M.shape[1], M.shape[0])
+        >>> np.linalg.norm(V @ scipy_Sp @ Uh @ M - np.eye(64, 64)) / np.linalg.norm(np.eye(64, 64))
+        0.00012007583711484639
+
+    """
+    from os import environ
+    environ['PINVTJ_ERR'] = '1'
+    U, S, V = svdtj(M, nGivens=nGivens, tol=tol, err_period=err_period,
+          relerr=relerr, nGivens_per_fac=nGivens_per_fac,
+          enable_large_Faust=enable_large_Faust, **kwargs)
+    environ['PINVTJ_ERR'] = '0'
+    Sp = 1/S
+    Sp[Sp == np.inf] = 0
+    return V, Sp, U.H
 
 def eigtj(M, nGivens=None, tol=0, err_period=100, order='ascend', relerr=True,
           nGivens_per_fac=None, verbosity=0, enable_large_Faust=False):
