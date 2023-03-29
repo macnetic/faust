@@ -21,13 +21,10 @@
 %> If it is a tuple of two integers as nGivens = [JU, JV], JU
 %> will be the limit number of rotations for U and JV the same for V.
 %> nGivens argument is optional if tol is set but becomes mandatory otherwise.
-%> @param 'tol', number: this is the error target on the norm of S relatively to M.
+%> @param 'tol', number: this is the error target on U' S  V against M.
 %> if error <= tol, the algorithm stops. See relerr below for the error formula.
 %> 	This argument is optional if nGivens is set, otherwise it becomes mandatory.
-%> @param 'relerr', bool: if false the norm error computed at iteration i
-%> is e_i = norm(S_i, 'fro') - norm(M, 'fro'), with S_i the vector of singular
-%> values produced at iteration i.
-%> If relerr is false, the error is e_i / norm(M, 'fro').
+%> @param 'relerr', bool: defines the type of error used to evaluate the stopping criterion defined by tol. true for a relative error (\f$\| U' S V - M\|_F \over \| M \|_F\f$) otherwise this is an absolute error (\f$\| U' S V - M\|_F \f$).
 %> @param 'nGivens_per_fac',int: this argument is the number of Givens
 %> rotations to set at most by factor of U and V.
 %> If this is an integer it will be the same number of U and V.
@@ -37,7 +34,7 @@
 %> i.e. tU = size(M, 1) / 2, tV = size(M, 2) / 2.
 %> @param 'enable_large_Faust',bool see fact.eigtj
 %> @param 'err_period', int:  it defines the period, in number of factors of U
-%> or V, the S norm error is compared to tol (reducing the period spares
+%> or V, the error is compared to tol (reducing the period spares
 %> some factors but increases slightly the computational cost because the error
 %> is computed more often).
 %>
@@ -68,28 +65,27 @@
 %>    3.1141e-15
 %> >> % Factoring according to an approximate accuracy target
 %> >> [U3, S3, V3] = svdtj(M, 'tol', 1e-12, 'enable_large_Faust', false);
-%> >> abs((norm(S3, 'fro') - norm(M, 'fro'))) / norm(S3, 'fro')
+%> >> norm(U3 * S3 * V3' - M) / norm(M)
+%>
 %> ans =
 %>
-%>      5.3817e-16
+%>      1.5950e-13
 %>
 %> >> % try with an absolute toelrance (the previous one was relative to M norm)
-%> >> [U4, S4, V4] = svdtj(M, 'tol', 1e-12, 'relerr', false, 'enable_large_Faust', true);
-%> >> % verify the absolute error is lower than 1e-12
-%> >> abs((norm(S4, 'fro') - norm(M, 'fro')))
+%> >> [U4, S4, V4] = svdtj(M, 'tol', 1e-6, 'relerr', false, 'enable_large_Faust', true);
+%> >> % verify the absolute error is lower than 1e-6
+%> >> norm(U4 * S4 * V4' - M)
 %>
 %> ans =
 %>
-%>    7.1054e-15
+%>    3.6203e-14
 %> >> % try a less accurate approximate to get less factors
-%> >> [U5, S5, V5] = svdtj(M, 'nGivens', [256, 512], 'tol', 1e-3, 'enable_large_Faust', false);
-%> >> abs((norm(S5, 'fro') - norm(M, 'fro'))) / norm(M, 'fro')
+%> >> [U5, S5, V5] = svdtj(M, 'nGivens', [256, 512], 'tol', 1e-1, 'enable_large_Faust', false);
+%> >> norm(U5 * S5 * V5' - M) / norm(M)
 %>
 %> ans =
 %>
-%>     0.0029
-%> >> % We are not exactly lower, it means that the nGivens stopping criterion
-%> >> % has been reached before tol's
+%>     0.0500
 %> >> %%% Now let's see the lengths of the different U, V Fausts
 %> >> length(V1) % it should be 4096 / nGivens_per_fac, which is (size(M, 2) / 2) = 256
 %>
@@ -105,17 +101,18 @@
 %>
 %> >> % but it is not, svdtj stopped automatically on U1 because its error stopped enhancing
 %> >> % (it can be verified with: 'verbosity', 1)
-%> >> [length(U3), length(V3)]
-%>
-%> ans =
-%>
-%>     64   200
-%>
-%> >> [length(U2), length(V2)]
+%>%> >> [length(U2), length(V2)]
 %>
 %> ans =
 %>
 %>    100   200
+%>
+
+%> >> [length(U3), length(V3)]
+%>
+%> ans =
+%>
+%>     64   256
 %>
 %> >> [length(U4), length(V4)]
 %>
@@ -129,24 +126,6 @@
 %> ans =
 %>
 %>     32    32
-%>
-%> >> % Another example about err_period
-%> >> % We can spare many factors in U3 and V3 if we verify the norm
-%> >> % error more often
-%> >> [U3, S3, V3] = svdtj(M, 'tol', 1e-12, 'enable_large_Faust', false, 'err_period', 1);
-%> >> % verify the relative error is lower than 1e-12
-%> >> abs(norm(S3, 'fro') - norm(M, 'fro')) / norm(M, 'fro')
-%>
-%> ans =
-%>
-%>    7.4066e-13
-%>
-%> >> length(U3)
-%> 53
-%> >> % instead of 64 factors with default value of err_period
-%> >> length(V3)
-%> 103
-%> >> % instead of 200 factors with default value of err_period
 %>
 %> @endcode
 %>
@@ -176,7 +155,7 @@
 %> The last step performed by svdtj() is to sort the singular values of S in descending order and build a signed permutation matrix to order the left singular vectors of W1 accordingly. The -1 elements of the signed permutation matrix allow to change the sign of each negative values of S by reporting it on the corresponding left singular vector (\f$ \sigma v_i = (-\sigma_i) (-v_i )\f$).<br/>
 %> To sum up W1 is replaced by W1 P and W2 by W2 abs(P) (because W2 also needs to be ordered), with P the signed permutation resulting of the descending sort of S. The resulting transforms/Fausts W1 and W2 are returned by svdtj along with the ordered S. Note that the permutation factor P (resp. abs(P)) is fused with the rightmost factor of the Faust object W1 (resp. W2).
 %>
-%> <p> @b See @b also fact.eigtj
+%> <p> @b See @b also fact.eigtj, fact.pinvtj
 %>
 %>
 %====================================================================

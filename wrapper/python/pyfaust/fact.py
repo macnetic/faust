@@ -124,13 +124,12 @@ def svdtj(M, nGivens=None, tol=0, err_period=100, relerr=True,
             if error <= tol, the algorithm stops. See relerr below for the error formula.
             This argument is optional if nGivens is set, otherwise it becomes mandatory.
             err_period: (int) it defines the period, in number of factors of U
-            or V, the S norm error is compared to tol (reducing the period spares
+            or V, the error is compared to tol (reducing the period spares
             some factors but increases slightly the computational cost because the error
             is computed more often).
-            relerr: (bool) if False the norm error computed at iteration i is e_i =
-            norm(U @ S_i @ V.H - M, 'fro'), with S_i the diagonal matrix formed
-            of the singular values produced at iteration i (completed with enough zeros).
-            If relerr is False, the error is e_i / norm(M, 'fro').
+            relerr: (bool) defines the type of error used to evaluate the stopping
+            criterion defined by tol. true for a relative error (\f$\| U' S V -
+            M\|_F \over \| M \|_F\f$) otherwise this is an absolute error (\f$\| U' S V - M\|_F\f$).
             nGivens_per_fac: (int or tuple(int, int)) this argument is the number of Givens
             rotations to set at most by factor of U and V.
             If this is an integer it will be the same number of U and V.
@@ -319,7 +318,7 @@ def pinvtj(M, nGivens=None, tol=0, err_period=100, relerr=True,
     Computes the pseudoinverse of M using svdtj.
 
     Args:
-        M: the matrix from which to compute the pseudoinverse.
+        M: the matrix to compute the pseudoinverse.
         nGivens: cf. svdtj
         tol:  cf. svdtj (here the error is computed on U.H S^+ V).
         err_period: cf. svdtj
