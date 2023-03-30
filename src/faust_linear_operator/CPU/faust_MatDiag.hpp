@@ -88,12 +88,15 @@ Real<FPP> Faust::MatDiag<FPP>::normL1(faust_unsigned_int& col_id, const bool tra
 {
 	const FPP* data = getData();
 	Real<FPP> max = 0, a;
-	for(faust_unsigned_int i=0;i<std::min(this->dim1, this->dim2);i++)
-		if(Faust::fabs(a=Faust::fabs(data[i])) > Faust::fabs(max))
+	for(faust_unsigned_int i=0;i<min(this->dim1, this->dim2);i++)
+	{
+		a = Faust::fabs(data[i]);
+		if(Faust::fabs(a) > Faust::fabs(max))
 		{
 			max = a;
 			col_id = i;
 		}
+	}
 	return max;
 }
 
@@ -104,7 +107,7 @@ Faust::Vect<FPP,Cpu> Faust::MatDiag<FPP>::get_col(faust_unsigned_int id) const
 	memset(v.getData(),0, sizeof(FPP)*this->getNbRow());
 	if(id>=this->getNbCol())
 		handleError("Matdiag", "column index is out of dimension size.");
-	if(id < std::min(this->getNbRow(), this->getNbCol()))
+	if(id < min(this->getNbRow(), this->getNbCol()))
 		v.getData()[id] = getData()[id];
 	return v;
 }
@@ -114,7 +117,7 @@ Faust::MatGeneric<FPP,Cpu>* Faust::MatDiag<FPP>::get_cols(faust_unsigned_int col
 {
 	if(num_cols+col_id_start>=this->getNbCol())
 		handleError("Matdiag", "column index is out of dimension size.");
-	faust_unsigned_int dmin = std::min(this->getNbRow(), this->getNbCol());
+	faust_unsigned_int dmin = min(this->getNbRow(), this->getNbCol());
 	FPP * data = new FPP[num_cols];
 	if(col_id_start > dmin)
 		memset(data, 0, sizeof(FPP)*num_cols);
@@ -136,7 +139,7 @@ Faust::MatGeneric<FPP,Cpu>* Faust::MatDiag<FPP>::get_rows(faust_unsigned_int row
 {
 	if(num_rows+row_id_start>=this->getNbRow())
 		handleError("Matdiag", "row index is out of dimension size.");
-	faust_unsigned_int dmin = std::min(this->getNbRow(), this->getNbCol());
+	faust_unsigned_int dmin = min(this->getNbRow(), this->getNbCol());
 	FPP * data = new FPP[num_rows];
 	if(row_id_start > dmin)
 		memset(data, 0, sizeof(FPP)*num_rows);
@@ -191,7 +194,7 @@ void Faust::MatDiag<FPP>::setZeros()
 template<typename FPP>
 bool Faust::MatDiag<FPP>::containsNaN() const
 {
-	return Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>>(const_cast<FPP*>(getData()) /* no worry, just a read access */, std::min(this->dim1, this->dim2), 1).hasNaN();
+	return Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>>(const_cast<FPP*>(getData()) /* no worry, just a read access */, min(this->dim1, this->dim2), 1).hasNaN();
 }
 
 namespace Faust

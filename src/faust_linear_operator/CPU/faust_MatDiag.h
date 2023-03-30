@@ -1,5 +1,6 @@
 #ifndef __FAUST_MAT_DIAG__
 #define __FAUST_MAT_DIAG__
+#define NOMINMAX
 #ifndef NO_MATIO
 #include "matio.h" // otherwise matvar_t is defined as void from MatGeneric header
 #endif
