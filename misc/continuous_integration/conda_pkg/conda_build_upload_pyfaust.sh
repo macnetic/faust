@@ -102,6 +102,12 @@ PYFAUST_VERSION=$(echo $WHL_URL | sed -e 's/.*pyfaust-\([[:digit:].]\{1,\}\)-.*/
 #### SECOND STEP: generate the meta.yaml file for conda pkg building using the meta.yaml.in model file
 mkdir -p pyfaust
 sed -e "s%@PYFAUST_VERSION@%$PYFAUST_VERSION%;s%@WHL_URL@%$WHL_URL%" $META_YAML_PATH > pyfaust/meta.yaml
+if [[ "$SYSTEM" = win ]]
+then
+       sed -i 's%@LICENSE_FILEPATH@%..\\..\\..\\..\\license.txt%' pyfaust/meta.yaml
+else
+       sed -i 's%@LICENSE_FILEPATH@%../../../../license.txt%' pyfaust/meta.yaml
+fi
 
 #### THIRD STEP: build the package using conda
 

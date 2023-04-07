@@ -27,6 +27,7 @@ about:
   home: https://faust.inria.fr
   license: 3-clause BSD
   license_family: BSD
+  license_file: @LICENSE_FILEPATH@
   summary: 'FAµST python toolbox'
   description: |
     The FAµST toolbox provides algorithms and data structures to decompose a given dense matrix into a product of sparse matrices in order to reduce its computational complexity (both for storage and manipulation).
