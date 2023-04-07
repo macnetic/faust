@@ -20,7 +20,7 @@ Second, you need to enable the virtual environment:
 
 	C:\> call .\test_pyfaust-@CPACK_PACKAGE_VERSION@\Scripts\activate
 
-Then, if all worked correctly you must see the test_pyfaut-@CPACK_PACKAGE_VERSION@ prompt of your virtual environment.
+Then, if all worked correctly you should see the test_pyfaust-@CPACK_PACKAGE_VERSION@ prompt of your virtual environment.
 
 It remains now to install pyfaust in this environment.
 
