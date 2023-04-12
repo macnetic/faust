@@ -23,6 +23,7 @@
 #include <functional>
 #include <cstdlib>
 #include <cmath>
+#include <csignal>
 
 #define PALM4MSA2020_VERBOSE_CALC_ERR_ITE_PERIOD 1 // the period according to the relative error is computed and displayed in palm4msa2
 // this constant is overriden if the variable environment VERBOSE_CALC_ERR_ITE_PERIOD exists
@@ -37,6 +38,9 @@
 namespace Faust
 {
 
+	void palm4msa2_signal_handler(int signal);
+	void init_palm4msa2_interrupt();
+	bool is_palm4msa2_interrupted();
 
 	template <typename FPP, FDevice DEVICE>
 		void palm4msa2(

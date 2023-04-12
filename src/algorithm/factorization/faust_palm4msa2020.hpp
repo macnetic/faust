@@ -235,7 +235,11 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 		is_last_fac_updated = [&f_id, &nfacts]() {return f_id == nfacts-1;};
 	}
 
-	while(sc.do_continue(i, error))
+
+	init_palm4msa2_interrupt();
+	// set the signal handler for interruption
+	std::signal(SIGINT, palm4msa2_signal_handler);
+	while(sc.do_continue(i, error) && ! is_palm4msa2_interrupted())
 	{
 //		std::cout << "i: " <<  i << std::endl;
 //		std::cout << "nfacts:" << nfacts << std::endl;
