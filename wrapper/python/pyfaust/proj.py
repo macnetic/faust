@@ -231,6 +231,7 @@ class sp(proj_gen):
         """
 
         Args:
+            shape: shape of the input array.
             k: the number of nonzeros of the projection image.
             normalized: True to normalize the projection image according to its Frobenius norm.
             pos: True to skip negative values (replaced by zero) of the matrix to project.
@@ -272,6 +273,7 @@ class splin(proj_gen):
     def __init__(self, shape, k, normalized=True, pos=False):
         """
         Args:
+            shape: shape of the input array.
             k: the number of nonzeros of the projection image.
             normalized: True to normalize the projection image according to its Frobenius norm.
             pos: True to skip negative values (replaced by zero) of the matrix to project.
@@ -313,6 +315,7 @@ class spcol(proj_gen):
         """
 
         Args:
+            shape: shape of the input array.
             S: the support matrix.
             normalized: True to normalize the projection image according to its Frobenius norm.
             pos: True to skip negative values (replaced by zero) of the matrix to project.
@@ -377,6 +380,7 @@ class splincol(proj_gen):
         """
 
         Args:
+            shape: shape of the input array.
             k: the integer sparsity (number of nonzeros) targeted per-row and
             per-column.
             normalized: True to normalize the projection image according to its Frobenius norm.
@@ -670,6 +674,7 @@ class skperm(proj_gen):
         Projector constructor.
 
         Args:
+            shape: shape of the input array.
             k: the integer sparsity (number of nonzeros) targeted per-row and
             per-column.
             normalized: True to normalize the projection image according to its Frobenius norm.
@@ -681,7 +686,7 @@ class skperm(proj_gen):
 
 class triu_sp(proj_gen):
     """
-    Functor for the TRIU SP projector.
+    Functor for the TRIU_SP projector.
 
     A, the image matrix, is such that the lower triangular part is 0 and \f$ \| A \|_0 = k,  \| A\|_F = 1 \f$ (if normalized == True).
 
@@ -716,6 +721,7 @@ class triu_sp(proj_gen):
         """
 
         Args:
+            shape: shape of the input array.
             k: the number of nonzeros of the projection image.
             normalized: True to normalize the projection image according to its Frobenius norm.
             pos: True to skip negative values (replaced by zero) of the matrix to project.
@@ -726,7 +732,7 @@ class triu_sp(proj_gen):
 
 class tril_sp(proj_gen):
     """
-    Functor for the TRIL SP projector.
+    Functor for the TRIL_SP projector.
 
     A, the image matrix, is such that the upper triangular part is 0 and \f$ \| A \|_0 = k,  \| A\|_F = 1 \f$ (if normalized == True).
 
@@ -761,6 +767,7 @@ class tril_sp(proj_gen):
         """
 
         Args:
+            shape: shape of the input array.
             k: the number of nonzeros of the projection image.
             normalized: True to normalize the projection image according to its Frobenius norm.
             pos: True to skip negative values (replaced by zero) of the matrix to project.
@@ -804,6 +811,7 @@ class symm_sp(proj_gen):
         """
 
         Args:
+            shape: shape of the input array.
             k: the number of nonzeros of the projection image.
             normalized: True to normalize the projection image according to its Frobenius norm.
             pos: True to skip negative values (replaced by zero) of the matrix to project.
