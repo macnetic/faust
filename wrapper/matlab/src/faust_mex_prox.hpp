@@ -95,6 +95,15 @@ void faust_prox(const mxArray **prhs, const int nrhs, mxArray **plhs, const int 
 			case CONSTRAINT_NAME_ID:
 				Faust::prox_id(mat, normalized, pos);
 				break;
+            case CONSTRAINT_NAME_TRIL_SP:
+				Faust::prox_tril_sp(mat, (faust_unsigned_int) scal_param, normalized, pos);
+                break;
+            case CONSTRAINT_NAME_TRIU_SP:
+				Faust::prox_triu_sp(mat, (faust_unsigned_int) scal_param, normalized, pos);
+                break;
+            case CONSTRAINT_NAME_SYMM_SP:
+				Faust::prox_symm_sp(mat, (faust_unsigned_int) scal_param, normalized, pos);
+                break;
 			default:
 				mexErrMsgTxt("Unknown constraint name/type.");
 		}
