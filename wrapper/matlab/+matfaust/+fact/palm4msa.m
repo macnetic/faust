@@ -7,6 +7,13 @@
 %> @param 'backend',int (optional) the backend to use (the C++ implementation). Must be 2016 (the default) or 2020 (which should be faster for most of the factorizations).
 %> @param 'gpu', bool (optional) set to true to execute the algorithm using the GPU implementation. This option is only available when backend==2020.
 %>
+%>    @note If backend parameter is 2020 and independently to the StoppingCriterion defined in p,
+%>    it is possible to stop the algorithm manually at any iteration by the key
+%>    combination CTRL-C.
+%>    The last Faust computed in the factorization process will be returned.
+%>    A typical use case is when the verbose mode is enabled and you see that the error
+%>    doesn't change anymore or only slightly, you might stop iterations by typing CTRL-C.
+%>
 %> @retval F the Faust object result of the factorization.
 %> @retval [F, lambda] = palm4msa(M, p) when optionally getting lambda (scale).
 %>

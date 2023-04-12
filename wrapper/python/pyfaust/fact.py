@@ -707,6 +707,13 @@ def palm4msa(M, p, ret_lambda=False, backend=2016, on_gpu=False):
         should be faster for most of the factorizations).
         on_gpu: if True the GPU implementation is executed (this option applies only to 2020 backend).
 
+    NOTE: If backend=2020 and independently to the StoppingCriterion defined in p,
+    it is possible to stop the algorithm manually at any iteration by the key
+    combination CTRL-C.
+    The last Faust computed in the factorization process will be returned.
+    A typical use case is when the verbose mode is enabled and you see that the error
+    doesn't change anymore or only slightly, you might stop iterations by typing CTRL-C.
+
     Returns:
         The Faust object resulting of the factorization.
         if ret_lambda == True then the function returns a tuple (Faust, lambda).
@@ -940,6 +947,13 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
         simplified parametrizations used to generate a
         ParamsHierarchical instance and possibly adjust its attributes to factorize again.
 
+    NOTE: If backend=2020 and independently to the StoppingCriterion-s defined in p,
+    it is possible to stop any internal call to PALM4MSA manually at any iteration
+    by the key combination CTRL-C.
+    The last Faust computed in the PALM4MSA instance will be used to continue
+    the hierarchical factorization.
+    A typical use case is when the verbose mode is enabled and you see that the error
+    doesn't change anymore or only slightly, you might stop iterations by typing CTRL-C.
 
     Returns:
         F the Faust object result of the factorization: Faust\f$([S_1, S_2, ...
