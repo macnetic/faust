@@ -64,6 +64,8 @@ Faust::StoppingCriterion<T>& Faust::StoppingCriterion<T>::operator=(const Stoppi
 	nb_it = s.nb_it;
 	epsErr = s.epsErr;
 	lastErr = s.lastErr;
+	maxIteration = s.maxIteration;
+	errorThreshold = s.errorThreshold;
 	return *this;
 }
 
