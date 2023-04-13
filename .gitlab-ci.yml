@@ -257,6 +257,7 @@ pkg_linux_release:
 pkg_linux_release_static:
     <<: *build_gpu_mod
     stage: pkg
+    variables: {EXPERIMENTAL_PKG: 'OFF', GIT_SUBMODULE_STRATEGY: recursive} # git strategy for checking out gpu_mod
     script:
         - export FAUST_VERSION=$CI_COMMIT_TAG
         - ./misc/continuous_integration/jobs/linux/build_rpm_deb_pkgs-static_matio.sh
