@@ -4679,5 +4679,3 @@ class FaustMulMode:
     ## https://pytorch.org/docs/stable/generated/torch.chain_matmul.html?highlight=chain_matmul#torch.chain_matmul
     ## This method is only available for the specific packages pyfaust_torch.
     TORCH_CPU_DENSE_DYNPROG_SPARSE_L2R=10
-
-from pyfaust.lazylinop import LazyLinearOp
