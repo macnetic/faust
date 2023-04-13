@@ -25,9 +25,9 @@ classdef ConstraintName
 		HANKEL = 13
 		SKPERM = 14
 		ID = 15
-        TRIU_SP = 16
-        TRIL_SP = 17
-        SYMM_SP = 18
+        SPTRIU = 16
+        SPTRIL = 17
+        SPSYMM = 18
 	end
 	properties(SetAccess = public)
 		name
@@ -39,8 +39,8 @@ classdef ConstraintName
 			if(ischar(name) || iscell(name))
 				name = ConstraintName.str2name_int(name);
 			end
-			if(name > ConstraintName.SYMM_SP || name < ConstraintName.SP) %|| name == ConstraintName.BLKDIAG)
-				msg = 'name must be an integer among ConstraintName.SP, ConstraintName.SPCOL, ConstraintName.NORMCOL, ConstraintName.SPLINCOL, ConstraintName.CONST, ConstraintName.SP_POS, ConstraintName.SUPP, ConstraintName.NORMLIN, ConstraintName.TOEPLITZ, ConstraintName.CIRC, ConstraintName.ANTICIRC, ConstraintName.HANKEL, ConstraintName.SKPERM, ConstraintName.TRIL_SP, ConstraintName.TRIU_SP, ConstraintName.SYMM_SP.';
+			if(name > ConstraintName.SPSYMM || name < ConstraintName.SP) %|| name == ConstraintName.BLKDIAG)
+				msg = 'name must be an integer among ConstraintName.SP, ConstraintName.SPCOL, ConstraintName.NORMCOL, ConstraintName.SPLINCOL, ConstraintName.CONST, ConstraintName.SP_POS, ConstraintName.SUPP, ConstraintName.NORMLIN, ConstraintName.TOEPLITZ, ConstraintName.CIRC, ConstraintName.ANTICIRC, ConstraintName.HANKEL, ConstraintName.SKPERM, ConstraintName.SPTRIL, ConstraintName.SPTRIU, ConstraintName.SPSYMM.';
 				error(msg)
 			end
 			cons_name.name = name;
@@ -53,7 +53,7 @@ classdef ConstraintName
 			% (doing the same for is_real_constraint(), is_mat_constraint(), conv2str())
 			is_int = obj.name == obj.SP || obj.name == obj.SPLIN || obj.name == obj.SPCOL ...
 				|| obj.name == obj.SP_POS || obj.name == obj.SPLINCOL || obj.name == obj.SKPERM ...
-                || obj.name == obj.TRIU_SP || obj.name == obj.TRIL_SP || obj.name == obj.SYMM_SP;
+                || obj.name == obj.SPTRIU || obj.name == obj.SPTRIL || obj.name == obj.SPSYMM;
 			% BLKDIAG is a int constraint according to what faust_ConstraintGeneric.cpp indicates
 		end
 
@@ -99,12 +99,12 @@ classdef ConstraintName
 					str = 'blockdiag';
 				case obj.ID
 					str = 'id';
-                case obj.TRIL_SP
-                    str = 'tril_sp';
-                case obj.TRIU_SP
-                    str = 'triu_sp';
-                case obj.SYMM_SP
-                    str = 'symm_sp';
+                case obj.SPTRIL
+                    str = 'sptril';
+                case obj.SPTRIU
+                    str = 'sptriu';
+                case obj.SPSYMM
+                    str = 'spsymm';
 				otherwise
 					error('Unknown name')
 			end
@@ -150,12 +150,12 @@ classdef ConstraintName
 					id = ConstraintName.BLKDIAG;
 				case {'id', 'proj_id'}
 					id = ConstraintName.ID;
-                case 'symm_sp'
-                    id = ConstraintName.SYMM_SP;
-                case 'tril_sp'
-                    id = ConstraintName.TRIL_SP;
-                case 'triu_sp'
-                    id = ConstraintName.TRIU_SP;
+                case 'spsymm'
+                    id = ConstraintName.SPSYMM;
+                case 'sptril'
+                    id = ConstraintName.SPTRIL;
+                case 'sptriu'
+                    id = ConstraintName.SPTRIU;
 				otherwise
 					error(err_msg)
 			end

@@ -111,11 +111,11 @@ namespace Faust
 		Faust::MatGeneric<FPP,DEV>* prox_id_gen(Faust::MatDense<FPP,DEV> & M, const bool normalized=false, const bool pos=false,  const MatType forcedType=None);
 
   template<typename FPP, FDevice DEV>
-  MatGeneric<FPP,DEV>* prox_triu_sp_gen(MatDense<FPP,DEV> & M, faust_unsigned_int k, const bool normalized=true, const bool pos=false, const MatType forcedType=None);
+  MatGeneric<FPP,DEV>* prox_sptriu_gen(MatDense<FPP,DEV> & M, faust_unsigned_int k, const bool normalized=true, const bool pos=false, const MatType forcedType=None);
   template<typename FPP, FDevice DEV>
-  MatGeneric<FPP,DEV>* prox_tril_sp_gen(MatDense<FPP,DEV> & M, faust_unsigned_int k, const bool normalized=true, const bool pos=false, const MatType forcedType=None);
+  MatGeneric<FPP,DEV>* prox_sptril_gen(MatDense<FPP,DEV> & M, faust_unsigned_int k, const bool normalized=true, const bool pos=false, const MatType forcedType=None);
   template<typename FPP, FDevice DEV>
-  MatGeneric<FPP,DEV>* prox_symm_sp_gen(MatDense<FPP,DEV> & M, faust_unsigned_int k, const bool normalized=true, const bool pos=false, const MatType forcedType=None);
+  MatGeneric<FPP,DEV>* prox_spsymm_gen(MatDense<FPP,DEV> & M, faust_unsigned_int k, const bool normalized=true, const bool pos=false, const MatType forcedType=None);
 
 }
 

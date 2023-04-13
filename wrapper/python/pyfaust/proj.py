@@ -684,15 +684,15 @@ class skperm(proj_gen):
         super(skperm, self).__init__(shape)
         self.constraint = ConstraintInt('skperm', shape[0], shape[1], k, normalized, pos)
 
-class triu_sp(proj_gen):
+class sptriu(proj_gen):
     """
-    Functor for the TRIU_SP projector.
+    Functor for the SPTRIU projector.
 
     A, the image matrix, is such that the lower triangular part is 0 and \f$ \| A \|_0 = k,  \| A\|_F = 1 \f$ (if normalized == True).
 
 
     Example:
-        >>> from pyfaust.proj import triu_sp
+        >>> from pyfaust.proj import sptriu
         >>> from numpy.random import rand, seed
         >>> import numpy as np
         >>> seed(42) # just for reproducibility
@@ -703,7 +703,7 @@ class triu_sp(proj_gen):
                [0.02, 0.97, 0.83, 0.21, 0.18],
                [0.18, 0.3 , 0.52, 0.43, 0.29],
                [0.61, 0.14, 0.29, 0.37, 0.46]])
-        >>> p = triu_sp(M.shape, 3, normalized=False)
+        >>> p = sptriu(M.shape, 3, normalized=False)
         >>> p(M)
         array([[0.  , 0.95, 0.  , 0.  , 0.  ],
                [0.  , 0.  , 0.87, 0.  , 0.  ],
@@ -714,7 +714,7 @@ class triu_sp(proj_gen):
         True
 
 
-    <b>See also:</b> pyfaust.proj.tril_sp
+    <b>See also:</b> pyfaust.proj.sptril
     """
 
     def __init__(self, shape, k, normalized=True, pos=False):
@@ -727,18 +727,18 @@ class triu_sp(proj_gen):
             pos: True to skip negative values (replaced by zero) of the matrix to project.
 
         """
-        super(triu_sp, self).__init__(shape)
-        self.constraint = ConstraintInt('triu_sp', shape[0], shape[1], k, normalized, pos)
+        super(sptriu, self).__init__(shape)
+        self.constraint = ConstraintInt('sptriu', shape[0], shape[1], k, normalized, pos)
 
-class tril_sp(proj_gen):
+class sptril(proj_gen):
     """
-    Functor for the TRIL_SP projector.
+    Functor for the SPTRIL projector.
 
     A, the image matrix, is such that the upper triangular part is 0 and \f$ \| A \|_0 = k,  \| A\|_F = 1 \f$ (if normalized == True).
 
 
     Example:
-        >>> from pyfaust.proj import tril_sp
+        >>> from pyfaust.proj import sptril
         >>> from numpy.random import rand, seed
         >>> import numpy as np
         >>> seed(42) # just for reproducibility
@@ -749,7 +749,7 @@ class tril_sp(proj_gen):
                [0.02, 0.97, 0.83, 0.21, 0.18],
                [0.18, 0.3 , 0.52, 0.43, 0.29],
                [0.61, 0.14, 0.29, 0.37, 0.46]])
-        >>> p = tril_sp(M.shape, 3, normalized=False)
+        >>> p = sptril(M.shape, 3, normalized=False)
         >>> p(M)
         array([[0.  , 0.  , 0.  , 0.  , 0.  ],
                [0.  , 0.  , 0.  , 0.  , 0.  ],
@@ -760,7 +760,7 @@ class tril_sp(proj_gen):
         True
 
 
-    <b>See also:</b> pyfaust.proj.triu_sp
+    <b>See also:</b> pyfaust.proj.sptriu
     """
 
     def __init__(self, shape, k, normalized=True, pos=False):
@@ -773,10 +773,10 @@ class tril_sp(proj_gen):
             pos: True to skip negative values (replaced by zero) of the matrix to project.
 
         """
-        super(tril_sp, self).__init__(shape)
-        self.constraint = ConstraintInt('tril_sp', shape[0], shape[1], k, normalized, pos)
+        super(sptril, self).__init__(shape)
+        self.constraint = ConstraintInt('sptril', shape[0], shape[1], k, normalized, pos)
 
-class symm_sp(proj_gen):
+class spsymm(proj_gen):
     """
     Functor for the SYMM SP projector.
 
@@ -784,7 +784,7 @@ class symm_sp(proj_gen):
 
 
     Example:
-        >>> from pyfaust.proj import symm_sp
+        >>> from pyfaust.proj import spsymm
         >>> from numpy.random import rand, seed
         >>> import numpy as np
         >>> seed(42) # just for reproducibility
@@ -795,7 +795,7 @@ class symm_sp(proj_gen):
                [0.02, 0.97, 0.83, 0.21, 0.18],
                [0.18, 0.3 , 0.52, 0.43, 0.29],
                [0.61, 0.14, 0.29, 0.37, 0.46]])
-        >>> p = symm_sp(M.shape, 3, normalized=False)
+        >>> p = spsymm(M.shape, 3, normalized=False)
         >>> p(M)
         array([[0.  , 0.95, 0.  , 0.  , 0.  ],
                [0.95, 0.  , 0.97, 0.  , 0.  ],
@@ -817,5 +817,5 @@ class symm_sp(proj_gen):
             pos: True to skip negative values (replaced by zero) of the matrix to project.
 
         """
-        super(symm_sp, self).__init__(shape)
-        self.constraint = ConstraintInt('symm_sp', shape[0], shape[1], k, normalized, pos)
+        super(spsymm, self).__init__(shape)
+        self.constraint = ConstraintInt('spsymm', shape[0], shape[1], k, normalized, pos)

@@ -208,12 +208,12 @@ Faust::MatGeneric<FPP,DEV>* Faust::prox_sp_gen(Faust::MatDense<FPP, DEV> & M, fa
 }
 
 template<typename FPP, FDevice DEV>
-Faust::MatGeneric<FPP,DEV>* Faust::prox_triu_sp_gen(Faust::MatDense<FPP, DEV> & M, faust_unsigned_int k, const bool normalized/*=true*/, const bool pos/*=false*/, const MatType forcedType/*=None*/)
+Faust::MatGeneric<FPP,DEV>* Faust::prox_sptriu_gen(Faust::MatDense<FPP, DEV> & M, faust_unsigned_int k, const bool normalized/*=true*/, const bool pos/*=false*/, const MatType forcedType/*=None*/)
 {
 	const faust_unsigned_int dim1 = M.getNbRow();
 	const faust_unsigned_int dim2 = M.getNbCol();
 	auto out_is_dense = Faust::sparse_size<FPP>(k, dim1) > Faust::dense_size<FPP>(dim1, dim2) && forcedType == None || forcedType == Dense;
-	prox_triu_sp(M, k, normalized, pos);
+	prox_sptriu(M, k, normalized, pos);
 	if(out_is_dense)
 		return new Faust::MatDense<FPP,DEV>(M);
 	else
@@ -221,12 +221,12 @@ Faust::MatGeneric<FPP,DEV>* Faust::prox_triu_sp_gen(Faust::MatDense<FPP, DEV> & 
 }
 
 template<typename FPP, FDevice DEV>
-Faust::MatGeneric<FPP,DEV>* Faust::prox_tril_sp_gen(Faust::MatDense<FPP, DEV> & M, faust_unsigned_int k, const bool normalized/*=true*/, const bool pos/*=false*/, const MatType forcedType/*=None*/)
+Faust::MatGeneric<FPP,DEV>* Faust::prox_sptril_gen(Faust::MatDense<FPP, DEV> & M, faust_unsigned_int k, const bool normalized/*=true*/, const bool pos/*=false*/, const MatType forcedType/*=None*/)
 {
 	const faust_unsigned_int dim1 = M.getNbRow();
 	const faust_unsigned_int dim2 = M.getNbCol();
 	auto out_is_dense = Faust::sparse_size<FPP>(k, dim1) > Faust::dense_size<FPP>(dim1, dim2) && forcedType == None || forcedType == Dense;
-	prox_tril_sp(M, k, normalized, pos);
+	prox_sptril(M, k, normalized, pos);
 	if(out_is_dense)
 		return new Faust::MatDense<FPP,DEV>(M);
 	else
@@ -234,12 +234,12 @@ Faust::MatGeneric<FPP,DEV>* Faust::prox_tril_sp_gen(Faust::MatDense<FPP, DEV> & 
 }
 
 template<typename FPP, FDevice DEV>
-Faust::MatGeneric<FPP,DEV>* Faust::prox_symm_sp_gen(Faust::MatDense<FPP, DEV> & M, faust_unsigned_int k, const bool normalized/*=true*/, const bool pos/*=false*/, const MatType forcedType/*=None*/)
+Faust::MatGeneric<FPP,DEV>* Faust::prox_spsymm_gen(Faust::MatDense<FPP, DEV> & M, faust_unsigned_int k, const bool normalized/*=true*/, const bool pos/*=false*/, const MatType forcedType/*=None*/)
 {
   const faust_unsigned_int dim1 = M.getNbRow();
   const faust_unsigned_int dim2 = M.getNbCol();
   auto out_is_dense = Faust::sparse_size<FPP>(k, dim1) > Faust::dense_size<FPP>(dim1, dim2) && forcedType == None || forcedType == Dense;
-  prox_symm_sp(M, k, normalized, pos);
+  prox_spsymm(M, k, normalized, pos);
   if(out_is_dense)
     return new Faust::MatDense<FPP,DEV>(M);
   else

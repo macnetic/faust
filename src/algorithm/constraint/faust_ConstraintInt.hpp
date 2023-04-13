@@ -111,9 +111,9 @@ void Faust::ConstraintInt<FPP,DEVICE>::check_constraint_name()const
    case CONSTRAINT_NAME_SP_POS:
    case CONSTRAINT_NAME_BLKDIAG: //TODO: shouldn't it be a matrix constraint?
    case CONSTRAINT_NAME_SKPERM:
-   case CONSTRAINT_NAME_TRIU_SP:
-   case CONSTRAINT_NAME_TRIL_SP:
-   case CONSTRAINT_NAME_SYMM_SP:
+   case CONSTRAINT_NAME_SPTRIU:
+   case CONSTRAINT_NAME_SPTRIL:
+   case CONSTRAINT_NAME_SPSYMM:
      break;
    default:
      handleError(m_className," cannot create Faust::ConstraintInt objet from an faust_constraint object with constraint with constraint_name");
@@ -147,13 +147,13 @@ void Faust::ConstraintInt<FPP,DEVICE>::set_default_parameter()
       case CONSTRAINT_NAME_SKPERM:
          m_parameter = 0;
          break;
-   case CONSTRAINT_NAME_TRIU_SP:
+   case CONSTRAINT_NAME_SPTRIU:
      m_parameter = 0;
      break;
-   case CONSTRAINT_NAME_TRIL_SP:
+   case CONSTRAINT_NAME_SPTRIL:
      m_parameter = 0;
      break;
-   case CONSTRAINT_NAME_SYMM_SP:
+   case CONSTRAINT_NAME_SPSYMM:
      m_parameter = 0;
      break;
    default:
@@ -185,14 +185,14 @@ void Faust::ConstraintInt<FPP,DEVICE>::project(Faust::MatDense<FPP,DEVICE> & mat
       case CONSTRAINT_NAME_SKPERM:
          Faust::prox_skperm(mat, m_parameter, normalizing, pos);
          break;
-   case CONSTRAINT_NAME_TRIU_SP:
-     Faust::prox_triu_sp(mat, m_parameter, normalizing, pos);
+   case CONSTRAINT_NAME_SPTRIU:
+     Faust::prox_sptriu(mat, m_parameter, normalizing, pos);
      break;
-   case CONSTRAINT_NAME_TRIL_SP:
-     Faust::prox_tril_sp(mat, m_parameter, normalizing, pos);
+   case CONSTRAINT_NAME_SPTRIL:
+     Faust::prox_sptril(mat, m_parameter, normalizing, pos);
      break;
-   case CONSTRAINT_NAME_SYMM_SP:
-     Faust::prox_symm_sp(mat, m_parameter, normalizing, pos);
+   case CONSTRAINT_NAME_SPSYMM:
+     Faust::prox_spsymm(mat, m_parameter, normalizing, pos);
      break;
    default:
      handleError(m_className,"project : cannot project with this constraint name");
@@ -217,12 +217,12 @@ Faust::MatGeneric<FPP,DEVICE>* Faust::ConstraintInt<FPP,DEVICE>::project_gen(Fau
       return Faust::prox_sp_gen(mat, m_parameter, normalizing, pos);
     case CONSTRAINT_NAME_SKPERM:
       return Faust::prox_skperm_gen(mat,m_parameter, normalizing, pos);
-    case CONSTRAINT_NAME_TRIU_SP:
-      return Faust::prox_triu_sp_gen(mat, m_parameter, normalizing, pos);
-    case CONSTRAINT_NAME_TRIL_SP:
-      return Faust::prox_tril_sp_gen(mat, m_parameter, normalizing, pos);
-    case CONSTRAINT_NAME_SYMM_SP:
-      return Faust::prox_symm_sp_gen(mat, m_parameter, normalizing, pos);
+    case CONSTRAINT_NAME_SPTRIU:
+      return Faust::prox_sptriu_gen(mat, m_parameter, normalizing, pos);
+    case CONSTRAINT_NAME_SPTRIL:
+      return Faust::prox_sptril_gen(mat, m_parameter, normalizing, pos);
+    case CONSTRAINT_NAME_SPSYMM:
+      return Faust::prox_spsymm_gen(mat, m_parameter, normalizing, pos);
     default:
       handleError(m_className,"project : cannot project with this constraint name");
       break;

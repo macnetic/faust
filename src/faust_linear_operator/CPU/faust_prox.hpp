@@ -710,13 +710,13 @@ void Faust::prox_id(Faust::MatDense<FPP,Cpu> & M, const bool normalized /* deft 
 }
 
 template<typename FPP>
-void Faust::prox_triu_sp(Faust::MatDense<FPP, Cpu> & M, faust_unsigned_int k, const bool normalized /* true by default */, const bool pos)
+void Faust::prox_sptriu(Faust::MatDense<FPP, Cpu> & M, faust_unsigned_int k, const bool normalized /* true by default */, const bool pos)
 {
   Faust::prox_tri_sp(M, k, true, normalized, pos);
 }
 
 template<typename FPP>
-void Faust::prox_tril_sp(Faust::MatDense<FPP, Cpu> & M, faust_unsigned_int k, const bool normalized /* true by default */, const bool pos)
+void Faust::prox_sptril(Faust::MatDense<FPP, Cpu> & M, faust_unsigned_int k, const bool normalized /* true by default */, const bool pos)
 {
   Faust::prox_tri_sp(M, k, false, normalized, pos);
 }
@@ -832,7 +832,7 @@ void Faust::prox_tri_sp(Faust::MatDense<FPP, Cpu> & M, faust_unsigned_int k, boo
 }
 
 template<typename FPP>
-void Faust::prox_symm_sp(Faust::MatDense<FPP, Cpu> & M, faust_unsigned_int k, const bool normalized /* true by default */, const bool pos)
+void Faust::prox_spsymm(Faust::MatDense<FPP, Cpu> & M, faust_unsigned_int k, const bool normalized /* true by default */, const bool pos)
 {
   int row, col, ii, count = 0, symm_count = 0;
   const faust_unsigned_int dim1 = M.getNbRow();

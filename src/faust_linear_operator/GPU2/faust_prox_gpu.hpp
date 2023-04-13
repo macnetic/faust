@@ -215,13 +215,13 @@ namespace Faust
 		}
 
   template<typename FPP>
-  void prox_triu_sp(MatDense<FPP,GPU2> & M, faust_unsigned_int k, const bool normalized/*=true*/, const bool pos/*=false*/, const bool pure_gpu/*=true*/)
+  void prox_sptriu(MatDense<FPP,GPU2> & M, faust_unsigned_int k, const bool normalized/*=true*/, const bool pos/*=false*/, const bool pure_gpu/*=true*/)
   {
     prox_tri_sp(M, k, true, normalized, pos, pure_gpu);
   }
 
   template<typename FPP>
-  void prox_tril_sp(MatDense<FPP,GPU2> & M, faust_unsigned_int k, const bool normalized/*=true*/, const bool pos/*=false*/, const bool pure_gpu/*=true*/)
+  void prox_sptril(MatDense<FPP,GPU2> & M, faust_unsigned_int k, const bool normalized/*=true*/, const bool pos/*=false*/, const bool pure_gpu/*=true*/)
   {
     prox_tri_sp(M, k, false, normalized, pos, pure_gpu);
   }
@@ -241,15 +241,15 @@ namespace Faust
   }
 
   template<typename FPP>
-  void prox_symm_sp(MatDense<FPP,GPU2> & M, faust_unsigned_int k, const bool normalized/*=true*/, const bool pos/*=false*/, const bool pure_gpu/*=true*/)
+  void prox_spsymm(MatDense<FPP,GPU2> & M, faust_unsigned_int k, const bool normalized/*=true*/, const bool pos/*=false*/, const bool pure_gpu/*=true*/)
   {
     if(pure_gpu)
-//      M.prox_symm_sp(k, normalized, pos);
-		throw std::runtime_error("prox_symm_sp is not implemented on GPU");
+//      M.prox_spsymm(k, normalized, pos);
+		throw std::runtime_error("prox_spsymm is not implemented on GPU");
     else
       {
 	MatDense<FPP,Cpu> cpuM = M.tocpu();
-	prox_symm_sp(cpuM, k, normalized, pos);
+	prox_spsymm(cpuM, k, normalized, pos);
 	M = cpuM;
       }
   }

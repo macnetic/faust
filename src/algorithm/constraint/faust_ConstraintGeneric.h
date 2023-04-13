@@ -64,9 +64,9 @@ enum faust_constraint_name
    CONSTRAINT_NAME_HANKEL,
    CONSTRAINT_NAME_SKPERM,
    CONSTRAINT_NAME_ID,
-   CONSTRAINT_NAME_TRIU_SP, /*!< upper triangular matrix with fixed number of non zero elements, INT (Frobenius norm 1) */
-   CONSTRAINT_NAME_TRIL_SP, /*!< lower triangular matrix with fixed number of non zero elements, INT (Frobenius norm 1) */
-   CONSTRAINT_NAME_SYMM_SP /*!< symmetric matrix with fixed number of non zero elements, INT (Frobenius norm 1) */
+   CONSTRAINT_NAME_SPTRIU, /*!< upper triangular matrix with fixed number of non zero elements, INT (Frobenius norm 1) */
+   CONSTRAINT_NAME_SPTRIL, /*!< lower triangular matrix with fixed number of non zero elements, INT (Frobenius norm 1) */
+   CONSTRAINT_NAME_SPSYMM /*!< symmetric matrix with fixed number of non zero elements, INT (Frobenius norm 1) */
 };
 
 

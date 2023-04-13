@@ -32,9 +32,9 @@ bool PyxConstraintGeneric::is_int_constraint()
     case CONSTRAINT_NAME_SPLINCOL:
     case CONSTRAINT_NAME_SP_POS:
     case CONSTRAINT_NAME_SKPERM:
-    case CONSTRAINT_NAME_TRIU_SP:
-    case CONSTRAINT_NAME_TRIL_SP:
-    case CONSTRAINT_NAME_SYMM_SP:
+    case CONSTRAINT_NAME_SPTRIU:
+    case CONSTRAINT_NAME_SPTRIL:
+    case CONSTRAINT_NAME_SPSYMM:
       return true;
     default:
       return false;
@@ -192,14 +192,14 @@ int prox_int(unsigned int cons_type, unsigned long cons_param, FPP* mat_in, unsi
             case CONSTRAINT_NAME_SKPERM:
                 Faust::prox_skperm(fmat, (faust_unsigned_int) cons_param, normalized, pos);
                 break;
-	case CONSTRAINT_NAME_TRIU_SP:
-	  Faust::prox_triu_sp(fmat, (faust_unsigned_int) cons_param, normalized, pos);
+	case CONSTRAINT_NAME_SPTRIU:
+	  Faust::prox_sptriu(fmat, (faust_unsigned_int) cons_param, normalized, pos);
 	  break;
-	case CONSTRAINT_NAME_TRIL_SP:
-	  Faust::prox_tril_sp(fmat, (faust_unsigned_int) cons_param, normalized, pos);
+	case CONSTRAINT_NAME_SPTRIL:
+	  Faust::prox_sptril(fmat, (faust_unsigned_int) cons_param, normalized, pos);
 	  break;
-	case CONSTRAINT_NAME_SYMM_SP:
-	  Faust::prox_symm_sp(fmat, (faust_unsigned_int) cons_param, normalized, pos);
+	case CONSTRAINT_NAME_SPSYMM:
+	  Faust::prox_spsymm(fmat, (faust_unsigned_int) cons_param, normalized, pos);
 	  break;
 	default:
 	  throw invalid_argument("PyxConstraintInt::project() inconsistent constraint name");
