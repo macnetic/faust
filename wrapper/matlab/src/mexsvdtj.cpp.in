@@ -112,11 +112,11 @@ void svdtj(const mxArray* matlab_matrix, int J1, int J2, int t1, int t2, Real<SC
 			if (mxIsSparse(matlab_matrix))
 			{
 				mxArray2FaustspMat(matlab_matrix,sM_cplx);
-				svdtj_cplx(sM_cplx, J1, J2, t1, t2, tol, verbosity, relErr, order, enable_large_Faust, &U_cplx, &V_cplx, &S_cplx, err_period);
+				svdtj_cplx(sM_cplx, J1, J2, t1, t2, (double) tol, verbosity, relErr, order, enable_large_Faust, &U_cplx, &V_cplx, &S_cplx, err_period);
 			}else
 			{
 				mxArray2FaustMat(matlab_matrix, dM_cplx);
-				svdtj_cplx(dM_cplx, J1, J2, t1, t2, tol, verbosity, relErr, order, enable_large_Faust, &U_cplx, &V_cplx, &S_cplx, err_period);
+				svdtj_cplx(dM_cplx, J1, J2, t1, t2, (double) tol, verbosity, relErr, order, enable_large_Faust, &U_cplx, &V_cplx, &S_cplx, err_period);
 			}
 			if(U_cplx != nullptr)
 			{
