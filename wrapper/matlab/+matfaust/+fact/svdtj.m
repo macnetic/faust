@@ -38,6 +38,21 @@
 %> some factors but increases slightly the computational cost because the error
 %> is computed more often).
 %>
+%>
+%> \note In order to speed up the error computation of the approximate Faust, the
+%> algorithm follows a two-times strategy:
+%> 1. In the first iterations a rough error but less costly error is computed \f$\| M \|^2_F - \| S \|^2_F\f$
+%> 2. In the latest iterations the precise error (relative or absolute) indicated above
+%> (see relerr argument) is computed to reach the targeted accuracy. Don't forget that
+%> the err_period argument determines the frequency at which the error is
+%> calculated, you might decrease its value in order to obtain an error closer to
+%> what you asked. In last resort you can disable the two-times strategy by
+%> setting the environment related variable like this (defaulty the value is '0', which means
+%> that the two-times strategy is used).
+%> @code
+%> setenv('SVDTJ_ALL_TRUE_ERR', '1')
+%> @endcode
+%>
 %> @retval [U,S,V]: such that U*S*V' is the approximate of M with:
 %>      - S: (sparse real diagonal matrix) the singular values in descending order.
 %>      - U, V: (Faust objects) orthonormal transforms.
