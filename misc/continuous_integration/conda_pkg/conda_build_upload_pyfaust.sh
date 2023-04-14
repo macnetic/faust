@@ -1,7 +1,7 @@
 #!/bin/bash
 #set -e # won't continue any further if an error occurs
 
-# This script pupose is to build a conda pkg from wheel online pip package
+# This script purpose is to build a conda pkg from wheel online pip package
 # for linux, macosx or windows (by running the script on the same system) and upload it
 
 SYSTEM_ERROR="system must be either: linux, macosx or win"
@@ -104,9 +104,9 @@ mkdir -p pyfaust
 sed -e "s%@PYFAUST_VERSION@%$PYFAUST_VERSION%;s%@WHL_URL@%$WHL_URL%" $META_YAML_PATH > pyfaust/meta.yaml
 if [[ "$SYSTEM" = win ]]
 then
-       sed -i 's%@LICENSE_FILEPATH@%..\\..\\..\\..\\license.txt%' pyfaust/meta.yaml
+       sed -i 's%@LICENSE_FILEPATH@%..\\license.txt%' pyfaust/meta.yaml
 else
-       sed -i 's%@LICENSE_FILEPATH@%../../../../license.txt%' pyfaust/meta.yaml
+       sed -i 's%@LICENSE_FILEPATH@%../license.txt%' pyfaust/meta.yaml
 fi
 
 #### THIRD STEP: build the package using conda
