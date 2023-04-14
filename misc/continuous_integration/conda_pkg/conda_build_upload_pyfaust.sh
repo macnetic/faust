@@ -105,9 +105,15 @@ sed -e "s%@PYFAUST_VERSION@%$PYFAUST_VERSION%;s%@WHL_URL@%$WHL_URL%" $META_YAML_
 if [[ "$SYSTEM" = win ]]
 then
        sed -i 's%@LICENSE_FILEPATH@%..\\license.txt%' pyfaust/meta.yaml
-else
+elif [[ "$SYSTEM" = macosx ]]
+then
+       # macos sed doesn't like -i for some versions
+       sed -e 's/@LICENSE_FILEPATH@/..\/license.txt/' pyfaust/meta.yaml > /tmp/meta.yaml
+       mv /tmp/meta.yaml pyfaust/meta.yaml
+else # [[ "$SYSTEM" = linux ]]
        sed -i 's%@LICENSE_FILEPATH@%../license.txt%' pyfaust/meta.yaml
 fi
+
 
 #### THIRD STEP: build the package using conda
 
