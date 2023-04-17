@@ -196,7 +196,7 @@ def svdtj(M, nGivens=None, tol=0, err_period=100, relerr=True,
             >>> # try a less accurate approximate to get less factors
             >>> U5, S5, V5 = svdtj(M, nGivens=(256, 512), tol=1e-1, relerr=True, enable_large_Faust=False)
             >>> S5_ = spdiags(S5, [0], U5.shape[0], V5.shape[0])
-            >>> # verify the absolute error is lower than 1e-3
+            >>> # verify the absolute error is lower than 1e-1
             >>> np.linalg.norm(U5 @ S5_ @ V5.H - M) / np.linalg.norm(M)
             0.09351811486725303
             >>> ### Let's see the lengths of the different U, V Fausts

@@ -457,6 +457,13 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			this.verifyEqual(err, 0.0555, 'AbsTol', 0.0001)
 		end
 
+        function test_svdtj(this)
+            import matfaust.fact.svdtj
+            M = rand(16, 32);
+            [U5, S5, V5] = svdtj(M, 'tol', 1e-3, 'enable_large_Faust', false);
+            this.verifyLessThanOrEqual(norm(U5 * S5 * V5' - M) / norm(M), 1e-3)
+        end
+
 		function testHadamard(this)
 			disp('Test matfaust.wht()')
 			import matfaust.*

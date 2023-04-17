@@ -1624,7 +1624,7 @@ class TestFaustFactory(unittest.TestCase):
         M = rand(128,128)
         M = M.dot(M.T)
         D,U = eigtj(M, tol=err, relerr=False)
-        self.assertAlmostEqual(norm(M-U@np.diag(D)@U.T), err, places=3 )
+        self.assertLessEqual(norm(M-U@np.diag(D)@U.T), err)
         L = loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['Lap']
         L = L.astype(np.float64)
         M_cplx = L*np.complex128(1+0j) + L*np.complex128(0+1j)
@@ -1645,6 +1645,17 @@ class TestFaustFactory(unittest.TestCase):
         M_cplx = M_cplx.dot(np.matrix(M_cplx).H)
         D,U = eigtj(M_cplx, tol=err)
         self.assertLessEqual(norm(M_cplx-U@np.diag(D)@U.H)/norm(M_cplx), err)
+
+    def test_svdtj(self):
+        from pyfaust.fact import svdtj
+        from numpy.random import rand, seed
+        import numpy as np
+        from scipy.sparse import spdiags
+        M = rand(16, 32)
+        U5, S5, V5 = svdtj(M, tol=1e-3, relerr=True, enable_large_Faust=False)
+        S5_ = spdiags(S5, [0], U5.shape[0], V5.shape[0])
+        self.assertLessEqual(np.linalg.norm(U5 @ S5_ @ V5.H - M) /
+                             np.linalg.norm(M), 1e-3)
 
     def testFactPalm4MSA_fgft(self):
         print("Test pyfaust.fact._palm4msa_fgft()")
