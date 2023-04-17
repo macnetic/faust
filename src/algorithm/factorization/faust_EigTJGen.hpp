@@ -9,7 +9,7 @@ using namespace Faust;
 
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::update_D()
+void EigTJGen<FPP,DEVICE,FPP2,FPP4>::update_D()
 {
 	// D = spdiag(diag(L))
 	for(int i=0;i<D.size();i++)
@@ -23,13 +23,13 @@ void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::update_D()
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::order_D()
+void EigTJGen<FPP,DEVICE,FPP2,FPP4>::order_D()
 {
 	order_D(1);
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::order_D(const int order /* -1 for descending order, 1 for ascending order, 0 no order*/)
+void EigTJGen<FPP,DEVICE,FPP2,FPP4>::order_D(const int order /* -1 for descending order, 1 for ascending order, 0 no order*/)
 {
 	ordered_D = Faust::Vect<FPP,DEVICE>(D.size());
 	ord_indices.resize(0);
@@ -61,7 +61,7 @@ void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::order_D(const int order /* -1 for desc
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-const vector<int>& GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_ord_indices(const int order/*=1*/)
+const vector<int>& EigTJGen<FPP,DEVICE,FPP2,FPP4>::get_ord_indices(const int order/*=1*/)
 {
 	if(! is_D_ordered || D_order_dir != order)
 		order_D(order);
@@ -70,7 +70,7 @@ const vector<int>& GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_ord_indices(const in
 
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::compute_facts()
+void EigTJGen<FPP,DEVICE,FPP2,FPP4>::compute_facts()
 {
 
 
@@ -95,7 +95,7 @@ void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::compute_facts()
 	}
 	if(verbosity > 1)
 	{
-		std::cout << "GivensFGFTGen::compute_facts() end" << std::endl;
+		std::cout << "EigTJGen::compute_facts() end" << std::endl;
 		std::cout << "J: " << J << std::endl;
 		std::cout << "tol: " << stoppingError << std::endl;
 		std::cout << "stopcrit is error: " << stoppingCritIsError << std::endl;
@@ -107,13 +107,13 @@ void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::compute_facts()
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::GivensFGFTGen(MatGeneric<FPP4,DEVICE>* Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust /* deft to false */, const int err_period/*=100*/) :
+EigTJGen<FPP,DEVICE,FPP2,FPP4>::EigTJGen(MatGeneric<FPP4,DEVICE>* Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust /* deft to false */, const int err_period/*=100*/) :
 facts(J>0?(J*4<Lap->getNbRow()*Lap->getNbRow()||enable_large_Faust?J:0):0 /* don't allocate if the complexity doesn't worth it and enable_large_Faust is false*/), q_candidates(new int[Lap->getNbRow()]), J(J), D(Lap->getNbRow()), errs(0), coord_choices(0), Lap(*Lap), dim_size(Lap->getNbRow()), Lap_squared_fro_norm(0), is_D_ordered(false), D_order_dir(0), verbosity(verbosity), stoppingCritIsError(stoppingError != 0.0), stoppingError(stoppingError), errIsRel(errIsRel), enable_large_Faust(enable_large_Faust), ite(0), err_period(err_period), tag("")
 {
 	if(Lap->getNbCol() != Lap->getNbRow())
-		handleError("Faust::GivensFGFTComplex", "Laplacian must be a square matrix.");
+		handleError("Faust::EigTJComplex", "Laplacian must be a square matrix.");
 
-	if(this->J == 0 && ! this->stoppingCritIsError) handleError("GivensFGFT", "Either J or stoppingError must be > 0");
+	if(this->J == 0 && ! this->stoppingCritIsError) handleError("EigTJ", "Either J or stoppingError must be > 0");
 	// init the identity part of the factor buffer model
 	// allocate the mem. space for the 4 additional rotation part coeffs
 	for(int i=0;i<dim_size;i++)
@@ -127,34 +127,34 @@ facts(J>0?(J*4<Lap->getNbRow()*Lap->getNbRow()||enable_large_Faust?J:0):0 /* don
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::GivensFGFTGen(Faust::MatSparse<FPP4, DEVICE> & Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust/* deft to false */, const int err_period/*=100*/) :  GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>(&Lap, J, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period)
+EigTJGen<FPP,DEVICE,FPP2,FPP4>::EigTJGen(Faust::MatSparse<FPP4, DEVICE> & Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust/* deft to false */, const int err_period/*=100*/) :  EigTJGen<FPP,DEVICE,FPP2,FPP4>(&Lap, J, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period)
 {
 	L = new MatSparse<FPP4,DEVICE>(Lap);
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::GivensFGFTGen(Faust::MatDense<FPP4, DEVICE> & Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust/* deft to false */, const int err_period/*=100*/) : GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>(&Lap, J, verbosity, stoppingError, errIsRel,  enable_large_Faust, err_period)
+EigTJGen<FPP,DEVICE,FPP2,FPP4>::EigTJGen(Faust::MatDense<FPP4, DEVICE> & Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust/* deft to false */, const int err_period/*=100*/) : EigTJGen<FPP,DEVICE,FPP2,FPP4>(&Lap, J, verbosity, stoppingError, errIsRel,  enable_large_Faust, err_period)
 {
 	L = new MatDense<FPP4,DEVICE>(Lap);
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-FPP2 GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_err(int j) const
+FPP2 EigTJGen<FPP,DEVICE,FPP2,FPP4>::get_err(int j) const
 {
 	if(j > 0 && j < errs.size())
 		return errs[j];
 	else
-		throw out_of_range("GivensFGFTGen::get_err(j): j is out of range.");
+		throw out_of_range("EigTJGen::get_err(j): j is out of range.");
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-const vector<FPP2>& GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_errs() const
+const vector<FPP2>& EigTJGen<FPP,DEVICE,FPP2,FPP4>::get_errs() const
 {
 	return errs;
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-const Faust::Vect<FPP,DEVICE>& GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_D(const bool ord /* default to false */)
+const Faust::Vect<FPP,DEVICE>& EigTJGen<FPP,DEVICE,FPP2,FPP4>::get_D(const bool ord /* default to false */)
 {
 	if(ord)
 	{
@@ -166,7 +166,7 @@ const Faust::Vect<FPP,DEVICE>& GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_D(const 
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-const Faust::Vect<FPP,DEVICE>& GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_D(const int ord /* default to false */)
+const Faust::Vect<FPP,DEVICE>& EigTJGen<FPP,DEVICE,FPP2,FPP4>::get_D(const int ord /* default to false */)
 {
 	if(ord != 0)
 	{
@@ -179,7 +179,7 @@ const Faust::Vect<FPP,DEVICE>& GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_D(const 
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 template<typename FPP3>
-void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_Dspm(Faust::MatSparse<FPP3,DEVICE> & spD, const bool ord /* default to false */)
+void EigTJGen<FPP,DEVICE,FPP2,FPP4>::get_Dspm(Faust::MatSparse<FPP3,DEVICE> & spD, const bool ord /* default to false */)
 {
 	const Faust::Vect<FPP,DEVICE>& D_ = this->get_D(ord);
 	vector<int> nat_ord_indices;
@@ -193,13 +193,13 @@ void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_Dspm(Faust::MatSparse<FPP3,DEVICE>
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_D(FPP* diag_data, const bool ord /* default to false */)
+void EigTJGen<FPP,DEVICE,FPP2,FPP4>::get_D(FPP* diag_data, const bool ord /* default to false */)
 {
 	get_D(diag_data, ord?1:0);
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_D(FPP* diag_data, const int ord /* default to false */)
+void EigTJGen<FPP,DEVICE,FPP2,FPP4>::get_D(FPP* diag_data, const int ord /* default to false */)
 {
 	const Faust::Vect<FPP,DEVICE>& D_ = get_D(ord);
 	const FPP* src_data_ptr = D_.getData();
@@ -207,7 +207,7 @@ void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_D(FPP* diag_data, const int ord /*
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-const Faust::MatDense<FPP4,DEVICE> GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::compute_fourier(const bool ord /* default to false */)
+const Faust::MatDense<FPP4,DEVICE> EigTJGen<FPP,DEVICE,FPP2,FPP4>::compute_fourier(const bool ord /* default to false */)
 {
 	Faust::MatDense<FPP4,Cpu> fourier(L->getNbRow(), L->getNbCol());
 	Faust::MatDense<FPP4,Cpu>* ord_fourier;
@@ -227,19 +227,19 @@ const Faust::MatDense<FPP4,DEVICE> GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::compute_
 
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-const Faust::MatGeneric<FPP,DEVICE>& GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_L() const
+const Faust::MatGeneric<FPP,DEVICE>& EigTJGen<FPP,DEVICE,FPP2,FPP4>::get_L() const
 {
 	return *L;
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-const vector<pair<int,int>>& GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_coord_choices() const
+const vector<pair<int,int>>& EigTJGen<FPP,DEVICE,FPP2,FPP4>::get_coord_choices() const
 {
 	return coord_choices;
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_coord_choice(int j, int& p, int& q) const
+void EigTJGen<FPP,DEVICE,FPP2,FPP4>::get_coord_choice(int j, int& p, int& q) const
 {
 	if(j > 0 && j < coord_choices.size())
 	{
@@ -247,30 +247,30 @@ void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_coord_choice(int j, int& p, int& q
 		q = coord_choices[j].second;
 	}
 	else
-		throw out_of_range("GivensFGFTGen::get_coord_choice(j,p,q): j is out of range.");
+		throw out_of_range("EigTJGen::get_coord_choice(j,p,q): j is out of range.");
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-const Faust::MatDense<FPP4,DEVICE>& GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_Lap() const
+const Faust::MatDense<FPP4,DEVICE>& EigTJGen<FPP,DEVICE,FPP2,FPP4>::get_Lap() const
 {
 	return Lap;
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-const vector<Faust::MatSparse<FPP4,DEVICE>>& GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_facts() const
+const vector<Faust::MatSparse<FPP4,DEVICE>>& EigTJGen<FPP,DEVICE,FPP2,FPP4>::get_facts() const
 {
 	return facts;
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-Faust::Transform<FPP4,DEVICE> GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_transform(const bool ord)
+Faust::Transform<FPP4,DEVICE> EigTJGen<FPP,DEVICE,FPP2,FPP4>::get_transform(const bool ord)
 {
 	return get_transform(ord?1:0);
 }
 
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-Faust::Transform<FPP4,DEVICE> GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_transform(const int ord, const bool copy/*=true*/, const int first_nfacts/*=-1*/)
+Faust::Transform<FPP4,DEVICE> EigTJGen<FPP,DEVICE,FPP2,FPP4>::get_transform(const int ord, const bool copy/*=true*/, const int first_nfacts/*=-1*/)
 {
 	//TODO: facts should be a Transform or a TransformHelper to avoid the risk of memory leak in caller code when ord == true and copy == false
 	if(facts.size() == 0)
@@ -325,7 +325,7 @@ Faust::Transform<FPP4,DEVICE> GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_transform
 
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-FPP2 GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::calc_err()
+FPP2 EigTJGen<FPP,DEVICE,FPP2,FPP4>::calc_err()
 {
 	// please read: https://gitlab.inria.fr/faustgrp/faust/-/issues/316
 	// for proofs that the function computes the squared absolute error
@@ -349,7 +349,7 @@ FPP2 GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::calc_err()
 
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-void GivensFGFTGen<FPP, DEVICE, FPP2, FPP4>::update_err()
+void EigTJGen<FPP, DEVICE, FPP2, FPP4>::update_err()
 {
 	if(!((this->ite+1) % this->err_period) && this->stoppingCritIsError || this->verbosity > 1)
 	{

@@ -1,8 +1,8 @@
 #include "faust_MatDense.h"
-#include "faust_GivensFGFTParallel.h"
-#include "faust_GivensFGFT.h"
-#include "faust_GivensFGFTComplex.h"
-#include "faust_GivensFGFTParallelComplex.h"
+#include "faust_EigTJParallel.h"
+#include "faust_EigTJ.h"
+#include "faust_EigTJComplex.h"
+#include "faust_EigTJParallelComplex.h"
 #include "faust_SVDTJ.h"
 using namespace Faust;
 
@@ -11,14 +11,14 @@ FaustCoreCpp<FPP>* fact_givens_fgft_sparse(FPP* data, int* row_ptr, int* id_col,
         unsigned int J, unsigned int t /* end of input parameters*/, FPP* D, unsigned int verbosity, const FPP2 stoppingError, const bool errIsRel, const int order, const bool enable_large_Faust, const int err_period)
 {
       Faust::MatSparse<FPP, Cpu> mat_Lap(nnz, nrows, ncols, data, id_col, row_ptr);
-      GivensFGFT<FPP, Cpu, FPP2>* algo;
+      EigTJ<FPP, Cpu, FPP2>* algo;
       if(t <= 1)
       {
-          algo = new GivensFGFT<FPP, Cpu, FPP2>(mat_Lap, (int)J, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period);
+          algo = new EigTJ<FPP, Cpu, FPP2>(mat_Lap, (int)J, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period);
       }
       else
       {
-          algo = new GivensFGFTParallel<FPP, Cpu, FPP2>(mat_Lap, (int)J, (int) t, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period);
+          algo = new EigTJParallel<FPP, Cpu, FPP2>(mat_Lap, (int)J, (int) t, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period);
       }
       return fact_givens_fgft_generic(algo, D, order);
 }
@@ -30,20 +30,20 @@ FaustCoreCpp<FPP>* fact_givens_fgft(const FPP* Lap, unsigned int num_rows, unsig
     //just using the data in Lap as underlying pointer of MatDense)
     Faust::MatDense<FPP,Cpu> mat_Lap(Lap, num_rows, num_cols);
 
-    GivensFGFT<FPP, Cpu, FPP2>* algo;
+    EigTJ<FPP, Cpu, FPP2>* algo;
     if(t <= 1)
     {
-        algo = new GivensFGFT<FPP, Cpu, FPP2>(mat_Lap, (int)J, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period);
+        algo = new EigTJ<FPP, Cpu, FPP2>(mat_Lap, (int)J, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period);
     }
     else
     {
-        algo = new GivensFGFTParallel<FPP, Cpu, FPP2>(mat_Lap, (int)J, (int) t, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period);
+        algo = new EigTJParallel<FPP, Cpu, FPP2>(mat_Lap, (int)J, (int) t, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period);
     }
     return fact_givens_fgft_generic(algo, D, order);
 }
 
 template<typename FPP, typename FPP2>
-FaustCoreCpp<FPP>* fact_givens_fgft_generic(GivensFGFT<FPP, Cpu, FPP2>* algo, FPP* D, const int order)
+FaustCoreCpp<FPP>* fact_givens_fgft_generic(EigTJ<FPP, Cpu, FPP2>* algo, FPP* D, const int order)
 {
 
     FaustCoreCpp<FPP>* fc = nullptr;
@@ -73,14 +73,14 @@ FaustCoreCpp<FPP>* fact_givens_fgft_sparse_cplx(FPP* data, int* row_ptr, int* id
         unsigned int J, unsigned int t /* end of input parameters*/, FPP2* D, unsigned int verbosity, const FPP2 stoppingError, const bool errIsRel, const int order, const bool enable_large_Faust, const int err_period)
 {
       Faust::MatSparse<FPP, Cpu> mat_Lap(nnz, nrows, ncols, data, id_col, row_ptr);
-      GivensFGFTComplex<FPP, Cpu, FPP2>* algo;
+      EigTJComplex<FPP, Cpu, FPP2>* algo;
       if(t <= 1)
       {
-          algo = new GivensFGFTComplex<FPP, Cpu, FPP2>(mat_Lap, (int)J, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period);
+          algo = new EigTJComplex<FPP, Cpu, FPP2>(mat_Lap, (int)J, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period);
       }
       else
       {
-          algo = new GivensFGFTParallelComplex<FPP, Cpu, FPP2>(mat_Lap, (int)J, (int) t, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period);
+          algo = new EigTJParallelComplex<FPP, Cpu, FPP2>(mat_Lap, (int)J, (int) t, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period);
       }
       return fact_givens_fgft_generic_cplx(algo, D, order);
 }
@@ -92,20 +92,20 @@ FaustCoreCpp<FPP>* fact_givens_fgft_cplx(const FPP* Lap, unsigned int num_rows, 
     //just using the data in Lap as underlying pointer of MatDense)
     Faust::MatDense<FPP,Cpu> mat_Lap(Lap, num_rows, num_cols);
 
-    GivensFGFTComplex<FPP, Cpu, FPP2>* algo;
+    EigTJComplex<FPP, Cpu, FPP2>* algo;
     if(t <= 1)
     {
-        algo = new GivensFGFTComplex<FPP, Cpu, FPP2>(mat_Lap, (int)J, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period);
+        algo = new EigTJComplex<FPP, Cpu, FPP2>(mat_Lap, (int)J, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period);
     }
     else
     {
-        algo = new GivensFGFTParallelComplex<FPP, Cpu, FPP2>(mat_Lap, (int)J, (int) t, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period);
+        algo = new EigTJParallelComplex<FPP, Cpu, FPP2>(mat_Lap, (int)J, (int) t, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period);
     }
     return fact_givens_fgft_generic_cplx(algo, D, order);
 }
 
 template<typename FPP, typename FPP2>
-FaustCoreCpp<FPP>* fact_givens_fgft_generic_cplx(GivensFGFTComplex<FPP, Cpu, FPP2>* algo, FPP2* D, const int order)
+FaustCoreCpp<FPP>* fact_givens_fgft_generic_cplx(EigTJComplex<FPP, Cpu, FPP2>* algo, FPP2* D, const int order)
 {
 
     FaustCoreCpp<FPP>* fc = nullptr;

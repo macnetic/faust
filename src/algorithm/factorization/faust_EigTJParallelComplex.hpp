@@ -1,7 +1,7 @@
 using namespace Faust; //TODO: remove, not advisable in a header
 
 template<typename FPP, FDevice DEVICE, typename FPP2>
-GivensFGFTParallelComplex<FPP,DEVICE,FPP2>::GivensFGFTParallelComplex(Faust::MatDense<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity, const double stoppingError, const bool errIsRel,  const bool enable_large_Faust, const int err_period/*=100*/) : GivensFGFTComplex<FPP,DEVICE,FPP2>(Lap, J, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period), /*t(t), fact_nrots(0)*/ GivensFGFTParallelGen<typename FPP::value_type, DEVICE, FPP2, FPP>(t, *this)
+EigTJParallelComplex<FPP,DEVICE,FPP2>::EigTJParallelComplex(Faust::MatDense<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity, const double stoppingError, const bool errIsRel,  const bool enable_large_Faust, const int err_period/*=100*/) : EigTJComplex<FPP,DEVICE,FPP2>(Lap, J, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period), /*t(t), fact_nrots(0)*/ EigTJParallelGen<typename FPP::value_type, DEVICE, FPP2, FPP>(t, *this)
 {
 	if(J > 0) this->facts.resize(round(J/(float)t));
 	this->coord_choices.resize(0);
@@ -9,7 +9,7 @@ GivensFGFTParallelComplex<FPP,DEVICE,FPP2>::GivensFGFTParallelComplex(Faust::Mat
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2>
-GivensFGFTParallelComplex<FPP,DEVICE,FPP2>::GivensFGFTParallelComplex(Faust::MatSparse<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity, const double stoppingError, const bool errIsRel, const bool enable_large_Faust, const int err_period/*=100*/) : GivensFGFTComplex<FPP,DEVICE,FPP2>(Lap, J, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period), /* t(t), fact_nrots(0) */ GivensFGFTParallelGen<typename FPP::value_type, DEVICE, FPP2, FPP>(t, *this)
+EigTJParallelComplex<FPP,DEVICE,FPP2>::EigTJParallelComplex(Faust::MatSparse<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity, const double stoppingError, const bool errIsRel, const bool enable_large_Faust, const int err_period/*=100*/) : EigTJComplex<FPP,DEVICE,FPP2>(Lap, J, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period), /* t(t), fact_nrots(0) */ EigTJParallelGen<typename FPP::value_type, DEVICE, FPP2, FPP>(t, *this)
 {
 	if(J > 0) this->facts.resize(round(J/(float)t));
 	this->coord_choices.resize(0);
@@ -17,7 +17,7 @@ GivensFGFTParallelComplex<FPP,DEVICE,FPP2>::GivensFGFTParallelComplex(Faust::Mat
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2>
-void GivensFGFTParallelComplex<FPP,DEVICE,FPP2>::init_fact_nz_inds_sort_func()
+void EigTJParallelComplex<FPP,DEVICE,FPP2>::init_fact_nz_inds_sort_func()
 {
 	this->fact_nz_inds_sort_func= [](const pair<int,int> &a, const pair<int,int> &b, Faust::MatDense<FPP,DEVICE> & L_low)
 	{
@@ -30,20 +30,20 @@ void GivensFGFTParallelComplex<FPP,DEVICE,FPP2>::init_fact_nz_inds_sort_func()
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2>
-void GivensFGFTParallelComplex<FPP,DEVICE,FPP2>::next_step()
+void EigTJParallelComplex<FPP,DEVICE,FPP2>::next_step()
 {
 
 	substep_fun substep[] = {
-		&GivensFGFTParallelGen<typename FPP::value_type,DEVICE,FPP2,FPP>::max_L,
-		&GivensFGFTParallelComplex<FPP,DEVICE,FPP2>::loop_update_fact, //responsible to call choose_pivot(), calc_theta() and update_fact()
-		&GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L,
-		&GivensFGFTParallelComplex<FPP,DEVICE,FPP2>::update_D,
-		&GivensFGFTParallelComplex<FPP,DEVICE,FPP2>::update_err};
+		&EigTJParallelGen<typename FPP::value_type,DEVICE,FPP2,FPP>::max_L,
+		&EigTJParallelComplex<FPP,DEVICE,FPP2>::loop_update_fact, //responsible to call choose_pivot(), calc_theta() and update_fact()
+		&EigTJComplex<FPP,DEVICE,FPP2>::update_L,
+		&EigTJParallelComplex<FPP,DEVICE,FPP2>::update_D,
+		&EigTJParallelComplex<FPP,DEVICE,FPP2>::update_err};
 
 	for(int i=0;i<sizeof(substep)/sizeof(substep_fun);i++)
 	{
 #ifdef DEBUG_GIVENS
-		cout << "GivensFGFTParallelComplex ite=" << this->ite << " substep i=" << i << endl;
+		cout << "EigTJParallelComplex ite=" << this->ite << " substep i=" << i << endl;
 #endif
 		(this->*substep[i])();
 	}
@@ -51,7 +51,7 @@ void GivensFGFTParallelComplex<FPP,DEVICE,FPP2>::next_step()
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2>
-void GivensFGFTParallelComplex<FPP,DEVICE,FPP2>::update_fact()
+void EigTJParallelComplex<FPP,DEVICE,FPP2>::update_fact()
 {
 	FPP c_pp, c_pq, c_qp, c_qq;
 	FPP i = complex<typename FPP::value_type>(0,1);
@@ -102,7 +102,7 @@ void GivensFGFTParallelComplex<FPP,DEVICE,FPP2>::update_fact()
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2>
-void GivensFGFTParallelComplex<FPP,DEVICE,FPP2>::update_L(Faust::MatDense<FPP,Cpu> & L)
+void EigTJParallelComplex<FPP,DEVICE,FPP2>::update_L(Faust::MatDense<FPP,Cpu> & L)
 {
 	// L = S'*L*S
 //#undef OPT_UPDATE_L

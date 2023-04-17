@@ -178,14 +178,14 @@ endif(NOT NOCPPTESTS)
 ####### IF THE MATIO LIBRARY IS AVAILABLE ELSE WE USE TXT OR XML DATA  #######
 if(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE AND NOT NOCPPTESTS) # AND HDF5_LIB_FILE)
 	include_directories(${FAUST_BIN_TEST_SRC_DIR})
-	set(GIVENS_CLASS "GivensFGFTComplex<SCALAR,DEVICE,SCALAR2>")
+	set(GIVENS_CLASS "EigTJComplex<SCALAR,DEVICE,SCALAR2>")
 	set(GIVENS_SCALAR "Complex")
-	configure_file(${FAUST_SRC_TEST_SRC_CPP_DIR}/GivensFGFTUtil.h ${FAUST_BIN_TEST_SRC_DIR}/GivensFGFTUtilComplex.h @ONLY)
-	configure_file(${FAUST_SRC_TEST_SRC_CPP_DIR}/GivensFGFTUtil.hpp ${FAUST_BIN_TEST_SRC_DIR}/GivensFGFTUtilComplex.hpp @ONLY)
-	set(GIVENS_CLASS "GivensFGFT<SCALAR,DEVICE,SCALAR2>")
+	configure_file(${FAUST_SRC_TEST_SRC_CPP_DIR}/EigTJUtil.h ${FAUST_BIN_TEST_SRC_DIR}/EigTJUtilComplex.h @ONLY)
+	configure_file(${FAUST_SRC_TEST_SRC_CPP_DIR}/EigTJUtil.hpp ${FAUST_BIN_TEST_SRC_DIR}/EigTJUtilComplex.hpp @ONLY)
+	set(GIVENS_CLASS "EigTJ<SCALAR,DEVICE,SCALAR2>")
 	set(GIVENS_SCALAR "Real")
-	configure_file(${FAUST_SRC_TEST_SRC_CPP_DIR}/GivensFGFTUtil.h ${FAUST_BIN_TEST_SRC_DIR}/GivensFGFTUtilReal.h @ONLY)
-	configure_file(${FAUST_SRC_TEST_SRC_CPP_DIR}/GivensFGFTUtil.hpp ${FAUST_BIN_TEST_SRC_DIR}/GivensFGFTUtilReal.hpp @ONLY)
+	configure_file(${FAUST_SRC_TEST_SRC_CPP_DIR}/EigTJUtil.h ${FAUST_BIN_TEST_SRC_DIR}/EigTJUtilReal.h @ONLY)
+	configure_file(${FAUST_SRC_TEST_SRC_CPP_DIR}/EigTJUtil.hpp ${FAUST_BIN_TEST_SRC_DIR}/EigTJUtilReal.hpp @ONLY)
 
 	### list of executable generated in double and simple precision
 	# hierarchical_fact : test the hierarchical_fact algorithm
@@ -193,7 +193,7 @@ if(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE AND NOT NOCPPTESTS) 
 	# faust_multiplication : time comparison between Faust-vector product and Dense matrix-vector product
 
 
-	list(APPEND tests hierarchicalFactorization hierarchicalFactorizationFFT test_palm4MSA test_palm4MSAFFT faust_multiplication  faust_matdense_conjugate GivensFGFT GivensFGFTSparse GivensFGFTParallel GivensFGFTParallelSparse test_MatDiag faust_matsparse_mul faust_matsparse_index_op GivensFGFTComplex GivensFGFTComplexSparse GivensFGFTParallelComplex faust_toeplitz faust_circ faust_hankel faust_sparse_prox_sp palm4msa_2020 hierarchical2020 hierarchical2020Hadamard hierarchicalFactorizationHadamard hierarchicalFactorizationButterfly hierarchicalFactorizationButterflyBalanced test_MatBSR test_dynprog_mul_cpu faust_butterfly_transform faust_butterfly_transform2 faust_butterfly_mat faust_perm_mat test_svdtj)
+	list(APPEND tests hierarchicalFactorization hierarchicalFactorizationFFT test_palm4MSA test_palm4MSAFFT faust_multiplication  faust_matdense_conjugate EigTJ EigTJSparse EigTJParallel EigTJParallelSparse test_MatDiag faust_matsparse_mul faust_matsparse_index_op EigTJComplex EigTJComplexSparse EigTJParallelComplex faust_toeplitz faust_circ faust_hankel faust_sparse_prox_sp palm4msa_2020 hierarchical2020 hierarchical2020Hadamard hierarchicalFactorizationHadamard hierarchicalFactorizationButterfly hierarchicalFactorizationButterflyBalanced test_MatBSR test_dynprog_mul_cpu faust_butterfly_transform faust_butterfly_transform2 faust_butterfly_mat faust_perm_mat test_svdtj)
 
 	if(FAUST_TORCH)
 		list(APPEND tests faust_torch)
@@ -215,10 +215,10 @@ if(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE AND NOT NOCPPTESTS) 
 			endif()
 			if(${TEST_FPP} MATCHES complex )
 				set(TEST_IS_COMPLEX 1)
-				if(${testin} MATCHES GivensFGFT OR ${testin} MATCHES palm4msa_2020 OR ${testin} MATCHES hierarchical2020.* OR ${testin} MATCHES hierarchicalFactorizationHadamard OR ${testin} MATCHES hierarchicalFactorizationButterfly)
+				if(${testin} MATCHES EigTJ OR ${testin} MATCHES palm4msa_2020 OR ${testin} MATCHES hierarchical2020.* OR ${testin} MATCHES hierarchicalFactorizationHadamard OR ${testin} MATCHES hierarchicalFactorizationButterfly)
 					continue()
 				endif()
-				# GivensFGFT doesn't handle complex matrices
+				# EigTJ doesn't handle complex matrices
 			else()
 				set(TEST_IS_COMPLEX 0)
 			endif()

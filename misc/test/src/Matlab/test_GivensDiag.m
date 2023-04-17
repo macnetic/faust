@@ -1,5 +1,5 @@
-% This matlab test is a reference for C++ port of GivensFGFT
-% the C++ test in misc/test/src/C++/GivensFGFT.cpp.in is using the same file
+% This matlab test is a reference for C++ port of EigTJ
+% the C++ test in misc/test/src/C++/EigTJ.cpp.in is using the same file
 % so the results can be compared
 
 

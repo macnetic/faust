@@ -1522,7 +1522,7 @@ class TestFaustFactory(unittest.TestCase):
         err = norm((F@D.toarray())@F.T.toarray()-L,"fro")/norm(L,"fro")
         print("err: ", err)
         # the error reference is from the C++ test,
-        # misc/test/src/C++/GivensFGFT.cpp.in
+        # misc/test/src/C++/EigTJ.cpp.in
         self.assertAlmostEqual(err, 0.0326529, places=7)
         # check nnz for the F.numfactors()-1 first factors
         for fac in [F.factors(i) for i in range(0,F.numfactors())]:
@@ -1544,7 +1544,7 @@ class TestFaustFactory(unittest.TestCase):
         err = norm((F@D.toarray())@F.T.toarray()-L,"fro")/norm(L,"fro")
         print("err: ", err)
         # the error reference is from the C++ test,
-        # misc/test/src/C++/GivensFGFTParallel.cpp.in (_double version)
+        # misc/test/src/C++/EigTJParallel.cpp.in (_double version)
         self.assertAlmostEqual(err, 0.0398154, places=7)
         D2, F2 = eigtj(L, J, nGivens_per_fac=t, verbosity=0,
                        enable_large_Faust=True)
@@ -1553,7 +1553,7 @@ class TestFaustFactory(unittest.TestCase):
         err2 = norm((F2@D.toarray())@F2.T.toarray()-L,"fro")/norm(L,"fro")
         print("err2: ", err2)
         # the error reference is from the C++ test,
-        # misc/test/src/C++/GivensFGFTParallel.cpp.in
+        # misc/test/src/C++/EigTJParallel.cpp.in
         self.assertEqual(err, err2)
         # check nnz for the last factors (avoiding errors due to pivot image
         # near to zero in first factors)
@@ -1577,7 +1577,7 @@ class TestFaustFactory(unittest.TestCase):
         err = norm((F@D.toarray())@F.T.toarray()-L,"fro")/norm(L,"fro")
         print("err: ", err)
         # the error reference is from the C++ test,
-        # misc/test/src/C++/GivensFGFT.cpp.in
+        # misc/test/src/C++/EigTJ.cpp.in
         self.assertAlmostEqual(err, 0.0326529, places=7)
         # check nnz for the F.numfactors()-1 first factors
         for fac in [F.factors(i) for i in range(0,F.numfactors())]:
@@ -1599,7 +1599,7 @@ class TestFaustFactory(unittest.TestCase):
         err = norm((F@D.toarray())@F.T.toarray()-L,"fro")/norm(L,"fro")
         print("err: ", err)
         # the error reference is from the C++ test,
-        # misc/test/src/C++/GivensFGFTParallel.cpp.in (_double version)
+        # misc/test/src/C++/EigTJParallel.cpp.in (_double version)
         self.assertAlmostEqual(err, 0.0398154, places=7)
         D2, F2 = eigtj(csr_matrix(L), J, nGivens_per_fac=t, verbosity=0,
                        enable_large_Faust=True)
@@ -1608,7 +1608,7 @@ class TestFaustFactory(unittest.TestCase):
         err2 = norm((F2@D.toarray())@F2.T.toarray()-L,"fro")/norm(L,"fro")
         print("err2: ", err2)
         # the error reference is from the C++ test,
-        # misc/test/src/C++/GivensFGFTParallel.cpp.in
+        # misc/test/src/C++/EigTJParallel.cpp.in
         self.assertEqual(err, err2)
         # check nnz for the last factors
         for fac in [F2.factors(i) for i in range(F2.numfactors()-10, F2.numfactors())]:

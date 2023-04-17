@@ -1,5 +1,5 @@
-% This matlab test is a reference for C++ port of GivensFGFTParallel
-% the C++ test in misc/test/src/C++/GivensFGFTParallel.cpp.in is using the same file
+% This matlab test is a reference for C++ port of EigTJParallel
+% the C++ test in misc/test/src/C++/EigTJParallel.cpp.in is using the same file
 % so the results can be compared
 
 p = mfilename('fullpath');

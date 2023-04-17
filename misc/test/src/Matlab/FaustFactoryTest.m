@@ -352,7 +352,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			E = F*full(D)*F'-Lap;
 			err = norm(E,'fro')/norm(Lap,'fro')
 			% the error reference is from the C++ test,
-			% misc/test/src/C++/GivensFGFT.cpp.in
+			% misc/test/src/C++/EigTJ.cpp.in
 			this.verifyEqual(err, 0.0326529, 'AbsTol', 0.00001)
 			% verify it works the same using the eigtj() alias function
 			[F2,D2] = matfaust.fact.eigtj(Lap, 'nGivens', J, 'enable_large_Faust', true, 'nGivens_per_fac', 1);%, 0, 'verbosity', 2);
@@ -371,7 +371,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			E = F*full(D)*F'-Lap;
 			err = norm(E,'fro')/norm(Lap,'fro')
 			% the error reference is from the C++ test,
-			% misc/test/src/C++/GivensFGFT.cpp.in
+			% misc/test/src/C++/EigTJ.cpp.in
 			this.verifyEqual(err, 0.0326529, 'AbsTol', 0.00001)
 			% verify it works the same using the eigtj() alias function
 			[F2,D2] = matfaust.fact.eigtj(Lap, 'nGivens', J, 'nGivens_per_fac', 1, 'enable_large_Faust', true);%, 0, 'verbosity', 2);
@@ -391,7 +391,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			E = F*full(D)*F'-Lap;
 			err = norm(E,'fro')/norm(Lap,'fro')
 			% the error reference is from the C++ test,
-			% misc/test/src/C++/GivensFGFTParallel.cpp.in
+			% misc/test/src/C++/EigTJParallel.cpp.in
 			this.verifyEqual(err,0.0398154, 'AbsTol', 0.00001)
 			% verify it works the same using the eigtj() alias function
 			[F2,D2] = matfaust.fact.eigtj(Lap, 'nGivens', J, 'nGivens_per_fac', t, 'enable_large_Faust', true); %, 'verbosity', 2);
@@ -411,7 +411,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			E = F*full(D)*F'-Lap;
 			err = norm(E,'fro')/norm(Lap,'fro')
 			% the error reference is from the C++ test,
-			% misc/test/src/C++/GivensFGFTParallel.cpp.in
+			% misc/test/src/C++/EigTJParallel.cpp.in
 			this.verifyEqual(err, 0.0398154, 'AbsTol', 0.00001)
 			% verify it works the same using the eigtj() alias function
 			[F2,D2] = matfaust.fact.eigtj(Lap, 'nGivens', J, 'nGivens_per_fac', t, 'enable_large_Faust', true); %, 'verbosity', 2);

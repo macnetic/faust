@@ -13,12 +13,12 @@ namespace Faust
 {
 
 	template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-		class GivensFGFTParallelGen;
+		class EigTJParallelGen;
 
 	template<typename FPP, FDevice DEVICE, typename FPP2 = Real<FPP>, typename FPP4 = FPP>
-		class GivensFGFTGen {
+		class EigTJGen {
 			/**
-			 * \class GivensFGFTGen
+			 * \class EigTJGen
 			 *
 			 * \brief This class implements the Givens FGFT algorithm.
 			 * This algorithm is based on the classical Jacobi eigenvalues algorithm.
@@ -32,7 +32,7 @@ namespace Faust
 			 *    <https://hal.inria.fr/hal-01416110>
 			 *
 			 */
-			friend class GivensFGFTParallelGen<FPP, DEVICE, FPP2, FPP4>;
+			friend class EigTJParallelGen<FPP, DEVICE, FPP2, FPP4>;
 			/** \brief Temporary storage matrix for maximization of L. */
 			//			MatDense<FPP4,DEVICE> C;
 			/** \brief Column vector for the rowwise minimization of C (i.e. maximization of L). */
@@ -126,13 +126,13 @@ namespace Faust
 				 * TODO: complete argument list
 				 * */
 				// the MatSparse/MatDense constructor rely on this one
-				GivensFGFTGen(MatGeneric<FPP4,DEVICE>* Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust = false, const int err_period=100);
+				EigTJGen(MatGeneric<FPP4,DEVICE>* Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust = false, const int err_period=100);
 
-				GivensFGFTGen(MatSparse<FPP4, DEVICE> & Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust = false, const int err_period=100);
-				GivensFGFTGen(MatDense<FPP4, DEVICE> & Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust = false, const int err_period=100);
+				EigTJGen(MatSparse<FPP4, DEVICE> & Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust = false, const int err_period=100);
+				EigTJGen(MatDense<FPP4, DEVICE> & Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust = false, const int err_period=100);
 
 				/** Destructor */
-				virtual ~GivensFGFTGen() {delete[] q_candidates; delete L;};
+				virtual ~EigTJGen() {delete[] q_candidates; delete L;};
 
 				/**
 				 * \brief Algo. main step.
@@ -364,5 +364,5 @@ namespace Faust
 		};
 
 }
-#include "faust_GivensFGFTGen.hpp"
+#include "faust_EigTJGen.hpp"
 #endif

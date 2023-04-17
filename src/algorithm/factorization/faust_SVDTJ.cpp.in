@@ -1,7 +1,7 @@
-#include "faust_GivensFGFT.h"
-#include "faust_GivensFGFTParallel.h"
-#include "faust_GivensFGFTParallelComplex.h"
-#include "faust_GivensFGFTComplex.h"
+#include "faust_EigTJ.h"
+#include "faust_EigTJParallel.h"
+#include "faust_EigTJParallelComplex.h"
+#include "faust_EigTJComplex.h"
 #include "faust_SVDTJ.h"
 #include "faust_TransformHelper.h"
 #include <complex>
@@ -10,17 +10,17 @@ namespace Faust
 
 #if(@SVD_COMPLEX@==1)
 	template<>
-		void instantiate_algos<complex<@REAL_TYPE@>, Cpu, @REAL_TYPE@>(GivensFGFTGen<Real<complex<@REAL_TYPE@>>, Cpu, @REAL_TYPE@, complex<@REAL_TYPE@>>** algoW1, GivensFGFTGen<Real<complex<@REAL_TYPE@>>, Cpu, @REAL_TYPE@, complex<@REAL_TYPE@>>** algoW2, Faust::MatDense<complex<@REAL_TYPE@>,Cpu> &dM_M, Faust::MatDense<complex<@REAL_TYPE@>,Cpu> &dMM_,int J1, int J2, int t1, int t2, unsigned int verbosity, @REAL_TYPE@ tol, bool relErr, bool enable_large_Faust, const int err_period)
+		void instantiate_algos<complex<@REAL_TYPE@>, Cpu, @REAL_TYPE@>(EigTJGen<Real<complex<@REAL_TYPE@>>, Cpu, @REAL_TYPE@, complex<@REAL_TYPE@>>** algoW1, EigTJGen<Real<complex<@REAL_TYPE@>>, Cpu, @REAL_TYPE@, complex<@REAL_TYPE@>>** algoW2, Faust::MatDense<complex<@REAL_TYPE@>,Cpu> &dM_M, Faust::MatDense<complex<@REAL_TYPE@>,Cpu> &dMM_,int J1, int J2, int t1, int t2, unsigned int verbosity, @REAL_TYPE@ tol, bool relErr, bool enable_large_Faust, const int err_period)
 		{
 			if(t1 <= 1)
-				*algoW1 = new GivensFGFTComplex<complex<@REAL_TYPE@>,Cpu,@REAL_TYPE@>(dMM_, J1, verbosity, tol, relErr, enable_large_Faust, err_period);
+				*algoW1 = new EigTJComplex<complex<@REAL_TYPE@>,Cpu,@REAL_TYPE@>(dMM_, J1, verbosity, tol, relErr, enable_large_Faust, err_period);
 			else
-				*algoW1 = new GivensFGFTParallelComplex<complex<@REAL_TYPE@>, Cpu, @REAL_TYPE@>(dMM_, J1, t1, verbosity, tol, relErr, enable_large_Faust, err_period);
+				*algoW1 = new EigTJParallelComplex<complex<@REAL_TYPE@>, Cpu, @REAL_TYPE@>(dMM_, J1, t1, verbosity, tol, relErr, enable_large_Faust, err_period);
 
 			if(t2 <= 1)
-				*algoW2 = new GivensFGFTComplex<complex<@REAL_TYPE@>,Cpu,@REAL_TYPE@>(dM_M, J2, verbosity, tol, relErr, enable_large_Faust, err_period);
+				*algoW2 = new EigTJComplex<complex<@REAL_TYPE@>,Cpu,@REAL_TYPE@>(dM_M, J2, verbosity, tol, relErr, enable_large_Faust, err_period);
 			else
-				*algoW2 = new GivensFGFTParallelComplex<complex<@REAL_TYPE@>,Cpu,@REAL_TYPE@>(dM_M, J2, t2, verbosity, tol, relErr, enable_large_Faust, err_period);
+				*algoW2 = new EigTJParallelComplex<complex<@REAL_TYPE@>,Cpu,@REAL_TYPE@>(dM_M, J2, t2, verbosity, tol, relErr, enable_large_Faust, err_period);
 
 			(*algoW1)->set_tag("U");
 			(*algoW2)->set_tag("V");
@@ -37,18 +37,18 @@ namespace Faust
 #endif
 
 	template<>
-		void instantiate_algos<@REAL_TYPE@, Cpu, @REAL_TYPE@>(GivensFGFTGen<@REAL_TYPE@, Cpu, @REAL_TYPE@, @REAL_TYPE@>** algoW1, GivensFGFTGen<@REAL_TYPE@, Cpu, @REAL_TYPE@, @REAL_TYPE@>** algoW2, Faust::MatDense<@REAL_TYPE@,Cpu> &dM_M, Faust::MatDense<@REAL_TYPE@,Cpu> &dMM_,int J1, int J2, int t1, int t2, unsigned int verbosity, @REAL_TYPE@ tol, bool relErr, bool enable_large_Faust, const int err_period)
+		void instantiate_algos<@REAL_TYPE@, Cpu, @REAL_TYPE@>(EigTJGen<@REAL_TYPE@, Cpu, @REAL_TYPE@, @REAL_TYPE@>** algoW1, EigTJGen<@REAL_TYPE@, Cpu, @REAL_TYPE@, @REAL_TYPE@>** algoW2, Faust::MatDense<@REAL_TYPE@,Cpu> &dM_M, Faust::MatDense<@REAL_TYPE@,Cpu> &dMM_,int J1, int J2, int t1, int t2, unsigned int verbosity, @REAL_TYPE@ tol, bool relErr, bool enable_large_Faust, const int err_period)
 		{
 
 			if(t1 <= 1)
-				*algoW1 = new GivensFGFT<@REAL_TYPE@,Cpu,@REAL_TYPE@>(dMM_, J1, verbosity, tol, relErr, enable_large_Faust, err_period);
+				*algoW1 = new EigTJ<@REAL_TYPE@,Cpu,@REAL_TYPE@>(dMM_, J1, verbosity, tol, relErr, enable_large_Faust, err_period);
 			else
-				*algoW1 = new GivensFGFTParallel<@REAL_TYPE@,Cpu,@REAL_TYPE@>(dMM_, J1, t1, verbosity, tol, relErr, enable_large_Faust, err_period);
+				*algoW1 = new EigTJParallel<@REAL_TYPE@,Cpu,@REAL_TYPE@>(dMM_, J1, t1, verbosity, tol, relErr, enable_large_Faust, err_period);
 
 			if(t2 <= 1)
-				*algoW2 = new GivensFGFT<@REAL_TYPE@,Cpu,@REAL_TYPE@>(dM_M, J2, verbosity, tol, relErr, enable_large_Faust, err_period);
+				*algoW2 = new EigTJ<@REAL_TYPE@,Cpu,@REAL_TYPE@>(dM_M, J2, verbosity, tol, relErr, enable_large_Faust, err_period);
 			else
-				*algoW2 = new GivensFGFTParallel<@REAL_TYPE@,Cpu,@REAL_TYPE@>(dM_M, J2, t2, verbosity, tol, relErr, enable_large_Faust, err_period);
+				*algoW2 = new EigTJParallel<@REAL_TYPE@,Cpu,@REAL_TYPE@>(dM_M, J2, t2, verbosity, tol, relErr, enable_large_Faust, err_period);
 
 			(*algoW1)->set_tag("U");
 			(*algoW2)->set_tag("V");

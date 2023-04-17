@@ -5,7 +5,7 @@
 #include "faust_MatSparse.h"
 #include "faust_MatDense.h"
 #include "faust_Transform.h"
-#include "faust_GivensFGFTGen.h"
+#include "faust_EigTJGen.h"
 #include <cfloat>
 #include <vector>
 #include <cmath>
@@ -18,14 +18,14 @@ namespace Faust
 
 
 	template<typename FPP, FDevice DEVICE, typename FPP2 = Real<FPP>>
-		class GivensFGFT : public GivensFGFTGen<FPP, DEVICE, FPP2> {
+		class EigTJ : public EigTJGen<FPP, DEVICE, FPP2> {
 			/**
-			 * \class GivensFGFT
+			 * \class EigTJ
 			 *
 			 * \brief This class implements the Givens FGFT algorithm.
 			 * This algorithm is based on the classical Jacobi eigenvalues algorithm.
 			 *
-			 * See parent class GivensFGFTGen for documentation about members.
+			 * See parent class EigTJGen for documentation about members.
 			 *
 			 *  References:
 			 *
@@ -44,13 +44,13 @@ namespace Faust
 				/** \brief Rotation angle theta for the current iteration's Givens matrix. */
 				FPP2 theta;
 
-				/** \brief In calc_theta() two values are calculated for theta, this boolean is set to true to always choose theta2 (useful for GivensFGFTParallel). */
+				/** \brief In calc_theta() two values are calculated for theta, this boolean is set to true to always choose theta2 (useful for EigTJParallel). */
 				bool always_theta2;
 
 				/**
 				 * Function pointer to any step of the algorithm (internal purpose only).
 				 */
-				typedef void (GivensFGFT<FPP,DEVICE,FPP2>::*substep_fun)();
+				typedef void (EigTJ<FPP,DEVICE,FPP2>::*substep_fun)();
 
 
 			public:
@@ -60,10 +60,10 @@ namespace Faust
 				 * \param Lap The Laplacian matrix to approximate/diagonalize.
 				 * \param J The number of iterations, Givens rotations factors.
 				 * */
-				GivensFGFT(MatSparse<FPP,DEVICE>& Lap, int J, unsigned int verbosity = 0, const double stoppingError = 0.0, const bool errIsRel = true, const bool enable_large_Faust = false, const int err_period=100);
-				GivensFGFT(MatDense<FPP,DEVICE>& Lap, int J, unsigned int verbosity = 0, const double stoppingError = 0.0, const bool errIsRel = true, const bool enable_large_Faust = false, const int err_period=100);
+				EigTJ(MatSparse<FPP,DEVICE>& Lap, int J, unsigned int verbosity = 0, const double stoppingError = 0.0, const bool errIsRel = true, const bool enable_large_Faust = false, const int err_period=100);
+				EigTJ(MatDense<FPP,DEVICE>& Lap, int J, unsigned int verbosity = 0, const double stoppingError = 0.0, const bool errIsRel = true, const bool enable_large_Faust = false, const int err_period=100);
 				/** Destructor */
-				virtual ~GivensFGFT() {/*delete[] q_candidates; delete L;*/};
+				virtual ~EigTJ() {/*delete[] q_candidates; delete L;*/};
 
 				/**
 				 * \brief Algo. main step.
@@ -119,5 +119,5 @@ namespace Faust
 		};
 
 }
-#include "faust_GivensFGFT.hpp"
+#include "faust_EigTJ.hpp"
 #endif

@@ -43,7 +43,7 @@ namespace Faust
 	 * \return the USV' product as dense matrix.
 	 */
 	template<typename FPP, FDevice DEVICE, typename FPP2>
-		MatDense<FPP, DEVICE> calc_USV_(GivensFGFTGen<Real<FPP>, DEVICE, FPP2, FPP>* algoW1, GivensFGFTGen<Real<FPP>, DEVICE, FPP2, FPP>* algoW2, size_t nfacts_W1, size_t nfacts_W2, const Vect<FPP, DEVICE> & S);
+		MatDense<FPP, DEVICE> calc_USV_(EigTJGen<Real<FPP>, DEVICE, FPP2, FPP>* algoW1, EigTJGen<Real<FPP>, DEVICE, FPP2, FPP>* algoW2, size_t nfacts_W1, size_t nfacts_W2, const Vect<FPP, DEVICE> & S);
 
 
 	/**
@@ -53,7 +53,7 @@ namespace Faust
 		void svdtj_core_gen_blind(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM, MatDense<FPP,DEVICE> &dM_M, MatDense<FPP,DEVICE> &dMM_, int J1, int J2, int t1, int t2, FPP2 tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Vect<FPP,DEVICE> ** S_, const int err_period=100);
 
 	template<typename FPP, FDevice DEVICE, typename FPP2>
-		void instantiate_algos(GivensFGFTGen<Real<FPP>, Cpu, FPP2, FPP>** algoW1, GivensFGFTGen<Real<FPP>, Cpu, FPP2, FPP>** algoW2, Faust::MatDense<FPP,DEVICE> &dM_M, Faust::MatDense<FPP,DEVICE> &dMM_, int J1, int J2, int t1, int t2, unsigned int verbosity, FPP2 tol, bool relErr, bool enable_large_Faust, const int err_period);
+		void instantiate_algos(EigTJGen<Real<FPP>, Cpu, FPP2, FPP>** algoW1, EigTJGen<Real<FPP>, Cpu, FPP2, FPP>** algoW2, Faust::MatDense<FPP,DEVICE> &dM_M, Faust::MatDense<FPP,DEVICE> &dMM_, int J1, int J2, int t1, int t2, unsigned int verbosity, FPP2 tol, bool relErr, bool enable_large_Faust, const int err_period);
 
 	/**
 	 * \brief Move signs of S in matching singular vector of W1 (U).

@@ -3,7 +3,7 @@
 	cout << "VALIDATED ASSERTION: " << msg <<endl;
 
 template<typename SCALAR, FDevice DEVICE, typename SCALAR2>
-void test_err_against_Laplacian(@GIVENS_CLASS@ /*GivensFGFT<SCALAR,DEVICE,SCALAR2> or GivensFGFTComplex<SCALAR,DEVICE,SCALAR2> */ * algo, const char* conf_file)
+void test_err_against_Laplacian(@GIVENS_CLASS@ /*EigTJ<SCALAR,DEVICE,SCALAR2> or EigTJComplex<SCALAR,DEVICE,SCALAR2> */ * algo, const char* conf_file)
 {
 	Faust::MatDense<SCALAR,DEVICE> Lap, tmp;
 	Faust::MatDense<SCALAR,DEVICE> ordered_Uhat;
@@ -54,7 +54,7 @@ void test_err_against_Laplacian(@GIVENS_CLASS@ /*GivensFGFT<SCALAR,DEVICE,SCALAR
 }
 
 template<typename SCALAR, FDevice DEVICE, typename SCALAR2>
-void test_eigentransform(@GIVENS_CLASS@ /*GivensFGFT<SCALAR,DEVICE,SCALAR2> or GivensFGFTComplex<SCALAR,DEVICE,SCALAR2> */ * algo, const char* conf_file)
+void test_eigentransform(@GIVENS_CLASS@ /*EigTJ<SCALAR,DEVICE,SCALAR2> or EigTJComplex<SCALAR,DEVICE,SCALAR2> */ * algo, const char* conf_file)
 {
 	Faust::MatDense<SCALAR,DEVICE> U, tmp;
 	SCALAR2 err1;
@@ -101,7 +101,7 @@ void test_eigentransform(@GIVENS_CLASS@ /*GivensFGFT<SCALAR,DEVICE,SCALAR2> or G
 }
 
 template<typename SCALAR, FDevice DEVICE, typename SCALAR2>
-void test_pivot_choices(@GIVENS_CLASS@ /*GivensFGFT<SCALAR,DEVICE,SCALAR2> or GivensFGFTComplex<SCALAR,DEVICE,SCALAR2> */ * algo, const char* conf_file, const float same_pivot_target_rate /* default to .99 */, const int stop_count_ite /*= 57*/)
+void test_pivot_choices(@GIVENS_CLASS@ /*EigTJ<SCALAR,DEVICE,SCALAR2> or EigTJComplex<SCALAR,DEVICE,SCALAR2> */ * algo, const char* conf_file, const float same_pivot_target_rate /* default to .99 */, const int stop_count_ite /*= 57*/)
 {
 	vector<pair<int,int>> coord_choices = algo->get_coord_choices();
 	int J = init_int_from_matio(conf_file, "J");
@@ -150,7 +150,7 @@ void test_pivot_choices(@GIVENS_CLASS@ /*GivensFGFT<SCALAR,DEVICE,SCALAR2> or Gi
 }
 
 template<typename SCALAR, FDevice DEVICE, typename SCALAR2>
-void test_eigenvalues(@GIVENS_CLASS@ /*GivensFGFT<SCALAR,DEVICE,SCALAR2> or GivensFGFTComplex<SCALAR,DEVICE,SCALAR2> */ * algo, const char* conf_file)
+void test_eigenvalues(@GIVENS_CLASS@ /*EigTJ<SCALAR,DEVICE,SCALAR2> or EigTJComplex<SCALAR,DEVICE,SCALAR2> */ * algo, const char* conf_file)
 {
 	SCALAR2 ERR_OK_TRESHOLD = 1e-2;
 	Faust::MatDense<SCALAR,DEVICE> tmp;
@@ -203,7 +203,7 @@ void test_eigenvalues(@GIVENS_CLASS@ /*GivensFGFT<SCALAR,DEVICE,SCALAR2> or Give
 
 
 template<typename SCALAR, FDevice DEVICE, typename SCALAR2>
-void test_ite_errors(const @GIVENS_CLASS@ /*GivensFGFT<SCALAR,DEVICE,SCALAR2> or GivensFGFTComplex<SCALAR,DEVICE,SCALAR2> */ * algo, const char* conf_file, int ref_ite_period /* default to 0 to use algo ERROR_CALC_PERIOD */)
+void test_ite_errors(const @GIVENS_CLASS@ /*EigTJ<SCALAR,DEVICE,SCALAR2> or EigTJComplex<SCALAR,DEVICE,SCALAR2> */ * algo, const char* conf_file, int ref_ite_period /* default to 0 to use algo ERROR_CALC_PERIOD */)
 {
 	//
 	assert(algo->ERROR_CALC_PERIOD == 100); /** C++ impl. must calculate the error at the same rate than matlab */

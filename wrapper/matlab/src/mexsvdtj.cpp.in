@@ -33,10 +33,10 @@
 
 
 #include "mex.h"
-#include "faust_GivensFGFT.h"
-#include "faust_GivensFGFTParallel.h"
-#include "faust_GivensFGFTComplex.h"
-#include "faust_GivensFGFTParallelComplex.h"
+#include "faust_EigTJ.h"
+#include "faust_EigTJParallel.h"
+#include "faust_EigTJComplex.h"
+#include "faust_EigTJParallelComplex.h"
 #include "faust_SVDTJ.h"
 #include "faust_TransformHelper.h"
 #include "faust_linear_algebra.h"

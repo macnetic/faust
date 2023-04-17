@@ -6,7 +6,7 @@
 #include "faust_MatSparse.h"
 #include "faust_MatDense.h"
 #include "faust_Transform.h"
-#include "faust_GivensFGFTGen.h"
+#include "faust_EigTJGen.h"
 #include <cfloat>
 #include <vector>
 
@@ -14,14 +14,14 @@ namespace Faust
 {
 
 	template<typename FPP, FDevice DEVICE, typename FPP2 = Real<FPP>>
-		class GivensFGFTComplex : public GivensFGFTGen<typename FPP::value_type, DEVICE, FPP2, FPP>{
+		class EigTJComplex : public EigTJGen<typename FPP::value_type, DEVICE, FPP2, FPP>{
 			/**
-			 * \class GivensFGFTComplex
+			 * \class EigTJComplex
 			 *
 			 * \brief This class implements the Givens FGFT algorithm (Truncated Jacobi algorithm) for the complex matrix case (ideal case being the Hermitian matrix case).
 			 * This algorithm is based on the classical Jacobi eigenvalues algorithm.
 			 *
-			 * See parent class GivensFGFTGen for documentation about members.
+			 * See parent class EigTJGen for documentation about members.
 			 *
 			 *  References:
 			 *
@@ -48,14 +48,14 @@ namespace Faust
 				/**
 				 * Function pointer to any step of the algorithm (internal purpose only).
 				 */
-				typedef void (GivensFGFTComplex<FPP,DEVICE,FPP2>::*substep_fun)();
+				typedef void (EigTJComplex<FPP,DEVICE,FPP2>::*substep_fun)();
 
 
 			public:
 
 				const static unsigned int ERROR_CALC_PERIOD = 100;
-				GivensFGFTComplex(MatSparse<FPP,DEVICE>& Lap, int J, unsigned int verbosity = 0, const double stoppingError = 0.0, const bool errIsRel = true, const bool enable_large_Faust = false, const int err_period=100);
-				GivensFGFTComplex(MatDense<FPP,DEVICE>& Lap, int J, unsigned int verbosity = 0, const double stoppingError = 0.0, const bool errIsRel = true, const bool enable_large_Faust = false, const int err_period=100);
+				EigTJComplex(MatSparse<FPP,DEVICE>& Lap, int J, unsigned int verbosity = 0, const double stoppingError = 0.0, const bool errIsRel = true, const bool enable_large_Faust = false, const int err_period=100);
+				EigTJComplex(MatDense<FPP,DEVICE>& Lap, int J, unsigned int verbosity = 0, const double stoppingError = 0.0, const bool errIsRel = true, const bool enable_large_Faust = false, const int err_period=100);
 
 				virtual void next_step();
 
@@ -101,5 +101,5 @@ namespace Faust
 		};
 
 }
-#include "faust_GivensFGFTComplex.hpp"
+#include "faust_EigTJComplex.hpp"
 #endif

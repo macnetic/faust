@@ -1,22 +1,22 @@
 using namespace Faust;
 
 template<typename FPP, FDevice DEVICE, typename FPP2>
-void GivensFGFT<FPP,DEVICE,FPP2>::next_step()
+void EigTJ<FPP,DEVICE,FPP2>::next_step()
 {
 
 	substep_fun substep[] = {
-		&GivensFGFT<FPP,DEVICE,FPP2>::max_L,
-		&GivensFGFT<FPP,DEVICE,FPP2>::choose_pivot,
-		&GivensFGFT<FPP,DEVICE,FPP2>::calc_theta,
-		&GivensFGFT<FPP,DEVICE,FPP2>::update_fact,
-		&GivensFGFT<FPP,DEVICE,FPP2>::update_L,
-		&GivensFGFT<FPP,DEVICE,FPP2>::update_D,
-		&GivensFGFT<FPP,DEVICE,FPP2>::update_err};
+		&EigTJ<FPP,DEVICE,FPP2>::max_L,
+		&EigTJ<FPP,DEVICE,FPP2>::choose_pivot,
+		&EigTJ<FPP,DEVICE,FPP2>::calc_theta,
+		&EigTJ<FPP,DEVICE,FPP2>::update_fact,
+		&EigTJ<FPP,DEVICE,FPP2>::update_L,
+		&EigTJ<FPP,DEVICE,FPP2>::update_D,
+		&EigTJ<FPP,DEVICE,FPP2>::update_err};
 
 	for(int i=0;i<sizeof(substep)/sizeof(substep_fun);i++)
 	{
 #ifdef DEBUG_GIVENS
-		cout << "GivensFGFT ite=" << ite << " substep i=" << i << endl;
+		cout << "EigTJ ite=" << ite << " substep i=" << i << endl;
 #endif
 		(this->*substep[i])();
 	}
@@ -24,7 +24,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::next_step()
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2>
-void GivensFGFT<FPP,DEVICE,FPP2>::choose_pivot()
+void EigTJ<FPP,DEVICE,FPP2>::choose_pivot()
 {
 //Matlab ref. code:
 //        [~,p] = min(C_min_row);
@@ -35,12 +35,12 @@ void GivensFGFT<FPP,DEVICE,FPP2>::choose_pivot()
 	this->q = this->q_candidates[this->p];
 	this->coord_choices.push_back(pair<int,int>(this->p,this->q));
 #ifdef DEBUG_GIVENS
-	cout << "GivensFGFT::choose_pivot() ite: " << ite << " p: " << this->p << " q: " << this->q << endl;
+	cout << "EigTJ::choose_pivot() ite: " << ite << " p: " << this->p << " q: " << this->q << endl;
 #endif
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2>
-void GivensFGFT<FPP,DEVICE,FPP2>::max_L()
+void EigTJ<FPP,DEVICE,FPP2>::max_L()
 {
 	// Matlab ref. code:
 	//**************  at initialization
@@ -119,7 +119,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::max_L()
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2>
-void GivensFGFT<FPP,DEVICE,FPP2>::calc_theta()
+void EigTJ<FPP,DEVICE,FPP2>::calc_theta()
 {
 // Matlab ref. code:
 //		theta1 = atan2(L(q,q) - L(p,p),2*L(p,q))/2 ;
@@ -148,7 +148,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::calc_theta()
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2>
-void GivensFGFT<FPP,DEVICE,FPP2>::update_fact()
+void EigTJ<FPP,DEVICE,FPP2>::update_fact()
 {
 	// Matlab ref. code:
 	//        S = eye(n);
@@ -186,13 +186,13 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_fact()
 	this->facts[this->ite] = MatSparse<FPP,DEVICE>(this->fact_mod_row_ids, this->fact_mod_col_ids, this->fact_mod_values, n, n);
 	this->facts[this->ite].set_orthogonal(true);
 #ifdef DEBUG_GIVENS
-	cout << "GivensFGFT::update_fact() ite: " << ite << " fact norm: " << facts[this->ite].norm() << endl;
+	cout << "EigTJ::update_fact() ite: " << ite << " fact norm: " << facts[this->ite].norm() << endl;
 	facts[this->ite].Display();
 #endif
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2>
-void GivensFGFT<FPP,DEVICE,FPP2>::update_L(Faust::MatDense<FPP,Cpu> & L)
+void EigTJ<FPP,DEVICE,FPP2>::update_L(Faust::MatDense<FPP,Cpu> & L)
 {
 	// L = S'*L*S
 #ifdef DEBUG_GIVENS
@@ -214,7 +214,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_L(Faust::MatDense<FPP,Cpu> & L)
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2>
-void GivensFGFT<FPP,DEVICE,FPP2>::update_L(Faust::MatSparse<FPP,Cpu> & L)
+void EigTJ<FPP,DEVICE,FPP2>::update_L(Faust::MatSparse<FPP,Cpu> & L)
 {
 //#define OPT_UPDATE_SPARSE_L
 #undef OPT_UPDATE_SPARSE_L
@@ -234,7 +234,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_L(Faust::MatSparse<FPP,Cpu> & L)
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2>
-void GivensFGFT<FPP,DEVICE,FPP2>::update_L()
+void EigTJ<FPP,DEVICE,FPP2>::update_L()
 {
 	MatSparse<FPP, DEVICE>* sL = dynamic_cast<MatSparse<FPP, DEVICE>*>(this->L);
 	if(sL) update_L(*sL);
@@ -242,7 +242,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_L()
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2>
-void GivensFGFT<FPP,DEVICE,FPP2>::update_L_first(Faust::Vect<FPP,DEVICE>& L_vec_p, Faust::Vect<FPP,DEVICE>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q, Faust::MatDense<FPP,DEVICE> & L)
+void EigTJ<FPP,DEVICE,FPP2>::update_L_first(Faust::Vect<FPP,DEVICE>& L_vec_p, Faust::Vect<FPP,DEVICE>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q, Faust::MatDense<FPP,DEVICE> & L)
 {
 #define copy_vec2Lrow(vec,rowi) \
 	for(int i=0;i<L.getNbCol();i++) L.getData()[L.getNbRow()*i+rowi] = tmp[i]
@@ -268,7 +268,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_L_first(Faust::Vect<FPP,DEVICE>& L_vec_
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2>
-void GivensFGFT<FPP,DEVICE,FPP2>::update_L_second(Faust::Vect<FPP,DEVICE>& L_vec_p, Faust::Vect<FPP,DEVICE>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q, Faust::MatDense<FPP,DEVICE> & L)
+void EigTJ<FPP,DEVICE,FPP2>::update_L_second(Faust::Vect<FPP,DEVICE>& L_vec_p, Faust::Vect<FPP,DEVICE>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q, Faust::MatDense<FPP,DEVICE> & L)
 {
 	Faust::Vect<FPP,DEVICE> tmp, tmp2;
 	/*========== L *= S */
@@ -291,7 +291,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_L_second(Faust::Vect<FPP,DEVICE>& L_vec
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2>
-void GivensFGFT<FPP,DEVICE,FPP2>::update_L_second(Eigen::SparseMatrix<FPP,Eigen::RowMajor > & L_vec_p, Eigen::SparseMatrix<FPP, Eigen::RowMajor>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q, Faust::MatSparse<FPP,DEVICE> & L)
+void EigTJ<FPP,DEVICE,FPP2>::update_L_second(Eigen::SparseMatrix<FPP,Eigen::RowMajor > & L_vec_p, Eigen::SparseMatrix<FPP, Eigen::RowMajor>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q, Faust::MatSparse<FPP,DEVICE> & L)
 {
 	Eigen::SparseMatrix<FPP, Eigen::RowMajor> tmp, tmp2;
 	/*========== L *= S */
@@ -316,7 +316,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_L_second(Eigen::SparseMatrix<FPP,Eigen:
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2>
-void GivensFGFT<FPP,DEVICE,FPP2>::update_L_first(Eigen::SparseMatrix<FPP, Eigen::RowMajor> & L_vec_p, Eigen::SparseMatrix<FPP, Eigen::RowMajor>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q, Faust::MatSparse<FPP,DEVICE> & L)
+void EigTJ<FPP,DEVICE,FPP2>::update_L_first(Eigen::SparseMatrix<FPP, Eigen::RowMajor> & L_vec_p, Eigen::SparseMatrix<FPP, Eigen::RowMajor>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q, Faust::MatSparse<FPP,DEVICE> & L)
 {
 	Eigen::SparseMatrix<FPP, Eigen::RowMajor> tmp, tmp2, tmp3;
 	/*========== L = S'*L */
@@ -342,7 +342,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_L_first(Eigen::SparseMatrix<FPP, Eigen:
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2>
-GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatSparse<FPP,DEVICE>& Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError /* default to 0.0 */, const bool errIsRel, const bool enable_large_Faust/* deft to false */, const int err_period/*=100*/) :  GivensFGFTGen<FPP,DEVICE,FPP2>(Lap, J, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period), C(Lap.getNbRow(), Lap.getNbCol()), always_theta2(false)
+EigTJ<FPP,DEVICE,FPP2>::EigTJ(Faust::MatSparse<FPP,DEVICE>& Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError /* default to 0.0 */, const bool errIsRel, const bool enable_large_Faust/* deft to false */, const int err_period/*=100*/) :  EigTJGen<FPP,DEVICE,FPP2>(Lap, J, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period), C(Lap.getNbRow(), Lap.getNbCol()), always_theta2(false)
 {
 	//see parent ctor
 	C.setOnes();
@@ -350,7 +350,7 @@ GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatSparse<FPP,DEVICE>& Lap, int J
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2>
-GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust/* deft to false */, const int err_period/*=100*/) : GivensFGFTGen<FPP,DEVICE,FPP2>(Lap, J, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period), C(Lap.getNbRow(), Lap.getNbCol()), always_theta2(false)
+EigTJ<FPP,DEVICE,FPP2>::EigTJ(Faust::MatDense<FPP,DEVICE>& Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust/* deft to false */, const int err_period/*=100*/) : EigTJGen<FPP,DEVICE,FPP2>(Lap, J, verbosity, stoppingError, errIsRel, enable_large_Faust, err_period), C(Lap.getNbRow(), Lap.getNbCol()), always_theta2(false)
 {
 	// see parent ctor
 	C.setOnes();
@@ -358,10 +358,10 @@ GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, int J,
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2>
-const Faust::MatSparse<FPP,DEVICE> GivensFGFT<FPP,DEVICE,FPP2>::get_Dspm(const bool ord /* default to false */)
+const Faust::MatSparse<FPP,DEVICE> EigTJ<FPP,DEVICE,FPP2>::get_Dspm(const bool ord /* default to false */)
 {
 	MatSparse <FPP,DEVICE> spD;
-	GivensFGFTGen<FPP,DEVICE,FPP2>::get_Dspm(spD, ord);
+	EigTJGen<FPP,DEVICE,FPP2>::get_Dspm(spD, ord);
 	return spD;
 }
 

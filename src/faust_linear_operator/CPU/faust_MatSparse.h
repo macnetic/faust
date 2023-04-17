@@ -95,9 +95,9 @@ namespace Faust
 
 	//! MatDense class template of dense matrix
 	template<typename FPP,FDevice DEVICE> class MatDense;
-	template<typename FPP, FDevice DEVICE, typename FPP2> class GivensFGFT;
-	template<typename FPP, FDevice DEVICE, typename FPP2> class GivensFGFTParallel;
-	template<typename FPP, FDevice DEVICE, typename FPP2> class GivensFGFTComplex;
+	template<typename FPP, FDevice DEVICE, typename FPP2> class EigTJ;
+	template<typename FPP, FDevice DEVICE, typename FPP2> class EigTJParallel;
+	template<typename FPP, FDevice DEVICE, typename FPP2> class EigTJComplex;
 	template<typename FPP> class TransformHelperPoly;
 	template<typename FPP, FDevice DEV> class MatButterfly;
 	//TODO: simplify/remove the friendship by adding/using a public setter to is_ortho
@@ -111,12 +111,12 @@ namespace Faust
 		{
 
 			friend MatBSR<FPP, Cpu>;
-			friend GivensFGFT<FPP,Cpu, double>;
-			friend GivensFGFTParallel<FPP,Cpu, double>;
-			friend GivensFGFT<FPP,Cpu, float>;
-			friend GivensFGFTParallel<FPP,Cpu, float>;
-			friend GivensFGFTComplex<FPP,Cpu, double>;
-			friend GivensFGFTComplex<FPP,Cpu, float>;
+			friend EigTJ<FPP,Cpu, double>;
+			friend EigTJParallel<FPP,Cpu, double>;
+			friend EigTJ<FPP,Cpu, float>;
+			friend EigTJParallel<FPP,Cpu, float>;
+			friend EigTJComplex<FPP,Cpu, double>;
+			friend EigTJComplex<FPP,Cpu, float>;
 			friend Transform<FPP,Cpu>; //TODO: limit to needed member functions only (multiply)
 			friend TransformHelper<FPP,Cpu>; // TODO: limit to needed member functions only
 			friend TransformHelperPoly<FPP>; // TODO: limit to needed member functions only

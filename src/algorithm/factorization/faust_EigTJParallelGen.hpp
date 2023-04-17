@@ -5,12 +5,12 @@
 #endif
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-GivensFGFTParallelGen<FPP,DEVICE,FPP2,FPP4>::GivensFGFTParallelGen(int t, Faust::GivensFGFTGen<FPP, DEVICE, FPP2, FPP4> & alg) : alg(alg), t(t), fact_nrots(0)
+EigTJParallelGen<FPP,DEVICE,FPP2,FPP4>::EigTJParallelGen(int t, Faust::EigTJGen<FPP, DEVICE, FPP2, FPP4> & alg) : alg(alg), t(t), fact_nrots(0)
 {
 
 	if(alg.verbosity > 1)
 	{
-		std::cout << "GivensFGFTGenParallelGen ctor:" << std::endl;
+		std::cout << "EigTJGenParallelGen ctor:" << std::endl;
 		std::cout << "J: " << alg.J << std::endl;
 		std::cout << "tol: " << alg.stoppingError << std::endl;
 		std::cout << "stopcrit is error: " << alg.stoppingCritIsError << std::endl;
@@ -30,7 +30,7 @@ GivensFGFTParallelGen<FPP,DEVICE,FPP2,FPP4>::GivensFGFTParallelGen(int t, Faust:
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-void GivensFGFTParallelGen<FPP,DEVICE,FPP2,FPP4>::max_L()
+void EigTJParallelGen<FPP,DEVICE,FPP2,FPP4>::max_L()
 {
 	// 	  matlab ref
 	// 	  L_low = abs(tril(L,-1));
@@ -56,7 +56,7 @@ void GivensFGFTParallelGen<FPP,DEVICE,FPP2,FPP4>::max_L()
 
 #ifdef DEBUG_GIVENS
 	for(auto &p : fact_nz_inds)
-		cout << "GivensFGFTParallel::max_L() before sort (" << p.first+1 <<  "," << p.second+1 << ") :" << L_low(p.first, p.second) << endl;
+		cout << "EigTJParallel::max_L() before sort (" << p.first+1 <<  "," << p.second+1 << ") :" << L_low(p.first, p.second) << endl;
 #endif
 
 	//ENOTE: can't use sort(it,it, lambda) as vector because list doesn't provide random access it.
@@ -66,12 +66,12 @@ void GivensFGFTParallelGen<FPP,DEVICE,FPP2,FPP4>::max_L()
 			});
 #ifdef DEBUG_GIVENS
 	for(auto &p : fact_nz_inds)
-		cout << "GivensFGFTParallel::max_L() after sort (" << p.first+1 <<  "," << p.second+1 << ") :" << L_low(p.first, p.second) << endl;
+		cout << "EigTJParallel::max_L() after sort (" << p.first+1 <<  "," << p.second+1 << ") :" << L_low(p.first, p.second) << endl;
 #endif
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-void GivensFGFTParallelGen<FPP,DEVICE,FPP2, FPP4>::update_fact_nz_inds(int p, int q)
+void EigTJParallelGen<FPP,DEVICE,FPP2, FPP4>::update_fact_nz_inds(int p, int q)
 {
 	// matlab ref
 	//	other = RSmat==p | RSmat==q;
@@ -89,7 +89,7 @@ void GivensFGFTParallelGen<FPP,DEVICE,FPP2, FPP4>::update_fact_nz_inds(int p, in
 			i++;
 	}
 #ifdef DEBUG_GIVENS
-	std::cout << "GivensFGFTParallel::update_fact_nz_inds() after purge: ";
+	std::cout << "EigTJParallel::update_fact_nz_inds() after purge: ";
 	for(auto &p_ : fact_nz_inds)
 		std::cout << "(" << p_.first+1 <<  "," << p_.second+1 << ") :";
 	std::cout <<  std::endl;
@@ -97,7 +97,7 @@ void GivensFGFTParallelGen<FPP,DEVICE,FPP2, FPP4>::update_fact_nz_inds(int p, in
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-void GivensFGFTParallelGen<FPP,DEVICE,FPP2, FPP4>::loop_update_fact()
+void EigTJParallelGen<FPP,DEVICE,FPP2, FPP4>::loop_update_fact()
 {
 	fact_nrots = 0;
 	while(fact_nrots < t && 0 < fact_nz_inds.size())
@@ -112,7 +112,7 @@ void GivensFGFTParallelGen<FPP,DEVICE,FPP2, FPP4>::loop_update_fact()
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-void GivensFGFTParallelGen<FPP,DEVICE,FPP2, FPP4>::choose_pivot()
+void EigTJParallelGen<FPP,DEVICE,FPP2, FPP4>::choose_pivot()
 {
 	// fact_nz_inds is assumed to be sorted in max_L()
 	// the first one in the list maps the biggest abs val in L
@@ -126,7 +126,7 @@ void GivensFGFTParallelGen<FPP,DEVICE,FPP2, FPP4>::choose_pivot()
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-void GivensFGFTParallelGen<FPP,DEVICE,FPP2,FPP4>::update_L(Faust::MatSparse<FPP,Cpu> & L)
+void EigTJParallelGen<FPP,DEVICE,FPP2,FPP4>::update_L(Faust::MatSparse<FPP,Cpu> & L)
 {
 	// L = S'*L*S
 #ifdef OPT_UPDATE__SPARSE_L
@@ -198,13 +198,13 @@ void GivensFGFTParallelGen<FPP,DEVICE,FPP2,FPP4>::update_L(Faust::MatSparse<FPP,
 }
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-void GivensFGFTParallelGen<FPP,DEVICE,FPP2,FPP4>::finish_fact()
+void EigTJParallelGen<FPP,DEVICE,FPP2,FPP4>::finish_fact()
 {
 	int n = alg.Lap.getNbRow();
 	alg.facts[alg.ite] = Faust::MatSparse<FPP4,DEVICE>(alg.fact_mod_row_ids, alg.fact_mod_col_ids, alg.fact_mod_values, n, n);
 	alg.facts[alg.ite].set_orthogonal(true);
 #ifdef DEBUG_GIVENS
-	cout << "GivensFGFTParallel::finish_fact() ite: " << alg.ite << " fact norm: " << alg.facts[alg.ite].norm() << endl;
+	cout << "EigTJParallel::finish_fact() ite: " << alg.ite << " fact norm: " << alg.facts[alg.ite].norm() << endl;
 	alg.facts[alg.ite].Display();
 #endif
 }

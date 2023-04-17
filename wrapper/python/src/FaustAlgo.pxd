@@ -156,7 +156,7 @@ cdef extern from "FaustFact.h":
                                                            mul_perm)
 
 
-cdef extern from "FaustFactGivensFGFT.h":
+cdef extern from "FaustFactEigTJ.h":
 
     cdef FaustCoreCppCPU[FPP]* fact_givens_fgft[FPP,FPP2](const FPP* Lap, unsigned int num_rows,
                                                        unsigned int num_cols, unsigned int J,

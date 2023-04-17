@@ -1,9 +1,9 @@
-#include "faust_GivensFGFT.h"
-#include "faust_GivensFGFTParallel.h"
-#include "faust_GivensFGFTParallelComplex.h"
-#include "faust_GivensFGFTComplex.h"
+#include "faust_EigTJ.h"
+#include "faust_EigTJParallel.h"
+#include "faust_EigTJParallelComplex.h"
+#include "faust_EigTJComplex.h"
 #include "faust_constant.h"
-#include "faust_GivensFGFTGen.h"
+#include "faust_EigTJGen.h"
 #include <type_traits>
 
 namespace Faust
@@ -75,8 +75,8 @@ namespace Faust
 
 			assert(order != 0);  // we need to use a specific order of singular values/vectors approximates to know where to get the singular values in W1' M W2 matrix
 
-			GivensFGFTGen<Real<FPP>, DEVICE, FPP2, FPP>* algoW1;
-			GivensFGFTGen<Real<FPP>, DEVICE, FPP2, FPP>* algoW2;
+			EigTJGen<Real<FPP>, DEVICE, FPP2, FPP>* algoW1;
+			EigTJGen<Real<FPP>, DEVICE, FPP2, FPP>* algoW2;
 
 			if (t1 <= 0)
 				//automatic t1
@@ -293,7 +293,7 @@ namespace Faust
 		}
 
 	template<typename FPP, FDevice DEVICE, typename FPP2>
-		MatDense<FPP, DEVICE> calc_USV_(GivensFGFTGen<Real<FPP>, DEVICE, FPP2, FPP>* algoW1, GivensFGFTGen<Real<FPP>, DEVICE, FPP2, FPP>* algoW2, size_t nfacts_W1, size_t nfacts_W2, const Vect<FPP, DEVICE> & S)
+		MatDense<FPP, DEVICE> calc_USV_(EigTJGen<Real<FPP>, DEVICE, FPP2, FPP>* algoW1, EigTJGen<Real<FPP>, DEVICE, FPP2, FPP>* algoW2, size_t nfacts_W1, size_t nfacts_W2, const Vect<FPP, DEVICE> & S)
 		{
 
 			auto order = -1; // otherwise dS won't be a diagonal matrix
@@ -361,8 +361,8 @@ namespace Faust
 			// algorithm main idea: run two eigtj for U and V step by step until the target error is verified or the limit number of Givens is reached
 
 			assert(order != 0);  // we need to use a specific order of singular values/vectors approximates to know where to get the singular values in W1' M W2 matrix
-			GivensFGFTGen<Real<FPP>, DEVICE, FPP2, FPP>* algoW1;
-			GivensFGFTGen<Real<FPP>, DEVICE, FPP2, FPP>* algoW2;
+			EigTJGen<Real<FPP>, DEVICE, FPP2, FPP>* algoW1;
+			EigTJGen<Real<FPP>, DEVICE, FPP2, FPP>* algoW2;
 
 			if (t1 <= 0)
 				//automatic t1
@@ -622,7 +622,7 @@ namespace Faust
 							}
 
 							prev_aerr = aerr;
-							// erase permuted factors because algoW1/W2 doesn't keep account for them (cf. GivensFGFTGen::get_transform with ord == true and copy == false
+							// erase permuted factors because algoW1/W2 doesn't keep account for them (cf. EigTJGen::get_transform with ord == true and copy == false
 						}
 						if(order)
 						{

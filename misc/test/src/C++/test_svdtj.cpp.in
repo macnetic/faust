@@ -1,6 +1,6 @@
 
 #include "faust_TransformHelper.h"
-#include "faust_GivensFGFTGen.h"
+#include "faust_EigTJGen.h"
 #include "faust_SVDTJ.h"
 #include <cstdlib>
 #include <string>

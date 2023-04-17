@@ -2,7 +2,7 @@
 
 #ifndef __GIVENS_FGFT_PARALLEL_GEN__
 #define __GIVENS_FGFT_PARALLEL_GEN__
-#include "faust_GivensFGFT.h"
+#include "faust_EigTJ.h"
 #include "faust_MatSparse.h"
 #include <list>
 #include <functional>
@@ -11,12 +11,12 @@ namespace Faust
 
 
 	template<typename FPP, FDevice DEVICE, typename FPP2 = Real<FPP>, typename FPP4 = FPP>
-		class GivensFGFTParallelGen
+		class EigTJParallelGen
 		{
 			/**
-			 * \class GivensFGFTParallelGen
+			 * \class EigTJParallelGen
 			 *
-			 * \brief This class represents the parallel version of Givens FGFT algorithm (for concrete implementations see subclasses: GivensFGFTParallelComplex and GivensFGFTParallel).
+			 * \brief This class represents the parallel version of Givens FGFT algorithm (for concrete implementations see subclasses: EigTJParallelComplex and EigTJParallel).
 			 *
 			 * This variant of the parent class algorithm consists mainly to put t 2D rotation matrices in each iteration factor S (i.e. facts[ite]) when the basis version puts only a single rotation matrix into L.  //		 * //		 * This algorithm is based on the classical Jacobi eigenvalues algorithm.  //		 * //		 *  References:
 			 *
@@ -28,7 +28,7 @@ namespace Faust
 			 *
 			 */
 
-			GivensFGFTGen<FPP, DEVICE, FPP2, FPP4> & alg;
+			EigTJGen<FPP, DEVICE, FPP2, FPP4> & alg;
 
 			protected:
 				/** Maximum number of rotations per factor
@@ -77,12 +77,12 @@ namespace Faust
 		 *
 		 *
 		 * \param t the maximum number of 2D rotation matrices (Givens matrices) to insert in each factor. The effective number can be less than t if there is not enough pivot candidates left in the matrix L of the current iteration.
-		 * \param algo instance of GivensFGFT or GivensFGFTComplex (subclasses of GivensFGFTGen).
+		 * \param algo instance of EigTJ or EigTJComplex (subclasses of EigTJGen).
 		 */
-		GivensFGFTParallelGen(int t, GivensFGFTGen<FPP, DEVICE, FPP2, FPP4> & alg);
+		EigTJParallelGen(int t, EigTJGen<FPP, DEVICE, FPP2, FPP4> & alg);
 	};
 
-#include "faust_GivensFGFTParallelGen.hpp"
+#include "faust_EigTJParallelGen.hpp"
 
 
 }

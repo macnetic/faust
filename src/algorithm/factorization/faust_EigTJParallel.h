@@ -1,22 +1,22 @@
-#include "faust_GivensFGFTComplex.h"
-#include "faust_GivensFGFTParallelGen.h"
+#include "faust_EigTJ.h"
+#include "faust_EigTJParallelGen.h"
 
 #include <list>
 
-#ifndef __GIVENS_FGFT_PARALLEL_COMPLEX__
-#define __GIVENS_FGFT_PARALLEL_COMPLEX__
+#ifndef __GIVENS_FGFT_PARALLEL__
+#define __GIVENS_FGFT_PARALLEL__
 
 namespace Faust
 {
 
 
 	template<typename FPP, FDevice DEVICE, typename FPP2 = Real<FPP>>
-		class GivensFGFTParallelComplex : public GivensFGFTComplex<FPP,DEVICE,FPP2>, public GivensFGFTParallelGen<typename FPP::value_type, DEVICE, FPP2, FPP>
+		class EigTJParallel : public EigTJ<FPP,DEVICE,FPP2>, public EigTJParallelGen<FPP, DEVICE, FPP2>
 	{
 		/**
-		 * \class GivensFGFTParallelComplex
+		 * \class EigTJParallel
 		 *
-		 * \brief This class implements the parallel version of Givens FGFT algorithm (for the complex case).
+		 * \brief This class implements the parallel version of Givens FGFT algorithm.
 		 *
 		 * This variant of the parent class algorithm consists mainly to put t 2D rotation matrices in each iteration factor S (i.e. facts[ite]) when the basis version puts only a single rotation matrix into L.
 		 *
@@ -30,10 +30,7 @@ namespace Faust
 		 *    over Networks.
 		 *    <https://hal.inria.fr/hal-01416110>
 		 *
-		 *  Complementary reference for the complex case: https://en.wikipedia.org/wiki/Jacobi_method_for_complex_Hermitian_matrices
-		 *
 		 */
-
 
 		/**
 		 * Computes the coefficients of the last selected rotation matrix to be put later in current iteration factor.
@@ -44,11 +41,9 @@ namespace Faust
 		/**
 		 * Function pointer to any step of the algorithm.
 		 */
-		typedef void (GivensFGFTParallelComplex<FPP,DEVICE,FPP2>::*substep_fun)();
-
+		typedef void (EigTJParallel<FPP,DEVICE,FPP2>::*substep_fun)();
 
 		void init_fact_nz_inds_sort_func();
-
 		public:
 
 		void next_step();
@@ -63,11 +58,13 @@ namespace Faust
 		 * \param stoppingError defines a stopping criterion based on error (absolute relative error).
 		 *
 		 */
-		GivensFGFTParallelComplex(MatDense<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity = 0, const double stoppingCritIsError = 0.0,  const bool errIsRel = true, const bool enable_large_Faust = false, const int err_period=100);
-		GivensFGFTParallelComplex(MatSparse<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity = 0, const double stoppingCritIsError = 0.0, const bool errIsRel = true, const bool enable_large_Faust = false, const int err_period=100);
+		EigTJParallel(MatDense<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity = 0, const double stoppingCritIsError = 0.0,  const bool errIsRel = true, const bool enable_large_Faust = false, const int err_period=100);
+		EigTJParallel(MatSparse<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity = 0, const double stoppingCritIsError = 0.0, const bool errIsRel = true, const bool enable_large_Faust = false, const int err_period=100);
+
 	};
 
-#include "faust_GivensFGFTParallelComplex.hpp"
+#include "faust_EigTJParallel.hpp"
+
 
 }
 #endif

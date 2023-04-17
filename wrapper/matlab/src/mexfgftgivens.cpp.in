@@ -33,10 +33,10 @@
 
 
 #include "mex.h"
-#include "faust_GivensFGFT.h"
-#include "faust_GivensFGFTParallel.h"
-#include "faust_GivensFGFTComplex.h"
-#include "faust_GivensFGFTParallelComplex.h"
+#include "faust_EigTJ.h"
+#include "faust_EigTJParallel.h"
+#include "faust_EigTJComplex.h"
+#include "faust_EigTJParallelComplex.h"
 #include "faust_TransformHelper.h"
 #include "faust_linear_algebra.h"
 #include "class_handle.hpp"
@@ -49,7 +49,7 @@
 #include <stdexcept>
 
 //normally Givens is only for double, float scalars
-// update: complex matrices are available with GivensFGFTComplex
+// update: complex matrices are available with EigTJComplex
 typedef @FAUST_SCALAR@ SCALAR;
 typedef @FACT_FPP@ FPP2;
 
@@ -108,7 +108,7 @@ void fgft_givens(const mxArray* matlab_matrix, int J, int t, Real<SCALAR> tol, u
 	Faust::MatDense<SCALAR,Cpu> dLap;
 	Faust::MatSparse<SCALAR,Cpu> sLap;
 
-	Faust::GivensFGFT<SCALAR, Cpu, FPP2>* algo;
+	Faust::EigTJ<SCALAR, Cpu, FPP2>* algo;
 
 	try{
 		if (mxIsSparse(matlab_matrix))
@@ -116,18 +116,18 @@ void fgft_givens(const mxArray* matlab_matrix, int J, int t, Real<SCALAR> tol, u
 			mxArray2FaustspMat(matlab_matrix,sLap);
 			Lap = &sLap;
 			if(t <= 1)
-				algo = new GivensFGFT<SCALAR,Cpu,FPP2>(sLap, J, verbosity, tol, rel_err, enable_large_Faust, err_period);
+				algo = new EigTJ<SCALAR,Cpu,FPP2>(sLap, J, verbosity, tol, rel_err, enable_large_Faust, err_period);
 			else
-				algo = new GivensFGFTParallel<SCALAR,Cpu,FPP2>(sLap, J, t, verbosity, tol, rel_err, enable_large_Faust, err_period);
+				algo = new EigTJParallel<SCALAR,Cpu,FPP2>(sLap, J, t, verbosity, tol, rel_err, enable_large_Faust, err_period);
 
 		}else
 		{
 			mxArray2FaustMat(matlab_matrix,dLap);
 			Lap = &dLap;
 			if(t <= 1)
-				algo = new GivensFGFT<SCALAR,Cpu,FPP2>(dLap, J, verbosity, tol, rel_err, enable_large_Faust, err_period);
+				algo = new EigTJ<SCALAR,Cpu,FPP2>(dLap, J, verbosity, tol, rel_err, enable_large_Faust, err_period);
 			else
-				algo = new GivensFGFTParallel<SCALAR,Cpu,FPP2>(dLap, J, t, verbosity, tol, rel_err, enable_large_Faust, err_period);
+				algo = new EigTJParallel<SCALAR,Cpu,FPP2>(dLap, J, t, verbosity, tol, rel_err, enable_large_Faust, err_period);
 		}
 
 
@@ -163,7 +163,7 @@ void fgft_givens_cplx(const mxArray* matlab_matrix, int J, int t, double tol, un
 	Faust::MatDense<complex<SCALAR>,Cpu> dLap;
 	Faust::MatSparse<complex<SCALAR>,Cpu> sLap;
 
-	Faust::GivensFGFTComplex<complex<SCALAR>, Cpu, FPP2>* algo = nullptr;
+	Faust::EigTJComplex<complex<SCALAR>, Cpu, FPP2>* algo = nullptr;
 
 	try{
 		if (mxIsSparse(matlab_matrix))
@@ -171,18 +171,18 @@ void fgft_givens_cplx(const mxArray* matlab_matrix, int J, int t, double tol, un
 			mxArray2FaustspMat(matlab_matrix,sLap);
 			Lap = &sLap;
 			if(t <= 1)
-				algo = new GivensFGFTComplex<complex<SCALAR>,Cpu,FPP2>(sLap, J, verbosity, tol, rel_err, enable_large_Faust, err_period);
+				algo = new EigTJComplex<complex<SCALAR>,Cpu,FPP2>(sLap, J, verbosity, tol, rel_err, enable_large_Faust, err_period);
 			else
-				algo = new GivensFGFTParallelComplex<complex<SCALAR>,Cpu,FPP2>(sLap, J, t, verbosity, tol, rel_err, enable_large_Faust, err_period);
+				algo = new EigTJParallelComplex<complex<SCALAR>,Cpu,FPP2>(sLap, J, t, verbosity, tol, rel_err, enable_large_Faust, err_period);
 
 		}else
 		{
 			mxArray2FaustMat(matlab_matrix,dLap);
 			Lap = &dLap;
 			if(t <= 1)
-				algo = new GivensFGFTComplex<complex<SCALAR>,Cpu,FPP2>(dLap, J, verbosity, tol, rel_err, enable_large_Faust, err_period);
+				algo = new EigTJComplex<complex<SCALAR>,Cpu,FPP2>(dLap, J, verbosity, tol, rel_err, enable_large_Faust, err_period);
 			else
-				algo = new GivensFGFTParallelComplex<complex<SCALAR>,Cpu,FPP2>(dLap, J, t, verbosity, tol, rel_err, enable_large_Faust, err_period);
+				algo = new EigTJParallelComplex<complex<SCALAR>,Cpu,FPP2>(dLap, J, t, verbosity, tol, rel_err, enable_large_Faust, err_period);
 		}
 
 		algo->compute_facts();

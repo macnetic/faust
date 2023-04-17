@@ -1,5 +1,5 @@
 
-#include "faust_GivensFGFTParallel.h"
+#include "faust_EigTJParallel.h"
 #include "faust_MatDense.h"
 #include "faust_init_from_matio_params.h"
 #include "faust_init_from_matio_core.h"
@@ -26,7 +26,7 @@ int main()
 
 	sLap = Lap;
 	int J = 5472; //TODO: should be retrieved from .mat file (not be a hard-coded value)
-	GivensFGFTParallel<FPP,Cpu, FPP> algo(sLap,J,/*t=*/ Lap.getNbRow()/2,
+	EigTJParallel<FPP,Cpu, FPP> algo(sLap,J,/*t=*/ Lap.getNbRow()/2,
 			/*verbosity */ 0, /* stoppingError */ 0.0, /* errIsRel */ true, /* enable_large_Faust */ true);
 
 	algo.compute_facts();
