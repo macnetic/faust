@@ -268,18 +268,18 @@ function [U,S,V] = svdtj(M, varargin)
 	mex_args = {M, nGivens(1), nGivens(2), nGivens_per_fac(1), nGivens_per_fac(2), verbosity, tol, relerr, order, enable_large_Faust, err_period};
 	if isreal(M)
 		if(strcmp(class(M), 'single'))
-			[core_obj1, S, core_obj2] = mexsvdtjRealFloat(mex_args{:});
+			[core_obj1, S, core_obj2] = mexsvdtjfloat(mex_args{:});
 			S = spdiags(double(S), 0, size(M, 1), size(M, 2)); % matlab doesn't support single precision sparse matrix
 			U = Faust(core_obj1, isreal(M), 'cpu', 'float');
 			V = Faust(core_obj2, isreal(M), 'cpu', 'float');
 		else
-			[core_obj1, S, core_obj2] = mexsvdtjReal(mex_args{:});
+			[core_obj1, S, core_obj2] = mexsvdtjdouble(mex_args{:});
 			S = spdiags(double(S), 0, size(M, 1), size(M, 2));
 			U = Faust(core_obj1, isreal(M));
 			V = Faust(core_obj2, isreal(M));
 		end
 	else % M is complex
-			[core_obj1, S, core_obj2] = mexsvdtjReal(mex_args{:});
+			[core_obj1, S, core_obj2] = mexsvdtjdouble(mex_args{:});
 			S = spdiags(S, 0, size(M, 1), size(M, 2));
 			U = Faust(core_obj1, isreal(M), 'cpu', 'double', true);
 			V = Faust(core_obj2, isreal(M), 'cpu', 'double', true);

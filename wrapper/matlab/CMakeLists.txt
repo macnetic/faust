@@ -157,16 +157,16 @@ foreach(SCALAR_AND_FSUFFIX IN LISTS MEX_TYPES_AND_SUFFIXES) # TODO: complex<floa
 
     # Truncated Jacobi eigtj and svdtj
     if(NOT ${FAUST_SCALAR} MATCHES "complex")
-        configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexfgftgivens.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexfgftgivens${FSUFFIX}.cpp @ONLY)
-        configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexsvdtj.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexsvdtj${FSUFFIX}.cpp @ONLY)
+	    configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexfgftgivens.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexfgftgivens${SCALAR}.cpp @ONLY)
+	    configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexsvdtj.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexsvdtj${SCALAR}.cpp @ONLY)
     endif()
 	# copy the *.m for factorization now, because we have the FSUFFIX in hands
 	configure_file(${FAUST_MATLAB_DOC_SRC_DIR}/mexHierarchical_fact.m.in ${FAUST_MATLAB_DOC_SRC_DIR}/mexHierarchical_fact${FSUFFIX}.m COPYONLY)
 	configure_file(${FAUST_MATLAB_DOC_SRC_DIR}/mexPalm4MSA.m.in ${FAUST_MATLAB_DOC_SRC_DIR}/mexPalm4MSA${FSUFFIX}.m COPYONLY)
 	configure_file(${FAUST_MATLAB_DOC_SRC_DIR}/mexButterfly.m.in ${FAUST_MATLAB_DOC_SRC_DIR}/mexButterfly${FSUFFIX}.m @ONLY)
 	if(NOT ${FAUST_SCALAR} MATCHES "complex")
-		configure_file(${FAUST_MATLAB_DOC_SRC_DIR}/mexfgftgivens.m.in ${FAUST_MATLAB_DOC_SRC_DIR}/mexfgftgivens${FSUFFIX}.m COPYONLY)
-		configure_file(${FAUST_MATLAB_DOC_SRC_DIR}/mexsvdtj.m.in ${FAUST_MATLAB_DOC_SRC_DIR}/mexsvdtj${FSUFFIX}.m COPYONLY)
+		configure_file(${FAUST_MATLAB_DOC_SRC_DIR}/mexfgftgivens.m.in ${FAUST_MATLAB_DOC_SRC_DIR}/mexfgftgivens${SCALAR}.m COPYONLY)
+		configure_file(${FAUST_MATLAB_DOC_SRC_DIR}/mexsvdtj.m.in ${FAUST_MATLAB_DOC_SRC_DIR}/mexsvdtj${SCALAR}.m COPYONLY)
 	endif()
 
 	configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexPoly.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexPoly${FSUFFIX}.cpp @ONLY)
