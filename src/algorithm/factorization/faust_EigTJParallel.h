@@ -63,8 +63,10 @@ namespace Faust
 
 	};
 
-#include "faust_EigTJParallel.hpp"
 
 
 }
+
+#include "faust_EigTJParallel.hpp"
+
 #endif

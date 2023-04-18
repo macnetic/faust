@@ -1,4 +1,3 @@
-
 #ifndef __EIGTJ_COMPLEX__
 #define __EIGTJ_COMPLEX__
 

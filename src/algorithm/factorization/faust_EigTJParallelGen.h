@@ -1,11 +1,10 @@
-
-
 #ifndef __EIGTJ_PARALLEL_GEN__
 #define __EIGTJ_PARALLEL_GEN__
 #include "faust_EigTJ.h"
 #include "faust_MatSparse.h"
 #include <list>
 #include <functional>
+
 namespace Faust
 {
 
@@ -82,8 +81,10 @@ namespace Faust
 		EigTJParallelGen(int t, EigTJGen<FPP, DEVICE, FPP2, FPP4> & alg);
 	};
 
-#include "faust_EigTJParallelGen.hpp"
 
 
 }
+
+#include "faust_EigTJParallelGen.hpp"
+
 #endif

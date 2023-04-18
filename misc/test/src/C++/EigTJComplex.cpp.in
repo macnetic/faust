@@ -1,9 +1,10 @@
 
-#include "faust_EigTJComplex.h"
-#include "faust_MatDense.h"
+#include "faust_init_from_matio.h"
 #include "faust_init_from_matio_params.h"
 #include "faust_init_from_matio_core.h"
+#include "faust_MatDense.h"
 #include "faust_Transform.h"
+#include "faust_EigTJComplex.h"
 #include "EigTJUtilComplex.h"
 
 #include <complex>

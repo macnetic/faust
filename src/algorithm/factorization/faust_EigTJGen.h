@@ -1,4 +1,3 @@
-
 #ifndef __EIGTJ_GEN__
 #define __EIGTJ_GEN__
 

@@ -3,7 +3,7 @@
 	cout << "VALIDATED ASSERTION: " << msg <<endl;
 
 template<typename SCALAR, FDevice DEVICE, typename SCALAR2>
-void test_err_against_Laplacian(@GIVENS_CLASS@ /*EigTJ<SCALAR,DEVICE,SCALAR2> or EigTJComplex<SCALAR,DEVICE,SCALAR2> */ * algo, const char* conf_file)
+void test_err_against_Laplacian(Faust::@GIVENS_CLASS@ /*EigTJ<SCALAR,DEVICE,SCALAR2> or EigTJComplex<SCALAR,DEVICE,SCALAR2> */ * algo, const char* conf_file)
 {
 	Faust::MatDense<SCALAR,DEVICE> Lap, tmp;
 	Faust::MatDense<SCALAR,DEVICE> ordered_Uhat;
@@ -11,7 +11,7 @@ void test_err_against_Laplacian(@GIVENS_CLASS@ /*EigTJ<SCALAR,DEVICE,SCALAR2> or
 	SCALAR err_lap, err_lap2;
 	SCALAR2 ERR_OK_TRESHOLD = 1e-2;
 	init_faust_mat_from_matio(Lap,conf_file,"Lap");
-	err0 = init_double_from_matio(conf_file, "err0");
+	err0 = Faust::init_double_from_matio(conf_file, "err0");
 
 	Faust::MatDense<SCALAR,DEVICE> ordered_D(algo->get_Dspm(true));
 
@@ -54,14 +54,14 @@ void test_err_against_Laplacian(@GIVENS_CLASS@ /*EigTJ<SCALAR,DEVICE,SCALAR2> or
 }
 
 template<typename SCALAR, FDevice DEVICE, typename SCALAR2>
-void test_eigentransform(@GIVENS_CLASS@ /*EigTJ<SCALAR,DEVICE,SCALAR2> or EigTJComplex<SCALAR,DEVICE,SCALAR2> */ * algo, const char* conf_file)
+void test_eigentransform(Faust::@GIVENS_CLASS@ /*EigTJ<SCALAR,DEVICE,SCALAR2> or EigTJComplex<SCALAR,DEVICE,SCALAR2> */ * algo, const char* conf_file)
 {
 	Faust::MatDense<SCALAR,DEVICE> U, tmp;
 	SCALAR2 err1;
 	double ERR_OK_TRESHOLD = 1e-3;
 
 	init_faust_mat_from_matio(U,conf_file,"U");
-	err1 = init_double_from_matio(conf_file, "err1");
+	err1 = Faust::init_double_from_matio(conf_file, "err1");
 
 	// Compute manually the dense matrix of the eigenvectors (from the Givens transform / factors)
 	Faust::MatDense<SCALAR,DEVICE> Uhat(U.getNbRow(), U.getNbCol());
@@ -101,10 +101,10 @@ void test_eigentransform(@GIVENS_CLASS@ /*EigTJ<SCALAR,DEVICE,SCALAR2> or EigTJC
 }
 
 template<typename SCALAR, FDevice DEVICE, typename SCALAR2>
-void test_pivot_choices(@GIVENS_CLASS@ /*EigTJ<SCALAR,DEVICE,SCALAR2> or EigTJComplex<SCALAR,DEVICE,SCALAR2> */ * algo, const char* conf_file, const float same_pivot_target_rate /* default to .99 */, const int stop_count_ite /*= 57*/)
+void test_pivot_choices(Faust::@GIVENS_CLASS@ /*EigTJ<SCALAR,DEVICE,SCALAR2> or EigTJComplex<SCALAR,DEVICE,SCALAR2> */ * algo, const char* conf_file, const float same_pivot_target_rate /* default to .99 */, const int stop_count_ite /*= 57*/)
 {
 	vector<pair<int,int>> coord_choices = algo->get_coord_choices();
-	int J = init_int_from_matio(conf_file, "J");
+	int J = Faust::init_int_from_matio(conf_file, "J");
 
 	mat_t *matfp;
 
@@ -150,7 +150,7 @@ void test_pivot_choices(@GIVENS_CLASS@ /*EigTJ<SCALAR,DEVICE,SCALAR2> or EigTJCo
 }
 
 template<typename SCALAR, FDevice DEVICE, typename SCALAR2>
-void test_eigenvalues(@GIVENS_CLASS@ /*EigTJ<SCALAR,DEVICE,SCALAR2> or EigTJComplex<SCALAR,DEVICE,SCALAR2> */ * algo, const char* conf_file)
+void test_eigenvalues(Faust::@GIVENS_CLASS@ /*EigTJ<SCALAR,DEVICE,SCALAR2> or EigTJComplex<SCALAR,DEVICE,SCALAR2> */ * algo, const char* conf_file)
 {
 	SCALAR2 ERR_OK_TRESHOLD = 1e-2;
 	Faust::MatDense<SCALAR,DEVICE> tmp;
@@ -186,7 +186,7 @@ void test_eigenvalues(@GIVENS_CLASS@ /*EigTJ<SCALAR,DEVICE,SCALAR2> or EigTJComp
 	cout << "Relative difference on Dhat between matlab ref script and C++ impl:" << endl;
 	SCALAR test_D_err = tmp.norm()/ref_Dhat.norm();
 	cout << test_D_err << endl;
-	SCALAR2 ref_D_err = init_double_from_matio(conf_file, "err0"); // not used because it's recomputed
+	SCALAR2 ref_D_err = Faust::init_double_from_matio(conf_file, "err0"); // not used because it's recomputed
 	assert(Faust::fabs(test_D_err) < ERR_OK_TRESHOLD);
 	OK_ASSERT("Relative error norm(Dhat-Dhat_matlab)/norm(Dhat) is lower or equal to "<< ERR_OK_TRESHOLD << ".");
 
@@ -203,7 +203,7 @@ void test_eigenvalues(@GIVENS_CLASS@ /*EigTJ<SCALAR,DEVICE,SCALAR2> or EigTJComp
 
 
 template<typename SCALAR, FDevice DEVICE, typename SCALAR2>
-void test_ite_errors(const @GIVENS_CLASS@ /*EigTJ<SCALAR,DEVICE,SCALAR2> or EigTJComplex<SCALAR,DEVICE,SCALAR2> */ * algo, const char* conf_file, int ref_ite_period /* default to 0 to use algo ERROR_CALC_PERIOD */)
+void test_ite_errors(const Faust::@GIVENS_CLASS@ /*EigTJ<SCALAR,DEVICE,SCALAR2> or EigTJComplex<SCALAR,DEVICE,SCALAR2> */ * algo, const char* conf_file, int ref_ite_period /* default to 0 to use algo ERROR_CALC_PERIOD */)
 {
 	//
 	assert(algo->ERROR_CALC_PERIOD == 100); /** C++ impl. must calculate the error at the same rate than matlab */

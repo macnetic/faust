@@ -67,7 +67,8 @@ namespace Faust
 		EigTJParallelComplex(MatSparse<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity = 0, const double stoppingCritIsError = 0.0, const bool errIsRel = true, const bool enable_large_Faust = false, const int err_period=100);
 	};
 
-#include "faust_EigTJParallelComplex.hpp"
 
 }
+
+#include "faust_EigTJParallelComplex.hpp"
 #endif
