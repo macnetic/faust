@@ -55,15 +55,15 @@ typedef @FACT_FPP@ FPP2;
 
 using namespace Faust;
 
-void fgft_givens(const mxArray* matlab_matrix, int J, int t, Real<SCALAR> tol, unsigned int verbosity, bool rel_err,  int order, const bool enable_large_Faust, const int err_period, mxArray **plhs);
+void eigtj(const mxArray* matlab_matrix, int J, int t, Real<SCALAR> tol, unsigned int verbosity, bool rel_err,  int order, const bool enable_large_Faust, const int err_period, mxArray **plhs);
 
-void fgft_givens_cplx(const mxArray* matlab_matrix, int J, int t, double tol, unsigned int verbosity, bool rel_err, int order, const bool enable_large_Faust, const int err_period, mxArray **plhs);
+void eigtj_cplx(const mxArray* matlab_matrix, int J, int t, double tol, unsigned int verbosity, bool rel_err, int order, const bool enable_large_Faust, const int err_period, mxArray **plhs);
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
 
 	int J;
-	int t = 1; // default value for non-parallel Givens FGFT
+	int t = 1; // default value for non-parallel EigTJ
 	unsigned int verbosity = 0; //default verbosity (no info. displayed)
 	double tol = 0;
 	bool rel_err = true;
@@ -95,13 +95,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	const mxArray* matlab_matrix = prhs[0]; // Laplacian
 
 	if(mxIsComplex(matlab_matrix))
-		fgft_givens_cplx(matlab_matrix, J, t, tol, verbosity, rel_err, order, enable_large_Faust, err_period, plhs);
+		eigtj_cplx(matlab_matrix, J, t, tol, verbosity, rel_err, order, enable_large_Faust, err_period, plhs);
 	else
-		fgft_givens(matlab_matrix, J, t, tol, verbosity, rel_err,  order, enable_large_Faust, err_period, plhs);
+		eigtj(matlab_matrix, J, t, tol, verbosity, rel_err,  order, enable_large_Faust, err_period, plhs);
 
 }
 
-void fgft_givens(const mxArray* matlab_matrix, int J, int t, Real<SCALAR> tol, unsigned int verbosity, bool rel_err, int order, const bool enable_large_Faust, const int err_period, mxArray **plhs)
+void eigtj(const mxArray* matlab_matrix, int J, int t, Real<SCALAR> tol, unsigned int verbosity, bool rel_err, int order, const bool enable_large_Faust, const int err_period, mxArray **plhs)
 {
 	// initialization of the matrix that will be factorized
 	Faust::MatGeneric<SCALAR,Cpu>* Lap;
@@ -156,7 +156,7 @@ void fgft_givens(const mxArray* matlab_matrix, int J, int t, Real<SCALAR> tol, u
 
 }
 
-void fgft_givens_cplx(const mxArray* matlab_matrix, int J, int t, double tol, unsigned int verbosity, bool rel_err, int order, const bool enable_large_Faust, const int err_period, mxArray **plhs)
+void eigtj_cplx(const mxArray* matlab_matrix, int J, int t, double tol, unsigned int verbosity, bool rel_err, int order, const bool enable_large_Faust, const int err_period, mxArray **plhs)
 {
 	// initialization of the matrix that will be factorized
 	Faust::MatGeneric<complex<SCALAR>,Cpu>* Lap;

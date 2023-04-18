@@ -168,11 +168,11 @@ function [V,D] = eigtj(M, varargin)
 		nGivens_per_fac = min(nGivens_per_fac, nGivens);
 	end
 	if(strcmp(class(M), 'single'))
-		[core_obj, D] = mexfgftgivensfloat(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, order, enable_large_Faust, err_period);
+		[core_obj, D] = mex_eigtjfloat(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, order, enable_large_Faust, err_period);
 		D = sparse(diag(real(double(D))));
 		V = Faust(core_obj, isreal(M), 'cpu', 'float');
 	else
-		[core_obj, D] = mexfgftgivensdouble(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, order, enable_large_Faust, err_period);
+		[core_obj, D] = mex_eigtjdouble(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, order, enable_large_Faust, err_period);
 		D = sparse(diag(real(D)));
 		V = Faust(core_obj, isreal(M));
 	end

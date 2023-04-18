@@ -1,5 +1,5 @@
-#ifndef __GIVENS_FGFT__
-#define __GIVENS_FGFT__
+#ifndef __EIGTJ__
+#define __EIGTJ__
 
 #include "faust_constant.h"
 #include "faust_MatSparse.h"
@@ -22,7 +22,7 @@ namespace Faust
 			/**
 			 * \class EigTJ
 			 *
-			 * \brief This class implements the Givens FGFT algorithm.
+			 * \brief This class implements the EigTJ algorithm.
 			 * This algorithm is based on the classical Jacobi eigenvalues algorithm.
 			 *
 			 * See parent class EigTJGen for documentation about members.

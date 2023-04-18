@@ -1,6 +1,6 @@
 
-#ifndef __GIVENS_FGFT_COMPLEX__
-#define __GIVENS_FGFT_COMPLEX__
+#ifndef __EIGTJ_COMPLEX__
+#define __EIGTJ_COMPLEX__
 
 #include "faust_constant.h"
 #include "faust_MatSparse.h"
@@ -18,7 +18,7 @@ namespace Faust
 			/**
 			 * \class EigTJComplex
 			 *
-			 * \brief This class implements the Givens FGFT algorithm (Truncated Jacobi algorithm) for the complex matrix case (ideal case being the Hermitian matrix case).
+			 * \brief This class implements the EigTJ algorithm (Truncated Jacobi algorithm) for the complex matrix case (ideal case being the Hermitian matrix case).
 			 * This algorithm is based on the classical Jacobi eigenvalues algorithm.
 			 *
 			 * See parent class EigTJGen for documentation about members.

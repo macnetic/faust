@@ -64,7 +64,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
 
 	int J1, J2, err_period;
-	int t1 = 1, t2 = 1; // default value for non-parallel Givens FGFT
+	int t1 = 1, t2 = 1; // default value for non-parallel EigTJ
 	unsigned int verbosity = 0; //default verbosity (no info. displayed)
 	Real<SCALAR> tol = 0;
 	bool relErr = true;

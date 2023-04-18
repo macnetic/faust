@@ -1477,7 +1477,7 @@ def fgft_palm(U, Lap, p, init_D=None, ret_lambda=False, ret_params=False):
         tuple (FGFT, _lambda, p).
 
     See also:
-        hierarchical, fgft_givens, eigtj
+        hierarchical, eigtj
 
     References:
         - [1]   Le Magoarou L., Gribonval R. and Tremblay N., "Approximate fast

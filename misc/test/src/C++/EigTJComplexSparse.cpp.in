@@ -15,7 +15,7 @@ typedef @TEST_FPP2@ FPP2;
 
 /***
  * This test results have to be compared with what misc/test/src/Matlab/test_GivensDiag.m outputs.
- * That's a way to validate the C++ impl. of Givens Jacobi FGFT.
+ * That's a way to validate the C++ impl. of EigTJ.
  */
 
 

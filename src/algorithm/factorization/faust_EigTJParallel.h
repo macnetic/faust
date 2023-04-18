@@ -3,8 +3,8 @@
 
 #include <list>
 
-#ifndef __GIVENS_FGFT_PARALLEL__
-#define __GIVENS_FGFT_PARALLEL__
+#ifndef __EIGTJ_PARALLEL__
+#define __EIGTJ_PARALLEL__
 
 namespace Faust
 {
@@ -16,7 +16,7 @@ namespace Faust
 		/**
 		 * \class EigTJParallel
 		 *
-		 * \brief This class implements the parallel version of Givens FGFT algorithm.
+		 * \brief This class implements the parallel version of EigTJ algorithm.
 		 *
 		 * This variant of the parent class algorithm consists mainly to put t 2D rotation matrices in each iteration factor S (i.e. facts[ite]) when the basis version puts only a single rotation matrix into L.
 		 *

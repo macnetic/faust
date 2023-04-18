@@ -1,7 +1,7 @@
 
 
-#ifndef __GIVENS_FGFT_PARALLEL_GEN__
-#define __GIVENS_FGFT_PARALLEL_GEN__
+#ifndef __EIGTJ_PARALLEL_GEN__
+#define __EIGTJ_PARALLEL_GEN__
 #include "faust_EigTJ.h"
 #include "faust_MatSparse.h"
 #include <list>
@@ -16,7 +16,7 @@ namespace Faust
 			/**
 			 * \class EigTJParallelGen
 			 *
-			 * \brief This class represents the parallel version of Givens FGFT algorithm (for concrete implementations see subclasses: EigTJParallelComplex and EigTJParallel).
+			 * \brief This class represents the parallel version of EigTJ algorithm (for concrete implementations see subclasses: EigTJParallelComplex and EigTJParallel).
 			 *
 			 * This variant of the parent class algorithm consists mainly to put t 2D rotation matrices in each iteration factor S (i.e. facts[ite]) when the basis version puts only a single rotation matrix into L.  //		 * //		 * This algorithm is based on the classical Jacobi eigenvalues algorithm.  //		 * //		 *  References:
 			 *

@@ -10,7 +10,7 @@ This class groups all Givens related algorithms wrappers.
 cdef class FaustAlgoGenGivens@TYPE_NAME@:
 
     @staticmethod
-    def fact_givens_fgft@FUNC_TYPE_SUFFIX@(Lap, J, t, verbosity=0, stoppingError = 0.0,
+    def fact_eigtj@FUNC_TYPE_SUFFIX@(Lap, J, t, verbosity=0, stoppingError = 0.0,
                          errIsRel=True, order=1, enable_large_Faust=False,
                                            err_period=100):
         if(order == 'ascend'): order = 1
@@ -30,7 +30,7 @@ cdef class FaustAlgoGenGivens@TYPE_NAME@:
         D_view = D
 
         core = @CORE_CLASS@(core=True)
-        core.@CORE_OBJ@ = FaustCoreCy.fact_givens_fgft@FUNC_TYPE_SUFFIX@[@TYPE@,@REAL_TYPE@](&Lap_view[0,0],
+        core.@CORE_OBJ@ = FaustCoreCy.fact_eigtj@FUNC_TYPE_SUFFIX@[@TYPE@,@REAL_TYPE@](&Lap_view[0,0],
                                                                       Lap_num_rows,
                                                                       Lap_num_cols, J, t,
                                                                       &D_view[0], verbosity,
@@ -50,7 +50,7 @@ cdef class FaustAlgoGenGivens@TYPE_NAME@:
         return core, D
 
     @staticmethod
-    def fact_givens_fgft_sparse(Lap, J, t, verbosity=0, stoppingError = 0.0,
+    def fact_eigtj_sparse(Lap, J, t, verbosity=0, stoppingError = 0.0,
                                      errIsRel=True, order='ascend',
                                      enable_large_Faust=False, err_period=100):
         from scipy.sparse import spdiags
@@ -74,7 +74,7 @@ cdef class FaustAlgoGenGivens@TYPE_NAME@:
 
         core = @CORE_CLASS@(core=True)
         core.@CORE_OBJ@ = \
-        FaustCoreCy.fact_givens_fgft_sparse@FUNC_TYPE_SUFFIX@[@TYPE@, @REAL_TYPE@](&data1d[0],
+        FaustCoreCy.fact_eigtj_sparse@FUNC_TYPE_SUFFIX@[@TYPE@, @REAL_TYPE@](&data1d[0],
                                                                   &indices[0],
                                                                   &indptr[0],
                                                                   Lap.nnz,
@@ -115,11 +115,11 @@ cdef class FaustAlgoGenGivens@TYPE_NAME@:
         tol *= tol # the C++ impl. works on squared norms to measure errors
 
         if isinstance(M, np.ndarray):
-            core_obj,D = FaustAlgoGenGivens@TYPE_NAME@.fact_givens_fgft@FUNC_TYPE_SUFFIX@(M, nGivens, nGivens_per_fac,
+            core_obj,D = FaustAlgoGenGivens@TYPE_NAME@.fact_eigtj@FUNC_TYPE_SUFFIX@(M, nGivens, nGivens_per_fac,
                     verbosity, tol,
                     relerr, order, enable_large_Faust, err_period)
         elif isinstance(M, csr_matrix):
-            core_obj,D = FaustAlgoGenGivens@TYPE_NAME@.fact_givens_fgft_sparse@FUNC_TYPE_SUFFIX@(M, nGivens, nGivens_per_fac,
+            core_obj,D = FaustAlgoGenGivens@TYPE_NAME@.fact_eigtj_sparse@FUNC_TYPE_SUFFIX@(M, nGivens, nGivens_per_fac,
                     verbosity, tol,
                     relerr, order, enable_large_Faust, err_period)
         else:
