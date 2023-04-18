@@ -150,7 +150,7 @@ PKG=$(find_pkg)
 #echo pyfaust | conda run -n $CONDA_ENV anaconda login
 [[ -z "$PKG" || ! -r "$PKG" ]] && echo "Error: no built package was found in the virtual env directory." && exit 8
 [[ ! -r $TOKEN_FILE ]] && echo "Error: the anaconda token file $TOKEN wasn't found." && exit 9
-conda run -n $CONDA_ENV anaconda -t $TOKEN_FILE upload -u pyfaust $PKG
+conda run -n $CONDA_ENV anaconda -t $TOKEN_FILE upload -u pyfaust $PKG && conda env remove -n $CONDA_ENV
 # removing the package: conda run -n $CONDA_ENV anaconda -t ~/conda_pyfaust_token remove
 # clean the cache and unused package after uploading
 conda clean -a -y
