@@ -3134,7 +3134,7 @@ classdef Faust
 		%>    3.8527e-14
 		%>
 		%>
-		%> <p> @b See @b also Faust.mldivide, pinv Matlab built-in.
+		%> <p> @b See @b also Faust.mldivide, pinv Matlab built-in, matfaust.fact.pinvtj
 		%=====================================================================
 		function X = pinv(F)
 			X = pinv(full(F));

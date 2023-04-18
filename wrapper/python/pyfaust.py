@@ -2616,7 +2616,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             >>> np.allclose(F.pinv(), pinv(M))
             True
 
-        See also <a href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.pinv.html">numpy.linalg.pinv</a>
+        See also <a href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.pinv.html">numpy.linalg.pinv</a>, pyfaust.fact.pinvtj
         """
         from numpy.linalg.linalg import pinv
         return pinv(F.toarray())
