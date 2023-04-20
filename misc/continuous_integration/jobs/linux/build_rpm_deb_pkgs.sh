@@ -25,4 +25,4 @@ cpack -G RPM -C CPackConfig.cmake
 rm -Rf _CPack_Packages/x86_64/RPM
 cpack -G DEB -C CPackConfig.cmake
 rm -Rf _CPack_Packages/x86_64/DEB
-[[ -n "$COPY_PKG_TO_HOME" ]] && cp faust-$FAUST_VERSION*rpm faust-$FAUST_VERSION*deb $HOME
+[[ -n "$COPY_PKG_TO_HOME" ]] && cp faust-$FAUST_VERSION*rpm faust-$FAUST_VERSION*deb $HOME || exit 0
