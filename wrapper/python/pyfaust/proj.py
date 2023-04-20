@@ -712,6 +712,8 @@ class sptriu(proj_gen):
                [0.  , 0.  , 0.  , 0.  , 0.  ]])
         >>> np.linalg.norm(np.tril(p(M), -1)) == 0
         True
+        >>> np.count_nonzero(p(M)) == 3
+        True
 
 
     <b>See also:</b> pyfaust.proj.sptril
@@ -758,6 +760,8 @@ class sptril(proj_gen):
                [0.61, 0.  , 0.  , 0.  , 0.  ]])
         >>> np.linalg.norm(np.triu(p(M), 1)) == 0
         True
+        >>> np.count_nonzero(p(M)) == 3
+        True
 
 
     <b>See also:</b> pyfaust.proj.sptriu
@@ -780,7 +784,7 @@ class spsymm(proj_gen):
     """
     Functor for the SYMM SP projector.
 
-    A, the image matrix, is such that A is symmetric and \f$ \| A \|_0 = k,  \| A\|_F = 1 \f$ (if normalized == True).
+    A, the image matrix, is such that A is symmetric and \f$ \| A \|_0 = k + k \mod{2},  \| A\|_F = 1 \f$ (if normalized == True).
 
 
     Example:
@@ -803,6 +807,8 @@ class spsymm(proj_gen):
                [0.  , 0.  , 0.  , 0.  , 0.  ],
                [0.  , 0.  , 0.  , 0.  , 0.  ]])
         >>> np.linalg.norm(p(M) - p(M).T) == 0
+        True
+        >>> np.count_nonzero(p(M)) == 4
         True
 
     """

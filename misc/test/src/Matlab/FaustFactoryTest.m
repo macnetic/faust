@@ -712,6 +712,36 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			this.verifyEqual(norm(pM-pM_ref)/norm(pM_ref), 0)
 		end
 
+        function test_sptriu(this)
+            import matfaust.proj.sptriu
+            M = rand(5, 5);
+            k = 2;
+            p = sptriu(size(M), k);
+            M_ = p(M);
+            this.verifyEqual(numel(nonzeros(M_)), k)
+            this.verifyEqual(norm(tril(M_, -1)), 0)
+        end
+
+        function test_sptril(this)
+            import matfaust.proj.sptril
+            M = rand(5, 5);
+            k = 2;
+            p = sptril(size(M), k);
+            M_ = p(M);
+            this.verifyEqual(numel(nonzeros(M_)), k)
+            this.verifyEqual(norm(triu(M_, 1)), 0)
+        end
+
+        function test_spsymm(this)
+            import matfaust.proj.spsymm
+            M = rand(5, 5);
+            k = 2;
+            p = spsymm(size(M), k);
+            M_ = p(M);
+            this.verifyEqual(M_.', M_)
+            this.verifyEqual(numel(nonzeros(M_)), k)
+        end
+
 		function test_butterfly(this)
 			import matfaust.wht
 			import matfaust.dft

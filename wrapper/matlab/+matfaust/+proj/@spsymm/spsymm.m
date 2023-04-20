@@ -1,7 +1,7 @@
 %==================================================
 %> @brief Functor for the SPSYMM projector.
 %>
-%> A, the image matrix, is such that A is symmetric and \f$ \| A \|_0 = k,  \| A\|_F = 1 \f$ (if normalized == True).
+%> A, the image matrix, is such that A is symmetric and \f$ \| A \|_0 = k + k \mod{2},  \| A\|_F = 1 \f$ (if normalized == True).
 %==================================================
 classdef spsymm < matfaust.proj.proj_gen
 	properties
