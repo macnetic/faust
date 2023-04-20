@@ -73,13 +73,13 @@ ctest_matlab:
     only:
         - schedules
 
-ctest_nightly_linux:
+.ctest_nightly_linux:
     <<: *ctest_nightly_script
     tags:
         - linux
         - matlab
 
-ctest_nightly_macos:
+.ctest_nightly_macos:
     <<: *ctest_nightly_script
     variables: {BUILD_WRAPPER_MATLAB: "ON", BUILD_WRAPPER_PYTHON: "ON", SLOW_TESTS: "ON", DONT_PYPLOT_FAUST_TIME: "ON", NOPY2: "ON", BUILD_MULTITHREAD: "OFF"} # set mt to OFF because MacOS is kind of tricky to configure with OpenMP
     tags:
@@ -91,6 +91,26 @@ ctest_nightly_macos:
         - schedules
     tags:
         - win10
+
+doctest_nightly:
+  script:
+    - if [[ ! -d "doctest_pyfaust_latest" ]]; then $JOB_PYTHON -m venv doctest_pyfaust-latest;fi
+    - source doctest_pyfaust-latest/bin/activate
+    - python -m pip install pyfaust
+    - PF_DIR=`dirname $(python -c "import pyfaust as pf; print(pf.__file__)")`
+      #- python -m doctest -v $PF_DIR/__init__.py # already tested before pkg release
+    - python -m doctest -v $PF_DIR/factparams.py
+    - python -m doctest -v $PF_DIR/proj.py
+    - python -m doctest -v $PF_DIR/poly.py
+    - python -m doctest -v $PF_DIR/tools.py
+    - python -m doctest -v $PF_DIR/fact.py
+    - python -m doctest -v $PF_DIR/demo.py
+    - deactivate
+    - rm -Rf doctest_pyfaust-latest
+  only:
+    - schedules
+  tags:
+    - linux
 
 pkg_macos:
     stage: pkg
@@ -435,7 +455,7 @@ pkg_linux_purepy_release:
         # verify the pyfaust root with doctest (no go on failure)
         - if [[ ! $(basename $PWD) = 'build' ]]; then  cd build;fi
         - cd wrapper/python
-        - if ! python3 -m doctest -v pyfaust/__init__.py; then echo "error with doctest verification of pyfaust doc" 2>&1 && exit 1;fi
+        - if ! python3 -m doctest -v pyfaust/__init__.py; then echo "error with doctest verification of pyfaust doc" 2>&1 && exit 1;fi # TODO: remove manual exit/code + msg (useless)
         - cd ../..
     tags:
         - linux
