@@ -93,11 +93,20 @@ ctest_matlab:
         - win10
 
 doctest_nightly:
+  stage: test
   script:
+    - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
+    - cmake -DBUILD_WRAPPER_PYTHON=ON ..
     - if [[ ! -d "doctest_pyfaust_latest" ]]; then $JOB_PYTHON -m venv doctest_pyfaust-latest;fi
     - source doctest_pyfaust-latest/bin/activate
     - python -m pip install pyfaust
     - PF_DIR=`dirname $(python -c "import pyfaust as pf; print(pf.__file__)")`
+    - ls wrapper/python/pyfaust/*py
+    - md5sum wrapper/python/pyfaust/*py
+    - echo $PF_DIR
+    - md5sum $PF_DIR/*py
+    - cp -f wrapper/python/pyfaust/*py $PF_DIR/
+    - md5sum $PF_DIR/*py
       #- python -m doctest -v $PF_DIR/__init__.py # already tested before pkg release
     - python -m doctest -v $PF_DIR/factparams.py
     - python -m doctest -v $PF_DIR/proj.py
@@ -111,6 +120,9 @@ doctest_nightly:
     - schedules
   tags:
     - linux
+  except:
+    - tags
+  needs:
 
 pkg_macos:
     stage: pkg
