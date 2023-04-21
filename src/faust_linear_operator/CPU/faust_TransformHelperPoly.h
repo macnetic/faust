@@ -67,6 +67,7 @@ namespace Faust
 					bool on_gpu=false);
 
 			TransformHelperPoly(uint K, const TransformHelperPoly<FPP>& src);
+			TransformHelperPoly() : TransformHelper<FPP, Cpu>(), mul_and_combi_lin_on_gpu(false), T0_is_arbitrary(false), L(nullptr), rR(nullptr) {}
 
 			public:
 			faust_unsigned_int getNbRow() const;
@@ -98,7 +99,7 @@ namespace Faust
 			TransformHelper<FPP,Cpu>* clone();
 
 			void update_total_nnz();
-			MatDense<FPP, Cpu> multiply(const MatSparse<FPP,Cpu> &A, const bool transpose=false, const bool conjugate=false);
+			MatDense<FPP, Cpu> multiply(const MatSparse<FPP,Cpu> &A);
 			TransformHelper<FPP, Cpu>* multiply(const TransformHelper<FPP, Cpu>*) const;
 			TransformHelper<FPP, Cpu>* multiply(FPP& scalar);
 			faust_unsigned_int getNBytes() const;
@@ -125,15 +126,15 @@ namespace Faust
 			TransformHelper<FPP,Cpu>* swap_rows(const faust_unsigned_int id1, const faust_unsigned_int id2, const bool permutation=false, const bool inplace=false, const bool check_transpose=true);
             TransformHelper<FPP, Cpu>* slice(faust_unsigned_int start_row_id, faust_unsigned_int end_row_id,
 					                    faust_unsigned_int start_col_id, faust_unsigned_int end_col_id);
-			Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> &x, const bool transpose=false, const bool conjugate=false);
-			Vect<FPP,Cpu> multiply(const FPP* x, const bool transpose=false, const bool conjugate=false);
-			void multiply(const FPP* x, FPP* y, const bool transpose=false, const bool conjugate=false);
-			void multiply_cpu(const FPP* x, FPP* y, const bool transpose=false, const bool conjugate=false);
-			void multiply_gpu(const FPP* x, FPP* y, const bool transpose=false, const bool conjugate=false);
-			MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> &X, const bool transpose=false, const bool conjugate=false);
-			void multiply(const FPP* X, int n, FPP* out, const bool transpose=false, const bool conjugate=false);
-			void multiply_cpu(const FPP* X, int n, FPP* out, const bool transpose=false, const bool conjugate=false);
-			void multiply_gpu(const FPP* X, int n, FPP* out, const bool transpose=false, const bool conjugate=false);
+			Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> &x);
+			Vect<FPP,Cpu> multiply(const FPP* x);
+			void multiply(const FPP* x, FPP* y);
+			void multiply_cpu(const FPP* x, FPP* y);
+			void multiply_gpu(const FPP* x, FPP* y);
+			MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> &X);
+			void multiply(const FPP* X, int n, FPP* out);
+			void multiply_cpu(const FPP* X, int n, FPP* out);
+			void multiply_gpu(const FPP* X, int n, FPP* out);
 			TransformHelper<FPP, Cpu>* next(uint K);
 			TransformHelper<FPP, Cpu>* next();
 			Vect<FPP, Cpu> poly(MatDense<FPP,Cpu> & basisX, Vect<FPP, Cpu> coeffs);

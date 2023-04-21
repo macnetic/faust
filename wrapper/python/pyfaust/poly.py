@@ -82,8 +82,7 @@ def Chebyshev(L, K, dev='cpu', T0=None, impl='native'):
 
 
 def basis(L, K, basis_name, dev='cpu', T0=None, **kwargs):
-    """
-    Builds the Faust of the polynomial basis defined on the sparse matrix L.
+    """Builds the Faust of the polynomial basis defined on the sparse matrix L.
 
     Args:
         L: the sparse scipy square matrix in CSR format (scipy.sparse.csr_matrix).
@@ -100,28 +99,33 @@ def basis(L, K, basis_name, dev='cpu', T0=None, **kwargs):
     Example:
         >>> from pyfaust.poly import basis
         >>> from scipy.sparse import random
+        >>> from numpy.random import seed
+        >>> seed(42) # for reproducibility
         >>> L = random(50, 50, .02, format='csr')
         >>> L = L@L.T
         >>> K = 3
         >>> F = basis(L, K, 'chebyshev')
         >>> F
-        Faust size 200x50, density 0.0687, nnz_sum 687, 4 factor(s): 
-            - FACTOR 0 (real) SPARSE, size 200x150, density 0.0093, nnz 279
-            - FACTOR 1 (real) SPARSE, size 150x100, density 0.0152667, nnz 229
-            - FACTOR 2 (real) SPARSE, size 100x50, density 0.0258, nnz 129
-            - FACTOR 3 (real) SPARSE, size 50x50, density 0.02, nnz 50
+        Faust size 200x50, density 0.0699, nnz_sum 699, 4 factor(s):
+        - FACTOR 0 (double) SPARSE, size 200x150, density 0.00943333, nnz 283
+        - FACTOR 1 (double) SPARSE, size 150x100, density 0.0155333, nnz 233
+        - FACTOR 2 (double) SPARSE, size 100x50, density 0.0266, nnz 133
+        - FACTOR 3 (double) SPARSE, size 50x50, density 0.02, nnz 50
+         identity matrix flag
 
         Generate the next basis (the one with one additional dimension,
         whose the polynomial greatest degree is K+1 = 4)
 
         >>> G = next(F)
         >>> G
-        Faust size 250x50, density 0.08128, nnz_sum 1016, 5 factor(s): 
-            - FACTOR 0 (real) SPARSE, size 250x200, density 0.00658, nnz 329
-            - FACTOR 1 (real) SPARSE, size 200x150, density 0.0093, nnz 279
-            - FACTOR 2 (real) SPARSE, size 150x100, density 0.0152667, nnz 229
-            - FACTOR 3 (real) SPARSE, size 100x50, density 0.0258, nnz 129
-            - FACTOR 4 (real) SPARSE, size 50x50, density 0.02, nnz 50
+        Faust size 250x50, density 0.08256, nnz_sum 1032, 5 factor(s):
+        - FACTOR 0 (double) SPARSE, size 250x200, density 0.00666, nnz 333
+        - FACTOR 1 (double) SPARSE, size 200x150, density 0.00943333, nnz 283
+        - FACTOR 2 (double) SPARSE, size 150x100, density 0.0155333, nnz 233
+        - FACTOR 3 (double) SPARSE, size 100x50, density 0.0266, nnz 133
+        - FACTOR 4 (double) SPARSE, size 50x50, density 0.02, nnz 50
+         identity matrix flag
+
 
         The factors 0 to 3 of G are views of the same factors of F.
 
@@ -132,13 +136,11 @@ def basis(L, K, basis_name, dev='cpu', T0=None, **kwargs):
 
         >>> F2 = basis(L, K, 'chebyshev', T0=random(50,2, .3, format='csr'))
         >>> F2
-        Faust size 200x2, density 1.7125, nnz_sum 685, 4 factor(s): 
-            - FACTOR 0 (real) SPARSE, size 200x150, density 0.0095, nnz 285
-            - FACTOR 1 (real) SPARSE, size 150x100, density 0.0156667, nnz 235
-            - FACTOR 2 (real) SPARSE, size 100x50, density 0.027, nnz 135
-            - FACTOR 3 (real) SPARSE, size 50x2, density 0.3, nnz 30
-
-
+        Faust size 200x2, density 1.7475, nnz_sum 699, 4 factor(s):
+        - FACTOR 0 (double) SPARSE, size 200x150, density 0.00943333, nnz 283
+        - FACTOR 1 (double) SPARSE, size 150x100, density 0.0155333, nnz 233
+        - FACTOR 2 (double) SPARSE, size 100x50, density 0.0266, nnz 133
+        - FACTOR 3 (double) SPARSE, size 50x2, density 0.5, nnz 50
 
     """
     # impl (optional): 'native' (by default) for the C++ impl., "py" for the Python impl.
@@ -188,17 +190,19 @@ def poly(coeffs, basis='chebyshev', L=None, X=None, dev='cpu', out=None,
             >>> import numpy as np
             >>> from pyfaust.poly import basis, poly
             >>> from scipy.sparse import random
+            >>> np.random.seed(42) # for reproducibility
             >>> L = random(50, 50, .02, format='csr')
             >>> L = L@L.T
             >>> coeffs = np.array([.5, 1, 2, 3])
             >>> G = poly(coeffs, 'chebyshev', L)
             >>> G
-            Faust size 50x50, density 0.3608, nnz_sum 902, 5 factor(s):
-            - FACTOR 0 (real) SPARSE, size 50x200, density 0.02, nnz 200
-            - FACTOR 1 (real) SPARSE, size 200x150, density 0.00946667, nnz 284
-            - FACTOR 2 (real) SPARSE, size 150x100, density 0.0156, nnz 234
-            - FACTOR 3 (real) SPARSE, size 100x50, density 0.0268, nnz 134
-            - FACTOR 4 (real) SPARSE, size 50x50, density 0.02, nnz 50
+            Faust size 50x50, density 0.3596, nnz_sum 899, 5 factor(s):
+            - FACTOR 0 (double) SPARSE, size 50x200, density 0.02, nnz 200
+            - FACTOR 1 (double) SPARSE, size 200x150, density 0.00943333, nnz 283
+            - FACTOR 2 (double) SPARSE, size 150x100, density 0.0155333, nnz 233
+            - FACTOR 3 (double) SPARSE, size 100x50, density 0.0266, nnz 133
+            - FACTOR 4 (double) SPARSE, size 50x50, density 0.02, nnz 50
+             identity matrix flag
 
             Which is equivalent to do as below (in two times):
 
@@ -207,18 +211,19 @@ def poly(coeffs, basis='chebyshev', L=None, X=None, dev='cpu', out=None,
             >>> coeffs = np.array([.5, 1, 2, 3])
             >>> G = poly(coeffs, F)
             >>> G
-            Faust size 50x50, density 0.3608, nnz_sum 902, 5 factor(s):
-            - FACTOR 0 (real) SPARSE, size 50x200, density 0.02, nnz 200
-            - FACTOR 1 (real) SPARSE, size 200x150, density 0.00946667, nnz 284
-            - FACTOR 2 (real) SPARSE, size 150x100, density 0.0156, nnz 234
-            - FACTOR 3 (real) SPARSE, size 100x50, density 0.0268, nnz 134
-            - FACTOR 4 (real) SPARSE, size 50x50, density 0.02, nnz 50
+            Faust size 50x50, density 0.3596, nnz_sum 899, 5 factor(s):
+            - FACTOR 0 (double) SPARSE, size 50x200, density 0.02, nnz 200
+            - FACTOR 1 (double) SPARSE, size 200x150, density 0.00943333, nnz 283
+            - FACTOR 2 (double) SPARSE, size 150x100, density 0.0155333, nnz 233
+            - FACTOR 3 (double) SPARSE, size 100x50, density 0.0266, nnz 133
+            - FACTOR 4 (double) SPARSE, size 50x50, density 0.02, nnz 50
+             identity matrix flag
 
             Above G is a Faust because F is too.
             Below the full array of the Faust F is passed, so an array is returned into GA.
             >>> GA = poly(coeffs, F.toarray())
             >>> type(GA)
-            numpy.ndarray
+            <class 'numpy.ndarray'>
 
             But of course they are equal:
 
@@ -561,19 +566,16 @@ def expm_multiply(A, B, t, K=10, tradeoff='time', dev='cpu', **kwargs):
         >>> import numpy as np
         >>> from scipy.sparse import random
         >>> from pyfaust.poly import expm_multiply as fexpm_multiply
+        >>> np.random.seed(42) # for reproducibility
         >>> L = random(5, 5, .2, format='csr')
         >>> L = L@L.T
         >>> x = np.random.rand(L.shape[1])
         >>> t = np.linspace(start=-.5, stop=-0.1, num=3, endpoint=True)
         >>> y = fexpm_multiply(L, x, t)
         >>> y
-        array([[ 0.20063382,  0.39176039,  0.62490929,  0.60165209,
-                -0.00082166],
-               [ 0.20063382,  0.44945087,  0.62490929,  0.6401542 ,
-                0.02325689],
-               [ 0.20063382,  0.51456348,  0.62490929,  0.68279266,
-                0.05458717]])
-
+        array([[0.12706927, 0.21111065, 0.36636184, 0.41736344, 0.78517596],
+               [0.13190047, 0.24040598, 0.36636184, 0.4324354 , 0.78517596],
+               [0.13691536, 0.27376655, 0.36636184, 0.44805164, 0.78517596]])
 
    """
     if not isinstance(A, csr_matrix):
@@ -679,13 +681,14 @@ def invm_multiply(A, B, rel_err=1e-6, tradeoff='time', max_K=np.inf, dev='cpu', 
 		>>> from scipy.sparse import random
 		>>> from pyfaust.poly import invm_multiply
 		>>> from numpy.linalg import norm, inv
+        >>> np.random.seed(42) # for reproducibility
 		>>> A = random(64, 64, .1, format='csr')
 		>>> A = A@A.T
 		>>> B = np.random.rand(A.shape[1],2)
 		>>> A_inv_B = invm_multiply(A, B, rel_err=1e-2, max_K=2048)
 		>>> A_inv_B_ref = inv(A.toarray())@B
         >>> print("err:", norm(A_inv_B-A_inv_B_ref)/norm(A_inv_B))
-        err: 0.011045280586803805
+        err: 0.027283169722939017
 
     """
     eps = rel_err

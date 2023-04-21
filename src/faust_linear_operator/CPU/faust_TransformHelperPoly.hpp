@@ -11,7 +11,7 @@ namespace Faust
 				MatSparse<FPP, Cpu>* rR /* = nullptr*/,
 				MatSparse<FPP,Cpu> *T0 /*= nullptr*/,
 				BasisLaziness laziness /*= INSTANTIATE_COMPUTE_AND_FREE */,
-				bool on_gpu /*= false*/) : TransformHelper<FPP,Cpu>(), T0_is_arbitrary(false)
+				bool on_gpu /*= false*/) : TransformHelperPoly()
 	{
 		// assuming L is symmetric
 		this->L = L;
@@ -33,7 +33,6 @@ namespace Faust
 
 		if(T0 != nullptr)
 		{
-			T0->Display();
 			// T0 is arbitrary and need to be stored
 			// best choice is to instantiate the factor directly
 			this->basisChebyshevT0(T0);
@@ -48,7 +47,7 @@ namespace Faust
 	}
 
 	template<typename FPP>
-		TransformHelperPoly<FPP>::TransformHelperPoly(uint K, const TransformHelperPoly<FPP>& src) : TransformHelper<FPP, Cpu>()
+		TransformHelperPoly<FPP>::TransformHelperPoly(uint K, const TransformHelperPoly<FPP>& src) : TransformHelperPoly()
 	{
 		if(K+1 < src.size())
 			throw std::runtime_error("The src TransformHelperPoly size can't be greater than K+1.");
@@ -113,23 +112,23 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		Vect<FPP,Cpu> TransformHelperPoly<FPP>::multiply(const Vect<FPP,Cpu> &x, const bool transpose/*=false*/, const bool conjugate/*=false*/)
+		Vect<FPP,Cpu> TransformHelperPoly<FPP>::multiply(const Vect<FPP,Cpu> &x)
 		{
-			return std::move(this->multiply(x.getData(), transpose, conjugate));
+			return std::move(this->multiply(x.getData()));
 		}
 
 	template<typename FPP>
-		Vect<FPP,Cpu> TransformHelperPoly<FPP>::multiply(const FPP* x, const bool transpose/*=false*/, const bool conjugate/*=false*/)
+		Vect<FPP,Cpu> TransformHelperPoly<FPP>::multiply(const FPP* x)
 		{
 			int d = L->getNbRow();
 			uint K = this->size()-1;
 			Vect<FPP, Cpu> v0(d*(K+1));
-			multiply(x, v0.getData(), transpose, conjugate);
+			multiply(x, v0.getData());
 			return std::move(v0);
 		}
 
 	template<typename FPP>
-		void TransformHelperPoly<FPP>::multiply_cpu(const FPP* x, FPP* y, const bool transpose/*=false*/, const bool conjugate/*=false*/)
+		void TransformHelperPoly<FPP>::multiply_cpu(const FPP* x, FPP* y)
 		{
 			/**
 			 * Recurrence relation (k=1 to K):
@@ -166,7 +165,7 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		void TransformHelperPoly<FPP>::multiply_gpu(const FPP* x, FPP* y, const bool transpose/*=false*/, const bool conjugate/*=false*/)
+		void TransformHelperPoly<FPP>::multiply_gpu(const FPP* x, FPP* y)
 		{
 #ifdef USE_GPU_MOD
 			int d = L->getNbRow();
@@ -202,15 +201,15 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		void TransformHelperPoly<FPP>::multiply(const FPP* x, FPP* y, const bool transpose/*=false*/, const bool conjugate/*=false*/)
+		void TransformHelperPoly<FPP>::multiply(const FPP* x, FPP* y)
 		{
 			if(this->mul_and_combi_lin_on_gpu)
 			{
-				multiply_gpu(x, y, transpose, conjugate);
+				multiply_gpu(x, y);
 			}
 			else
 			{
-				multiply_cpu(x, y, transpose, conjugate);
+				multiply_cpu(x, y);
 			}
 		}
 
@@ -352,32 +351,32 @@ namespace Faust
 	//			}
 
 	template<typename FPP>
-		MatDense<FPP, Cpu> TransformHelperPoly<FPP>::multiply(const MatDense<FPP,Cpu> &X, const bool transpose/*=false*/, const bool conjugate/*=false*/)
+		MatDense<FPP, Cpu> TransformHelperPoly<FPP>::multiply(const MatDense<FPP,Cpu> &X)
 		{
 			//				std::cout << "TransformHelperPoly<FPP>::multiply(MatDense)" << std::endl;
 			int d = L->getNbRow();
 			uint K = this->size()-1;
 			int n = X.getNbCol();
 			MatDense<FPP,Cpu> Y(d*(K+1), n);
-			multiply(X.getData(), n, Y.getData(), transpose, conjugate);
+			multiply(X.getData(), n, Y.getData());
 			return Y;
 		}
 
 	template<typename FPP>
-		void TransformHelperPoly<FPP>::multiply(const FPP* X, int n, FPP* Y, const bool transpose/*=false*/, const bool conjugate/*=false*/)
+		void TransformHelperPoly<FPP>::multiply(const FPP* X, int n, FPP* Y)
 		{
 			if(this->mul_and_combi_lin_on_gpu)
 			{
-				multiply_gpu(X, n, Y, transpose, conjugate);
+				multiply_gpu(X, n, Y);
 			}
 			else
 			{
-				multiply_cpu(X, n, Y, transpose, conjugate);
+				multiply_cpu(X, n, Y);
 			}
 		}
 
 	template<typename FPP>
-		void TransformHelperPoly<FPP>::multiply_cpu(const FPP* X, int n, FPP* Y, const bool transpose/*=false*/, const bool conjugate/*=false*/)
+		void TransformHelperPoly<FPP>::multiply_cpu(const FPP* X, int n, FPP* Y)
 		{
 			int d = L->getNbRow();
 			uint K = this->size()-1;
@@ -390,12 +389,12 @@ namespace Faust
 				//				memcpy(V0_ord.getData()+scale*i, y.getData(), sizeof(FPP)*scale);
 				Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>> x_vec(const_cast<FPP*>(X+i*d), d);
 				Eigen::Map<Eigen::Matrix<FPP, Eigen::Dynamic, 1>> y_vec(const_cast<FPP*>(Y+i*scale), scale);
-				multiply(x_vec.data(), y_vec.data(), transpose, conjugate);
+				multiply(x_vec.data(), y_vec.data());
 			}
 		}
 
 	template<typename FPP>
-		void TransformHelperPoly<FPP>::multiply_gpu(const FPP* X, int n, FPP* Y, const bool transpose/*=false*/, const bool conjugate/*=false*/)
+		void TransformHelperPoly<FPP>::multiply_gpu(const FPP* X, int n, FPP* Y)
 		{
 #ifdef USE_GPU_MOD
 			int d = L->getNbRow();
@@ -441,7 +440,7 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		MatDense<FPP, Cpu> TransformHelperPoly<FPP>::multiply(const MatSparse<FPP,Cpu> &A, const bool transpose/*=false*/, const bool conjugate/*=false*/)
+		MatDense<FPP, Cpu> TransformHelperPoly<FPP>::multiply(const MatSparse<FPP,Cpu> &A)
 		{
 			MatDense<FPP, Cpu> M(this->getNbRow(), A.getNbCol());
 			M.setZeros();
@@ -459,7 +458,7 @@ namespace Faust
 			{
 				auto id = *i;
 				auto vect = A.get_col(id);
-				this->multiply(vect.getData(), M.getData()+M.getNbRow()*id, transpose, conjugate);
+				this->multiply(vect.getData(), M.getData()+M.getNbRow()*id);
 			}
 			return M;
 		}
@@ -1080,7 +1079,7 @@ namespace Faust
 			str<<"Faust size ";
 				str << this->get_fact_nb_rows(0) << "x" << this->get_fact_nb_cols(this->size()-1);
 			auto density = (double)this->get_total_nnz()/this->getNbRow()/this->getNbCol();
-			str <<", density "<< density << ", nnz_sum "<<this->get_total_nnz() << ", " << this->size() << " factor(s): "<< std::endl;
+			str <<", density "<< density << ", nnz_sum "<<this->get_total_nnz() << ", " << this->size() << " factor(s):"<< std::endl;
 			for (int i=0 ; i<this->size() ; i++)
 			{
 				str << "- ";
@@ -1099,9 +1098,10 @@ namespace Faust
 				else
 					str << nrows << "x" << ncols;
 				str << ", density "<< density <<", nnz "<< this->get_fact_nnz(i);
-				str <<std::endl;
-				if (! T0_is_arbitrary || is_fact_created[this->size()-1] && this->get_gen_fact_nonconst(this->size()-1)->is_id())
-					str <<" identity matrix flag" << std::endl;
+				if(i < this->size() - 1)
+					str <<std::endl;
+				else if (! T0_is_arbitrary || is_fact_created[this->size()-1] && this->get_gen_fact_nonconst(this->size()-1)->is_id())
+					str << std::endl << " identity matrix flag" /*<< std::endl*/;
 			}
 			return str.str();
 		}
