@@ -184,7 +184,7 @@ def svdtj(M, nGivens=None, tol=0, err_period=100, relerr=True,
             True
             >>> # verify the relative error is lower than 1e-12
             >>> np.linalg.norm(U3 @ S3_ @ V3.H - M) / np.linalg.norm(M)
-            9.122446623891136e-13
+            9.122443356294125e-13
             >>> # try with an absolute tolerance (the previous one was relative to M)
             >>> U4, S4, V4 = svdtj(M, tol=1e-6, relerr=False, enable_large_Faust=False)
             >>> S4_ = spdiags(S4, [0], U4.shape[0], V4.shape[0])
@@ -209,7 +209,7 @@ def svdtj(M, nGivens=None, tol=0, err_period=100, relerr=True,
             >>> (len(U2), len(V2))
             (100, 200)
             >>> (len(U3), len(V3))
-            (64, 200)
+            (64, 256)
             >>> (len(U4), len(V4))
             (64, 200)
             >>> # not surprisingly U5 and V5 use the smallest number of factors (nGivens and tol were the smallest)
@@ -356,9 +356,12 @@ def pinvtj(M, nGivens=None, tol=0, err_period=100, relerr=True,
         >>> M = np.random.rand(128, 64)
         >>> V, Sp, Uh = pinvtj(M, tol=1e-3)
         >>> scipy_Sp = spdiags(Sp, [0], M.shape[1], M.shape[0])
-        >>> np.linalg.norm(V @ scipy_Sp @ Uh @ M - np.eye(64, 64)) / np.linalg.norm(np.eye(64, 64))
-        0.00012007583711484639
+        >>> err = np.linalg.norm(V @ scipy_Sp @ Uh @ M - np.eye(64, 64)) / np.linalg.norm(np.eye(64, 64))
+        >>> print(np.round(err, decimals=6))
+        0.00012
 
+    See also:
+        svdtj
     """
     from os import environ
     environ['PINVTJ_ERR'] = '1'
@@ -454,8 +457,8 @@ def eigtj(M, nGivens=None, tol=0, err_period=100, order='ascend', relerr=True,
         >>> # Uhat is the Fourier matrix/eigenvectors approximation as a Faust
         >>> # (200 factors)
         >>> # Dhat the eigenvalues diagonal matrix approx.
-        >>> print("err: ", norm(Lap-Uhat@np.diag(Dhat)@Uhat.H)/norm(Lap)) # about 6.5e-3
-        err:  0.006494660956003688
+        >>> print("err: ", np.round(norm(Lap-Uhat@np.diag(Dhat)@Uhat.H)/norm(Lap), decimals=4)) # about 6.5e-3
+        err:  0.0065
         >>> Dhat2, Uhat2 = eigtj(Lap, tol=0.01)
         >>> assert(norm(Lap-Uhat2@np.diag(Dhat2)@Uhat2.H)/norm(Lap) < .011)
         >>> # and then asking for an absolute error

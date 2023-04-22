@@ -1024,7 +1024,7 @@ class bsl:
         return gamma
 
     @staticmethod
-    def run(input_data_dir=get_data_dirpath(silent=False),
+    def run(input_data_dir=get_data_dirpath(silent=True),
             output_dir=DEFT_RESULTS_DIR, on_gpu=False):
         """This function performs brain source localization.
         It uses several gain matrices [2], including FAuSTs, and OMP solver.
@@ -1184,7 +1184,7 @@ class bsl:
         from scipy.io import loadmat
         if(use_precomputed_data):
             mat_file_entries = \
-            loadmat(os.path.join(get_data_dirpath(silent=False),"results_BSL_user.mat"))
+            loadmat(os.path.join(get_data_dirpath(silent=True),"results_BSL_user.mat"))
         else:
             mat_file_entries = loadmat(input_dir+os.sep+'results_BSL_user.mat')
         compute_times = mat_file_entries['compute_Times']
