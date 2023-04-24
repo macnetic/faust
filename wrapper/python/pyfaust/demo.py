@@ -59,9 +59,11 @@ def runall():
     """Runs all the demos in a row.
     Example:
         >>> from pyfaust.demo import runall, allfigs
-        >>> runall()
+        >>> runall() # doctest:+ELLIPSIS
+        ***...
         >>> # benchmark data files go in DEFT_RESULTS_DIR
-        >>> allfigs()
+        >>> allfigs() # doctest:+ELLIPSIS
+        ***...
         >>> # figures resulting from benchmark go in DEFT_FIG_DIR
     """
     def print_header(title):
@@ -260,7 +262,7 @@ class fft:
             xlabel ('log(dim)')
 
         figlegend(figure(1).get_axes()[0].get_lines(),['dense', 'faust',
-                                                       'fft'],loc='best')
+                                                       'fft'])
 
 
         if(not os.path.exists(output_dir)):
@@ -653,13 +655,13 @@ class hadamard:
         had_faust = Faust(filepath=_prefix_fname_with_dir(input_dir,
                                                           hadamard._had_faust_fname))
         fig1 = figure(1)
-        subplot("1"+str(had_faust.numfactors()+1)+'1')
+        subplot(int("1"+str(had_faust.numfactors()+1)+'1'))
         imshow(had_faust.toarray())
         xticks([])
         yticks([])
         facts = [];
         for i in range(0,had_faust.numfactors()):
-            subplot("1"+str(hadamard._nfacts+1)+str(i+2))
+            subplot(int("1"+str(hadamard._nfacts+1)+str(i+2)))
             # all factors are normally sparse
             fac = had_faust.factors(i)
             facts.append(fac)
@@ -670,12 +672,12 @@ class hadamard:
             yticks([])
 
         fig2 = figure(2)
-        subplot("1"+str(had_faust.numfactors()+1)+'1')
+        subplot(int("1"+str(had_faust.numfactors()+1)+'1'))
         imshow(had_faust.toarray())
         xticks([])
         yticks([])
         for i in range(0,had_faust.numfactors()):
-            subplot("1"+str(hadamard._nfacts+1)+str(i+2))
+            subplot(int("1"+str(hadamard._nfacts+1)+str(i+2)))
             title("nz = "+str(count_nonzero(fac)))
             spy(facts[i], markersize=1)
             xticks([])
@@ -800,7 +802,7 @@ class hadamard:
             ymax = max(max(mean_mult_times[:,t[2]]),
                        max(mean_mult_times[:,t[3]]))
 
-            subplot("22"+t[0])
+            subplot(int("22"+t[0]))
             title('Runtime Hadamard '+t[1])
             grid(True)
             #hold(True)
@@ -815,7 +817,7 @@ class hadamard:
             ymin = min(t[2])
             ymax = max(t[2])
 
-            subplot("22"+t[0])
+            subplot(int("22"+t[0]))
             title('Speedup Hadamard '+t[1])
             grid(True)
             #hold(True)
