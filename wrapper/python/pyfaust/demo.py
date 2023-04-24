@@ -734,7 +734,7 @@ class hadamard:
                 mult_times[i,k,_HAD_DENSE] = _timer()-t
 
                 t = _timer()
-                yfaust = had_faust*x
+                yfaust = had_faust @ x
                 mult_times[i,k,_HAD_FAUST] = _timer()-t
 
                 if(norm(ydense-yfaust) > threshold):
@@ -746,7 +746,7 @@ class hadamard:
                 mult_times[i,k,_HAD_TRANS_DENSE] = _timer()-t
 
                 t = _timer()
-                yfaust_trans = had_faust.T*x
+                yfaust_trans = had_faust.T @ x
                 mult_times[i,k,_HAD_TRANS_FAUST] = _timer()-t
 
                 if(norm(yfaust_trans-ydense_trans) > threshold):
