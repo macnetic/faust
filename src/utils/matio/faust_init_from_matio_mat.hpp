@@ -372,7 +372,7 @@ namespace Faust {
                     || mat_sparse->nir < mat_sparse->ndata
                     || mat_sparse->jc[var->dims[1]] != mat_sparse->ndata)
             {
-                std::cerr<<"Error in init_faust_spmat<FPP,DEVICE>_from_matio : incorrect dimensions"<<std::endl;
+                std::cerr<<"Error in init_spmat_from_matvar: incorrect dimensions"<<std::endl;
                 exit(EXIT_FAILURE);
             }
 
@@ -401,18 +401,21 @@ namespace Faust {
 			}
             int cmpt=0;
             for (int i=0 ; i<var->dims[1] ; i++)
+			{
                 for (int j = mat_sparse->jc[i] ; j < mat_sparse->jc[i + 1] ; j++)
                 {
+
                     rowind[cmpt] = mat_sparse->ir[cmpt] ;
                     colind[cmpt] = i ;
                     cmpt++;
                 }
+			}
 
             S = MatSparse<FPP,DEVICE>(rowind, colind, values, var->dims[0], var->dims[1]);
 
             if (cmpt != S.getNonZeros())
             {
-                std::cerr<<"Error in init_faust_spmat<FPP,DEVICE>_from_matio : cmpt != nnz : cmpt="<<cmpt<<" ; nnz="<<S.getNonZeros()<<std::endl;
+                std::cerr<<"Error in init_spmat_from_matvar: cmpt != nnz : cmpt="<<cmpt<<" ; nnz="<<S.getNonZeros()<<std::endl;
                 exit(EXIT_FAILURE);
             }
 

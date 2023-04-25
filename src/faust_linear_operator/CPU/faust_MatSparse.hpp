@@ -759,19 +759,28 @@ matvar_t* Faust::MatSparse<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate,
 #ifdef NO_MATIO
 	throw std::runtime_error("Sorry but NO_MATIO option was enabled at compiling time, so MAT-IO library wasn't enabled and the matrix can't be saved.");
 #else
+#if MATIO_MAJOR_VERSION != 1 || MATIO_MINOR_VERSION != 5 // look out MATIO_VERSION_STR for full version string
+#error "matio version must be 1.5.x"
+#endif
+#if MATIO_RELEASE_LEVEL >= 18 // the precise version that switched to unsigned int (1.5.18)
+	typedef mat_uint32_t MATIO_INT;
+#else
+	typedef mat_int32_t MATIO_INT;
+#endif
 	//TODO: refactor this function because it is a bit too long
 	matvar_t* var = NULL;
 	Eigen::SparseMatrix<FPP,Eigen::RowMajor> mat_;
 	size_t dims[2];
 	mat_sparse_t sparse = {0,};
 	//	sparse.njc = (int) this->getNbCol()+1;
-	sparse.nzmax = (int) this->nnz;
-	sparse.ndata = (int) this->nnz;
-	int* jc;
-	int* ir = new int[sparse.nzmax];
+	sparse.nzmax = (MATIO_INT) this->nnz;
+	sparse.ndata = (MATIO_INT) this->nnz;
+	MATIO_INT* jc;
+	MATIO_INT* ir = new MATIO_INT[sparse.nzmax];
+
 	Real<FPP>* data;
 	mat_complex_split_t z = {0,};
-	int nir = 0; //incremented later row by row
+	MATIO_INT nir = 0; //incremented later row by row
 	int i = 0;
 
 	matio_types matio_type;
@@ -806,29 +815,34 @@ matvar_t* Faust::MatSparse<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate,
 	}
 
 	sparse.njc = dims[1]+1;
-	jc = new int[sparse.njc];
+	jc = new MATIO_INT[sparse.njc];
 
 	jc[sparse.njc-1] = this->nnz;
-	for(int j=0;j<sparse.njc-1;j++) jc[j] = -1;
+	for(MATIO_INT j=0;j<sparse.njc-1;j++) jc[j] = 0; // TODO: memset/OpenMP ?
 
 	// we use the transpose matrix because we are in row-major order but MatIO wants col-major order
 	// and the sparse matrix iterator respects the row-major order
 	Eigen::SparseMatrix<FPP,Eigen::RowMajor> st;
 	st = mat_.transpose();
+	jc[0] = 0; // 1st ele./1st row id of first column, always at id 0 of data/ir
+	bool first_col_elt = false;
+	MATIO_INT last_col_id = 0;
 	for (int k=0; k<st.outerSize(); ++k)
+	{
+		first_col_elt = true;
 		for (typename Eigen::SparseMatrix<FPP,Eigen::RowMajor>::InnerIterator it(st,k); it; ++it)
 		{
-			//			std::cout << "row:" << it.row() << " col:" << it.col() <<  " val:" << it.value() << std::endl;
-			if(it.row() > 0){
-				i=1;
-				while(it.row()>=i && jc[it.row()-i] < 0) {
-					jc[it.row()-i] = nir;
-					i++;
-				}
+//			std::cout << "row:" << it.row() << " col:" << it.col() <<  " val:" << it.value() << std::endl;
+			// remember we transposed the matrix, so it.row() is the col id, it.col() the row id
+			if(it.row() > 0 && first_col_elt)
+			{
+				jc[last_col_id+1] = nir;
+				first_col_elt = false;
+				last_col_id = it.row();
 			}
-			if(jc[it.row()] < 0) jc[it.row()] = nir;
 			ir[nir] = it.col();
-			if(opt) {
+			if(opt)
+			{
 				((Real<FPP>*)z.Re)[nir] = std::real((complex<Real<FPP>>)it.value());
 				if(conjugate)
 					((Real<FPP>*)z.Im)[nir] = -std::imag((complex<Real<FPP>>)it.value());
@@ -839,11 +853,13 @@ matvar_t* Faust::MatSparse<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate,
 				data[nir] = std::real(complex<Real<FPP>>(it.value()));
 			nir++;
 		}
-	i=1;
-	while(i<=st.rows() && jc[st.rows()-i] < 0) {
-		jc[st.rows()-i] = nir;
-		i++;
 	}
+	// count of last nz column
+	if(last_col_id > 0) jc[last_col_id+1] = nir;
+
+	// intermediate counts for empty columns
+	for(MATIO_INT j=1;j<sparse.njc-1;j++) if(jc[j] == 0) jc[j] = jc[j-1]; // TODO: memset/OpenMP ?
+
 	sparse.ir = ir;
 	sparse.jc = jc;
 	sparse.nir = nir;
@@ -1523,7 +1539,6 @@ void Faust::MatSparse<FPP,Cpu>::vstack(MatSparse<FPP, Cpu>& top, MatSparse<FPP, 
 		{
 			tripletList.push_back(T(it.row()+top.getNbRow(), it.col(), it.value()));
 		}
-
 	mat.setFromTriplets(tripletList.begin(), tripletList.end());
 	update_dim();
 }
