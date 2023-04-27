@@ -13,10 +13,10 @@ variables:
     USE_OPENBLASO: 'OFF' # by default any pip whl pkg doesn't use openblas-openmp (eigen blas backend)
     PYFAUST_PKG_NAME: 'pyfaust' # default package name, it can change for openblas-openmp whl package # only used in test_unix_purepy_pkg job
     # linux static library paths:
-    LINUX_HDF5_SLIB_PATH: '/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a'
-    LINUX_ZLIB_SLIB_PATH: '/opt/local/zlib-1.2.11/libz.a'
-    LINUX_MATIO_SLIB_PATH: '/opt/local/matio-1.5.7/src/.libs/libmatio.a'
-    # macosx satic library paths
+    LINUX_MATIO_SLIB_PATH: '/opt/local/matio-1.5.23/libmatio.a'
+    LINUX_HDF5_SLIB_PATH: '/opt/local/hdf5-1.14.0/libhdf5.a'
+    LINUX_ZLIB_SLIB_PATH: '/opt/local/zlib-1.2.13/libz.a'
+    # macosx static library paths
     MACOS_HDF5_SLIB_PATH: '/opt/local/lib/libhdf5.a'
     MACOS_ZLIB_SLIB_PATH: '/opt/local/lib/libz.a'
     MACOS_MATIO_SLIB_PATH: '/usr/local/lib/libmatio.a'
