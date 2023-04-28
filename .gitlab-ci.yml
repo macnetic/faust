@@ -188,9 +188,9 @@ pkg_win:
 
 .build_gpu_mod: &build_gpu_mod
       before_script: # TODO: loop on 9.2 and 11.4 (cuda versions)
-#        - cd gpu_mod; if [[ ! -d build-cu9.2 ]]; then mkdir build-cu9.2; fi; cd build-cu9.2
-#        - cmake -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda-9.2 -DCMAKE_CUDA_COMPILER=/usr/local/cuda-9.2/bin/nvcc .. && make
-#        - cd ../..
+        - cd gpu_mod; if [[ ! -d build-cu12.1 ]]; then mkdir build-cu12.1; fi; cd build-cu12.1
+        - cmake -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda-12.1 -DCMAKE_CUDA_COMPILER=/usr/local/cuda-12.1/bin/nvcc .. && make
+        - cd ../..
         - cd gpu_mod; if [[ ! -d build-cu11.4 ]]; then mkdir build-cu11.4; fi; cd build-cu11.4
         - cmake -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda-11.4 -DCMAKE_CUDA_COMPILER=/usr/local/cuda-11.4/bin/nvcc .. && make
         - cd ../..
@@ -375,10 +375,10 @@ pages:
         - if [[ -n "$USE_GPU_MOD" ]]; then GPU_MOD_SHA=$(git submodule foreach git log --oneline -n1 | sed -e 's/ .*//' | tail -1); fi
         - echo GPU_MOD_SHA=$GPU_MOD_SHA
           # TODO: loop on CUDA VERSIONS instead of duplicating the commands
-#        - if [[ -n "$USE_GPU_MOD" ]]; then cd gpu_mod; if [[ ! -d build-cu9.2 ]]; then mkdir build-cu9.2; fi; cd build-cu9.2; fi
-#          # don't build the lib if already installed
-#        - if [[ -n "$USE_GPU_MOD" ]]; then cmake -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda-9.2 -DCMAKE_CUDA_COMPILER=/usr/local/cuda-9.2/bin/nvcc ..;L=$HOME"/libgm-$GPU_MOD_SHA-cu9.2.so"; echo LIB=$L; if [[ -r "$L" ]]; then cp "$L" ./libgm.so; else make; cp ./libgm.so "$L";fi;fi
-#        - if [[ -n "$USE_GPU_MOD" ]]; then cd ../..; fi
+        - if [[ -n "$USE_GPU_MOD" ]]; then cd gpu_mod; if [[ ! -d build-cu12.1 ]]; then mkdir build-cu12.1; fi; cd build-cu12.1; fi
+          # don't build the lib if already installed
+        - if [[ -n "$USE_GPU_MOD" ]]; then cmake -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda-12.1 -DCMAKE_CUDA_COMPILER=/usr/local/cuda-12.1/bin/nvcc ..;L=$HOME"/libgm-$GPU_MOD_SHA-cu12.1.so"; echo LIB=$L; if [[ -r "$L" ]]; then cp "$L" ./libgm.so; else make; cp ./libgm.so "$L";fi;fi
+        - if [[ -n "$USE_GPU_MOD" ]]; then cd ../..; fi
         - if [[ -n "$USE_GPU_MOD" ]]; then cd gpu_mod; if [[ ! -d build-cu11.4 ]]; then mkdir build-cu11.4; fi; cd build-cu11.4; fi
           # don't build the lib if already installed
         - if [[ -n "$USE_GPU_MOD" ]]; then cmake -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda-11.4 -DCMAKE_CUDA_COMPILER=/usr/local/cuda-11.4/bin/nvcc ..;L=$HOME"/libgm-$GPU_MOD_SHA-cu11.4.so"; echo LIB=$L; if [[ -r "$L" ]]; then cp "$L" ./libgm.so; else make; cp ./libgm.so "$L";fi;fi
@@ -420,10 +420,10 @@ pkg_linux_purepy_rev:
         - if [[ -n "$USE_GPU_MOD" ]]; then GPU_MOD_SHA=$(git submodule foreach git log --oneline -n1 | sed -e 's/ .*//' | tail -1); fi
         - echo GPU_MOD_SHA=$GPU_MOD_SHA
           # TODO: loop on CUDA VERSIONS instead of duplicating the commands
-#        - if [[ -n "$USE_GPU_MOD" ]]; then cd gpu_mod; if [[ ! -d build-cu9.2 ]]; then mkdir build-cu9.2; fi; cd build-cu9.2; fi
-#          # don't build the lib if already installed
-#        - if [[ -n "$USE_GPU_MOD" ]]; then cmake -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda-9.2 -DCMAKE_CUDA_COMPILER=/usr/local/cuda-9.2/bin/nvcc ..;L=$HOME"/libgm-$GPU_MOD_SHA-cu9.2.so"; echo LIB=$L; if [[ -r "$L" ]]; then cp "$L" ./libgm.so; else make; cp ./libgm.so "$L";fi;fi
-#        - if [[ -n "$USE_GPU_MOD" ]]; then cd ../..; fi
+        - if [[ -n "$USE_GPU_MOD" ]]; then cd gpu_mod; if [[ ! -d build-cu12.1 ]]; then mkdir build-cu12.1; fi; cd build-cu12.1; fi
+          # don't build the lib if already installed
+        - if [[ -n "$USE_GPU_MOD" ]]; then cmake -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda-12.1 -DCMAKE_CUDA_COMPILER=/usr/local/cuda-12.1/bin/nvcc ..;L=$HOME"/libgm-$GPU_MOD_SHA-cu12.1.so"; echo LIB=$L; if [[ -r "$L" ]]; then cp "$L" ./libgm.so; else make; cp ./libgm.so "$L";fi;fi
+        - if [[ -n "$USE_GPU_MOD" ]]; then cd ../..; fi
         - if [[ -n "$USE_GPU_MOD" ]]; then cd gpu_mod; if [[ ! -d build-cu11.4 ]]; then mkdir build-cu11.4; fi; cd build-cu11.4; fi
           # don't build the lib if already installed
         - if [[ -n "$USE_GPU_MOD" ]]; then cmake -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda-11.4 -DCMAKE_CUDA_COMPILER=/usr/local/cuda-11.4/bin/nvcc ..;L=$HOME"/libgm-$GPU_MOD_SHA-cu11.4.so"; echo LIB=$L; if [[ -r "$L" ]]; then cp "$L" ./libgm.so; else make; cp ./libgm.so "$L";fi;fi

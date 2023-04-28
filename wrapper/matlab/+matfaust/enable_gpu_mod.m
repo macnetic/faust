@@ -17,7 +17,7 @@ function enable_gpu_mod(varargin)
 	backend = 'cuda';
 	silent = true;
 	osstr = computer;
-	backend_suffixes = {'-cu11.4', '-cu9.2', ''};
+	backend_suffixes = {'-cu12.1', '-cu11.4', ''};
 	libpaths = {};
 	for bi = 1:length(backend_suffixes)
 		bs = backend_suffixes{bi};
