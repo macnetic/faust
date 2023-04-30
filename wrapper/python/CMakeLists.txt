@@ -227,10 +227,9 @@ if(USE_GPU_MOD)
 			file(CREATE_LINK ${CUDA_CONF_GPU_MOD_NAME} ${GPU_MOD_LIB_PPATH}/${GPU_MOD_LIB} RESULT SYMLINK_OK SYMBOLIC)
 			install(FILES ${GPU_MOD_LIB_PPATH}/${GPU_MOD_LIB} DESTINATION ${CMAKE_INSTALL_PYTHON_PREFIX}/pyfaust/lib)
 		endif()
-		# don't add a classifier for CUDA 11.4 because it is not yet indexed on pypi.org https://pypi.org/classifiers
-		if(NOT CUDA_CONF MATCHES 11.4)
-			set(GPU_CUDA_VERSION_PYPI_CLASSIFIER "'${GPU_CUDA_VERSION_PYPI_CLASSIFIER}Environment :: GPU :: NVIDIA CUDA :: ${CUDA_CONF}', ")
-		endif()
+		# verify here that classifiers are available for the used CUDA versions: https://pypi.org/classifiers/
+		string(REGEX REPLACE "\\..*" "" CUDA_MAJOR_VERSION ${CUDA_CONF})
+		set(GPU_CUDA_VERSION_PYPI_CLASSIFIER "${GPU_CUDA_VERSION_PYPI_CLASSIFIER} 'Environment :: GPU :: NVIDIA CUDA :: ${CUDA_MAJOR_VERSION}', ")
 	endforeach()
 endif()
 
