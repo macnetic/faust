@@ -20,11 +20,16 @@ project: [FAµST website](http://faust.inria.fr)
 
 Dependencies
 ============
-- cuda 11 ( >= 11.6, preferably the latest cuda 11 version available). There is a known bug on cuda 11.4 (issue #305). CUDA is optional, only used if cmake option ``USE_GPU_MOD`` is ON.
+- cuda (preferably cuda 12 latest version but 9 and 11 are also supported).
+There is a known bug on cuda 11.4 (issue #305). CUDA is optional, only used if cmake option ``USE_GPU_MOD`` is ON.
+The ``gpu_mod`` submodule must be checked out in order to enable this function.
 - Eigen 3.4.x.
-- [matio](https://github.com/tbeu/matio) version >= 1.5.7 (guaranteed) and <= 1.5.17 (potentially), and its own dependencies, as hdf5. This dependency can be disabled through cmake option ``NO_MATIO``.
+- [matio](https://github.com/tbeu/matio) version >= 1.5.7 (current latest version 1.5.23 is supported and advised).
+matio own dependencies, as hdf5 and zlib. matio dependency can be disabled through cmake option ``NO_MATIO``.
 - Python3 (with numpy, scipy and cython) to build the python wrappers.
-- MATLAB (>= R2017b) to build the matlab wrappers.
+- Matlab (>= R2017b) to build the matlab wrappers
+(there is a constraint on the gcc compiler version depending on the used Matlab version,
+the CMake script indicate if the match is not appropriate).
 - libxml2 (Optional, needed with CMake ``BUILD_READ_XML_FILE``).
 - TODO: other?
 
@@ -120,12 +125,15 @@ Contacts
 
 Credits
 ========
-	Luc Le Magoarou
-	Remi Gribonval
-	Nicolas Bellot
-	Adrien Leman
-	Thomas Gautrais
-	Hakim Hadj-Djilani
+
+Researchers:
+Luc Le Magoarou
+Remi Gribonval
+TODO: add others
+
+Software engineers:
+Adrien Leman (2016), Nicolas Bellot(2015-2016), Thomas Gautrais (2015), Hakim Hadj-Djilani (2018-), Pascal Carrivain (2023-).
+
 ---
 
 References

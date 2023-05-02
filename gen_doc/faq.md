@@ -25,8 +25,8 @@
 
 
 **3. About CUDA (for GPU FAµST API support)**  
-[3.1 Where can I find the CUDA 9 / 11 installer for my system?](#cuda_one)  
-[3.2 How do I need to configure the CUDA 9 / 11 installer on Windows 10?](#cuda_two)  
+[3.1 Where can I find the CUDA 12 / 11 installer for my system?](#cuda_one)  
+[3.2 How do I need to configure the CUDA 12 / 11 installer on Windows 10?](#cuda_two)  
 
 
 # 1. About matfaust
@@ -563,19 +563,19 @@ channels:
 
 \anchor cuda_one
 
-## 3.1 Where can I find the CUDA 9 / 11 installer for my system?
+## 3.1 Where can I find the CUDA 12 / 11 installer for my system?
 
-FAµST wrappers GPU API needs CUDA 9 (or 11) to work. To install this toolkit you need to download the approriate archive [here for CUDA 9](https://developer.nvidia.com/cuda-92-download-archive) (or [here for CUDA 11](https://developer.nvidia.com/cuda-downloads?target_os=Linux)). Select your system and architecture then download the package/installer.
+FAµST wrappers GPU API needs CUDA 12 (or 11) to work. To install this toolkit you need to download the approriate archive [here for CUDA 12](https://developer.nvidia.com/cuda-downloads?target_os=Linux) (or [here for CUDA 11](https://developer.nvidia.com/cuda-11-7-1-download-archive)). Select your system and architecture then download the package/installer.
 
-**Note**: it's recommended to install the most recent version of CUDA 11 (instead of CUDA 9).
+**Note**: it's recommended to install the most recent version of CUDA 11 (instead of CUDA 11).
 
 \anchor cuda_two
 
-## 3.2 How do I need to configure the CUDA 9 / 11 installer on Windows 10?
+## 3.2 How do I need to configure the CUDA 12 / 11 installer on Windows 10?
 
 After downloading the installer through one link given in 3.1, you can launch it to start the install. You shall see several panels during the process, they are listed below with the options you should select.
 
-Of course the CUDA 9 / 11 will work only if you have a NVIDIA card fully installed with its approriate driver compatible to CUDA 9 / 11 (however the CUDA installer proposes to install the driver).
+Of course the CUDA 12 / 11 will work only if you have a NVIDIA card fully installed with its approriate driver compatible to CUDA 12 / 11 (however the CUDA installer proposes to install the driver).
 
 Panel 1: System Check (nothing special to do).  
 Panel 2: License Agreement (you must accept to continue).  
@@ -591,6 +591,6 @@ In the option panel:
 
 Continue to the last panel and finish the install.
 
-\note After install don't forget to configure your ``PATH`` environment variable. During the CUDA 9 / 11 install the variables ``CUDA_PATH`` and ``CUDA_PATH_V9_2`` (or CUDA_PATH_V11_4 etc.) have been set automatically. You need to add ``%CUDA_PATH_V9_2%\bin`` (``%CUDA_PATH_V11_4%\bin``) to your ``PATH`` (otherwise pyfaust and matfaust won't load the ``CUSPARSE`` and ``CUBLAS`` needed libraries at runtime).
+\note After install don't forget to configure your ``PATH`` environment variable. During the CUDA 11 / 12 install the variables ``CUDA_PATH`` and ``CUDA_PATH_V12_1`` (or CUDA_PATH_V11_4 etc.) have been set automatically. You need to add ``%CUDA_PATH_V12_1%\bin`` (``%CUDA_PATH_V11_4%\bin``) to your ``PATH`` (otherwise pyfaust and matfaust won't load the ``CUSPARSE`` and ``CUBLAS`` needed libraries at runtime).
 
 
