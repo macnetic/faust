@@ -285,8 +285,6 @@ pkg_linux_release:
       - job: pkg_linux_purepy_release
         artifacts: true
 
-
-
 pkg_linux_release_static:
     <<: *build_gpu_mod
     stage: pkg
@@ -309,6 +307,27 @@ pkg_linux_release_static:
       - job: pkg_linux_purepy_release
         artifacts: true
 
+upload_pkgs_to_registry:
+  stage: pkg_pub
+  script:
+    - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
+    - for PKG in *.pkg *.rpm *.deb *.exe; do curl --header "JOB-TOKEN:$CI_JOB_TOKEN" --upload-file $PKG "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/faust/$CI_COMMIT_TAG/$PKG"; done
+  needs:
+    - job: pkg_macos_release
+      artifacts: true
+    - job: pkg_win_release
+      artifacts: true
+    - job: pkg_linux_release
+      artifacts: true
+    - job: pkg_linux_release_static
+      artifacts: true
+    - job: test_linux_pkg_release
+    - job: test_macos_pkg_release
+  tags:
+    - linux
+  only:
+    - tags
+
 pages:
     stage: gitlab_pages
     script:
@@ -326,8 +345,9 @@ pages:
         - ../gen_doc/gen_pkg_dl_page.sh $CI_COMMIT_TAG # download.html generated
         - mv download.html ../public/packages/
           #- mv *.pkg *.rpm *.deb *.exe ../public/packages/
-        - mv *.pkg *.rpm *.deb  ../public/packages/
+          #- mv *.pkg *.rpm *.deb  ../public/packages/
     needs:
+      - job: upload_pkgs_to_registry
       - job: pkg_macos_release
         artifacts: true
       - job: pkg_win_release

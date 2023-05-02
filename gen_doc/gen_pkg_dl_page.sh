@@ -1,5 +1,8 @@
 #!/bin/bash
 
+GITLAB_URL=$CI_API_V4_URL/projects/$CI_PROJECT_ID # variables automatically available from gitlab-runner/CI pipeline
+                                                  # (set them manually in your environment otherwise)
+
 function usage
 {
 	echo "$0 <faust_version> [<filepath>]"
@@ -19,7 +22,7 @@ function generate_html
 	do
 		SYS=${CONF%%::*}
 		FILE=${CONF##*::}
-		echo "<tr><td>$SYS</td><td><a href=\"https://faustgrp.gitlabpages.inria.fr/faust/packages/$FILE\">$FILE</a></td><td>$(sha256sum_or_not_found $FILE)</td></tr>"
+		echo "<tr><td>$SYS</td><td><a href=\"$GITLAB_URL/packages/generic/faust/$VERSION/$FILE\">$FILE</a></td><td>$(sha256sum_or_not_found $FILE)</td></tr>"
 	done
 	echo "</table>"
 
