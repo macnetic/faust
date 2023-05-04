@@ -154,11 +154,19 @@ pkg_macos:
 #        - mkdir gpu_mod
 #        - git submodule sync --recursive
 #        - git submodule update --init --recursive
+#TODO: loop on cuda versions
         - cd gpu_mod
         - if NOT EXIST build-cu11.4 (mkdir build-cu11.4) else (rmdir /S /Q build-cu11.4 & mkdir build-cu11.4)
         - cd build-cu11.4
-        - cmake -G "Visual Studio 16 2019" ..
-          #- cmake -G "MinGW Makefiles" -DCMAKE_CUDA_COMPILER="E:/NVIDIA GPU Computing Toolkit/CUDA/v9.2/bin/nvcc.exe" .. #-DCUDA_HOST_COMPILER="E:/TDM-GCC-64/bin/g++.exe" ..
+        - cmake -G "Visual Studio 16 2019" -DCMAKE_CUDA_COMPILER="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.4/bin/nvcc.exe" -DCUDA_TOOLKIT_INCLUDE="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.4/include" -DCUDA_TOOLKIT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.4" ..
+          #- cmake -G "MinGW Makefiles" -DCMAKE_CUDA_COMPILER="E:/NVIDIA GPU Computing Toolkit/CUDA/v11.4/bin/nvcc.exe" .. #-DCUDA_HOST_COMPILER="E:/TDM-GCC-64/bin/g++.exe" ..
+        - cmake --build . --config %BUILD_CONFIG%
+        - move %BUILD_CONFIG%\gm.dll .
+        - cd ..
+        - if NOT EXIST build-cu12.1 (mkdir build-cu12.1) else (rmdir /S /Q build-cu12.1 & mkdir build-cu12.1)
+        - cd build-cu12.1
+        - cmake -G "Visual Studio 16 2019" -DCMAKE_CUDA_COMPILER="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1/bin/nvcc.exe" -DCUDA_TOOLKIT_INCLUDE="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1/include" -DCUDA_TOOLKIT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1" ..
+          #- cmake -G "MinGW Makefiles" -DCMAKE_CUDA_COMPILER="E:/NVIDIA GPU Computing Toolkit/CUDA/v12.1/bin/nvcc.exe" .. #-DCUDA_HOST_COMPILER="E:/TDM-GCC-64/bin/g++.exe" ..
         - cmake --build . --config %BUILD_CONFIG%
         - move %BUILD_CONFIG%\gm.dll .
         - cd ..\..
@@ -187,7 +195,7 @@ pkg_win:
 
 
 .build_gpu_mod: &build_gpu_mod
-      before_script: # TODO: loop on 9.2 and 11.4 (cuda versions)
+      before_script: # TODO: loop on the two versions
         - cd gpu_mod; if [[ ! -d build-cu12.1 ]]; then mkdir build-cu12.1; fi; cd build-cu12.1
         - cmake -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda-12.1 -DCMAKE_CUDA_COMPILER=/usr/local/cuda-12.1/bin/nvcc .. && make
         - cd ../..
@@ -545,7 +553,14 @@ pkg_linux_purepy_release_openblaso:
         - cd gpu_mod
         - if NOT EXIST build-cu11.4 (mkdir build-cu11.4) else (rmdir /S /Q build-cu11.4 & mkdir build-cu11.4)
         - cd build-cu11.4
-        - cmake -G "Visual Studio 16 2019" ..
+        - cmake -G "Visual Studio 16 2019" -DCMAKE_CUDA_COMPILER="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.4/bin/nvcc.exe" -DCUDA_TOOLKIT_INCLUDE="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.4/include" -DCUDA_TOOLKIT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.4" ..
+          #- cmake -G "MinGW Makefiles" -DCMAKE_CUDA_COMPILER="E:/NVIDIA GPU Computing Toolkit/CUDA/v9.2/bin/nvcc.exe" .. #-DCUDA_HOST_COMPILER="E:/TDM-GCC-64/bin/g++.exe" ..
+        - cmake --build . --config %BUILD_CONFIG%
+        - move %BUILD_CONFIG%\gm.dll .
+        - cd ..
+        - if NOT EXIST build-cu12.1 (mkdir build-cu12.1) else (rmdir /S /Q build-cu12.1 & mkdir build-cu12.1)
+        - cd build-cu12.1
+        - cmake -G "Visual Studio 16 2019" -DCMAKE_CUDA_COMPILER="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1/bin/nvcc.exe" -DCUDA_TOOLKIT_INCLUDE="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1/include" -DCUDA_TOOLKIT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1" ..
           #- cmake -G "MinGW Makefiles" -DCMAKE_CUDA_COMPILER="E:/NVIDIA GPU Computing Toolkit/CUDA/v9.2/bin/nvcc.exe" .. #-DCUDA_HOST_COMPILER="E:/TDM-GCC-64/bin/g++.exe" ..
         - cmake --build . --config %BUILD_CONFIG%
         - move %BUILD_CONFIG%\gm.dll .
