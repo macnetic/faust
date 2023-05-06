@@ -210,9 +210,13 @@ if(USE_GPU_MOD)
 		if(NOT BUILD_WRAPPER_MATLAB)
 			# we are packaging a pip package or at least using python setup_tools (and not cmake)
 			file(COPY ${GPU_MOD_BUILD_DIR}/${GPU_MOD_LIB} DESTINATION ${GPU_MOD_LIB_PPATH})
+			message(STATUS COPY "${GPU_MOD_BUILD_DIR}/${GPU_MOD_LIB} DESTINATION ${GPU_MOD_LIB_PPATH}")
 			file(RENAME ${GPU_MOD_LIB_PPATH}/${GPU_MOD_LIB} ${GPU_MOD_LIB_PPATH}/${CUDA_CONF_GPU_MOD_NAME})
+			message(STATUS "RENAME ${GPU_MOD_LIB_PPATH}/${GPU_MOD_LIB} ${GPU_MOD_LIB_PPATH}/${CUDA_CONF_GPU_MOD_NAME}")
 			# if the link already exists it will be overwritten
-			file(CREATE_LINK ${CUDA_CONF_GPU_MOD_NAME} ${GPU_MOD_LIB_PPATH}/${GPU_MOD_LIB} RESULT SYMLINK_OK SYMBOLIC)
+#			file(CREATE_LINK ${CUDA_CONF_GPU_MOD_NAME} ${GPU_MOD_LIB_PPATH}/${GPU_MOD_LIB} RESULT SYMLINK_OK SYMBOLIC)
+#			message(STATUS "CREATE_LINK ${CUDA_CONF_GPU_MOD_NAME} ${GPU_MOD_LIB_PPATH}/${GPU_MOD_LIB} RESULT SYMLINK_OK SYMBOLIC")
+			# in fact the symlink is useless because defaulty wheel packages don't support symlink (a wheel is a zip), it is converted to a copy resulting to a unnecessary larger whl file
 		else()
 			# MATLAB wrapper is compiled too, it means we share the libgm between wrappers and have to symlink it in pyfaust
 			file(MAKE_DIRECTORY ${GPU_MOD_LIB_PPATH})
