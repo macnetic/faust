@@ -547,7 +547,7 @@ Your installed version is: 2.35
 
 Take care to add the conda-forge channel to your environment before installing pyfaust.  
 In this goal, please follow the install guide [here](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/install_pyfaust_in_venv.html#anaconda).  
-In order to verify you don't already have conda-forge set in your channels, use the follwing command:  
+In order to verify you don't already have conda-forge set in your channels, use the following command:  
 
       conda config --show channels
 
@@ -565,32 +565,21 @@ channels:
 
 ## 3.1 Where can I find the CUDA 12 / 11 installer for my system?
 
-FAµST wrappers GPU API needs CUDA 12 (or 11) to work. To install this toolkit you need to download the approriate archive [here for CUDA 12](https://developer.nvidia.com/cuda-downloads?target_os=Linux) (or [here for CUDA 11](https://developer.nvidia.com/cuda-11-7-1-download-archive)). Select your system and architecture then download the package/installer.
+FAµST wrappers GPU API needs CUDA 12 (or 11) to work. To install this toolkit you need to download the appropriate archive [here for CUDA 12](https://developer.nvidia.com/cuda-downloads?target_os=Linux) (or [here for CUDA 11](https://developer.nvidia.com/cuda-11-8-0-download-archive)). Select your system and architecture then download the package/installer.
 
-**Note**: it's recommended to install the most recent version of CUDA 11 (instead of CUDA 11).
+**Note**: it's recommended to install the most recent version of CUDA 12 (instead of CUDA 11 or older CUDA 12).
 
 \anchor cuda_two
 
 ## 3.2 How do I need to configure the CUDA 12 / 11 installer on Windows 10?
 
-After downloading the installer through one link given in 3.1, you can launch it to start the install. You shall see several panels during the process, they are listed below with the options you should select.
+After downloading the installer through one of the links given in 3.1, launch it to start the install. You shall see several panels during the process, they are listed below with the options you should select.
 
-Of course the CUDA 12 / 11 will work only if you have a NVIDIA card fully installed with its approriate driver compatible to CUDA 12 / 11 (however the CUDA installer proposes to install the driver).
+Of course the CUDA 12 / 11 will work only if you have a NVIDIA CUDA compatible card fully installed with its appropriate driver compatible to CUDA 12 / 11 (note that the CUDA installer proposes to install the driver).
 
 Panel 1: System Check (nothing special to do).  
 Panel 2: License Agreement (you must accept to continue).  
-Panel 3: Installation Options: choose "custom (Advanced)".  
+Panel 3: Installation Options: choose "Express (Recommended)".  
 
-In the option panel:
-- Disable ``Driver components`` and ``Other components`` (however note that you must have installed/updated your NVIDIA card driver).
-- In the CUDA section keep enabled ``Visual Studio Integration`` and disable ``Samples`` and ``Documentation``.
-- In ``CUDA > Runtime`` disable ``Demo Suite`` and keep ``CUDART``, ``CUBLAS`` and ``CUSPARSE`` in ``Libraries``.
-- In ``CUDA > Development > Compiler > Libraries``: keep enabled ``CUBLAS`` and ``CUSPARSE``.
-- In ``CUDA > Development > Complier``: keep ``nvcc`` disable others.
-- In ``CUDA > Development > Tools``: disable all.
-
-Continue to the last panel and finish the install.
-
-\note After install don't forget to configure your ``PATH`` environment variable. During the CUDA 11 / 12 install the variables ``CUDA_PATH`` and ``CUDA_PATH_V12_1`` (or CUDA_PATH_V11_4 etc.) have been set automatically. You need to add ``%CUDA_PATH_V12_1%\bin`` (``%CUDA_PATH_V11_4%\bin``) to your ``PATH`` (otherwise pyfaust and matfaust won't load the ``CUSPARSE`` and ``CUBLAS`` needed libraries at runtime).
-
+Of course, not all components provided by the CUDA installer are really necessary to run FAµST on GPU, but following the express install is the simplest way to make FAµST work with CUDA properly.
 
