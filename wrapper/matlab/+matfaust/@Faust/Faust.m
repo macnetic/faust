@@ -3343,7 +3343,7 @@ classdef Faust
 		%>
 		%================================================================
 		function c = class(F)
-			if(strcmp(F.dtype, 'float'))
+			if(any(strcmp(F.dtype, {'float', 'single'})))
 				c = 'single';
 			else
 				c = 'double';
