@@ -663,6 +663,17 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         """
         return F
 
+    def __neg__(F):
+        """
+        Returns - F (unary operator).
+
+
+        NOTE: This method overloads the Python unary operator -.
+
+        <b>See also</b> Faust.__sub__, Faust.__mul__
+        """
+        return -1 * F
+
     def __add__(F, *args, **kwargs):
         """
         Sums F to one or a sequence of variables (Faust objects, arrays or scalars).

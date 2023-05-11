@@ -365,8 +365,21 @@ classdef Faust
 		%>
 		%> <p>@b See @b also Faust.plus</p>
 		%======================================================
-		function G = uplus(F) 
+		function G = uplus(F)
 			G = F;
+		end
+
+		%======================================================
+		%> @brief Returns - F.
+		%>
+		%>===
+		%>
+		%> This function overloads a Matlab built-in function.
+		%>
+		%> <p>@b See @b also Faust.sum, Faust.mtimes</p>
+		%======================================================
+		function G = uminus(F)
+			G = -1 * F;
 		end
 
 		%======================================================================
