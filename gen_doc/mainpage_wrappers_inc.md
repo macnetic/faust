@@ -25,7 +25,7 @@ Besides, if you're more familiar with Matlab, some livescripts are also availabl
 - [Using the FAµST Factorization Wrappers](./Faust_factorization.mlx.html)
 - [Using the FAµST API in Algorithms](./Use_of_Faust_objects_in_algorithms.mlx.html)
 - [Using The FAµST Projectors API](./faust_projectors.mlx.html)
-- [Using the GPU with matfaust](./using_gpu_matfaust.html)
+- [Using the GPU with matfaust](./using_gpu_matfaust.mlx.html)
 - [Using the poly module](./matfaust_poly.html)
 - [Using the PALM4MSA-MHTP algorithm](./MHTP_algorithms.mlx.html)
 - [Faust Optimizations](./Faust_optimizations.mlx.html)

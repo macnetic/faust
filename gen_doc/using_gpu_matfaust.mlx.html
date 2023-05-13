@@ -1,0 +1,2086 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,IE=9,chrome=1"><meta name="generator" content="MATLAB 2022b"><title>Using The GPU FAµST API</title><style type="text/css">.rtcContent { padding: 30px; } .S0 { margin: 3px 10px 5px 4px; padding: 0px; line-height: 20px; min-height: 0px; white-space: pre-wrap; color: rgb(33, 33, 33); font-family: Helvetica, Arial, sans-serif; font-style: normal; font-size: 20px; font-weight: 700; text-align: left;  }
+.S1 { margin: 2px 10px 9px 4px; padding: 0px; line-height: 21px; min-height: 0px; white-space: pre-wrap; color: rgb(33, 33, 33); font-family: Helvetica, Arial, sans-serif; font-style: normal; font-size: 14px; font-weight: 400; text-align: left;  }
+.S2 { margin: 10px 0px 20px; padding-left: 0px; font-family: Helvetica, Arial, sans-serif; font-size: 14px;  }
+.S3 { margin-left: 56px; line-height: 21px; min-height: 0px; text-align: left; white-space: pre-wrap;  }
+.S4 { margin: 15px 10px 5px 4px; padding: 0px; line-height: 18px; min-height: 0px; white-space: pre-wrap; color: rgb(33, 33, 33); font-family: Helvetica, Arial, sans-serif; font-style: normal; font-size: 17px; font-weight: 700; text-align: left;  }
+.CodeBlock { background-color: #F5F5F5; margin: 10px 0 10px 0; }
+.S5 { border-left: 1px solid rgb(191, 191, 191); border-right: 1px solid rgb(191, 191, 191); border-top: 1px solid rgb(191, 191, 191); border-bottom: 0px none rgb(33, 33, 33); border-radius: 4px 4px 0px 0px; padding: 6px 45px 0px 13px; line-height: 18.004px; min-height: 0px; white-space: nowrap; color: rgb(33, 33, 33); font-family: Menlo, Monaco, Consolas, "Courier New", monospace; font-size: 14px;  }
+.S6 { border-left: 1px solid rgb(191, 191, 191); border-right: 1px solid rgb(191, 191, 191); border-top: 0px none rgb(33, 33, 33); border-bottom: 0px none rgb(33, 33, 33); border-radius: 0px; padding: 0px 45px 0px 13px; line-height: 18.004px; min-height: 0px; white-space: nowrap; color: rgb(33, 33, 33); font-family: Menlo, Monaco, Consolas, "Courier New", monospace; font-size: 14px;  }
+.S7 { border-left: 1px solid rgb(191, 191, 191); border-right: 1px solid rgb(191, 191, 191); border-top: 0px none rgb(33, 33, 33); border-bottom: 1px solid rgb(191, 191, 191); border-radius: 0px; padding: 0px 45px 4px 13px; line-height: 18.004px; min-height: 0px; white-space: nowrap; color: rgb(33, 33, 33); font-family: Menlo, Monaco, Consolas, "Courier New", monospace; font-size: 14px;  }
+.S8 { color: rgb(33, 33, 33); padding: 10px 0px 6px 17px; background: rgb(255, 255, 255) none repeat scroll 0% 0% / auto padding-box border-box; font-family: Menlo, Monaco, Consolas, "Courier New", monospace; font-size: 14px; overflow-x: hidden; line-height: 17.234px;  }
+/* Styling that is common to warnings and errors is in diagnosticOutput.css */.embeddedOutputsErrorElement {    min-height: 18px;    max-height: 550px;}
+.embeddedOutputsErrorElement .diagnosticMessage-errorType {    overflow: auto;}
+.embeddedOutputsErrorElement.inlineElement {}
+.embeddedOutputsErrorElement.rightPaneElement {}
+/* Styling that is common to warnings and errors is in diagnosticOutput.css */.embeddedOutputsWarningElement {    min-height: 18px;    max-height: 550px;}
+.embeddedOutputsWarningElement .diagnosticMessage-warningType {    overflow: auto;}
+.embeddedOutputsWarningElement.inlineElement {}
+.embeddedOutputsWarningElement.rightPaneElement {}
+/* Copyright 2015-2019 The MathWorks, Inc. *//* In this file, styles are not scoped to rtcContainer since they could be in the Dojo Tooltip */.diagnosticMessage-wrapper {    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;    font-size: 12px;}
+.diagnosticMessage-wrapper.diagnosticMessage-warningType {    color: rgb(255,100,0);}
+.diagnosticMessage-wrapper.diagnosticMessage-warningType a {    color: rgb(255,100,0);    text-decoration: underline;}
+.diagnosticMessage-wrapper.diagnosticMessage-errorType {    color: rgb(230,0,0);}
+.diagnosticMessage-wrapper.diagnosticMessage-errorType a {    color: rgb(230,0,0);    text-decoration: underline;}
+.diagnosticMessage-wrapper .diagnosticMessage-messagePart,.diagnosticMessage-wrapper .diagnosticMessage-causePart {    white-space: pre-wrap;}
+.diagnosticMessage-wrapper .diagnosticMessage-stackPart {    white-space: pre;}
+.embeddedOutputsTextElement,.embeddedOutputsVariableStringElement {    white-space: pre;    word-wrap:  initial;    min-height: 18px;    max-height: 550px;}
+.embeddedOutputsTextElement .textElement,.embeddedOutputsVariableStringElement .textElement {    overflow: auto;}
+.textElement,.rtcDataTipElement .textElement {    padding-top: 2px;}
+.embeddedOutputsTextElement.inlineElement,.embeddedOutputsVariableStringElement.inlineElement {}
+.inlineElement .textElement {}
+.embeddedOutputsTextElement.rightPaneElement,.embeddedOutputsVariableStringElement.rightPaneElement {    min-height: 16px;}
+.rightPaneElement .textElement {    padding-top: 2px;    padding-left: 9px;}
+.S9 { margin: 10px 10px 9px 4px; padding: 0px; line-height: 21px; min-height: 0px; white-space: pre-wrap; color: rgb(33, 33, 33); font-family: Helvetica, Arial, sans-serif; font-style: normal; font-size: 14px; font-weight: 400; text-align: left;  }
+.S10 { border-left: 1px solid rgb(191, 191, 191); border-right: 1px solid rgb(191, 191, 191); border-top: 1px solid rgb(191, 191, 191); border-bottom: 1px solid rgb(191, 191, 191); border-radius: 4px 4px 0px 0px; padding: 6px 45px 4px 13px; line-height: 18.004px; min-height: 0px; white-space: nowrap; color: rgb(33, 33, 33); font-family: Menlo, Monaco, Consolas, "Courier New", monospace; font-size: 14px;  }
+.S11 { border-left: 1px solid rgb(191, 191, 191); border-right: 1px solid rgb(191, 191, 191); border-top: 1px solid rgb(191, 191, 191); border-bottom: 1px solid rgb(191, 191, 191); border-radius: 0px; padding: 6px 45px 4px 13px; line-height: 18.004px; min-height: 0px; white-space: nowrap; color: rgb(33, 33, 33); font-family: Menlo, Monaco, Consolas, "Courier New", monospace; font-size: 14px;  }
+.S12 { border-left: 1px solid rgb(191, 191, 191); border-right: 1px solid rgb(191, 191, 191); border-top: 1px solid rgb(191, 191, 191); border-bottom: 0px none rgb(33, 33, 33); border-radius: 0px; padding: 6px 45px 0px 13px; line-height: 18.004px; min-height: 0px; white-space: nowrap; color: rgb(33, 33, 33); font-family: Menlo, Monaco, Consolas, "Courier New", monospace; font-size: 14px;  }
+.variableValue { width: 100% !important; }
+.embeddedOutputsMatrixElement,.eoOutputWrapper .matrixElement {    min-height: 18px;    box-sizing: border-box;}
+.embeddedOutputsMatrixElement .matrixElement,.eoOutputWrapper  .matrixElement,.rtcDataTipElement .matrixElement {    position: relative;}
+.matrixElement .variableValue,.rtcDataTipElement .matrixElement .variableValue {    white-space: pre;    display: inline-block;    vertical-align: top;    overflow: hidden;}
+.embeddedOutputsMatrixElement.inlineElement {}
+.embeddedOutputsMatrixElement.inlineElement .topHeaderWrapper {    display: none;}
+.embeddedOutputsMatrixElement.inlineElement .veTable .body {    padding-top: 0 !important;    max-height: 100px;}
+.inlineElement .matrixElement {    max-height: 300px;}
+.embeddedOutputsMatrixElement.rightPaneElement {}
+.rightPaneElement .matrixElement,.rtcDataTipElement .matrixElement {    overflow: hidden;    padding-left: 9px;}
+.rightPaneElement .matrixElement {    margin-bottom: -1px;}
+.embeddedOutputsMatrixElement .matrixElement .valueContainer,.eoOutputWrapper .matrixElement .valueContainer,.rtcDataTipElement .matrixElement .valueContainer {    white-space: nowrap;    margin-bottom: 3px;}
+.embeddedOutputsMatrixElement .matrixElement .valueContainer .horizontalEllipsis.hide,.embeddedOutputsMatrixElement .matrixElement .verticalEllipsis.hide,.eoOutputWrapper .matrixElement .valueContainer .horizontalEllipsis.hide,.eoOutputWrapper .matrixElement .verticalEllipsis.hide,.rtcDataTipElement .matrixElement .valueContainer .horizontalEllipsis.hide,.rtcDataTipElement .matrixElement .verticalEllipsis.hide {    display: none;}
+.embeddedOutputsVariableMatrixElement .matrixElement .valueContainer.hideEllipses .verticalEllipsis, .embeddedOutputsVariableMatrixElement .matrixElement .valueContainer.hideEllipses .horizontalEllipsis {    display:none;}
+.embeddedOutputsMatrixElement .matrixElement .valueContainer .horizontalEllipsis,.eoOutputWrapper .matrixElement .valueContainer .horizontalEllipsis {    margin-bottom: -3px;}
+.eoOutputWrapper .embeddedOutputsVariableMatrixElement .matrixElement .valueContainer {    cursor: default !important;}
+.embeddedOutputsVariableElement {    white-space: pre-wrap;    word-wrap: break-word;    min-height: 18px;    max-height: 250px;    overflow: auto;}
+.variableElement {}
+.embeddedOutputsVariableElement.inlineElement {}
+.inlineElement .variableElement {}
+.embeddedOutputsVariableElement.rightPaneElement {    min-height: 16px;}
+.rightPaneElement .variableElement {    padding-top: 2px;    padding-left: 9px;}
+.outputsOnRight .embeddedOutputsVariableElement.rightPaneElement .eoOutputContent {    /* Remove extra space allocated for navigation border */    margin-top: 0;    margin-bottom: 0;}
+.variableNameElement {    margin-bottom: 3px;    display: inline-block;}
+/* * Ellipses as base64 for HTML export. */.matrixElement .horizontalEllipsis,.rtcDataTipElement .matrixElement .horizontalEllipsis {    display: inline-block;    margin-top: 3px;    /* base64 encoded version of images-liveeditor/HEllipsis.png */    width: 30px;    height: 12px;    background-repeat: no-repeat;    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB0AAAAJCAYAAADO1CeCAAAAJUlEQVR42mP4//8/A70xw0i29BUDFPxnAEtTW37wWDqakIa4pQDvOOG89lHX2gAAAABJRU5ErkJggg==");}
+.matrixElement .verticalEllipsis,.textElement .verticalEllipsis,.rtcDataTipElement .matrixElement .verticalEllipsis,.rtcDataTipElement .textElement .verticalEllipsis {    margin-left: 35px;    /* base64 encoded version of images-liveeditor/VEllipsis.png */    width: 12px;    height: 30px;    background-repeat: no-repeat;    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAZCAYAAAAIcL+IAAAALklEQVR42mP4//8/AzGYgWyFMECMwv8QddRS+P//KyimlmcGUOFoOI6GI/UVAgDnd8Dd4+NCwgAAAABJRU5ErkJggg==");}</style></head><body><div class = rtcContent><h2  class = 'S0'><span>Using The GPU FAµST API</span></h2><div  class = 'S1'><span></span></div><div  class = 'S1'><span style=' font-weight: bold;'>Sections in this tutorial:</span></div><ol  class = 'S2'><li  class = 'S3'><a href = "#H_56DDA800"><span style=' font-weight: bold;'>Creating a GPU Faust object</span></a></li><li  class = 'S3'><a href = "#H_6E16813C"><span style=' font-weight: bold;'>Generating a GPU Faust</span></a></li><li  class = 'S3'><a href = "#H_8D10B379"><span style=' font-weight: bold;'>Manipulating GPU Fausts and CPU interoperability</span></a></li><li  class = 'S3'><a href = "#M_720F1519"><span style=' font-weight: bold;'>Benchmarking your GPU with matfaust!</span></a></li><li  class = 'S3'><a href = "#H_F542ED39"><span style=' font-weight: bold;'>Running some FAµST algorithms on GPU</span></a></li><li  class = 'S3'><a href = "#H_CA5F30DB"><span style=' font-weight: bold;'>Manually loading the matfaust GPU module</span></a></li></ol><div  class = 'S1'><span></span></div><div  class = 'S1'><span></span></div><div  class = 'S1'><span>In this tutorial we’ll see quickly how to leverage the GPU computing power with matfaust. Since matfaust 3.0.0 the API has been modified to make the GPU available directly from the Matlab wrapper. Indeed, an independent GPU module (aka </span><span style=' font-family: monospace;'>gpu_mod</span><span>) has been developed for this purpose.</span></div><div  class = 'S1'><span>The first question you might ask is: does it work on my computer?  Here is the answer: the loading of this module is quite transparent, if an NVIDIA GPU is available and CUDA (11 or 12) is properly installed on your  system, you have normally nothing to do except installing matfaust to get the GPU implementations at your fingertips. We’ll see at the end of  this tutorial how to load manually the module and how to get further information in case of an error.</span></div><div  class = 'S1'><span>It is worthy to note that Mac OS X is not supported because NVIDIA has stopped to support this OS.</span></div><div  class = 'S1'><span>Also please notice that the GPU module support is still considered in beta status as the code is relatively young and still evolving. However the API shouldn’t evolve that much in a near future.</span></div><h3  class = 'S4' id = 'H_56DDA800' ><span>1. Creating a GPU Faust object</span></h3><div  class = 'S1'><span></span></div><div  class = 'S1'><span>Let’s start with some basic Faust creations on the GPU. Almost all the  ways of creating a Faust object in CPU memory are also available to create a GPU Faust. First of all, creating a Faust using the constructor works seamlessly on GPU, the only need is to specify the </span><span style=' font-family: monospace;'>dev</span><span> keyword argument, as follows:</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S5'><span style="white-space: pre"><span >import </span><span style="color: rgb(167, 9, 245);">matfaust.Faust</span></span></div></div><div class="inlineWrapper"><div  class = 'S6'><span style="white-space: pre"><span >M = rand(10, 10);</span></span></div></div><div class="inlineWrapper"><div  class = 'S6'><span style="white-space: pre"><span >N = rand(10, 15);</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre"><span >gpuF = Faust({M, N}, </span><span style="color: rgb(167, 9, 245);">'dev'</span><span >, </span><span style="color: rgb(167, 9, 245);">'gpu'</span><span >)</span></span></div><div  class = 'S8'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="C5D889AA" prevent-scroll="true" data-testid="output_0" style="width: 1106px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div class="textElement eoOutputContent" data-width="1076" data-height="79" data-hashorizontaloverflow="false" style="max-height: 261px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><span class="variableNameElement" style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">gpuF = </span></div><div style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">Faust size 10x15, density 1.66667, nnz_sum 250, 2 factor(s): 
+- FACTOR 0 (double) [GPU] DENSE, size 10x10, density 1, nnz 100, addr: 0x7f7c00c94060
+- FACTOR 1 (double) [GPU] DENSE, size 10x15, density 1, nnz 150, addr: 0x7f7b8d9795d0
+
+</div></div></div></div></div></div><div  class = 'S9'><span>It’s clearly indicated in the output that the Faust object is instantiated in GPU memory (the N and M numpy arrays are copied from the CPU to the GPU memory). However it’s also possible to check this programmatically:</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S10'><span style="white-space: pre"><span >device(gpuF)</span></span></div><div  class = 'S8'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="0ECB1A09" prevent-scroll="true" data-testid="output_1" style="width: 1106px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div class="textElement eoOutputContent" data-width="1076" data-height="20" data-hashorizontaloverflow="false" style="max-height: 261px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><span class="variableNameElement" style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">ans = </span>'gpu'</div></div></div></div></div></div><div  class = 'S9'><span>While for a CPU Faust you’ll get:</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S10'><span style="white-space: pre"><span >device(Faust({M, N}, </span><span style="color: rgb(167, 9, 245);">'dev'</span><span >, </span><span style="color: rgb(167, 9, 245);">'cpu'</span><span >))</span></span></div><div  class = 'S8'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="7DEB9F95" prevent-scroll="true" data-testid="output_2" style="width: 1106px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div class="textElement eoOutputContent" data-width="1076" data-height="20" data-hashorizontaloverflow="false" style="max-height: 261px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><span class="variableNameElement" style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">ans = </span>'cpu'</div></div></div></div></div></div><div  class = 'S9'><span>In </span><span style=' font-family: monospace;'>gpuF</span><span> the factors are dense matrices but it’s totally possible to instantiate sparse matrices on the GPU as you can do on CPU side.</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S5'><span style="white-space: pre"><span >S = sprand(10, 15, .25);</span></span></div></div><div class="inlineWrapper"><div  class = 'S6'><span style="white-space: pre"><span >T = sprand(15, 10, .05);</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre"><span >sparse_gpuF = Faust({S, T}, </span><span style="color: rgb(167, 9, 245);">'dev'</span><span >, </span><span style="color: rgb(167, 9, 245);">'gpu'</span><span >)</span></span></div><div  class = 'S8'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="538AF3C6" prevent-scroll="true" data-testid="output_3" style="width: 1106px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div class="textElement eoOutputContent" data-width="1076" data-height="79" data-hashorizontaloverflow="false" style="max-height: 261px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><span class="variableNameElement" style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">sparse_gpuF = </span></div><div style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">Faust size 10x10, density 0.42, nnz_sum 42, 2 factor(s): 
+- FACTOR 0 (double) [GPU] SPARSE, size 10x15, density 0.226667, nnz 34, addr: 0x7f7b8ebe2cc0
+- FACTOR 1 (double) [GPU] SPARSE, size 15x10, density 0.0533333, nnz 8, addr: 0x7f7b8ebe7000
+
+</div></div></div></div></div></div><div  class = 'S9'><span>You can also create a GPU Faust by explicitly copying a CPU Faust to the GPU memory. Actually, at anytime you can copy a CPU Faust to GPU and  conversely. The </span><span style=' font-family: monospace;'>clone()</span><span> member function is here precisely for this purpose. Below we copy </span><span style=' font-family: monospace;'>gpuF</span><span> to CPU and back again to GPU in the new Faust </span><span style=' font-family: monospace;'>gpuF2</span><span>.</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S10'><span style="white-space: pre"><span >cpuF = clone(gpuF, </span><span style="color: rgb(167, 9, 245);">'cpu'</span><span >)</span></span></div><div  class = 'S8'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="7C210D62" prevent-scroll="true" data-testid="output_4" style="width: 1106px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div class="textElement eoOutputContent" data-width="1076" data-height="64" data-hashorizontaloverflow="false" style="max-height: 261px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><span class="variableNameElement" style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">cpuF = </span></div><div style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">Faust size 10x15, density 1.66667, nnz_sum 250, 2 factor(s):
+- FACTOR 0 (double) DENSE, size 10x10, density 1, nnz 100
+- FACTOR 1 (double) DENSE, size 10x15, density 1, nnz 150
+</div></div></div></div></div><div class="inlineWrapper outputs"><div  class = 'S11'><span style="white-space: pre"><span > gpuF2 = clone(cpuF, </span><span style="color: rgb(167, 9, 245);">'gpu'</span><span >)</span></span></div><div  class = 'S8'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="5901DA04" prevent-scroll="true" data-testid="output_5" style="width: 1106px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div class="textElement eoOutputContent" data-width="1076" data-height="79" data-hashorizontaloverflow="false" style="max-height: 261px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><span class="variableNameElement" style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">gpuF2 = </span></div><div style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">Faust size 10x15, density 1.66667, nnz_sum 250, 2 factor(s): 
+- FACTOR 0 (double) [GPU] DENSE, size 10x10, density 1, nnz 100, addr: 0x7f7b70361e20
+- FACTOR 1 (double) [GPU] DENSE, size 10x15, density 1, nnz 150, addr: 0x7f7b70396600
+
+</div></div></div></div></div></div><h3  class = 'S4' id = 'H_6E16813C' ><span>2. Generating a GPU Faust</span></h3><div  class = 'S1'><span></span></div><div  class = 'S1'><span>Many of the functions for generating a Faust object on CPU are available on GPU too. It is always the same, you precise the </span><span style=' font-family: monospace;'>dev</span><span> argument by assigning the </span><span style=' font-family: monospace;'>'gpu'</span><span> value and you’ll get a GPU Faust instead of a CPU Faust.</span></div><div  class = 'S1'><span>For example, the code below will successively create a random GPU Faust, a Hadamard transform GPU Faust, an identity GPU Faust and finally a DFT GPU Faust.</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S5'><span style="white-space: pre"><span >import </span><span style="color: rgb(167, 9, 245);">matfaust.wht</span></span></div></div><div class="inlineWrapper"><div  class = 'S6'><span style="white-space: pre"><span >import </span><span style="color: rgb(167, 9, 245);">matfaust.dft</span></span></div></div><div class="inlineWrapper"><div  class = 'S6'><span style="white-space: pre"><span style="color: rgb(0, 128, 19);">% Random GPU Faust</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre"><span >matfaust.rand(10, 10, </span><span style="color: rgb(167, 9, 245);">'num_factors'</span><span >, 11, </span><span style="color: rgb(167, 9, 245);">'dev'</span><span >, </span><span style="color: rgb(167, 9, 245);">'gpu'</span><span >)</span></span></div><div  class = 'S8'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="6DC4B950" prevent-scroll="true" data-testid="output_6" style="width: 1106px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div class="textElement eoOutputContent" data-width="1076" data-height="212" data-hashorizontaloverflow="false" style="max-height: 261px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><span class="variableNameElement" style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">ans = </span></div><div style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">Faust size 10x10, density 5.5, nnz_sum 550, 11 factor(s): 
+- FACTOR 0 (double) [GPU] SPARSE, size 10x10, density 0.5, nnz 50, addr: 0x7f7b703d09e0
+- FACTOR 1 (double) [GPU] SPARSE, size 10x10, density 0.5, nnz 50, addr: 0x7f7b704ad520
+- FACTOR 2 (double) [GPU] SPARSE, size 10x10, density 0.5, nnz 50, addr: 0x7f7b703cbf90
+- FACTOR 3 (double) [GPU] SPARSE, size 10x10, density 0.5, nnz 50, addr: 0x7f7b70496990
+- FACTOR 4 (double) [GPU] SPARSE, size 10x10, density 0.5, nnz 50, addr: 0x7f7b703cb5c0
+- FACTOR 5 (double) [GPU] SPARSE, size 10x10, density 0.5, nnz 50, addr: 0x7f7b704ab2f0
+- FACTOR 6 (double) [GPU] SPARSE, size 10x10, density 0.5, nnz 50, addr: 0x7f7b704a2bc0
+- FACTOR 7 (double) [GPU] SPARSE, size 10x10, density 0.5, nnz 50, addr: 0x7f7b704a2d30
+- FACTOR 8 (double) [GPU] SPARSE, size 10x10, density 0.5, nnz 50, addr: 0x7f7b70497000
+- FACTOR 9 (double) [GPU] SPARSE, size 10x10, density 0.5, nnz 50, addr: 0x7f7b7049f150
+- FACTOR 10 (double) [GPU] SPARSE, size 10x10, density 0.5, nnz 50, addr: 0x7f7b7049b770
+
+</div></div></div></div></div><div class="inlineWrapper"><div  class = 'S12'><span style="white-space: pre"><span style="color: rgb(0, 128, 19);">% Hadamard GPU Faust</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre"><span >wht(32, </span><span style="color: rgb(167, 9, 245);">'dev'</span><span >, </span><span style="color: rgb(167, 9, 245);">'gpu'</span><span >)</span></span></div><div  class = 'S8'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="50D121C1" prevent-scroll="true" data-testid="output_7" style="width: 1106px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div class="textElement eoOutputContent" data-width="1076" data-height="123" data-hashorizontaloverflow="false" style="max-height: 261px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><span class="variableNameElement" style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">ans = </span></div><div style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">Faust size 32x32, density 0.3125, nnz_sum 320, 5 factor(s): 
+- FACTOR 0 (double) [GPU] SPARSE, size 32x32, density 0.0625, nnz 64, addr: 0x7f7b703c1c60
+- FACTOR 1 (double) [GPU] SPARSE, size 32x32, density 0.0625, nnz 64, addr: 0x7f7b703c74c0
+- FACTOR 2 (double) [GPU] SPARSE, size 32x32, density 0.0625, nnz 64, addr: 0x7f7b703ba0b0
+- FACTOR 3 (double) [GPU] SPARSE, size 32x32, density 0.0625, nnz 64, addr: 0x7f7b703c2530
+- FACTOR 4 (double) [GPU] SPARSE, size 32x32, density 0.0625, nnz 64, addr: 0x7f7b703bacb0
+
+</div></div></div></div></div><div class="inlineWrapper"><div  class = 'S12'><span style="white-space: pre"><span style="color: rgb(0, 128, 19);">% Identity GPU Faust</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre"><span >matfaust.eye(16, </span><span style="color: rgb(167, 9, 245);">'dev'</span><span >, </span><span style="color: rgb(167, 9, 245);">'gpu'</span><span >)</span></span></div><div  class = 'S8'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="28EB3093" prevent-scroll="true" data-testid="output_8" style="width: 1106px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div class="textElement eoOutputContent" data-width="1076" data-height="64" data-hashorizontaloverflow="false" style="max-height: 261px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><span class="variableNameElement" style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">ans = </span></div><div style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">Faust size 16x16, density 0.0625, nnz_sum 16, 1 factor(s): 
+- FACTOR 0 (double) [GPU] SPARSE, size 16x16, density 0.0625, nnz 16, addr: 0x7f7b703ce290
+
+</div></div></div></div></div><div class="inlineWrapper"><div  class = 'S12'><span style="white-space: pre"><span style="color: rgb(0, 128, 19);">% DFT GPU Faust</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre"><span >dft(32, </span><span style="color: rgb(167, 9, 245);">'dev'</span><span >, </span><span style="color: rgb(167, 9, 245);">'gpu'</span><span >)</span></span></div><div  class = 'S8'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="C8D52D3F" prevent-scroll="true" data-testid="output_9" style="width: 1106px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div class="textElement eoOutputContent" data-width="1076" data-height="138" data-hashorizontaloverflow="false" style="max-height: 261px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><span class="variableNameElement" style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">ans = </span></div><div style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">Faust size 32x32, density 0.34375, nnz_sum 352, 6 factor(s): 
+- FACTOR 0 (complex) [GPU] SPARSE, size 32x32, density 0.0625, nnz 64, addr: 0x7f7b704be470
+- FACTOR 1 (complex) [GPU] SPARSE, size 32x32, density 0.0625, nnz 64, addr: 0x7f7b704be0e0
+- FACTOR 2 (complex) [GPU] SPARSE, size 32x32, density 0.0625, nnz 64, addr: 0x7f7b704ba770
+- FACTOR 3 (complex) [GPU] SPARSE, size 32x32, density 0.0625, nnz 64, addr: 0x7f7b704aaaa0
+- FACTOR 4 (complex) [GPU] SPARSE, size 32x32, density 0.0625, nnz 64, addr: 0x7f7b704ba2a0
+- FACTOR 5 (complex) [GPU] SPARSE, size 32x32, density 0.03125, nnz 32, addr: 0x7f7b704c4ca0
+
+</div></div></div></div></div></div><h3  class = 'S4' id = 'H_8D10B379' ><span style=' font-weight: bold;'>3. Manipulating GPU Fausts and CPU interoperability</span></h3><div  class = 'S1'><span>Once you’ve created GPU Faust objects, you can perform operations on them staying in GPU world (that is, with no array transfer to CPU memory). That’s of course not always possible.</span></div><div  class = 'S1'><span>For example, let’s consider Faust-scalar multiplication and  Faust-matrix product. In the first case the scalar is copied to the GPU memory and likewise in the second case the matrix is copied from CPU to GPU in order to proceed to the computation. However in both cases the Faust factors stay into GPU memory and don’t move during the computation.</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S5'><span style="white-space: pre"><span style="color: rgb(0, 128, 19);">% Faust-scalar multiplication</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre"><span >2*gpuF</span></span></div><div  class = 'S8'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="15E5F1B7" prevent-scroll="true" data-testid="output_10" style="width: 1106px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div class="textElement eoOutputContent" data-width="1076" data-height="79" data-hashorizontaloverflow="false" style="max-height: 261px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><span class="variableNameElement" style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">ans = </span></div><div style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">Faust size 10x15, density 1.66667, nnz_sum 250, 2 factor(s): 
+- FACTOR 0 (double) [GPU] DENSE, size 10x10, density 1, nnz 100, addr: 0x7f7b704ca4c0
+- FACTOR 1 (double) [GPU] DENSE, size 10x15, density 1, nnz 150, addr: 0x7f7b8d9795d0
+
+</div></div></div></div></div></div><div  class = 'S9'><span>When you make a scalar multiplication only one factor is multiplied, the others don’t change, they are shared between the Faust being multiplied and the resulting Faust. This is an optimization and to go further in  this direction the factor chosen to be multiplied is the smallest in memory (not necessarily the first one).</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S5'><span style="white-space: pre"><span style="color: rgb(0, 128, 19);">% Faust-matrix product (the matrix is copied to GPU</span></span></div></div><div class="inlineWrapper"><div  class = 'S6'><span style="white-space: pre"><span style="color: rgb(0, 128, 19);">% then the multiplication is performed on GPU)</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre"><span >gpuF*rand(size(gpuF,2), 15)</span></span></div><div  class = 'S8'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableMatrixElement" uid="CD3EC257" prevent-scroll="true" data-testid="output_11" data-width="1076" style="width: 1106px; white-space: normal; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div class="matrixElement veSpecifier eoOutputContent" style="white-space: normal; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div class="veVariableName variableNameElement double" style="width: 1076px; white-space: normal; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div class="headerElementClickToInteract" style="white-space: normal; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><span style="white-space: normal; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">ans = </span><span class="veVariableValueSummary veMetaSummary" style="white-space: normal; font-style: normal; color: rgb(179, 179, 179); font-size: 12px;">10×15</span></div></div><div class="valueContainer" data-layout="{&quot;columnWidth&quot;:73,&quot;totalColumns&quot;:15,&quot;totalRows&quot;:10,&quot;charsPerColumn&quot;:10}" style="white-space: nowrap; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div class="variableValue" style="width: 1024px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">   19.5188   15.8627   16.3494   20.0092   17.8775   15.2394   18.8780   20.4982   17.9227   17.8550   16.4497   16.1623   21.2342   17.3840   20.0797
+   16.6294   12.7984   13.2690   17.6679   14.7213   13.4675   15.8209   17.1853   15.6553   14.1920   14.0095   13.5296   18.9866   15.4844   17.4967
+   22.9040   18.5855   19.1411   24.2191   20.6279   18.5282   22.2976   24.3699   21.7080   20.3446   19.8407   19.2123   26.6791   21.4684   23.7823
+   20.2891   16.7623   16.5466   21.7549   18.7845   16.6076   20.2857   21.9744   19.6952   18.8697   17.7469   17.4555   23.7157   18.9584   22.0221
+   23.9356   18.7735   19.4222   24.7610   20.8382   18.4186   22.8625   24.9051   22.1823   21.1143   19.9065   19.2679   26.9927   22.2751   24.9935
+   16.9493   14.1255   14.4688   17.4038   15.6445   13.6824   16.4207   18.1339   15.7387   15.3461   14.4891   14.3344   19.0035   15.2028   17.4503
+   20.6190   16.5093   17.3293   21.5318   18.8465   16.6641   19.7383   21.8821   19.2809   17.9509   17.5920   17.3533   23.4642   19.0278   21.3797
+   17.4974   13.7856   14.2992   19.0386   15.9878   14.2171   17.1030   18.6477   16.9732   15.4865   15.3269   14.9055   20.3935   16.6752   18.6180
+   21.7549   17.4454   18.2602   23.2019   20.3546   17.4574   21.1492   23.0594   20.5578   19.5494   18.9371   18.6304   24.2629   19.8503   22.5232
+   17.6941   13.9832   14.2790   19.2290   16.1250   14.3518   17.3875   18.6344   17.0925   15.8015   15.3906   14.8908   20.5301   16.6689   18.8594
+</div><div class="horizontalEllipsis" style="white-space: nowrap; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"></div><div class="verticalEllipsis hide" style="white-space: nowrap; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"></div></div></div><div class="outputLayer selectedOutputDecorationLayer doNotExport" style="white-space: normal; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"></div><div class="outputLayer activeOutputDecorationLayer doNotExport" style="white-space: normal; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"></div><div class="outputLayer scrollableOutputDecorationLayer doNotExport" style="white-space: normal; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"></div></div></div></div></div><div  class = 'S9'><span>On the contrary, and that matters for optimization, there is no CPU-GPU  transfer at all when you create another GPU Faust named for example </span><span style=' font-family: monospace;'>gpuF2</span><span> on the GPU and decide to multiply the two of them like this:</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S10'><span style="white-space: pre"><span >gpuF2 = matfaust.rand(size(gpuF, 2), 18, </span><span style="color: rgb(167, 9, 245);">'dev'</span><span >, </span><span style="color: rgb(167, 9, 245);">'gpu'</span><span >)</span></span></div><div  class = 'S8'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="8210074D" prevent-scroll="true" data-testid="output_12" style="width: 1106px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div class="textElement eoOutputContent" data-width="1076" data-height="123" data-hashorizontaloverflow="false" style="max-height: 261px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><span class="variableNameElement" style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">gpuF2 = </span></div><div style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">Faust size 15x18, density 1.51852, nnz_sum 410, 5 factor(s): 
+- FACTOR 0 (double) [GPU] SPARSE, size 15x18, density 0.277778, nnz 75, addr: 0x7f7b72b727c0
+- FACTOR 1 (double) [GPU] SPARSE, size 18x16, density 0.3125, nnz 90, addr: 0x7f7b72b51710
+- FACTOR 2 (double) [GPU] SPARSE, size 16x16, density 0.3125, nnz 80, addr: 0x7f7b72b57410
+- FACTOR 3 (double) [GPU] SPARSE, size 16x17, density 0.294118, nnz 80, addr: 0x7f7b72b57430
+- FACTOR 4 (double) [GPU] SPARSE, size 17x18, density 0.277778, nnz 85, addr: 0x7f7b72b6f2b0
+
+</div></div></div></div></div><div class="inlineWrapper outputs"><div  class = 'S11'><span style="white-space: pre"><span >gpuF3 = gpuF * gpuF2</span></span></div><div  class = 'S8'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="0910B8B7" prevent-scroll="true" data-testid="output_13" style="width: 1106px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div class="textElement eoOutputContent" data-width="1076" data-height="153" data-hashorizontaloverflow="false" style="max-height: 261px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><span class="variableNameElement" style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">gpuF3 = </span></div><div style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">Faust size 10x18, density 3.66667, nnz_sum 660, 7 factor(s): 
+- FACTOR 0 (double) [GPU] DENSE, size 10x10, density 1, nnz 100, addr: 0x7f7c00c94060
+- FACTOR 1 (double) [GPU] DENSE, size 10x15, density 1, nnz 150, addr: 0x7f7b8d9795d0
+- FACTOR 2 (double) [GPU] SPARSE, size 15x18, density 0.277778, nnz 75, addr: 0x7f7b72b727c0
+- FACTOR 3 (double) [GPU] SPARSE, size 18x16, density 0.3125, nnz 90, addr: 0x7f7b72b51710
+- FACTOR 4 (double) [GPU] SPARSE, size 16x16, density 0.3125, nnz 80, addr: 0x7f7b72b57410
+- FACTOR 5 (double) [GPU] SPARSE, size 16x17, density 0.294118, nnz 80, addr: 0x7f7b72b57430
+- FACTOR 6 (double) [GPU] SPARSE, size 17x18, density 0.277778, nnz 85, addr: 0x7f7b72b6f2b0
+
+</div></div></div></div></div></div><div  class = 'S9'><span>Besides, it’s important to note that </span><span style=' font-family: monospace;'>gpuF3</span><span> factors are not duplicated in memory because they already exist for </span><span style=' font-family: monospace;'>gpuF</span><span> and </span><span style=' font-family: monospace;'>gpuF2</span><span>, that’s an extra optimization: </span><span style=' font-family: monospace;'>gpuF3</span><span> is just a memory view of the factors of </span><span style=' font-family: monospace;'>gpuF</span><span> and </span><span style=' font-family: monospace;'>gpuF2</span><span> (the same GPU arrays are shared between </span><span style=' font-family: monospace;'>Faust</span><span> objects). That works pretty well the same for CPU </span><span style=' font-family: monospace;'>Faust</span><span> objects.</span></div><div  class = 'S1'><span>Finally, please notice that CPU Faust objects are not directly interoperable with GPU Fausts objects. You can try, it’ll end up with an error.</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S5'><span style="white-space: pre"><span >cpuF = matfaust.rand(5, 5, </span><span style="color: rgb(167, 9, 245);">'num_factors'</span><span >, 5, </span><span style="color: rgb(167, 9, 245);">'dev'</span><span >, </span><span style="color: rgb(167, 9, 245);">'cpu'</span><span >);</span></span></div></div><div class="inlineWrapper"><div  class = 'S6'><span style="white-space: pre"><span >gpuF = matfaust.rand(5, 5, </span><span style="color: rgb(167, 9, 245);">'num_factors'</span><span >, 6, </span><span style="color: rgb(167, 9, 245);">'dev'</span><span >, </span><span style="color: rgb(167, 9, 245);">'gpu'</span><span >);</span></span></div></div><div class="inlineWrapper"><div  class = 'S6'><span style="white-space: pre"><span style="color: rgb(0, 128, 19);">% A first try to multiply a CPU Faust with a GPU one...</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre"><span >cpuF * gpuF</span></span></div><div  class = 'S8'><div class="inlineElement eoOutputWrapper embeddedOutputsErrorElement" uid="595E2AF2" prevent-scroll="true" data-testid="output_14" style="width: 1106px; white-space: normal; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div class="diagnosticMessage-wrapper diagnosticMessage-errorType eoOutputContent" data-width="1076" data-height="120" data-hashorizontaloverflow="false" style="max-height: 261px; white-space: normal; font-style: normal; color: rgb(183, 49, 44); font-size: 12px;"><div class="diagnosticMessage-messagePart" style="white-space: pre-wrap; font-style: normal; color: rgb(183, 49, 44); font-size: 12px;">Error using mexFaustReal<br style="white-space: pre-wrap; font-style: normal; color: rgb(183, 49, 44); font-size: 12px;">Handle not valid.</div><div class="diagnosticMessage-stackPart" style="white-space: pre; font-style: normal; color: rgb(183, 49, 44); font-size: 12px;"><br style="white-space: pre; font-style: normal; color: rgb(183, 49, 44); font-size: 12px;">Error in matfaust.Faust/call_mex (line 5560)<br style="white-space: pre; font-style: normal; color: rgb(183, 49, 44); font-size: 12px;">						[varargout{1:nargout}] = mexFaustReal(func_name, F.matrix.objectHandle, varargin{:});<br style="white-space: pre; font-style: normal; color: rgb(183, 49, 44); font-size: 12px;"><br style="white-space: pre; font-style: normal; color: rgb(183, 49, 44); font-size: 12px;">Error in  *  (line 1323)<br style="white-space: pre; font-style: normal; color: rgb(183, 49, 44); font-size: 12px;">						C = matfaust.Faust(F, call_mex(F, 'mul_faust', A.matrix.objectHandle));</div></div></div></div></div></div><div  class = 'S9'><span>It doesn't work, you must either convert </span><span style=' font-family: monospace;'>cpuF</span><span> to a GPU Faust or </span><span style=' font-family: monospace;'>gpuF</span><span> to a CPU Faust before multiplying. Below is a second try using conversion as needed...</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S10'><span style="white-space: pre"><span >clone(cpuF, </span><span style="color: rgb(167, 9, 245);">'gpu'</span><span >) * gpuF</span></span></div><div  class = 'S8'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="C38F4B77" prevent-scroll="true" data-testid="output_15" style="width: 1106px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div class="textElement eoOutputContent" data-width="1076" data-height="212" data-hashorizontaloverflow="false" style="max-height: 261px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><span class="variableNameElement" style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">ans = </span></div><div style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">Faust size 5x5, density 11, nnz_sum 275, 11 factor(s): 
+- FACTOR 0 (double) [GPU] SPARSE, size 5x5, density 1, nnz 25, addr: 0x7f7b6914e590
+- FACTOR 1 (double) [GPU] SPARSE, size 5x5, density 1, nnz 25, addr: 0x7f7b69150700
+- FACTOR 2 (double) [GPU] SPARSE, size 5x5, density 1, nnz 25, addr: 0x7f7b690ca660
+- FACTOR 3 (double) [GPU] SPARSE, size 5x5, density 1, nnz 25, addr: 0x7f7b6914e9c0
+- FACTOR 4 (double) [GPU] SPARSE, size 5x5, density 1, nnz 25, addr: 0x7f7b69138340
+- FACTOR 5 (double) [GPU] SPARSE, size 5x5, density 1, nnz 25, addr: 0x7f7b72b82480
+- FACTOR 6 (double) [GPU] SPARSE, size 5x5, density 1, nnz 25, addr: 0x7f7b72b82570
+- FACTOR 7 (double) [GPU] SPARSE, size 5x5, density 1, nnz 25, addr: 0x7f7b7035c540
+- FACTOR 8 (double) [GPU] SPARSE, size 5x5, density 1, nnz 25, addr: 0x7f7b7035c620
+- FACTOR 9 (double) [GPU] SPARSE, size 5x5, density 1, nnz 25, addr: 0x7f7b72b80870
+- FACTOR 10 (double) [GPU] SPARSE, size 5x5, density 1, nnz 25, addr: 0x7f7b72b88750
+
+</div></div></div></div></div></div><div  class = 'S9'><span>Now it works!</span></div><h3  class = 'S4' id = 'M_720F1519' ><span>4. Benchmarking your GPU with matfaust!</span></h3><div  class = 'S1'><span></span></div><div  class = 'S1'><span>Of course when we run some code on GPU rather than on CPU, it is clearly to enhance the performance. So let’s try your GPU and find out if it is worth it or not compared to your CPU. First, measure how much time it takes on CPU to compute a Faust norm and the dense array corresponding to the product of its factors:</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S5'><span style="white-space: pre"><span >cpuF = matfaust.rand(1024, 1024, </span><span style="color: rgb(167, 9, 245);">'num_factors'</span><span >, 10, </span><span style="color: rgb(167, 9, 245);">'fac_type'</span><span >, </span><span style="color: rgb(167, 9, 245);">'dense'</span><span >);</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre"><span >timeit(@() norm(cpuF, 2))</span></span></div><div  class = 'S8'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, "Courier New", monospace; font-size: 12px; '>ans = 0.1806</div></div></div><div class="inlineWrapper outputs"><div  class = 'S11'><span style="white-space: pre"><span >timeit(@() full(cpuF))</span></span></div><div  class = 'S8'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, "Courier New", monospace; font-size: 12px; '>ans = 0.9955</div></div></div></div><div  class = 'S9'><span>Now let’s make some GPU heat with norms and matrix products!</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S5'><span style="white-space: pre"><span >gpuF = clone(cpuF, </span><span style="color: rgb(167, 9, 245);">'dev'</span><span >, </span><span style="color: rgb(167, 9, 245);">'gpu'</span><span >);</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre"><span >timeit(@() norm(gpuF, 2))</span></span></div><div  class = 'S8'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, "Courier New", monospace; font-size: 12px; '>ans = 0.0312</div></div></div><div class="inlineWrapper outputs"><div  class = 'S11'><span style="white-space: pre"><span >timeit(@() full(gpuF))</span></span></div><div  class = 'S8'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, "Courier New", monospace; font-size: 12px; '>ans = 0.1873</div></div></div></div><div  class = 'S9'><span>Of course not all GPUs are equal. For example, on a Tesla V100 I've got respectively 7.6e-3 and 1.03e-2 seconds for the 2-norm and the </span><span style=' font-family: monospace;'>full</span><span> array.</span></div><div  class = 'S1'><span>Likewise let’s compare the performance obtained for a sparse Faust:</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S5'><span style="white-space: pre"><span >cpuF2 = matfaust.rand(1024, 1024, </span><span style="color: rgb(167, 9, 245);">'num_factors'</span><span >, 10, </span><span style="color: rgb(167, 9, 245);">'fac_type'</span><span >, </span><span style="color: rgb(167, 9, 245);">'sparse'</span><span >);</span></span></div></div><div class="inlineWrapper"><div  class = 'S6'><span style="white-space: pre"><span >gpuF2 = clone(cpuF2, </span><span style="color: rgb(167, 9, 245);">'dev'</span><span >, </span><span style="color: rgb(167, 9, 245);">'gpu'</span><span >);</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre"><span >timeit(@() norm(gpuF2, 2))</span></span></div><div  class = 'S8'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, "Courier New", monospace; font-size: 12px; '>ans = 0.0050</div></div></div><div class="inlineWrapper outputs"><div  class = 'S11'><span style="white-space: pre"><span >timeit(@() full(gpuF2))</span></span></div><div  class = 'S8'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, "Courier New", monospace; font-size: 12px; '>ans = 0.0196</div></div></div></div><h3  class = 'S4' id = 'H_F542ED39' ><span style=' font-weight: bold;'>5. Running some FAµST algorithms on GPU</span></h3><div  class = 'S1'><span style=' font-weight: bold;'></span></div><div  class = 'S1'><span>Some of the FAµST algorithms implemented in the C++ core are now also available in pure GPU mode.</span></div><div  class = 'S1'><span>For example, let’s compare the factorization times taken by the hierarchical factorization when launched on CPU and GPU.</span></div><div  class = 'S1'><span>When running on GPU, the matrix to factorize is copied in GPU memory and almost all operations executed during the algorithm don’t imply the CPU in any manner (the only exception at this stage of development is the proximal operators that only run on CPU).</span></div><div  class = 'S1'><span>First please copy the following function in the appropriate filename </span><span style=' font-family: monospace;'>factorize_MEG.m</span><span> into in the current working directory of Matlab (or by adding the destination directory to your path by calling </span><span style=' font-family: monospace;'>addpath</span><span>).</span></div><div  class = 'S1'><span style=' font-family: monospace;'>        function [MEG16, total_time, err] = factorize_MEG(dev)</span></div><div  class = 'S1'><span style=' font-family: monospace;'>            import matfaust.fact.hierarchical</span></div><div  class = 'S1'><span style=' font-family: monospace;'>            import matfaust.factparams.ParamsHierarchicalRectMat</span></div><div  class = 'S1'><span style=' font-family: monospace;'>            load('matrix_MEG.mat')</span></div><div  class = 'S1'><span style=' font-family: monospace;'>            MEG = matrix.';</span></div><div  class = 'S1'><span style=' font-family: monospace;'>            num_facts = 9;</span></div><div  class = 'S1'><span style=' font-family: monospace;'>            k = 10;</span></div><div  class = 'S1'><span style=' font-family: monospace;'>            s = 8;</span></div><div  class = 'S1'><span style=' font-family: monospace;'>            tic</span></div><div  class = 'S1'><span style=' font-family: monospace;'>            p = ParamsHierarchicalRectMat.createParams(MEG, {'rectmat', num_facts, k, s});</span></div><div  class = 'S1'><span style=' font-family: monospace;'>            MEG16 = hierarchical(MEG, p, 'backend', 2020, 'gpu', strcmp(dev, 'gpu'));</span></div><div  class = 'S1'><span style=' font-family: monospace;'>            total_time = toc;</span></div><div  class = 'S1'><span style=' font-family: monospace;'>            err = norm(MEG16-MEG, 'fro')/norm(MEG, 'fro');</span></div><div  class = 'S1'><span style=' font-family: monospace;'>        end</span></div><div  class = 'S1'><span style=' font-family: monospace;'>Now we can run the hierarchical algorithm on CPU and then GPU. For more information about this algorithm please consult the </span><a href = "https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacematfaust_1_1fact.html#a2b2101831c564836ca022ae4f7a7f010"><span style=' font-family: monospace;'>API doc</span></a><span style=' font-family: monospace;'>.</span></div><div  class = 'S1'><span style=' font-weight: bold;'>Warning: THE COMPUTATION CAN LAST TEN TO THIRTY MINUTES OR SO ON CPU</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S10'><span style="white-space: pre"><span >[MEG16, total_time, err] = factorize_MEG(</span><span style="color: rgb(167, 9, 245);">'cpu'</span><span >)</span></span></div><div  class = 'S8'><div class="inlineElement eoOutputWrapper embeddedOutputsTextElement" uid="461D33BD" data-scroll-top="null" data-scroll-left="null" prevent-scroll="true" data-testid="output_22" style="width: 1106px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div class="textElement eoOutputContent" data-width="1076" data-height="23996" data-hashorizontaloverflow="false" style="max-height: 261px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">Faust::hierarchical: 1/8
+Faust::hierarchical: 2/8
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+Faust::hierarchical: 3/8
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+Faust::hierarchical: 4/8
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+Faust::hierarchical: 5/8
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+Faust::hierarchical: 6/8
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+Faust::hierarchical: 7/8
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+Faust::hierarchical: 8/8
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed mul. optimization mode to: 5
+changed ...</div></div><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="3C1522BB" prevent-scroll="true" data-testid="output_23" style="width: 1106px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div class="textElement eoOutputContent" data-width="1076" data-height="167" data-hashorizontaloverflow="false" style="max-height: 261px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><span class="variableNameElement" style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">MEG16 = </span></div><div style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">Faust size 204x8193, density 0.0631655, nnz_sum 105573, 9 factor(s):
+- FACTOR 0 (double) DENSE, size 204x204, density 0.293613, nnz 12219
+- FACTOR 1 (double) DENSE, size 204x204, density 0.0392157, nnz 1632
+- FACTOR 2 (double) DENSE, size 204x204, density 0.0392157, nnz 1632
+- FACTOR 3 (double) DENSE, size 204x204, density 0.0392157, nnz 1632
+- FACTOR 4 (double) DENSE, size 204x204, density 0.0392157, nnz 1632
+- FACTOR 5 (double) DENSE, size 204x204, density 0.0392157, nnz 1632
+- FACTOR 6 (double) DENSE, size 204x204, density 0.0392157, nnz 1632
+- FACTOR 7 (double) DENSE, size 204x204, density 0.0392157, nnz 1632
+- FACTOR 8 (double) DENSE, size 204x8193, density 0.0490196, nnz 81930
+</div></div></div><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, "Courier New", monospace; font-size: 12px; '>total_time = 715.0017</div><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, "Courier New", monospace; font-size: 12px; '>err = 0.1291</div></div></div></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S10'><span style="white-space: pre"><span >[MEG16, total_time, err] = factorize_MEG(</span><span style="color: rgb(167, 9, 245);">'gpu'</span><span >)</span></span></div><div  class = 'S8'><div class="inlineElement eoOutputWrapper embeddedOutputsTextElement" uid="AEEDE8C4" data-scroll-top="null" data-scroll-left="null" prevent-scroll="true" data-testid="output_26" style="width: 1106px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div class="textElement eoOutputContent" data-width="1076" data-height="120" data-hashorizontaloverflow="false" style="max-height: 261px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">Faust::hierarchical: 1/8
+Faust::hierarchical: 2/8
+Faust::hierarchical: 3/8
+Faust::hierarchical: 4/8
+Faust::hierarchical: 5/8
+Faust::hierarchical: 6/8
+Faust::hierarchical: 7/8
+Faust::hierarchical: 8/8</div></div><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="B35BE518" prevent-scroll="true" data-testid="output_27" style="width: 1106px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div class="textElement eoOutputContent" data-width="1076" data-height="167" data-hashorizontaloverflow="false" style="max-height: 261px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><span class="variableNameElement" style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">MEG16 = </span></div><div style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">Faust size 204x8193, density 0.0631655, nnz_sum 105573, 9 factor(s):
+- FACTOR 0 (double) DENSE, size 204x204, density 0.293613, nnz 12219
+- FACTOR 1 (double) DENSE, size 204x204, density 0.0392157, nnz 1632
+- FACTOR 2 (double) DENSE, size 204x204, density 0.0392157, nnz 1632
+- FACTOR 3 (double) DENSE, size 204x204, density 0.0392157, nnz 1632
+- FACTOR 4 (double) DENSE, size 204x204, density 0.0392157, nnz 1632
+- FACTOR 5 (double) DENSE, size 204x204, density 0.0392157, nnz 1632
+- FACTOR 6 (double) DENSE, size 204x204, density 0.0392157, nnz 1632
+- FACTOR 7 (double) DENSE, size 204x204, density 0.0392157, nnz 1632
+- FACTOR 8 (double) DENSE, size 204x8193, density 0.0490196, nnz 81930
+</div></div></div><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, "Courier New", monospace; font-size: 12px; '>total_time = 168.5770</div><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, "Courier New", monospace; font-size: 12px; '>err = 0.1291</div></div></div></div><div  class = 'S9'><span>For the comparison here are the results I got on a Tesla V100 GPU:</span></div><div  class = 'S1'><span style=' font-family: monospace;'>        [~, total_time, err] = factorize_MEG('gpu')</span></div><div  class = 'S1'><span style=' font-family: monospace;'>  </span></div><div  class = 'S1'><span style=' font-family: monospace;'>        total_time =</span></div><div  class = 'S1'><span style=' font-family: monospace;'></span></div><div  class = 'S1'><span style=' font-family: monospace;'>          49.49</span></div><div  class = 'S1'><span style=' font-family: monospace;'></span></div><div  class = 'S1'><span style=' font-family: monospace;'>        err =</span></div><div  class = 'S1'><span style=' font-family: monospace;'></span></div><div  class = 'S1'><span style=' font-family: monospace;'>            0.1296</span></div><div  class = 'S1'><span style=' font-family: monospace;'></span></div><div  class = 'S1'><span>As you see it’s far faster than with the CPU!</span></div><h3  class = 'S4' id = 'H_CA5F30DB' ><span style=' font-weight: bold;'>6. Manually loading the matfaust GPU module</span></h3><div  class = 'S1'><span>If something goes wrong when trying to use the GPU matfaust extension, here is how to manually load the module and obtain more  information.</span></div><div  class = 'S1'><span>The key is the function </span><a href = "https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacematfaust.html#a75568ecea590cd9f9cd14dce87bfdc84"><span>enable_gpu_mod</span></a><span>.</span></div><div  class = 'S1'><span>This function allows to give another try to </span><span style=' font-family: monospace;'>gpu_mod</span><span> loading with the verbose mode enabled.</span></div><div  class = 'S1'><span>Below I copy output that show what it should look like when it doesn’t work:</span></div><div  class = 'S1'><span style=' font-family: monospace;'>        matfaust.enable_gpu_mod('silent', false)</span></div><div  class = 'S1'><span style=' font-family: monospace;'>        Output:</span></div><div  class = 'S1'><span style=' font-family: monospace;'>        WARNING: you must call enable_gpu_mod() before using GPUModHandler singleton.</span></div><div  class = 'S1'><span style=' font-family: monospace;'>        loading libgm</span></div><div  class = 'S1'><span style=' font-family: monospace;'>        libgm.so: cannot open shared object file: No such file or directory</span></div><div  class = 'S1'><span style=' font-weight: bold;'>NOTE</span><span>: this tutorial was made upon the following FAµST version</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S10'><span style="white-space: pre"><span >matfaust.version()</span></span></div><div  class = 'S8'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="D300A682" prevent-scroll="true" data-testid="output_30" style="width: 1106px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div class="textElement eoOutputContent" data-width="1076" data-height="20" data-hashorizontaloverflow="false" style="max-height: 261px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><span class="variableNameElement" style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">ans = </span>'3.38.9'</div></div></div></div></div></div><div  class = 'S9'></div>
+<br>
+<!-- 
+##### SOURCE BEGIN #####
+%% Using The GPU FAµST API
+% 
+% 
+% *Sections in this tutorial:*
+%% 
+% # *Creating a GPU Faust object*
+% # *Generating a GPU Faust*
+% # *Manipulating GPU Fausts and CPU interoperability*
+% # *Benchmarking your GPU with matfaust!*
+% # *Running some FAµST algorithms on GPU*
+% # *Manually loading the matfaust GPU module*
+%% 
+% 
+% 
+% 
+% 
+% In this tutorial we’ll see quickly how to leverage the GPU computing power 
+% with matfaust. Since matfaust 3.0.0 the API has been modified to make the GPU 
+% available directly from the Matlab wrapper. Indeed, an independent GPU module 
+% (aka |gpu_mod|) has been developed for this purpose.
+% 
+% The first question you might ask is: does it work on my computer?  Here is 
+% the answer: the loading of this module is quite transparent, if an NVIDIA GPU 
+% is available and CUDA (11 or 12) is properly installed on your  system, you 
+% have normally nothing to do except installing matfaust to get the GPU implementations 
+% at your fingertips. We’ll see at the end of  this tutorial how to load manually 
+% the module and how to get further information in case of an error.
+% 
+% It is worthy to note that Mac OS X is not supported because NVIDIA has stopped 
+% to support this OS.
+% 
+% Also please notice that the GPU module support is still considered in beta 
+% status as the code is relatively young and still evolving. However the API shouldn’t 
+% evolve that much in a near future.
+% 1. Creating a GPU Faust object
+% 
+% 
+% Let’s start with some basic Faust creations on the GPU. Almost all the  ways 
+% of creating a Faust object in CPU memory are also available to create a GPU 
+% Faust. First of all, creating a Faust using the constructor works seamlessly 
+% on GPU, the only need is to specify the |dev| keyword argument, as follows:
+
+import matfaust.Faust
+M = rand(10, 10);
+N = rand(10, 15);
+gpuF = Faust({M, N}, 'dev', 'gpu')
+%% 
+% It’s clearly indicated in the output that the Faust object is instantiated 
+% in GPU memory (the N and M numpy arrays are copied from the CPU to the GPU memory). 
+% However it’s also possible to check this programmatically:
+
+device(gpuF)
+%% 
+% While for a CPU Faust you’ll get:
+
+device(Faust({M, N}, 'dev', 'cpu'))
+%% 
+% In |gpuF| the factors are dense matrices but it’s totally possible to instantiate 
+% sparse matrices on the GPU as you can do on CPU side.
+
+S = sprand(10, 15, .25);
+T = sprand(15, 10, .05);
+sparse_gpuF = Faust({S, T}, 'dev', 'gpu')
+%% 
+% You can also create a GPU Faust by explicitly copying a CPU Faust to the GPU 
+% memory. Actually, at anytime you can copy a CPU Faust to GPU and  conversely. 
+% The |clone()| member function is here precisely for this purpose. Below we copy 
+% |gpuF| to CPU and back again to GPU in the new Faust |gpuF2|.
+
+cpuF = clone(gpuF, 'cpu')
+ gpuF2 = clone(cpuF, 'gpu')
+% 2. Generating a GPU Faust
+% 
+% 
+% Many of the functions for generating a Faust object on CPU are available on 
+% GPU too. It is always the same, you precise the |dev| argument by assigning 
+% the |'gpu'| value and you’ll get a GPU Faust instead of a CPU Faust.
+% 
+% For example, the code below will successively create a random GPU Faust, a 
+% Hadamard transform GPU Faust, an identity GPU Faust and finally a DFT GPU Faust.
+
+import matfaust.wht
+import matfaust.dft
+% Random GPU Faust
+matfaust.rand(10, 10, 'num_factors', 11, 'dev', 'gpu')
+% Hadamard GPU Faust
+wht(32, 'dev', 'gpu')
+% Identity GPU Faust
+matfaust.eye(16, 'dev', 'gpu')
+% DFT GPU Faust
+dft(32, 'dev', 'gpu')
+% *3. Manipulating GPU Fausts and CPU interoperability*
+% Once you’ve created GPU Faust objects, you can perform operations on them 
+% staying in GPU world (that is, with no array transfer to CPU memory). That’s 
+% of course not always possible.
+% 
+% For example, let’s consider Faust-scalar multiplication and  Faust-matrix 
+% product. In the first case the scalar is copied to the GPU memory and likewise 
+% in the second case the matrix is copied from CPU to GPU in order to proceed 
+% to the computation. However in both cases the Faust factors stay into GPU memory 
+% and don’t move during the computation.
+
+% Faust-scalar multiplication
+2*gpuF
+%% 
+% When you make a scalar multiplication only one factor is multiplied, the others 
+% don’t change, they are shared between the Faust being multiplied and the resulting 
+% Faust. This is an optimization and to go further in  this direction the factor 
+% chosen to be multiplied is the smallest in memory (not necessarily the first 
+% one).
+
+% Faust-matrix product (the matrix is copied to GPU
+% then the multiplication is performed on GPU)
+gpuF*rand(size(gpuF,2), 15)
+%% 
+% On the contrary, and that matters for optimization, there is no CPU-GPU  transfer 
+% at all when you create another GPU Faust named for example |gpuF2| on the GPU 
+% and decide to multiply the two of them like this:
+
+gpuF2 = matfaust.rand(size(gpuF, 2), 18, 'dev', 'gpu')
+gpuF3 = gpuF * gpuF2
+%% 
+% Besides, it’s important to note that |gpuF3| factors are not duplicated in 
+% memory because they already exist for |gpuF| and |gpuF2|, that’s an extra optimization: 
+% |gpuF3| is just a memory view of the factors of |gpuF| and |gpuF2| (the same 
+% GPU arrays are shared between |Faust| objects). That works pretty well the same 
+% for CPU |Faust| objects.
+% 
+% Finally, please notice that CPU Faust objects are not directly interoperable 
+% with GPU Fausts objects. You can try, it’ll end up with an error.
+
+cpuF = matfaust.rand(5, 5, 'num_factors', 5, 'dev', 'cpu');
+gpuF = matfaust.rand(5, 5, 'num_factors', 6, 'dev', 'gpu');
+% A first try to multiply a CPU Faust with a GPU one...
+cpuF * gpuF
+%% 
+% It doesn't work, you must either convert |cpuF| to a GPU Faust or |gpuF| to 
+% a CPU Faust before multiplying. Below is a second try using conversion as needed...
+
+clone(cpuF, 'gpu') * gpuF
+%% 
+% Now it works!
+% 4. Benchmarking your GPU with matfaust!
+% 
+% 
+% Of course when we run some code on GPU rather than on CPU, it is clearly to 
+% enhance the performance. So let’s try your GPU and find out if it is worth it 
+% or not compared to your CPU. First, measure how much time it takes on CPU to 
+% compute a Faust norm and the dense array corresponding to the product of its 
+% factors:
+
+cpuF = matfaust.rand(1024, 1024, 'num_factors', 10, 'fac_type', 'dense');
+timeit(@() norm(cpuF, 2))
+timeit(@() full(cpuF))
+%% 
+% Now let’s make some GPU heat with norms and matrix products!
+
+gpuF = clone(cpuF, 'dev', 'gpu');
+timeit(@() norm(gpuF, 2))
+timeit(@() full(gpuF))
+%% 
+% Of course not all GPUs are equal. For example, on a Tesla V100 I've got respectively 
+% 7.6e-3 and 1.03e-2 seconds for the 2-norm and the |full| array.
+% 
+% Likewise let’s compare the performance obtained for a sparse Faust:
+
+cpuF2 = matfaust.rand(1024, 1024, 'num_factors', 10, 'fac_type', 'sparse');
+gpuF2 = clone(cpuF2, 'dev', 'gpu');
+timeit(@() norm(gpuF2, 2))
+timeit(@() full(gpuF2))
+% *5. Running some FAµST algorithms on GPU*
+% 
+% 
+% Some of the FAµST algorithms implemented in the C++ core are now also available 
+% in pure GPU mode.
+% 
+% For example, let’s compare the factorization times taken by the hierarchical 
+% factorization when launched on CPU and GPU.
+% 
+% When running on GPU, the matrix to factorize is copied in GPU memory and almost 
+% all operations executed during the algorithm don’t imply the CPU in any manner 
+% (the only exception at this stage of development is the proximal operators that 
+% only run on CPU).
+% 
+% First please copy the following function in the appropriate filename |factorize_MEG.m| 
+% into in the current working directory of Matlab (or by adding the destination 
+% directory to your path by calling |addpath|).
+% 
+% |function [MEG16, total_time, err] = factorize_MEG(dev)|
+% 
+% |import matfaust.fact.hierarchical|
+% 
+% |import matfaust.factparams.ParamsHierarchicalRectMat|
+% 
+% |load('matrix_MEG.mat')|
+% 
+% |MEG = matrix.';|
+% 
+% |num_facts = 9;|
+% 
+% |k = 10;|
+% 
+% |s = 8;|
+% 
+% |tic|
+% 
+% |p = ParamsHierarchicalRectMat.createParams(MEG, {'rectmat', num_facts, k, 
+% s});|
+% 
+% |MEG16 = hierarchical(MEG, p, 'backend', 2020, 'gpu', strcmp(dev, 'gpu'));|
+% 
+% |total_time = toc;|
+% 
+% |err = norm(MEG16-MEG, 'fro')/norm(MEG, 'fro');|
+% 
+% |end|
+% 
+% |Now we can run the hierarchical algorithm on CPU and then GPU. For more information 
+% about this algorithm please consult the| <https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacematfaust_1_1fact.html#a2b2101831c564836ca022ae4f7a7f010 
+% |API doc|>|.|
+% 
+% *Warning: THE COMPUTATION CAN LAST TEN TO THIRTY MINUTES OR SO ON CPU*
+
+[MEG16, total_time, err] = factorize_MEG('cpu')
+%%
+[MEG16, total_time, err] = factorize_MEG('gpu')
+%% 
+% For the comparison here are the results I got on a Tesla V100 GPU:
+%% 
+% |[~, total_time, err] = factorize_MEG('gpu')|
+% 
+% 
+% 
+% |total_time =|
+% 
+% 
+% 
+% |49.49|
+% 
+% 
+% 
+% |err =|
+% 
+% 
+% 
+% |0.1296|
+% 
+% 
+% 
+% As you see it’s far faster than with the CPU!
+% *6. Manually loading the matfaust GPU module*
+% If something goes wrong when trying to use the GPU matfaust extension, here 
+% is how to manually load the module and obtain more  information.
+% 
+% The key is the function <https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacematfaust.html#a75568ecea590cd9f9cd14dce87bfdc84 
+% enable_gpu_mod>.
+% 
+% This function allows to give another try to |gpu_mod| loading with the verbose 
+% mode enabled.
+% 
+% Below I copy output that show what it should look like when it doesn’t work:
+% 
+% |matfaust.enable_gpu_mod('silent', false)|
+% 
+% |Output:|
+% 
+% |WARNING: you must call enable_gpu_mod() before using GPUModHandler singleton.|
+% 
+% |loading libgm|
+% 
+% |libgm.so: cannot open shared object file: No such file or directory|
+%% 
+% *NOTE*: this tutorial was made upon the following FAµST version
+
+matfaust.version()
+%% 
+%
+##### SOURCE END #####
+-->
+</div></body></html>

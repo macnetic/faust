@@ -164,7 +164,6 @@ if(BUILD_DOCUMENTATION)
 	configure_file(${FAUST_DOC_SRC_DIR}/Faust_factorization.mlx.html ${PROJECT_BINARY_DIR}/doc/html/Faust_factorization.mlx.html COPYONLY)
 	configure_file(${FAUST_DOC_SRC_DIR}/Use_of_Faust_objects_in_algorithms.mlx ${PROJECT_BINARY_DIR}/doc/html/Use_of_Faust_objects_in_algorithms.mlx COPYONLY)
 	configure_file(${FAUST_DOC_SRC_DIR}/Use_of_Faust_objects_in_algorithms.mlx.html ${PROJECT_BINARY_DIR}/doc/html/Use_of_Faust_objects_in_algorithms.mlx.html COPYONLY)
-	configure_file(${FAUST_DOC_SRC_DIR}/using_gpu_matfaust.html ${PROJECT_BINARY_DIR}/doc/html/using_gpu_matfaust.html COPYONLY)
 
 	configure_file(${FAUST_DOC_SRC_DIR}/faust_projectors.mlx ${PROJECT_BINARY_DIR}/doc/html/faust_projectors.mlx COPYONLY)
 	configure_file(${FAUST_DOC_SRC_DIR}/faust_projectors.mlx.html ${PROJECT_BINARY_DIR}/doc/html/faust_projectors.mlx.html COPYONLY)
@@ -174,6 +173,9 @@ if(BUILD_DOCUMENTATION)
 	configure_file(${FAUST_DOC_SRC_DIR}/MHTP_algorithms.mlx.html ${PROJECT_BINARY_DIR}/doc/html/MHTP_algorithms.mlx.html COPYONLY)
 	configure_file(${FAUST_DOC_SRC_DIR}/Faust_optimizations.mlx ${PROJECT_BINARY_DIR}/doc/html/Faust_optimizations.mlx COPYONLY)
 	configure_file(${FAUST_DOC_SRC_DIR}/Faust_optimizations.mlx.html ${PROJECT_BINARY_DIR}/doc/html/Faust_optimizations.mlx.html COPYONLY)
+
+	configure_file(${FAUST_DOC_SRC_DIR}/using_gpu_matfaust.mlx ${PROJECT_BINARY_DIR}/doc/html/using_gpu_matfaust.mlx COPYONLY)
+	configure_file(${FAUST_DOC_SRC_DIR}/using_gpu_matfaust.mlx.html ${PROJECT_BINARY_DIR}/doc/html/using_gpu_matfaust.mlx.html COPYONLY)
 
 	configure_file(${FAUST_SRC_TEST_SRC_PYTHON_DIR}/test_svd_rc_vs_err.py ${PROJECT_BINARY_DIR}/doc/html/test_svd_rc_vs_err.py COPYONLY)
 	configure_file(${FAUST_SRC_TEST_SRC_PYTHON_DIR}/step-by-step_palm4msa.py ${PROJECT_BINARY_DIR}/doc/html/step-by-step_palm4msa.py COPYONLY)
