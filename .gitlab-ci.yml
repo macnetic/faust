@@ -816,7 +816,7 @@ conda_linux_pub:
     - misc/continuous_integration/conda_pkg/conda_build_upload_pyfaust.sh linux 3.9 misc/continuous_integration/conda_pkg/meta.yaml.in
     - conda env remove -n build_upload_pyfaust_venv_39
     - misc/continuous_integration/conda_pkg/conda_build_upload_pyfaust.sh linux 3.11 misc/continuous_integration/conda_pkg/meta.yaml.in
-    - conda env remove -n build_upload_pyfaust_venv_310
+    - conda env remove -n build_upload_pyfaust_venv_311
   only:
     - tags
   tags:
