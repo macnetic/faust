@@ -252,13 +252,10 @@ def poly(coeffs, basis='chebyshev', L=None, X=None, dev='cpu', out=None,
         from pyfaust.poly import basis as _basis
         basis = F = _basis(L, K, basis, dev=dev, impl=impl)
 
-    if isFaust(basis):
-        F = basis
-    elif not isinstance(basis, np.ndarray):
+    if not isinstance(basis, np.ndarray) and not isFaust(basis):
         raise TypeError('basis is neither a str neither a Faust nor'
                         ' a numpy.ndarray')
-    else:
-        F = basis
+    F = basis
     if L == None:
         d = F.shape[0]//(K+1)
     else:
@@ -287,7 +284,7 @@ def poly(coeffs, basis='chebyshev', L=None, X=None, dev='cpu', out=None,
                 Fc = Fc.clone(dev=dev)
             return Fc
         else:
-            if not isinstance(X, type(None)):
+            if X is not None:
                 raise X_and_basis_an_array_error
             return _poly_arr_cpp(coeffs, F, d, dev=dev, out=out)
     else:
