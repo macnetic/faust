@@ -689,7 +689,7 @@ cdef class FaustAlgoGen@TYPE_NAME@:
                 raise dtype_err
             yview = y
         else:
-            y = np.empty((nbrow_y, nbcol_y), dtype='@TYPE@', order='F')
+            y = np.empty((nbrow_y, nbcol_y), dtype=type2dtype('@TYPE@'), order='F')
             yview = y
 
         #void polyCoeffs(int d, int K, int n, const FPP* basisX, const FPP* coeffs, FPP* out) const;
@@ -773,7 +773,8 @@ cdef class FaustAlgoGen@TYPE_NAME@:
         else:
             out = []
             for i in range(ncoeffs):
-                out.append(np.empty((nbrow_y, nbcol_y), dtype='@TYPE@',
+                out.append(np.empty((nbrow_y, nbcol_y),
+                                    dtype=type2dtype('@TYPE@'),
                                     order='F'))
                 addr = out[i].__array_interface__['data'][0]
                 yview[i] = <@TYPE@*> addr
