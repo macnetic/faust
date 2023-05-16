@@ -3234,6 +3234,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             raise TypeError("1D weights expected when shapes of a and weights"
                             " differ.")
 
+        weights = weights.astype(F.dtype)
         if weights.shape == F.shape:
             aF = Faust([(weights[:,0].T).reshape(1,F.shape[0])], dev=F.device)@F[:,0]
             for i in range(1,F.shape[1]):
@@ -4575,7 +4576,7 @@ def _cplx2real_op(op):
     if pyfaust.isFaust(op):
         return Faust([_cplx2real_op(op.factors(i)) for i in range(op.numfactors())])
     else:
-        rop = np.real(op)
+        rop = np.real(op) # doesn't change type for scipy matrix if it is one
         iop = np.imag(op)
         if isinstance(op, (csr_matrix, csc_matrix, coo_matrix, bsr_matrix)):
             vertcat = svstack
