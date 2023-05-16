@@ -175,7 +175,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         if("scale" in kwargs.keys()):
             # scale hidden argument
             scale = kwargs['scale']
-            if(not isinstance(scale, (float, int, complex))):
+            if not np.isscalar(scale):
                 raise Exception("Scale must be a number.")
         else:
             scale = 1.0
@@ -792,13 +792,14 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                                                                             *array_types))])
             F = Faust(np.ones(max_nrows, 1, dtype=F.dtype), dev=F.device)@F
         def scalar2Faust(G):
+            if not np.isscalar(G):
+                raise TypeError("scalar must be int, float or complex")
             if isinstance(G, int):
                 G = float(G)
-            elif not isinstance(G, (float, complex)):
-                raise TypeError("scalar must be int, float or complex")
             G, Gdtype = (float(G), np.float64) if (isinstance(G, (np.float64, float)) and F.dtype != 'complex') else (complex(G), np.complex128)
-            return Faust([np.ones((F.shape[0], 1), dtype=F.dtype)*G,
-                          np.ones((1, F.shape[1]), dtype=F.dtype).astype(Gdtype)],
+            return Faust([(np.ones((F.shape[0], 1),
+                                   dtype=F.dtype)*G).astype(F.dtype),
+                          np.ones((1, F.shape[1]), dtype=F.dtype)],
                          dev=F.device)
         def broadcast_to_F(G):
             if G.shape[0] == 1:
@@ -828,18 +829,18 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                     G = Faust([np.ones((F.shape[0], 1), dtype=F.dtype), G.reshape(1, G.size)], dev=F.device)
                 else:
                     G = broadcast_to_F(Faust(G, dev=F.device))
-            elif isinstance(G,(int, float, complex)):
+            elif np.isscalar(G):
                 G = scalar2Faust(G)
             largs.append(G)
 
-        id = seye(F.shape[1], dtype=F.dtype)
+        C = F.concatenate(*largs, axis=1)
+        id = seye(F.shape[1], dtype=C.dtype)
         id_vstack = svstack([id for i in range(0,
                                                len(largs)+1)])
-        C = F.concatenate(*largs, axis=1)
         F = C@Faust(id_vstack, dev=F.device)
         return F
 
-    def __radd__(F,lhs_op):
+    def __radd__(F, lhs_op):
         """Returns lhs_op+F.
         <b>See also</b> Faust.__add__
         """
@@ -966,7 +967,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         <b>See also</b> Faust.__mul__, Faust.__itruediv__
         """
-        if isinstance(s, (float, complex, int)) or isinstance(s, np.ndarray):
+        if np.isscalar(s) or isinstance(s, np.ndarray):
             return F*(1./s)
         else:
             raise Exception("unsupported operand type(s) for /: a Faust can only be "
@@ -1017,7 +1018,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         """
         if isinstance(A, np.ndarray) and A.ndim == 2:
             F = F * Faust(A)
-        elif isinstance(A, (float, complex, int)):
+        elif np.isscalar(A):
             F = F * A
         else:
             raise TypeError('Type of A is not supported')
@@ -1032,7 +1033,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         elif isinstance(A, (csr_matrix, csc_matrix, coo_matrix, bsr_matrix,
                             np.ndarray)) and A.ndim == 2:
             F = F+Faust(A)
-        elif isinstance(A, (float, complex, int)):
+        elif np.isscalar(A):
             F = F + A
         else:
             raise TypeError('Type of A is not supported')
@@ -1047,7 +1048,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         elif isinstance(A, (csr_matrix, csc_matrix, coo_matrix, bsr_matrix,
                             np.ndarray)) and A.ndim == 2:
             F = F-Faust(A)
-        elif isinstance(A, (float, complex, int)):
+        elif np.isscalar(A):
             F = F - A
         else:
             raise TypeError('Type of A is not supported')
@@ -1121,7 +1122,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             elif F.dtype != 'complex' and A.dtype == 'complex':
                 F = F.astype('complex')
             return Faust(core_obj=F.m_faust.multiply_faust(A.m_faust))
-        elif(isinstance(A, (float, int, complex))):
+        elif np.isscalar(A):
             raise ValueError("Scalar operands are not allowed, use '*'"
                              " instead")
         elif isinstance(A, np.ndarray):
@@ -1167,7 +1168,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         <b>See also</b> Faust.__init__, Faust.rcg, Faust.__mul__, Faust.__matmul__, Faust.dot
         """
-        if(isinstance(A, (float, int, complex))):
+        if np.isscalar(A):
             return F*A
         return F.__matmul__(A)
 
@@ -1238,7 +1239,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         <b>See also</b> Faust.__rmul__
         """
-        if(isinstance(A, (float, int, complex))):
+        if np.isscalar(A):
             if isinstance(A, int):
                 A = float(A)
             elif isinstance(A, complex):
@@ -1334,7 +1335,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         """ lhs_op*F
         <b>See also</b> Faust.__mul__
         """
-        if isinstance(lhs_op, (float, int, complex)):
+        if np.isscalar(lhs_op):
             return F.__mul__(lhs_op)
         elif(isinstance(lhs_op, np.ndarray)):
             #TODO: refactor with __mul__
@@ -1484,16 +1485,16 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             raise ValueError("Axis must be 0 or 1.")
 
         largs = []
-        any_G_is_cplx = F.dtype == 'complex'
+        largest_dtype = F.dtype
         for i,G in enumerate(args):
             if(isinstance(G, (np.ndarray, csr_matrix, csc_matrix))):
                 G = Faust(G, dev=F.device)
             elif(not isinstance(G, Faust)): raise ValueError("You can't concatenate a "
-                                                           "Faust with something "
-                                                           "that is not a Faust, "
-                                                           "a numpy array or scipy "
-                                                           "sparse matrix.")
-            any_G_is_cplx |= G.dtype == 'complex'
+                                                             "Faust with something "
+                                                             "that is not a Faust, "
+                                                             "a numpy array or scipy "
+                                                             "sparse matrix.")
+            largest_dtype =  G.dtype if np.dtype(G.dtype).itemsize > np.dtype(largest_dtype).itemsize else largest_dtype
             largs.append(G)
 
             if(axis == 0 and F.shape[1] != G.shape[1] or axis == 1 and F.shape[0]
@@ -1501,15 +1502,11 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                                                 "the two Fausts must "
                                                 "agree.")
 
-
-        if any_G_is_cplx:
-            # one Faust is complex convert all real Faust to complex
             for i in range(len(largs)):
-                if largs[i].dtype != 'complex':
-                    largs[i] = largs[i].astype('complex')
-            if F.dtype != 'complex':
-                F = F.astype('complex')
-
+                if largs[i].dtype != largest_dtype:
+                    largs[i] = largs[i].astype(largest_dtype)
+            if F.dtype != largest_dtype:
+                F = F.astype(largest_dtype)
 
         if all([isFaust(G) for G in largs]) and not "iterative" in kwargs.keys() or kwargs['iterative']:
             # use iterative meth.
@@ -2326,7 +2323,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         return lF
 
     def _check_factor_idx(F, i):
-        if(not isinstance(i, (float, int))):
+        if not np.isscalar(i) or not np.isreal(i):
             raise TypeError('i must be an integer.')
         i = int(np.floor(i))
         if(i < 0 or i >= F.numfactors()):
@@ -3139,9 +3136,9 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
            (not isinstance(axis[0], int) or not isinstance(axis[1], int)):
             raise TypeError("axis must be int or tuple of ints")
         if axis == None or axis == 0 or is_tuple and 0 in axis:
-            F = Faust(np.ones((1, F.shape[0])), dev=F.device)@F
+            F = Faust(np.ones((1, F.shape[0]), dtype=F.dtype), dev=F.device)@F
         if axis == 1 or is_tuple and 1 in axis:
-            F = F@Faust(np.ones((F.shape[1], 1)), dev=F.device)
+            F = F@Faust(np.ones((F.shape[1], 1), dtype=F.dtype), dev=F.device)
         if is_tuple and len([i for i in axis if i < 0
                              or i > 1]) or is_int and (axis < 0 or axis > 1):
             raise ValueError("axis "+str(axis)+" is out of bounds for a Faust "
@@ -4414,7 +4411,7 @@ def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
                         "bool.")
     if not density:
         density = -1
-    elif not isinstance(density, (float, int)):
+    elif not np.isscalar(density) or not np.isreal(density):
         raise ValueError("rand(): density must be a float")
     density = float(density)
     if dev == "cpu":
