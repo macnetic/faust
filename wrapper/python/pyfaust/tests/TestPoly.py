@@ -8,24 +8,18 @@ from scipy.sparse.linalg import expm_multiply as scipy_expm_multiply
 import tempfile
 import os
 
-dev = 'cpu'
-field = 'real'
-
-
 class TestPoly(unittest.TestCase):
 
-    def __init__(self, methodName='runTest', dev='cpu', field='real'):
+    def __init__(self, methodName='runTest', dev='cpu', dtype='double'):
         super(TestPoly, self).__init__(methodName)
         self.dev = dev
-        self.field = field
+        if dtype == 'real': # backward compat
+            dtype = 'double'
+        self.dtype = dtype
 
     def setUp(self):
         self.d = 50
         self.density = 0.02
-        if self.field == 'complex':
-            self.dtype = 'complex'
-        else:
-            self.dtype = 'double'
         self.L = random(self.d, self.d, .02, format='csr', dtype=self.dtype)
         self.L @= self.L.H
         self.K = 5
@@ -92,8 +86,8 @@ class TestPoly(unittest.TestCase):
         L = self.L
         K = self.K
         density = self.density
-        F = basis(L, K, 'chebyshev', dev=self.dev)
-        coeffs = np.random.rand(K+1).astype(L.dtype)
+        F = basis(L, K, 'chebyshev', dev=self.dev).astype(self.dtype)
+        coeffs = np.random.rand(K+1).astype(self.dtype)
         G = poly(coeffs, F)
         # Test polynomial as Faust
         poly_ref = np.zeros((d,d))
@@ -102,28 +96,32 @@ class TestPoly(unittest.TestCase):
         self.assertAlmostEqual((G-poly_ref).norm(), 0)
         # Test polynomial as array
         GM = poly(coeffs, F.toarray())
-        self.assertTrue(isinstance(GM, np.ndarray) and np.allclose(GM,
-                                                                  poly_ref.toarray()))
+        self.assertTrue(isinstance(GM, np.ndarray))
+        err = norm(GM - poly_ref.toarray())/norm(poly_ref.toarray())
+        self.assertLessEqual(err, 1e-6)
         # Test polynomial-vector product
         x = np.random.rand(F.shape[1], 1).astype(L.dtype)
         # Three ways to do (not all as efficient as each other)
         Fx1 = poly(coeffs, F, dev=self.dev)@x
         Fx2 = poly(coeffs, F@x, dev=self.dev)
         Fx3 = poly(coeffs, F, X=x, dev=self.dev)
-        self.assertTrue(np.allclose(Fx1, Fx2))
+        err = norm(Fx1-Fx2)/norm(Fx1)
+        self.assertLessEqual(err, 1e-6)
         self.assertTrue(np.allclose(Fx1, Fx3))
         # Test polynomial-matrix product
         X = np.random.rand(F.shape[1], 18).astype(L.dtype)
         FX1 = poly(coeffs, F, dev=self.dev)@X
         FX2 = poly(coeffs, F@X, dev=self.dev)
         FX3 = poly(coeffs, F, X=X, dev=self.dev)
-        self.assertTrue(np.allclose(FX1, FX2))
+        err = norm(FX1-FX2)/norm(FX1)
+        self.assertLessEqual(err, 1e-6)
         self.assertTrue(np.allclose(FX2, FX3))
         # Test creating the polynomial basis on the fly
         G2 = poly(coeffs, 'chebyshev', L)
         self.assertAlmostEqual((G-G2).norm(), 0)
         GX = poly(coeffs, 'chebyshev', L, X=X, dev=self.dev)
-        self.assertTrue(np.allclose(GX, FX1))
+        err = norm(FX1-GX)/norm(FX1)
+        self.assertLessEqual(err, 1e-6)
         # Test polynomial-matrix product with arbitrary T0
         F_ = basis(L, K, 'chebyshev', dev=self.dev, T0=csr_matrix(X))
         GT0eqX = poly(coeffs, F_, dev=self.dev).toarray()

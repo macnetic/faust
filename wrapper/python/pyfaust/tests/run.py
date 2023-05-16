@@ -14,8 +14,8 @@ if __name__ == "__main__":
             raise ValueError("dev argument must be cpu or gpu.")
         if(nargs > 2):
             field = sys.argv[2]
-            if field not in ['complex', 'real']:
-                raise ValueError("field must be complex or float")
+            if field not in ['complex', 'real', 'float32', 'float64', 'double']:
+                raise ValueError("field must be 'complex', 'real', 'float32', 'float64', 'double'")
         del sys.argv[2]  # deleted to avoid interfering with unittest
         del sys.argv[1]
     if(nargs > 1):

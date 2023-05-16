@@ -601,6 +601,7 @@ test_macos_pkg_release:
     - python$MACOS_PY_VER -c "import pyfaust; print(pyfaust.version()); print(pyfaust.rand(5,5).toarray());"
     - python$MACOS_PY_VER -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'real')"
     - python$MACOS_PY_VER -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'complex')"
+    - python$MACOS_PY_VER -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'float32')"
   only:
     - tags
   tags:
@@ -620,12 +621,14 @@ test_linux_pkg_release:
     - python$NUX_PY_VER -c "import pyfaust; print(pyfaust.version()); print(pyfaust.rand(5,5).toarray());"
     - python$NUX_PY_VER -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'real')"
     - python$NUX_PY_VER -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'complex')"
+    - python$NUX_PY_VER -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'float32')"
     - sudo rpm -e faust
     - sudo rpm -i --nodeps build/faust-$CI_COMMIT_TAG-static-x86_64.rpm
     - matlab -nojvm -nodisplay -r "disp(matfaust.version());disp(full(matfaust.rand(5,5))); exit;" | tee /tmp/faust && grep $CI_COMMIT_TAG /tmp/faust
     - python$NUX_PY_VER -c "import pyfaust; print(pyfaust.version()); print(pyfaust.rand(5,5).toarray());"
     - python$NUX_PY_VER -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'real')"
     - python$NUX_PY_VER -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'complex')"
+    - python$NUX_PY_VER -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'float32')"
     - sudo rpm -e faust
   only:
     - tags
@@ -652,6 +655,7 @@ test_linux_pkg_release:
     - python -c "import pyfaust; print(pyfaust.version()); print(pyfaust.rand(5,5).toarray());"
     - python -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'real')"
     - python -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'complex')"
+    - python -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'float32')"
     - cd "C:\Program Files\Faust"
       #- call 'uninstall.exe' /S
     - python -c "import os; os.system('uninstall.exe /S')"

@@ -17,32 +17,24 @@ class TestFaust(unittest.TestCase):
     MAX_DIM_SIZE = 256
     MIN_DIM_SIZE = 3
 
-    def __init__(self, methodName='runTest', dev='cpu', field='real'):
+    def __init__(self, methodName='runTest', dev='cpu', dtype='double'):
         super(TestFaust, self).__init__(methodName)
+        if dtype == 'real': # backward compat
+            dtype = 'double'
+        self.dtype = dtype
         self.dev = dev
-        self.field = field
 
     def setUp(self):
         """
         """
-#        self.dev = 'cpu'
-#        self.field = 'real'
-#        if 'dev' in os.environ:
-#            self.dev = os.environ['dev']
-#        if 'field' in os.environ:
-#            self.field = os.environ['field']
         nrows = randint(TestFaust.MIN_DIM_SIZE,
                         TestFaust.MAX_DIM_SIZE+1)
         ncols = randint(TestFaust.MIN_DIM_SIZE,
                         TestFaust.MAX_DIM_SIZE+1)
         nfacts = randint(TestFaust.MIN_NUM_FACTORS,
                          TestFaust.MAX_NUM_FACTORS+1)
-        dtype = 'double'
-        if self.field not in ['real', 'complex']:
-            dtype = self.field
-            self.field = 'real'
         self.F = frand(nrows, ncols, num_factors=nfacts, dev=self.dev,
-                       field=self.field, dtype=dtype)
+                       dtype=self.dtype)
         self.nrows = nrows
         self.ncols = ncols
         self.nfacts = nfacts
@@ -64,15 +56,11 @@ class TestFaust(unittest.TestCase):
 
         def sparse_fac_size(sfac):
             int_size = 4
-            double_size = 8
-            cplx_size = 16
+            sfac.dtype.itemsize
             nnz = sfac.nnz
             nrows = sfac.shape[0]
             size = nnz*int_size+(nrows+1)*int_size
-            if sfac.dtype == np.complex128:
-                size += cplx_size*nnz
-            elif sfac.dtype == np.float64:
-                size += double_size*nnz
+            size += sfac.dtype.itemsize * nnz
             return size
         Fsize = 0
         for i in range(0, self.F.numfactors()):
@@ -128,7 +116,7 @@ class TestFaust(unittest.TestCase):
 
     def test_add(self):
         print("Faust.__add__, __radd__")
-        G = frand(self.nrows, self.ncols, dev=self.dev)
+        G = frand(self.nrows, self.ncols, dev=self.dev, dtype=self.dtype)
         self.assertTrue(np.allclose((self.F+G).toarray(),
                                     self.F.toarray()+G.toarray()))
         self.assertTrue(np.allclose((self.F+G.toarray()).toarray(),
@@ -136,7 +124,7 @@ class TestFaust(unittest.TestCase):
 
     def test_sub(self):
         print("Faust.__sub__, __rsub__")
-        G = frand(self.nrows, self.ncols, dev=self.dev)
+        G = frand(self.nrows, self.ncols, dev=self.dev, dtype=self.dtype)
         self.assertTrue(np.allclose((self.F-G).toarray(),
                                     self.F.toarray()-G.toarray()))
         self.assertTrue(np.allclose((self.F-G.toarray()).toarray(),
@@ -148,7 +136,7 @@ class TestFaust(unittest.TestCase):
 
     def test_matmul(self):
         print("Faust.__matmul__, dot, __rmatmul__")
-        G = frand(self.ncols, self.nrows, dev=self.dev)
+        G = frand(self.ncols, self.nrows, dev=self.dev, dtype=self.dtype)
         self.assertTrue(np.allclose((self.F@G).toarray(),
                                     self.F.toarray()@G.toarray()))
         self.assertTrue(np.allclose((self.F@G.toarray()),
@@ -163,7 +151,7 @@ class TestFaust(unittest.TestCase):
 
     def test_concatenate(self):
         print("Faust.concatenate, pyfaust.vstack, pyfaust.hstack")
-        G = frand(self.nrows, self.ncols, dev=self.dev)
+        G = frand(self.nrows, self.ncols, dev=self.dev, dtype=self.dtype)
         self.assertTrue(np.allclose((self.F.concatenate(G)).toarray(),
                                     np.concatenate((self.F.toarray(),
                                                     G.toarray()))))
@@ -318,7 +306,7 @@ class TestFaust(unittest.TestCase):
         Fa = self.F.toarray()
         sFa = sF.toarray()
         self._assertAlmostEqual(sFa[:, j1], Fa[:, j2])
-        self.assertAlmostEqual(sF.norm(), self.F.norm())
+        self.assertAlmostEqual(sF.norm(), self.F.norm(), places=3)
 
     def test_swap_rows(self):
         print("Faust.swap_rows")
@@ -328,7 +316,7 @@ class TestFaust(unittest.TestCase):
         Fa = self.F.toarray()
         sFa = sF.toarray()
         self._assertAlmostEqual(sFa[i1, :], Fa[i2, :])
-        self.assertAlmostEqual(sF.norm(), self.F.norm())
+        self.assertAlmostEqual(sF.norm(), self.F.norm(), places=3)
 
     def test_optimize_memory(self):
         print("Faust.optimize_memory")
@@ -362,7 +350,8 @@ class TestFaust(unittest.TestCase):
 
     def test_average(self):
         print("Faust.average")
-        weights = [ np.random.rand(self.F.shape[0]), np.random.rand(self.F.shape[1])]
+        weights = [ np.random.rand(self.F.shape[0]).astype(self.dtype),
+                   np.random.rand(self.F.shape[1]).astype(self.dtype)]
         for i in [0, 1]:
             self._assertAlmostEqual(self.F.average(axis=i).toarray().reshape(1, self.F.shape[(i+1)%2]),
                                     np.average(self.F.toarray(), axis=i))
