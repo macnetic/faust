@@ -794,12 +794,15 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         def scalar2Faust(G):
             if not np.isscalar(G):
                 raise TypeError("scalar must be int, float or complex")
-            if isinstance(G, int):
-                G = float(G)
-            G, Gdtype = (float(G), np.float64) if (isinstance(G, (np.float64, float)) and F.dtype != 'complex') else (complex(G), np.complex128)
-            return Faust([(np.ones((F.shape[0], 1),
-                                   dtype=F.dtype)*G).astype(F.dtype),
-                          np.ones((1, F.shape[1]), dtype=F.dtype)],
+            if np.isreal(G):
+                if F.dtype == 'complex':
+                    Gdtype = 'complex'
+                else:
+                    Gdtype = F.dtype
+            else:
+                Gdtype = 'complex'
+            return Faust([np.full((F.shape[0], 1), G, dtype=Gdtype),
+                          np.ones((1, F.shape[1]), dtype=Gdtype)],
                          dev=F.device)
         def broadcast_to_F(G):
             if G.shape[0] == 1:
