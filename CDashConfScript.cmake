@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 3.21.0)
 
 
 set (CTEST_SOURCE_DIRECTORY "${CTEST_SCRIPT_DIRECTORY}")

@@ -31,6 +31,7 @@ matio own dependencies, as hdf5 and zlib. matio dependency can be disabled throu
 (there is a constraint on the gcc compiler version depending on the used Matlab version,
 the CMake script indicate if the match is not appropriate).
 - libxml2 (Optional, needed with CMake ``BUILD_READ_XML_FILE``).
+- CMake >= 3.21.0
 - TODO: other?
 
 
