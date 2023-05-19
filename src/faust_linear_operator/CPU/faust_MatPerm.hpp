@@ -116,7 +116,7 @@ namespace Faust
 	void MatPerm<FPP, Cpu>::multiply(Vect<FPP,Cpu> & x, char opThis) const
 	{
 		Vect<FPP, Cpu> z(x.size());
-		const_cast<MatPerm<FPP, Cpu>*>(this)->multiply(x.getData(), z.getData(), x.size(), opThis != 'N'); //TODO: conjugate
+		const_cast<MatPerm<FPP, Cpu>*>(this)->multiply(x.getData(), z.getData(), x.size(), opThis != 'N', 'H' == opThis || 'C' == opThis); //TODO: conjugate
 		x = z;
 	}
 
@@ -506,7 +506,7 @@ namespace Faust
 		MatDense<FPP, Cpu> MatPerm<FPP, Cpu>::to_dense() const
 		{
 			MatDense<FPP, Cpu> dense(this->getNbCol(), this->getNbCol());
-			dense.setOnes();
+			dense.setEyes();
 			multiply(dense, 'N');
 			return dense;
 		}

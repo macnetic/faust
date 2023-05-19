@@ -521,7 +521,7 @@ namespace Faust
 		MatDense<FPP, Cpu> MatButterfly<FPP, Cpu>::to_dense() const
 		{
 			MatDense<FPP, Cpu> dense(this->getNbCol(), this->getNbCol());
-			dense.setOnes();
+			dense.setEyes();
 			multiply(dense, 'N');
 			return dense;
 		}
