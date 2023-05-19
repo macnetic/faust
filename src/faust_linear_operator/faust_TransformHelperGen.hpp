@@ -367,6 +367,8 @@ namespace Faust
 					ids_ = new faust_unsigned_int[n_ids];
 			for(auto i = 0;i < n_ids;i++)
 			{
+				if(is_transposed)
+					ids_[i] = size() - ids[i] - 1;
 				auto id = ids_[i];
 				if(id >= size()) throw out_of_range("factor id is greater or equal to the size of Transform.");
 				if(id == 0 || id == size()-1)
@@ -374,8 +376,6 @@ namespace Faust
 					const_cast<Faust::TransformHelperGen<FPP, DEV>*>(this)->eval_sliced_Transform();
 					const_cast<Faust::TransformHelperGen<FPP, DEV>*>(this)->eval_fancy_idx_Transform();
 				}
-				if(is_transposed)
-					ids_[i] = size() - id - 1;
 			}
 			std::vector<Faust::MatGeneric<FPP,DEV>*> factors;
 			for(auto i=0; i < n_ids; i++)
