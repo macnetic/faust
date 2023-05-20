@@ -104,7 +104,7 @@ namespace Faust
 			 */
 			static bool isPerm(const MatSparse<FPP, Cpu> &S, bool verify_ones=true);
 
-			MatDense<FPP, Cpu> to_dense() const;
+			MatDense<FPP, Cpu> to_dense() const; //TODO: rename toMatDense
 		};
 
 }

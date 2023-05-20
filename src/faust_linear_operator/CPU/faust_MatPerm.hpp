@@ -170,18 +170,18 @@ namespace Faust
 #pragma omp parallel for
 		for(int i=0;i < size; i++)
 			if(conjugate)
-				y[i] = Faust::conj(d_ptr[i]) * x[perm_ids[i]];
+				y[i] = Faust::conj(d_ptr[i]) * x[do_transp?perm_ids_T[i]:perm_ids[i]];
 			else
-				y[i] = d_ptr[i] * x[perm_ids[i]];
+				y[i] = d_ptr[i] * x[do_transp?perm_ids_T[i]:perm_ids[i]];
 #else
 		// this is slower
 		VecMap x_vec(const_cast<FPP*>(x), size); // const_cast is harmless
 		VecMap y_vec(y, size); // const_cast is harmless
 		if(do_transp)
 			if(conjugate)
-				y_vec = diag_conj(DT) * x_vec(perm_ids);
+				y_vec = diag_conj(DT) * x_vec(perm_ids_T);
 			else
-				y_vec = DT * x_vec(perm_ids);
+				y_vec = DT * x_vec(perm_ids_T);
 		else
 			if(conjugate)
 				y_vec = diag_conj(D) * x_vec(perm_ids);
@@ -212,16 +212,16 @@ namespace Faust
 			#pragma omp parallel for
 			for(int i=0;i < Y_nrows; i++)
 				if(conjugate)
-					Y_mat.row(i) = Faust::conj(d_ptr[i]) * X_mat.row(perm_ids[i]);
+					Y_mat.row(i) = Faust::conj(d_ptr[i]) * X_mat.row(do_transp?perm_ids_T[i]:perm_ids[i]);
 				else
-					Y_mat.row(i) = d_ptr[i] * X_mat.row(perm_ids[i]);
+					Y_mat.row(i) = d_ptr[i] * X_mat.row(do_transp?perm_ids_T[i]:perm_ids[i]);
 #else
 			// TODO: refactor the exp with a macro diag_prod
 			if(do_transp)
 				if(conjugate)
-					Y_mat = diag_conj(DT) * X_mat(perm_ids, Eigen::placeholders::all);
+					Y_mat = diag_conj(DT) * X_mat(perm_ids_T, Eigen::placeholders::all);
 				else
-					Y_mat = DT * X_mat(perm_ids, Eigen::placeholders::all);
+					Y_mat = DT * X_mat(perm_ids_T, Eigen::placeholders::all);
 			else
 				if(conjugate)
 					Y_mat = diag_conj(D) * X_mat(perm_ids, Eigen::placeholders::all);
