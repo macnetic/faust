@@ -1438,6 +1438,13 @@ class TestFaustFactory(unittest.TestCase):
             ref_fft = FT.toarray()
             self.assertAlmostEqual(norm(ref_fft-fFT)/norm(ref_fft),0)
             self.assertTrue(np.allclose(FT@x, oFT@x))
+            # adjoint case
+            FH = F.H
+            oFH = oF.H
+            fFH = oFH.toarray()
+            ref_fft = FH.toarray()
+            self.assertAlmostEqual(norm(ref_fft-fFH)/norm(ref_fft),0)
+            self.assertTrue(np.allclose(FH@x, oFH@x))
 
     def testRandButterflyOpt(self):
         print("Test pyfaust.opt_butterfly_faust()")
@@ -1466,6 +1473,13 @@ class TestFaustFactory(unittest.TestCase):
         ref_F = FT.toarray()
         self.assertAlmostEqual(norm(ref_F-fFT)/norm(ref_F),0)
         self.assertTrue(np.allclose(FT@x, oFT@x))
+        # adjoint case
+        FH = F.H
+        oFH = oF.H
+        fFH = oFH.toarray()
+        ref_F = FH.toarray()
+        self.assertAlmostEqual(norm(ref_F-fFH)/norm(ref_F),0)
+        self.assertTrue(np.allclose(FH@x, oFH@x))
 
     def testRandButterfly(self):
         print("Test pyfaust.rand_butterfly")
