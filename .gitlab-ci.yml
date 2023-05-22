@@ -57,6 +57,9 @@ ctest_python:
       - junit2html build_FaustLinuxPython/junit_output.xml build_FaustLinuxPython/python_pyfaust_test_output.html
       - deactivate
       - rm -Rf junit_venv
+        # fail the ci job if any ctest test (or unit test) have failed
+      - FAILED_TESTS=$(grep -B 1 'Outcome:.*Failed' junit_output.xml.html | sed -ne 's%.*Test case:.*<b>\(.*\)</b>.*%\1%p')
+      - if [ -n "$FAILED_TESTS" ]; then echo "Failed tests: $FAILED_TESTS"; exit 1;fi
     except:
         - schedules
         - tags
