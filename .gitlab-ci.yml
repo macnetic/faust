@@ -62,7 +62,7 @@ ctest_python:
       - rm -Rf junit_venv
         # fail the ci job if any ctest test (or unit test) have failed
       - FAILED_TESTS=$(grep -B 1 'Outcome:.*Failed' build_FaustLinuxPython/python_pyfaust_test_output.html | sed -ne 's%.*Test case:.*<b>\(.*\)</b>.*%\1%p')
-      - if [ -n "${FAILED_TESTS}" ]; then echo 'Failed tests:${FAILED_TESTS}'; exit 1;fi
+      - if [ -n "${FAILED_TESTS}" ]; then echo "Failed tests:${FAILED_TESTS}"; exit 1;fi
     except:
         - schedules
         - tags
@@ -73,18 +73,35 @@ ctest_python:
     artifacts:
         paths:
             - build_FaustLinuxPython/python_pyfaust_test_output.html
-        expire_in: '1 week'
+        expire_in: '6 months'
 
 
 ctest_matlab:
     <<: *ctest_script
     variables: {BUILD_WRAPPER_MATLAB: "ON", SLOW_TESTS: "OFF", NOCPPTESTS: "ON", BUILD_MULTITHREAD: "OFF"} # MT OFF because of macOS complicated way to enable OpenMP (but packages are OMP enabled)
+    after_script:
+      # TODO: refactor with ctest_python after script
+      - python3 -m venv junit_venv # use default python3 in PATH (the same has been used in ctest building -- cf. CDashConfScript)
+      - source junit_venv/bin/activate
+      - export BUILD_DIR=$(ls -d build_*  | tail -1)
+      - pip install junit2html
+      - junit2html ${BUILD_DIR}/junit_output.xml ${BUILD_DIR}/matlab_matfaust_test_output.html
+      - deactivate
+      - rm -Rf junit_venv
+        # fail the ci job if any ctest test (or unit test) have failed
+      - FAILED_TESTS=$(grep -B 1 'Outcome:.*Failed' ${BUILD_DIR}/matlab_matfaust_test_output.html | sed -ne 's%.*Test case:.*<b>\(.*\)</b>.*%\1%p')
+      - if [ -n "${FAILED_TESTS}" ]; then echo "Failed tests:${FAILED_TESTS}"; exit 1;fi
     except:
         - schedules
         - tags
     stage: test
     tags:
         - matlab
+    artifacts:
+        paths:
+          #- ${BUILD_DIR}/matlab_matfaust_test_output.html # won't work
+          - $(ls -d build_*  | tail -1)/matlab_matfaust_test_output.html
+        expire_in: '6 months'
 
 .ctest_nightly: &ctest_nightly_script
     <<: *ctest_script
