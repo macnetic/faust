@@ -49,7 +49,7 @@ ctest:
 
 ctest_python:
     <<: *ctest_script
-    variables: {BUILD_WRAPPER_PYTHON: "ON", SLOW_TESTS: "OFF", DONT_PYPLOT_FAUST_TIME: "ON", NOCPPTESTS: "ON", NOPY2: "ON", BUILD_MULTITHREAD: "ON"} #, GIT_STRATEGY: none}
+    variables: {BUILD_WRAPPER_PYTHON: "ON", SLOW_TESTS: "OFF", DONT_PYPLOT_FAUST_TIME: "ON", NOCPPTESTS: "ON", NOPY2: "ON", BUILD_MULTITHREAD: "ON", BUILD_FLOAT_PYX: "ON"} #, GIT_STRATEGY: none}
     after_script:
       - python3 -m venv junit_venv # use default python3 in PATH (the same has been used in ctest building -- cf. CDashConfScript)
       - source junit_venv/bin/activate
