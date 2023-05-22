@@ -48,6 +48,9 @@ ctest:
         - linux
 
 ctest_python:
+    before_script:
+      # fix strange libomp deadlock happening on pyfaust.hierarchical unit test (because of an env. config. related error)
+      - export LD_PRELOAD=/usr/lib64/libomp.so
     <<: *ctest_script
     variables: {BUILD_WRAPPER_PYTHON: "ON", SLOW_TESTS: "OFF", DONT_PYPLOT_FAUST_TIME: "ON", NOCPPTESTS: "ON", NOPY2: "ON", BUILD_MULTITHREAD: "ON", BUILD_FLOAT_PYX: "ON"} #, GIT_STRATEGY: none}
     after_script:
@@ -58,8 +61,8 @@ ctest_python:
       - deactivate
       - rm -Rf junit_venv
         # fail the ci job if any ctest test (or unit test) have failed
-      - FAILED_TESTS=$(grep -B 1 'Outcome:.*Failed' junit_output.xml.html | sed -ne 's%.*Test case:.*<b>\(.*\)</b>.*%\1%p')
-      - if [ -n "$FAILED_TESTS" ]; then echo "Failed tests: $FAILED_TESTS"; exit 1;fi
+      - FAILED_TESTS=$(grep -B 1 'Outcome:.*Failed' build_FaustLinuxPython/python_pyfaust_test_output.html | sed -ne 's%.*Test case:.*<b>\(.*\)</b>.*%\1%p')
+      - if [ -n "${FAILED_TESTS}" ]; then echo 'Failed tests:${FAILED_TESTS}'; exit 1;fi
     except:
         - schedules
         - tags
