@@ -1237,8 +1237,8 @@ classdef Faust < handle % subclass of handle for Faust.delete to be called on cl
 		%>     1
 		%>
 		%> >> % pF is smaller in memory and should be Faster too
-		%> >> tic; full(F); tF = toc;
-		%> >> tic; full(pF); tpF = toc;
+		%> >> tF = timeit(@() full(F));
+		%> >> tpF = timeit(@() full(pF));
 		%> >> tpF < tF
 		%>
 		%> ans =
@@ -1426,24 +1426,13 @@ classdef Faust < handle % subclass of handle for Faust.delete to be called on cl
 		%> >> oF = optimize_time(F); % doctest: +ELLIPSIS
 		%> ...
 		%> >> % oF should be Faster too
-		%> >> tic; full(F); tF = toc;
-		%> >> tic; full(oF); toF = toc;
-		%> >> toF < tF % full time
+		%> >> tF = timeit(@() full(F));
+		%> >> toF = timeit(@() full(oF));
+		%> >> toF < tF % doctest: +ELLIPSIS
 		%>
 		%> ans =
 		%>
-		%>   logical
-		%>
-		%>    1
-		%>
-		%> >> v = rand(size(F, 2), 1);
-		%> >> tic; F*v; tF = toc;
-		%> >> tic; oF*v; toF = toc;
-		%> >> toF < tF % Faust-vector mul
-		%>
-		%> ans =
-		%>
-		%>   logical
+		%> ...
 		%>
 		%>    1
 		%>
@@ -3632,9 +3621,9 @@ classdef Faust < handle % subclass of handle for Faust.delete to be called on cl
 		%> @code
 		%> >> import matfaust.Faust
 		%> >> F = matfaust.rand(10,10);
-		%> >> F.save('my_faust.mat')
-		%> >> F2 = matfaust.Faust.load('my_faust.mat');
-		%> >> F3 = Faust('my_faust.mat');
+		%> >> save(F, 'F.mat')
+		%> >> F2 = matfaust.Faust.load('F.mat');
+		%> >> F3 = Faust('F.mat');
 		%> >> all(all(full(F2) == full(F)))
 		%>
 		%> ans =
@@ -3695,11 +3684,26 @@ classdef Faust < handle % subclass of handle for Faust.delete to be called on cl
 		%> @b Example
 		%> @code
 		%> >> import matfaust.Faust
-		%> >> F = matfaust.rand(10,10)
-		%> >> F.save('my_faust.mat')
-		%> >> F2 = matfaust.Faust.load_native('my_faust.mat')
-		%> >> F3 = Faust('my_faust.mat')
-		%> % F == F2 == F3
+		%> >> F = matfaust.rand(10,10);
+		%> >> save(F, 'F.mat');
+		%> >> F2 = matfaust.Faust.load_native('F.mat');
+		%> >> F3 = Faust('F.mat');
+		%> >> all(all(full(F2) == full(F)))
+		%>
+		%> ans =
+		%>
+		%>   logical
+		%>
+		%>    1
+		%>
+		%> >> all(all(full(F3) == full(F)))
+		%>
+		%> ans =
+		%>
+		%>   logical
+		%>
+		%>    1
+		%>
 		%> @endcode
 		%>
 		%> <p> @b See @b also Faust.Faust, Faust.save

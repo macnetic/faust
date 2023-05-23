@@ -40,7 +40,7 @@ function parse_doxy_block {
                                                         s/&nbsp;/ /g;
                                                         s/@retval/Returns/g;
                                                         s/@warning/Warning:/g;
-                                                        s/@[^[:blank:]]* \{0,1\}//g;
+                                                        s/@[^[:blank:](]\{1,\} \{0,1\}//g;
                                                 }"
 }
 
