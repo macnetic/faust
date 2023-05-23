@@ -54,6 +54,7 @@
 %>                      The default value is 'real'.
 %> @param 'dev', str 'gpu or 'cpu' to create the random Faust on CPU or GPU (by default on CPU).
 %> @param 'class', str 'double' (by default) or 'single' to select the scalar type used for the Faust generated.
+%> @param 'seed', int  seed to initialize the PRNG used to generate the Faust factors. If 0 (default) the seed will be initialized with a random value depending of the time clock.
 %>
 %>
 %> @retval F the random Faust.
@@ -130,6 +131,7 @@ function F = rand(M, N, varargin)
 	argc = length(varargin);
 	dev = 'cpu';
 	class = 'double';
+	seed = 0;
 	if(argc > 0)
 		for i=1:2:argc
 			if(argc > i)
@@ -185,6 +187,12 @@ function F = rand(M, N, varargin)
 					else
 						per_row = tmparg;
 					end
+				case 'seed'
+					if(argc == i || ~ isscalar(tmparg) || ~ isreal(tmparg))
+						error('isscalar keyword argument is not followed by a real scalar')
+					else
+						seed = uint64(tmparg);
+					end
 				case 'dev'
 					if(argc == i || ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu'))
 						error('dev keyword argument is not followed by a valid value: cpu, gpu*.')
@@ -197,6 +205,7 @@ function F = rand(M, N, varargin)
 					else
 						class = tmparg;
 					end
+				case 'seed'
 				otherwise
 					if((isstr(varargin{i}) || ischar(varargin{i}))  && ~ strcmp(tmparg, 'cpu') && ~ startsWith(tmparg, 'gpu') && ~ strcmp(tmparg, 'dense') && ~ strcmp(tmparg, 'sparse') && ~ strcmp(tmparg, 'mixed') && ~ strcmp(tmparg, 'real') && ~ strcmp(tmparg, 'complex'))
 						error([ tmparg ' unrecognized argument'])
@@ -227,25 +236,25 @@ function F = rand(M, N, varargin)
 	end
 	if(strcmp(dev, 'cpu'))
 		if(field == COMPLEX)
-			core_obj = mexFaustCplx('rand', num_rows, num_cols, fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
+			core_obj = mexFaustCplx('rand', num_rows, num_cols, fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row, seed);
 			is_real = false;
 		else %if(field == REAL)
 			if(strcmp(class, 'double'))
-				core_obj = mexFaustReal('rand', num_rows, num_cols, fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
+				core_obj = mexFaustReal('rand', num_rows, num_cols, fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row, seed);
 			else % single
-				core_obj = mexFaustRealFloat('rand', num_rows, num_cols, fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
+				core_obj = mexFaustRealFloat('rand', num_rows, num_cols, fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row, seed);
 			end
 			is_real = true;
 		end
 	else
 		if(field == COMPLEX)
-			core_obj = mexFaustGPUCplx('rand', num_rows, num_cols, fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
+			core_obj = mexFaustGPUCplx('rand', num_rows, num_cols, fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row, seed);
 			is_real = false;
 		else %if(field == REAL)
 			if(strcmp(class, 'double'))
-				core_obj = mexFaustGPUReal('rand', num_rows, num_cols, fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
+				core_obj = mexFaustGPUReal('rand', num_rows, num_cols, fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row, seed);
 			else % float
-				core_obj = mexFaustGPURealFloat('rand', num_rows, num_cols, fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
+				core_obj = mexFaustGPURealFloat('rand', num_rows, num_cols, fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row, seed);
 			end
 			is_real = true;
 		end

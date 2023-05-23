@@ -6,8 +6,8 @@ void faust_rand(const mxArray **prhs, const int nrhs, mxArray **plhs, const int 
 
 	if(nlhs!=1)
 		mexErrMsgTxt("rand(): 1 variable result is expected.");
-	if(nrhs < 6)
-		mexErrMsgTxt("rand(): wrong number of arguments (must be 6 to 7)");
+	if(nrhs < 10)
+		mexErrMsgTxt("rand(): wrong number of arguments (must be at least 10)");
 
 	int num_rows = mxGetScalar(prhs[1]), num_cols =mxGetScalar(prhs[2]);
 	faust_unsigned_int t = (faust_unsigned_int) mxGetScalar(prhs[3]),
@@ -17,6 +17,10 @@ void faust_rand(const mxArray **prhs, const int nrhs, mxArray **plhs, const int 
 					   max_dim_size = (faust_unsigned_int) mxGetScalar(prhs[7]);
 	float density = (float) mxGetScalar(prhs[8]);
 	bool per_row = (bool) mxGetScalar(prhs[9]);
+	unsigned int seed = 0;
+
+	if(nrhs >= 11)
+		seed = (unsigned int) mxGetScalar(prhs[10]);
 
 	Faust::TransformHelper<SCALAR,DEV>* F = Faust::TransformHelper<SCALAR,DEV>::randFaust(
 			num_rows,
@@ -27,7 +31,8 @@ void faust_rand(const mxArray **prhs, const int nrhs, mxArray **plhs, const int 
 			min_dim_size,
 			max_dim_size,
 			density,
-			per_row);
+			per_row,
+			seed);
 
 	if(F) //not NULL
 		plhs[0]=convertPtr2Mat<Faust::TransformHelper<SCALAR,DEV> >(F);
