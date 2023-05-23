@@ -60,8 +60,8 @@ ctest_python:
       - deactivate
       - rm -Rf junit_venv
         # fail the ci job if any ctest test (or unit test) have failed
-      - FAILED_TESTS=$(grep -B 1 'Outcome:.*Failed' build_FaustLinuxPython/python_pyfaust_test_output.html | sed -ne 's%.*Test case:.*<b>\(.*\)</b>.*%\1%p')
-      - if [ -n "${FAILED_TESTS}" ]; then echo "Failed tests:${FAILED_TESTS}"; exit 1;fi
+      - echo "Failed tests:"
+      - if grep -B 1 'Outcome:.*Failed' build_FaustLinuxPython/python_pyfaust_test_output.html | sed -ne 's%.*Test case:.*<b>\(.*\)</b>.*%\1%p'; then exit 1; else echo "all tests passed"; exit 0;fi
     except:
         - schedules
         - tags
@@ -89,8 +89,8 @@ ctest_matlab:
       - deactivate
       - rm -Rf junit_venv
         # fail the ci job if any ctest test (or unit test) have failed
-      - FAILED_TESTS=$(grep -B 1 'Outcome:.*Failed' ${BUILD_DIR}/matlab_matfaust_test_output.html | sed -ne 's%.*Test case:.*<b>\(.*\)</b>.*%\1%p')
-      - if [ -n "${FAILED_TESTS}" ]; then echo "Failed tests:${FAILED_TESTS}"; exit 1;fi
+      - echo "Failed tests:"
+      - if grep -B 1 'Outcome:.*Failed' ${BUILD_DIR}/matlab_matfaust_test_output.html | sed -ne 's%.*Test case:.*<b>\(.*\)</b>.*%\1%p'; then exit 1; else echo "all tests passed"; exit 0;fi
     except:
         - schedules
         - tags
