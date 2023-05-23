@@ -66,7 +66,7 @@ ctest_python:
         - schedules
         - tags
     stage: test
-    allow_failure: false
+    allow_failure: false # set to true to continue the pipeline even if a ctest test has failed
     tags:
         - linux
     artifacts:
@@ -95,6 +95,8 @@ ctest_matlab:
         - schedules
         - tags
     stage: test
+    allow_failure: false # set to true to continue the pipeline even if a ctest test has failed
+    tags:
     tags:
         - matlab
     artifacts:
