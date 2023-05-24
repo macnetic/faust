@@ -3935,7 +3935,7 @@ def circ(c, dev='cpu', diag_opt=False):
     else:
         right = FwP.H
     nfwp = len(FwP)
-    left = FwP.left(nfwp-2) # ignoring last butterfly factor
+    left = FwP.left(nfwp-2, as_faust=True) # ignoring last butterfly factor
     # reintegrate last butterfly factor multiplied by S
     left = left @ Faust(FwP.factors(nfwp-1) @ S)
     if diag_opt:
