@@ -285,7 +285,7 @@ classdef Faust < handle % subclass of handle for Faust.delete to be called on cl
 				F.matrix = FaustCore(factors, scale, optCopy, F.is_real, F.dev, F.dtype);
 			elseif(ischar(varargin{1}))
 				% init a Faust from file
-				F = matfaust.Faust.load_native(varargin{:});
+				F = matfaust.Faust.load(varargin{:});
 			elseif(isa(varargin{1}, 'matfaust.Faust'))
 				% create a Faust from another but not with the same
 				% handle to set inside the FaustCore object (matrix)
