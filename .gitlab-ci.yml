@@ -90,12 +90,14 @@ ctest_matlab:
       - rm -Rf junit_venv
         # fail the ci job if any ctest test (or unit test) have failed
       - echo "Failed tests:"
-      - if grep -B 1 'Outcome:.*Failed' ${BUILD_DIR}/matlab_matfaust_test_output.html | sed -ne 's%.*Test case:.*<b>\(.*\)</b>.*%\1%p'; then exit 1; else echo "all tests passed"; exit 0;fi
+      - if grep -B 1 'Outcome:.*Failed' ${BUILD_DIR}/matlab_matfaust_test_output.html | sed -ne 's%.*Test case:.*<b>\(.*\)</b>.*%\1%p'; then exit 1; else if grep "Failure Summary:" ${BUILD_DIR}/matlab_matfaust_test_output.html; then echo "all ctest passed but some unit tests failed (look the junit report!)"; exit 2; else echo "(None) all tests passed"; exit 0;fi;fi
     except:
         - schedules
         - tags
     stage: test
     allow_failure: false # set to true to continue the pipeline even if a ctest test has failed
+      #- exit_codes: 2 # to tolerate unit test failure (and not ctest failure) -- false value must be removed too
+      # https://docs.gitlab.com/ee/ci/yaml/README.html#allow_failureexit_codes
     tags:
     tags:
         - matlab
