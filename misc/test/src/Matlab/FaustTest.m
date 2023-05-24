@@ -391,7 +391,7 @@ classdef FaustTest < matlab.unittest.TestCase
 			this.verifyEqual(F*M, J*M, 'RelTol', 1e-5)
 			this.verifyEqual(F*S, J*S, 'RelTol', 1e-5)
 			% using the F*S benchmark
-			K = optimize_time(F, 'mat', M)
+			K = optimize_time(F, 'mat', S)
 			this.verifyEqual(full(F), full(K), 'RelTol', 1e-5)
 			this.verifyEqual(F*M, K*M, 'RelTol', 1e-5)
 			this.verifyEqual(F*S, K*S, 'RelTol', 1e-5)
