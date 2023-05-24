@@ -57,15 +57,15 @@ if(BUILD_WRAPPER_MATLAB)
 
 
 	else(WIN32 AND NOT UNIX)	
-		add_test(NAME MATLAB_FACT_HIER_MEX COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('matrix_hierarchical_fact','config_hierarchical_fact',9402,10,'MEX'); catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)" ) # TODO: lambda is 9407 on macOS (why ?)
+		add_test(NAME MATLAB_FACT_HIER_MEX COMMAND matlab -nojvm -nodisplay -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('matrix_hierarchical_fact','config_hierarchical_fact',9402,10,'MEX'); catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)" ) # TODO: lambda is 9407 on macOS (why ?)
 
 
 
 		if(${SLOW_TESTS})
-			add_test(NAME MATLAB_FACT_MEG_MEX COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('matrix_MEG','config_MEG',22594,1,'MEX');catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
+			add_test(NAME MATLAB_FACT_MEG_MEX COMMAND matlab -nojvm -nodisplay -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('matrix_MEG','config_MEG',22594,1,'MEX');catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 		endif()
 
-		add_test(NAME MATLAB_FACT_HADAMARD_MEX COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('matrix_HADAMARD_32','config_HADAMARD_32',5941,30,'MEX');catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
+		add_test(NAME MATLAB_FACT_HADAMARD_MEX COMMAND matlab -nojvm -nodisplay -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('matrix_HADAMARD_32','config_HADAMARD_32',5941,30,'MEX');catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 
 		if(${SLOW_TESTS})
 			add_test(NAME MATLAB_DEMO_INSTALL COMMAND matlab -nodesktop -r "try;testpass=0;addpath('${CMAKE_INSTALL_MATLAB_PREFIX}');setup_FAUST;import matfaust.demo.runall;runall;catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
@@ -76,20 +76,20 @@ if(BUILD_WRAPPER_MATLAB)
 		# 1st factor sparse size 10x3,
 		# 2nd factor dense size 3x2,
 		# 3rd factor sparse size 2x5
-		add_test(NAME MATLAB_FAUST_CONFIG_REAL1 COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([10,3,2,5],{'real.sparse','real.dense','real.sparse'},0.5);test_matlab_faust(factors,prod,30,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
+		add_test(NAME MATLAB_FAUST_CONFIG_REAL1 COMMAND matlab -nojvm -nodisplay -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([10,3,2,5],{'real.sparse','real.dense','real.sparse'},0.5);test_matlab_faust(factors,prod,30,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 		
 		#test Faust with 3 real factors : 
 		# 1st factor sparse size 5x2, 
 		# 2nd factor dense size 2x3, 
 		# 3rd factor sparse size 3x10		
-		add_test(NAME MATLAB_FAUST_CONFIG_REAL2 COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([5,2,3,10],{'real.dense','real.sparse','real.dense'},0.5);test_matlab_faust(factors,prod,30,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
+		add_test(NAME MATLAB_FAUST_CONFIG_REAL2 COMMAND matlab -nojvm -nodisplay -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([5,2,3,10],{'real.dense','real.sparse','real.dense'},0.5);test_matlab_faust(factors,prod,30,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 		#test Faust with 1 real factor : 
 		# 1st factor dense size 10x3, 		
-		add_test(NAME MATLAB_FAUST_CONFIG_REAL3 COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([100,10],{'real.dense'},1.0);test_matlab_faust(factors,prod,30,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")		
+		add_test(NAME MATLAB_FAUST_CONFIG_REAL3 COMMAND matlab -nojvm -nodisplay -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([100,10],{'real.dense'},1.0);test_matlab_faust(factors,prod,30,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")		
 		
 		#test Faust with 1 real factor : 
 		# 1st factor sparse size 10x3, 		
-		add_test(NAME MATLAB_FAUST_CONFIG_REAL4 COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([100,10],{'real.sparse'},0.1);test_matlab_faust(factors,prod,1000,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
+		add_test(NAME MATLAB_FAUST_CONFIG_REAL4 COMMAND matlab -nojvm -nodisplay -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([100,10],{'real.sparse'},0.1);test_matlab_faust(factors,prod,1000,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 
 
 
@@ -97,20 +97,20 @@ if(BUILD_WRAPPER_MATLAB)
 		# 1st factor real dense size 10x3, 
 		# 2nd factor complex dense size 3x2, 
 		# 3rd factor complex dense size 2x5		
-		add_test(NAME MATLAB_FAUST_CONFIG_CPLX1 COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([10,3,2,5],{'real.dense','complex.dense','complex.dense'},0.5);test_matlab_faust(factors,prod,30,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
+		add_test(NAME MATLAB_FAUST_CONFIG_CPLX1 COMMAND matlab -nojvm -nodisplay -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([10,3,2,5],{'real.dense','complex.dense','complex.dense'},0.5);test_matlab_faust(factors,prod,30,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 		
 		#test Faust with 3 factors : 
 		# 1st factor real sparse size 10x3, 
 		# 2nd factor complex dense size 3x2, 
 		# 3rd factor complex sparse size 2x5		
-		add_test(NAME MATLAB_FAUST_CONFIG_CPLX2 COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([10,3,2,5],{'real.sparse','complex.dense','complex.sparse'},0.5);test_matlab_faust(factors,prod,30,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
+		add_test(NAME MATLAB_FAUST_CONFIG_CPLX2 COMMAND matlab -nojvm -nodisplay -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([10,3,2,5],{'real.sparse','complex.dense','complex.sparse'},0.5);test_matlab_faust(factors,prod,30,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 
 
 		## test the matlab Faust class methods with incorrect parameter
-		add_test(NAME MATLAB_FAUST_2 COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;test_matlab_faust2;catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
+		add_test(NAME MATLAB_FAUST_2 COMMAND matlab -nojvm -nodisplay -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;test_matlab_faust2;catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 
 		## make some speed-up comparison
-		add_test(NAME MATLAB_FAUST_SPEED COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;test_matlab_faust_time;catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
+		add_test(NAME MATLAB_FAUST_SPEED COMMAND matlab -nojvm -nodisplay -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;test_matlab_faust_time;catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 
 
 		add_test(NAME MATLAB_FAUST_UNIT_TESTS COMMAND matlab -nodisplay -nojvm -r "try;testpass=0;addpath('${PROJECT_BINARY_DIR}/wrapper/matlab:${PROJECT_BINARY_DIR}/run_test/tools:${PROJECT_BINARY_DIR}/run_test/bin');set_path;cd ${FAUST_SRC_TEST_SRC_MATLAB_DIR};FaustTest ${PROJECT_BINARY_DIR}/wrapper/matlab/ ${PROJECT_BINARY_DIR}/run_test/bin ${PROJECT_BINARY_DIR}/run_test/tools;catch ME;testpass=-1;displ(getReport(ME));end;exit(testpass)")
