@@ -56,8 +56,10 @@
 
 
 
+
  function test_matlab_faust(factors_,expected_F_dense,dim3,copyOptimized)
 %function test_matlab_faust(dim1,dim2,dim3,nb_fact)
+rng(datetime('now').Second*1000+feature('getpid'))
 import matfaust.Faust
 int_max= 100;
 threshold = 0.2;
@@ -567,8 +569,8 @@ disp('Ok');
 
 %% load_faust and save_faust test
 disp('TEST LOAD AND SAVE : ');
-filename = ['@FAUST_BIN_TEST_OUTPUT_DIR@' filesep 'faust.mat'];
-disp(['save faust into the file : ' filename]); 
+filename = ['@FAUST_BIN_TEST_OUTPUT_DIR@' filesep 'faust' int2str(floor(rand()*10000)) '.mat'];
+disp(['save faust into the file : ' filename])
 save(F,filename);
 F_loaded = Faust(filename);
 [dim1_loaded,dim2_loaded]=size(F_loaded);
@@ -599,7 +601,7 @@ end
 
 
 
-filename_trans = [ '@FAUST_BIN_TEST_OUTPUT_DIR@' filesep 'faust_trans.mat'];
+filename_trans = [ '@FAUST_BIN_TEST_OUTPUT_DIR@' filesep 'faust_trans' int2str(floor(rand()*10000)) '.mat'];
 disp(['save transposed faust into the file : ' filename_trans]); 
 save(F_trans,filename_trans);
 
