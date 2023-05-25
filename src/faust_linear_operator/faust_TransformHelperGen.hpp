@@ -769,10 +769,12 @@ namespace Faust
 			this->mul_order_opt_mode = mul_order_opt_mode;
 			if(! silent)
 			{
+#ifdef OUTPUT_OPT_MODE_CHANGE
 				std::cout << "changed mul. optimization mode to: " << this->mul_order_opt_mode;
 				if(! this->mul_order_opt_mode)
 					std::cout << " (opt. disabled, default mul.)";
 				std::cout << std::endl;
+#endif
 			}
 
 		}

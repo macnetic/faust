@@ -440,11 +440,11 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			stop_crit = StoppingCriterion(params.niter1);
 			stop_crit2 = StoppingCriterion(params.niter2);
 			params.fact_side = 0; % forced
-			params.verbose = 0; % forced
+			params.verbose = false; % forced
 			params.init_lambda = 128;
 			params.step_size = 1e-16
 			params.grad_calc_opt_mode = 2
-			params = ParamsHierarchical(fact_cons, res_cons, stop_crit, stop_crit2, 'is_fact_side_left', params.fact_side == 1, 'is_update_way_R2L', params.update_way == 1, 'init_lambda', params.init_lambda, 'step_size', params.step_size, 'constant_step_size', false, 'is_verbose', params.verbose ~= 1);
+			params = ParamsHierarchical(fact_cons, res_cons, stop_crit, stop_crit2, 'is_fact_side_left', params.fact_side == 1, 'is_update_way_R2L', params.update_way == 1, 'init_lambda', params.init_lambda, 'step_size', params.step_size, 'constant_step_size', false, 'is_verbose', params.verbose);
 			diag_init_D = diag(init_D);
 			[F,D,lambda] = matfaust.fact.fgft_palm(U, Lap, params, diag_init_D);
 			this.verifyEqual(size(F), size(U))
@@ -526,7 +526,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			fields = {'real', 'complex'};
 			for i=1:2
 				for j=1:2
-					field = fields{j}
+					field = fields{j};
 					if strcmp(field, 'real')
 						class = classes{i};
 					else % field == complex
@@ -822,11 +822,11 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			disp('Test matfaust.fact.hierarchical')
 			import matfaust.fact.hierarchical
 			import matfaust.dft
-			DFT = full(dft(32))
+			DFT = full(dft(32));
 			F = hierarchical(DFT, 'dft', 'backend', 2020)
 			err = norm(full(F)-DFT)/norm(DFT)
 			this.verifyLessThanOrEqual(err, 1e-3)
-			DFT = full(dft(32))
+			DFT = full(dft(32));
 			F = hierarchical(DFT, 'dft', 'backend', 2016)
 			err = norm(full(F)-DFT)/norm(DFT)
 			this.verifyLessThanOrEqual(err, 1e-3)

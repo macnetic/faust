@@ -207,15 +207,15 @@ disp('TEST NNZ : ');
 nz = nnz_sum(F);
 
 expected_nz = 0
-nf = numfactors(F)
+nf = numfactors(F);
 for i=1:numfactors(F)
-	expected_nz = expected_nz + numel(nonzeros(factors(F, i)))
+	expected_nz = expected_nz + numel(nonzeros(factors(F, i)));
 end
 
 if(expected_nz ~= nz)
     error('nnz : invalid number of nonzeros');
 end
-expected_density = expected_nz / size(F, 1) / size(F, 2)
+expected_density = expected_nz / size(F, 1) / size(F, 2);
 
 new_facts{1}=eye(dim1,dim1);
 new_facts{2}=eye(dim1,dim1);
@@ -717,10 +717,10 @@ disp('Ok');
 
 %% test conj
 disp('TEST CONJ : ');
-full(F)
-F_conj = conj(F)
-F_conj_full= full(F_conj)
-expected_F_conj_full = conj(full(F))
+full(F);
+F_conj = conj(F);
+F_conj_full= full(F_conj);
+expected_F_conj_full = conj(full(F));
 [dim1,dim2]=size(expected_F_conj_full);
 [dim1_conj,dim2_conj]=size(F_conj_full);
 
@@ -747,7 +747,7 @@ for i=1:nb_fact
 end
 % test conj save
 save(conj(F),filename)
-saved_conj_F=full(Faust(filename))
+saved_conj_F=full(Faust(filename));
 if ( ~isequal(saved_conj_F,F_conj_full))
     saved_conj_F
     F_conj_full
@@ -758,10 +758,10 @@ disp('Ok');
 
 %% test ctranspose
 disp('TEST CTRANSPOSE : ');
-full(F)
-F_ctranspose = ctranspose(F)
-F_ctranspose_full= full(F_ctranspose)
-expected_F_ctranspose_full = ctranspose(full(F))
+full(F);
+F_ctranspose = ctranspose(F);
+F_ctranspose_full= full(F_ctranspose);
+expected_F_ctranspose_full = ctranspose(full(F));
 [dim1,dim2]=size(expected_F_ctranspose_full);
 [dim1_ctranspose,dim2_ctranspose]=size(F_ctranspose_full);
 
@@ -779,8 +779,8 @@ if(norm(expected_F_ctranspose_full-F_ctranspose_full)/norm(expected_F_ctranspose
 end
 % test factors_ on ctranspose
 for i=1:nb_fact
-	A=factors(F_ctranspose,i)
-	cT=ctranspose(factors_{nb_fact-i+1})
+	A=factors(F_ctranspose,i);
+	cT=ctranspose(factors_{nb_fact-i+1});
 	if(norm(full(A-cT))/norm(full(cT)) > 1e-6)
 		ctranspose(factors_{nb_fact-i+1})
         factors(F_ctranspose,i)
@@ -789,7 +789,7 @@ for i=1:nb_fact
 end
 % test ctranspose save
 save(ctranspose(F),filename)
-saved_ctranspose_F=full(Faust(filename))
+saved_ctranspose_F=full(Faust(filename));
 if ( ~isequal(saved_ctranspose_F,F_ctranspose_full))
     saved_ctranspose_F
     F_ctranspose_full

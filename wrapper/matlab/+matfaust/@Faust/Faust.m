@@ -792,9 +792,9 @@ classdef Faust < handle % subclass of handle for Faust.delete to be called on cl
 		function C = mtimes_trans(F, A, trans)
 			%%
 			if trans
-				F = F.'
+				F = F.';
 			end
-			C = mtimes(F, A)
+			C = mtimes(F, A);
 		end
 
 		%======================================================================
