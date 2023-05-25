@@ -1,12 +1,12 @@
 classdef FaustTest < matlab.unittest.TestCase
-    % Tests the Faust class.
+	% Tests the Faust class.
 
 	properties
 		test_faust
 		faust_paths
-        factors
-        num_factors
-    end
+		factors
+		num_factors
+	end
 
 	properties (Constant = true)
 		MAX_NUM_FACTORS = 32
@@ -19,17 +19,17 @@ classdef FaustTest < matlab.unittest.TestCase
 		end
 	end
 
-    methods (TestMethodSetup)
-        function addFaustToPath(this)
+	methods (TestMethodSetup)
+		function addFaustToPath(this)
 			addpath(this.faust_paths{:})
-        	set_path
+			set_path
 			import matfaust.Faust
 		end
 
 		function instantiateTestFaust(this)
 			import matfaust.Faust
-			num_factors = randi(this.MAX_NUM_FACTORS)
-			density = 0.1
+			num_factors = randi(this.MAX_NUM_FACTORS);
+			density = 0.1;
 			d2 = randi(this.MAX_DIM_SIZE);
 			factors = cell(1,num_factors);
 			for i = 1:num_factors
@@ -37,11 +37,11 @@ classdef FaustTest < matlab.unittest.TestCase
 				d2 = randi(this.MAX_DIM_SIZE);
 				factors{i} = sprand(d1, d2, density);
 			end
-			this.test_faust = Faust(factors,1.0)
-            this.factors = factors;
-            this.num_factors = num_factors
+			this.test_faust = Faust(factors,1.0);
+			this.factors = factors;
+			this.num_factors = num_factors;
 		end
-    end
+	end
 
 	methods(TestMethodTeardown)
 		function deleteTestFaust(this)
@@ -51,32 +51,34 @@ classdef FaustTest < matlab.unittest.TestCase
 
 	methods(Static)
 		function sumnnz = nnzero_count(factors)
-			sumnnz = 0
+			sumnnz = 0;
 			disp('size:');size(factors,2)
 			for i = 1:size(factors,2)
-				sumnnz = sumnnz + nnz(factors{i})
+				sumnnz = sumnnz + nnz(factors{i});
 			end
 		end
 	end
 
 	methods (Test)
-        function testSave(this)
+		function testSave(this)
+			disp('Test Faust.save/Faust.Faust(file)')
 			import matfaust.Faust
-			rand_suffix = int2str(randi(10000))
-			filepath = [ tempdir filesep 'test_faust' rand_suffix '.mat']
+			rand_suffix = int2str(randi(10000));
+			filepath = [ tempdir filesep 'test_faust' rand_suffix '.mat'];
 			save(this.test_faust, filepath)
-			F = Faust(filepath)
+			F = Faust(filepath);
 			for i = 1:numfactors(F)
 				this.verifyEqual(full(factors(this.test_faust,i)), full(factors(F,i)))
 			end
 			delete(filepath)
-        end
+		end
 
 		function testSave2(this)
+			disp('Test Faust.save/Faust.Faust(file) #2')
 			import matfaust.Faust
-			rand_suffix = int2str(randi(10000))
-			filepath_ref = [ tempdir filesep 'ref_faust' rand_suffix '.mat']
-			filepath_test = [ tempdir filesep 'test_faust' rand_suffix '.mat']
+			rand_suffix = int2str(randi(10000));
+			filepath_ref = [ tempdir filesep 'ref_faust' rand_suffix '.mat'];
+			filepath_test = [ tempdir filesep 'test_faust' rand_suffix '.mat'];
 			nb_fact=numfactors(this.test_faust);
 
 			faust_factors=cell(1,nb_fact);
@@ -86,8 +88,8 @@ classdef FaustTest < matlab.unittest.TestCase
 			end
 			save(filepath_ref,'faust_factors');
 			save(this.test_faust,filepath_test)
-			ref_F = Faust(filepath_ref)
-			test_F = Faust(filepath_test)
+			ref_F = Faust(filepath_ref);
+			test_F = Faust(filepath_test);
 			this.verifyEqual(numfactors(ref_F), numfactors(test_F))
 			for i = 1:numfactors(ref_F)
 				this.verifyEqual(full(factors(ref_F,i)), full(factors(test_F,i)))
@@ -97,15 +99,15 @@ classdef FaustTest < matlab.unittest.TestCase
 			delete(filepath_test)
 		end
 
-        function testSize(this)
-           disp('testSize()')
-           [num_rows, num_cols] = size(this.test_faust);
-           num_facs = this.num_factors;
-           size_first_fac = size(this.factors{1});
-           size_last_fac = size(this.factors{num_facs});
-           this.verifyEqual(num_rows, size_first_fac(1))
-           this.verifyEqual(num_cols, size_last_fac(2))
-        end
+		function testSize(this)
+			disp('testSize()')
+			[num_rows, num_cols] = size(this.test_faust);
+			num_facs = this.num_factors;
+			size_first_fac = size(this.factors{1});
+			size_last_fac = size(this.factors{num_facs});
+			this.verifyEqual(num_rows, size_first_fac(1))
+			this.verifyEqual(num_cols, size_last_fac(2))
+		end
 
 		function testNumel(this)
 			disp('testNumel()')
@@ -114,32 +116,32 @@ classdef FaustTest < matlab.unittest.TestCase
 			this.verifyEqual(test_numel, ref_numel)
 		end
 
-        function testGetFactorAndConstructor(this)
-            disp('testGetFactorAndConstructor()')
-            for i = 1:this.num_factors
-               this.verifyEqual(full(factors(this.test_faust, i)), full(this.factors{i}))
-            end
-			% test factors on transpose Faust
-			tF = this.test_faust.'
+		function testGetFactorAndConstructor(this)
+			disp('testGetFactorAndConstructor()')
 			for i = 1:this.num_factors
-               this.verifyEqual(full(transpose(factors(tF, this.num_factors-i+1))), full(this.factors{i}))
-            end
+				this.verifyEqual(full(factors(this.test_faust, i)), full(this.factors{i}))
+			end
+			% test factors on transpose Faust
+			tF = this.test_faust.';
+			for i = 1:this.num_factors
+				this.verifyEqual(full(transpose(factors(tF, this.num_factors-i+1))), full(this.factors{i}))
+			end
 			% test factors on conj Faust
-			cF = conj(this.test_faust)
+			cF = conj(this.test_faust);
 			for i = 1:this.num_factors
-               this.verifyEqual(full(conj(factors(cF, i))), full(this.factors{i}))
-            end
+				this.verifyEqual(full(conj(factors(cF, i))), full(this.factors{i}))
+			end
 			% test factors on transpose Faust
-			tcF = this.test_faust.'
+			tcF = this.test_faust.';
 			for i = 1:this.num_factors
-               this.verifyEqual(full(conj(transpose(factors(tcF, this.num_factors-i+1)))), full(this.factors{i}))
-		   end
+				this.verifyEqual(full(conj(transpose(factors(tcF, this.num_factors-i+1)))), full(this.factors{i}))
+			end
 		end
 
-        function testGetNumFactors(this)
-            disp('testGetNumFactors()')
-            this.verifyEqual(numfactors(this.test_faust), this.num_factors)
-        end
+		function testGetNumFactors(this)
+			disp('testGetNumFactors()')
+			this.verifyEqual(numfactors(this.test_faust), this.num_factors)
+		end
 
 		function testNormalize(this)
 			disp(['testNormalize on faust of size: ' int2str(size(this.test_faust))])
@@ -204,78 +206,78 @@ classdef FaustTest < matlab.unittest.TestCase
 			end
 		end
 
-        function testNorm2(this)
-            disp('testNorm2()')
-            ref_F = this.mulFactors();
-            this.verifyEqual(norm(ref_F,2), norm(this.test_faust, 2), 'RelTol',0.05)
-        end
-
-        function testNorm1(this)
-            disp('testNorm1()')
-            ref_F = this.mulFactors();
-            this.verifyEqual(norm(ref_F,1), norm(this.test_faust, 1), 'RelTol',0.05)
-        end
-
-        function testNormFro(this)
-            disp('testNormFro()')
-            ref_F = this.mulFactors();
-            this.verifyEqual(norm(ref_F, 'fro'), norm(this.test_faust, 'fro'), 'RelTol',0.05)
-        end
-
-        function testNormInf(this)
-            disp('testNormInf()')
-            ref_F = this.mulFactors();
-            this.verifyEqual(norm(ref_F, inf), norm(this.test_faust, inf), 'RelTol',0.05)
+		function testNorm2(this)
+			disp('testNorm2()')
+			ref_F = this.mulFactors();
+			this.verifyEqual(norm(ref_F,2), norm(this.test_faust, 2), 'RelTol',0.05)
 		end
 
-        function testnnz(this)
-            disp('testnnz()')
+		function testNorm1(this)
+			disp('testNorm1()')
+			ref_F = this.mulFactors();
+			this.verifyEqual(norm(ref_F,1), norm(this.test_faust, 1), 'RelTol',0.05)
+		end
+
+		function testNormFro(this)
+			disp('testNormFro()')
+			ref_F = this.mulFactors();
+			this.verifyEqual(norm(ref_F, 'fro'), norm(this.test_faust, 'fro'), 'RelTol',0.05)
+		end
+
+		function testNormInf(this)
+			disp('testNormInf()')
+			ref_F = this.mulFactors();
+			this.verifyEqual(norm(ref_F, inf), norm(this.test_faust, inf), 'RelTol',0.05)
+		end
+
+		function testnnz(this)
+			disp('testnnz()')
 			this.verifyEqual(nnz_sum(this.test_faust), FaustTest.nnzero_count(this.factors))
-        end
+		end
 
-        function testDensity(this)
-            disp('testDensity()')
-            ref_nlines = size(this.factors{1},1)
-            ref_ncols = size(this.factors{this.num_factors},2)
-            this.verifyEqual(FaustTest.nnzero_count(this.factors)/ref_nlines/ref_ncols, density(this.test_faust), 'AbsTol', 0.01)
-        end
+		function testDensity(this)
+			disp('testDensity()')
+			ref_nlines = size(this.factors{1},1);
+			ref_ncols = size(this.factors{this.num_factors},2);
+			this.verifyEqual(FaustTest.nnzero_count(this.factors)/ref_nlines/ref_ncols, density(this.test_faust), 'AbsTol', 0.01)
+		end
 
-        function testrcg(this)
-            disp('testrcg()')
-            ref_nlines = size(this.factors{1},1)
-            ref_ncols = size(this.factors{this.num_factors},2)
-            this.verifyEqual(ref_nlines*ref_ncols/FaustTest.nnzero_count(this.factors), rcg(this.test_faust), 'RelTol', 0.01)
-        end
+		function testrcg(this)
+			disp('testrcg()')
+			ref_nlines = size(this.factors{1},1);
+			ref_ncols = size(this.factors{this.num_factors},2);
+			this.verifyEqual(ref_nlines*ref_ncols/FaustTest.nnzero_count(this.factors), rcg(this.test_faust), 'RelTol', 0.01)
+		end
 
-        function testend(this)
-            disp('testend()')
-            prod_F = this.mulFactors();
-            for i=1:size(this.factors{1},1)
+		function testend(this)
+			disp('testend()')
+			prod_F = this.mulFactors();
+			for i=1:size(this.factors{1},1)
 				end_F = full(this.test_faust(i,end));
 				this.verifyEqual(prod_F(i,end), end_F(1,1),'RelTol', 0.01)
-            end
-            for j=1:size(this.factors{this.num_factors},2)
+			end
+			for j=1:size(this.factors{this.num_factors},2)
 				end_F = full(this.test_faust(end,j));
 				this.verifyEqual(prod_F(end,j), end_F(1,1), 'RelTol', 0.01)
-            end
-        end
+			end
+		end
 
-        function testsubsref(this)
-            disp('testsubsref()')
-            % test whole faust
-            ref_F =  this.mulFactors();
-            test_F = full(this.test_faust(1:end,1:end));
-            this.verifyEqual(ref_F(1:end,1:end), test_F, 'RelTol', 0.01)
-            % test a random row
-            row_i = randi([1,size(this.test_faust,1)]);
-            test_F = full(this.test_faust(row_i,:));
-            this.verifyEqual(test_F, ref_F(row_i,:), 'RelTol', 0.01)
-            % test a random col
-            col_i = randi([1,size(this.test_faust,2)]);
-            test_F = full(this.test_faust(:,col_i));
-            this.verifyEqual(test_F, ref_F(:,col_i), 'RelTol', 0.01)
+		function testsubsref(this)
+			disp('testsubsref()')
+			% test whole faust
+			ref_F =  this.mulFactors();
+			test_F = full(this.test_faust(1:end,1:end));
+			this.verifyEqual(ref_F(1:end,1:end), test_F, 'RelTol', 0.01)
+			% test a random row
+			row_i = randi([1,size(this.test_faust,1)]);
+			test_F = full(this.test_faust(row_i,:));
+			this.verifyEqual(test_F, ref_F(row_i,:), 'RelTol', 0.01)
+			% test a random col
+			col_i = randi([1,size(this.test_faust,2)]);
+			test_F = full(this.test_faust(:,col_i));
+			this.verifyEqual(test_F, ref_F(:,col_i), 'RelTol', 0.01)
 			% test double-slice (on rows and cols at the same time)
-			tested_fausts = {this.test_faust, ctranspose(this.test_faust)}
+			tested_fausts = {this.test_faust, ctranspose(this.test_faust)};
 			for i=1,length(tested_fausts)
 				row_i1 = randi([1,size(tested_fausts{i},1)]);
 				row_i2 = randi([row_i1,size(tested_fausts{i},1)]);
@@ -292,14 +294,14 @@ classdef FaustTest < matlab.unittest.TestCase
 				col_i1 = randi([1,size(G,2)]);
 				col_i2 = randi([col_i1,size(G,2)]);
 				H = G(row_i1:row_i2, col_i1:col_i2);
-				full_H = full(H)
+				full_H = full(H);
 				% ensure consistence of slicing on full matrices
 				this.verifyEqual(full_G(row_i1:row_i2, col_i1:col_i2), full_H, 'RelTol', 0.0001)
 				% test second slice on transpose of sliced Faust G
-				tG = transpose(G)
-				full_tG = full(tG)
-				I = tG(col_i1:col_i2, row_i1:row_i2)
-				full_I = full(I)
+				tG = transpose(G);
+				full_tG = full(tG);
+				I = tG(col_i1:col_i2, row_i1:row_i2);
+				full_I = full(I);
 				this.verifyEqual(full_I, full_tG(col_i1:col_i2, row_i1:row_i2), 'RelTol', 0.0001)
 				%============= test indexing by arbitrary vectors
 				F = tested_fausts{i};
@@ -329,39 +331,39 @@ classdef FaustTest < matlab.unittest.TestCase
 				test_sF = full(F(row_ids,col_ids));
 				this.verifyEqual(ref_sfF, test_sF, 'RelTol', 0.0001);
 				%============= test slice indexing with negative steps;
-				row_step = randi([row_i1-row_i2-1, -1])
-				col_step = randi([col_i1-col_i2-1, -1])
+				row_step = randi([row_i1-row_i2-1, -1]);
+				col_step = randi([col_i1-col_i2-1, -1]);
 				ref_sfF = fF(row_i2:row_step:row_i1,col_i2:col_step:col_i1);
 				test_sF = full(F(row_i2:row_step:row_i1,col_i2:col_step:col_i1));
 				this.verifyEqual(ref_sfF, test_sF, 'RelTol', 0.0001);
 			end
 		end
 
-        function testFull(this)
-            disp('Test Faust.full()')
-            ref_faust = this.mulFactors();
-            test_faust = full(this.test_faust);
-            this.verifyEqual(test_faust, ref_faust, 'RelTol', 10^-3)
-        end
+		function testFull(this)
+			disp('Test Faust.full()')
+			ref_faust = this.mulFactors();
+			test_faust = full(this.test_faust);
+			this.verifyEqual(test_faust, ref_faust, 'RelTol', 10^-3)
+		end
 
-        function testTranspose(this)
-            disp('Test Faust.transpose()')
-            % test full matrix to avoid longer time for comparisons (element by
-            % element)
-            transp_faust = full(transpose(this.test_faust)); 
-            test_faust = full(this.test_faust);
-            this.verifyEqual(test_faust,transpose(transp_faust), 'RelTol', 10^-3)
-        end
+		function testTranspose(this)
+			disp('Test Faust.transpose()')
+			% test full matrix to avoid longer time for comparisons (element by
+			% element)
+			transp_faust = full(transpose(this.test_faust));
+			test_faust = full(this.test_faust);
+			this.verifyEqual(test_faust,transpose(transp_faust), 'RelTol', 10^-3)
+		end
 
-        function testCtranspose(this)
-            disp('Test Faust.ctranspose()')
-            %TODO
-        end
+		function testCtranspose(this)
+			disp('Test Faust.ctranspose()')
+			%TODO
+		end
 
-        function testConj(this)
-            disp('Test Faust.conj()')
-            %TODO
-        end
+		function testConj(this)
+			disp('Test Faust.conj()')
+			%TODO
+		end
 
 		function testProdOpt(this)
 			disp('Test GREEDY and DYNPROG prod opt methods and optimize_time')
@@ -374,24 +376,24 @@ classdef FaustTest < matlab.unittest.TestCase
 			set_FM_mul_mode(G, GREEDY);
 			this.verifyEqual(full(F), full(H), 'RelTol', 1e-5)
 			this.verifyEqual(full(F), full(G), 'RelTol', 1e-5)
-			M = rand(size(F,2), size(F,1))
+			M = rand(size(F,2), size(F,1));
 			this.verifyEqual(F*M, H*M, 'RelTol', 1e-5)
 			this.verifyEqual(F*M, G*M, 'RelTol', 1e-5)
-			S = sprand(size(F,2), size(F,1), .2)
+			S = sprand(size(F,2), size(F,1), .2);
 			this.verifyEqual(F*S, H*S, 'RelTol', 1e-5)
 			this.verifyEqual(F*S, G*S, 'RelTol', 1e-5)
 			% test any method chosen by optimize_time
-			I = optimize_time(F)
+			I = optimize_time(F);
 			this.verifyEqual(full(F), full(I), 'RelTol', 1e-5)
 			this.verifyEqual(F*M, I*M, 'RelTol', 1e-5)
 			this.verifyEqual(F*S, I*S, 'RelTol', 1e-5)
 			% using the F*M benchmark
-			J = optimize_time(F, 'mat', M)
+			J = optimize_time(F, 'mat', M);
 			this.verifyEqual(full(F), full(J), 'RelTol', 1e-5)
 			this.verifyEqual(F*M, J*M, 'RelTol', 1e-5)
 			this.verifyEqual(F*S, J*S, 'RelTol', 1e-5)
 			% using the F*S benchmark
-			K = optimize_time(F, 'mat', S)
+			K = optimize_time(F, 'mat', S);
 			this.verifyEqual(full(F), full(K), 'RelTol', 1e-5)
 			this.verifyEqual(F*M, K*M, 'RelTol', 1e-5)
 			this.verifyEqual(F*S, K*S, 'RelTol', 1e-5)
@@ -422,7 +424,7 @@ classdef FaustTest < matlab.unittest.TestCase
 			disp('test real mul by real scalar')
 			r = rand();
 			test_rF = full(F*r);
-			test_commu_rF = full(r*F)
+			test_commu_rF = full(r*F);
 			ref_rF = ref_full_faust*r;
 			this.verifyEqual(test_rF,ref_rF, 'RelTol', 10^-3);
 			this.verifyEqual(test_commu_rF,ref_rF, 'RelTol', 10^-3);
@@ -433,7 +435,7 @@ classdef FaustTest < matlab.unittest.TestCase
 			disp('test mul by complex scalar')
 			r = rand()+j*rand();
 			test_rF = full(F*r);
-			test_commu_rF = full(r*F)
+			test_commu_rF = full(r*F);
 			ref_rF = ref_full_faust*r;
 			this.verifyEqual(test_rF,ref_rF, 'RelTol', 10^-3);
 			this.verifyEqual(test_commu_rF,ref_rF, 'RelTol', 10^-3);
@@ -446,8 +448,6 @@ classdef FaustTest < matlab.unittest.TestCase
 			matfaust.rand(size(F,2), randi(100) , 'density', .5, 'field', 'complex')};
 			for ii=1:length(r_fausts)
 				rF = r_fausts{ii};
-				size(F)
-				size(rF)
 				test_rF = full(F*rF);
 				ref_rF = ref_full_faust*full(rF);
 				this.verifyEqual(test_rF, ref_rF, 'RelTol', 10^-3);
@@ -474,6 +474,7 @@ classdef FaustTest < matlab.unittest.TestCase
 		end
 
 		function testdiv(this)
+			disp('Test Faust / (div)')
 			scals = [rand(1,1), rand(1,1)+rand(1,1)*j]
 			for i=1:size(scals,2)
 				s = scals(i);
@@ -487,7 +488,7 @@ classdef FaustTest < matlab.unittest.TestCase
 
 		function testplus(this)
 			disp('test addition of Faust and scalar (complex and real)')
-			scals = [rand(1,1), rand(1,1)+rand(1,1)*j]
+			scals = [rand(1,1), rand(1,1)+rand(1,1)*j];
 			F = this.test_faust;
 			for i=1:size(scals,2)
 				s = scals(i);
@@ -498,16 +499,16 @@ classdef FaustTest < matlab.unittest.TestCase
 			end
 			disp('test plus(Faust1,Faust2)')
 			import matfaust.Faust
-			fausts = {matfaust.rand(size(F,1), size(F,1), 'num_factors', 5)*Faust(rand(size(F,1),size(F,2))), matfaust.rand(size(F,1), size(F,1), 'num_factors', 5, 'density', .5, 'field', 'complex')*Faust(rand(size(F,1),size(F,2)))}
+			fausts = {matfaust.rand(size(F,1), size(F,1), 'num_factors', 5)*Faust(rand(size(F,1),size(F,2))), matfaust.rand(size(F,1), size(F,1), 'num_factors', 5, 'density', .5, 'field', 'complex')*Faust(rand(size(F,1),size(F,2)))};
 			for i=1:length(fausts)
-				F2 = fausts{i}
+				F2 = fausts{i};
 				this.verifyEqual(full(F+F2),full(F)+full(F2),'RelTol', 10^-2)
 			end
 		end
 
 		function testminus(this)
 			disp('test subtraction of Faust and scalar (complex and real)')
-			scals = [rand(1,1) , rand(1,1)+rand(1,1)*j]
+			scals = [rand(1,1) , rand(1,1)+rand(1,1)*j];
 			F = this.test_faust;
 			for i=1:size(scals,2)
 				s = scals(i);
@@ -518,14 +519,15 @@ classdef FaustTest < matlab.unittest.TestCase
 			end
 			disp('test minus(Faust1,Faust2)')
 			import matfaust.Faust
-			fausts = {matfaust.rand(size(F,1), size(F,1), 'num_factors', 5)*Faust(rand(size(F,1),size(F,2))), matfaust.rand(size(F,1), size(F,1), 'num_factors', 5, 'density', .5, 'field', 'complex')*rand(size(F,1),size(F,2))}
+			fausts = {matfaust.rand(size(F,1), size(F,1), 'num_factors', 5)*Faust(rand(size(F,1),size(F,2))), matfaust.rand(size(F,1), size(F,1), 'num_factors', 5, 'density', .5, 'field', 'complex')*rand(size(F,1),size(F,2))};
 			for i=1:length(fausts)
-				F2 = fausts{i}
+				F2 = fausts{i};
 				this.verifyEqual(full(F-F2),full(F)-full(F2),'RelTol', 10^-2)
 			end
 		end
 
 		function testcat(this)
+			disp('Test Faust.cat')
 			import matfaust.Faust
 			disp('Test cat')
 			FAUST=0;
@@ -551,7 +553,6 @@ classdef FaustTest < matlab.unittest.TestCase
 							H_facs{i} = factors(G, i);
 						end
 					end
-					H_facs
 					H = Faust(H_facs);
 					if(typeG == SPARSE)
 						H_ = sparse(full(H));
@@ -569,7 +570,7 @@ classdef FaustTest < matlab.unittest.TestCase
 					end
 					this.verifyEqual(full(C), full(D), 'AbsTol', 1e-11)
 					this.verifyEqual(full(C), cat(dimcat, full(F),full(H)),'AbsTol', 1e-3)
-					C = cat(dimcat,F,H)
+					C = cat(dimcat,F,H);
 					this.verifyEqual(full(C), cat(dimcat, full(F),full(H)),'AbsTol', 1e-3)
 				end
 			end
@@ -605,6 +606,7 @@ classdef FaustTest < matlab.unittest.TestCase
 		end
 
 		function testFaustBSR(this)
+			disp('Test Faust(BSR)')
 			M = 10;
 			N = 9;
 			bnnz = 3;
@@ -617,6 +619,7 @@ classdef FaustTest < matlab.unittest.TestCase
 		end
 
 		function testSaveBSRFaust(this)
+			disp('Test Faust.save (BSR Faust)')
 			bnnz = 3;
 			M = 10;
 			N = 9;
@@ -632,37 +635,39 @@ classdef FaustTest < matlab.unittest.TestCase
 			this.verifyEqual(full(F), full(G), 'AbsTol', 1e-6)
 		end
 
-        function testDelete(this)
-            disp('Test Faust.delete()')
-            tFaust = transpose(this.test_faust);
-            delete(this.test_faust);
-            this.verifyError(@() size(this.test_faust),'MATLAB:class:InvalidHandle')
-            this.verifyEqual(size(tFaust), [size(this.factors{this.num_factors},2), size(this.factors{1},1)])
-        end
+		function testDelete(this)
+			disp('Test Faust.delete()')
+			tFaust = transpose(this.test_faust);
+			delete(this.test_faust);
+			this.verifyError(@() size(this.test_faust),'MATLAB:class:InvalidHandle')
+			this.verifyEqual(size(tFaust), [size(this.factors{this.num_factors},2), size(this.factors{1},1)])
+		end
 
-    function testReal(this)
-        F = matfaust.rand(15, 22);
-        G = matfaust.rand(32, 12, 'field', 'complex');
-        fausts = {F, G};
-        for i=1:length(fausts)
-            F = fausts{i};
-            rF = real(F);
-            this.verifyTrue(norm(full(rF)-real(full(F)))/norm(full(F)) < 1e-6)
-        end
-    end
+		function testReal(this)
+			disp('Test Faust.real')
+			F = matfaust.rand(15, 22);
+			G = matfaust.rand(32, 12, 'field', 'complex');
+			fausts = {F, G};
+			for i=1:length(fausts)
+				F = fausts{i};
+				rF = real(F);
+				this.verifyTrue(norm(full(rF)-real(full(F)))/norm(full(F)) < 1e-6)
+			end
+		end
 
-    function testImag(this)
-        F = matfaust.rand(15, 22);
-        G = matfaust.rand(32, 12, 'field', 'complex');
-        fausts = {F, G};
-        for i=1:length(fausts)
-            F = fausts{i};
-            iF = imag(F);
-            this.verifyTrue(norm(full(iF)-imag(full(F)))/norm(full(F)) < 1e-6)
-        end
-    end
+		function testImag(this)
+			disp('Test Faust.imag')
+			F = matfaust.rand(15, 22);
+			G = matfaust.rand(32, 12, 'field', 'complex');
+			fausts = {F, G};
+			for i=1:length(fausts)
+				F = fausts{i};
+				iF = imag(F);
+				this.verifyTrue(norm(full(iF)-imag(full(F)))/norm(full(F)) < 1e-6)
+			end
+		end
 
-    end
+	end
 
 
 	methods
@@ -676,15 +681,15 @@ classdef FaustTest < matlab.unittest.TestCase
 			end
 		end
 
-        function prod_F = mulFactors(this)
-            first_fac_size = size(this.factors{1});
-            prod_F = eye(first_fac_size(1));
-            for i=1:this.num_factors
-                prod_F = prod_F*this.factors{i};
-            end
-        end
+		function prod_F = mulFactors(this)
+			first_fac_size = size(this.factors{1});
+			prod_F = eye(first_fac_size(1));
+			for i=1:this.num_factors
+				prod_F = prod_F*this.factors{i};
+			end
+		end
 
-    end
+	end
 end
 
 

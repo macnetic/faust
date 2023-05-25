@@ -37,8 +37,8 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			cons{2} = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32, 32, 1.0);
 			stop_crit = StoppingCriterion(200);
 			params = ParamsPalm4MSA(cons, stop_crit, 'is_update_way_R2L', is_update_way_R2L, 'init_lambda', init_lambda, 'step_size', ParamsFact.DEFAULT_STEP_SIZE,...
-			'constant_step_size', ParamsFact.DEFAULT_CONSTANT_STEP_SIZE);
-			F = matfaust.fact.palm4msa(M, params)
+				'constant_step_size', ParamsFact.DEFAULT_CONSTANT_STEP_SIZE);
+			F = matfaust.fact.palm4msa(M, params);
 			this.verifyEqual(size(F), size(M))
 			%disp('norm F: ')
 			%norm(F, 'fro')
@@ -69,8 +69,8 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			cons{2} = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32, 32, 1.0);
 			stop_crit = StoppingCriterion(200);
 			params = ParamsPalm4MSA(cons, stop_crit, 'is_update_way_R2L', is_update_way_R2L, 'init_lambda', init_lambda, 'step_size', ParamsFact.DEFAULT_STEP_SIZE,...
-			'constant_step_size', ParamsFact.DEFAULT_CONSTANT_STEP_SIZE);
-			F = matfaust.fact.palm4msa(M, params, 'backend', 2020)
+				'constant_step_size', ParamsFact.DEFAULT_CONSTANT_STEP_SIZE);
+			F = matfaust.fact.palm4msa(M, params, 'backend', 2020);
 			this.verifyEqual(size(F), size(M))
 			%disp('norm F: ')
 			%norm(F, 'fro')
@@ -97,7 +97,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			cons{2} = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32, 32, 1.0);
 			stop_crit = StoppingCriterion(200);
 			params = ParamsPalm4MSA(cons, stop_crit, 'is_update_way_R2L', is_update_way_R2L, 'init_lambda', init_lambda);
-			F = matfaust.fact.palm4msa(M, params)
+			F = matfaust.fact.palm4msa(M, params);
 			this.verifyEqual(size(F), size(M))
 			%disp('norm F: ')
 			%norm(F, 'fro')
@@ -125,7 +125,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			cons{2} = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32, 32, 1.0);
 			stop_crit = StoppingCriterion(200);
 			params = ParamsPalm4MSA(cons, stop_crit, 'is_update_way_R2L', is_update_way_R2L, 'init_lambda', init_lambda, 'init_facts', init_facts);
-			F = matfaust.fact.palm4msa(M, params)
+			F = matfaust.fact.palm4msa(M, params);
 			this.verifyEqual(size(F), size(M))
 			%disp('norm F: ')
 			%norm(F, 'fro')
@@ -153,7 +153,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			cons{2} = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32, 32, 1.0);
 			stop_crit = StoppingCriterion(200);
 			params = ParamsPalm4MSA(cons, stop_crit, 'is_update_way_R2L', is_update_way_R2L, 'init_lambda', init_lambda, 'init_facts', init_facts);
-			F = matfaust.fact.palm4msa(M, params, 'backend', 2020)
+			F = matfaust.fact.palm4msa(M, params, 'backend', 2020);
 			this.verifyEqual(size(F), size(M))
 			%disp('norm F: ')
 			%norm(F, 'fro')
@@ -196,7 +196,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			%init_facts = cell(num_facts,1);
 			%init_facts{1} = zeros(500,32);
 			%for i=2:num_facts
-				%init_facts{i} = zeros(32);
+			%init_facts{i} = zeros(32);
 			%end
 			%M = rand(500, 32)
 			load([this.faust_paths{1},'../../../misc/data/mat/matrix_hierarchical_fact.mat'])
@@ -213,7 +213,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			stop_crit = StoppingCriterion(200);
 			stop_crit2 = StoppingCriterion(200);
 			params = ParamsHierarchical(fact_cons, res_cons, stop_crit, stop_crit2);
-			F = matfaust.fact.hierarchical(M, params)
+			F = matfaust.fact.hierarchical(M, params);
 			this.verifyEqual(size(F), size(M))
 			%disp('norm F: ')
 			%norm(F, 'fro')
@@ -234,7 +234,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			%init_facts = cell(num_facts,1);
 			%init_facts{1} = zeros(500,32);
 			%for i=2:num_facts
-				%init_facts{i} = zeros(32);
+			%init_facts{i} = zeros(32);
 			%end
 			%M = rand(500, 32)
 			load([this.faust_paths{1},'../../../misc/data/mat/matrix_hierarchical_fact.mat'])
@@ -251,7 +251,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			stop_crit = StoppingCriterion(200);
 			stop_crit2 = StoppingCriterion(200);
 			params = ParamsHierarchical(fact_cons, res_cons, stop_crit, stop_crit2);
-			F = matfaust.fact.hierarchical(M, params, 'backend', 2020)
+			F = matfaust.fact.hierarchical(M, params, 'backend', 2020);
 			this.verifyEqual(size(F), size(M))
 			%disp('norm F: ')
 			%norm(F, 'fro')
@@ -272,7 +272,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			%init_facts = cell(num_facts,1);
 			%init_facts{1} = zeros(500,32);
 			%for i=2:num_facts
-				%init_facts{i} = zeros(32);
+			%init_facts{i} = zeros(32);
 			%end
 			%M = rand(500, 32)
 			load([this.faust_paths{1},'../../../misc/data/mat/matrix_hierarchical_fact.mat'])
@@ -289,8 +289,8 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			stop_crit = StoppingCriterion(200);
 			stop_crit2 = StoppingCriterion(200);
 			params = ParamsHierarchical(fact_cons, res_cons, stop_crit, stop_crit2,...
-					'init_lambda', init_lambda, 'is_update_way_R2L', is_update_way_R2L);
-			F = matfaust.fact.hierarchical(M, params)
+				'init_lambda', init_lambda, 'is_update_way_R2L', is_update_way_R2L);
+			F = matfaust.fact.hierarchical(M, params);
 			this.verifyEqual(size(F), size(M))
 			%disp('norm F: ')
 			%norm(F, 'fro')
@@ -311,7 +311,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			%init_facts = cell(num_facts,1);
 			%init_facts{1} = zeros(500,32);
 			%for i=2:num_facts
-				%init_facts{i} = zeros(32);
+			%init_facts{i} = zeros(32);
 			%end
 			%M = rand(500, 32)
 			load([this.faust_paths{1},'../../../misc/data/mat/matrix_hierarchical_fact.mat'])
@@ -328,8 +328,8 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			stop_crit = StoppingCriterion(200);
 			stop_crit2 = StoppingCriterion(200);
 			params = ParamsHierarchical(fact_cons, res_cons, stop_crit, stop_crit2,...
-					'init_lambda', init_lambda, 'is_update_way_R2L', is_update_way_R2L);
-			F = matfaust.fact.hierarchical(M, params, 'backend', 2020)
+				'init_lambda', init_lambda, 'is_update_way_R2L', is_update_way_R2L);
+			F = matfaust.fact.hierarchical(M, params, 'backend', 2020);
 			this.verifyEqual(size(F), size(M))
 			%disp('norm F: ')
 			%norm(F, 'fro')
@@ -369,7 +369,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			%disp('norm F: ')
 			%norm(F, 'fro')
 			E = F*full(D)*F'-Lap;
-			err = norm(E,'fro')/norm(Lap,'fro')
+			err = norm(E,'fro')/norm(Lap,'fro');
 			% the error reference is from the C++ test,
 			% misc/test/src/C++/EigTJ.cpp.in
 			this.verifyEqual(err, 0.0326529, 'AbsTol', 0.00001)
@@ -439,14 +439,14 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			res_cons{3} =  ConstraintInt(ConstraintName(ConstraintName.SP), 128, 128, 384);
 			stop_crit = StoppingCriterion(params.niter1);
 			stop_crit2 = StoppingCriterion(params.niter2);
-			params.fact_side = 0 % forced
-			params.verbose = 0 % forced
+			params.fact_side = 0; % forced
+			params.verbose = 0; % forced
 			params.init_lambda = 128;
 			params.step_size = 1e-16
 			params.grad_calc_opt_mode = 2
 			params = ParamsHierarchical(fact_cons, res_cons, stop_crit, stop_crit2, 'is_fact_side_left', params.fact_side == 1, 'is_update_way_R2L', params.update_way == 1, 'init_lambda', params.init_lambda, 'step_size', params.step_size, 'constant_step_size', false, 'is_verbose', params.verbose ~= 1);
-			diag_init_D = diag(init_D)
-			[F,D,lambda] = matfaust.fact.fgft_palm(U, Lap, params, diag_init_D)
+			diag_init_D = diag(init_D);
+			[F,D,lambda] = matfaust.fact.fgft_palm(U, Lap, params, diag_init_D);
 			this.verifyEqual(size(F), size(U))
 			%disp('norm F: ')
 			%norm(F, 'fro')
@@ -457,12 +457,13 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			this.verifyEqual(err, 0.0555, 'AbsTol', 0.0001)
 		end
 
-        function test_svdtj(this)
-            import matfaust.fact.svdtj
-            M = rand(16, 32);
-            [U5, S5, V5] = svdtj(M, 'tol', 1e-3, 'enable_large_Faust', false);
-            this.verifyLessThanOrEqual(norm(U5 * S5 * V5' - M) / norm(M), 1e-3)
-        end
+		function test_svdtj(this)
+			disp('Test matfaust.fact.svdtj')
+			import matfaust.fact.svdtj
+			M = rand(16, 32);
+			[U5, S5, V5] = svdtj(M, 'tol', 1e-3, 'enable_large_Faust', false);
+			this.verifyLessThanOrEqual(norm(U5 * S5 * V5' - M) / norm(M), 1e-3)
+		end
 
 		function testHadamard(this)
 			disp('Test matfaust.wht()')
@@ -508,7 +509,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			n = 2^log2n;
 			normed_vals = {true, false};
 			for i=1:2
-				normed = normed_vals{i}
+				normed = normed_vals{i};
 				F = dft(n, 'normed', normed, 'diag_opt', true);
 				fF = full(F);
 				frefF = full(dft(n, 'normed', normed, 'diag_opt', false));
@@ -516,33 +517,35 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			end
 		end
 
-        function testRandButterfly(this)
-            import matfaust.wht
-            import matfaust.rand_butterfly
-            H = full(wht(32));
-            classes = {'single', 'double'};
-            fields = {'real', 'complex'};
-            for i=1:2
-                for j=1:2
-                    field = fields{j}
-                    if strcmp(field, 'real')
-                        class = classes{i};
-                    else % field == complex
-                        class = classes{2};
-                    end
-                    F = rand_butterfly(32, 'class', class, 'field', field);
-                    this.assertNotEqual(full(F), H);
-                    [ref_I, ref_J, ~] = find(H);
-                    [I, J, ~] = find(full(F));
-                    this.assertEqual(ref_I, I);
-                    this.assertEqual(ref_J, J);
-                end
-            end
-        end
+		function testRandButterfly(this)
+			disp('Test matfaust.rand_butterfly')
+			import matfaust.wht
+			import matfaust.rand_butterfly
+			H = full(wht(32));
+			classes = {'single', 'double'};
+			fields = {'real', 'complex'};
+			for i=1:2
+				for j=1:2
+					field = fields{j}
+					if strcmp(field, 'real')
+						class = classes{i};
+					else % field == complex
+						class = classes{2};
+					end
+					F = rand_butterfly(32, 'class', class, 'field', field);
+					this.assertNotEqual(full(F), H);
+					[ref_I, ref_J, ~] = find(H);
+					[I, J, ~] = find(full(F));
+					this.assertEqual(ref_I, I);
+					this.assertEqual(ref_J, J);
+				end
+			end
+		end
 
 		function testCircAntiCirc(this)
+			disp('Test matfaust.circ/anticirc')
 			c = [1 2 3 4];
-			C = [[1     4     3     2]
+			C = [[1     4     3     2];
 			[2     1     4     3]
 			[3     2     1     4]
 			[4     3     2     1]];
@@ -550,39 +553,40 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			this.assertEqual(C, real(full(matfaust.circ(c, 'diag_opt', true))))
 			this.assertEqual(matfaust.circ(c) * reshape(c, numel(c), 1), matfaust.circ(c, 'diag_opt', true) * reshape(c, numel(c), 1))
 			A = [[2     3     4     1]
-			     [3     4     1     2]
-			     [4     1     2     3]
-			     [1     2     3     4]];
+			[3     4     1     2]
+			[4     1     2     3]
+			[1     2     3     4]];
 			this.assertEqual(A, real(full(matfaust.anticirc(c))))
 			this.assertEqual(A, real(full(matfaust.anticirc(c, 'diag_opt', true))))
 			this.assertEqual(matfaust.anticirc(c) * reshape(c, numel(c), 1), matfaust.anticirc(c, 'diag_opt', true) * reshape(c, numel(c), 1))
 			% not a power of two
 			c = [1 2 3 4 5];
 			C = [[1     5     4     3     2]
-				 [2     1     5     4     3]
-				 [3     2     1     5     4]
-				 [4     3     2     1     5];
-				 [5     4     3     2     1]];
+			[2     1     5     4     3]
+			[3     2     1     5     4]
+			[4     3     2     1     5]
+			[5     4     3     2     1]];
 			this.assertEqual(C, real(full(matfaust.circ(c))), 'AbsTol', 1e-8)
 			this.assertEqual(C, real(full(matfaust.circ(c, 'diag_opt', true))), 'AbsTol', 1e-8)
 			this.assertEqual(matfaust.circ(c) * reshape(c, numel(c), 1), matfaust.circ(c, 'diag_opt', true) * reshape(c, numel(c), 1))
 			A = [[2     3     4     5    1]
-			     [3     4     5     1    2]
-			     [4     5     1     2    3]
-			     [5     1     2     3    4]
-			     [1     2     3     4    5]];
+			[3     4     5     1    2]
+			[4     5     1     2    3]
+			[5     1     2     3    4]
+			[1     2     3     4    5]];
 			this.assertEqual(A, real(full(matfaust.anticirc(c))), 'AbsTol', 1e-8)
 			this.assertEqual(A, real(full(matfaust.anticirc(c, 'diag_opt', true))), 'AbsTol', 1e-8)
 			this.assertEqual(matfaust.anticirc(c) * reshape(c, numel(c), 1), matfaust.anticirc(c, 'diag_opt', true) * reshape(c, numel(c), 1))
 		end
 
 		function testToeplitz(this)
-			c = [1 2 3 4]
-			r = [1 7 8]
+			disp('Test matfaust.toeplitz')
+			c = [1 2 3 4];
+			r = [1 7 8];
 			T = [[1., 7., 8.]
 			[2., 1., 7.]
 			[3., 2., 1.]
-			[4., 3., 2.]]
+			[4., 3., 2.]];
 			this.verifyEqual(T, real(full(matfaust.toeplitz(c, r))), 'AbsTol', 1e-6)
 			this.verifyEqual(T, real(full(matfaust.toeplitz(c, r, 'diag_opt', true))), 'AbsTol', 1e-6)
 			this.verifyEqual(toeplitz(c, r), real(full(matfaust.toeplitz(c, r))), 'AbsTol', 1e-6)
@@ -594,6 +598,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 		end
 
 		function test_sp(this)
+			disp('Test matfaust.proj.sp')
 			import matfaust.proj.sp;
 			min_n = 5;
 			min_m = 5;
@@ -610,6 +615,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 		end
 
 		function test_splincol(this)
+			disp('Test matfaust.proj.splincol')
 			import matfaust.proj.splincol
 			min_n = 5;
 			min_m = 5;
@@ -624,6 +630,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 		end
 
 		function test_spcol(this)
+			disp('Test matfaust.proj.spcol')
 			import matfaust.proj.spcol
 			min_n = 5;
 			min_m = 5;
@@ -640,6 +647,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 		end
 
 		function test_normcol(this)
+			disp('Test matfaust.proj.normcol')
 			import matfaust.proj.normcol
 			min_n = 5;
 			min_m = 5;
@@ -655,6 +663,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 		end
 
 		function test_normlin(this)
+			disp('Test matfaust.proj.normlin')
 			import matfaust.proj.normlin
 			min_n = 5;
 			min_m = 5;
@@ -670,6 +679,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 		end
 
 		function test_const(this)
+			disp('Test matfaust.proj.const')
 			import matfaust.proj.const
 			min_n = 5;
 			min_m = 5;
@@ -684,6 +694,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 		end
 
 		function test_supp(this)
+			disp('Test matfaust.proj.supp')
 			import matfaust.proj.supp
 			min_n = 5;
 			min_m = 5;
@@ -698,57 +709,62 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 		end
 
 		function test_skperm(this)
+			disp('Test matfaust.proj.skperm')
 			import matfaust.proj.skperm
 			M = [-0.04440802, -0.17569296, -0.02557815, -0.15559154;
 			-0.0083095,  -3.38725936, -0.78484126, -0.4883618;
 			-1.48942563, -1.71787215, -0.84000212, -3.71752454;
-			-0.88957883, -0.19107863, -5.92900636, -6.51064175]
-			p = skperm(size(M), 2, 'normalized', false)
+			-0.88957883, -0.19107863, -5.92900636, -6.51064175];
+			p = skperm(size(M), 2, 'normalized', false);
 			pM_ref = [-0.04440802,0.,-0.02557815,0.;
 			-0.0083095,-3.38725936,0.,0.;
 			0.,-1.71787215,0.,-3.71752454;
-			0.,0.,-5.92900636,-6.51064175]
-			pM = p(M)
+			0.,0.,-5.92900636,-6.51064175];
+			pM = p(M);
 			this.verifyEqual(norm(pM-pM_ref)/norm(pM_ref), 0)
 		end
 
-        function test_sptriu(this)
-            import matfaust.proj.sptriu
-            M = rand(5, 5);
-            k = 2;
-            p = sptriu(size(M), k);
-            M_ = p(M);
-            this.verifyEqual(numel(nonzeros(M_)), k)
-            this.verifyEqual(norm(tril(M_, -1)), 0)
-        end
+		function test_sptriu(this)
+			disp('Test matfaust.proj.sptriu')
+			import matfaust.proj.sptriu
+			M = rand(5, 5);
+			k = 2;
+			p = sptriu(size(M), k);
+			M_ = p(M);
+			this.verifyEqual(numel(nonzeros(M_)), k)
+			this.verifyEqual(norm(tril(M_, -1)), 0)
+		end
 
-        function test_sptril(this)
-            import matfaust.proj.sptril
-            M = rand(5, 5);
-            k = 2;
-            p = sptril(size(M), k);
-            M_ = p(M);
-            this.verifyEqual(numel(nonzeros(M_)), k)
-            this.verifyEqual(norm(triu(M_, 1)), 0)
-        end
+		function test_sptril(this)
+			disp('Test matfaust.proj.sptril')
+			import matfaust.proj.sptril
+			M = rand(5, 5);
+			k = 2;
+			p = sptril(size(M), k);
+			M_ = p(M);
+			this.verifyEqual(numel(nonzeros(M_)), k)
+			this.verifyEqual(norm(triu(M_, 1)), 0)
+		end
 
-        function test_spsymm(this)
-            import matfaust.proj.spsymm
-            M = rand(5, 5);
-            k = 2;
-            p = spsymm(size(M), k);
-            M_ = p(M);
-            this.verifyEqual(M_.', M_)
-            this.verifyEqual(numel(nonzeros(M_)), k)
-        end
+		function test_spsymm(this)
+			disp('Test matfaust.proj.spsymm')
+			import matfaust.proj.spsymm
+			M = rand(5, 5);
+			k = 2;
+			p = spsymm(size(M), k);
+			M_ = p(M);
+			this.verifyEqual(M_.', M_)
+			this.verifyEqual(numel(nonzeros(M_)), k)
+		end
 
 		function test_butterfly(this)
+			disp('Test matfaust.fact.butterfly')
 			import matfaust.wht
 			import matfaust.dft
 			import matfaust.fact.butterfly
 			D = full(dft(64));
 			H = full(wht(64));
-			types = {'left', 'right', 'bbtree'}
+			types = {'left', 'right', 'bbtree'};
 			for t=1:2
 				if(t == 2)
 					M = D;
@@ -757,10 +773,10 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 				end
 				for i=1:3
 					type = types{i};
-                    args = {M, 'type', type};
-                    if ~ isreal(M)
-                        args = [args, {'perm', 'bitrev'}];
-                    end
+					args = {M, 'type', type};
+					if ~ isreal(M)
+						args = [args, {'perm', 'bitrev'}];
+					end
 					F = butterfly(args{:});
 					this.verifyEqual(norm(full(F)-M)/norm(M), 0, 'AbsTol', 1e-6);
 				end
@@ -768,6 +784,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 		end
 
 		function test_palm4msa_mhtp(this)
+			disp('Test matfaust.fact.palm4msa_mhtp')
 			import matfaust.fact.palm4msa_mhtp
 			import matfaust.factparams.*
 			import matfaust.proj.*
@@ -776,12 +793,13 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			stop_crit = StoppingCriterion(200);
 			param = ParamsPalm4MSA(projs, stop_crit);
 			mhtp_param = MHTPParams('num_its', 60, 'palm4msa_period', 10);
-			G = palm4msa_mhtp(M, param, mhtp_param)
+			G = palm4msa_mhtp(M, param, mhtp_param);
 			err = norm(full(G)-M)/norm(M)
 			this.verifyLessThanOrEqual(err, 0.20)
 		end
 
 		function test_hierarchical_mhtp(this)
+			disp('Test matfaust.fact.hierarchical_mhtp')
 			import matfaust.fact.hierarchical_mhtp
 			import matfaust.factparams.ParamsHierarchical
 			import matfaust.factparams.StoppingCriterion
@@ -790,18 +808,18 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			M = rand(500,32);
 			fact_projs = { splin([500,32], 5), sp([32,32], 96), sp([32, 32], 96)};
 			res_projs = { normcol([32,32], 1), sp([32,32], 666), sp([32, 32], 333)};
-			stop_crit1 = StoppingCriterion(200)
-			stop_crit2 = StoppingCriterion(200)
+			stop_crit1 = StoppingCriterion(200);
+			stop_crit2 = StoppingCriterion(200);
 			% 50 iterations of MHTP will run every 100 iterations of PALM4MSA (each time PALM4MSA is called by the hierarchical algorithm)
-			mhtp_param = MHTPParams('num_its', 150, 'palm4msa_period', 100)
-			param = ParamsHierarchical(fact_projs, res_projs, stop_crit1, stop_crit2)
-			F = hierarchical_mhtp(M, param, mhtp_param)
+			mhtp_param = MHTPParams('num_its', 150, 'palm4msa_period', 100);
+			param = ParamsHierarchical(fact_projs, res_projs, stop_crit1, stop_crit2);
+			F = hierarchical_mhtp(M, param, mhtp_param);
 			err = norm(full(F)-M)/norm(M)
 			this.verifyLessThanOrEqual(err, 0.20)
 		end
 
 		function test_hierarchical_dft(this)
-			disp('Test hierarchical dft')
+			disp('Test matfaust.fact.hierarchical')
 			import matfaust.fact.hierarchical
 			import matfaust.dft
 			DFT = full(dft(32))
@@ -814,42 +832,44 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			this.verifyLessThanOrEqual(err, 1e-3)
 		end
 
-        function test_dct(this)
-            n = 128;
-            % x = rand(n, 1);
-            x = ones(n, 1)
-            y_ref = zeros(n, 1);
-            for k=1:n
-                for i=1:n
-                    y_ref(k) = y_ref(k) + 2 * x(i) * cos(pi * (k-1) * (2 * (i-1) + 1) / 2 / n);
-                end
-            end
-            DCT = matfaust.dct(n, 'normed', false);
-            y_test = real(DCT*x);
-            this.verifyEqual(y_ref, y_test, 'AbsTol', 1e-6);
-			DCT_normed = matfaust.dct(n)
-			DCT_normalized = normalize(DCT)
-            this.verifyEqual(DCT_normed*x, DCT_normalized*x, 'AbsTol', 1e-6);
-        end
+		function test_dct(this)
+			disp('Test matfaust.dct')
+			n = 128;
+			% x = rand(n, 1);
+			x = ones(n, 1);
+			y_ref = zeros(n, 1);
+			for k=1:n
+				for i=1:n
+					y_ref(k) = y_ref(k) + 2 * x(i) * cos(pi * (k-1) * (2 * (i-1) + 1) / 2 / n);
+				end
+			end
+			DCT = matfaust.dct(n, 'normed', false);
+			y_test = real(DCT*x);
+			this.verifyEqual(y_ref, y_test, 'AbsTol', 1e-6);
+			DCT_normed = matfaust.dct(n);
+			DCT_normalized = normalize(DCT);
+			this.verifyEqual(DCT_normed*x, DCT_normalized*x, 'AbsTol', 1e-6);
+		end
 
-        function test_dst(this)
-            n = 128;
-            % x = rand(n, 1);
-            x = ones(n, 1);
-            y_ref = zeros(n, 1);
-            for k=1:n
-                for i=1:n
-                    y_ref(k) = y_ref(k) + x(i) * sin(pi / n * ((i-1) + 1 / 2) * k);
-                end
-            end
-            y_ref = y_ref * 2;
-            DST = matfaust.dst(n, 'normed', false);
-            y_test = real(DST*x);
-            this.verifyEqual(y_ref, y_test, 'AbsTol', 1e-6);
-			DST_normed = matfaust.dst(n)
-			DST_normalized = normalize(DST)
-            this.verifyEqual(DST_normed*x, DST_normalized*x, 'AbsTol', 1e-6);
-        end
+		function test_dst(this)
+			disp('Test matfaust.dst')
+			n = 128;
+			% x = rand(n, 1);
+			x = ones(n, 1);
+			y_ref = zeros(n, 1);
+			for k=1:n
+				for i=1:n
+					y_ref(k) = y_ref(k) + x(i) * sin(pi / n * ((i-1) + 1 / 2) * k);
+				end
+			end
+			y_ref = y_ref * 2;
+			DST = matfaust.dst(n, 'normed', false);
+			y_test = real(DST*x);
+			this.verifyEqual(y_ref, y_test, 'AbsTol', 1e-6);
+			DST_normed = matfaust.dst(n);
+			DST_normalized = normalize(DST);
+			this.verifyEqual(DST_normed*x, DST_normalized*x, 'AbsTol', 1e-6);
+		end
 
 	end
 
