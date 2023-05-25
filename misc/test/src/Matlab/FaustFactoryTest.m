@@ -754,7 +754,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			p = spsymm(size(M), k);
 			M_ = p(M);
 			this.verifyEqual(M_.', M_)
-			this.verifyEqual(numel(nonzeros(M_)), k)
+			this.verifyTrue(numel(nonzeros(M_)) - k <= 1)
 		end
 
 		function test_butterfly(this)

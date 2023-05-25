@@ -784,7 +784,8 @@ class spsymm(proj_gen):
     """
     Functor for the SYMM SP projector.
 
-    A, the image matrix, is such that A is symmetric and \f$ \| A \|_0 = k + k \mod{2},  \| A\|_F = 1 \f$ (if normalized == True).
+    A, the image matrix, is such that A is symmetric and \f$ k \le \| A \|_0
+    \le k + 1,  \| A\|_F = 1 \f$ (if normalized == True).
 
 
     Example:
@@ -818,7 +819,8 @@ class spsymm(proj_gen):
 
         Args:
             shape: shape of the input array.
-            k: the number of nonzeros of the projection image.
+            k: the number of nonzeros of the projection image. The result might
+            be k+1 nonzeros in case of an odd number of nonzeros on the diagonal.
             normalized: True to normalize the projection image according to its Frobenius norm.
             pos: True to skip negative values (replaced by zero) of the matrix to project.
 

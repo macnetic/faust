@@ -1,7 +1,7 @@
 %==================================================
 %> @brief Functor for the SPSYMM projector.
 %>
-%> A, the image matrix, is such that A is symmetric and \f$ \| A \|_0 = k + k \mod{2},  \| A\|_F = 1 \f$ (if normalized == True).
+%> A, the image matrix, is such that A is symmetric and \f$ k \le \| A \|_0 \le k + 1,  \| A\|_F = 1 \f$ (if normalized == True).
 %==================================================
 classdef spsymm < matfaust.proj.proj_gen
 	properties
@@ -14,7 +14,8 @@ classdef spsymm < matfaust.proj.proj_gen
 		%> &nbsp;&nbsp;&nbsp; @b spsymm(@b shape,@b k,@b 'normalized', bool,@b 'pos', bool): the optional parameters are set. By default both normalized and pos are false.
 		%>
 		%> @param shape: vector of size 2, to define the size of the input matrix.
-		%> @param k: the sparsity parameter (the number of nonzeros of the projection image.
+		%> @param k: the sparsity parameter (the number of nonzeros of the projection image. The result might
+		%> be k+1 nonzeros in case of an odd number of nonzeros on the diagonal.
 		%> @param 'normalized', true: normalizes the projection image according to its Frobenius norm.
 		%> @param 'normalized', false: (the default) no normalization.
 		%> @param 'pos', true: skips the negative values (replaced by zero) of the input matrix.
