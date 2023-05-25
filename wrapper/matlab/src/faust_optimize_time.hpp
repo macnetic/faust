@@ -52,9 +52,9 @@ void faust_optimize_time_prod(const mxArray **prhs, const int nrhs, mxArray **pl
 		SCALAR* ptr_data = nullptr;
 		mxArray2Ptr(mat, ptr_data);
 		const size_t mat_nrows = mxGetM(mat);
-		const size_t mat_ncols  = mxGetN(mat);
+		const size_t mat_ncols = mxGetN(mat);
         ds_mat.resize(mat_nrows, mat_ncols);
-        memcpy(ds_mat.getData(), ptr_data, mat_ncols*mat_ncols*sizeof(SCALAR));
+        memcpy(ds_mat.getData(), ptr_data, mat_nrows*mat_ncols*sizeof(SCALAR));
         delete [] ptr_data;
 		if(DEV == Cpu)
 			matGen = (Faust::MatDense<SCALAR, DEV>*) &ds_mat; // cast to avoid compil error but the bad case (DEV == GPU2) will never occur
