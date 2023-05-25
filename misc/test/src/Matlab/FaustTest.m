@@ -182,13 +182,21 @@ classdef FaustTest < matlab.unittest.TestCase
 					else
 						rtest_norm = test_norm;
 					end
-					ref_full_NF(i,:) = orig_ref_full_F(i,:)/norm(orig_ref_full_F(i,:), rtest_norm);
+					n = norm(orig_ref_full_F(i,:), rtest_norm);
+					if n == 0
+						n = 1; % avoid NaN in normalized column
+					end
+					ref_full_NF(i,:) = orig_ref_full_F(i,:)/n
 					% ENOTE: the cell array indexing returns a copy otherwise we wouldn't need to copy back into it after modif.
 					ref_full_NFs{1} = ref_full_NF;
 				end
 				for i=1:size(orig_ref_full_F,2)
 					ref_full_NF = ref_full_NFs{2};
-					ref_full_NF(:,i) = orig_ref_full_F(:,i)/norm(orig_ref_full_F(:,i), test_norm);
+					n = norm(orig_ref_full_F(:,i), test_norm);
+					if n == 0
+						n = 1;
+					end
+					ref_full_NF(:,i) = orig_ref_full_F(:,i)/n
 					ref_full_NFs{2} = ref_full_NF;
 				end
 				for i=1:length(test_signatures)
