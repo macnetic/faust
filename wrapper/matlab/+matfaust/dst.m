@@ -159,5 +159,13 @@ function F = mod_fft(N, varargin)
         i = i + 1;
         N_ = N_ / 2;
     end
-    F = matfaust.Faust([Bs, {complex(bitrev_perm(N))}], varargin{:});
+    %F = matfaust.Faust([Bs, {complex(bitrev_perm(N))}], varargin{:});
+	%BR = complex(bitrev_perm(N)); % complex of sparse matrix doesn't work for matlab R2018b, it works for R2022b but I don't know since which version exactly
+	BR = complex(matfaust.Faust(bitrev_perm(N)));
+	F = matfaust.Faust(Bs) * BR;
+	if length(varargin) > 0
+		if strcmp(varargin{1}, 'dev') && ~ strcmp(varargin{2}, 'cpu')
+			F = clone(F, varargin{1:2});
+		end
+	end
 end
