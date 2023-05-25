@@ -237,7 +237,7 @@ classdef FaustTest < matlab.unittest.TestCase
             disp('testDensity()')
             ref_nlines = size(this.factors{1},1)
             ref_ncols = size(this.factors{this.num_factors},2)
-            this.verifyEqual(nnzero_count(this.factors)/ref_nlines/ref_ncols, density(this.test_faust), 'AbsTol', 0.01)
+            this.verifyEqual(FaustTest.nnzero_count(this.factors)/ref_nlines/ref_ncols, density(this.test_faust), 'AbsTol', 0.01)
         end
 
         function testrcg(this)
