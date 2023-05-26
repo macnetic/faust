@@ -78,7 +78,7 @@ ctest_python:
 
 
 ctest_matlab:
-    variables: {BUILD_WRAPPER_MATLAB: "ON", SLOW_TESTS: "OFF", NOCPPTESTS: "ON", BUILD_MULTITHREAD: "OFF"} # MT OFF because of macOS complicated way to enable OpenMP (but packages are OMP enabled)
+    variables: {BUILD_WRAPPER_MATLAB: "ON", SLOW_TESTS: "OFF", NOCPPTESTS: "ON", BUILD_MULTITHREAD: "OFF", BUILD_FLOAT_MEX: "ON"} # MT OFF because of macOS complicated way to enable OpenMP (but packages are OMP enabled)
     script:
       # TODO: refactor with ctest_python script
       - ctest -O ctest.log -S ./CDashConfScript.cmake -j4 --output-junit junit_output.xml
