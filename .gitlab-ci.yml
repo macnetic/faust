@@ -437,9 +437,9 @@ pages:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
         - cmake -DCMAKE_CXX_COMPILER=$CMAKE_CXX_COMPILER ..
         - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=OFF -DBUILD_DOCUMENTATION=OFF -DCPACK_PACKAGE_VERSION=$VERSION -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DBUILD_TESTING=OFF -DEXCLUDE_FAUST_LIB_INSTALL=ON -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=$MATIO_STATIC_LIB_PATH -DZ_STATIC_LIB_PATH=$Z_STATIC_LIB_PATH -DHDF5_STATIC_LIB_PATH=$HDF5_STATIC_LIB_PATH -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DEXPERIMENTAL_PKG=$EXPERIMENTAL_PKG -DFAUST_TORCH=$FAUST_TORCH -DCMAKE_PREFIX_PATH="$CMAKE_PREFIX_PATH" -DNOPY2=$NOPY2 -DBUILD_MULTITHREAD=$BUILD_MULTITHREAD -DUSE_GPU_MOD=$USE_GPU_MOD -DEXPERIMENTAL_PKG=$EXPERIMENTAL_PKG -DFAUST_TORCH=$FAUST_TORCH -DBUILD_FLOAT_PYX=ON -DUSE_OPENBLASO="$USE_OPENBLASO" ..'
-        - make
+        - make 2>&1 | grep -i 'error:\|Building\|Link'
         - cd wrapper/python
-        - $JOB_PYTHON setup.py bdist_wheel
+        - $JOB_PYTHON setup.py bdist_wheel 2>&1 | grep -i 'error:\|Building\|Link\|creating'
         - if [[ "$GEN_EGG" != "OFF" ]]; then $JOB_PYTHON setup.py bdist_egg;fi
         - if [[ "$NOPY2" != "ON" ]]; then python2 setup.py bdist_wheel; fi
         - if [[ "$NOPY2" != "ON" && "$GEN_EGG" != "OFF" ]]; then python2 setup.py bdist_egg; fi
