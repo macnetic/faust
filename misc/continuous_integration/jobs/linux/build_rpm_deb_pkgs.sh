@@ -26,6 +26,8 @@ find ./ -name "*.o" -delete # (more space for rpm/deb generation)
 cpack -G RPM -C CPackConfig.cmake
 # remove package temporary files
 rm -Rf _CPack_Packages/x86_64/RPM
+[[ ! -r $(ls "faust-$FAUST_VERSION"*rpm) ]] && echo "Failed to generate RPM package" && exit 2
 cpack -G DEB -C CPackConfig.cmake
 rm -Rf _CPack_Packages/x86_64/DEB
+[[ ! -r $(ls "faust-$FAUST_VERSION"*deb) ]] && echo "Failed to generate DEB package" && exit 3
 [[ -n "$COPY_PKG_TO_HOME" ]] && cp faust-$FAUST_VERSION*rpm faust-$FAUST_VERSION*deb $HOME || exit 0
