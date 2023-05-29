@@ -75,6 +75,10 @@
 %> Mainly for convenience and test purposes, a Faust can be converted into
 %> the corresponding full matrix using the function Faust.full.
 %>
+%> @note it could be wiser to encapsulate a Faust in a
+%> <a href="https://gitlab.inria.fr/faustgrp/matlazylinop/-/blob/main/src/%2Blazylinop/aslazylinearoperator.m">lazylinop.LazyLinearOp</a>
+%> for a totally lazy paradigm on all available operations.
+%>
 %> @warning using Faust.full is discouraged except for test purposes, as it
 %> loses the main potential interests of the FAuST structure: compressed
 %> memory storage and faster matrix-vector multiplication compared to its
@@ -2824,6 +2828,11 @@ classdef Faust < handle % subclass of handle for Faust.delete to be called on cl
 		%>
 		%> @retval C the concatenation result as a new Faust.
 		%>
+		%> @note it could be wiser to encapsulate a Faust in a
+		%> <a href="https://gitlab.inria.fr/faustgrp/matlazylinop/-/blob/main/src/%2Blazylinop/aslazylinearoperator.m">lazylinop.LazyLinearOp</a>
+		%> for a lazy concatenation.
+		%> </br>
+		%>
 		%>
 		%> @b Example
 		%> @code
@@ -2960,7 +2969,11 @@ classdef Faust < handle % subclass of handle for Faust.delete to be called on cl
 		%>
 		%> &nbsp;&nbsp;&nbsp; @b C=HORZCAT(F,A) concatenates the Faust F and A horizontally. A is a Faust or a sparse/full matrix. The result is the Faust C. @b HORZCAT(F,A) is the same as [F,G].<br/>
 		%> &nbsp;&nbsp;&nbsp; @b C=HORZCAT(@b F,@b A,@b B,…) concatenates horizontally F to A, B, etc. @b HORZCAT(@b F,@b A, @b B,…) is the same as [F,A,B,…].<br/>
-%>
+		%>
+		%> @note it could be wiser to encapsulate a Faust in a
+		%> <a href="https://gitlab.inria.fr/faustgrp/matlazylinop/-/blob/main/src/%2Blazylinop/aslazylinearoperator.m">lazylinop.LazyLinearOp</a>
+		%> for a lazy concatenation.
+		%>
 		%> <p>@b See @b also Faust.vertcat, Faust.cat.
 		%======================================================================
 		function HC = horzcat(varargin)
@@ -2979,6 +2992,10 @@ classdef Faust < handle % subclass of handle for Faust.delete to be called on cl
 		%>
 		%> &nbsp;&nbsp;&nbsp; @b C=VERTCAT(F,A) concatenates the Faust F and A vertically. A is a Faust or a sparse/full matrix. The result is the Faust C. @b VERTCAT(F,A) is the same as [F;G].<br/>
 		%> &nbsp;&nbsp;&nbsp; @b C=VERTCAT(@b F, @b A, @b B,…) concatenates vertically F to A, B etc. @b VERTCAT(@b F, @b A, @b B,…) is the same as [F;A;B;…].<br/>
+		%>
+		%> @note it could be wiser to encapsulate a Faust in a
+		%> <a href="https://gitlab.inria.fr/faustgrp/matlazylinop/-/blob/main/src/%2Blazylinop/aslazylinearoperator.m">lazylinop.LazyLinearOp</a>
+		%> for a lazy concatenation.
 		%>
 		%> <p>@b See @b also Faust.horzcat, Faust.cat.
 		%======================================================================

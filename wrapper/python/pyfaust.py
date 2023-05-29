@@ -71,6 +71,10 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
     Mainly for convenience and test purposes, a Faust can be converted into
     the corresponding full matrix using the function Faust.toarray.
 
+    NOTE: it could be wiser to encapsulate a Faust in a
+    <a href="https://faustgrp.gitlabpages.inria.fr/lazylinop/api_lazylinop.html#lazylinop.aslazylinearoperator">lazylinop.LazyLinearOp</a>
+    for a totally lazy paradigm on all available operations.
+
     Warning: using Faust.toarray is discouraged except for test purposes, as it
     loses the main potential interests of the FAuST structure: compressed
     memory storage and faster matrix-vector multiplication compared to its
@@ -1387,6 +1391,10 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         <br/>N.B.: you could have an elementwise non-significant absolute
         difference between the two members.
+
+        NOTE: it could be wiser to encapsulate a Faust in a
+        <a href="https://faustgrp.gitlabpages.inria.fr/lazylinop/api_lazylinop.html#lazylinop.aslazylinearoperator">lazylinop.LazyLinearOp</a>
+        for a lazy concatenation.
 
 
            Args:
@@ -3367,7 +3375,7 @@ def concatenate(_tuple, *args, axis=0, **kwargs):
         - FACTOR 4 (double) SPARSE, size 56x100, density 0.05, nnz 280
         - FACTOR 5 (double) SPARSE, size 100x50, density 0.02, nnz 100
 
-    <b>See also</b> numpy.concatenate
+    <b>See also</b> numpy.concatenate, Faust.concatenate
     """
     if not isinstance(_tuple, tuple):
         raise TypeError("first arg must be a tuple")
@@ -3395,6 +3403,11 @@ def hstack(_tuple):
 
     <b>See also</b> numpy.hstack
 
+
+    NOTE: it could be wiser to encapsulate a Faust in a
+    <a href="https://faustgrp.gitlabpages.inria.fr/lazylinop/api_lazylinop.html#lazylinop.aslazylinearoperator">lazylinop.LazyLinearOp</a>
+    for a lazy concatenation.
+
     Example:
         >>> from pyfaust import *
         >>> seed(42) # just for reproducibility
@@ -3416,6 +3429,11 @@ def vstack(_tuple):
     Concatenates vertically Faust-s and/or numpy.ndarray arrays using Faust.concatenate().
 
     <b>See also</b> numpy.vstack
+
+
+    NOTE: it could be wiser to encapsulate a Faust in a
+    <a href="https://faustgrp.gitlabpages.inria.fr/lazylinop/api_lazylinop.html#lazylinop.aslazylinearoperator">lazylinop.LazyLinearOp</a>
+    for a lazy concatenation.
 
     Example:
         >>> from pyfaust import *
