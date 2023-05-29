@@ -14,7 +14,7 @@ cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=
 # concise output for make (gitlab output is limited)
 make 2>&1 | tee /tmp/log_$(basename $0)_make_$(date +%s) | grep "error:\|Building\|Link\|creating"
 make clean
-# clean might be not enough, explicitly delete object files
+# clean might be not enough, explicitly delete object files (more space for rpm/deb generation)
 find ./ -name "*.o" -delete
 cpack -G RPM -C CPackConfig.cmake
 # remove package temporary files
