@@ -1,5 +1,6 @@
 %==========================================================================================
 %> @brief Generates a random Faust composed only of BSR matrices.
+%>
 %> @param M the number of rows of the random Faust.
 %> @param N the number of columns of the random Faust.
 %> @param BM the nonzero block number of rows (must divide M).
@@ -32,26 +33,27 @@
 %>
 %> @b Example @b 2
 %> @code
-%>>> matfaust.rand_bsr(128, 128, 32, 32, 'num_factors', [6, 10], 'field', 'real', 'class', 'double', 'density', .8)
+%> >> matfaust.rand_bsr(128, 128, 32, 32, 'num_factors', [6, 10], 'field', 'real', 'class', 'double', 'density', .8)
 %>
-%>ans = 
+%> ans =
 %>
-%>Faust size 128x128, density 8.125, nnz_sum 133120, 10 factor(s): 
-%>- FACTOR 0 (double) BSR, size 128x128, density 0.8125, nnz 13312
-%>- FACTOR 1 (double) BSR, size 128x128, density 0.8125, nnz 13312
-%>- FACTOR 2 (double) BSR, size 128x128, density 0.8125, nnz 13312
-%>- FACTOR 3 (double) BSR, size 128x128, density 0.8125, nnz 13312
-%>- FACTOR 4 (double) BSR, size 128x128, density 0.8125, nnz 13312
-%>- FACTOR 5 (double) BSR, size 128x128, density 0.8125, nnz 13312
-%>- FACTOR 6 (double) BSR, size 128x128, density 0.8125, nnz 13312
-%>- FACTOR 7 (double) BSR, size 128x128, density 0.8125, nnz 13312
-%>- FACTOR 8 (double) BSR, size 128x128, density 0.8125, nnz 13312
-%>- FACTOR 9 (double) BSR, size 128x128, density 0.8125, nnz 13312
+%> Faust size 128x128, density 8.125, nnz_sum 133120, 10 factor(s):
+%> - FACTOR 0 (double) BSR, size 128x128, density 0.8125, nnz 13312
+%> - FACTOR 1 (double) BSR, size 128x128, density 0.8125, nnz 13312
+%> - FACTOR 2 (double) BSR, size 128x128, density 0.8125, nnz 13312
+%> - FACTOR 3 (double) BSR, size 128x128, density 0.8125, nnz 13312
+%> - FACTOR 4 (double) BSR, size 128x128, density 0.8125, nnz 13312
+%> - FACTOR 5 (double) BSR, size 128x128, density 0.8125, nnz 13312
+%> - FACTOR 6 (double) BSR, size 128x128, density 0.8125, nnz 13312
+%> - FACTOR 7 (double) BSR, size 128x128, density 0.8125, nnz 13312
+%> - FACTOR 8 (double) BSR, size 128x128, density 0.8125, nnz 13312
+%> - FACTOR 9 (double) BSR, size 128x128, density 0.8125, nnz 13312
 %>
 %>
 %> @endcode
 %>
 %> <p>@b See @b also Faust.Faust, matfaust.rand.
+%==========================================================================================
 function F = rand_bsr(M, N, BM, BN, varargin)
 	argc = length(varargin);
 	dev = 'cpu';
