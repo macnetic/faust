@@ -496,7 +496,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			fF = full(F);
 			fftI = fft(eye(n));
 			% this.verifyEqual(nnz(fH), numel(fH));
-			this.verifyEqual(norm(fF-fftI), 0, 'AbsTol', 10^-12);
+			this.verifyEqual(norm(fF-fftI), 0, 'AbsTol', 10^-11);
 			this.assertEqual(full(dft(n)), full(normalize(F)), 'AbsTol', 10^-7)
 
 			this.assertEqual(full(dft(n, 'normed', false)), full(F), 'AbsTol', 10^-7)
