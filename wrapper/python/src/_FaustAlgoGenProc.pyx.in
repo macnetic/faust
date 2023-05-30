@@ -32,7 +32,10 @@ cdef class FaustAlgoGen@PROC@@TYPE_NAME@:
                                                                density,
                                                                per_row,
                                                                seed)
-        if(core.@CORE_OBJ@ == NULL): raise MemoryError()
+        if core.@CORE_OBJ@ == NULL:
+            # it could be memory allocation failure
+            # if device is GPU, it could be a GPU unavailability
+            raise MemoryError()
         return core
 
     @staticmethod

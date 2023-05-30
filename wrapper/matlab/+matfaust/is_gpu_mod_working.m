@@ -15,5 +15,6 @@ function success = is_gpu_mod_working()
 		end
 		success = exist('gpuF');
 	end
+	% TODO: test another device (dev argument)
 end
 

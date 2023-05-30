@@ -535,8 +535,22 @@ template<typename FPP, FDevice DEV>
           unsigned int t,
           unsigned int min_num_factors, unsigned int max_num_factors,
           unsigned int min_dim_size, unsigned int max_dim_size, float density, bool per_row, unsigned int seed) {
-      Faust::TransformHelper<FPP,DEV>* th = Faust::TransformHelper<FPP,DEV>::randFaust(faust_nrows, faust_ncols, Faust::RandFaustType(t), min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row, seed);
-      if(!th) return NULL;
+      Faust::TransformHelper<FPP,DEV>* th;
+      try
+      {
+          th = Faust::TransformHelper<FPP,DEV>::randFaust(faust_nrows, faust_ncols, Faust::RandFaustType(t), min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row, seed);
+      }
+      catch(std::runtime_error &re)
+      {
+          // known possible exception, CUDA error when DEV == GPU
+          // TODO: any other ?
+          // cpu error std::bad_alloc already caught in MatDense/MatSparse if
+          // happened
+          // catching the exception here is useful to detect the GPU is not
+          // available
+          // besides it is already handled in mex code for matfaust
+      }
+      if(!th) return nullptr;
       FaustCoreCpp<FPP,DEV>* core = new FaustCoreCpp<FPP,DEV>(th);
       return core;
   }

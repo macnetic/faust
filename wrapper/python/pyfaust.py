@@ -4580,8 +4580,37 @@ def enable_gpu_mod(libpaths=None, backend='cuda', silent=False, fatal=False):
 def is_gpu_mod_enabled():
     """
     Returns True if the gpu_mod plug-in has been loaded correctly, False otherwise.
+
+    <b>See also</b> pyfaust.is_gpu_mod_working
     """
     return _FaustCorePy._is_gpu_mod_enabled()
+
+def is_gpu_mod_working():
+    """
+    This function returns True if gpu_mod is working properly False otherwise.
+
+    is_gpu_mod_working comes as a complement of pyfaust.is_gpu_mod_enabled.
+    The latter ensures that gpu_mod shared library/plugin is properly loaded in
+    memory but doesn't ensure that the GPU is available (for example, the
+    NVIDIA driver might not be installed). The former ensures both that the
+    gpu_mod is loaded and the GPU (device 0) is properly available for
+    computing.
+
+    """
+    #TODO: test another device (dev argument)
+    if is_gpu_mod_enabled():
+        try:
+            gpuF = rand(1, 1, dev='gpu')
+        except:
+            # knowing that the Faust size can't be smaller than one
+            # it is not likely a full GPU memory comsumption error
+            # then it is a CUDA device availability error
+            # (e.g. CUDA installed but the driver is not or GPU not plugged in)
+            # anyway the gpu_mod can't work
+            return False
+        return 'gpuF' in locals()
+    else:
+        return False
 
 def check_dev(dev):
     if dev.startswith('gpu'):
