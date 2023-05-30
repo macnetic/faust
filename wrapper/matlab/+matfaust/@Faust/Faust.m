@@ -687,15 +687,15 @@ classdef Faust < handle % subclass of handle for Faust.delete to be called on cl
 		%> >> rng(42) % for reproducibility
 		%> >> F = matfaust.rand(5, 4, 'seed', 42);
 		%> >> A = rand(size(F,2), 5);
-		%> >> G = F * A
+		%> >> G = F * A;
+		%> >> norm(G - full(F) * A) < 1e-12
 		%>
-		%>  G =
+		%> ans =
 		%>
-		%>     39.7046   14.1398   25.0990   15.2811   22.8604
-		%>     38.5451   13.7125   24.3601   14.8383   22.1941
-		%>     33.1797   11.8034   20.9672   12.7729   19.1048
-		%>     48.3839   17.2431   30.5919   18.6187   27.8566
-		%>     36.8883   13.1388   23.3192   14.1968   21.2388
+		%>   logical
+		%>
+		%>      1
+		%>
 		%> >> % this is equivalent to G = mtimes(F, A)
 		%>
 		%> >> G = matfaust.rand(size(F, 2), 15);
@@ -2514,9 +2514,16 @@ classdef Faust < handle % subclass of handle for Faust.delete to be called on cl
 		%> @code
 		%> %in a matlab terminal
 		%> >> F = matfaust.rand(8, 5, 'seed', 42);
-		%> >> F = F * F';
-		%> >> power_iteration(F)
-		%> 1.0928e+04
+		%> >> l1 = power_iteration(F*F');
+		%> >> % the 2-norm of F is its greatest singular value
+		%> >> % which is also the square root of the greatest eigenvalue of F*F'
+		%> >> abs(sqrt(l1) - norm(full(F), 2)) < 1e-12
+		%>
+		%> ans =
+		%>
+		%>   logical
+		%>
+		%>      1
 		%> @endcode
 		%==========================================================
 		function lambda = power_iteration(F, varargin)
