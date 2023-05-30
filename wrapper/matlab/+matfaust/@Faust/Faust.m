@@ -3273,8 +3273,8 @@ classdef Faust < handle % subclass of handle for Faust.delete to be called on cl
 		%> - FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
 		%>
 		%> >> % and only if your device supports a compatible NVIDIA device
-		%> >> Fc_gpu = clone(F, 'dev', 'gpu');  % doctest: +SKIP_IF(~ matfaust.is_gpu_mod_enabled())
-		%> >> device(gpuF) % doctest: +SKIP_IF(~ matfaust.is_gpu_mod_enabled())
+		%> >> Fc_gpu = clone(F, 'dev', 'gpu');  % doctest: +SKIP_IF(~ matfaust.is_gpu_mod_enabled() || ~ matfaust.is_gpu_mod_working())
+		%> >> device(gpuF) % doctest: +SKIP_IF(~ matfaust.is_gpu_mod_enabled() || ~ matfaust.is_gpu_mod_working())
 		%>
 		%> ans =
 		%>
@@ -3327,8 +3327,8 @@ classdef Faust < handle % subclass of handle for Faust.delete to be called on cl
 		%>
 		%>     'cpu'
 		%>
-		%> >> gpuF = matfaust.rand(5,5, 'dev', 'gpu'); % doctest: +SKIP_IF(~ matfaust.is_gpu_mod_enabled())
-		%> >> device(gpuF) % doctest: +SKIP_IF(~ matfaust.is_gpu_mod_enabled())
+		%> >> gpuF = matfaust.rand(5,5, 'dev', 'gpu'); % doctest: +SKIP_IF(~ matfaust.is_gpu_mod_enabled() || ~ matfaust.is_gpu_mod_working())
+		%> >> device(gpuF) % doctest: +SKIP_IF(~ matfaust.is_gpu_mod_enabled() || ~ matfaust.is_gpu_mod_working())
 		%>
 		%> ans =
 		%>
