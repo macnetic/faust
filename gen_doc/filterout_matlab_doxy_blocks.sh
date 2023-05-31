@@ -8,5 +8,5 @@
 
 [[ ! -r "$1" ]] && echo "$1 is not readable/existing as a file." >&2 && exit 0 # not an error, just skipping
 #sed -i '/%=\{5,\}/,/%=\{5,\}/d' $1 # macos default sed can't do this (it gives an error:sed: 1: command c expects \ followed by text
-sed -e '/%=\{5,\}/,/%=\{5,\}/d' $1 > ${1}_tmp
+sed -e '/%\s\{0,\}=\{5,\}/,/%\s\{0,\}=\{5,\}/d' $1 > ${1}_tmp
 mv "${1}_tmp" "$1"
