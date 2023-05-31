@@ -1,6 +1,7 @@
 
 from sys import platform as _pf
 from os.path import basename
+from os import environ
 libomp_loading_verbose = False
 internal_libomp_loading = True
 
@@ -75,7 +76,7 @@ def try_modify_wrapper_lib_on_macos():
 # load libomp pyfaust embedded library if found in pyfaust location
 if _pf in ['darwin', 'linux', 'win32']:
     try_modify_wrapper_lib_on_macos()
-    if internal_libomp_loading:
+    if internal_libomp_loading and not 'DISABLE_PYFAUST_LIBOMP' in environ:
         load_lib_omp()
     else:
         inform_user_how_to_install_libomp()
