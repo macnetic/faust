@@ -784,8 +784,8 @@ class spsymm(proj_gen):
     """
     Functor for the SYMM SP projector.
 
-    A, the image matrix, is such that A is symmetric and \f$ k \le \| A \|_0
-    \le k + 1,  \| A\|_F = 1 \f$ (if normalized == True).
+    A, the image matrix of M, is such that A is symmetric and \f$ k \le \| A \|_0
+    \le k + 1,  \| A\|_F = 1 \f$ (if normalized == True), assuming that \f$\| M \|_0 >= k\f$.
 
 
     Example:

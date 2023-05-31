@@ -1,8 +1,33 @@
-%==================================================
+% ==================================================
 %> @brief Functor for the NORMLIN projector.
 %>
 %> A, the image matrix, is defined by \f$ \forall i \in \{1,\ldots,shape(1)\} \f$ the i-th row \f$  A_{i,*} \f$ is such that \f$ \| A_{i, *} \|_2 = s \f$.
-%==================================================
+%>
+%> @b Example
+%> @code
+%> >> import matfaust.proj.normlin
+%> >> rng(42)
+%> >> M = rand(5, 5)
+%>
+%> M =
+%>
+%>     0.3745    0.1560    0.0206    0.1834    0.6119
+%>     0.9507    0.0581    0.9699    0.3042    0.1395
+%>     0.7320    0.8662    0.8324    0.5248    0.2921
+%>     0.5987    0.6011    0.2123    0.4319    0.3664
+%>     0.1560    0.7081    0.1818    0.2912    0.4561
+%>
+%> >> p = normlin(size(M), .01);
+%> >> pM = p(M);
+%> >> norm(pM(1,:), 2) % doctest: +ELLIPSIS
+%>
+%> ans =
+%>
+%>     1...
+%>
+%> >>
+%> @endcode
+% ==================================================
 classdef normlin < matfaust.proj.proj_gen
 	properties
 	end
