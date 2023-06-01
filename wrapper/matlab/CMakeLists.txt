@@ -81,7 +81,7 @@ foreach(MATFAUST_FILE IN LISTS FAUST_MATLAB_MATFAUST_FILE_LIST)
 		#TODO: copy if error (fallback solution)
 		#configure_file(${FAUST_MATLAB_NAMESPACE_SRC_DIR}/${MATFAUST_FILE} ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE} COPYONLY)
 
-		add_custom_target(FILTER_OUT_MATLAB_DOXYBLOCKS_${MATFAUST_SHORT_FILE} ALL
+		add_custom_target(DEL_DOXYDOC_${MATFAUST_SHORT_FILE} ALL
 			COMMAND ${PROJECT_SOURCE_DIR}/gen_doc/filterout_matlab_doxy_blocks.sh ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE} COMMENT "Removing doxygen blocks from class file ${MATFAUST_FILE}" DEPENDS doc)
 	else()
 		message(STATUS "matfaust function file: " ${MATFAUST_FILE})
@@ -98,7 +98,7 @@ foreach(MATFAUST_FILE IN LISTS FAUST_MATLAB_MATFAUST_FILE_LIST)
 			DEPENDS ${FAUST_MATLAB_BIN_DIR}/expfiltered/${MATFAUST_FILE}
 			COMMENT "Generating matfaust inline doc for ${MATFAUST_FILE}")
 
-		add_custom_target(FILTER_OUT_MATLAB_DOXYBLOCKS_${MATFAUST_SHORT_FILE} ALL
+		add_custom_target(DEL_DOXYDOC_${MATFAUST_SHORT_FILE} ALL
 			COMMAND ${PROJECT_SOURCE_DIR}/gen_doc/filterout_matlab_doxy_blocks.sh ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE} COMMENT "Removing doxygen blocks from function file ${MATFAUST_FILE}." DEPENDS doc)
 	endif()
 	add_custom_target(GEN_INLINE_DOC_${MATFAUST_SHORT_FILE} ALL DEPENDS ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE})
