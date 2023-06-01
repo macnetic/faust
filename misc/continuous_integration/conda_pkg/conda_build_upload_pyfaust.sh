@@ -144,9 +144,25 @@ then
 else
 	echo "pyfaust conda package already built: $PKG"
 fi
-[[ ! "$?" = 0 ]] && echo "Error: failed to build pyfaust conda package" && exit 7
-# find the package
-PKG=$(find_pkg)
+if [[ ! "$?" = 0 ]]; then
+	PKG=$(find $(conda run -n $CONDA_ENV echo \$CONDA_PREFIX) -name "pyfaust-*.bz2")
+	if [[ $SYSTEM = linux && -r /usr/lib64/libomp.so && -r "$PKG" ]]
+	then
+		# NOTE: here is a messy fix for a messy conda-build behaviour
+		# it tries to patch pyfaust embedded libomp for any reason about library RPATH
+		# it ends up with a defective libomp that does'nt load anymore
+		# here we replace the modified libomp with the initial one
+		# TODO: as far as I know this bug happens only on linux and might be fixed on more recent version of conda, verify
+		tar xjvf $PKG
+		cp /usr/lib64/libomp.so lib/python$PYVER/site-packages/pyfaust/lib/libomp.so
+		tar -cjvf $PKG lib info
+	else
+		echo "Error: failed to build pyfaust conda package" && exit 7
+	fi
+else
+	# find the package
+	PKG=$(find_pkg)
+fi
 #echo pyfaust | conda run -n $CONDA_ENV anaconda login
 [[ -z "$PKG" || ! -r "$PKG" ]] && echo "Error: no built package was found in the virtual env directory." && exit 8
 [[ ! -r $TOKEN_FILE ]] && echo "Error: the anaconda token file $TOKEN wasn't found." && exit 9
