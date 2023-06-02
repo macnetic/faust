@@ -22,10 +22,12 @@
 %> of indices (as defined by the perm argument) and conversely how to convert
 %> a permutation matrix to a list of indices of permutation.
 %> @code
+%> >> rng(42)
 %> >> I = randperm(8) % random permutation as a list indices
+%>
 %> I =
 %>
-%>      6     1     5     3     7     2     8     4
+%>      7     6     5     1     4     3     8     2
 %>
 %> >> % convert a permutation as a list of indices to a permutation matrix P as a csr_matrix
 %> >> n = numel(I);
@@ -34,20 +36,21 @@
 %>
 %> ans =
 %>
-%>      0     1     0     0     0     0     0     0
-%>      0     0     0     0     0     1     0     0
 %>      0     0     0     1     0     0     0     0
 %>      0     0     0     0     0     0     0     1
-%>      0     0     1     0     0     0     0     0
-%>      1     0     0     0     0     0     0     0
+%>      0     0     0     0     0     1     0     0
 %>      0     0     0     0     1     0     0     0
+%>      0     0     1     0     0     0     0     0
+%>      0     1     0     0     0     0     0     0
+%>      1     0     0     0     0     0     0     0
 %>      0     0     0     0     0     0     1     0
 %>
 %> >> [I_, ~, ~] = find(P);
 %> >> I_ = I_.'
 %> I_ =
 %>
-%>      6     1     5     3     7     2     8     4
+%>      7     6     5     1     4     3     8     2
+%>
 %> >> all(I_ == I)
 %>
 %> ans =
@@ -66,18 +69,29 @@
 %> >> import matfaust.fact.butterfly
 %> >> H = full(wht(32));
 %> >> F = butterfly(H, 'type', 'bbtree');
-%> >> err = norm(F-H)/norm(H)
+%> >> err = norm(F-H)/norm(H) < 1e-14
+%>
 %> err =
 %>
-%>    1.3947e-15
+%>   logical
+%>
+%>      1
+%>
 %> >> % it works with dft too!
 %> >> % all you need is to specify the bit-reversal permutation
 %> >> % since the Discrete Fourier Transform is the product of a butterfly factors with this particular permutation
 %> >> DFT = full(dft(32));
 %> >> F = butterfly(DFT, 'type', 'bbtree', 'perm', 'bitrev');
-%> >> err = norm(full(F)-DFT)/norm(DFT)
+%> >> err = norm(full(F)-DFT)/norm(DFT) < 1e-14
+%>
 %> err =
-%> 	  2.9339e-15
+%>
+%>   logical
+%>
+%>      1
+%>
+%>
+%> >>
 %> @endcode
 %>
 %> Use butterfly with simple permutations:
@@ -90,6 +104,8 @@
 %> >> F2 = butterfly(M, 'type', 'bbtree', 'perm', p);
 %> >> % compute the relative diff
 %> >> norm(F2-F1)/norm(F1)
+%> ...
+%>
 %> ans =
 %>         0
 %> >> % then try another permutation
@@ -100,10 +116,11 @@
 %> Use butterfly with a permutation defined by a list of indices J:
 %> @code
 %> >> J = 32:-1:1;
-%> >> F = butterfly(H, 'type', 'bbtree', 'perm', J);
+%> >> F = butterfly(H, 'type', 'bbtree', 'perm', J)
+%>
 %> F =
 %>
-%> Faust size 32x32, density 0.34375, nnz_sum 352, 6 factor(s):
+%> Faust size 32x32, density 0.3125, nnz_sum 320, 5 factor(s):
 %> - FACTOR 0 (double) SPARSE, size 32x32, density 0.0625, nnz 64
 %> - FACTOR 1 (double) SPARSE, size 32x32, density 0.0625, nnz 64
 %> - FACTOR 2 (double) SPARSE, size 32x32, density 0.0625, nnz 64
@@ -124,12 +141,14 @@
 %>
 %> F =
 %>
-%> Faust size 32x32, density 0.34375, nnz_sum 352, 6 factor(s):
+%> Faust size 32x32, density 0.3125, nnz_sum 320, 5 factor(s):
 %> - FACTOR 0 (double) SPARSE, size 32x32, density 0.0625, nnz 64
 %> - FACTOR 1 (double) SPARSE, size 32x32, density 0.0625, nnz 64
 %> - FACTOR 2 (double) SPARSE, size 32x32, density 0.0625, nnz 64
 %> - FACTOR 3 (double) SPARSE, size 32x32, density 0.0625, nnz 64
 %> - FACTOR 4 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+%>
+%> >>
 %> @endcode
 %>
 %>
@@ -144,6 +163,8 @@
 %> - FACTOR 2 (double) SPARSE, size 32x32, density 0.0625, nnz 64
 %> - FACTOR 3 (double) SPARSE, size 32x32, density 0.0625, nnz 64
 %> - FACTOR 4 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+%>
+%> >>
 %> @endcode
 %>
 %>
