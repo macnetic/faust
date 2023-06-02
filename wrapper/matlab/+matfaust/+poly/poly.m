@@ -1,6 +1,3 @@
-%> @package matfaust.poly @brief The matfaust module for polynomial basis as Faust objects.
-%> @note This module is still in BETA status.
-
 %======================================================================
 %> @brief Computes the linear combination of the polynomials defined by basis.
 %>
@@ -19,16 +16,19 @@
 %> >> L = L*L';
 %> >> coeffs = [.5 1 2 3];
 %> >> G = poly(coeffs, 'chebyshev', 'L', L)
-%> @endcode
 %>
 %> G =
 %>
-%> Faust size 50x50, density 0.3524, nnz_sum 881, 5 factor(s):
-%> - FACTOR 0 (real) SPARSE, size 50x200, density 0.02, nnz 200
-%> - FACTOR 1 (real) SPARSE, size 200x150, density 0.00923333, nnz 277
-%> - FACTOR 2 (real) SPARSE, size 150x100, density 0.0151333, nnz 227
-%> - FACTOR 3 (real) SPARSE, size 100x50, density 0.0254, nnz 127
-%> - FACTOR 4 (real) SPARSE, size 50x50, density 0.02, nnz 50
+%> Faust size 50x50, density 0.35, nnz_sum 875, 5 factor(s):
+%> - FACTOR 0 (double) SPARSE, size 50x200, density 0.02, nnz 200
+%> - FACTOR 1 (double) SPARSE, size 200x150, density 0.00916667, nnz 275
+%> - FACTOR 2 (double) SPARSE, size 150x100, density 0.015, nnz 225
+%> - FACTOR 3 (double) SPARSE, size 100x50, density 0.025, nnz 125
+%> - FACTOR 4 (double) SPARSE, size 50x50, density 0.02, nnz 50
+%>  identity matrix flag
+%>
+%> >>
+%> @endcode
 %>
 %> Which is equivalent to do as below (in two times):
 %>
@@ -36,39 +36,48 @@
 %> >> K = 3;
 %> >> F = basis(L, K, 'chebyshev');
 %> >> G = poly(coeffs, F)
-%> @endcode
 %>
 %> G =
 %>
-%> Faust size 50x50, density 0.3524, nnz_sum 881, 5 factor(s):
-%> - FACTOR 0 (real) SPARSE, size 50x200, density 0.02, nnz 200
-%> - FACTOR 1 (real) SPARSE, size 200x150, density 0.00923333, nnz 277
-%> - FACTOR 2 (real) SPARSE, size 150x100, density 0.0151333, nnz 227
-%> - FACTOR 3 (real) SPARSE, size 100x50, density 0.0254, nnz 127
-%> - FACTOR 4 (real) SPARSE, size 50x50, density 0.02, nnz 50
+%> Faust size 50x50, density 0.35, nnz_sum 875, 5 factor(s):
+%> - FACTOR 0 (double) SPARSE, size 50x200, density 0.02, nnz 200
+%> - FACTOR 1 (double) SPARSE, size 200x150, density 0.00916667, nnz 275
+%> - FACTOR 2 (double) SPARSE, size 150x100, density 0.015, nnz 225
+%> - FACTOR 3 (double) SPARSE, size 100x50, density 0.025, nnz 125
+%> - FACTOR 4 (double) SPARSE, size 50x50, density 0.02, nnz 50
+%>  identity matrix flag
+%>
+%> >>
+%> @endcode
 %>
 %> Above G is a Faust because F is too. Below the full array of the Faust F is passed, so an array is returned into GA.
 %>
 %> @code
-%> GA = poly(coeffs, full(F));
-%> ismatrix(GA)
+%> >> GA = poly(coeffs, full(F));
+%> >> ismatrix(GA)
+%>
+%> ans =
+%>
+%>  	logical
+%>
+%>  	1
+%>
+%> >>
 %> @endcode
-%>
-%>ans =
-%>
-%>	logical
-%>
-%>	1
 %>
 %> But of course they are equal:
 %>
 %> @code
-%> >> norm(GA-full(G))/(norm(GA))
+%> >> norm(GA-full(G))/(norm(GA)) < 1e-16
+%>
+%> ans =
+%>
+%>  	logical
+%>
+%>  	1
+%>
+%> >>
 %> @endcode
-%>
-%>ans =
-%>
-%>   8.8455e-17
 %>
 %======================================================================
 function LC = poly(coeffs, basis, varargin)
@@ -153,7 +162,7 @@ function LC = poly(coeffs, basis, varargin)
 			error('coeffs and basis dimensions must agree.')
 		end
 		d = floor(size(basis,1) / (K+1));
-		if(size(coeffs, 2) == 1)
+		if(size(coeffs, 1) == 1)
 			if(is_real)
 				if(is_float)
 					LC = mexPolyRealFloat('polyMatrix', d, K, size(basis,2), coeffs, basis, on_gpu);
@@ -178,3 +187,7 @@ function LC = poly(coeffs, basis, varargin)
 		% LC is a matrix
 	end
 end
+%> @package matfaust.poly @brief The matfaust module for polynomial basis as Faust objects.
+%> @note This module is still in BETA status.
+
+

@@ -18,29 +18,32 @@
 %> >> L = L*L';
 %> >> K = 3;
 %> >> F = basis(L, K, 'chebyshev')
-%> @endcode
+%>
 %> F =
 %>
 %> Faust size 200x50, density 0.6612, nnz_sum 6612, 4 factor(s):
-%> - FACTOR 0 (real) SPARSE, size 200x150, density 0.0751333, nnz 2254
-%> - FACTOR 1 (real) SPARSE, size 150x100, density 0.146933, nnz 2204
-%> - FACTOR 2 (real) SPARSE, size 100x50, density 0.4208, nnz 2104
-%> - FACTOR 3 (real) SPARSE, size 50x50, density 0.02, nnz 50
+%> - FACTOR 0 (double) SPARSE, size 200x150, density 0.0751333, nnz 2254
+%> - FACTOR 1 (double) SPARSE, size 150x100, density 0.146933, nnz 2204
+%> - FACTOR 2 (double) SPARSE, size 100x50, density 0.4208, nnz 2104
+%> - FACTOR 3 (double) SPARSE, size 50x50, density 0.02, nnz 50
+%>  identity matrix flag
+%> @endcode
 %>
 %> By default, the 0-degree polynomial is the identity.
 %> However it is possible to replace the corresponding matrix by any sparse matrix T0 of your choice (with the only constraint that size(T0,1) == size(L, 1)). In that purpose, do as follows:
 %>
 %> @code
-%> >> T0 = sprand(50, 2, .3)
+%> >> rng(42)
+%> >> T0 = sprand(50, 2, .3);
 %> >> F = basis(L, 3, 'chebyshev', 'T0', T0)
-%> @endcode
 %> F =
 %>
-%> Faust size 200x50, density 0.6612, nnz_sum 6612, 4 factor(s):
-%> - FACTOR 0 (real) SPARSE, size 200x150, density 0.0751333, nnz 2254
-%> - FACTOR 1 (real) SPARSE, size 150x100, density 0.146933, nnz 2204
-%> - FACTOR 2 (real) SPARSE, size 100x50, density 0.4208, nnz 2104
-%> - FACTOR 3 (real) SPARSE, size 50x2, density 0.23, nnz 23
+%> Faust size 200x2, density 16.53, nnz_sum 6612, 4 factor(s):
+%> - FACTOR 0 (double) SPARSE, size 200x150, density 0.0751333, nnz 2254
+%> - FACTOR 1 (double) SPARSE, size 150x100, density 0.146933, nnz 2204
+%> - FACTOR 2 (double) SPARSE, size 100x50, density 0.4208, nnz 2104
+%> - FACTOR 3 (double) SPARSE, size 50x2, density 0.5, nnz 50
+%> @endcode
 %>
 %>
 %=======================================================================

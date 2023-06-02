@@ -1,4 +1,3 @@
-
 %==============================================
 %> @brief Computes an approximate of the action of the matrix exponential of A on B using series of Chebyshev polynomials.
 %>
@@ -16,19 +15,60 @@
 %> @b Example
 %> @code
 %> % in a matlab terminal
+%> >> rng(42)
 %> >> import matfaust.poly.expm_multiply
 %> >> L = sprand(5, 5, .2);
 %> >> L = L*L';
 %> >> x = rand(size(L,2), 1);
 %> >> t = linspace(-.5, -.1, 3);
-%> >> C = expm_multiply(L, x, t);
+%> >> C = expm_multiply(L, x, t)
+%>
+%> C(:,:,1) =
+%>
+%>     0.1796
+%>     0.1706
+%>     0.3698
+%>     0.4223
+%>     0.2662
+%>
+%> C(:,:,2) =
+%>
+%>     0.1809
+%>     0.2164
+%>     0.4254
+%>     0.4261
+%>     0.2748
+%>
+%> C(:,:,3) =
+%>
+%>     0.1825
+%>     0.2721
+%>     0.4893
+%>     0.4300
+%>     0.2852
+%>
+%> >> norm(C(:,:,1) - expm(t(1) * L) * x)
+%>
+%> ans =
+%>
+%>    1.0194e-15
+%>
+%> >> norm(C(:,:,2) - expm(t(2) * L) * x)
+%>
+%> ans =
+%>
+%>    4.9763e-15
+%>
+%> >> norm(C(:,:,3) - expm(t(3) * L) * x)
+%>
+%> ans =
+%>
+%>    6.4160e-15
+%>
+%> >>
 %> @endcode
 %>
-%> C =
-%>
-%>     0.1401    0.4218    0.9157    0.3332    0.2658
-%>     0.1408    0.4218    0.9157    0.4620    0.4532
-%>     0.1415    0.4218    0.9157    0.6580    0.7508
+%> @b see @b also matlab builtin expm
 %==============================================
 function C = expm_multiply(A, B, t, varargin)
 	dev = 'cpu';

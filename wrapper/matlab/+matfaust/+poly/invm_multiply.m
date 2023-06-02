@@ -15,18 +15,20 @@
 %> @b Example
 %> @code
 %> >> import matfaust.poly.*
+%> >> rng(42)
 %> >> A = sprand(64, 64, .1);
 %> >> A = A*A';
 %> >> B = rand(size(A, 2), 2);
 %> >> AinvB = invm_multiply(A, B, 'rel_err', 1e-6);
 %> >> AinvB_ref = inv(full(A))*B;
 %> >> err = norm(AinvB-AinvB_ref)/norm(AinvB)
+%>
+%> err =
+%>
+%>    1.5364e-10
+%>
+%> >>
 %> @endcode
-%>
-%>err =
-%>
-%>   8.5162e-11
-%>
 %==============================================
 function AinvB = invm_multiply(A, B, varargin)
 	dev = 'cpu';

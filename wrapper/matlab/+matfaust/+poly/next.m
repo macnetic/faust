@@ -10,33 +10,35 @@
 %> @code
 %> % in a matlab terminal
 %> >> import matfaust.poly.*
+%> >> rng(42)
 %> >> L = sprand(50, 50, .2);
 %> >> L = L*L';
 %> >> K = 3;
 %> >> F = basis(L, K, 'chebyshev');
 %> >> G = next(F);
 %> >> F
-%> @endcode
+%>
 %> F =
 %>
-%>Faust size 200x50, density 0.6672, nnz_sum 6672, 4 factor(s):
-%>- FACTOR 0 (real) SPARSE, size 200x150, density 0.0758, nnz 2274
-%>- FACTOR 1 (real) SPARSE, size 150x100, density 0.148267, nnz 2224
-%>- FACTOR 2 (real) SPARSE, size 100x50, density 0.4248, nnz 2124
-%>- FACTOR 3 (real) SPARSE, size 50x50, density 0.02, nnz 50
+%> Faust size 200x50, density 0.6624, nnz_sum 6624, 4 factor(s):
+%> - FACTOR 0 (double) SPARSE, size 200x150, density 0.0752667, nnz 2258
+%> - FACTOR 1 (double) SPARSE, size 150x100, density 0.1472, nnz 2208
+%> - FACTOR 2 (double) SPARSE, size 100x50, density 0.4216, nnz 2108
+%> - FACTOR 3 (double) SPARSE, size 50x50, density 0.02, nnz 50
+%>  identity matrix flag
 %>
-%> @code
 %> >> G
-%> @endcode
+%>
 %> G =
 %>
-%> Faust size 250x50, density 0.71968, nnz_sum 8996, 5 factor(s):
-%> - FACTOR 0 (real) SPARSE, size 250x200, density 0.04648, nnz 2324
-%> - FACTOR 1 (real) SPARSE, size 200x150, density 0.0758, nnz 2274
-%> - FACTOR 2 (real) SPARSE, size 150x100, density 0.148267, nnz 2224
-%> - FACTOR 3 (real) SPARSE, size 100x50, density 0.4248, nnz 2124
-%> - FACTOR 4 (real) SPARSE, size 50x50, density 0.02, nnz 50
+%> Faust size 250x50, density 0.71456, nnz_sum 8932, 5 factor(s):
+%> - FACTOR 0 (double) SPARSE, size 250x200, density 0.04616, nnz 2308
+%> - FACTOR 1 (double) SPARSE, size 200x150, density 0.0752667, nnz 2258
+%> - FACTOR 2 (double) SPARSE, size 150x100, density 0.1472, nnz 2208
+%> - FACTOR 3 (double) SPARSE, size 100x50, density 0.4216, nnz 2108
+%> - FACTOR 4 (double) SPARSE, size 50x50, density 0.02, nnz 50
 %>  identity matrix flag
+%>
 %> @endcode
 %>
 %======================================================================
