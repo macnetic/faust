@@ -186,7 +186,7 @@ doctest_nightly_matfaust:
     - rm -Rf build
     # all is set to doctest matfaust
     # no -nojvm because it's needed for Faust.imagesc doctest
-    - 'for S in Faust proj.sp proj.splin proj.spcol proj.splincol proj.const proj.supp proj.normlin proj.normcol proj.blockdiag proj.anticirc proj.circ proj.hankel proj.skperm proj.sptriu proj.sptril proj.spsymm proj.toeplitz proj.proj_id poly.poly poly.expm_multiply poly.next poly.basis poly.expm_inv_multiply; do if matlab -nodisplay -r "addpath /usr/share/octave/packages/doctest-0.7.0/; setup_FAUST; doctest matfaust.$S; exit;" | tee /tmp/matlab_doctest_$ | grep FAIL; then exit 1; else exit 0; fi; done'
+    - 'for S in Faust proj.sp proj.splin proj.spcol proj.splincol proj.const proj.supp proj.normlin proj.normcol proj.blockdiag proj.anticirc proj.circ proj.hankel proj.skperm proj.sptriu proj.sptril proj.spsymm proj.toeplitz proj.proj_id poly.poly poly.expm_multiply poly.next poly.basis poly.expm_inv_multiply factparams.ParamsHierarchicalWHTNoResCons factparams.ParamsHierarchicalRectMatNoResCons factparams.ParamsHierarchicalNoResCons factparams.ParamsHierarchicalRectMat; do if matlab -nodisplay -r "addpath /usr/share/octave/packages/doctest-0.7.0/; setup_FAUST; doctest matfaust.$S; exit;" | tee /tmp/matlab_doctest_$ | grep FAIL; then exit 1; else exit 0; fi; done'
   after_script:
     - if [ $(rpm -qa faust | wc -l) -gt 0 ]; then sudo rpm -e faust;fi
   only:

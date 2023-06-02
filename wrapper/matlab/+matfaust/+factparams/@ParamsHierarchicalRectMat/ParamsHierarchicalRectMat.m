@@ -31,17 +31,17 @@ classdef ParamsHierarchicalRectMat < matfaust.factparams.ParamsHierarchical
 	%>
 	%> @b Example:
 	%> @code
-	%> import matfaust.factparams.*
-	%> % set p1 with m, n, j, k parameters
-	%> p1 = ParamsHierarchicalRectMat(32, 128, 8, 4, 2);
-	%> % now with additional optional rho and P
-	%> p2 =  ParamsHierarchicalRectMat(32, 128, 8, 4, 2, 'rho', .7, 'P', 1.5);
+	%> >> import matfaust.factparams.*
+	%> >> % set p1 with m, n, j, k parameters
+	%> >> p1 = ParamsHierarchicalRectMat(32, 128, 8, 4, 2);
+	%> >> % now with additional optional rho and P
+	%> >> p2 =  ParamsHierarchicalRectMat(32, 128, 8, 4, 2, 'rho', .7, 'P', 1.5);
 	%> @endcode
 	%>
 	%>
-	%> [1] Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse
-        %> approximations of matrices and applications", Journal of Selected
-        %> Topics in Signal Processing, 2016. [https://hal.archives-ouvertes.fr/hal-01167948v1]
+    %> [1] Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse
+    %> approximations of matrices and applications", Journal of Selected
+    %> Topics in Signal Processing, 2016. [https://hal.archives-ouvertes.fr/hal-01167948v1]
         %==================================
 		function p = ParamsHierarchicalRectMat(m, n, j, k, s, varargin)
 			import matfaust.factparams.*
@@ -97,8 +97,8 @@ classdef ParamsHierarchicalRectMat < matfaust.factparams.ParamsHierarchical
 		%> >> num_facts = 9;
 		%> >> k = 10;
 		%> >> s = 8;
-		%> >> p = ParamsHierarchicalRectMat.createParams(rand(256, 1024), {'rectmat', num_facts, k, s})
-		%> >> p2 = ParamsHierarchicalRectMat.createParams(rand(256, 1024), {'rectmat', num_facts, k, s, 'rho', 1.2, 'P', 2})
+		%> >> p = ParamsHierarchicalRectMat.createParams(rand(256, 1024), {'rectmat', num_facts, k, s});
+		%> >> p2 = ParamsHierarchicalRectMat.createParams(rand(256, 1024), {'rectmat', num_facts, k, s, 'rho', 1.2, 'P', 2});
 		%> @endcode
 		%========================
 		function sp = createParams(M, p)

@@ -6,25 +6,31 @@
 %> factors are not constrained at all, the other factors are constrained with
 %> matfaust.proj.skperm.
 %>
-%> @b Example
-%> @code
-%> import matfaust.wht
-%> import matfaust.factparams.*
-%> import matfaust.fact.hierarchical
-%>
-%> H = full(wht(32));
-%> p = ParamsHierarchicalWHTNoResCons(5);
-%> F = hierarchical(H, p)
-%> @endcode
 %>
 %> <b/> See also matfaust.fact.hierarchical, matfaust.demo.hadamard
 % =================================================
 classdef ParamsHierarchicalWHTNoResCons < matfaust.factparams.ParamsHierarchicalNoResCons
     methods
-        % =================================================
+        %=================================================
         %> @param n: the number of output factors (the input matrix to factorize must
         %> be of size [2^n, 2^n]) .
-        % =================================================
+        %>
+        %> @b Example
+        %> @code
+        %> >> import matfaust.wht
+        %> >> import matfaust.factparams.*
+        %> >> import matfaust.fact.hierarchical
+        %> >> H = full(wht(32));
+        %> >> p = ParamsHierarchicalWHTNoResCons(5);
+        %> >> F = hierarchical(H, p);
+        %> Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 1/4
+        %> Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 2/4
+        %> Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 3/4
+        %> Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 4/4
+        %>
+        %> >>
+        %> @endcode
+        %=================================================
         function p = ParamsHierarchicalWHTNoResCons(n, varargin)
             import matfaust.factparams.*
             proj_name = 'skperm'; % because splincol doesn't work well

@@ -1,9 +1,9 @@
 % =========================================================
-%> A ParamsHierarchical specialization for which there is no residual constraints.
+%> @brief A ParamsHierarchical specialization for which there is no residual constraints.
 % =========================================================
 classdef ParamsHierarchicalNoResCons < matfaust.factparams.ParamsHierarchical
 	methods
-		% =========================================================
+		%=========================================================
 		%>	@brief Constructor.
 		%>
 		%>	@param fact_constraints a ConstrainstList or a cell array of matfaust.proj.proj_gen or matfaust.factparams.ConstraintGeneric that define the structure of the pyfaust.fact.hierarchical resulting Faust factors in the same order if is_fact_side_left==true, in the reverse order otherwise.
@@ -27,43 +27,57 @@ classdef ParamsHierarchicalNoResCons < matfaust.factparams.ParamsHierarchical
 		%> @b Example
 		%> This example shows two parametrizations that are equivalent. The first one, p1, is defined trough a ParamsHierarchical instance while the second one, p2, is defined using a ParamsHierarchicalNoResCons instance.
 		%> @code
-		%> import matfaust.proj.*
-		%> import matfaust.factparams.*
-		%> import matfaust.fact.hierarchical
-		%> import matfaust.wht
-		%> H = full(wht(32));
-		%> d = size(H, 1);
-		%> n = ceil(log2(d));
-		%> res_projs = {};
-		%> fac_projs = {};
-		%> for i=1:n
-		%> 	if i == n
-		%> 		res_projs = { res_projs{:}, skperm([d,d], ceil(d/2^i), 'normalized', true)};
-		%> 	else
-		%> 		res_projs = { res_projs{:}, proj_id([d,d])};
-		%> 	end
-		%> 	fac_projs = {fac_projs{:}, skperm([d, d], 2, 'normalized', true)};
-		%> end
-		%> stop_crit = StoppingCriterion(30);
-		%> p1 = ParamsHierarchical(fac_projs, res_projs, stop_crit, stop_crit, 'is_update_way_R2L', true, 'packing_RL', false);
-		%> disp("factorizing with p1 (ParamsHierarchical) into Faust F1")
-		%> F1 = hierarchical(H, p1, 'backend', 2020)
-		%> F1_error = norm(full(F1)-H)/norm(H)
-		%> simple_projs = {fac_projs{:}, res_projs{end}};
-		%> p2 = ParamsHierarchicalNoResCons(simple_projs, stop_crit, stop_crit, 'is_update_way_R2L', true, 'packing_RL', false);
-		%> disp("factorizing with p2 (ParamsHierarchical) into Faust F2")
-		%> F2 = hierarchical(H, p2, 'backend', 2020)
-		%> F2_error = norm(full(F2)-H)/norm(H)
+		%> >> import matfaust.proj.*
+		%> >> import matfaust.factparams.*
+		%> >> import matfaust.fact.hierarchical
+		%> >> import matfaust.wht
+		%> >> H = full(wht(32));
+		%> >> d = size(H, 1);
+		%> >> n = ceil(log2(d));
+		%> >> res_projs = {};
+		%> >> fac_projs = {};
+		%> >> for i=1:n
+		%> .. if i == n
+		%> .. 		res_projs = { res_projs{:}, skperm([d,d], ceil(d/2^i), 'normalized', true)};
+		%> .. else
+		%> .. 		res_projs = { res_projs{:}, proj_id([d,d])};
+		%> .. 	end
+		%> .. fac_projs = {fac_projs{:}, skperm([d, d], 2, 'normalized', true)};
+		%> .. end
+		%> >> stop_crit = StoppingCriterion(30);
+		%> >> p1 = ParamsHierarchical(fac_projs, res_projs, stop_crit, stop_crit, 'is_update_way_R2L', true, 'packing_RL', false);
+		%> >> % factorizing with p1 (ParamsHierarchical) into Faust F1
+		%> >> F1 = hierarchical(H, p1, 'backend', 2020);
+        %> Faust::hierarchical: 1/5
+        %> Faust::hierarchical: 2/5
+        %> Faust::hierarchical: 3/5
+        %> Faust::hierarchical: 4/5
+        %> Faust::hierarchical: 5/5
+        %>
+		%> >> F1_error = norm(full(F1)-H)/norm(H)
+        %>
+        %> F1_error =
+        %>
+        %>      0
+        %>
+		%> >> simple_projs = {fac_projs{:}, res_projs{end}};
+		%> >> p2 = ParamsHierarchicalNoResCons(simple_projs, stop_crit, stop_crit, 'is_update_way_R2L', true, 'packing_RL', false);
+		%> >> % factorizing with p2 (ParamsHierarchical) into Faust F2
+		%> >> F2 = hierarchical(H, p2, 'backend', 2020);
+        %> Faust::hierarchical: 1/5
+        %> Faust::hierarchical: 2/5
+        %> Faust::hierarchical: 3/5
+        %> Faust::hierarchical: 4/5
+        %> Faust::hierarchical: 5/5
+        %>
+		%> >> F2_error = norm(full(F2)-H)/norm(H)
+        %>
+        %> F2_error =
+        %>
+        %>      0
+        %> >>
 		%> @endcode
 		%>
-		%> Output:
-		%> @code
-		%> factorizing with p1 (ParamsHierarchical) into Faust F1
-		%> Faust::hierarchical: 1/5
-		%> Faust::hierarchical: 2/5
-		%> Faust::hierarchical: 3/5
-		%> Faust::hierarchical: 4/5
-		%> Faust::hierarchical: 5/5
 		%>
 		%> F1 = 
 		%>
@@ -102,7 +116,7 @@ classdef ParamsHierarchicalNoResCons < matfaust.factparams.ParamsHierarchical
 		%>
 		%> @endcode
 		%>
-		% =========================================================
+		%=========================================================
 		function p = ParamsHierarchicalNoResCons(fact_constraints, stop_crit1, stop_crit2, varargin)
 			import matfaust.factparams.*
 			import matfaust.proj.proj_id
