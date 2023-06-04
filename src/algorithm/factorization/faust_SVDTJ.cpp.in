@@ -5,6 +5,9 @@
 #include "faust_SVDTJ.h"
 #include "faust_TransformHelper.h"
 #include <complex>
+
+using namespace std;
+
 namespace Faust
 {
 

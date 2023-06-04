@@ -49,12 +49,15 @@
 #include "mx2Faust.h"
 #include "faust2Mx.h"
 #include <stdexcept>
-
-typedef @FAUST_SCALAR@ SCALAR;
-//typedef complex<SCALAR> CPLX_SCALAR; // re-enable if one day complex<float> is supported
-typedef complex<double> CPLX_SCALAR;
+#include <complex>
 
 using namespace Faust;
+using namespace std;
+
+typedef @FAUST_SCALAR@ SCALAR;
+//typedef std::complex<SCALAR> CPLX_SCALAR; // re-enable if one day complex<float> is supported
+typedef complex<double> CPLX_SCALAR;
+
 
 //void svdtj_cplx(const mxArray* matlab_matrix, int J, int t, double tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust mxArray **plhs);
 

@@ -160,6 +160,8 @@ foreach(SCALAR_AND_FSUFFIX IN LISTS MEX_TYPES_AND_SUFFIXES) # TODO: complex<floa
 
     # Truncated Jacobi eigtj and svdtj
     if(NOT ${FAUST_SCALAR} MATCHES "complex")
+	    set(SVD_COMPLEX 1)
+	    set(REAL_TYPE ${FAUST_SCALAR})
 	    configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mex_eigtj.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mex_eigtj${SCALAR}.cpp @ONLY)
 	    configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexsvdtj.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexsvdtj${SCALAR}.cpp @ONLY)
     endif()
