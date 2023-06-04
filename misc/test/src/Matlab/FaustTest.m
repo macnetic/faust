@@ -577,9 +577,9 @@ classdef FaustTest < matlab.unittest.TestCase
 						D = [F H_];
 					end
 					this.verifyEqual(full(C), full(D), 'AbsTol', 1e-11)
-					this.verifyEqual(full(C), cat(dimcat, full(F),full(H)),'AbsTol', 1e-3)
+					this.verifyEqual(full(C), cat(dimcat, full(F),full(H)),'RelTol', 1e-14)
 					C = cat(dimcat,F,H);
-					this.verifyEqual(full(C), cat(dimcat, full(F),full(H)),'AbsTol', 1e-3)
+					this.verifyEqual(full(C), cat(dimcat, full(F),full(H)),'RelTol', 1e-14)
 				end
 			end
 			% test random number of Fausts concatenation
