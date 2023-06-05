@@ -25,14 +25,16 @@
 %> >> param = ParamsPalm4MSA(projs, stop_crit);
 %> >> mhtp_param = MHTPParams('num_its', 60, 'palm4msa_period', 10);
 %> >> G = palm4msa_mhtp(M, param, mhtp_param)
+%>
+%> G =
+%>
+%> Faust size 500x32, density 0.18225, nnz_sum 2916, 2 factor(s):
+%> - FACTOR 0 (double) SPARSE, size 500x32, density 0.15625, nnz 2500
+%> - FACTOR 1 (double) SPARSE, size 32x32, density 0.40625, nnz 416
+%>
+%> >>
 %> @endcode
-%> 
-%> G = 
-%> 
-%> Faust size 500x32, density 0.17825, nnz_sum 2852, 2 factor(s): 
-%> - FACTOR 0 (real) SPARSE, size 500x32, density 0.15625, nnz 2500
-%> - FACTOR 1 (real) SPARSE, size 32x32, density 0.34375, nnz 352
-%> 
+%>
 %==========================================================================
 function  [F,lambda] = palm4msa_mhtp(M, palm4msa_p, mhtp_p, varargin)
 	palm4msa_p.use_MHTP = mhtp_p;

@@ -19,12 +19,12 @@
 %> >> import matfaust.fact.pinvtj
 %> >> rng(42) % for reproducibility
 %> >> M = rand(128, 64);
-%> >> [V, Sp, Uh] = pinvtj(M, 'tol', 1.5e-3);
+%> >> [V, Sp, Uh] = pinvtj(M, 'tol', 1.5e-2);
 %> >> norm(V * Sp * Uh * M - eye(64)) / norm(eye(64))
 %>
 %> ans =
 %>
-%>      0.00036
+%>      0.0036
 %>
 %> @endcode
 %====================================================================

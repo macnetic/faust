@@ -2,22 +2,24 @@
 %==========================================================================================
 %> @brief Approximates M by A S_1 … S_n B using palm4msa.
 %>
+%> @note Notice that A (resp. B) might be multiplied lambda (scale constant of PALM4MSA).
+%> It happens if it is the smallest factor in memory of the output Faust
+%> (so the first (resp. last) factor might differ to A (resp. B) by this multiplicative constant).
 %>
 %> @Example
 %> @code
-%> import matfaust.fact.palm4msa
-%> import matfaust.factparams.*
-%>
-%> p = ParamsPalm4MSA(…
-%>     ConstraintList('spcol', 2, 10, 20, 'sp', 30, 20, 20),…
-%>     StoppingCriterion(50), 'is_verbose', false);
-%> M = rand(10,10);
-%> A = matfaust.rand(10,10);
-%> B = matfaust.rand(20, 10);
-%> [F, lamdba] = palm4msa_constends(M, p, A, B)
-%>
-%> assert(norm(A - factors(F,1))/norm(A) <= eps(double(1)))
-%> assert(norm(B - factors(F,4))/norm(B) <= eps(double(1)))
+%>  >> import matfaust.fact.palm4msa_constends
+%>  >> import matfaust.factparams.*
+%>  >> rng(42)
+%>  >> p = ParamsPalm4MSA(...
+%>   .. ConstraintList('spcol', 2, 10, 20, 'sp', 30, 20, 20),...
+%>   .. StoppingCriterion(50), 'is_verbose', false);
+%>  >> M = rand(10,10);
+%>  >> A = rand(10,10);
+%>  >> B = rand(20, 10);
+%>  >> [F, lamdba] = palm4msa_constends(M, p, A, B);
+%>  >> assert(norm(A - factors(F,1))/norm(A) <= eps(double(1)))
+%>  >> assert(norm(B - factors(F,4))/norm(B) <= eps(double(1)))
 %>
 %> @endcode
 %==========================================================================================
@@ -43,14 +45,5 @@ function [F, lambda] = palm4msa_constends(M, p, A, varargin)
 		'init_lambda', p.init_lambda, 'step_size', p.step_size, 'constant_step_size', ...
 		p.constant_step_size, 'is_verbose', p.is_verbose);
 	[F, lambda ] = palm4msa(M, p);
-	f1 = factors(F, 1);
-	f1 = f1 / lambda;
-	nF = cell(1, numfactors(F));
-	nF{1} = f1;
-	for i=2:numfactors(F)
-		nF{i} = factors(F, i);
-	end
-	nF{2} = nF{2}*lambda;
-	F = matfaust.Faust(nF);
 end
 % experimental block end

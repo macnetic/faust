@@ -31,62 +31,68 @@
 %>
 %> @b Example 1: Fully Defined Parameters for a Random Matrix Factorization
 %> @code
-%>  import matfaust.factparams.*
-%>  import matfaust.fact.hierarchical
-%>  M = rand(500, 32);
-%>  fact_cons = ConstraintList('splin', 5, 500, 32, 'sp', 96, 32, 32, 'sp', 96, 32, 32);
-%>  res_cons = ConstraintList('normcol', 1, 32, 32, 'sp', 666, 32, 32, 'sp', 333, 32, 32);
-%> % or alternatively you can use projectors-functors
-%> % import matfaust.proj.*
-%> % fact_cons = {splin([500,32], 5), sp([32,32], 96), sp([32,32], 96)}
-%> % res_cons = {normcol([32,32], 1), sp([32,32], 666), sp([32,32], 333)}
-%>  stop_crit = StoppingCriterion(200);
-%>  stop_crit2 = StoppingCriterion(200);
-%>  params = ParamsHierarchical(fact_cons, res_cons, stop_crit, stop_crit2, 'is_update_way_R2L', false, 'init_lambda', 1.0);
-%>  F = hierarchical(M, params, 'backend', 2016)
+%> >> import matfaust.factparams.*
+%> >> import matfaust.fact.hierarchical
+%> >> M = rand(500, 32);
+%> >> fact_cons = ConstraintList('splin', 5, 500, 32, 'sp', 96, 32, 32, 'sp', 96, 32, 32);
+%> >> res_cons = ConstraintList('normcol', 1, 32, 32, 'sp', 666, 32, 32, 'sp', 333, 32, 32);
+%> >> % or alternatively you can use projectors-functors
+%> >> % import matfaust.proj.*
+%> >> % fact_cons = {splin([500,32], 5), sp([32,32], 96), sp([32,32], 96)}
+%> >> % res_cons = {normcol([32,32], 1), sp([32,32], 666), sp([32,32], 333)}
+%> >> stop_crit = StoppingCriterion(200);
+%> >> stop_crit2 = StoppingCriterion(200);
+%> >> params = ParamsHierarchical(fact_cons, res_cons, stop_crit, stop_crit2, 'is_update_way_R2L', false, 'init_lambda', 1.0);
+%> >> F = hierarchical(M, params, 'backend', 2016)
+%> Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 1/3<br/>
+%> Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 2/3<br/>
+%> Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 3/3<br/>
+%>
+%>  F =
+%>
+%> Faust size 500x32, density 0.189063, nnz_sum 3025, 4 factor(s):
+%> - FACTOR 0 (double) SPARSE, size 500x32, density 0.15625, nnz 2500
+%> - FACTOR 1 (double) SPARSE, size 32x32, density 0.09375, nnz 96
+%> - FACTOR 2 (double) SPARSE, size 32x32, density 0.09375, nnz 96
+%> - FACTOR 3 (double) SPARSE, size 32x32, density 0.325195, nnz 333
+%>
+%> >>
 %>  @endcode
-%>  Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorization 1/3<br/>
-%>  Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorization 2/3<br/>
-%>  Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorization 3/3<br/>
-%>
-%>  F = 
-%>
-%>  Faust size 500x32, density 0.189063, nnz_sum 3025, 4 factor(s): 
-%>  - FACTOR 0 (real) SPARSE, size 500x32, density 0.15625, nnz 2500
-%>  - FACTOR 1 (real) SPARSE, size 32x32, density 0.09375, nnz 96
-%>  - FACTOR 2 (real) SPARSE, size 32x32, density 0.09375, nnz 96
-%>  - FACTOR 3 (real) SPARSE, size 32x32, density 0.325195, nnz 333
 %>
 %>  @b Example 2: Simplified Parameters for Hadamard Factorization
 %>@code
-%> import matfaust.*
-%> import matfaust.fact.hierarchical
-%> % generate a Hadamard Faust of size 32x32
-%> FH = wht(32);
-%> H = full(FH); % the full matrix version
-%> % factorize it
-%> FH2 = hierarchical(H, 'hadamard');
-%> % test the relative error
-%> norm(FH-FH2, 'fro')/norm(FH, 'fro') % the result is about 1e-16, the factorization is accurate
+%> >> import matfaust.*
+%> >> import matfaust.fact.hierarchical
+%> >> % generate a Hadamard Faust of size 32x32
+%> >> FH = wht(32);
+%> >> H = full(FH); % the full matrix version
+%> >> % factorize it
+%> >> FH2 = hierarchical(H, 'hadamard')
+%> Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 1/4
+%> Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 2/4
+%> Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 3/4
+%> Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 4/4
+%>
+%> FH2 =
+%>
+%> Faust size 32x32, density 0.3125, nnz_sum 320, 5 factor(s):
+%> - FACTOR 0 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+%> - FACTOR 1 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+%> - FACTOR 2 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+%> - FACTOR 3 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+%> - FACTOR 4 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+%>
+%> >> % test the relative error
+%> >> norm(FH-FH2, 'fro')/norm(FH, 'fro') < 1e-15 % the result is about 1e-16, the factorization is accurate doctest: +ELLIPSIS
+%>
+%> ans =
+%>
+%>   ... logical ...
+%>
+%>    1
+%>
+%> >>
 %>@endcode
-%>FH =
-%>
-%>Faust size 32x32, density 0.3125, nnz_sum 320, 5 factor(s):
-%>- FACTOR 0 (real) SPARSE, size 32x32, density 0.0625, nnz 64
-%>- FACTOR 1 (real) SPARSE, size 32x32, density 0.0625, nnz 64
-%>- FACTOR 2 (real) SPARSE, size 32x32, density 0.0625, nnz 64
-%>- FACTOR 3 (real) SPARSE, size 32x32, density 0.0625, nnz 64
-%>- FACTOR 4 (real) SPARSE, size 32x32, density 0.0625, nnz 64
-%>
-%>FH2 =
-%>
-%>Faust size 32x32, density 0.3125, nnz_sum 320, 5 factor(s):
-%>- FACTOR 0 (real) SPARSE, size 32x32, density 0.0625, nnz 64
-%>- FACTOR 1 (real) SPARSE, size 32x32, density 0.0625, nnz 64
-%>- FACTOR 2 (real) SPARSE, size 32x32, density 0.0625, nnz 64
-%>- FACTOR 3 (real) SPARSE, size 32x32, density 0.0625, nnz 64
-%>- FACTOR 4 (real) SPARSE, size 32x32, density 0.0625, nnz 64
-%>
 %>
 %>@b Example 3: Simplified Parameters for a Rectangular Matrix Factorization (the BSL demo  MEG matrix)
 %>
@@ -100,51 +106,64 @@
 %> >> k = 10;
 %> >> s = 8;
 %> >> MEG16 = hierarchical(MEG, {'rectmat', num_facts, k, s})
-%> @endcode
+%>
 %> MEG16 =
 %>
 %> Faust size 204x8193, density 0.0631655, nnz_sum 105573, 9 factor(s):
-%> - FACTOR 0 (real) SPARSE, size 204x204, density 0.293613, nnz 12219
-%> - FACTOR 1 (real) SPARSE, size 204x204, density 0.0392157, nnz 1632
-%> - FACTOR 2 (real) SPARSE, size 204x204, density 0.0392157, nnz 1632
-%> - FACTOR 3 (real) SPARSE, size 204x204, density 0.0392157, nnz 1632
-%> - FACTOR 4 (real) SPARSE, size 204x204, density 0.0392157, nnz 1632
-%> - FACTOR 5 (real) SPARSE, size 204x204, density 0.0392157, nnz 1632
-%> - FACTOR 6 (real) SPARSE, size 204x204, density 0.0392157, nnz 1632
-%> - FACTOR 7 (real) SPARSE, size 204x204, density 0.0392157, nnz 1632
-%> - FACTOR 8 (real) SPARSE, size 204x8193, density 0.0490196, nnz 81930
+%> - FACTOR 0 (double) SPARSE, size 204x204, density 0.293613, nnz 12219
+%> - FACTOR 1 (double) SPARSE, size 204x204, density 0.0392157, nnz 1632
+%> - FACTOR 2 (double) SPARSE, size 204x204, density 0.0392157, nnz 1632
+%> - FACTOR 3 (double) SPARSE, size 204x204, density 0.0392157, nnz 1632
+%> - FACTOR 4 (double) SPARSE, size 204x204, density 0.0392157, nnz 1632
+%> - FACTOR 5 (double) SPARSE, size 204x204, density 0.0392157, nnz 1632
+%> - FACTOR 6 (double) SPARSE, size 204x204, density 0.0392157, nnz 1632
+%> - FACTOR 7 (double) SPARSE, size 204x204, density 0.0392157, nnz 1632
+%> - FACTOR 8 (double) SPARSE, size 204x8193, density 0.0490196, nnz 81930
 %>
-%> @code
 %> >> % verify the constraint k == 10, on column 5
 %> >> fac9 = factors(MEG16,9);
 %> >> numel(nonzeros(fac9(:,5)))
-%> @endcode
+%>
 %> ans =
 %>
-%> 10
+%>      10
 %>
-%> @code
 %> >> % now verify the s constraint is respected on MEG16 factor 2
 %> >> numel(nonzeros(factors(MEG16, 2)))/size(MEG16,1)
+%>
+%> ans =
+%>
+%>      8
+%>
+%> >>
 %> @endcode
 %>
-%>ans =
-%>
-%> 8
 %> <br/>
 %> @b Example 4: Simplified Parameters for Discrete Fourier Transform Factorization
-%>@code
-%> import matfaust.*
-%> import matfaust.fact.hierarchical
-%> % generate a DFT Faust of size 32x32
-%> FDFT = dft(32);
-%> DFT = full(DFT); % the full matrix version
-%> % factorize it
-%> FDFT2 = hierarchical(DFT, 'dft');
-%> % test the relative error
-%> norm(FDFT-FDFT2, 'fro')/norm(FDFT, 'fro') % the result is about 1e-6, the factorization is accurate
+%> @code
+%> >> import matfaust.*
+%> >> import matfaust.fact.hierarchical
+%> >> % generate a DFT Faust of size 32x32
+%> >> FDFT = dft(32);
+%> >> DFT = full(FDFT); % the full matrix version
+%> >> % factorize it
+%> >> FDFT2 = hierarchical(DFT, 'dft');
+%>  Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 1/5
+%>  Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 2/5
+%>  Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 3/5
+%>  Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 4/5
+%>  Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 5/5
+%>
+%> >> % test the relative error
+%> >> norm(FDFT-FDFT2, 'fro')/norm(FDFT, 'fro') < 1e-5 % the result is about 1e-6, the factorization is accurate doctest: +ELLIPSIS
+%>
+%> ans =
+%>
+%>   ... logical ...
+%>
+%>    1
+%>
 %> >> FDFT
-%>@endcode
 %>
 %> FDFT =
 %>
@@ -155,9 +174,7 @@
 %> - FACTOR 3 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
 %> - FACTOR 4 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
 %> - FACTOR 5 (complex) SPARSE, size 32x32, density 0.03125, nnz 32
-%> @code
 %> >> FDFT2
-%> @endcode
 %>
 %> FDFT2 =
 %>
@@ -168,6 +185,7 @@
 %> - FACTOR 3 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
 %> - FACTOR 4 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
 %> - FACTOR 5 (complex) SPARSE, size 32x32, density 1, nnz 1024
+%> @endcode
 %>
 %> @b Example 5: Simplified Parameters for Hadamard Factorization without residual
 %> constraints</b>
@@ -184,21 +202,18 @@
 %> >> H = full(FH); % the full matrix version
 %> >> % factorize it
 %> >> FH2 = hierarchical(H, 'hadamard_simple', 'backend', 2020);
-%> @endcode
 %> Faust::hierarchical: 1/4<br/>
 %> Faust::hierarchical: 2/4<br/>
 %> Faust::hierarchical: 3/4<br/>
 %> Faust::hierarchical: 4/4<br/>
-%> @code
 %> >> % test the relative error
 %> >> norm(H-full(FH2), 'fro')/norm(H, 'fro')
-%> @endcode
+%>
 %> ans =
 %>
 %>      0
-%> @code
+%>
 %> >> FH2
-%> @endcode
 %>
 %> FH2 =
 %>
@@ -208,6 +223,8 @@
 %>      - FACTOR 2 (double) SPARSE, size 32x32, density 0.0625, nnz 64
 %>      - FACTOR 3 (double) SPARSE, size 32x32, density 0.0625, nnz 64
 %>      - FACTOR 4 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+%>
+%> @endcode
 %>
 %> @b Example 6: Simplified Parameters for a Rectangular Matrix Factorization (the BSL demo MEG matrix) without residual constraints</b>
 %>
@@ -228,46 +245,49 @@
 %> >> MEG = load('matrix_MEG.mat');
 %> >> MEG = MEG.matrix.';
 %> >> F1 = hierarchical(MEG, {'MEG', 5, 10, 8}, 'backend', 2020)
-%> @endcode
+%> Faust::hierarchical: 1/4
+%> Faust::hierarchical: 2/4
+%> Faust::hierarchical: 3/4
+%> Faust::hierarchical: 4/4
 %>
 %> F1 =
 %>
-%> Faust size 204x8193, density 0.0697966, nnz_sum 116656, 5 factor(s):
-%> - FACTOR 0 (double) DENSE, size 204x204, density 0.716792, nnz 29830
+%> Faust size 204x8193, density 0.0697972, nnz_sum 116657, 5 factor(s):
+%> - FACTOR 0 (double) DENSE, size 204x204, density 0.716816, nnz 29831
 %> - FACTOR 1 (double) SPARSE, size 204x204, density 0.0392157, nnz 1632
 %> - FACTOR 2 (double) SPARSE, size 204x204, density 0.0392157, nnz 1632
 %> - FACTOR 3 (double) SPARSE, size 204x204, density 0.0392157, nnz 1632
 %> - FACTOR 4 (double) SPARSE, size 204x8193, density 0.0490196, nnz 81930
 %>
-%> @code
 %> >> F2 = hierarchical(MEG, {'MEG_SIMPLE', 5, 10, 8}, 'backend', 2020)
-%> @endcode
+%> Faust::hierarchical: 1/4
+%> Faust::hierarchical: 2/4
+%> Faust::hierarchical: 3/4
+%> Faust::hierarchical: 4/4
 %>
 %> F2 =
 %>
-%> Faust size 204x8193, density 0.0697966, nnz_sum 116656, 5 factor(s):
-%> - FACTOR 0 (double) DENSE, size 204x204, density 0.716792, nnz 29830
+%> Faust size 204x8193, density 0.0697972, nnz_sum 116657, 5 factor(s):
+%> - FACTOR 0 (double) DENSE, size 204x204, density 0.716816, nnz 29831
 %> - FACTOR 1 (double) SPARSE, size 204x204, density 0.0392157, nnz 1632
 %> - FACTOR 2 (double) SPARSE, size 204x204, density 0.0392157, nnz 1632
 %> - FACTOR 3 (double) SPARSE, size 204x204, density 0.0392157, nnz 1632
 %> - FACTOR 4 (double) SPARSE, size 204x8193, density 0.0490196, nnz 81930
 %>
-%> @code
 %> >> % compare the errors:
 %> >> norm(MEG-full(F2), 'fro') / norm(MEG, 'fro')
-%> @endcode
 %>
 %> ans =
 %>
 %>     0.1303
 %>
-%> @code
 %> >> norm(MEG-full(F1), 'fro') / norm(MEG, 'fro')
-%> @endcode
 %>
 %> ans =
 %>
 %>     0.1260
+%> >>
+%> @endcode
 %>
 %> <p> @b See @b also matfaust.faust_fact, factparams.ParamsHierarchical, factparams.ParamsHierarchicalWHT, factparams.ParamsHierarchicalRectMat,factparams.ParamsHierarchicalDFT
 %==========================================================================================

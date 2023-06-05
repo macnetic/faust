@@ -20,23 +20,23 @@
 %> @b Example
 %>
 %> @code
-%>  import matfaust.factparams.*
-%>  import matfaust.fact.palm4msa
-%>  M = rand(500, 32);
-%>  cons = ConstraintList('splin', 5, 500, 32, 'normcol', 1, 32, 32);
-%>  % or alternatively, using the projectors
-%>  % import matfaust.proj.*
-%>  % cons = {splin([500,32], 5), normcol([32,32], 1)};
-%>  stop_crit = StoppingCriterion(200);
-%>  params = ParamsPalm4MSA(cons, stop_crit, 'is_update_way_R2L', false, 'init_lambda', 1.0);
-%>  F = palm4msa(M, params, 'backend', 2016)
-%> @endcode
+%> >>  import matfaust.factparams.*
+%> >>  import matfaust.fact.palm4msa
+%> >>  M = rand(500, 32);
+%> >>  cons = ConstraintList('splin', 5, 500, 32, 'normcol', 1, 32, 32);
+%> >>  % or alternatively, using the projectors
+%> >>  % import matfaust.proj.*
+%> >>  % cons = {splin([500,32], 5), normcol([32,32], 1)};
+%> >>  stop_crit = StoppingCriterion(200);
+%> >>  params = ParamsPalm4MSA(cons, stop_crit, 'is_update_way_R2L', false, 'init_lambda', 1.0);
+%> >>  F = palm4msa(M, params, 'backend', 2016)
 %>
 %> F =
 %>
 %> Faust size 500x32, density 0.22025, nnz_sum 3524, 2 factor(s):
-%> - FACTOR 0 (real) SPARSE, size 500x32, density 0.15625, nnz 2500
-%> - FACTOR 1 (real) DENSE, size 32x32, density 1, nnz 1024
+%> - FACTOR 0 (double) SPARSE, size 500x32, density 0.15625, nnz 2500
+%> - FACTOR 1 (double) DENSE, size 32x32, density 1, nnz 1024
+%> @endcode
 %>
 %>
 %> See also matfaust.factparams.ParamsPalm4msaWHT to factorize a Hadamard matrix using the SKPERM projector.

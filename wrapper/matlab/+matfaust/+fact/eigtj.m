@@ -44,26 +44,25 @@
 %>
 %> @b Example
 %> @code
-%> import matfaust.fact.eigtj
-%>
-%> % get a Laplacian to diagonalize
-%> load('Laplacian_256_community.mat')
-%> % do it
-%> [Uhat, Dhat] = eigtj(Lap, 'nGivens', size(Lap,1)*100, 'nGivens_per_fac', size(Lap, 1)/2, 'verbosity', 2, 'enable_large_Faust', true)
-%> % Uhat is the Fourier matrix/eigenvectors approximation as a Faust (200 factors)
-%> % Dhat the eigenvalues diagonal matrix approx.
-%> % Computing the decomposition of the same matrix but targeting a precise relative error
-%> [Uhat2, Dhat2] = eigtj(Lap, 'tol', 0.01)
-%> assert(norm(Lap-Uhat2*Dhat2*Uhat2', 'fro')/norm(Lap, 'fro') < .011)
-%> % and then asking for an absolute error
-%> [Uhat3, Dhat3] = eigtj(Lap, 'tol', 0.1, 'relerr', false)
-%> assert(norm(Lap-Uhat3*Dhat3*Uhat3', 'fro') < .11)
-%> % now recompute Uhat2, Dhat2 but asking a descending order of eigenvalues
-%> [Uhat4, Dhat4] = eigtj(Lap, 'tol', 0.01, 'order', 'descend')
-%> assert(all(all(Dhat4(end:-1:1,end:-1:1) == Dhat2(1:end,1:end))))
-%> % and now with no sort
-%> [Uhat5, Dhat5] = eigtj(Lap, 'tol', 0.01, 'order', 'undef');
-%> assert(all(sort(diag(Dhat5)) == diag(Dhat2)))
+%> >> import matfaust.fact.eigtj
+%> >> % get a Laplacian to diagonalize
+%> >> load('Laplacian_256_community.mat')
+%> >> % do it
+%> >> [Uhat, Dhat] = eigtj(Lap, 'nGivens', size(Lap,1)*100, 'nGivens_per_fac', size(Lap, 1)/2, 'enable_large_Faust', true);
+%> >> % Uhat is the Fourier matrix/eigenvectors approximation as a Faust (200 factors)
+%> >> % Dhat the eigenvalues diagonal matrix approx.
+%> >> % Computing the decomposition of the same matrix but targeting a precise relative error
+%> >> [Uhat2, Dhat2] = eigtj(Lap, 'tol', 0.01);
+%> >> assert(norm(Lap-Uhat2*Dhat2*Uhat2', 'fro')/norm(Lap, 'fro') < .011)
+%> >> % and then asking for an absolute error
+%> >> [Uhat3, Dhat3] = eigtj(Lap, 'tol', 0.1, 'relerr', false);
+%> >> assert(norm(Lap-Uhat3*Dhat3*Uhat3', 'fro') < .11)
+%> >> % now recompute Uhat2, Dhat2 but asking a descending order of eigenvalues
+%> >> [Uhat4, Dhat4] = eigtj(Lap, 'tol', 0.01, 'order', 'descend');
+%> >> assert(all(all(Dhat4(end:-1:1,end:-1:1) == Dhat2(1:end,1:end))))
+%> >> % and now with no sort
+%> >> [Uhat5, Dhat5] = eigtj(Lap, 'tol', 0.01, 'order', 'undef');
+%> >> assert(all(sort(diag(Dhat5)) == diag(Dhat2)))
 %> @endcode
 %>
 %>

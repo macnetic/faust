@@ -72,7 +72,7 @@
 %>    3.1328e-15
 %> >> % Specifying a different number of rotations for U and V
 %> >> % Because U is smaller it should need less rotations
-%> >> [U2, S2, V2] = svdtj(M, 'nGivens', [2400, 3200], 'enable_large_Faust', true)
+%> >> [U2, S2, V2] = svdtj(M, 'nGivens', [2400, 3200], 'enable_large_Faust', true);
 %> >> norm(U2 * S2 * V2' - M) / norm(M)
 %>
 %> ans =
@@ -80,6 +80,8 @@
 %>    3.1141e-15
 %> >> % Factoring according to an approximate accuracy target
 %> >> [U3, S3, V3] = svdtj(M, 'tol', 1e-12, 'enable_large_Faust', false);
+%> Warning: eigtj stopped on U approximate which is too long to be worth it, set enable_large_Faust to true if you want to continue anyway...
+%> Warning: eigtj stopped on V approximate which is too long to be worth it, set enable_large_Faust to true if you want to continue anyway...
 %> >> norm(U3 * S3 * V3' - M) / norm(M)
 %>
 %> ans =
@@ -116,7 +118,7 @@
 %>
 %> >> % but it is not, svdtj stopped automatically on U1 because its error stopped enhancing
 %> >> % (it can be verified with: 'verbosity', 1)
-%>%> >> [length(U2), length(V2)]
+%> >> [length(U2), length(V2)]
 %>
 %> ans =
 %>

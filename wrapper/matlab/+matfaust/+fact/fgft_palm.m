@@ -18,51 +18,50 @@
 %>
 %> @b Example
 %> @code
-%> import matfaust.*
-%> import matfaust.factparams.*
-%> import matfaust.fact.fgft_palm
+%>  >> import matfaust.*
+%>  >> import matfaust.factparams.*
+%>  >> import matfaust.fact.fgft_palm
+%>  >> % get the Laplacian
+%>  >> load('Laplacian_128_ring.mat');
+%>  >> [U, D] = eig(Lap);
+%>  >> [D, I] = sort(diag(D));
+%>  >> D = diag(D);
+%>  >> U = U(:,I);
+%>  >> dim = size(Lap, 1);
+%>  >> nfacts = round(log2(dim)-3);
+%>  >> over_sp = 1.5; % sparsity overhead
+%>  >> dec_fact = .5; % decrease of the residuum sparsity
+%>  >> % define the sparsity constraints for the factors
+%> >> fact_cons = {};
+%> >> res_cons = {};
+%> >> for i=1:nfacts
+%> ..    fact_cons = [ fact_cons {ConstraintInt('sp', dim, dim, min(round(dec_fact^i*dim^2*over_sp), size(Lap,1)))} ];
+%> ..    res_cons = [ res_cons {ConstraintInt('sp', dim, dim, min(round(2*dim*over_sp), size(Lap, 1)))} ];
+%> .. end
+%> >> % set the parameters for the PALM hierarchical algo.
+%> >> params = ParamsHierarchical(fact_cons, res_cons, StoppingCriterion(50), StoppingCriterion(100), 'step_size', 1e-6, 'constant_step_size', true, 'init_lambda', 1.0, 'is_fact_side_left', false);
+%> >> %% compute FGFT for Lap, U, D
+%> >> init_D_diag = diag(D);
+%> >> [Uhat, Dhat, lambda, ~ ] = fgft_palm(U, Lap, params, init_D_diag);
+%> Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 1/4
+%> Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 2/4
+%> Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 3/4
+%> Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 4/4
 %>
-%> % get the Laplacian
-%> load('Laplacian_128_ring.mat');
+%> >> %% errors on FGFT and Laplacian reconstruction
+%> >> err_U = norm(Uhat-U, 'fro')/norm(U, 'fro')
 %>
-%> [U, D] = eig(Lap);
-%> [D, I] = sort(diag(D));
-%> D = diag(D);
-%> U = U(:,I);
+%>     err_U =
 %>
-%> dim = size(Lap, 1);
+%>    		1.0133
 %>
-%> nfacts = round(log2(dim)-3);
-%> over_sp = 1.5; % sparsity overhead
-%> dec_fact = .5; % decrease of the residuum sparsity
+%> >> err_Lap = norm(Uhat*full(Dhat)*Uhat'-Lap, 'fro') / norm(Lap, 'fro')
 %>
-%> % define the sparsity constraints for the factors
-%> fact_cons = {};
-%> res_cons = {};
-%> for i=1:nfacts
-%>     fact_cons = [ fact_cons {ConstraintInt('sp', dim, dim, min(round(dec_fact^j*dim^2*over_sp), size(Lap,1)))} ];
-%>     res_cons = [ res_cons {ConstraintInt('sp', dim, dim, min(round(2*dim*over_sp), size(Lap, 1)))} ];
-%> end
+%>     err_Lap =
 %>
-%> % set the parameters for the PALM hierarchical algo.
-%> params = ParamsHierarchical(fact_cons, res_cons, StoppingCriterion(50), StoppingCriterion(100), 'step_size', 1e-6, 'constant_step_size', true, 'init_lambda', 1.0, 'is_fact_side_left', false);
-%> %% compute FGFT for Lap, U, D
-%> init_D_diag = diag(D);
-%> [Uhat, Dhat, lambda, ~ ] = fgft_palm(U, Lap, params, init_D_diag);
+%>      	0.9623
 %>
-%> %% errors on FGFT and Laplacian reconstruction
-%> err_U = norm(Uhat-U, 'fro')/norm(U, 'fro')
-%> err_Lap = norm(Uhat*full(Dhat)*Uhat'-Lap, 'fro') / norm(Lap, 'fro')
-%> % Output:
-%> % Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 1/4
-%> % Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 2/4
-%> % Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 3/4
-%> % Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 4/4
-%> %    err_U =
-%> %   		1.0013
-%> %    err_Lap =
-%> %    	0.9707
-%>
+%> >>
 %> @endcode
 %>
 %> <p> @b See @b also fact.fact_hierarchical, fact.eigtj, fact.fgft_givens

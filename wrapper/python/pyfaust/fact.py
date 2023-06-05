@@ -5,12 +5,11 @@
 ##
 ##    This module gives access to the main factorization algorithms of
 ##    FAuST. These algorithms can factorize a dense matrix into a sparse product
-##    (i.e. a Faust object). A few of them are only available in experimental
-##    packages.
+##    (i.e. a Faust object).
 ##
 ##    There are several factorization algorithms.
 ##
-##    - The first one is Palm4MSA :
+##    - The first one is PALM4MSA:
 ##    which stands for Proximal Alternating Linearized Minimization for
 ##    Multi-layer Sparse Approximation. Note that Palm4MSA is not
 ##    intended to be used directly. You should rather rely on the second algorithm.
@@ -22,6 +21,7 @@
 ##
 ##    - The third group of algorithms is for approximate eigenvalue decomposition (eigtj) and singular value decomposition (svdtj).
 ##
+##    - The fourth algorithm is pyfaust.fact.butterfly.
 ##
 ##
 
