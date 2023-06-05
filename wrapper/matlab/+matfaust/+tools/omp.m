@@ -7,7 +7,7 @@
 %> &nbsp;&nbsp;&nbsp; <b> x=omp(y, D, 'maxiter', N)</b> stops the algorithm after N iterations.<br/>
 %> &nbsp;&nbsp;&nbsp; <b> x=omp(y, D, 'tol', 10^-16)</b> runs the algoritm until the relative error is lower or equal to 10**-16. This is equivalent to <b>x=omp(y, D, 'tol', 10^-16, 'relerr', true)</b><br/>
 %> &nbsp;&nbsp;&nbsp; <b> x=omp(y, D, 'maxiter', N, 'tol', 10^-16)</b> runs at most N iterations until the <code>tol</code> precision is reached.<br/>
-%> &nbsp;&nbsp;&nbsp; <b>x=omp(y, D, 'tol', 10^-16, 'relerr', false)</b> runs the algoritm until the absolute error is lower or equal to 10**-16.<br/><br/>
+%> &nbsp;&nbsp;&nbsp; <b>x=omp(y, D, 'tol', 10^-16, 'relerr', false)</b> runs the algorithm until the absolute error is lower or equal to 10**-16.<br/><br/>
 %>
 %>
 %> @param y The vector to approximate by D*x.
@@ -20,7 +20,46 @@
 %> @param 'verbose', false (optional) To disable the verbosity (this is the default option).
 %>
 %>
-%>@return x the solution of y = D*x (according to the error).
+%> @return x the solution of y = D*x (according to the error).
+%>
+%> @b Example:
+%> @code
+%> >> rng(42)
+%> >> F = matfaust.rand(15, 10);
+%> >> x = rand(10, 1)
+%>
+%> x =
+%>
+%>     0.3745
+%>     0.9507
+%>     0.7320
+%>     0.5987
+%>     0.1560
+%>     0.1560
+%>     0.0581
+%>     0.8662
+%>     0.6011
+%>     0.7081
+%>
+%> >> y = F * x;
+%> >> x_ = matfaust.tools.omp(y, F)
+%> Stopping. Exact signal representation found!
+%>
+%> x_ =
+%>
+%>     0.3745
+%>     0.9507
+%>     0.7320
+%>     0.5987
+%>     0.1560
+%>     0.1560
+%>     0.0581
+%>     0.8662
+%>     0.6011
+%>     0.7081
+%>
+%> @endcode
+%>
 %===============================================================================
 function x = omp(y, D, varargin)
 	argc = length(varargin);
