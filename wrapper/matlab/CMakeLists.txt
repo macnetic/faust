@@ -47,9 +47,10 @@ foreach(MATFAUST_FILE IN LISTS FAUST_MATLAB_MATFAUST_FILE_LIST)
 		add_custom_command(
 			OUTPUT ${FAUST_MATLAB_BIN_DIR}/expfiltered/${MATFAUST_FILE}
 			COMMAND ${CMAKE_COMMAND} -E make_directory ${FAUST_MATLAB_BIN_DIR}/expfiltered/${PARENT_DIR}
-			COMMAND
-			${CMAKE_COMMAND} -E copy
+			COMMAND ${CMAKE_COMMAND} -E copy
 			${FAUST_MATLAB_NAMESPACE_SRC_DIR}/${MATFAUST_FILE}
+			${FAUST_MATLAB_BIN_DIR}/expfiltered/${MATFAUST_FILE}
+			COMMAND python ${PROJECT_SOURCE_DIR}/misc/binpkg_postinst_scripts/remove_experimental_tags.py
 			${FAUST_MATLAB_BIN_DIR}/expfiltered/${MATFAUST_FILE}
 			DEPENDS ${FAUST_MATLAB_NAMESPACE_SRC_DIR}/${MATFAUST_FILE}
 			COMMENT "Copying matfaust ${MATFAUST_FILE} code including experimental code.")
