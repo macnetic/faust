@@ -201,6 +201,8 @@ classdef quickstart
 		%> This demo presents the method to factorize a given matrix into a Faust.
 		%============================================================
 		function factorize_matrix()
+			import matfaust.proj.sp
+			import matfaust.factparams.*
 			% number of row of the matrix
 			dim1 = 500;
 			% number of column of the matrix
@@ -217,8 +219,14 @@ classdef quickstart
 			%% generate parameters of the factorization
 			params = generate_params(dim1,dim2,nb_factor,rcg_);
 
-			%% factorization (create Faust from matrix A)
-			faust_A = faust_decompose(A,params);
+            fact_cons = {sp([dim1, dim1], 1667)};
+            res_cons = {sp([dim1, dim2], 3333)};
+            stop_crit = StoppingCriterion(200);
+            stop_crit2 = StoppingCriterion(200);
+            params = ParamsHierarchical(fact_cons, res_cons, stop_crit, stop_crit2);
+
+            %% factorization (create Faust from matrix A)
+            faust_A = matfaust.fact.hierarchical(A,params);
 			faust_A = optimize_memory(faust_A);
 
 			%% speed-up multiplication

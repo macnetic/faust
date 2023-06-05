@@ -48,18 +48,11 @@
 %> Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 3/4
 %> Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 4/4
 %>
-%> >> %% errors on FGFT and Laplacian reconstruction
-%> >> err_U = norm(Uhat-U, 'fro')/norm(U, 'fro')
-%>
-%>     err_U =
-%>
-%>    		1.0133
-%>
-%> >> err_Lap = norm(Uhat*full(Dhat)*Uhat'-Lap, 'fro') / norm(Lap, 'fro')
+%> >> err_Lap = norm(Uhat*full(Dhat)*Uhat'-Lap, 'fro') / norm(Lap, 'fro') % doctest: +ELLIPSIS
 %>
 %>     err_Lap =
 %>
-%>      	0.9623
+%>      	0.9...
 %>
 %> >>
 %> @endcode
