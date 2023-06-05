@@ -1584,7 +1584,14 @@ namespace Faust
 		TransformHelper<FPP, Cpu>* TransformHelper<FPP,Cpu>::optButterflyFaust(const TransformHelper<FPP, Cpu>* F)
 		{
 			//TODO: verify a few assertions to detect if F factors do not match a butterfly structure
-			// TODO: what if F's state is special (transpose, conjugate, sliced, indexed)?
+			for(auto fac: F->transform->data)
+			{
+				if(dynamic_cast<MatButterfly<FPP, Cpu>*>(fac))
+				{
+					std::cerr << "warning: this Faust is already Butterfly optimized (untouched Faust returned)." << std::endl;
+					return const_cast<TransformHelper<FPP, Cpu>*>(F);
+				}
+			}
 			bool has_perm = false;
 			const MatSparse<FPP, Cpu>* last_sp_mat = nullptr;
 			// test if last_perm is a valid permutation (if not it is assumed that it's a butterfly matrix)
@@ -1593,6 +1600,8 @@ namespace Faust
 			std::vector<MatGeneric<FPP,Cpu>*> factors(F->size());
 			optButterfly_factors(factors, has_perm, F->transform->data);
 			auto oF = new TransformHelper<FPP, Cpu>(factors, FPP(1.0), false, false, /* internal call */ true);
+			// TODO: what if F is sliced, indexed?
+			// handle transpose/conjugate state
 			if(F->is_transposed && F->is_conjugate)
 			{
 				auto oF_ = oF->adjoint();
