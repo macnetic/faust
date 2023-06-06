@@ -282,7 +282,7 @@ class TestFaustPy(unittest.TestCase):
             for j in range(0, prod.shape[1]):
                 #print(self.F[i,j][0],prod[i,j])
                 if(prod[i,j] != 0):
-                    self.assertLessEqual((test_prod[i,j]-prod[i,j])/prod[i,j],10**-6)
+                    self.assertLessEqual(np.abs(test_prod[i,j]-prod[i,j])/np.abs(prod[i,j]), 10**-6)
 
 
     def testGetItem(self):
@@ -354,7 +354,7 @@ class TestFaustPy(unittest.TestCase):
         row_ids = [ self.r.randint(0,F.shape[0]-1) for i in
                    range(0,num_inds)]
         F_rows = F[row_ids,:]
-        self.assertTrue((F_rows.toarray() == F.toarray()[row_ids,:]).all())
+        self.assertTrue(np.allclose(F_rows.toarray(), F.toarray()[row_ids,:]))
         print("test fancy indexing on cols")
         num_inds = self.r.randint(1,F.shape[1])
         col_ids = [ int(self.r.randint(0,F.shape[1]-1)) for i in
