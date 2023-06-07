@@ -30,6 +30,7 @@ stages:
     - test
     - pkg_purepy
     - pkg
+    - code_cov
     - pkg_test
     - pkg_pub
     - gitlab_pages
@@ -196,6 +197,41 @@ doctest_nightly_matfaust:
     - matlab
   except:
     - tags
+
+pyfaust_test_code_coverage:
+  stage: code_cov
+  script:
+    # use conda rather than venv because python built on VM has not been
+    # built with --enable-loadable-sqlite-extensions (and sqlite-devel)
+    # but it is a need of coverave python package
+    # so we use py3.9 from conda
+    - conda create -n test_coverage_pyfaust python==3.9
+    - conda activate test_coverage_pyfaust
+      # install pyfaust with pip
+    - pip install $(find ./ -name "*pyfaust*whl")
+    - conda install -c conda-forge -y coverage
+    - coverage erase # just in case
+    - 'PYFAUST_DIR=$(dirname $(python -c "import pyfaust as pf; print(pf.__file__)"))'
+    - coverage run --source $PYFAUST_DIR misc/test/src/Python/test_FaustPy.py
+    - coverage run -a --source $PYFAUST_DIR $PYFAUST_DIR/tests/run.py
+    - coverage report $(find $PYFAUST_DIR -name "*.py" | grep -v -w tests)
+    - coverage html $(find $PYFAUST_DIR -name "*.py" | grep -v -w tests)
+    - conda deactivate
+  after_script:
+    - conda-env remove -n test_coverage_pyfaust
+  except:
+      - schedules
+      - tags
+  tags:
+    - conda_linux
+  artifacts:
+    paths:
+      - htmlcov/index.html
+    when:  always
+    expire_in: '6 months'
+  needs:
+    - job: pkg_linux_purepy_rev
+      artifacts: true
 
 pkg_macos:
     stage: pkg
