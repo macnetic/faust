@@ -571,6 +571,9 @@ disp('Ok');
 disp('TEST LOAD AND SAVE : ');
 filename = ['@FAUST_BIN_TEST_OUTPUT_DIR@' filesep 'faust' int2str(floor(rand()*10000)) '.mat'];
 disp(['save faust into the file : ' filename])
+if exist(filename, 'file') > 0
+	delete(filename)
+end
 save(F,filename);
 F_loaded = Faust(filename);
 [dim1_loaded,dim2_loaded]=size(F_loaded);
@@ -603,6 +606,10 @@ end
 
 filename_trans = [ '@FAUST_BIN_TEST_OUTPUT_DIR@' filesep 'faust_trans' int2str(floor(rand()*10000)) '.mat'];
 disp(['save transposed faust into the file : ' filename_trans]); 
+if exist(filename_trans, 'file') > 0
+	delete(filename_trans)
+end
+
 save(F_trans,filename_trans);
 
 F_trans_loaded = Faust(filename_trans);
@@ -746,6 +753,11 @@ for i=1:nb_fact
 	end
 end
 % test conj save
+
+if exist(filename, 'file') > 0
+	delete(filename)
+end
+
 save(conj(F),filename)
 saved_conj_F=full(Faust(filename));
 if ( ~isequal(saved_conj_F,F_conj_full))
@@ -788,6 +800,10 @@ for i=1:nb_fact
 	end
 end
 % test ctranspose save
+
+if exist(filename, 'file') > 0
+	delete(filename)
+end
 save(ctranspose(F),filename)
 saved_ctranspose_F=full(Faust(filename));
 if ( ~isequal(saved_ctranspose_F,F_ctranspose_full))
