@@ -214,6 +214,9 @@ pyfaust_test_code_coverage:
     - 'PYFAUST_DIR=$(dirname $(python -c "import pyfaust as pf; print(pf.__file__)"))'
     - coverage run --source $PYFAUST_DIR misc/test/src/Python/test_FaustPy.py
     - coverage run -a --source $PYFAUST_DIR $PYFAUST_DIR/tests/run.py
+    # take doctest into account
+    - for MOD in factparams proj poly tools fact demo;do PY=$(python -c "import doctest;import pyfaust as pf;from os.path import dirname;fn = dirname(pf.__file__)+'/${MOD}.py';print(fn)"); echo -e '\nif __name__ == "__main__":\n    import doctest;\n    doctest.testmod()' >> $PY;done
+    - for MOD in factparams proj poly tools fact demo;do coverage run -a --source $PYFAUST_DIR $PYFAUST_DIR/$MOD.py;done
     - coverage report $(find $PYFAUST_DIR -name "*.py" | grep -v -w tests)
     - coverage html $(find $PYFAUST_DIR -name "*.py" | grep -v -w tests)
     - conda deactivate
