@@ -12,6 +12,7 @@ find a section for each one of them in the next of this document.
 2.2 [Gitlab continuous integration (ci) job](#py_mat_test_ci_jobs)  
 2.3 [Test report on Gitlab pages](#py_mat_test_reports)  
 2.4 [Doctest](#doctest)  
+2.5 [Test coverage](#test_cover)
 3. [FAµST C++ core tests](#cpp_tests)  
 4. [Package tests and automatic release](#test_release_packages)  
 
@@ -56,8 +57,6 @@ recent FAµST API is needed).
       ``pyfaust.Faust`` class and all algorithms/functions),
     * ``FaustTest.m`` (31 unit tests for the ``matfaust.Faust`` class), ``FaustFactoryTest.m`` (39 unit tests for factorizations and other algorithms).
 
-- Test coverage: TODO
-
 **<a name="py_mat_test_ci_jobs">
 2.2 Gitlab continuous integration (ci) job
 </a>**
@@ -94,6 +93,20 @@ fails). These ci jobs are [scheduled](https://gitlab.inria.fr/faustgrp/faust/-/p
 to run every night.
 If any of the tested pyfaust/matfaust submodules or functions fails (and they are all tested at the time of
 writing), the erroneous tests will be displayed in the ci job output.
+
+**<a name="test_cover">
+2.5 Test Coverage
+</a>**
+
+It really matters to keep a metric of how much code is covered by the tests in the project.
+
+- The ci job ``pyfaust_test_code_coverage`` measures the test coverage for
+pyfaust (using the same tests as ``ctest_python`` and
+``doctest_nightly_pyfaust``). At the moment I'm writing these lines, the cover
+is about 72%. The same ci job produces a report available on gitlab-pages
+too as job's artifact (e.g.: [report](https://faustgrp.gitlabpages.inria.fr/-/faust/-/jobs/3169837/artifacts/htmlcov/index.html) -- note: this link won't last forever). The report is also available directly as text in the ci job output.
+
+- For matfaust this is yet to do (using maybe [MOcov](https://github.com/MOcov/MOcov)).
 
 **<a name="cpp_tests">
 3. FAµST C++ core tests
