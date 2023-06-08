@@ -30,8 +30,8 @@ for f in wrapper/python/_FaustCorePy.cpython-*-darwin.so;do sudo install_name_to
 otool -L wrapper/python/_FaustCorePy.cpython-*-darwin.so
 #'sudo hdiutil create -volname Faust-$FAUST_VERSION-MatlabR2016a-Py2.7 -srcfolder /opt/local/faust -ov -format UDRW faust-$FAUST_VERSION'
 sudo pkgbuild --identifier fr.inria.faust --version $FAUST_VERSION --root /opt/local/faust --install-location /opt/local/faust --scripts . ./faust-$FAUST_VERSION.pkg
-for FILE in $(find /usr/local/lib ! -iname "libmatio*" -maxdepth 1 -mindepth 1); do filter_list+="--filter $(basename $FILE) "; done;
-sudo pkgbuild --identifier fr.inria.faust.matio --version 1.5.12 --root /usr/local/lib $filter_list --install-location /usr/local/lib ./matio-bin-1.5.12.pkg
+for FILE in $(find /opt/local/lib ! -iname "libmatio*" -a ! -iname "libhdf*" -maxdepth 1 -mindepth 1); do filter_list+="--filter $(basename $FILE) "; done;
+sudo pkgbuild --identifier fr.inria.faust.matio --version 1.5.12 --root /opt/local/lib $filter_list --install-location /opt/local/lib ./matio-bin-1.5.12.pkg
 sudo pkgbuild --identifier fr.inria.faust.openmp --version 367070 --root /opt/local/lib/libomp --install-location /opt/local/lib/libomp ./libomp-367070.pkg
 productbuild --synthesize --package ./matio-bin-1.5.12.pkg --package libomp-367070.pkg --package faust-$FAUST_VERSION.pkg ./distribution.plist
 sed -e 's/\(.*pkg-ref id=.fr.inria.faust".*\)/\1<title>FAµST '$FAUST_VERSION'<\/title><license file="licenses.html"\/><readme file="installer_readme.html"\/>/' distribution.plist > tmp.plist; mv tmp.plist distribution.plist
