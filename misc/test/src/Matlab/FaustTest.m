@@ -438,8 +438,8 @@ classdef FaustTest < matlab.unittest.TestCase
 			this.verifyEqual(test_commu_rF,ref_rF, 'RelTol', 10^-3);
 			this.verifyNotEqual(test_rF, ref_full_faust*(r+1))
 			this.verifyNotEqual(test_commu_rF, ref_full_faust*(r+1))
-			this.assertLessThan(norm(full(F'*r)-full(F)'*r)/norm(full(F)'*r), eps(1.))
-			this.assertLessThan(norm(full(F.'*r)-full(F).'*r)/norm(full(F).'*r), eps(1.))
+			this.assertLessThan(norm(full(F'*r)-full(F)'*r)/norm(full(F)'*r), 1e-15)
+			this.assertLessThan(norm(full(F.'*r)-full(F).'*r)/norm(full(F).'*r), 1e-15)
 			disp('test mul by complex scalar')
 			r = rand()+j*rand();
 			test_rF = full(F*r);
@@ -449,8 +449,8 @@ classdef FaustTest < matlab.unittest.TestCase
 			this.verifyEqual(test_commu_rF,ref_rF, 'RelTol', 10^-3);
 			this.verifyNotEqual(test_rF, ref_full_faust*(r+1))
 			this.verifyNotEqual(test_commu_rF, ref_full_faust*(r+1))
-			this.assertLessThan(norm(full(F'*r)-full(F)'*r)/norm(full(F)'*r), eps(1.))
-			this.assertLessThan(norm(full(F.'*r)-full(F).'*r)/norm(full(F).'*r), eps(1.))
+			this.assertLessThan(norm(full(F'*r)-full(F)'*r)/norm(full(F)'*r), 1e-15)
+			this.assertLessThan(norm(full(F.'*r)-full(F).'*r)/norm(full(F).'*r), 1e-15)
 			disp('test mul of two Fausts')
 			r_fausts = {matfaust.rand(size(F,2), randi(100)),
 			matfaust.rand(size(F,2), randi(100) , 'density', .5, 'field', 'complex')};
