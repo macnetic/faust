@@ -60,6 +60,7 @@
  function test_matlab_faust(factors_,expected_F_dense,dim3,copyOptimized)
 %function test_matlab_faust(dim1,dim2,dim3,nb_fact)
 rng(datetime('now').Second*1000+feature('getpid'))
+fprefix = replace(mat2str(prod(1:10)),  {' ', ']', '['}, {'_', '', ''});
 import matfaust.Faust
 int_max= 100;
 threshold = 0.2;
@@ -569,11 +570,8 @@ disp('Ok');
 
 %% load_faust and save_faust test
 disp('TEST LOAD AND SAVE : ');
-filename = ['@FAUST_BIN_TEST_OUTPUT_DIR@' filesep 'faust' int2str(floor(rand()*10000)) '.mat'];
+filename = ['@FAUST_BIN_TEST_OUTPUT_DIR@' filesep fprefix '_' 'faust' int2str(floor(rand()*10000)) '.mat'];
 disp(['save faust into the file : ' filename])
-if exist(filename, 'file') > 0
-	delete(filename)
-end
 save(F,filename);
 F_loaded = Faust(filename);
 [dim1_loaded,dim2_loaded]=size(F_loaded);
@@ -604,12 +602,8 @@ end
 
 
 
-filename_trans = [ '@FAUST_BIN_TEST_OUTPUT_DIR@' filesep 'faust_trans' int2str(floor(rand()*10000)) '.mat'];
+filename_trans = [ '@FAUST_BIN_TEST_OUTPUT_DIR@' filesep fprefix '_' 'faust_trans' int2str(floor(rand()*10000)) '.mat'];
 disp(['save transposed faust into the file : ' filename_trans]); 
-if exist(filename_trans, 'file') > 0
-	delete(filename_trans)
-end
-
 save(F_trans,filename_trans);
 
 F_trans_loaded = Faust(filename_trans);
@@ -753,11 +747,7 @@ for i=1:nb_fact
 	end
 end
 % test conj save
-
-if exist(filename, 'file') > 0
-	delete(filename)
-end
-
+filename = ['@FAUST_BIN_TEST_OUTPUT_DIR@' filesep fprefix '_' 'faust' int2str(floor(rand()*10000)) '.mat'];
 save(conj(F),filename)
 saved_conj_F=full(Faust(filename));
 if ( ~isequal(saved_conj_F,F_conj_full))
@@ -800,10 +790,7 @@ for i=1:nb_fact
 	end
 end
 % test ctranspose save
-
-if exist(filename, 'file') > 0
-	delete(filename)
-end
+filename = ['@FAUST_BIN_TEST_OUTPUT_DIR@' filesep fprefix '_' 'faust' int2str(floor(rand()*10000)) '.mat'];
 save(ctranspose(F),filename)
 saved_ctranspose_F=full(Faust(filename));
 if ( ~isequal(saved_ctranspose_F,F_ctranspose_full))
