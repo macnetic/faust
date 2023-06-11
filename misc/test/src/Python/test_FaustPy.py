@@ -24,10 +24,9 @@ class TestFaustPy(unittest.TestCase):
         factors = []
         d2 = r.randint(TestFaustPy.MIN_DIM_SIZE, TestFaustPy.MAX_DIM_SIZE)
         for i in range(0, num_factors):
-            d1, d2 = d2, r.randint(1, TestFaustPy.MAX_DIM_SIZE)
+            d1, d2 = d2, r.randint(TestFaustPy.MIN_DIM_SIZE, TestFaustPy.MAX_DIM_SIZE)
             factors += [sparse.random(d1, d2, density=0.5, format='csr',
                         dtype=np.float64)] #.toarray() removed
-            #print("factor",i,":", factors[i])
         self.F = Faust(factors)
         self.factors = factors
         # we keep dense matrices as reference for the tests
@@ -292,7 +291,7 @@ class TestFaustPy(unittest.TestCase):
         prod = self.mulFactors()
         test_prod = self.F[::,::].toarray()
         self.assertProdEq(prod, test_prod)
-        # reminder the Faust is of minimal size 3 for the both dims (MIN_DIM_SIZE)
+        # remind the Faust is of minimal size 3 for the both dims (MIN_DIM_SIZE)
         # test_prod = self.F[...,...].toarray() # forbidden (only one index can
         # be an ellipsis)
         # self.assertProdEq(prod, test_prod)
