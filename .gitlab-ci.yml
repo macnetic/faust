@@ -136,7 +136,7 @@ ctest_matlab:
     tags:
         - win10
 
-.doctest_nightly_pyfaust:
+doctest_nightly_pyfaust:
   stage: test
   script:
     - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
@@ -168,7 +168,7 @@ ctest_matlab:
   except:
     - tags
 
-.doctest_nightly_matfaust:
+doctest_nightly_matfaust:
   stage: test
   script:
     # get latest successful ci job pkg_linux
@@ -202,16 +202,6 @@ matfaust_test_code_coverage:
   stage: code_cov
   script:
     - rm -Rf ~gitlab-runner/matlab # avoid interference with rpm installed faust
-      # install mocov
-    # get latest successful ci job pkg_linux
-    - 'JOB_ID=$(curl -s --header "PRIVATE-TOKEN: $GITLAB_API_READ_TOKEN" "https://gitlab.inria.fr/api/v4/projects/6960/jobs?scope=success&per_page=10000" 2>&1 | tee -a /tmp/log_curl_doctest_matfaust | sed -e "s/}/}\n/g" | grep "\"pkg_linux\"" | head -1 | sed -ne "s/.*{\"id\":\([[:digit:]]\+\).*pkg_linux.*/\1/p") || echo JOB_ID=$JOB_ID'
-     # download artifact archive
-    - 'curl --header "PRIVATE-TOKEN: $GITLAB_API_READ_TOKEN" https://gitlab.inria.fr/api/v4/projects/6960/jobs/$JOB_ID/artifacts > artifacts.zip'
-    # what's in this?
-    - zip -Tv artifacts.zip
-    - yes | unzip artifacts.zip || echo 'artifacts unzipped'
-    - rm artifacts.zip
-    # install the pkg but first remove poential older one
     - if [ $(rpm -qa faust | wc -l) -gt 0 ]; then sudo rpm -e faust;fi
     - sudo rpm -i --nodeps build/faust*rpm
       # install mocov
@@ -230,8 +220,6 @@ matfaust_test_code_coverage:
     - matlab
   except:
     - tags
-  only:
-    - schedules
 
 pyfaust_test_code_coverage:
   stage: code_cov
