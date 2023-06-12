@@ -22,7 +22,9 @@ classdef FaustTest < matlab.unittest.TestCase
 	methods (TestMethodSetup)
 		function addFaustToPath(this)
 			addpath(this.faust_paths{:})
-			set_path
+			if exist('set_path') > 0
+				set_path
+			end
 			import matfaust.Faust
 		end
 
