@@ -28,14 +28,15 @@ function parse_doxy_block {
                                                         s/@param[[:blank:]]\([^[:blank:]]\{1,\}\)/- Parameter \1: /;
                                                         s/@code//;
                                                         s/@endcode//;
-							s/<code>//g;
-							s/<\/code>//g;
+                                                        s/<code>//g;
+                                                        s/<\/code>//g;
                                                         s/\(Examples\{0,1\}\)/\1:/;
                                                         #s/<[^>]*>//g;
                                                         s/<b>//g;
                                                         s/<\/b>//g;
                                                         s/<br\/>//g;
                                                         s/<p>//g;
+                                                        s%<p/>%%g;
                                                         s/<img.*src=\"\([^\"]\{1,\}\)\".*\/>/\1/g;
                                                         s/&nbsp;/ /g;
                                                         s/@retval/Returns/g;
