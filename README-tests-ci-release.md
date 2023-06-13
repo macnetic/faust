@@ -106,7 +106,18 @@ pyfaust (using the same tests as ``ctest_python`` and
 is about 72%. The same ci job produces a report available on gitlab-pages
 too as job's artifact (e.g.: [report](https://faustgrp.gitlabpages.inria.fr/-/faust/-/jobs/3169837/artifacts/htmlcov/index.html) -- note: this link won't last forever). The report is also available directly as text in the ci job output.
 
-- For matfaust this is yet to do (using maybe [MOcov](https://github.com/MOcov/MOcov)).
+- For matfaust the ci job is ``matfaust_test_code_coverage`` it uses MOCov to
+produce a coverage report as this [one](https://faustgrp.gitlabpages.inria.fr/-/faust/-/jobs/3186956/artifacts/coverage_html/index.html)
+(this link might be deleted in the future, in which case you might look at artifacts of recent ci
+[jobs](https://gitlab.inria.fr/faustgrp/faust/-/jobs)). The tests used for coverage calculation
+are pretty much the same as the ones in ``ctest_matlab`` and ``doctest_nightly_matfaust``.
+When writing this doc, the coverage was about 48.6%, it is partially due to the fact that the
+code for mex float (single in matlab) is not auto-tested but there is no reason to think it
+would fail more often than the code for double which is tested. However it would be advisable
+to pursue for a larger coverage.
+
+- About GPU code: unfortunately no automatic testing is made for GPU code
+  because no NVIDIA GPU is available on VMs/Docker daemons that run the project gitlab-runners.
 
 **<a name="cpp_tests">
 3. FAµST C++ core tests
