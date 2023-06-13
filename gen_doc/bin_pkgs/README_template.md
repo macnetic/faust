@@ -80,7 +80,19 @@ Then launch the script that is responsible to add FAµST location in your Matlab
 	>> % then test again FAµST
 	>> matfaust.rand(10, 10, 'num_factors', 1, 'dim_sizes', 10, 'density', .5, 'fac_type', 'dense', 'field', 'complex')
 
-For that change to be applied permanently, you need to automatize the `addpath()' call made by setup_FAUST.<br/>
+### 3.1.1 Permament path using savepath
+
+Once matfaust path has been loaded into matlab environment you can save the
+configuration for future uses by simply typing:
+
+    >> savepath
+
+The next time you'll run Matlab the matfaust package will be directly
+available.
+
+### 3.1.2 Permanent path using Matlab's startup.m
+
+Another way for that change of matlab path to be applied permanently, is to automatize the `addpath()' call made by ``setup_FAUST``.<br/>
 For that purpose:
 
 <ol>
@@ -97,7 +109,7 @@ For that purpose:
 
 Finally type <a href="https://fr.mathworks.com/help/matlab/ref/rehash.html#d120e1067468">`rehash toolbox'</a> in your current matlab terminal and restart Matlab in order to verify the configuration is permanent.
 
-Note: you can also edit a user specific startup.m script instead of system's startup.m. Look the Matlab documentation [here](https://fr.mathworks.com/help/matlab/matlab_env/startup-options.html).
+Note: you can also edit a user's specific startup.m script instead of system's startup.m. Look the Matlab documentation [here](https://fr.mathworks.com/help/matlab/matlab_env/startup-options.html).
 
 OK! You can follow the [quick start usage](#usage) now.
 
