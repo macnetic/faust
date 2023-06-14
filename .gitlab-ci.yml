@@ -213,6 +213,7 @@ matfaust_test_code_coverage:
     - matlab
   except:
     - tags
+    - schedules
 
 pyfaust_test_code_coverage:
   stage: code_cov
