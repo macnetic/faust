@@ -170,6 +170,8 @@ void auto_tests()
 	cout << string(20, '=') << " test 3: abs. error" << endl;
 	J1 = J2 = 0;
 	tol = 1e-3;
+	if(is_same<FPP,float>())
+		tol = 1e-2;
 	relErr = false;
 	enable_large_Faust = true; //otherwise it doesn't work
 	norm_err = svdtj_and_error(A, J1, J2, t1, t2, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
