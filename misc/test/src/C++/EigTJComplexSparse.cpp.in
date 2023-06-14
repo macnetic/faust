@@ -30,8 +30,7 @@ int main()
 	J = init_int_from_matio(conf_file, "J");
 
 	Faust::MatSparse<complex<FPP>,Cpu> sLap(Lap);
-	EigTJComplex<complex<FPP>,Cpu,FPP> algo(sLap,J);
-
+	EigTJComplex<complex<FPP>,Cpu,FPP> algo(sLap,J, /*verbosity =*/ 0, /*stoppingError =*/ 0.0, /*errIsRel =*/ true, /*enable_large_Faust =*/ true, /*err_period=*/100);
 	algo.compute_facts();
 
 	// Compare pivot choices along the iterations (between matlab ref and C++ impl.)
