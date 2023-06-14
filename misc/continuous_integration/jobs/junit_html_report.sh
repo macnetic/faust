@@ -4,7 +4,7 @@
 REPORT_NAME="$1"
 python3 -m venv junit_venv # use default python3 in PATH (the same has been used in ctest building -- cf. CDashConfScript)
 source junit_venv/bin/activate
-export BUILD_DIR=$(ls -d build  | tail -1)
+export BUILD_DIR=$(ls -d build* | tail -1)
 pip install junit2html
 junit2html ${BUILD_DIR}/junit_output.xml ${BUILD_DIR}/${REPORT_NAME}.html
 deactivate
