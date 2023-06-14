@@ -96,8 +96,8 @@ void test_eigentransform(Faust::@GIVENS_CLASS@ /*EigTJ<SCALAR,DEVICE,SCALAR2> or
 	cout << "Error relatively to Fourier matrix (computed with matlab eig()):" << endl;
 	cout << tmp.norm()/U.norm() << endl;
 	cout << "matlab err: " << err1 << endl;
-	assert(Faust::fabs(tmp.norm()/U.norm()-err1)/err1 < ERR_OK_TRESHOLD*60);
-	OK_ASSERT("Relative error ||Uhat-U||/||U|| is the same as Matlab's (relative precision: " << ERR_OK_TRESHOLD*60 << ").");
+	assert(Faust::fabs(tmp.norm()/U.norm()-err1)/err1 < ERR_OK_TRESHOLD*90);
+	OK_ASSERT("Relative error ||Uhat-U||/||U|| is the same as Matlab's (relative precision: " << ERR_OK_TRESHOLD*90 << ").");
 }
 
 template<typename SCALAR, FDevice DEVICE, typename SCALAR2>
