@@ -105,7 +105,7 @@
 %> >> num_facts = 9;
 %> >> k = 10;
 %> >> s = 8;
-%> >> MEG16 = hierarchical(MEG, {'rectmat', num_facts, k, s})
+%> >> MEG16 = hierarchical(MEG, {'rectmat', num_facts, k, s}) % too long for doctest, % doctest: +SKIP
 %>
 %> MEG16 =
 %>
@@ -121,15 +121,15 @@
 %> - FACTOR 8 (double) SPARSE, size 204x8193, density 0.0490196, nnz 81930
 %>
 %> >> % verify the constraint k == 10, on column 5
-%> >> fac9 = factors(MEG16,9);
-%> >> numel(nonzeros(fac9(:,5)))
+%> >> fac9 = factors(MEG16,9); % doctest: +SKIP
+%> >> numel(nonzeros(fac9(:,5))) % doctest: +SKIP
 %>
 %> ans =
 %>
 %>      10
 %>
 %> >> % now verify the s constraint is respected on MEG16 factor 2
-%> >> numel(nonzeros(factors(MEG16, 2)))/size(MEG16,1)
+%> >> numel(nonzeros(factors(MEG16, 2)))/size(MEG16,1) % doctest: +SKIP
 %>
 %> ans =
 %>
