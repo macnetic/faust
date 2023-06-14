@@ -32,7 +32,7 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
 	if(p.isVerbose) p.Display();
 	for(int i=0;i < fac_constraints.size();i++)
 	{
-		cout << "Faust::hierarchical: " << i+1 << "/" << fac_constraints.size() << endl;
+		std::cout << "Faust::hierarchical: " << i+1 << "/" << fac_constraints.size() << std::endl;
 		if(is_fact_side_left)
 		{
 			Si = S->get_gen_fact_nonconst(0);
