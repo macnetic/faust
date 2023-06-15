@@ -45,6 +45,7 @@ namespace Faust
 			long *perm_ids_ptr;
 #endif
 			bool is_transp;
+			FPP zero;
 
 
 			public:

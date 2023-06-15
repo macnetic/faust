@@ -5,7 +5,7 @@ namespace Faust
 	//TODO: dtor?
 	//
 	template<typename FPP>
-	MatPerm<FPP, Cpu>::MatPerm()
+	MatPerm<FPP, Cpu>::MatPerm() : zero(FPP(0))
 	{
 #ifdef USE_PYTHONIC
 		perm_ids_ptr = nullptr;
@@ -441,7 +441,7 @@ namespace Faust
 		if(j == perm_ids[i])
 			return d_ptr[i];
 		else
-			return FPP(0);
+			return zero;
 	}
 
 

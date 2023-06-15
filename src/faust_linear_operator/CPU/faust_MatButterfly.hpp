@@ -7,7 +7,7 @@ namespace Faust
 	//TODO: dtor?
 
 	template<typename FPP>
-	MatButterfly<FPP, Cpu>::MatButterfly(const MatSparse<FPP, Cpu> &factor, int level)
+	MatButterfly<FPP, Cpu>::MatButterfly(const MatSparse<FPP, Cpu> &factor, int level) : zero(FPP(0))
 	{
 		// build a d1, d2 pair from the butterfly factor
 		auto size = factor.getNbRow();
@@ -71,6 +71,7 @@ namespace Faust
 #endif
 		level = src.level;
 		is_transp = src.is_transp;
+		this->zero = src.zero;
 		return *this;
 	}
 
@@ -471,11 +472,11 @@ namespace Faust
 			if(j == i - k)
 				return d2_ptr[i];
 			else
-				return FPP(0);
+				zero;
 		if(j == i + k)
 			return d2_ptr[i];
 		else
-			return FPP(0);
+			return zero;
 	}
 
 

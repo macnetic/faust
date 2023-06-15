@@ -51,6 +51,7 @@ namespace Faust
 #endif
 			int level;
 			bool is_transp;
+			FPP zero;
 
 
 			public:
