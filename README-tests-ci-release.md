@@ -14,6 +14,9 @@ find a section for each one of them in the next of this document.
 2.4 [Doctest](#doctest)  
 2.5 [Test coverage](#test_cover)
 3. [FAµST C++ core tests](#cpp_tests)  
+3.1 [Tests](#cpp_tests)  
+3.2 [Gitlab continuous integration (ci) job](#py_mat_test_ci_jobs)  
+3.3 [Test report on Gitlab pages](#cpp_test_report)
 4. [Package tests and automatic release](#test_release_packages)  
 
 <a name="gitlab_pol_test"/>
@@ -42,7 +45,7 @@ the packages tests must pass or it will fail).
 2.1 Test scripts for pyfaust/matfaust
 </a>**
 
-- Location directory: ``misc/test/src/Python`` for pyfaust and
+- Directory location: ``misc/test/src/Python`` for pyfaust and
   ``misc/test/src/Matlab``
   for matfaust.
 
@@ -123,7 +126,26 @@ to pursue for a larger coverage.
 3. FAµST C++ core tests
 </a>**
 
-TODO
+### 3.1 Tests
+
+- Directory location: ``misc/test/src/C++`` and ``misc/test/src/C++/unit``
+
+### 3.2 Gitlab continuous integration (ci) job
+<a name="cpp_test_ci_jobs"/>
+
+- Gitlab ci job: ``ctest`` performs C++ tests.
+- For more details about ctest, take a look at [2.2](#py_mat_test_ci_jobs).
+
+### 3.3 Test report on Gitlab pages
+<a name="cpp_test_report"/>
+
+- On the end of ``ctest`` ci job execution a test report in HTML
+  is automatically uploaded to the project Gitlab pages (as a hidden page).
+  The link is displayed in the ci job output (the finished jobs are listed
+  [here](https://gitlab.inria.fr/faustgrp/faust/-/jobs)).
+  Here is [an example of report for C++ tests](https://faustgrp.gitlabpages.inria.fr/-/faust/-/jobs/3193880/artifacts/build_FaustLinux/cpp_test_report.html)
+  (if this link doesn't work, the associated pipeline has been deleted on Gitlab,
+  please look [here](https://gitlab.inria.fr/faustgrp/faust/-/jobs) for a recent ``ctest`` output).
 
 **<a name="test_release_packages">
 4. Package tests and automatic release
