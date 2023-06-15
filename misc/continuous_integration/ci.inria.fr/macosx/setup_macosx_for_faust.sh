@@ -60,17 +60,24 @@ yes | pip install matplotlib # separately because it could fail
 wget https://download.pytorch.org/libtorch/cpu/libtorch-macos-1.4.0.zip
 unzip libtorch-macos-1.4.0.zip
 mv libtorch /opt/local/
-echo "Please manually install matlab by copying directly the directory from /Volumes/Untitled/ attached to faust2-macos-2019 (advice: use scp)"
-echo "First, a DATA storage volume must be created and attached to the VM instance (use command: diskutil mount)."
+# install a recent version of cmake (>=3.21)
+sudo port install cmake
+sudo port activate cmake
+# disable pre-installed old one (3.2)
+sudo mv /usr/local/bin/cmake /usr/local/bin/cmake_old
+echo "Please manually install matlab by copying directly the directory from /Volumes/Untitled/ attached to faust2-macos-2019"
+echo "(volume named 'macosx-extra_disk' on cloudstack), two ways to proceed:"
+echo " 1. use scp if the volume is attached to another VM"
+echo "  (In that case, a DATA storage volume must be created and attached to the VM instance (use command: diskutil mount)."
+echo " 2. attach the volume to this VM if not, and use diskutil mount /dev/disk1"
 echo "Finally add matlab to the PATH (in .bash_profile)."
 echo "It is also useful to symlink the matlab binary in /usr/bin/ for the root user env. to be OK for installing/testing the pkg (postinstall script needs to find matlab)."
-echo "Other need about matlab OpenMP: you need to copy the library as for example: ciosx:~ ci$ cp /Volumes/Untitled/MATLAB_R2018b.app/sys/os/maci64/libiomp5.dylib /opt/local/lib/libomp/libiomp5_matlab.dylib"
+echo "Other need about matlab OpenMP: you need to copy the library as for example: ciosx:~ ci$ cp /Volumes/Untitled/MATLAB/MATLAB_R2018b.app/sys/os/maci64/libiomp5.dylib /opt/local/lib/libomp/libiomp5_matlab.dylib"
 echo "ABOUT SUDO: add this line in /etc/sudoers: ci ALL=(ALL:ALL) NOPASSWD: ALL (this way the runner won't need to type the password for running commands as root)"
-echo "matio should be reinstalled too because the version from MacPorts is 1.5.21, not compatible with FAµST (at least because of the type mat_sparse_t which contain fields of different types compared to previous version). The version to install is matio-1.5.19 in /usr/local or another way is to copy files /usr/local/matio_pub.h /usr/local/matio.h and /usr/local/lib/libmatio*from faust2-macosx-2019
 echo ===== manually install concurrent version of python, eg.:
-echo port install py310 py310-cython py310-pip
-echo pip-3.10 install doxypypy chardet wheel pygsp numpy
-echo DOXYPYPY_DIR=$(dirname $(python3.10 -c "import doxypypy; print(doxypypy.__file__)"))
+echo port install py311-cython py311-pip
+echo pip-3.11 install doxypypy chardet wheel pygsp numpy
+echo DOXYPYPY_DIR=$(dirname $(python3.11 -c "import doxypypy; print(doxypypy.__file__)"))
 echo wget https://raw.githubusercontent.com/Feneric/doxypypy/master/doxypypy/doxypypy.py
 echo sudo mv doxypypy.py ${DOXYPYPY_DIR}
 #echo "WARNING: the matlab installer link is likely to fail"
