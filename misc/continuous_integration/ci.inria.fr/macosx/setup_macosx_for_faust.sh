@@ -28,17 +28,28 @@ yes | port install eigen3 matio cmake p7zip zlib
 sudo ln -sf /opt/local/lib/libmatio.a /usr/local/lib/
 sudo ln -sf /opt/local/include/matio.h /usr/local/include
 sudo ln -sf /opt/local/include/matio_pub.h /usr/local/include
+for F in /opt/local/lib/libmatio.*; do sudo ln -sf $F /usr/local/lib/$(basename $F);done
+for F in /opt/local/lib/libhdf5*; do sudo ln -sf $F /usr/local/lib/$(basename $F);done
+for F in /opt/local/lib/libz*; do sudo ln -sf $F /usr/local/lib/$(basename $F);done
 yes | port install libomp-devel libomp 
 ### 4. Install and configure clang compiler environment (and OpenMP)
 port -f activate libomp
 sudo cp /opt/local/lib/libomp/libomp.dylib /opt/local/lib/libomp/libomp_macports.dylib # needed for ci package jobs
-yes | port install clang-8.0
+yes | port install clang-9.0
 echo 'export OpenMP_INC_DIR=/opt/local/include/libomp' >> /Users/ci/.bash_profile
 echo 'export OpenMP_gomp_LIBRARY=/opt/local/lib/libomp/libgomp.dylib' >> /Users/ci/.bash_profile
 mv /usr/bin/clang /usr/bin/clang_
 mv /usr/bin/clang++ /usr/bin/clang++_
-ln -sf /opt/local/bin/clang-mp-8.0 /opt/local/bin/clang
-ln -sf /opt/local/bin/clang++-mp-8.0 /opt/local/bin/clang++
+ln -sf /opt/local/bin/clang-mp-9.0 /opt/local/bin/clang
+ln -sf /opt/local/bin/clang++-mp-9.0 /opt/local/bin/clang++
+ln -sf /opt/local/bin/clang-mp-9.0 /usr/bin/clang
+ln -sf /opt/local/bin/clang++-mp-9.0 /usr/bin/clang++
+# we switched from clang 8 to clang 9 because of this error:
+# ciosx:~ ci$ /opt/local/libexec/llvm-8.0/bin/clang --version
+# dyld: cannot load 'clang' (load command 0x80000034 is unknown)
+# Trace/BPT trap: 5
+#mv /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++_ # don't do this or port won't be able to detect clang version and make any install
+#udo ln -sf /opt/local/bin/clang++-mp-9.0 /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++
 ### 5. Install Python packages and dependencies
 yes | port install graphviz doxygen
 sudo ln -sf /opt/local/bin/dot /usr/bin/
@@ -49,7 +60,7 @@ port select --set pip pip39
 ln -sf /opt/local/bin/python3.9 /opt/local/bin/python3
 yes | port install py39-cython
 yes | port select --set cython cython39
-yes |pip install doxypypy chardet wheel pygsp numpy
+yes | python3.9 -m pip install doxypypy chardet wheel pygsp numpy setuptools==49.1.3 # above this version commit sha256 as version fails
 # get dest dir before downloading because otherwise it would be the current path
 DOXYPYPY_DIR=$(dirname $(python3 -c "import doxypypy; print(doxypypy.__file__)"))
 wget https://raw.githubusercontent.com/Feneric/doxypypy/master/doxypypy/doxypypy.py
@@ -63,6 +74,8 @@ mv libtorch /opt/local/
 # install a recent version of cmake (>=3.21)
 sudo port install cmake
 sudo port activate cmake
+sudo mv /usr/local/bin/cmake /usr/local/bin/cmake_
+sudo mv /usr/local/bin/ctest /usr/local/bin/ctest_
 # disable pre-installed old one (3.2)
 sudo mv /usr/local/bin/cmake /usr/local/bin/cmake_old
 echo "Please manually install matlab by copying directly the directory from /Volumes/Untitled/ attached to faust2-macos-2019"
