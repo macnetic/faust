@@ -56,8 +56,8 @@ ctest:
     only:
       # C++ tests are executed only if something was modified in C++ lib or C++ tests
       changes:
-        - src/**
-        - misc/test/src/C++/**
+        - src/**/*
+        - misc/test/src/C++/**/*
 
 ctest_python:
     before_script:

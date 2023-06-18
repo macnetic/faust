@@ -56,7 +56,6 @@ using namespace Faust;
 
 void test_prod(RandFaustType mat_type)
 {
-	//RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density=.1f, bool per_row=true
 	TransformHelper<FPP,Cpu>* th = TransformHelper<FPP,Cpu>::randFaust(mat_type, 12, 12, 1024, 1024, .05);
 //	th->save_mat_file("test_faust.mat");
 //	TransformHelper<FPP,Cpu>* th  = new TransformHelper<FPP, Cpu>();
