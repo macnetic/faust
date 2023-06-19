@@ -499,8 +499,8 @@ class runtimecmp:
         curve_thickness = 2
 
         # hold differents figures in the same box
-        ymin = min(mean_tdense.min(), mean_tfaust.min())
-        ymax = max(mean_tdense.max(), mean_tfaust.max())
+        ymin = min([mean_tdense.min(), mean_tfaust.min()])
+        ymax = max([mean_tdense.max(), mean_tfaust.max()])
 
         legendy = [ 'Time (A*x)', 'Time (A.T*x)']
 
@@ -797,10 +797,10 @@ class hadamard:
         for t in [("1","A*x", _HAD_FAUST, _HAD_DENSE),("3", "A.T*x",
                                                        _HAD_TRANS_FAUST,
                                                        _HAD_TRANS_DENSE)]:
-            ymin = min(min(mean_mult_times[:,t[2]]),
-                       min(mean_mult_times[:,t[3]]))
-            ymax = max(max(mean_mult_times[:,t[2]]),
-                       max(mean_mult_times[:,t[3]]))
+            ymin = min([min(mean_mult_times[:,t[2]]),
+                       min(mean_mult_times[:,t[3]])])
+            ymax = max([max(mean_mult_times[:,t[2]]),
+                       max(mean_mult_times[:,t[3]])])
 
             subplot(int("22"+t[0]))
             title('Runtime Hadamard '+t[1])
@@ -946,8 +946,8 @@ class hadamard:
         #hold(True)
         grid(True)
         axis([h._norm_log2_dims[0], h._norm_log2_dims[-1],
-              min(faust_speedup.min(), rcgs.min(), 1),
-              max(faust_speedup.max(), rcgs.max(), 1)])
+              min([faust_speedup.min(), rcgs.min(), 1]),
+              max([faust_speedup.max(), rcgs.max(), 1])])
         semilogy(h._norm_log2_dims, faust_speedup, lw=line_width)
         semilogy(h._norm_log2_dims, rcgs, lw=line_width)
         semilogy(h._norm_log2_dims, ones(len(_dims)), lw=line_width, c='black')
@@ -1145,13 +1145,13 @@ class bsl:
                     solver_idx = solver_sol.nonzero()
                     # print("solver_idx=", solver_idx)
                     # input()
-                    resDist[j,k,0,i] = min(norm(points[idx[0],:] -
+                    resDist[j,k,0,i] = min([norm(points[idx[0],:] -
                                                 points[solver_idx[0][0],:], 2),norm(points[idx[0],:]
                                                                               - points[solver_idx[0][1],:],
-                                                                                   2));
-                    resDist[j,k,1,i] = min(norm(points[idx[1],:] -
+                                                                                   2)]);
+                    resDist[j,k,1,i] = min([norm(points[idx[1],:] -
                                                 points[solver_idx[0][0],:],2),norm(points[idx[1],:]
-                                                                              - points[solver_idx[0][1],:],2));
+                                                                              - points[solver_idx[0][1],:],2)]);
 
 
         _create_dir_if_doesnt_exist(output_dir)
@@ -1252,8 +1252,8 @@ class bsl:
             lw=1.5)
         legend(["speed up FAuST", "neutral speed up"])
         title("BSL -speed up using FAUST OMP solver")
-        minY = min(min(real_RCGs[1:]), .9)
-        maxY = max(max(real_RCGs[1:]), .9)
+        minY = min([min(real_RCGs[1:]), .9])
+        maxY = max([max(real_RCGs[1:]), .9])
         xticks([])
         #tight_layout()
         plt.rc('text', usetex=True)
