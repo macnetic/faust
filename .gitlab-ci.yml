@@ -602,7 +602,7 @@ pkg_macos_purepy_release_extra_pyver:
 
 pkg_macos_purepy_release_torch_linked:
     extends: pkg_macos_purepy_release
-    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: $MACOS_MATIO_SLIB_PATH, Z_STATIC_LIB_PATH: $MACOS_ZLIB_SLIB_PATH, HDF5_STATIC_LIB_PATH: $MACOS_HDF5_SLIB_PATH, FAUST_TORCH: "ON", CMAKE_PREFIX_PATH: "/opt/local/libtorch/share/cmake/Torch", BUILD_MULTITHREAD: "ON", EXPERIMENTAL_PKG: "OFF", NOPY2: "ON", CMAKE_CXX_COMPILER: "/opt/local/bin/clang++-mp-9.0"}
+    variables: {GIT_SUBMODULE_STRATEGY: none, MATIO_STATIC_LIB_PATH: $MACOS_MATIO_SLIB_PATH, Z_STATIC_LIB_PATH: $MACOS_ZLIB_SLIB_PATH, HDF5_STATIC_LIB_PATH: $MACOS_HDF5_SLIB_PATH, FAUST_TORCH: "ON", CMAKE_PREFIX_PATH: "/opt/local/libtorch/share/cmake/Torch", BUILD_MULTITHREAD: "ON", EXPERIMENTAL_PKG: "OFF", NOPY2: "ON", CMAKE_CXX_COMPILER: "/opt/local/bin/clang++-mp-9.0"}
     before_script:
       - VERSION=$CI_COMMIT_TAG
       - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
