@@ -22,7 +22,7 @@ if(BUILD_READ_MAT_FILE AND NOT NO_MATIO)
 	if(${USE_MATIO_STATIC_LIBS})
 		# Build using matio static library and dependencies
 		if(NOT WIN32)
-			set(PYTHON_EXT_EXTRA_OBJECTS "[ '${MATIO_STATIC_LIB_PATH}', '${HDF5_STATIC_LIB_PATH}', '${Z_STATIC_LIB_PATH}']") # the order matters for compilation
+			set(PYTHON_EXT_EXTRA_OBJECTS "[ '${MATIO_STATIC_LIB_PATH}', '${HDF5_STATIC_LIB_PATH}', '${Z_STATIC_LIB_PATH}',  '${SZIP_STATIC_LIB_PATH}']") # the order matters for compilation
 		else() # WIN32 (tested on Visual Studio)
 			# compile the pyx and all faust .cpp needed (instead to link to faust.lib)
 			set(PY_EXT_SOURCES "${PY_EXT_SOURCES}+glob('${FAUST_PYTHON_SRC_SRC_DIR}/*.cpp')")
