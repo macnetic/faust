@@ -9,12 +9,12 @@ then
 fi
 cd build
 cmake -DOpenMP_gomp_LIBRARY=/opt/local/lib/libomp/libgomp.dylib -DBUILD_WRAPPER_PYTHON=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_VERSION=$FAUST_VERSION -DCMAKE_BUILD_TYPE=Release -DEXCLUDE_FAUST_LIB_INSTALL=ON -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DBUILD_MULTITHREAD=ON -DNOPY2=ON -DCMAKE_CXX_COMPILER=/opt/local/bin/clang++-mp-8.0 -DBUILD_FLOAT_PYX=ON -DBUILD_FLOAT_MEX=ON -DEXPERIMENTAL_PKG=$EXPERIMENTAL_PKG ..
-make LANG=en_GB.UTF-8
+make -j4 LANG=en_GB.UTF-8
 # to compile matlab wrappers use matlab libiomp5 but backup the clang lib first
 #- sudo mv /opt/local/lib/libomp/libomp.dylib /opt/local/lib/libomp/libomp.dylib.bak
 sudo cp /opt/local/lib/libomp/libiomp5_matlab.dylib /opt/local/lib/libomp/libomp.dylib
 cmake -DBUILD_WRAPPER_MATLAB=ON ..
-make LANG=en_GB.UTF-8
+make -j4 LANG=en_GB.UTF-8
 # restore clang libomp
 #- sudo cp /opt/local/lib/libomp/libomp.dylib /opt/local/lib/libomp/libiomp5.dylib
 sudo cp /opt/local/lib/libomp/libomp_macports.dylib /opt/local/lib/libomp/libomp.dylib
@@ -23,7 +23,7 @@ otool -L wrapper/python/_FaustCorePy.cpython-*-darwin.so
 for f in wrapper/python/_FaustCorePy.cpython-*-darwin.so; do sudo install_name_tool -change @rpath/libiomp5.dylib /opt/local/lib/libomp/libomp.dylib $f;done
 otool -L wrapper/python/_FaustCorePy.cpython-*-darwin.so
 sudo rm -Rf /opt/local/faust # install dir
-sudo make install LANG=en_GB.UTF-8
+sudo make -j4 install LANG=en_GB.UTF-8
 # ensure libomp path also in install path
 #TODO: why doing it two times?
 for f in wrapper/python/_FaustCorePy.cpython-*-darwin.so;do sudo install_name_tool -change @rpath/libiomp5.dylib /opt/local/lib/libomp/libomp.dylib $f;done
