@@ -828,7 +828,7 @@ test_macos_purepy_release: # take care to keep this variable consistent with the
       artifacts: true
   tags:
     - macos
-    - macos_pkg_tester
+    - macos_pip_pkg_tester
 
 test_macos_purepy_release_extra_pyver:
   variables: {JOB_PYTHON: 'python3.11'} # take care to keep this variable consistent with the version used in pkg_macos_purepy_release_extra_pyver
@@ -838,7 +838,7 @@ test_macos_purepy_release_extra_pyver:
       artifacts: true
   tags:
     - macos
-    - macos_pkg_tester
+    - macos_pip_pkg_tester
 
 test_nux_purepy_release:
   variables: {JOB_PYTHON: 'python3.9'}
