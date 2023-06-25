@@ -390,7 +390,19 @@ foreach(PYFAUST_FILE ${PYFAUST_FILES})
 	endif()
 endforeach()
 
-add_custom_target(${FAUST_PYTHON_TARGET} ALL DEPENDS ${FAUST_TARGET})
+set(PY_CPP_TARGET python_cpp)
+file(GLOB PY_CPP_FILES "${FAUST_PYTHON_BIN_DIR}/F*cpp")
+add_library(${PY_CPP_TARGET} STATIC ${PY_CPP_FILES})
+target_include_directories(${PY_CPP_TARGET} PRIVATE ${FAUST_PYTHON_SRC_SRC_DIR}) # py include dir is set later
+if(USE_GPU_MOD)
+	target_include_directories(${PY_CPP_TARGET} PRIVATE ${GPU_MOD_INCLUDE_DIR} PRIVATE ${GPU_MOD_INCLUDE_DIR}/../build-cu11.4/ PRIVATE ${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR})
+	target_compile_definitions(${PY_CPP_TARGET} PRIVATE -DUSE_GPU_MOD)
+endif()
+string(REGEX REPLACE "\\.cpp" ".o" PY_CPP_OBJS ${PY_EXT_SOURCES})
+set(PYTHON_EXT_EXTRA_OBJECTS ${PYTHON_EXT_EXTRA_OBJECTS}"+${PY_CPP_OBJS}") # TODO: it should be the static library not the objects but who cares?
+set(PY_EXT_SOURCES "['${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.pyx']") # reset src without cpp objs # TODO: add an option to do one way or another
+
+add_custom_target(${FAUST_PYTHON_TARGET} ALL DEPENDS ${FAUST_TARGET} ${PY_CPP_TARGET})
 
 list(LENGTH PYTHON_EXES PYTHON_EXES_LEN)
 list(LENGTH CYTHON_EXES CYTHON_EXES_LEN)
@@ -427,6 +439,9 @@ if(UNIX)
 			add_custom_target(EMBED_OPENBLASO_IN_PYFAUST ALL
 				COMMAND cmake -P ${PROJECT_SOURCE_DIR}/CMake/embed_sys_openblaso_into_pyfaust.txt DEPENDS ${FAUST_PYTHON_TARGET} COMMENT "Embedding the libopenblaso library in pyfaust/lib directory")
 		endif()
+
+		exec_program("${PYTHON_EXE}" ARGS "-c '\r\nfrom sysconfig import get_paths;print\(get_paths\(\)[\"include\"]\)'" OUTPUT_VARIABLE PY_C_INC_DIR RETURN_VALUE PY_RES)
+		include_directories(${PY_CPP_TARGET} ${PY_C_INC_DIR})
 	endforeach()
 elseif(WIN32)
 	if(${CMAKE_GENERATOR} MATCHES "Visual Studio")
@@ -453,6 +468,9 @@ elseif(WIN32)
 				# we do not use embed_sys_libomp_into_pyfaust because it doesn't indicate full paths for all libraries on Windows with VS
 				configure_file(${VCOMPLIB_PATH} ${FAUST_PYTHON_BIN_DIR}/pyfaust/lib COPYONLY)
 			endif()
+
+			exec_program("${PYTHON_EXE}" ARGS "-c '\r\nfrom sysconfig import get_paths;print\(get_paths\(\)[\"include\"]\)'" OUTPUT_VARIABLE PY_C_INC_DIR RETURN_VALUE PY_RES)
+		include_directories(${PY_CPP_TARGET} ${PY_C_INC_DIR})
 		endforeach()
 	endif()
 else()
