@@ -20,7 +20,7 @@ variables:
     MACOS_HDF5_SLIB_PATH: '/opt/local/lib/libhdf5.a'
     MACOS_ZLIB_SLIB_PATH: '/opt/local/lib/libz.a'
     MACOS_MATIO_SLIB_PATH: '/usr/local/lib/libmatio.a'
-    MACOS_SZIP_SLIB_PATH: '/usr/local/lib/szip.a'
+    MACOS_SZIP_SLIB_PATH: '/opt/local/lib/libsz.a'
 
 .ctest_template: &ctest_script
     script:
