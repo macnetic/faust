@@ -13,14 +13,14 @@
 
 ### 1.1 For Python
 
-@note  This section treats only of system packages/installers but note that some PIP and Anaconda packages are also available. They are recommended way of installing pyfaust, in particular because of the easier weak dependency management. You might install them in virtual environments:
+@note  This section treats only of system packages/installers but note that some PIP and Anaconda packages are also available. Installing those PIP packages is recommended, in particular because of the easier weak dependency management. You might install them in virtual environments:
 \ref install_pyfaust_in_venv.<br/> 
 
 FAµST is designed for the Python ecosystem which as usual relies on the numpy and scipy packages.
 
 If you want to run the FAµST demos (module pyfaust.demo), you'll also need the matplotlib package.
 
-Please ensure these packages are installed on your system. One way to install them is to use the pip program delivered with your python version.
+Please ensure these packages are installed on your system. One way to proceed is to use the pip program delivered with your python version.
 
 	pip install numpy scipy matplotlib # pygsp
 	# it could be pip3 instead of pip
@@ -36,8 +36,8 @@ If you want to use FAµST with Python 3 you must use precisely the @PY3_VER@ ver
 
 ### 1.2 For Matlab
 
-The FAµST wrapper for Matlab has been tested on several Matlab versions starting from version 2016a,b up to version 2018a,b.<br/>
-However it's not totally excluded that FAµST works with older or newer versions.
+The FAµST wrapper for Matlab has been tested on several Matlab versions starting from version 2016a,b up to version 2022b.<br/>
+However it's not totally excluded that FAµST works with older and moreover newer versions.
 
 \anchor installation 
 ## 2. Installation
@@ -197,11 +197,11 @@ For more information on the FAµST API, and a whole function listing, consult th
 
 N.B.: to access the documentation, you need to be in the graphical interface of Matlab.
 
-Note that the doxygen documentation for the Matlab API is also available locally after installing Faust. You can consult it from your web browser: [namespacematfaust.html](@API_DOC_BASE_URL@/html/namespacematfaust.html).
+Note that the doxygen documentation for the Matlab API is also available locally after installing Faust (in the installation folder). You can consult it online: [namespacematfaust.html](@API_DOC_BASE_URL@/html/namespacematfaust.html).
 
 ### 4.2 Python Wrapper
 
-In the same spirit than the Matlab tutorial showed in the previous section, you can execute the quick start script for Python.
+In the same spirit as the Matlab tutorial showed in the previous section, you can execute the quick start script for Python.
 
 	$ python3 -c "from pyfaust.demo import quickstart; quickstart.run()"
 	dimension of the Faust :  (1000, 2000)
@@ -224,14 +224,14 @@ You can also go through the Python terminal to build a FAµST product and call i
 	6.666666666666667
 	>>> A.density()
 	0.15
-	>>> A.get_num_factors()
+	>>> A.numfactors()
 	2
-	>>> F1 = A.get_factor(0)
-	>>> F2 = A.get_factor(1)
+	>>> F1 = A.factors(0)
+	>>> F2 = A.factors(1)
 	>>> A.shape
-	(1000L, 2000L)
+	(1000, 2000)
 
-Note that the doxygen documentation for the Python API is also available locally after installing Faust. You can consult it from your web browser: [namespacepyfaust.html](@API_DOC_BASE_URL@/html/namespacepyfaust.html).
+Note that the doxygen documentation for the Python API is also available locally after installing Faust (in the installation folder). You can consult it online: [namespacepyfaust.html](@API_DOC_BASE_URL@/html/namespacepyfaust.html).
 
 
 

@@ -12,7 +12,7 @@ Alternatively, you can also proceed with the following command in a terminal:
 Likewise, if Matlab has not been installed in its default path, then it's most likely the auto-setup script won't find it, see <a href="#installation_testing">below</a> then for troubleshooting.<br/>
 To avoid this issue you can <i>symlink</i> you matlab path into /Applications (the default path) as it follows:
 
-<pre><code>    $ sudo ln -sf /path/to/matlab/install/MATLAB/MATLAB_R2018b.app /Applications/MATLAB/ # creates the MATLAB folder if doesn't exit yet
+<pre><code>    $ sudo ln -sf /path/to/matlab/install/MATLAB/MATLAB_R2018b.app /Applications/MATLAB/ # you have to create the MATLAB folder if it doesn't exist yet
 </code></pre>
 
 
@@ -22,6 +22,6 @@ To avoid this issue you can <i>symlink</i> you matlab path into /Applications (t
 you'll need to restart your Matlab or Python session in order to take into account the new configuration of your environment. Of course if you want to use only the Python wrapper you don't need to worry about setting the PATH environment for Matlab and conversely. But note that if later you change your mind and want FAµST for the both platforms you'll just need to relaunch the installer.
 </li>
 <li>
-  On Mac OS X you might need to install OpenMP for pyfaust to work, for further information please look at this <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/FAQ.html#py_four">FAQ entry</a>.
+  On Mac OS X you might need to install OpenMP for pyfaust to work, for further information please look at this <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/FAQ.html#py_four">FAQ entry</a>. It was actually a need of older versions of FAµST, in recent ones OpenMP is delivered with the pyfaust package itself.
 </li>
 </ul>
