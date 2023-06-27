@@ -63,7 +63,7 @@ Nevertheless, it might not work properly for any reason (e.g. network issue happ
 
 #### 1.1.1. The Easy Way:
 
-Just reinstall FAµST! It will relaunch the data download if your network connection is properly enabled. If it doesn't work, repeat the operation after having deleted the data folder located in FAµST installation path or python site-packages/pyfaust folder (read the 1.2 below to determine this path).
+Just reinstall FAµST! It will relaunch the data download if your network connection is properly enabled. If it doesn't work, repeat the operation after having deleted the data folder located in FAµST installation path or your user main directory (e.g. $HOME/pyfaust_data on Linux and Mac OS X).
 
 #### 1.1.2. The Manual Way:
 
@@ -72,41 +72,41 @@ This is assumed that you installed the pyfaust wrapper from a pip package or thr
 Here is an example of commands you can type to download the data (it's on Linux bash but similar if not totally the same commands apply to other systems) :
 
 
-First, find where pyfaust is installed (if you installed pyfaust for python 3, run python3 not 2.7):
+First, find where pyfaust is installed (we use python 3):
 
 	$ python -c "import pyfaust; print(pyfaust.__file__)"
-	/usr/lib64/python2.7/site-packages/pyfaust/__init__.pyc
+    /home/faq/test_pyfaust_venv/lib64/python3.11/site-packages/pyfaust/__init__.py
 
 Second, run these commands to download and uncompress the data:
 
 - If you installed pyfaust from a pip package (NOTE: the path is not the same if you use python3, look above to get the prefix path to which append the data folder):
 
-	$ DATA_DEST=/usr/lib64/python2.7/site-packages/pyfaust/data; sudo rm -Rf $DATA_DEST; mkdir $DATA_DEST; python /usr/lib64/python2.7/site-packages/pyfaust/datadl.py $DATA_DEST
-	Downloading FAµST data: 100 %
-	====== data downloaded: /tmp/faust_data-2.4.2.zip
-	Uncompressing zip archive to /usr/lib64/python2.7/site-packages/pyfaust/data
+        $ rm -Rf ~/pyfaust_data && python test_pyfaust_venv/lib/python3.11/site-packages/pyfaust/datadl.py ~/pyfaust_data
+        Downloading FAuST data : 100 %
+        ====== data downloaded: /tmp/faust_data.zip
+        Uncompressing zip archive to /home/faq/pyfaust_data
 
 - Or if you installed it another way (e.g with a rpm or .exe installer):
 
-	# get the matlab wrapper path:
-	$ matlab -nojvm -r "import matfaust.Faust;which Faust"
-	/opt/local/faust/matlab/+matfaust/@Faust/Faust.m  % matfaust.Faust constructor
-	# the result command indicates we have to download the data in the matfaust wrapper path here: /opt/local/faust/matlab/data
-	$ DATA_DEST=/opt/local/faust/matlab/data
-	$ sudo rm -Rf $DATA_DEST; mkdir $DATA_DEST; python /usr/lib64/python2.7/site-packages/pyfaust/datadl.py $DATA_DEST
+        # get the matlab wrapper path:
+        $ matlab -nojvm -r "import matfaust.Faust;which Faust"
+        /opt/local/faust/matlab/+matfaust/@Faust/Faust.m  % matfaust.Faust constructor
+        # the result command indicates we have to download the data in the matfaust wrapper path here: /opt/local/faust/matlab/data
+        $ DATA_DEST=/opt/local/faust/matlab/data
+        $ sudo rm -Rf $DATA_DEST; mkdir $DATA_DEST; sudo python /opt/local/faust/python/pyfaust/datadl.py $DATA_DEST
         Downloading FAµST data: 100 %
-        ====== data downloaded: /tmp/faust_data-2.4.2.zip
+        ====== data downloaded: /tmp/faust_data.zip
         Uncompressing zip archive to /opt/local/faust/matlab/data
 
-If finally you still don't manage to retrieve the data, please write an [email](index.html) with all the details (at least the version of FAµST, the installer used and of course your system).
+If finally you still don't manage to retrieve the data, please write an [email](https://faust.inria.fr/contact) with all the details (at least the version of FAµST, the installer used and of course your system).
 
 \anchor mat_two
 ## 1.2. How to fix mex not found error: "Undefined function or variable 'mexFaustReal'"?
 
 If something went wrong, for example at install stage, it is possible that Matlab doesn't find FAµST (in particular the mex or even matlab files `.m`).  
-In this case, an error similar to two examples might be raised:
+In this case, an error similar to the two examples below might be raised:
 
-	>> import matfaust.rand         
+	>> import matfaust.rand
 	Error using import
 	Import argument 'matfaust.rand' cannot be found or cannot be imported.
 
@@ -132,6 +132,8 @@ To fix this issue, you have to update the Matlab path manually, however a script
 
 	 launch quick_start or run_all_demo.m 
 
+For further details, about how to save this path once and for all look at the [install guide](md_README.html#installation_testing).
+
 \anchor mat_three
 ## 1.3. How to launch the demos with matfaust?
 
@@ -142,32 +144,32 @@ You might run all the demos at once or one by one. In the former case you should
 
 Note: the raw result are then in output files located in the directory ``./output``.
 
-To launch the demo one by one, you can pick the command in your interest below:
+To launch the demo one by one, you can pick the command of interest below:
 
 
-For the [BSL](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacematfaust_1_1demo.html) demo:
+For the [BSL](classmatfaust_1_1demo_1_1bsl.html) demo:
 
 	>> import matfaust.demo.bsl.*
 	>> BSL()
 	>> Fig_BSL()
 
-For the [DFT](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1demo_1_1fft.html) demo:
+For the [DFT](classmatfaust_1_1demo_1_1fft.html) demo:
 
 	>> import matfaust.demo.fft.speed_up_fourier
 	>> speed_up_fourier
 
-For the [Hadamard](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1demo_1_1hadamard.html) demo:
+For the [Hadamard](classmatfaust_1_1demo_1_1hadamard.html) demo:
 
 	>> import matfaust.demo.hadamard
 	>> hadamard.speed_up_hadamard()
 
-For the [runtime comparison](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1demo_1_1runtimecmp.html) demo:
+For the [runtime comparison](classmatfaust_1_1demo_1_1runtimecmp.html) demo:
 
 	>> import matfaust.demo.runtimecmp
 	>> runtimecmp.runtime_comparison
 	>> runtimecmp.Fig_runtime_comparison
 
-And for the last and simplest demo, the [quickstart script](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1demo_1_1quickstart.html):
+And for the last and simplest demo, the [quickstart script](classmatfaust_1_1demo_1_1quickstart.html):
 
 	>> import matfaust.demo.quickstart
 	>> quickstart.quick_start()
@@ -177,19 +179,19 @@ And for the last and simplest demo, the [quickstart script](https://faustgrp.git
 \anchor mat_four
 ## 1.4. How can I launch the integrated unit tests of matfaust?
 
-TODO (in the meanwhile you can read the [pyfaust entry](#py_two))
+TODO (in the meantime you can read the [pyfaust entry](#py_one))
 
 \anchor mat_five
 
 ## 1.5. How to run the PALM4MSA algorithm in a step-by-step fashion?
 
-TODO (in the meanwhile you can read the [pyfaust entry](#py_three))
+TODO (in the meantime you can read the [pyfaust entry](#py_three))
 
 \anchor mat_six
 
 ## 1.6  Why this no_normalization parameter for PALM4MSA and hierarchical factorization?
 
-TODO (in the meanwhile you can read the [pyfaust entry](#py_five))
+TODO (in the meantime you can read the [pyfaust entry](#py_five))
 
 \anchor mat_seven
 
@@ -231,7 +233,7 @@ The solution is straightforward, you encapsulate it in a Faust as follows:
 	    'single'
 
 
-sF is now your single sparse matrix encapsulated in a Faust. You can easily proceed to any operation on it as for any Faust. They all be computed as respect to the single/float precision (which is of course less expensive than double precision).
+sF is now your single sparse matrix encapsulated in a Faust. You can easily proceed to any operation on it as for any Faust. All will be computed as respect to the single/float precision (which is of course less expensive than double precision).
 
 
 # 2. About pyfaust
@@ -243,7 +245,7 @@ That's actually quite simple, if pyfaust is properly installed, you just have to
 	python -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'real')"
 	# in some cases, it could be python3 or python3* instead of python
 
-Note: in the above test, the Faust class is tested for the CPU C++ backend and real Faust objects (i.e. dtype == np.float). If you want to test GPU complex Faust, just replace the arguments as this: ``run_tests('gpu', 'complex')``.
+Note: in the above test, the Faust class is tested for the CPU C++ backend and real Faust objects (i.e. dtype == np.float). If you want to test GPU complex Faust, just replace the arguments as this: ``run_tests('gpu', 'complex')``. Of course you need a properly installed NVIDIA GPU.
 
 \anchor py_two
 ## 2.2. How to launch the demos with pyfaust?
@@ -260,21 +262,21 @@ To generate the figures that go by default into ``pyfaust.demo.DEFT_FIG_DIR``, y
 	>>> from pyfaust.demo import allfigs
 	>>> allfigs()
 
-To launch the demo one by one, you can pick the command in your interest below:
+To launch the demo one by one, you can pick the command of interest below:
 
-For the [BSL](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1demo_1_1bsl.html) demo:
+For the [BSL](classpyfaust_1_1demo_1_1bsl.html) demo:
 
 	>>> from pyfaust.demo import bsl
 	>>> bsl.run() # runs the experiment
 	>>> bsl.fig() # generates the figures
 
-For the [DFT](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1demo_1_1fft.html) demo:
+For the [DFT](classpyfaust_1_1demo_1_1fft.html) demo:
 
 	>>> from pyfaust.demo import fft
 	>>> fft.speed_up_fourier()
 	>>> fft.fig_speedup_fourier()
 
-For the [Hadamard](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1demo_1_1hadamard.html) demo:
+For the [Hadamard](classpyfaust_1_1demo_1_1hadamard.html) demo:
 
 	>>> from pyfaust.demo import hadamard
 	>>> hadamard.run_fact()
@@ -282,13 +284,13 @@ For the [Hadamard](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/cla
 	>>> hadamard.run_norm_hadamard()
 	>>> hadamard.figs()
 
-For the [runtime comparison](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1demo_1_1runtimecmp.html) demo:
+For the [runtime comparison](classpyfaust_1_1demo_1_1runtimecmp.html) demo:
 
 	>>> from pyfaust.demo import runtimecmp
 	>>> runtimecmp.run()
 	>>> runtimecmp.fig()
 
-And for the last and simplest demo, the [quickstart script](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1demo_1_1quickstart.html):
+And for the last and simplest demo, the [quickstart script](classpyfaust_1_1demo_1_1quickstart.html):
 
 	>>> from pyfaust.demo import quickstart
 	>>> quickstart.run()
@@ -297,7 +299,7 @@ And for the last and simplest demo, the [quickstart script](https://faustgrp.git
 
 ## 2.3. How to run the PALM4MSA algorithm in step-by-step fashion?
 
-Although the verbose mode of the PALM4MSA implementation allows displaying some info, it might be useful in order to analayze the algorithm (e.g. build the loss function or check the matrix supports evolution), to be able to run just one iteration at a time, get all the Faut layers, the scale factor (lambda), do whatever one needs with them, and then continue to the next iteration.
+Although the verbose mode of the PALM4MSA implementation allows displaying some info, it might be useful in order to analyze the algorithm (e.g. build the loss function or check the matrix supports evolution), to be able to run just one iteration at a time, get all the Faust layers, the scale factor (lambda), do whatever one needs with them, and then continue to the next iteration.
 
 It implies to reinitialize the next iteration in the same state it was at the end of the past iteration. The script [step-by-step_palm4msa.py](./step-by-step_palm4msa.py) shows how to do that for a matrix factorization in two factors but it is not much different with a greater number of factors.
 On the script end PALM4MSA is performed all iterations at once in order to verify the step-by-step execution was consistent.
@@ -321,7 +323,7 @@ Once Macports is installed, launch a terminal and type this command:
         sudo port install libomp
         sudo port -f activate libomp
 
-Note that starting from pyfaust 3.11.1 the libomp library is embedded in the pyfaust package, so you shouldn't meet this issue again for this version and the next.
+Note that starting from pyfaust 3.11.1 the libomp library is embedded in the pyfaust package, so you shouldn't meet this issue again for this version and the nexts.
 
 \anchor py_five
 
@@ -329,7 +331,7 @@ Note that starting from pyfaust 3.11.1 the libomp library is embedded in the pyf
 
 Well, you must know that in PALM4MSA updating a factor consists to first applying the gradient on it and then passing the resulting matrix through a proximity operator to enforce the structure/sparsity. After this two stages, the prox output matrix is often normalized.  
 Experiments have shown that it is totally possible to fail the normalization stage when the norm of the matrix is too high to be a number (or at least to be encoded in a floating point data type), it is in fact infinite. So you might end up with a zero matrix after normalization. In other close cases it can give NaN as matrix elements or 2-norms.  
-Hence disabling the normalization can help to avoid those overflows. That's why this option has been added to the parameters in both [pyfaust](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1factparams_1_1ParamsHierarchical.html#a663cfce79af6baa7006ee0af7006e18e) and [matfaust](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1factparams_1_1ParamsHierarchical.html#a0e596bab0beffb2d5892fadbe3e185aa).  
+Hence disabling the normalization can help to avoid those overflows. That's why this option has been added to the parameters in both [pyfaust](classpyfaust_1_1factparams_1_1ParamsHierarchical.html#a663cfce79af6baa7006ee0af7006e18e) and [matfaust](classmatfaust_1_1factparams_1_1ParamsHierarchical.html#a0e596bab0beffb2d5892fadbe3e185aa).  
 For example, running the hierarchical factorization algorithm on a Hadamard matrix of numpy dtype float32 and size 512x512 is a case where this kind of error occurs.  
 Below I reproduce the code firstly with the normalization enabled and the error it produces, secondly without normalization to show that it fixes the issue.  
 Note that this new parameter is limited to the 2020 implementations of PALM4MSA and the hierarchical algorithm.  
@@ -342,7 +344,7 @@ Error case:
 	from time import time
 	import numpy as np
 	dim = 512
-	H = wht(dim, dtype='float')
+	H = wht(dim, dtype='float32')
 	M = H.toarray()
 	F = hierarchical(M, 'hadamard', on_gpu=False, backend=2020)
 	print("error:", (F-H).norm()/H.norm())
@@ -360,7 +362,7 @@ Error case:
 	  what():  Error in update_lambda: S (the Faust) contains nan elements in at least one of its matrices, can't compute lambda.
 	Aborted
 
-\note This error case has been fixed (without disabling the normalization) by the [3.16.0 FAµST version](https://faust.inria.fr/fa%c2%b5st-3-16-0-fix-of-the-hadamard-512x512-factorization-in-float-single-precision/) (which exceptionally computes the 2-norm of matrices in double precision when the single precision failed). So don't be suprised if you're unable to reproduce this error. However the fix is only available on the 2020 backend of the hierarchical PALM4MSA algorithm. So you can reproduce it anyway if you set the 2016 backend instead in hierarchical function arguments.
+\note This error case has been fixed (without disabling the normalization) by the [3.16.0 FAµST version](https://faust.inria.fr/fa%c2%b5st-3-16-0-fix-of-the-hadamard-512x512-factorization-in-float-single-precision/) (which exceptionally computes the 2-norm of matrices in double precision when the single precision failed). So don't be surprised if you're unable to reproduce this error. However the fix is only available on the 2020 backend of the hierarchical PALM4MSA algorithm. So you can reproduce it anyway if you set the 2016 backend instead in hierarchical function arguments.
 
 Fixed case:
 
@@ -370,7 +372,7 @@ Fixed case:
 	from time import time
 	import numpy as np
 	dim = 512
-	H = wht(dim, dtype='float')
+	H = wht(dim, dtype='float32')
 	M = H.toarray()
 	p = ParamsHierarchicalSquareMat.createParams(M, 'hadamard')
 	p.no_normalization = True
@@ -392,7 +394,7 @@ Fixed case:
 
 ## 2.6. How to fix the Segmentation Fault issue when using Torch with pyfaust on Mac OS X?
 
-A conflict issue has been identified between pyfaust and pytorch on Mac OS X. It is most likely due to different versions of OpenMP loaded on the fly after package imports. The reason has not been investigated properly yet but a workaround is easy to set in place for any user. The first extract of code below show how to reproduce the error, which is in fact a Segmentation Fault, then a second block of code show how to workaround this error. In brief, importing pyfaust first will do the fix! 
+A conflict issue has been identified between pyfaust and pytorch on Mac OS X. It is most likely due to different versions of OpenMP loaded on the fly after package imports. The reason has not been investigated properly yet but a workaround is easy to set in place for any user. The first extract of code below shows how to reproduce the error, which is in fact a Segmentation Fault, then a second block of code shows how to workaround this error. In brief, importing pyfaust first will do the fix! 
 
 Reproducing the error:
 
@@ -507,11 +509,11 @@ To understand why this error is happening you have to reconsider the semantics o
 		18.83137495, 12.5277266 , 12.34828219, 18.76995746,  5.38920997]])
 
 As you can see in numpy the operation of indexing the array M with the expression M[I, J] implies first a broadcasting of the two lists I and J together and second to return the array [M[I[0], J[0]], M[I[1], J[1]], ..., M[I[-1], J[-1]]].
-Obviously, doing the same operation with a Faust would need to compute the full array (Faust.toarray()) which is an operation to avoid to spare calculation time. That's why this operation is not implemeted in pyfaust, but you can write it very quickly if needed (it is as simple as F.toarray()[I,J]).
+Obviously, doing the same operation with a Faust would need to compute the full array (Faust.toarray()) which is an operation to avoid to spare calculation time. That's why this operation is not implemented in pyfaust, but you can write it very quickly if needed (it is as simple as F.toarray()[I,J]).
 
 So now, let's explain why the error suggests to use rather F[I][:, J] instead of F[I, J] whereas they are not the same operation at all.
-The reason is because of Matlab! In Matlab M(I, J), with M a matrix, doesn't mean the same thing as in Python. It actually means to return the submatrix of M composed of the rows of M indexed in I (in the same order) and to keep in those rows only the entries whose the columns are indexed in J (in the same order again). More formally if subM = M(I, J) then subM is a matrix of size N = numel(I) x P = numel(J) such that for every pair (i,j) in {1, ..., N} x {1, ..., M}, subM(i, j) == M(I(i), J(j)).
-Back to numpy, you can write this Matlab way of indexing with the simple expression F[I][: J] which is totally feasible on a Faust, without having to compute the full array. Hence the error suggests to do that in case the user would confuse the semantics of Matlab (Faust-compatible) and Python (not Faust-compatible). In short, that's just an hint for using a supported operation which is near from an unsupported operation.
+The reason is because of Matlab! In Matlab M(I, J), with M a matrix, doesn't mean the same thing as in Python. It actually means to return the submatrix of M composed of the rows of M indexed in I (in the same order) and to keep in those rows only the entries whose the columns are indexed in J (in the same order again). More formally if subM = M(I, J) then subM is a matrix of size (N = numel(I)) x (P = numel(J)) such that for every pair (i,j) in {1, ..., N} x {1, ..., M}, subM(i, j) == M(I(i), J(j)).
+Back to numpy, you can write this Matlab way of indexing with the simple expression F[I][: J] which is totally feasible on a Faust, without having to compute the full array. Hence the error suggests to do that in case the user would confuse the semantics of Matlab (Faust-compatible) and Python (not Faust-compatible). In short, that's just a hint for using a supported operation which is near from an unsupported operation.
 
 
 \anchor py_eight
@@ -546,12 +548,12 @@ Your installed version is: 2.35
 ```
 
 Take care to add the conda-forge channel to your environment before installing pyfaust.  
-In this goal, please follow the install guide [here](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/install_pyfaust_in_venv.html#anaconda).  
+In this goal, please follow the install guide [here](install_pyfaust_in_venv.html#anaconda).  
 In order to verify you don't already have conda-forge set in your channels, use the following command:  
 
       conda config --show channels
 
-If it returns a list containing 'conda-forge' as in the example of output below, then your all set.
+If it returns a list containing 'conda-forge' as in the example of output below, then you're all set.
 
 ```
 channels:
