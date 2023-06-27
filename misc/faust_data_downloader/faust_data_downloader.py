@@ -56,7 +56,11 @@ def download_uncompress(uncompress_dir=None, base_url=BASE_URL,
 
 
 if __name__ == '__main__':
+    from os import mkdir
+    from os.path import dirname, join
     uncompress_dir=None
-    if len(argv) > 1 and isdir(argv[1]):
-        uncompress_dir=argv[1]
+    if len(argv) > 1 and isdir(dirname(argv[1])):
+        uncompress_dir = argv[1]
+        if not exists(uncompress_dir):
+            mkdir(uncompress_dir)
     download_uncompress(uncompress_dir)
