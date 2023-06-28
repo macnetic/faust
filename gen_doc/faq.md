@@ -22,6 +22,7 @@
 [2.6. How to fix the Segmentation Fault issue when using Torch with pyfaust on Mac OS X?](#py_six)  
 [2.7 Why the Faust F[I, J] indexing operation is not implemented in pyfaust?](#py_seven)  
 [2.8 How to fix conda pyfaust install error about glibc](#py_eight)  
+[2.9 Installing pyfaust with conda why did I obtain a SafetyError on libomp?](#py_nine)
 
 
 **3. About CUDA (for GPU FAµST API support)**  
@@ -559,6 +560,29 @@ If it returns a list containing 'conda-forge' as in the example of output below,
 channels:
   - conda-forge
   - defaults
+```
+
+\anchor py_nine
+
+## 2.9 Installing pyfaust with conda why did I obtain a SafetyError on libomp?
+
+The scenario is as follows :
+
+After a ``conda -c pyfaust install pyfaust`` you might end up on the error copied below, which mentions a ``SafetyError`` on ``libomp.so``. First, there is no need to pay more attention to this message because this is in fact only a warning. It doesn't prevent the installation of pyfaust. Secondly, the reason of this error is a bug of conda-build that has led us to a workaround that necessitates to modify libomp after conda package building. The modification implies a difference of size in the package manifest relatively to the real size of libomp, hence the error.
+
+For further details about installing pyfaust with conda, please refer to this [page](install_pyfaust_in_venv.html#anaconda).
+
+An example of the error message:
+
+```
+[...]
+Downloading and Extracting Packages
+
+Preparing transaction: done
+Verifying transaction: -                                                                                 SafetyError: The package for pyfaust located at /home/user/miniconda3/pkgs/pyfaust-3.38.17-py39_0
+appears to be corrupted. The path 'lib/python3.9/site-packages/pyfaust/lib/libomp.so'
+has an incorrect size.                                                                                     reported size: 759273 bytes
+  actual size: 723280 bytes
 ```
 
 # 3. About CUDA (for GPU FAµST API support)
