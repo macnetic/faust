@@ -1998,9 +1998,10 @@ class ParamsPalm4msaWHT(ParamsPalm4MSA):
         >>> H = wht(128).toarray()
         >>> p = ParamsPalm4msaWHT(H.shape[0])
         >>> F = palm4msa(H, p)
+        >>> # Approximation error
         >>> err = (F-H).norm()/norm(H)
-        >>> print("Approximation error:", err)
-        Approximation error: 1.112389296475859e-16
+        >>> err < 1e-15
+        True
 
     Reference:
         [1] Quoc-Tung Le, Rémi Gribonval. Structured Support Exploration For
