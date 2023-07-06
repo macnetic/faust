@@ -69,6 +69,8 @@ int main(int argc, char* argv[])
 		cout<<"floating point precision == float"<<endl;
 	}
 
+	seed(42);
+
 	int mat_nrows = 10;
 	int mat_ncols = 10;
 	int n_mats = 5;
