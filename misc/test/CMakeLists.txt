@@ -236,6 +236,7 @@ if(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE AND NOT NOCPPTESTS) 
 			# Generation of the binary files in double and float precision
 			add_executable(${TEST_CPP_NAME} ${FAUST_BIN_TEST_SRC_DIR}/${TEST_FILE_CPP} ${FAUST_BIN_TEST_SRC_DIR}/) #${FAUST_CMDLINE_TYPE_FORMAT_MAT_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_CMDLINE_TYPE_FORMAT_MAT_SRC_DIR}/faust_init_from_matio_mat.cpp)
 
+			add_test(NAME ${TEST_CPP_NAME} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/${TEST_CPP_NAME})
 			set(TEST_LIBS ${FAUST_TARGET};${MATIO_LIB_FILE};${HDF5_LIB_FILE})
 			if(FAUST_TORCH)
 				list(APPEND TEST_LIBS ${TORCH_LIBRARY};${Torch_DIR}/../../../lib/libc10.so)
