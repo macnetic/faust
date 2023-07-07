@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
 	}
 	Faust::MatDense<FPP,Cpu> data;
 
-	char configPalm2Filename[] = "config_compared_palm2.mat";
+	char configPalm2Filename[] = "@FAUST_CONFIG_MAT_DIR@/config_compared_palm2.mat";
 
 	init_faust_mat_from_matio(data, configPalm2Filename, "data");
 	Faust::ConstraintInt<FPP,Cpu> c1(CONSTRAINT_NAME_SPLIN, 5, 500, 32);
