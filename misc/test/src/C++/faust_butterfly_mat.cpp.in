@@ -290,6 +290,41 @@ void testCloneTranspConj(MatButterfly<FPP, Cpu>& butterflyMat,  const MatSparse<
 	delete clone;
 }
 
+template<typename T>
+void butterfly_faust(TransformHelper<T, Cpu>*& F, int log2size);
+
+
+
+template<>
+void butterfly_faust(TransformHelper<complex<double>, Cpu>*& F, int log2size)
+{
+	F = TransformHelper<complex<double>, Cpu>::fourierFaust(log2size, false);
+}
+
+
+template<>
+void butterfly_faust(TransformHelper<complex<float>, Cpu>*& F, int log2size)
+{
+	F = TransformHelper<complex<float>, Cpu>::fourierFaust(log2size, false);
+}
+
+
+template<>
+void butterfly_faust(TransformHelper<double, Cpu>*& F, int log2size)
+{
+	auto cF = TransformHelper<complex<double>, Cpu>::fourierFaust(log2size, false);
+	F = cF->real<double>();
+	delete cF;
+}
+
+template<>
+void butterfly_faust(TransformHelper<float, Cpu>*& F, int log2size)
+{
+	auto cF = TransformHelper<complex<float>, Cpu>::fourierFaust(log2size, false);
+	F = cF->real<float>();
+	delete cF;
+}
+
 int main(int argc, char** argv)
 {
 	int log2size = 4;
@@ -298,7 +333,10 @@ int main(int argc, char** argv)
 	std::cout << "log2size: " << log2size << std::endl;
 
 	int size = 1 << log2size;
-	auto F = TransformHelper<FPP, Cpu>::fourierFaust(log2size, false);
+
+	TransformHelper<FPP, Cpu> *F;
+	butterfly_faust(F, log2size);
+
 	auto dsButterflyMat = F->get_fact(0);
 	MatSparse<FPP, Cpu> spButterflyMat(dsButterflyMat);
 	MatButterfly<FPP, Cpu> butterflyMat(spButterflyMat, /* level */ 0);
@@ -363,5 +401,6 @@ int main(int argc, char** argv)
 	testNorm1(butterflyMat, spButterflyMat);
 	testGemm(butterflyMat, spButterflyMat);
 	testCloneTranspConj(butterflyMat, spButterflyMat);
+	delete F;
 	return EXIT_SUCCESS;
 }
