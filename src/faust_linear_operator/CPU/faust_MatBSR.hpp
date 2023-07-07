@@ -1067,7 +1067,7 @@ const T& BSRMat<T, BlockStorageOrder>::operator()(unsigned int i, unsigned int j
 		unsigned int bi = i / bm; // the block row index of (i,j)
 		// how many nz blocks in bi-th row 
 		unsigned int bc = browptr[bi+1] - browptr[bi];
-		if(!bc) return 0; // no nz blocks in the bi-th row
+		if(!bc) return zero; // no nz blocks in the bi-th row
 		// is j located in a nz block of bi-th row?
 		unsigned int bj = j / bn; // block column index of (i,j)
 		for(int k=browptr[bi];k<browptr[bi+1]; k++)
