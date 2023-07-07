@@ -29,7 +29,7 @@ int main()
 
 	Faust::MatSparse<FPP,Cpu> spLap(Lap);
 	// Execute the algorithm
-	EigTJ<FPP,Cpu,FPP> algo(spLap, J);
+	EigTJ<FPP,Cpu,FPP> algo(spLap, J, /*verbosity */ 0, /* stoppingError */ 0.0, /* errIsRel */ true, /* enable_large_Faust */ true);
 	algo.compute_facts();
 
 	// Compare pivot choices along the iterations (between matlab ref and C++ impl.)
