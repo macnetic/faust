@@ -98,12 +98,12 @@ template<typename FPP>
 Faust::MatSparse<FPP,Cpu>::MatSparse(const Faust::MatDiag<FPP>& D) : Faust::MatGeneric<FPP,Cpu>(D.getNbRow(),D.getNbCol()), mat(Eigen::SparseMatrix<FPP,Eigen::RowMajor>(D.getNbRow(), D.getNbCol())), nnz(D.getNonZeros())
 {
 	size_t* id_row = new size_t[nnz];
-	size_t* col_ptr = new size_t[nnz+1];
+	size_t* col_ptr = new size_t[this->dim2+1];
 	FPP* data = new FPP[nnz];
 	FPP c;
 	int j = 0;
 	col_ptr[0] = 0;
-	for(int i=0; i < D.getNbCol(); i++)
+	for(int i=0; i < this->dim2; i++)
 		if(i < nnz && (c = D.getData()[i]) != FPP(0))
 		{
 			id_row[j] = i;
