@@ -747,14 +747,28 @@ void Faust::gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<F
 		{
 			if (typeB == 'N')
 				C.mat = alpha * A.mat * B.mat + beta * C.mat;
-			else
+			else if (typeB == 'T')
 				C.mat = alpha * A.mat * B.mat.transpose() + beta * C.mat;
-		}else
+			else // typeB == H
+				C.mat = alpha * A.mat * B.mat.adjoint() + beta * C.mat;
+		}
+		else if (typeA == 'T')
 		{
 			if (typeB == 'N')
 				C.mat = alpha * A.mat.transpose() * B.mat + beta * C.mat ;
-			else
+			else if (typeB == 'T')
 				C.mat = alpha * A.mat.transpose() * B.mat.transpose() + beta * C.mat;
+			else // typeB == H
+				C.mat = alpha * A.mat.transpose() * B.mat.adjoint() + beta * C.mat;
+		}
+		else //if (typeA == 'H')
+		{
+			if (typeB == 'N')
+				C.mat = alpha * A.mat.transpose() * B.mat + beta * C.mat ;
+			else if (typeB == 'T')
+				C.mat = alpha * A.mat.adjoint() * B.mat.transpose() + beta * C.mat;
+			else // typeB == H
+				C.mat = alpha * A.mat.adjoint() * B.mat.adjoint() + beta * C.mat;
 		}
 
 	}
