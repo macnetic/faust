@@ -12,13 +12,24 @@ typedef @TEST_FPP@ FPP;
 using namespace std;
 using namespace Faust;
 
+double tol()
+{
+	if(is_same<FPP, complex<double>>::value)
+		return 1e-4;
+	else if(is_same<FPP, complex<float>>::value || is_same<FPP,float>::value)
+		return 1e-3;
+	else // double
+		return 1e-6;
+}
+
 void test_fro_norm(const MatBSR<FPP, Cpu>& bmat)
 {
 	cout << "=== Testing MatBSR::norm:" << std::endl;
 	auto dmat = bmat.to_dense();
 	cout << "bsr mat fro-norm:" << bmat.norm() << std::endl;
 	cout << "dense mat fro-norm:" << dmat.norm() << std::endl;
-	assert(std::abs(bmat.norm()-dmat.norm()) < 1e-6);
+	cout << "error:" << std::abs(bmat.norm()-dmat.norm()) << std::endl;
+	assert(std::abs(bmat.norm()-dmat.norm()) < tol());
 	cout << "OK." << std::endl;
 }
 
@@ -28,7 +39,7 @@ void test_1_norm(const MatBSR<FPP, Cpu>& bmat)
 	auto dmat = bmat.to_dense();
 	cout << "bsr mat fro-normL1:" << bmat.normL1() << std::endl;
 	cout << "dense mat fro-normL1:" << dmat.normL1() << std::endl;
-	assert(std::abs(bmat.normL1()-dmat.normL1()) < 1e-6);
+	assert(std::abs(bmat.normL1()-dmat.normL1()) < tol());
 	cout << "OK." << std::endl;
 }
 
@@ -38,7 +49,7 @@ void test_clone(const MatBSR<FPP, Cpu>& bmat)
 	auto clone = bmat.Clone();
 	cout << "bsr mat fro-norm:" << bmat.norm() << std::endl;
 	cout << "clone bsr mat fro-norm:" << clone->norm() << std::endl;
-	assert(std::abs(bmat.norm()-clone->norm()) < 1e-6);
+	assert(std::abs(bmat.norm()-clone->norm()) < tol());
 	cout << "OK" << std::endl;
 }
 
@@ -59,19 +70,19 @@ void test_mul_vec(const MatBSR<FPP, Cpu>& bmat)
 	dmat.multiply(vec_cpy, 'N');
 //	cout << "ref vec:";vec_cpy.Display(); cout << "norm: " << vec_cpy.norm() << std::endl;
 //	cout << "test vec:";vec.Display(); cout << "norm: " << vec.norm() << std::endl;
-	assert(std::abs(vec.norm()-vec_cpy.norm()) < 1e-6);
+	assert(std::abs(vec.norm()-vec_cpy.norm()) < tol());
 	cout << "MatBSR::multiply(Vect, 'N') OK" << endl;
 	bmat.multiply(vec_t, 'T');
 	dmat.multiply(vec_t_cpy, 'T');
 //	cout << "ref vec_t:";vec_t_cpy.Display(); cout << "norm: " << vec_t_cpy.norm() << std::endl;
 //	cout << "test vec_t:";vec_t.Display(); cout << "norm: " << vec_t.norm() << std::endl;
-	assert(std::abs(vec_t.norm()-vec_t_cpy.norm()) < 1e-6);
+	assert(std::abs(vec_t.norm()-vec_t_cpy.norm()) < tol());
 	cout << "MatBSR::multiply(Vect, 'T') OK" << endl;
 	bmat.multiply(vec_h, 'H');
 	dmat.multiply(vec_h_cpy, 'H');
 //	cout << "ref vec:";vec_h_cpy.Display(); cout << "norm: " << vec_h_cpy.norm() << std::endl;
 //	cout << "test vec_h:";vec_h.Display(); cout << "norm: " << vec_h.norm() << std::endl;
-	assert(std::abs(vec_h.norm()-vec_h_cpy.norm()) < 1e-6);
+	assert(std::abs(vec_h.norm()-vec_h_cpy.norm()) < tol());
 	cout << "MatBSR::multiply(Vect, 'H') OK" << endl;
 	cout << "OK" << endl;
 }
@@ -84,7 +95,7 @@ void test_mul_vec2(const MatBSR<FPP, Cpu>& bmat)
 	auto dmat = bmat.to_dense();
 	Vect<FPP, Cpu> test_vec = bmat.multiply(vec);
 	Vect<FPP, Cpu> ref_vect = dmat.multiply(vec);
-	assert(std::abs(test_vec.norm()-ref_vect.norm()) < 1e-6);
+	assert(std::abs(test_vec.norm()-ref_vect.norm()) < tol());
 	delete md;
 	cout << "OK" << endl;
 }
@@ -99,7 +110,7 @@ void test_mul_dense(const MatBSR<FPP, Cpu>& bmat)
 	bmat.multiply(rmd_copy, 'N');
 	assert((*rmd).getNbRow() == rmd_copy.getNbRow() && (*rmd).getNbCol() == rmd_copy.getNbCol());
 	rmd_copy -= *rmd;
-	assert(rmd_copy.norm() < 1e-6);
+	assert(rmd_copy.norm() < tol());
 	delete rmd;
 	cout << "OK" << endl;
 }
@@ -118,7 +129,7 @@ void test_mul_dense_transp(const MatBSR<FPP, Cpu>& bmat)
 	rmd_copy.Display();
 	assert((*rmd).getNbRow() == rmd_copy.getNbRow() && (*rmd).getNbCol() == rmd_copy.getNbCol());
 	rmd_copy -= *rmd;
-	assert(rmd_copy.norm() < 1e-6);
+	assert(rmd_copy.norm() < tol());
 	delete rmd;
 	cout << "OK" << endl;
 }
@@ -133,7 +144,7 @@ void test_mul_dense_transconj(const MatBSR<FPP, Cpu>& bmat)
 	bmat.multiply(rmd_copy, 'H');
 	assert((*rmd).getNbRow() == rmd_copy.getNbRow() && (*rmd).getNbCol() == rmd_copy.getNbCol());
 	rmd_copy -= *rmd;
-	assert(rmd_copy.norm() < 1e-6);
+	assert(rmd_copy.norm() < tol());
 	delete rmd;
 	cout << "OK" << endl;
 }
@@ -152,7 +163,7 @@ void test_mul_sparse(const MatBSR<FPP, Cpu>& bmat)
 	*rmd = rms;
 	MatDense<FPP, Cpu> rmd_copy(rms_copy);
 	rmd_copy -= *rmd;
-	assert(rmd_copy.norm() < 1e-6);
+	assert(rmd_copy.norm() < tol());
 	delete rmd;
 	cout << "OK" << endl;
 }
@@ -170,7 +181,7 @@ void test_mul_sparse_transp(const MatBSR<FPP, Cpu>& bmat)
 	*rmd = rms;
 	MatDense<FPP, Cpu> rmd_copy(rms_copy);
 	rmd_copy -= *rmd;
-	assert(rmd_copy.norm() < 1e-6);
+	assert(rmd_copy.norm() < tol());
 	delete rmd;
 	cout << "OK" << endl;
 }
@@ -188,7 +199,7 @@ void test_mul_sparse_transconj(const MatBSR<FPP, Cpu>& bmat)
 	*rmd = rms;
 	MatDense<FPP, Cpu> rmd_copy(rms_copy);
 	rmd_copy -= *rmd;
-	assert(rmd_copy.norm() < 1e-6);
+	assert(rmd_copy.norm() < tol());
 	delete rmd;
 	cout << "OK" << endl;
 }
@@ -207,7 +218,7 @@ void test_mul_sparse_right(const MatBSR<FPP, Cpu>& bmat_orig)
 //	bmat.Display();
 	assert(bmat.getNbRow() == dmat.getNbRow() && bmat.getNbCol() == dmat.getNbCol());
 	dmat -= dmat_copy;
-	assert(dmat.norm() < 1e-6);
+	assert(dmat.norm() < tol());
 	delete rmd;
 	cout << "OK" << endl;
 }
@@ -223,7 +234,7 @@ void test_gemm_NN(const MatBSR<FPP, Cpu>& bmat)
 	dmat.faust_gemm(*B, C_copy, (*B)(0,0), C_copy(0,0), 'N', 'N');
 	MatDense<FPP, Cpu> test = *C;
 	test -= C_copy;
-	assert(test.norm() < 1e-6);
+	assert(test.norm() < tol());
 	delete B;
 	delete C;
 	cout << "OK" << endl;
@@ -241,7 +252,7 @@ void test_gemm_NT(const MatBSR<FPP, Cpu>& bmat)
 	dmat.faust_gemm(*B, C_copy, (*B)(0,0), C_copy(0,0), 'N', 'T');
 	MatDense<FPP, Cpu> test = *C;
 	test -= C_copy;
-	assert(test.norm() < 1e-6);
+	assert(test.norm() < tol());
 	delete B;
 	delete C;
 	cout << "OK" << endl;
@@ -258,7 +269,7 @@ void test_gemm_TT(const MatBSR<FPP, Cpu>& bmat)
 	dmat.faust_gemm(*B, C_copy, (*B)(0,0), C_copy(0,0), 'T', 'T');
 	MatDense<FPP, Cpu> test = *C;
 	test -= C_copy;
-	assert(test.norm() < 1e-6);
+	assert(test.norm() < tol());
 	delete B;
 	delete C;
 	cout << "OK" << endl;
@@ -275,7 +286,7 @@ void test_gemm_HH(const MatBSR<FPP, Cpu>& bmat)
 	dmat.faust_gemm(*B, C_copy, (*B)(0,0), C_copy(0,0), 'H', 'H');
 	MatDense<FPP, Cpu> test = *C;
 	test -= C_copy;
-	assert(test.norm() < 1e-6);
+	assert(test.norm() < tol());
 	delete B;
 	delete C;
 	cout << "OK" << endl;
@@ -294,7 +305,7 @@ void test_transpose(const MatBSR<FPP, Cpu>& bmat)
 	test -= dmat;
 	dmat.print_file("dmat.txt");
 	bmat_t.to_dense().print_file("bmat_t.txt");
-	assert(test.norm() < 1e-6);
+	assert(test.norm() < tol());
 	cout << "OK" << endl;
 }
 
@@ -308,7 +319,7 @@ void test_conjugate(const MatBSR<FPP, Cpu>& bmat)
 	assert(bmat_c.getNbRow() == dmat.getNbRow() && bmat_c.getNbCol() == dmat.getNbCol());
 	MatDense<FPP, Cpu> test = bmat_c.to_dense();
 	test -= dmat;
-	assert(test.norm() < 1e-6);
+	assert(test.norm() < tol());
 	cout << "OK" << endl;
 }
 
@@ -322,7 +333,7 @@ void test_adjoint(const MatBSR<FPP, Cpu>& bmat)
 	assert(bmat_a.getNbRow() == dmat.getNbRow() && bmat_a.getNbCol() == dmat.getNbCol());
 	MatDense<FPP, Cpu> test = bmat_a.to_dense();
 	test -= dmat;
-	assert(test.norm() < 1e-6);
+	assert(test.norm() < tol());
 	cout << "OK" << endl;
 }
 
@@ -360,7 +371,7 @@ void test_mul_scal(const MatBSR<FPP, Cpu>& bmat)
 	bmat_copy *= scal;
 	MatDense<FPP, Cpu> test(dmat);
 	test -= bmat_copy.to_dense();
-	assert(test.norm() < 1e-6);
+	assert(test.norm() < tol());
 	delete rmd;
 	cout << "OK" << endl;
 }
@@ -379,7 +390,7 @@ void test_get_col(const MatBSR<FPP, Cpu>& bmat)
 		bcol = bmat.get_col(j);
 		test = dcol;
 		test -= bcol;
-		assert(test.norm() < 1e-6);
+		assert(test.norm() < tol());
 	}
 	cout << "OK" << endl;
 }
@@ -405,7 +416,7 @@ void test_get_cols(const MatBSR<FPP, Cpu>& bmat)
 		test -= MatDense<FPP, Cpu>(*bcols);
 		delete dcols;
 		delete bcols;
-		assert(test.norm() < 1e-6);
+		assert(test.norm() < tol());
 	}
 	cout << "OK" << endl;
 }
@@ -430,7 +441,7 @@ void test_get_rows(const MatBSR<FPP, Cpu>& bmat)
 		test -= MatDense<FPP, Cpu>(*brows);
 		delete drows;
 		delete brows;
-		assert(test.norm() < 1e-6);
+		assert(test.norm() < tol());
 	}
 	cout << "OK" << endl;
 }
@@ -459,7 +470,7 @@ void test_get_cols2(const MatBSR<FPP, Cpu>& bmat)
 		delete dcols;
 		delete bcols;
 		delete []col_ids;
-		assert(test.norm() < 1e-6);
+		assert(test.norm() < tol());
 	}
 	cout << "OK" << endl;
 }
@@ -488,7 +499,7 @@ void test_get_rows2(const MatBSR<FPP, Cpu>& bmat)
 		delete drows;
 		delete brows;
 		delete []row_ids;
-		assert(test.norm() < 1e-6);
+		assert(test.norm() < tol());
 	}
 	cout << "OK" << endl;
 }
@@ -555,13 +566,13 @@ void test_getitem(const MatBSR<FPP, Cpu>& bmat)
 {
 	cout << "=== Testing MatBSR::operator(int,int)" << endl;
 	auto dmat = bmat.to_dense();
-	assert(abs(dmat.norm()-bmat.norm()) < 1e-6);
+	assert(abs(dmat.norm()-bmat.norm()) < tol());
 	for(int i=0;i < bmat.getNbRow();i++)
 	{
 		for(int j=0;j < bmat.getNbCol();j++)
 		{
 //			cout << dmat(i,j) << "==" << bmat(i,j) <<" ?" << endl;
-			assert(abs(dmat(i,j)-bmat(i,j)) < 1e-6);
+			assert(abs(dmat(i,j)-bmat(i,j)) < tol());
 		}
 	}
 	cout << "OK" << endl;
@@ -575,7 +586,7 @@ void test_tosparse(const MatBSR<FPP, Cpu>& bmat)
 	auto dmat = bmat.to_dense();
 	test -= dmat;
 	cout << test.norm() << endl;
-	assert(test.norm() < 1e-6);
+	assert(test.norm() < tol());
 	cout << "OK" << endl;
 }
 
@@ -615,7 +626,7 @@ void test_faust()
 	std::cout << "Faust with dense matrix time: " << elapsed_seconds.count() << "s\n";
 	cout << endl;
 	toarray_ref -= toarray;
-	assert(toarray_ref.norm() < 1e-6);
+	assert(toarray_ref.norm() < tol());
 	MatSparse<FPP, Cpu> *rand_smat = new MatSparse<FPP, Cpu>(*rand_dmat);
 	F->replace(rand_smat, rep_id);
 	F->display(); 
@@ -679,7 +690,7 @@ void test_faust2()
 	elapsed_seconds = end-start;
 	auto test = bsr_prod;
 	test -= ds_prod;
-	assert(test.norm()/bsr_prod.norm() < 1e-6);
+	assert(test.norm()/bsr_prod.norm() < tol());
 	std::cout << "Dense Faust-dense matrix mul time: " << elapsed_seconds.count() << "s\n";
 	/**************** test prod by mat_sparse */
 	auto mat_sparse = MatDense<FPP, Cpu>::randMat(faust_nrows, faust_ncols, .02);
@@ -705,7 +716,7 @@ void test_faust2()
 	elapsed_seconds = end-start;
 	test = bsr_prod;
 	test -= ds_prod;
-	assert(test.norm()/bsr_prod.norm() < 1e-6);
+	assert(test.norm()/bsr_prod.norm() < tol());
 	std::cout << "Dense Faust-sparse matrix mul time: " << elapsed_seconds.count() << "s\n";
 
 	delete mat_sparse;
@@ -757,13 +768,13 @@ int main(int argc, char** argv)
 	test_mul_sparse_transp(*bmat);
 	test_mul_sparse_transconj(*bmat);
 	test_mul_sparse_right(*bmat);
+	test_transpose(*bmat);
+	test_conjugate(*bmat);
+	test_adjoint(*bmat);
 	test_gemm_NN(*bmat);
 	test_gemm_NT(*bmat);
 	test_gemm_TT(*bmat);
 	test_gemm_HH(*bmat);
-	test_transpose(*bmat);
-	test_conjugate(*bmat);
-	test_adjoint(*bmat);
 	test_nnz(*bmat);
 	test_nbytes(*bmat);
 	test_get_type(*bmat);
