@@ -400,6 +400,7 @@ namespace Faust
 				Real<FPP> terr = 1; // true error (absolute or relative)
 				bool terr_enabled = false;
 				Real<FPP> prev_aerr = -1;
+				Real<FPP> prev_terr = -1;
 				Transform<FPP, DEVICE> tW1, tW2;
 				bool loop = true;
 				MatDense<FPP, DEVICE> W1_MW2_; // previous computation of W1' M W2 (initialization at M; no Givens yet, in svdtj_compute_W1H_M_W2_meth3)
@@ -553,7 +554,7 @@ namespace Faust
 						{
 							W1_MW2 = svdtj_compute_W1H_M_W2_meth3(dM, tW1, tW2, W1_MW2_, err_period, k1, k2, t1, t2, new_W1, new_W2);
 
-							prev_S = S; //TODO: shouldn't be stored and be recomputed if needed (when better_S becomes false which is rare)
+							prev_S = S; //TODO: shouldn't be stored but rather be recomputed if needed (when better_S becomes false which is rare)
 
 							// extract S from W1_MW2
 							if(order < 0)
@@ -581,7 +582,7 @@ namespace Faust
 									if(relErr) terr /= M_norm;
 									if(verbosity)
 									{
-										std::cout << "SVDTJ ";
+										std::cout << "SVDTJ iteration: " << int(k1 / t1) << ", ";
 										if(relErr)
 											std::cout << "relative ";
 										else
@@ -589,6 +590,25 @@ namespace Faust
 										std::cout << "error: ";
 										std::cout << terr << std::endl;
 									}
+
+
+									if(prev_terr > 0 && terr >= prev_terr && terr / prev_terr >= 2)
+									{
+										// too bad, S has not enhanced
+										// stop the algorithm with the last best result
+
+										better_S = false;
+										if(verbosity)
+										{
+											std::cerr << "Singular values have stopped to improve, rollback to previous iteration and stop." << std::endl;
+											std::cout << "error: " << prev_terr << std::endl;
+										}
+										S = prev_S;
+										terr = prev_terr;
+										break;
+									}
+
+									prev_terr = terr;
 								}
 								else
 								{
@@ -597,32 +617,31 @@ namespace Faust
 									aerr = Faust::fabs(M_norm * M_norm - Sd_norm * Sd_norm);
 									// check if we're good to switch to the exact error
 									terr_enabled = Faust::fabs(tol * tol - aerr) < Faust::fabs(E);
+									if(verbosity)
+										std::cout << "SVDTJ iteration: " << int(k1 / t1) << ", singular values approximate square norm error: " << aerr << std::endl;
+
+									if(prev_aerr > 0 && (aerr > prev_aerr && aerr / prev_aerr >= 10))
+										//							if(prev_aerr > 0 && aerr >= prev_aerr)
+									{
+										// too bad, S has not enhanced
+										// stop the algorithm with the last best result
+
+										better_S = false;
+										if(verbosity)
+										{
+											std::cerr << "Singular values have stopped to improve, rollback to previous iteration and stop." << std::endl;
+											std::cout << "approximate err: " << prev_aerr << std::endl;
+										}
+										S = prev_S;
+										aerr = prev_aerr;
+										break;
+									}
+
+									prev_aerr = aerr;
 								}
-								if(verbosity)
-									std::cout << "SVDTJ iteration: " << int(k1 / t1) << " singular values approximate square norm error: " << aerr << std::endl;
 
 							}
 
-
-
-							if(prev_aerr > 0 && aerr > prev_aerr && aerr / prev_aerr >= 10)
-							{
-								// too bad, S has not enhanced
-								// stop the algorithm with the last best result
-
-								better_S = false;
-								if(verbosity)
-								{
-									std::cerr << "Singular values has stopped to improve, rollback the algorithm to previous iteration and stop." << std::endl;
-									S = prev_S;
-									aerr = prev_aerr;
-									std::cout << "approximate err: " << aerr << std::endl;
-								}
-								break;
-							}
-
-							prev_aerr = aerr;
-							// erase permuted factors because algoW1/W2 doesn't keep account for them (cf. EigTJGen::get_transform with ord == true and copy == false
 						}
 						if(order)
 						{
@@ -635,9 +654,9 @@ namespace Faust
 				}
 
 				// don't use tW1 and tW2 here because we want an independent copy (not linked to algoW1 and algoW2 internal data)
-				Transform<FPP,DEVICE> transW1 = std::move(algoW1->get_transform(/*order*/ order, /*copy*/ true, /*nfacts*/ better_W1 && better_S?-1:algoW1->nfacts() - err_period));
+				Transform<FPP,DEVICE> transW1 = std::move(algoW1->get_transform(order, /*copy*/ true, /*nfacts*/ better_W1 && better_S?-1:algoW1->nfacts() - err_period));
 
-				Transform<FPP,DEVICE> transW2 = std::move(algoW2->get_transform(/*order*/ order, /*copy*/ true, /*nfacts*/ better_W2 && better_S?-1:algoW2->nfacts() - err_period));
+				Transform<FPP,DEVICE> transW2 = std::move(algoW2->get_transform(order, /*copy*/ true, /*nfacts*/ better_W2 && better_S?-1:algoW2->nfacts() - err_period));
 
 				TransformHelper<FPP,DEVICE> *thW1 = new TransformHelper<FPP,DEVICE>(transW1, true); // true is for moving and not copying the Transform object into TransformHelper (optimization possible cause we know the original object won't be used later)
 
