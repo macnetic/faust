@@ -126,17 +126,21 @@ to pursue for a larger coverage.
 3. FAµST C++ core tests
 </a>**
 
-### 3.1 Tests
+#### 3.1 Tests
 
 - Directory location: ``misc/test/src/C++`` and ``misc/test/src/C++/unit``
 
-### 3.2 Gitlab continuous integration (ci) job
+#### 3.2 Gitlab continuous integration (ci) jobs
 <a name="cpp_test_ci_jobs"/>
 
 - Gitlab ci job: ``ctest`` performs C++ tests.
+-  Note that for a matter of pipeline speed this ci job runs only if there are changes in ``src/**/*``or ``misc/test/src/C++/**/*``.
+For the same reason another ci job named ``ctest_nightly`` is made to run the tests that are very slow/long. They are enabled through the cmake option
+``SLOW_TESTS`` (which is defaultly set to ``OFF``). There is one job version for each supported OS (``ctest_nightly_linux``, ``ctest_nightly_macos``,
+ ``ctest_nightly_win10``), for the moment the macos' is disabled mainly because the macos' runs in monothread (see ``.gitlab-ci.yml``).
 - For more details about ctest, take a look at [2.2](#py_mat_test_ci_jobs).
 
-### 3.3 Test report on Gitlab pages
+#### 3.3 Test report on Gitlab pages
 <a name="cpp_test_report"/>
 
 - On the end of ``ctest`` ci job execution a test report in HTML
@@ -146,6 +150,8 @@ to pursue for a larger coverage.
   Here is [an example of report for C++ tests](https://faustgrp.gitlabpages.inria.fr/-/faust/-/jobs/3193880/artifacts/build_FaustLinux/cpp_test_report.html)
   (if this link doesn't work, the associated pipeline has been deleted on Gitlab,
   please look [here](https://gitlab.inria.fr/faustgrp/faust/-/jobs) for a recent ``ctest`` output).
+
+- At the time of writing it exist 167 C++ tests ran by the ctest ci job. It includes many unit tests and all these tests passed the latest pipeline.
 
 **<a name="test_release_packages">
 4. Package tests and automatic release
