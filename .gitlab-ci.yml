@@ -117,7 +117,7 @@ ctest_matlab:
     only:
         - schedules
 
-.ctest_nightly_linux:
+ctest_nightly_linux:
     <<: *ctest_nightly_script
     tags:
         - linux
@@ -129,7 +129,7 @@ ctest_matlab:
     tags:
         - macos
 
-.ctest_nightly_win10:
+ctest_nightly_win10:
     <<: *ctest_script
     only:
         - schedules
