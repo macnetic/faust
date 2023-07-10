@@ -790,9 +790,13 @@ int main(int argc, char** argv)
 	test_getitem(*bmat);
 	test_tosparse(*bmat);
 	delete bmat;
-	test_faust();
-	test_faust2();
-	test_faust3();
+	if(argc > 1)
+	{
+		// mini-benchmark
+		test_faust();
+		test_faust2();
+		test_faust3();
+	}
 	return EXIT_SUCCESS;
 }
 
