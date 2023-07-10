@@ -2,12 +2,17 @@
 %> @brief Performs an approximate singular value decomposition and returns the left and
 %> right singular vectors as Faust transforms.
 %>
-%> @note this function is based on fact.eigtj which relies on the truncated Jacobi algorithm, hence the 'tj' in the name. See below the examples for further details on how svdtj is defined using eigtj.
+%> @note this function is based on fact.eigtj which relies on the truncated Jacobi algorithm, hence the 'tj' in the name. See below the examples for further details on how svdtj is defined using eigtj. It's noteworthy that svdtj is still in experimental status, for example it
+%> exists cases for which it won't converge (to an abitrary precision, see tol argument).
+%> Another important thing is that svdtj needs to compute
+%> M.M' and M'.M which is not particularly advisable when M is large and
+%> dense.
+%>
 %>
 %> @b Usage
 %>
 %> &nbsp;&nbsp;&nbsp; @b Primary examples of calls include:<br/>
-%> &nbsp;&nbsp;&nbsp; @b <b>[U,S,V] = svdtj(M, ‘nGivens’,n) </b> outputs U,V as Faust objects made of n elementary Givens rotations grouped into factors. By default each factor gathers (up to) m = floor(size(M,1)/2) such rotations. By default vector S contains the approximate singular values in descending order.<br/>
+%> &nbsp;&nbsp;&nbsp; @b <b>[U,S,V] = svdtj(M, ‘nGivens’,n) </b> outputs U,V as Faust objects made of n elementary Givens rotations grouped into factors. By default each factor gathers (up to) m = floor(size(M,1)/2) such rotations. By default vector S contains the approximate singular values in any order.<br/>
 %> &nbsp;&nbsp;&nbsp; @b    <b>[U,S,V] = svdtj(M,’tol’,0.01)</b> same as above with n determined adaptively by a relative approximation error 0.01<br/>
 %> &nbsp;&nbsp;&nbsp; @b       <b>[U,S,V] = svdtj(M,’tol’,0.01,’relerr’,false)</b> same as above with an absolute approximation error<br/>
 %> &nbsp;&nbsp;&nbsp; @b       <b>[U,S,V] = svdtj(M,’nGivens’,n,’tol’,0.01)</b> same as above with a number of elementary Givens bounded by n even if the targeted approximation error is not achieved<br/>
@@ -54,7 +59,7 @@
 %> @endcode
 %>
 %> @retval [U,S,V]: such that U*S*V' is the approximate of M with:
-%>      - S: (sparse real diagonal matrix) the singular values in descending order.
+%>      - S: (sparse real diagonal matrix) the singular values in any order.
 %>      - U, V: (Faust objects) orthonormal transforms.
 %>
 %> @b Example
@@ -168,9 +173,6 @@
 %> and likewise the right singular vectors to W2.
 %>
 %> To compute a consistent approximation of S we observe that U and V are orthogonal/unitary hence \f$ S  = U^* M V \f$ so we ignore the off-diagonal coefficients of the approximation and take \f$ S = diag(U^* M V)  \approx diag(W_1^* M W_2)\f$
-%>
-%> The last step performed by svdtj() is to sort the singular values of S in descending order and build a signed permutation matrix to order the left singular vectors of W1 accordingly. The -1 elements of the signed permutation matrix allow to change the sign of each negative values of S by reporting it on the corresponding left singular vector (\f$ \sigma v_i = (-\sigma_i) (-v_i )\f$).<br/>
-%> To sum up W1 is replaced by W1 P and W2 by W2 abs(P) (because W2 also needs to be ordered), with P the signed permutation resulting of the descending sort of S. The resulting transforms/Fausts W1 and W2 are returned by svdtj along with the ordered S. Note that the permutation factor P (resp. abs(P)) is fused with the rightmost factor of the Faust object W1 (resp. W2).
 %>
 %> <p> @b See @b also fact.eigtj, fact.pinvtj
 %>

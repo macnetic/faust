@@ -109,7 +109,14 @@ def svdtj(M, nGivens=None, tol=0, err_period=100, relerr=True,
     """
         Performs a singular value decomposition and returns the left and right singular vectors as Faust transforms.
 
-        NOTE: this function is based on fact.eigtj which relies on the truncated Jacobi algorithm, hence the 'tj' in the name. See below the examples for further details on how svdtj is defined using eigtj.
+        NOTE: this function is based on fact.eigtj which relies on the
+        truncated Jacobi algorithm, hence the 'tj' in the name. See below the
+        examples for further details on how svdtj is defined using eigtj.
+        It's noteworthy that svdtj is still in experimental status, for example
+        it exists cases for which it won't converge (to an abitrary precision,
+        see tol argument). Another important thing is that it needs to compute
+        M.M^H and M^H.M which is not particularly advisable when M is large and
+        dense.
 
         Args:
             M: a real or complex matrix (np.ndarray or scipy.sparse.csr_matrix). The dtype must be float32, float64
@@ -150,13 +157,13 @@ def svdtj(M, nGivens=None, tol=0, err_period=100, relerr=True,
             setting the environment related variable like this (defaulty the value is '0', which means
             that the two-times strategy is used).
             <code>
-            os.environ['SVDTJ_ALL_TRUE_ERR'] = '1' 
+            os.environ['SVDTJ_ALL_TRUE_ERR'] = '1'
             </code>
 
 
         Returns:
             The tuple U,S,V: such that U*numpy.diag(S)*V.H is the approximate of M.
-            - (np.array vector) S the singular values in descending order.
+            - (np.array vector) S the singular values in any order.
             - (Faust objects) U,V orthonormal Fausts.
         <br/>
         Examples:
@@ -238,18 +245,6 @@ def svdtj(M, nGivens=None, tol=0, err_period=100, relerr=True,
 
         To compute a consistent approximation of S we observe that U and V are orthogonal hence \f$ S  = U^* M V \f$ so we ignore the off-diagonal coefficients of the approximation and take \f$ S = diag(U^* M V)  \approx diag(W_1^* M W_2)\f$
 
-        The last step performed by svdtj() is to sort the singular values of S
-        in descending order and build a signed permutation matrix to order the
-        left singular vectors of W1 accordingly. The -1 elements of the signed
-        permutation matrix allow to change the sign of each negative values of
-        S by reporting it on the corresponding left singular vector (\f$
-        \sigma_i v_i = (-\sigma_i) (-v_i )\f$).<br/>
-        To sum up W1 is replaced by W1 P and W2 by W2 abs(P) (because W2 also
-        needs to be ordered), with P the signed permutation resulting of the
-        descending sort of S. The resulting transforms/Fausts W1 and W2 are
-        returned by svdtj along with the ordered S. Note that the permutation
-        factor P (resp. abs(P)) is fused with the rightmost factor of the Faust
-        object W1 (resp. W2).
 
      See also:
         eigtj
