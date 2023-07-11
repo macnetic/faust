@@ -229,6 +229,7 @@ pyfaust_test_code_coverage:
     # built with --enable-loadable-sqlite-extensions (and sqlite-devel)
     # but it is a need of coverave python package
     # so we use py3.9 from conda
+    - cmake -P misc/download_unzip_faust_misc_data.cmake # tests need data
     - conda create -n test_coverage_pyfaust python==3.9
     - conda activate test_coverage_pyfaust
       # install pyfaust with pip
