@@ -183,7 +183,7 @@ endif()
 # Allows building of shared libraries:
 #option(BUILD_EXTERNALS_LIBS "Build externals libraries if they are not installed." ON)
 # Enable testing:
-option(BUILD_TESTING "Build Tests" ON) 
+option(BUILD_TESTING "Build Tests" OFF) 
 #Allows generating the doc:
 option(BUILD_DOCUMENTATION "Generating the doxygen documentation." OFF)
 # Allows multithreading:

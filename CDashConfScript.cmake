@@ -87,7 +87,7 @@ else() #WIN32
 	set(CONF_OPTIONS "${CONF_OPTIONS} -DCMAKE_INSTALL_PREFIX=C:/Users/$ENV{USERNAME}")
 endif()
 
-set(CONF_OPTIONS "${CONF_OPTIONS} -DEXPERIMENTAL_PKG=ON")
+set(CONF_OPTIONS "${CONF_OPTIONS} -DEXPERIMENTAL_PKG=ON -DBUILD_TESTING=ON")
 
 #ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY}) # no need to empty build dir. because
 # we use CTEST_START_WITH_EMPTY_BINARY_DIRECTORY above and gitlab-runner starts with a new one
