@@ -209,6 +209,7 @@ matfaust_test_code_coverage:
     - cd MOcov
     - make install
     - cd ..
+    - cmake -P misc/download_unzip_faust_misc_data.cmake # tests need data
     - matlab -nojvm -nodisplay -r "addpath misc/test/src/Matlab;matfaust_test_coverage; exit" | tee /tmp/matfaust_test_cov_output
   after_script:
     - if [ $(rpm -qa faust | wc -l) -gt 0 ]; then sudo rpm -e faust;fi
