@@ -10,7 +10,8 @@ if(NOT REMOTE_DATA_URL OR NOT REMOTE_DATA_FILE)
 	foreach(data_BSL ${BSL_DATA_FILE})
 		configure_file(${FAUST_DATA_MAT_DIR}/${data_BSL} ${FAUST_MATFAUST_DEMO_DATA_BIN_DIR}/${data_BSL} COPYONLY)
 	endforeach()
-	# copy data matrix for quick_start.m
+	include(${FAUST_MISC_DIR}/download_unzip_faust_misc_data.cmake) # misc/data is online
+	# copy data matrix for quick_start.m # TODO: do we really need this matrix for the next?
 	configure_file(${FAUST_DATA_MAT_DIR}/faust_quick_start.mat ${FAUST_MATFAUST_DEMO_DATA_BIN_DIR}/faust_quick_start.mat COPYONLY)
 endif()
 
