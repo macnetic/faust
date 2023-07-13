@@ -37,27 +37,6 @@ the CMake script indicate if the match is not appropriate).
 
 ---
 
-Cloning the project
-============
-
-```
-git clone git@gitlab.inria.fr:faustgrp/faust.git faust
-```
-
-**NOTE**: The project git binary objects are heavy (it can take up to ~ 1.5 Gio of data). If your connection is unstable don't download the whole history (using the ``--depth`` option -- issue #294).
-
-```
-git clone git@gitlab.inria.fr:faustgrp/faust.git --depth=1 --single-branch faust
-```
-**NOTE**: you can also use the [https://gitlab.inria.fr/faustgrp/faust.git](https://gitlab.inria.fr/faustgrp/faust.git) URL.
-
-Then if you really need the full git history to work on the project, fetch it (preferably when your Internet connection is good) :
-
-```
-git fetch --unshallow
-```
-
----
 Build on UNIX
 =====================
 
