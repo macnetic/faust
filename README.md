@@ -71,6 +71,41 @@ Quick Build of the python wrappers (pyfaust) on UNIX (without MATLAB and MATIO)
 
 ---
 
+
+Using Docker for a quick build of the python wrappers (pyfaust) on Linux without any dependency burden
+==================================================================================================
+
+First you need to install [docker](https://docs.docker.com/engine/install/) or ``podman-docker``.
+Then follow the next commands:
+
+    git clone https://gitlab.inria.fr/faustgrp/faust.git faust
+    cd faust/docker_linux
+    # build the docker image, naming it faust_fedora
+    docker build -t faust_fedora .
+    # run a terminal in the docker container you just built
+    docker run -v $PWD/../../faust:/faust:z -it faust_fedora bash
+    # the :z in the mapping exp. is only needed if your system is selinux enabled
+
+Then in the bash terminal launched above in the docker container, type the following commands to build and test pyfaust (with its wrappers).
+
+    [root@faust_fedora]# mkdir build_docker && cd build_docker
+    [root@faust_fedora]# cmake -DBUILD_WRAPPER_PYTHON=ON -DMATIO_INC_DIR=/usr/include -DMATIO_LIB_FILE=/usr/lib64/libmatio.so ..
+    [root@faust_fedora]# make faust_python
+    [root@faust_fedora]# cd wrapper/python/
+    [root@faust_fedora]# python3 -c "import pyfaust as pf; print(pf.rand(10,10))"
+    Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
+    - FACTOR 0 (double) SPARSE, size 10x10, density 0.5, nnz 50
+    - FACTOR 1 (double) SPARSE, size 10x10, density 0.5, nnz 50
+    - FACTOR 2 (double) SPARSE, size 10x10, density 0.5, nnz 50
+    - FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
+    - FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
+
+Now you can modify the C++ code of FAµST in ``src`` or the python wrappers in ``wrapper/python``.
+Thanks to the docker directory mapping you can do it outside of the docker container
+ in your own environment and easily build pyfaust again from the container as explained above.
+
+---
+
 Quickest Install on Linux, Windows and macOS (pre-built pakages)
 ============================================
 
