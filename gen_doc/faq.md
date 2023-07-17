@@ -22,7 +22,8 @@
 [2.6. How to fix the Segmentation Fault issue when using Torch with pyfaust on Mac OS X?](#py_six)  
 [2.7 Why the Faust F[I, J] indexing operation is not implemented in pyfaust?](#py_seven)  
 [2.8 How to fix conda pyfaust install error about glibc](#py_eight)  
-[2.9 Installing pyfaust with conda why did I obtain a SafetyError on libomp?](#py_nine)
+[2.9 Installing pyfaust with conda why did I obtained a SafetyError on libomp?](#py_nine)  
+[2.10. Why do I get the error 'OMP: Error #15: Initializing libomp.dylib, but found libomp.dylib already initialized.' when I use pyfaust on Mac OS X and How to fix it?](#py_ten)  
 
 
 **3. About CUDA (for GPU FAµST API support)**  
@@ -564,7 +565,7 @@ channels:
 
 \anchor py_nine
 
-## 2.9 Installing pyfaust with conda why did I obtain a SafetyError on libomp?
+## 2.9 Installing pyfaust with conda why did I obtained a SafetyError on libomp?
 
 The scenario is as follows :
 
@@ -584,6 +585,24 @@ appears to be corrupted. The path 'lib/python3.9/site-packages/pyfaust/lib/libom
 has an incorrect size.                                                                                     reported size: 759273 bytes
   actual size: 723280 bytes
 ```
+
+\anchor py_ten
+
+## 2.10. Why do I get the error 'OMP: Error #15: Initializing libomp.dylib, but found libomp.dylib already initialized.' when I use pyfaust on Mac OS X and How to fix it?
+
+Installing pyfaust with [conda](install_pyfaust_in_venv.html#anaconda) you might end up on the error reproduced below. It is about OpenMP that came with pyfaust but also installed through numpy which uses in this case MKL (the Intel library). The error complains about the two versions in conflict at loading time.
+
+```
+OMP: Error #15: Initializing libomp.dylib, but found libomp.dylib already initialized.
+OMP: Hint This means that multiple copies of the OpenMP runtime have been linked into the program. That is dangerous, since it can degrade performance or cause incorrect results. The best thing to do is to ensure that only a single OpenMP runtime is linked into the process, e.g. by avoiding static linking of the OpenMP runtime in any library. As an unsafe, unsupported, undocumented workaround you can set the environment variable KMP_DUPLICATE_LIB_OK=TRUE to allow the program to continue to execute, but that may cause crashes or silently produce incorrect results. For more information, please see http://openmp.llvm.org/
+```
+
+To workaround this issue we propose to install nomkl wich removes the MKL backend:
+
+```
+conda install -c conda-forge nomkl
+```
+
 
 # 3. About CUDA (for GPU FAµST API support)
 
