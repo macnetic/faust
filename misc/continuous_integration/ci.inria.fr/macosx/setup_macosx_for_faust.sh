@@ -48,19 +48,19 @@ ln -sf /opt/local/bin/clang++-mp-9.0 /usr/bin/clang++
 # ciosx:~ ci$ /opt/local/libexec/llvm-8.0/bin/clang --version
 # dyld: cannot load 'clang' (load command 0x80000034 is unknown)
 # Trace/BPT trap: 5
-#mv /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++_ # don't do this or port won't be able to detect clang version and make any install
+#mv /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  backup
 #udo ln -sf /opt/local/bin/clang++-mp-9.0 /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++
 ### 5. Install Python packages and dependencies
 yes | port install graphviz doxygen
 sudo ln -sf /opt/local/bin/dot /usr/bin/
-yes | port install python39 py39-pip
-yes | port install jpeg # pillow (indirect denpendency of pyfaust needs this to build)
-port select --set python python39
-port select --set pip pip39
-ln -sf /opt/local/bin/python3.9 /opt/local/bin/python3
-yes | port install py39-cython
-yes | port select --set cython cython39
-yes | python3.9 -m pip install doxypypy chardet wheel pygsp numpy setuptools==49.1.3 # above this version commit sha256 as version fails
+yes | port install python310 py310-pip
+yes | port install jpeg # pillow (indirect dependency of pyfaust needs this to build)
+port select --set python python310
+port select --set pip pip310
+ln -sf /opt/local/bin/python3.10 /opt/local/bin/python3
+yes | port install py310-cython
+yes | port select --set cython cython310
+yes | python3.10 -m pip install doxypypy chardet wheel pygsp numpy setuptools==49.1.3 # above this version commit sha256 as version fails
 # get dest dir before downloading because otherwise it would be the current path
 DOXYPYPY_DIR=$(dirname $(python3 -c "import doxypypy; print(doxypypy.__file__)"))
 wget https://raw.githubusercontent.com/Feneric/doxypypy/master/doxypypy/doxypypy.py
