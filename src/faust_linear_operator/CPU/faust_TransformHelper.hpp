@@ -1578,7 +1578,7 @@ namespace Faust
 	{\
 		factors[i] = new MatButterfly<FPP, Cpu>(*dynamic_cast<MatSparse<FPP, Cpu>*>(src_factors[i]), i);\
 	}\
-	if(has_perm) factors[n__] = new MatPerm<FPP, Cpu>(*dynamic_cast<MatSparse<FPP, Cpu>*>(src_factors[n__]));\
+	if(has_perm) if(dynamic_cast<MatPerm<FPP, Cpu>*>(src_factors[n__])) factors[n__] = src_factors[n__]; else factors[n__] = new MatPerm<FPP, Cpu>(*dynamic_cast<MatSparse<FPP, Cpu>*>(src_factors[n__]));\
 
 	template<typename FPP>
 		TransformHelper<FPP, Cpu>* TransformHelper<FPP,Cpu>::optButterflyFaust(const TransformHelper<FPP, Cpu>* F)
@@ -1595,7 +1595,9 @@ namespace Faust
 			bool has_perm = false;
 			const MatSparse<FPP, Cpu>* last_sp_mat = nullptr;
 			// test if last_perm is a valid permutation (if not it is assumed that it's a butterfly matrix)
-			if(last_sp_mat = dynamic_cast<MatSparse<FPP, Cpu>*>(F->transform->data[F->size()-1]))
+			if(dynamic_cast<MatPerm<FPP, Cpu>*>(F->transform->data[F->size()-1]))
+				has_perm = true;
+			else if(last_sp_mat = dynamic_cast<MatSparse<FPP, Cpu>*>(F->transform->data[F->size()-1]))
 				has_perm = MatPerm<FPP, Cpu>::isPerm(*last_sp_mat, /*verify_ones*/ false);
 			std::vector<MatGeneric<FPP,Cpu>*> factors(F->size());
 			optButterfly_factors(factors, has_perm, F->transform->data);

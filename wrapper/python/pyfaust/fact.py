@@ -1513,7 +1513,7 @@ def fgft_palm(U, Lap, p, init_D=None, ret_lambda=False, ret_params=False):
 # experimental block end
 
 
-def butterfly(M, type="bbtree", perm=None, diag_opt=False):
+def butterfly(M, type="bbtree", perm=None, diag_opt=False, mul_perm=None):
     """
     Factorizes M according to a butterfly support and optionally a permutation using the algorithms described in [1].
 
@@ -1547,8 +1547,12 @@ def butterfly(M, type="bbtree", perm=None, diag_opt=False):
             bit-reversal permutation (cf. pyfaust.bitrev_perm).
             5. By default this argument is None, no permutation is used (this
             is equivalent to using the identity permutation matrix in 1).
-        diag_opt: if True then the returned Faust is optimized using
-        pyfaust.opt_butterfly_faust.
+        diag_opt: if True then the returned Faust is optimized using pyfaust.opt_butterfly_faust.
+        mul_perm: decides if the permutation is multiplied into the rightest
+        butterfly factor (mul_perm=True) or if this permutation is left apart as the rightest
+        factor of the Faust (mul_perm=False). It can't be True if diag_opt is True (an error is
+        raised otherwise). Defaultly, mul_perm=None which implies that mul_perm
+        is True iff diag_opt is False.
 
     Note: Below is an example of how to create a permutation scipy CSR matrix from a permutation list
     of indices (as defined by the perm argument) and conversely how to convert
@@ -1652,6 +1656,10 @@ def butterfly(M, type="bbtree", perm=None, diag_opt=False):
      See also:
          pyfaust.wht, pyfaust.dft, pyfaust.rand_butterfly
     """
+    if mul_perm is None:
+        mul_perm = not diag_opt
+    if mul_perm and diag_opt:
+        raise ValueError('mul_perm and diag_opt option can not be both True.')
     def perm2indices(P):
             return P.T.nonzero()[1]
     is_real = np.empty((1,))
@@ -1659,7 +1667,8 @@ def butterfly(M, type="bbtree", perm=None, diag_opt=False):
     if isinstance(perm, str):
         if perm == 'bitrev':
             P = bitrev_perm(M.shape[1])
-            return butterfly(M, type, perm=perm2indices(P), diag_opt=diag_opt)
+            return butterfly(M, type, perm=perm2indices(P), diag_opt=diag_opt,
+                            mul_perm=mul_perm)
         elif perm == 'default_8':
             # the three modified functions below were originally extracted from the 3 clause-BSD code hosted here: https://github.com/leonzheng2/butterfly
             # please look the header license here https://github.com/leonzheng2/butterfly/blob/main/src/utils.py
@@ -1723,7 +1732,8 @@ def butterfly(M, type="bbtree", perm=None, diag_opt=False):
             permutations = [perm2indices(get_permutation_matrix(int(np.log2(M.shape[0])),
                                                    perm_name)) \
                             for perm_name in  ["000", "001", "010", "011", "100", "101", "110", "111"]]
-            return butterfly(M, type, permutations, diag_opt=diag_opt)
+            return butterfly(M, type, permutations, diag_opt=diag_opt,
+                             mul_perm=mul_perm)
     elif isinstance(perm, (list, tuple)) and isinstance(perm[0], (list, tuple,
                                                                  np.ndarray)):
         # loop on each perm and keep the best approximation
@@ -1733,7 +1743,7 @@ def butterfly(M, type="bbtree", perm=None, diag_opt=False):
             # print(p)
             row_inds = np.arange(len(p))
             P = csr_matrix((np.ones(row_inds.size), (row_inds, p)))
-            F = butterfly(M, type, p)
+            F = butterfly(M, type, p, diag_opt=diag_opt, mul_perm=mul_perm)
             # compute error
             error = np.linalg.norm(F.toarray()-M)/Faust(M).norm()
             # print(error)
@@ -1741,7 +1751,7 @@ def butterfly(M, type="bbtree", perm=None, diag_opt=False):
                 best_err = error
                 best_F = F
         return best_F
-    args = (M, type, perm, not diag_opt)
+    args = (M, type, perm, mul_perm)
     if is_real:
         is_float = M.dtype == 'float32'
         if is_float:

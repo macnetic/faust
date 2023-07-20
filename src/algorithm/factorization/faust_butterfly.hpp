@@ -851,7 +851,9 @@ namespace Faust
 				else
 				{
 					// the permutation is not multiplied
-					th->push_back(new_last_fac);
+					// use a MatPerm
+					th->push_back(new MatPerm<FPP, Cpu>(*new_last_fac));
+					delete new_last_fac;
 				}
 				if(Pt != nullptr)
 					delete Pt;

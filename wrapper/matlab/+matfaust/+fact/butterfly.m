@@ -4,19 +4,26 @@
 %> The result is a Faust F of the form BP where B has a butterfly structure and P is a permutation matrix determined by the optional parameter ‘perm'.
 %>
 %> @param M: the matrix to factorize. It can be real (single or double, the class might have a large impact on performance) or complex. M must be square and its dimension must be a power of two.
-%>@param 'type', str: the type of factorization 'right'ward, 'left'ward or 'bbtree'.
+%>@param 'type',str: the type of factorization 'right'ward, 'left'ward or 'bbtree'.
 %>        More precisely: if 'left' (resp. 'right') is used then at each stage of the
 %>        factorization the most left factor (resp. the most right factor) is split in two.
 %>        If 'bbtree' is used then the matrix is factorized according to a Balanced
 %>        Binary Tree (which is faster as it allows parallelization).
 %> @param 'perm', value	five kinds of values are possible for this argument.
-%> @param 'diag_opt', bool: if true then the returned Faust is optimized using matfaust.opt_butterfly_faust.
 %>
 %> 1. perm is an array of column indices of the permutation matrix P which is such that the returned Faust is F = B * P where B is the Faust butterfly approximation of M*P.'.  If the array of indices is not a valid permutation the behaviour is undefined (however an invalid size or an out of bound index raise an exception).
 %> 2. perm is a cell array of arrays of permutation column indices as defined in 1. In that case, all permutations passed to the function are used as explained in 1, each one producing a Faust, the best one (that is the best approximation of M in the Frobenius norm) is kept and returned by butterfly.
 %> 3. perm is 'default_8', this is a particular case of 2. Eight default permutations are used. For the definition of those permutations please refer to [2].
 %> 4. perm is 'bitrev': in that case the permutation is the bit-reversal permutation (cf. matfaust.tools.bitrev_perm).
 %> 5. By default this argument is empty, no permutation is used (this is equivalent to using the identity permutation matrix in 1).
+%>
+%> @param 'diag_opt',bool: if true then the returned Faust is optimized using matfaust.opt_butterfly_faust.
+%> @param 'mul_perm',bool : decides if the permutation is multiplied into the rightest
+%>			butterfly factor (mul_perm=true) or if this permutation is left apart as the rightest
+%>			factor of the Faust (mul_perm=false). It can't be true if diag_opt is true (an error is
+%>			raised otherwise). Defaultly, mul_perm is not set which implies that mul_perm
+%>			is true iff diag_opt is false.
+%
 %>
 %> @note Below is an example of how to create a permutation matrix from a permutation list
 %> of indices (as defined by the perm argument) and conversely how to convert
@@ -205,9 +212,21 @@ function F = butterfly(M, varargin)
 									else
 										diag_opt = varargin{i+1};
 									end
+								case 'mul_perm'
+									if(nargin < i+1 || ~ islogical(varargin{i+1}))
+										error('mul_perm keyword argument is not followed by a logical')
+									else
+										mul_perm = varargin{i+1};
+									end
                         end
                 end
         end
+		if ~ exist('mul_perm')
+			mul_perm = ~ diag_opt;
+		end
+		if mul_perm && diag_opt
+			error('mul_perm and diag_opt option can not be both true.')
+		end
         if strcmp(perm, 'default_8')
             permutations = cell(1, 8);
             pchoices = {'000', '001', '010', '011', '100', '101', '110', '111'};
@@ -216,13 +235,13 @@ function F = butterfly(M, varargin)
                  [permutations{i}, ~, ~] = find(P);
                  permutations{i} = permutations{i}.'; % just for readibility in case of printing
             end
-            F = matfaust.fact.butterfly(M, 'type', type, 'perm', permutations, 'diag_opt', diag_opt);
+            F = matfaust.fact.butterfly(M, 'type', type, 'perm', permutations, 'diag_opt', diag_opt, 'mul_perm', mul_perm);
             return;
 		elseif strcmp(perm, 'bitrev')
 			P = bitrev_perm(size(M, 2));
 			[perm, ~, ~] = find(P);
 			perm = perm.';
-			F = matfaust.fact.butterfly(M, 'type', type, 'perm', perm, 'diag_opt', diag_opt);
+			F = matfaust.fact.butterfly(M, 'type', type, 'perm', perm, 'diag_opt', diag_opt, 'mul_perm', mul_perm);
 			return;
         elseif iscell(perm) % perm is a cell of arrays, each one defining a permutation to test
             % evaluate butterfly factorisation using the permutations and
@@ -232,7 +251,7 @@ function F = butterfly(M, varargin)
             for i=1:length(perm)
 				%                perm{i}
 				m = numel(perm{i});
-				F = matfaust.fact.butterfly(M, 'type', type, 'perm', perm{i}, 'diag_opt', diag_opt);
+				F = matfaust.fact.butterfly(M, 'type', type, 'perm', perm{i}, 'diag_opt', diag_opt, 'mul_perm', mul_perm);
 				err = norm(full(F)-M, 'fro')/nM;
                 if err < min_err
                     min_err = err;
@@ -250,15 +269,18 @@ function F = butterfly(M, varargin)
                 type = 2;
         end
 		if(strcmp(class(M), 'single'))
-				core_obj = mexButterflyRealFloat(M, type, perm, ~ diag_opt); % last arg is mul_perm
+				core_obj = mexButterflyRealFloat(M, type, perm, mul_perm); % last arg is mul_perm
 				F = Faust(core_obj, isreal(M), 'cpu', 'float', true); % 4th arg is for copying
 		else
 			if(isreal(M))
-				core_obj = mexButterflyReal(M, type, perm, ~ diag_opt);
+				core_obj = mexButterflyReal(M, type, perm, mul_perm);
 			else
-				core_obj = mexButterflyCplx(M, type, perm, ~ diag_opt);
+				core_obj = mexButterflyCplx(M, type, perm, mul_perm);
 			end
 			F = Faust(core_obj, isreal(M), 'cpu', 'double', true); % 4th arg is for copying
+		end
+		if diag_opt
+			F = matfaust.opt_butterfly_faust(F);
 		end
 end
 
