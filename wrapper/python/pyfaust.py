@@ -639,10 +639,12 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             Faust size 50x100, density 1.3, nnz_sum 6500, 2 factor(s):
             - FACTOR 0 (double) SPARSE, size 50x87, density 0.494253, nnz 2150
             - FACTOR 1 (double) SPARSE, size 87x100, density 0.5, nnz 4350
+
             >>> F
             Faust size 50x100, density 1.3, nnz_sum 6500, 2 factor(s):
             - FACTOR 0 (double) SPARSE, size 50x87, density 0.494253, nnz 2150
             - FACTOR 1 (double) SPARSE, size 87x100, density 0.5, nnz 4350
+
             >>> print(F)
             Faust size 50x100, density 1.3, nnz_sum 6500, 2 factor(s):
             - FACTOR 0 (double) SPARSE, size 50x87, density 0.494253, nnz 2150
@@ -3124,6 +3126,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             - FACTOR 3 (double) SPARSE, size 10x10, density 0.5, nnz 50
             - FACTOR 4 (double) SPARSE, size 10x10, density 0.5, nnz 50
             - FACTOR 5 (double) DENSE, size 10x1, density 1, nnz 10
+
             >>> F.sum(axis=1).toarray()
             array([[ 60.96835408],
                    [112.00753373],

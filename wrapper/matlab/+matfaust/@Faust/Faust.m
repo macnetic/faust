@@ -136,61 +136,51 @@ classdef Faust < handle % subclass of handle for Faust.delete to be called on cl
 		%>								The file must have been saved before with Faust.save().
 		%> @param 'dev',str 'gpu or 'cpu' to create the Faust on CPU or GPU (by default on CPU).
 		%>
-		%> @b Examples
-		%> @code
-		%>	import matfaust.Faust
-		%>	factors = cell(1,5);
-		%>	is_sparse = false;
-		%>	for i=1:5
-		%>		% alternate sparse and dense factors
-		%>		if(is_sparse)
-		%>			factors{i} = sprand(100, 100, 0.1);
-		%>		else
-		%>			factors{i} = rand(100, 100);
-		%>		end
-		%>		is_sparse = ~ is_sparse;
-		%>	end
-		%>	% define a Faust with those factors
-		%>	F = Faust(factors)
-		%>
-		%>
-		%>	save(F, 'F.mat')
-		%>	% define a Faust from file
-		%>	G = Faust('F.mat')
-		%>
-		%>	H = Faust(rand(10,10)) % creating a Faust with only one factor
-		%>
-		%> @endcode
-		%>
-		%> <b>Output:</b>
-		%>
-		%> F =
-		%>
-		%> Faust size 100x100, density 3.1912, nnz_sum 31912, 5 factor(s):<br/>
-		%> - FACTOR 0 (double) DENSE, size 100x100, density 1, nnz 10000<br/>
-		%> - FACTOR 1 (double) SPARSE, size 100x100, density 0.0956, nnz 956<br/>
-		%> - FACTOR 2 (double) DENSE, size 100x100, density 1, nnz 10000<br/>
-		%> - FACTOR 3 (double) SPARSE, size 100x100, density 0.0956, nnz 956<br/>
-		%> - FACTOR 4 (double) DENSE, size 100x100, density 1, nnz 10000<br/>
-		%>
-		%> G =
-		%>
-		%> Faust size 100x100, density 3.1912, nnz_sum 31912, 5 factor(s):
-		%> - FACTOR 0 (double) DENSE, size 100x100, density 1, nnz 10000
-		%> - FACTOR 1 (double) SPARSE, size 100x100, density 0.0956, nnz 956
-		%> - FACTOR 2 (double) DENSE, size 100x100, density 1, nnz 10000
-		%> - FACTOR 3 (double) SPARSE, size 100x100, density 0.0956, nnz 956
-		%> - FACTOR 4 (double) DENSE, size 100x100, density 1, nnz 10000
-		%>
-		%> H =
-		%>
-		%> Faust size 10x10, density 1, nnz_sum 100, 1 factor(s):
-		%> - FACTOR 0 (double) DENSE, size 10x10, density 1, nnz 100
-		%>
-		%>
-		%> <p>@b See @b also Faust.delete, Faust.save, matfaust.rand, matfaust.dft, matfaust.wht</p>
-		%>
-		%======================================================================
+        %> @b Examples
+        %>
+        %> @code
+        %> >> import matfaust.Faust
+        %> >> factors = cell(1,5);
+        %> >> is_sparse = false;
+        %> >> % alternate sparse and dense factors
+        %> >> for i=1:5; if(is_sparse);factors{i} = sprand(100, 100, 0.1); else factors{i} = rand(100, 100); end; is_sparse = ~ is_sparse; end
+        %> >> % define a Faust with those factors
+        %> >> F = Faust(factors)
+        %>
+        %> F =
+        %>
+        %> Faust size 100x100, density 3.1897, nnz_sum 31897, 5 factor(s):
+        %> - FACTOR 0 (double) DENSE, size 100x100, density 1, nnz 10000
+        %> - FACTOR 1 (double) SPARSE, size 100x100, density 0.0943, nnz 943
+        %> - FACTOR 2 (double) DENSE, size 100x100, density 1, nnz 10000
+        %> - FACTOR 3 (double) SPARSE, size 100x100, density 0.0954, nnz 954
+        %> - FACTOR 4 (double) DENSE, size 100x100, density 1, nnz 10000
+        %>
+        %> >> save(F, 'F.mat')
+        %> >> % define a Faust from file
+        %> >> G = Faust('F.mat')
+        %>
+        %> G =
+        %>
+        %> Faust size 100x100, density 3.1897, nnz_sum 31897, 5 factor(s):
+        %> - FACTOR 0 (double) DENSE, size 100x100, density 1, nnz 10000
+        %> - FACTOR 1 (double) SPARSE, size 100x100, density 0.0943, nnz 943
+        %> - FACTOR 2 (double) DENSE, size 100x100, density 1, nnz 10000
+        %> - FACTOR 3 (double) SPARSE, size 100x100, density 0.0954, nnz 954
+        %> - FACTOR 4 (double) DENSE, size 100x100, density 1, nnz 10000
+        %>
+        %> >> H = Faust(rand(10,10)) % creating a Faust with only one factor
+        %>
+        %> H =
+        %>
+        %> Faust size 10x10, density 1, nnz_sum 100, 1 factor(s):
+        %> - FACTOR 0 (double) DENSE, size 10x10, density 1, nnz 100
+        %> @endcode
+        %>
+        %>
+        %> <p>@b See @b also Faust.delete, Faust.save, matfaust.rand, matfaust.dft, matfaust.wht</p>
+        %>
+        %======================================================================
 		function F = Faust(varargin)
 			%%
 			err_msg = 'matfaust.Faust() error: the arguments are not valid.';

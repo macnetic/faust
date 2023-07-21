@@ -471,6 +471,7 @@ pages:
           # in order to avoid publishing an empty API doc
         - if [ ! -r doc/html/namespacepyfaust.html -o ! -r doc/html/namespacematfaust.html ]; then echo "error with doxygen doc generation" 2>&1 && exit 1; fi
         - mkdir -p ../public/last-doc
+        - ../gen_doc/prevent_chevron_selection.sh ./doc/html
         - cp -Rf doc/html ../public/last-doc/
         - mkdir -p ../public/packages
         - ../gen_doc/gen_pkg_dl_page.sh $CI_COMMIT_TAG # download.html generated
