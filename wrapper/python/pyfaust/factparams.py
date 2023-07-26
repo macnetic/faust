@@ -9,12 +9,12 @@ from warnings import warn
 
 
 ## @package pyfaust.factparams @brief The module for the parameterization of FAuST's algorithms (Palm4MSA and Hierarchical Factorization).
-## <b/> See also: pyfaust.fact.hierarchical, pyfaust.fact.palm4msa
+## <b/> See also: :py:func:`pyfaust.fact.hierarchical`, :py:func:`pyfaust.fact.palm4msa`
 
 """
     This module provides all the classes that represent the input parameters needed
-    by factorization algorithms pyfaust.fact.palm4msa()
-    pyfaust.fact.hierarchical()
+    by factorization algorithms :py:func:`pyfaust.fact.palm4msa`()
+    :py:func:`pyfaust.fact.hierarchical`()
 """
 
 class StoppingCriterion(object):
@@ -24,12 +24,7 @@ class StoppingCriterion(object):
         - number of iterations,
         - error threshold.
 
-    Attributes:
-        num_its: see pyfaust.factparams.StoppingCriterion.__init__.
-        maxiter: see pyfaust.factparams.StoppingCriterion.__init__.
-        relerr: see pyfaust.factparams.StoppingCriterion.__init__.
-        relmat: see pyfaust.factparams.StoppingCriterion.__init__.
-        tol: see pyfaust.factparams.StoppingCriterion.__init__.
+    \see :py:func:`.StoppingCriterion.__init__`
     """
     DEFAULT_MAXITER=10000
     DEFAULT_TOL=0.3
@@ -42,23 +37,29 @@ class StoppingCriterion(object):
         Class constructor.
 
         Args:
-            num_its: (optional) the fixed number of iterations of the
-            algorithm. By default the value is DEFAULT_NUMITS. The constructor
-            will fail if arguments num_its and tol are used together.
-            tol: (optional) error target according to the algorithm is stopped.
-            The constructor  will fail if arguments num_its and tol are used together.
-            maxiter: (optional) The maximum number of iterations to run the algorithm,
-            whatever is the criterion used (tol or num_its).
-            relerr: (optional) if False the tol error defines an absolute
-            error, otherwise it defines a relative error (in this case the
-            'relmat' matrix will be used to convert internally the given 'tol'
-            value to the corresponding absolute error).
-            relmat: (optional) The matrix against which is defined the relative error.
-            if relerr is True, this argument is mandatory.
-            erreps: (optional) defines the epsilon on the approximation error
-            between two PALM4MSA iterations. If the error doesn't improve more
-            than erreps then the algorithm stops (warning: this argument is
-            only supported by the 2020 backend of PALM4MSA implementations).
+            num_its: (int)
+                the fixed number of iterations of the
+                algorithm. By default the value is DEFAULT_NUMITS. The constructor
+                will fail if arguments num_its and tol are used together.
+            tol: (float)
+                error target according to the algorithm is stopped.
+                The constructor  will fail if arguments num_its and tol are used together.
+            maxiter: (int)
+                The maximum number of iterations to run the algorithm,
+                whatever is the criterion used (tol or num_its).
+            relerr: (bool)
+                if False the tol error defines an absolute
+                error, otherwise it defines a relative error (in this case the
+                'relmat' matrix will be used to convert internally the given 'tol'
+                value to the corresponding absolute error).
+            relmat: (bool)
+                The matrix against which is defined the relative error.
+                if relerr is True, this argument is mandatory.
+            erreps: (float)
+                defines the epsilon on the approximation error
+                between two PALM4MSA iterations. If the error doesn't improve more
+                than erreps then the algorithm stops (warning: this argument is
+                only supported by the 2020 backend of PALM4MSA implementations).
 
 
         Example:
@@ -380,16 +381,23 @@ class ConstraintGeneric(ABC):
     This class shouldn't be instantiated, rather rely on sub-classes.
     Typically, a constraint finds its place into a ParamsFact or sub-class
     instance (as a container for the factorization parameters).
-    It's also possible to set a list of constraints with the ConstraintList class.
-
-    <b/> See also: ConstraintInt, ConstraintReal, ConstraintMat, pyfaust.fact.palm4msa, pyfaust.fact.hierarchical, ParamsPalm4MSA, ParamsHierarchical.
+    It's also possible to set a list of constraints with the
+    :py:class:`.ConstraintList` class.
 
     Attributes:
-        _name: The name of the constraint applied to the factor (ConstraintName instance).
-        _num_rows: the number of columns of the constrained matrix.
-        _num_cols: the number of columns of the constrained matrix.
-        _cons_value: The value of the constraint.
+        _name:
+            The name of the constraint applied to the factor (ConstraintName instance).
+        _num_rows:
+            the number of columns of the constrained matrix.
+        _num_cols:
+            the number of columns of the constrained matrix.
+        _cons_value:
+            The value of the constraint.
 
+    \see :py:func:`.ConstraintGeneric.__init__`, :py:class:`.ConstraintInt`,
+    :py:class:`.ConstraintReal`, :py:class:`.ConstraintMat`,
+    :py:func:`pyfaust.fact.palm4msa`, :py:func:`pyfaust.fact.hierarchical`,
+    :py:class:`.ParamsPalm4MSA`, :py:class:`.ParamsHierarchical`.
     """
 
     def __init__(self, name, num_rows, num_cols, cons_value, normalized=True, pos=False):
@@ -400,10 +408,14 @@ class ConstraintGeneric(ABC):
         abstract.
 
         Args:
-            name: The name of the constraint applied to the factor (ConstraintName instance).
-            num_rows: the number of columns of the constrained matrix.
-            num_cols: the number of columns of the constrained matrix.
-            cons_value: The value of the constraint.
+            name: (:py:class:`.ConstraintName`)
+                The name of the constraint applied to the factor.
+            num_rows: (int)
+                the number of columns of the constrained matrix.
+            num_cols: (int)
+                the number of columns of the constrained matrix.
+            cons_value:
+                The value of the constraint.
 
         Raises:
             TypeError: Can't instantiate abstract class ConstraintGeneric with
@@ -489,16 +501,24 @@ class ConstraintInt(ConstraintGeneric):
         matrix with besides for SP_POS the zero replacement of all
         negative values.
 
+        \see :py:func:`.ConstraintInt.__init__`
 
     """
     def __init__(self, name, num_rows, num_cols, cons_value, normalized=True, pos=False):
         """
             Args:
-                name: must be a ConstraintName instance set with a value among SP_POS, SP, SPLIN, SPCOL, SPLINCOL, SPTRIU, SPTRIL, SPSYMM (cf. ConstraintName) or it can also be one of the more handy str aliases which are respectively: 'sppos', 'sp', 'splin', 'spcol', 'splincol', 'sptriu', 'sptril', 'spsymm'.
-                num_rows: the number of rows of the constrained matrix.
-                num_cols: the number of columns of the constrained matrix.
-                cons_value: the integer value of the constraint (the 0-norm as
-                sparsity).
+                name: (:py:class:`.ConstraintName` or str)
+                    it must be a ConstraintName instance set with a value among
+                    SP_POS, SP, SPLIN, SPCOL, SPLINCOL, SPTRIU, SPTRIL, SPSYMM (cf. :py:class:`.ConstraintName`)
+                    or it can also be one of the more handy str aliases which are respectively
+                    'sppos', 'sp', 'splin', 'spcol', 'splincol', 'sptriu', 'sptril', 'spsymm'.
+                num_rows: (int)
+                    the number of rows of the constrained matrix.
+                num_cols: (int)
+                    the number of columns of the constrained matrix.
+                cons_value: (int)
+                    the integer value of the constraint (the 0-norm as
+                    sparsity).
 
             Example:
                 >>> from pyfaust.factparams import ConstraintInt
@@ -512,14 +532,14 @@ class ConstraintInt(ConstraintGeneric):
                 >>> np.count_nonzero(cons.project(M))
                 2
 
-            <b/> See also: ConstraintGeneric.__init__
+            \see :py:func:`ConstraintGeneric.__init__`
         """
         super(ConstraintInt, self).__init__(name, num_rows, num_cols,
                                             cons_value, normalized, pos)
-        if(not isinstance(cons_value, int)):
+        if not isinstance(cons_value, int):
             raise TypeError('ConstraintInt must receive a int as cons_value '
                             'argument.')
-        if(not isinstance(self._name, ConstraintName) or not self._name.is_int_constraint()):
+        if not isinstance(self._name, ConstraintName) or not self._name.is_int_constraint():
             raise TypeError('ConstraintInt first argument must be a '
                             'ConstraintName with a int type name '
                             '(name.is_int_constraint() must return True).')
@@ -552,6 +572,7 @@ class ConstraintMat(ConstraintGeneric):
     """
         This class represents a matrix-based constraint to apply on a matrix.
 
+        \see :py:func:`.ConstraintMat.__init__`
     """
 
     normalized_default = {ConstraintName.ID: False, ConstraintName.TOEPLITZ: True, ConstraintName.CIRC: True,
@@ -563,17 +584,21 @@ class ConstraintMat(ConstraintGeneric):
         Constructs a matrix type constraint.
 
         Args:
-            name: must be a ConstraintName instance set with a value among
-            ID, SUPP, CONST, TOEPLITZ or (AANTI)CIRC(ULANT) (cf. ConstraintName) or it can also be one of the
-            more handy str aliases which are respectively: 'supp' and 'const'.
-            cons_value: the value of the constraint, it must be a numpy.array
-            shape: (optional) the shape of the matrix (only useful for identity prox,
-            ConstraintName.ID. In this case the cons_value argument is None).
-            that defines the constraint (the matrix support for SUPP and the
-            constant matrix for CONST).
-            normalized: None because the default value depends on the
-            constraint name (it can be False or True, see
-            ConstraintMat.normalized_default).
+            name: (:py:class:`.ConstraintName` or str)
+                must be a ConstraintName instance set with a value among
+                ID, SUPP, CONST, TOEPLITZ or (AANTI)CIRC(ULANT) (cf. ConstraintName) or it can also be one of the
+                more handy str aliases which are respectively: 'supp' and 'const'.
+            cons_value: (np.ndarray)
+                the value of the constraint, it must be a numpy.array
+            shape: (tuple)
+                the shape of the matrix (only useful for identity prox,
+                `ConstraintName.ID`. In this case the cons_value argument is None).
+                that defines the constraint (the matrix support for SUPP and the
+                constant matrix for CONST).
+            normalized: (bool or NoneType)
+                None because the default value depends on the
+                constraint name (it can be False or True, see
+                ConstraintMat.normalized_default).
 
         Example:
             >>> from pyfaust.factparams import ConstraintMat
@@ -598,6 +623,7 @@ class ConstraintMat(ConstraintGeneric):
             >>> norm(cons.project(M))
             1.0
 
+        \see :py:func:`ConstraintGeneric.__init__`
         """
         if not cons_value is None:
             _shape = cons_value.shape
@@ -642,7 +668,7 @@ class ConstraintMat(ConstraintGeneric):
 
     def project(self, M):
         """
-            <b/> See: ConstraintGeneric.project
+        \see :py:func:`.ConstraintGeneric.project`
         """
         super(ConstraintMat, self).project(M)
         is_real = np.empty((1,))
@@ -678,19 +704,24 @@ class ConstraintReal(ConstraintGeneric):
         It constrains a matrix by a column/row-vector 2-norm
         (ConstraintName.NORMCOL, ConstraintName.NORMLIN).
 
+        \see :py:func:`.ConstraintReal.__init__`
     """
     def __init__(self, name, num_rows, num_cols, cons_value, normalized=False, pos=False):
         """
         Constructs a real type constraint.
 
         Args:
-            name: must be a ConstraintName instance set with a value among NORMCOL, NORMLIN (cf. ConstraintName) or it can also be one of the more handy str aliases which are respectively: 'normcol', 'normlin'.
-            num_rows: the number of columns of the constrained matrix.
-            num_cols: the number of columns of the constrained matrix.
-            cons_value: the parameter value of the constraint, it must be a
-            float number that designates the 2-norm imposed to all columns (if
-            name is ConstraintName.NORMCOL) or rows (if
-            name is ConstraintName.NORMLIN).
+            name: (:py:class:`.ConstraintName` or str)
+                must be a ConstraintName instance set with a value among NORMCOL, NORMLIN (cf. ConstraintName) or it can also be one of the more handy str aliases which are respectively: 'normcol', 'normlin'.
+            num_rows: (int)
+                the number of columns of the constrained matrix.
+            num_cols: (int)
+                the number of columns of the constrained matrix.
+            cons_value: (float)
+                the parameter value of the constraint, it must be a
+                float number that designates the 2-norm imposed to all columns
+                (if name is ConstraintName.NORMCOL) or rows (if name is
+                ConstraintName.NORMLIN).
 
         Example:
             >>> from pyfaust.factparams import ConstraintReal
@@ -704,7 +735,7 @@ class ConstraintReal(ConstraintGeneric):
             >>> norm(cons.project(M)[:,2])
             1.9999999999999998
 
-            <b/> See also: ConstraintGeneric.__init__
+            \see :py:func:`.ConstraintGeneric.__init__`
         """
         super(ConstraintReal, self).__init__(name, num_rows, num_cols,
                                              cons_value, normalized=False, pos=False)
@@ -719,7 +750,7 @@ class ConstraintReal(ConstraintGeneric):
 
     def project(self, M):
         """
-        <b/> See: ConstraintGeneric.project
+        \see :py:func:`ConstraintGeneric.project`
         """
         super(ConstraintReal, self).project(M)
         is_real = np.empty((1,))
@@ -749,7 +780,7 @@ class ConstraintList(object):
     """
     A helper class for constructing a list of consistent pyfaust.proj.proj_gen projectors or ConstraintGeneric objects.
 
-    NOTE: ConstraintGeneric use is not advised (these objects are not well
+    NOTE: :py:class:`.ConstraintGeneric` use is not advised (these objects are not well
     documented). Use rather the projectors functors (from pyfaust.proj module).
 
 
@@ -836,7 +867,7 @@ class MHTPParams:
     """
     This class defines the set of parameters to run the MHTP-PALM4MSA algorithm.
 
-    <b/> See also pyfaust.fact.palm4msa_mhtp, pyfaust.fact.hierarchical_mhtp
+    \see :py:func:`.MHTPParams.__init__`, :py:func:`pyfaust.fact.palm4msa_mhtp`, :py:func:`pyfaust.fact.hierarchical_mhtp`
     """
     def __init__(self, num_its=50,
                  constant_step_size=False, step_size=1e-3,
@@ -845,19 +876,27 @@ class MHTPParams:
         """Constructor of the MHTPParams class.
 
             Args:
-                num_its: (int, optional) the number of iterations to run the MHTP algorithm.
-                constant_step_size: (bool, optional) True to use a constant step
-                for the gradient descent, False otherwise. If False the step size
-                is computed dynamically along the iterations (according to a Lipschitz criterion).
-                step_size: (float, optional) The step size used when constant_step_size==True.
-                palm4msa_period: (int, optional) The period (in term of iterations)
-                according to the MHTP algorithm is ran (i.e.: 0 <= i < N being the PALM4MSA
-                iteration, MHTP is launched every i = 0 (mod palm4msa_period).
-                Hence the algorithm is ran one time at least -- at PALM4MSA iteration 0).
-                updating_lambda: (bool, optional) if True then the scale factor of the Faust resulting of the factorization is updated after each iteration of MHTP (otherwise it never changes during the whole MHTP execution).
+                num_its: (int)
+                    the number of iterations to run the MHTP algorithm.
+                constant_step_size: (bool)
+                    True to use a constant step for the gradient descent, False otherwise.
+                    If False the step size is computed dynamically along the iterations
+                    (according to a Lipschitz criterion).
+                step_size: (float)
+                    The step size used when constant_step_size==True.
+                palm4msa_period: (int)
+                    The period (in term of iterations)
+                    according to the MHTP algorithm is ran (i.e.: 0 <= i < N being the PALM4MSA
+                    iteration, MHTP is launched every i = 0 (mod palm4msa_period).
+                    Hence the algorithm is ran one time at least -- at PALM4MSA iteration 0).
+                updating_lambda: (bool)
+                    if True then the scale factor of the Faust resulting of the factorization is
+                    updated after each iteration of MHTP (otherwise it never changes during the
+                    whole MHTP execution).
 
 
-            <b/> See also pyfaust.fact.palm4msa_mhtp, pyfaust.fact.hierarchical_mhtp
+            \see :py:func:`pyfaust.fact.palm4msa_mhtp`,
+            :py:func:`pyfaust.fact.hierarchical_mhtp`
         """
         stop_crit = StoppingCriterion(num_its=num_its)
         if not isinstance(stop_crit, StoppingCriterion):
@@ -900,7 +939,15 @@ class ParamsFact(ABC):
         factorization but as an abstract class it's not for direct use.
         The documentation is hence left empty, please refer to the subclasses.
 
-    <b/> See also  ParamsHierarchical, ParamsPalm4MSA
+        Attrs:
+            DISABLED_OPT: (int)
+                Optimization disabled (value 0)
+            INTERNAL_OPT: (int)
+                Internal optimization (value 1).
+            EXTERNAL_OPT: (int)
+                External optimization (value 2)
+
+    \see :py:class:`.ParamsHierarchical`, :py:class:`.ParamsPalm4MSA`
     """
     DISABLED_OPT = 0
     INTERNAL_OPT = 1
@@ -915,7 +962,8 @@ class ParamsFact(ABC):
                  grad_calc_opt_mode=EXTERNAL_OPT,
                  **kwargs):
         """
-        <b/> See ParamsHierarchical.__init__, ParamsPalm4MSA.__init__
+        \see :py:func:`.ParamsHierarchical.__init__`,
+        :py:func:`.ParamsPalm4MSA.__init__`
         """
         self.num_facts = num_facts
         self.is_update_way_R2L = is_update_way_R2L
@@ -972,6 +1020,10 @@ class ParamsFact(ABC):
 
     @abstractmethod
     def is_mat_consistent(self, M):
+        """
+        Verifies a matrix M is shapely consistent to the constraints (it can be
+        factorized according to these constraints).
+        """
         if(not isinstance(M, np.ndarray)):
             raise ValueError("M must be a numpy ndarray")
         #print("M.shape=", M.shape)
@@ -1008,13 +1060,14 @@ class ParamsFact(ABC):
     def get_constraints(projs):
         """
         Returns a python list of constraints from the projs which is a
-        ConstralintList or a list/tuple that can be a
-        mix of pyfaust.factparams.ConstraintGeneric or pyfaust.proj.proj_gen.
-        If projs is a ConstraintList then the function just returns the same
+        :py:class:`.ConstralintList` or a list/tuple that can be a
+        mix of :py:class:`.ConstraintGeneric` or
+        :py:class:`pyfaust.proj.proj_gen`.
+        If projs is a :py:class:`.ConstraintList` then the function just returns the same
         object as is.
 
-        The function purpose is to make the list uniform as ConstraintGeneric
-        objects.
+        The function purpose is to make the list uniform as
+        :py:class:`.ConstraintGeneric` objects.
         """
         from pyfaust.proj import proj_gen
         if isinstance(projs, ConstraintList):
@@ -1042,8 +1095,8 @@ class ParamsHierarchical(ParamsFact):
         for the algorithm. But it exists simplified parameterizations for the
         same algorithm as child classes.
 
-        <b/> See also ParamsHierarchicalWHT,
-        ParamsHierarchicalRectMat, pyfaust.fact.hierarchical
+        \see :py:func:`.__init__`, :py:class:`.ParamsHierarchicalWHT`,
+        :py:class:`.ParamsHierarchicalRectMat`, :py:func:`pyfaust.fact.hierarchical`
     """
     def __init__(self, fact_constraints, res_constraints, stop_crit1,
                  stop_crit2, is_update_way_R2L=False, init_lambda=1.0,
@@ -1062,59 +1115,74 @@ class ParamsHierarchical(ParamsFact):
         Constructor.
 
         Args:
-            fact_constraints: a ConstraintList object or a list of
-            pyfaust.proj.proj_gen objects to define the constraints of the main
-            factor at each level of the factorization hierarchy (the first one for
-            the first factorization and so on).
-            res_constraints: a ConstraintList object or a list of
-            pyfaust.proj.proj_gen objects to define the constraints to apply to
-            the residual factor at each level of the factorization hierarchy
-            (the first one for the first factorization and so on).
-            stop_crit1: a pyfaust.factparams.StoppingCriterion instance
-            which defines the algorithm stopping criterion for the local
-            optimization of the 2 terms of the last factorization
-            (a main factor and a residual).
-            stop_crit2: a pyfaust.factparams.StoppingCriterion instance
-            which defines the algorithm stopping criterion for the global optimization.
-            is_update_way_R2L: if True pyfaust.fact.palm4msa (called for each
-            optimization stage) will update factors from the right to the left,
-            otherwise it's done in reverse order.
-            init_lambda: the scale scalar initial value for the global
-            optimization (by default the value is one). It applies only to
-            local optimization at each iteration (the global optimization
-            lambda is updated consequently).
-            step_size: the initial step of the PALM descent for both local and
-            global optimization stages.
-            constant_step_size: if True the step_size keeps constant along
-            the algorithm iterations otherwise it is updated before every
-            factor update.
-            is_fact_side_left: if True the leftmost factor is factorized,
-            otherwise it's the rightmost.
-            is_verbose: True to enable the verbose mode.
-            factor_format: 'dynamic' (by default), 'dense', or 'sparse'. If
-            'dense' or 'sparse' then all factors will be respectively numpy.ndarray or
-            scipy.sparse.csr_matrix. If 'dynamic' is used then the algorithm
-            determines the format of each factor automatically in order to
-            decrease the memory footprint of the Faust. This option is
-            available only on the 2020 backend pyfaust.fact.palm4msa, pyfaust.fact.hierarchical
-            or pyfaust.fact.palm4msa_mhtp, pyfaust.fact.hierarchical_mhtp.
-            packing_RL: True (by default) to pre-compute R and L products
-            (only available with 2020 backend of pyfaust.fact.hierarchical).
-            no_normalization: False (by default), if True it disables the
-            normalization of prox output matrix in PALM4MSA algorithm. Note
-            that this option is experimental (only available with 2020 backend of pyfaust.fact.hierarchical).
-            no_lambda: False (by default), if True it disables the lambda
-            scalar factor in the PALM4MSA algorithm which consists
-            basically to set it always to one (it also lowers the algorithm
-            cost).
-            norm2_max_iter: maximum number of iterations of power iteration
-            algorithm. Used for computing 2-norm.
-            norm2_threshold: power iteration algorithm threshold (default to
-            1e-6). Used for computing 2-norm.
-            grad_calc_opt_mode: the mode used for computing the PALM gradient. It
-            can be one value among ParamsFact.EXTERNAL_OPT,
-            ParamsFact.INTERNAL_OPT or ParamsFact.DISABLED_OPT. This parameter
-            is experimental, its value shouln't be changed.
+            fact_constraints: (:py:class:`.ConstraintList` or list[:py:class:`pyfaust.proj.proj_gen`])
+                to define the constraints of the main factor at each level of
+                the factorization hierarchy (the first one for
+                the first factorization and so on).
+            res_constraints: (:py:class:`.ConstraintList` or list[:py:class:`pyfaust.proj.proj_gen`])
+            to define the constraints to apply to the residual factor at each
+            level of the factorization hierarchy (the first one for the first
+            factorization and so on).
+            stop_crit1: (:py:class:`.StoppingCriterion`)
+                defines the algorithm stopping criterion for the local
+                optimization of the 2 terms of the last factorization
+                (a main factor and a residual).
+            stop_crit2: (:py:class:`.StoppingCriterion`)
+                a pyfaust.factparams.StoppingCriterion instance
+                which defines the algorithm stopping criterion for the global
+                optimization.
+            is_update_way_R2L: (bool)
+                if True :py:func:`pyfaust.fact.palm4msa` (called for each
+                optimization stage) will update factors from the right to the left,
+                otherwise it's done in reverse order.
+            init_lambda: (float)
+                the scale scalar initial value for the global
+                optimization (by default the value is one). It applies only to
+                local optimization at each iteration (the global optimization
+                lambda is updated consequently).
+            step_size: (float)
+                the initial step of the PALM descent for both local and
+                global optimization stages.
+            constant_step_size: (bool)
+                if True the step_size keeps constant along
+                the algorithm iterations otherwise it is updated before every
+                factor update.
+            is_fact_side_left: (bool)
+                if True the leftmost factor is factorized,
+                otherwise it's the rightmost.
+            is_verbose: (bool)
+                True to enable the verbose mode.
+            factor_format: (str)
+                'dynamic' (by default), 'dense', or 'sparse'. If
+                'dense' or 'sparse' then all factors will be respectively numpy.ndarray or
+                scipy.sparse.csr_matrix. If 'dynamic' is used then the algorithm
+                determines the format of each factor automatically in order to
+                decrease the memory footprint of the Faust. This option is
+                available only on the 2020 backend :py:func:`pyfaust.fact.palm4msa`, :py:func:`pyfaust.fact.hierarchical`
+                or :py:func:`pyfaust.fact.palm4msa_mhtp`, :py:func:`pyfaust.fact.hierarchical_mhtp`.
+            packing_RL: (bool)
+                True (by default) to pre-compute R and L products
+                (only available with 2020 backend of :py:func:`pyfaust.fact.hierarchical`).
+            no_normalization: (bool)
+                False (by default), if True it disables the
+                normalization of prox output matrix in PALM4MSA algorithm. Note
+                that this option is experimental (only available with 2020 backend of
+                :py:func:`pyfaust.fact.hierarchical`).
+            no_lambda: (bool)
+                False (by default), if True it disables the lambda
+                scalar factor in the PALM4MSA algorithm which consists
+                basically to set it always to one (it also lowers the algorithm
+                cost).
+            norm2_max_iter: (int)
+                maximum number of iterations of power iteration
+                algorithm. Used for computing 2-norm.
+                norm2_threshold: power iteration algorithm threshold (default to
+                1e-6). Used for computing 2-norm.
+            grad_calc_opt_mode: (int)
+                the mode used for computing the PALM gradient. It
+                can be one value among `ParamsFact.EXTERNAL_OPT`,
+                `ParamsFact.INTERNAL_OPT` or `ParamsFact.DISABLED_OPT`. This parameter
+                is experimental, its value shouln't be changed.
         """
         import pyfaust.proj
         if not isinstance(fact_constraints, (list, tuple, ConstraintList)):
@@ -1282,14 +1350,14 @@ class ParamsHierarchical(ParamsFact):
 
 class ParamsHierarchicalNoResCons(ParamsHierarchical):
     """
-    This class is a simplified ParamsHierarchical in which you define only the pyfaust.fact.hierarchical resulting Faust factors constraints.
+    This class is a simplified ParamsHierarchical in which you define only the :py:func:`pyfaust.fact.hierarchical` resulting Faust factors constraints.
 
     You don't have to define the intermediate residual factors as you normally do with a
     ParamsHierarchical. With a ParamsHierachicalNoResCons they are defined
     automatically/internally using pyfaust.proj.proj_id. It means that only the
     gradient descent of PALM4MSA modify the residual factors. The only residual
     factor you have to define the constraint for, is the last one (because it is
-    present in the resulting Faust of pyfaust.fact.hierarchical).
+    present in the resulting Faust of :py:func:`pyfaust.fact.hierarchical`).
 
     The example below shows (for a Hadamard matrix factorization) the definition
     of a ParamsHierarchical instance and its simpler equivalent (with the same set
@@ -1297,13 +1365,15 @@ class ParamsHierarchicalNoResCons(ParamsHierarchical):
     It allows to get exactly what is exactly a ParamsHierarchicalNoResCons internally.
     This example is a detailed way to the same thing as ParamsHierarchicalWHTNoResCons.
 
-    <b/> See also ParamsHierarchical, pyfaust.fact.hierarchical
+    \see :py:class:`.ParamsHierarchical`, :py:func:`pyfaust.fact.hierarchical`,
+    :py:func:`.ParamsHierarchicalNoResCons.__init__`
 
 
     Example:
         This example shows two parameterizations that are equivalent. The first one,
-        p1, is defined trough a ParamsHierarchical instance while the second one,
+        p1, is defined through a ParamsHierarchical instance while the second one,
         p2, is defined using a ParamsHierarchicalNoResCons instance.
+
         >>> from pyfaust import wht
         >>> from pyfaust.proj import skperm, proj_id
         >>> from pyfaust.factparams import ParamsHierarchical, ParamsHierarchicalNoResCons, StoppingCriterion
@@ -1368,7 +1438,7 @@ class ParamsHierarchicalNoResCons(ParamsHierarchical):
         Args:
             fact_constraints: the list of pyfaust.proj.proj_gen or
             pyfaust.factparams.ConstraintGeneric that define the structure of
-            the pyfaust.fact.hierarchical resulting Faust factors in the same
+            the :py:func:`pyfaust.fact.hierarchical` resulting Faust factors in the same
             order if is_fact_side_left==False, in the reverse order otherwise.
             stop_crit1: cf. pyfaust.fact.ParamsHierarchical.__init__
             stop_crit2: cf. pyfaust.fact.ParamsHierarchical.__init__
@@ -1430,13 +1500,14 @@ class ParamsHierarchicalDFT(ParamsHierarchical):
     """
     The simplified parameterization class for factorizing a DFT matrix using the hierarchical factorization algorithm.
 
-    <b/> See also pyfaust.fact.hierarchical
+    \see :py:func:`pyfaust.fact.hierarchical`, :py:func:`.__init__`
     """
 
     def __init__(self, n):
         """
         Args:
-            n: the log2(size) of the DFT matrix (of size 2^n x 2^n).
+            n: (int)
+                the log2(size) of the DFT matrix (of size 2^n x 2^n).
         """
         n = int(n)
         supports = self.support_DFT(n)
@@ -1477,7 +1548,8 @@ class ParamsHierarchicalDFT(ParamsHierarchical):
         Generates the DFT supports with the additional bit-reversal permutation matrix.
 
         Args:
-            n: the log2(size) of the DFT (of size 2^n x 2^n).
+            n: (int)
+                the log2(size) of the DFT (of size 2^n x 2^n).
         """
         size = 2 ** n
         supports = []
@@ -1492,12 +1564,13 @@ class ParamsHierarchicalDFT(ParamsHierarchical):
         supports += [br_permu]
         return supports
 
-    def bit_rev_permu(self, n):
+    def bit_rev_permu(self, n : int):
         """
         Returns the Bit-reversal permutation of index n.
 
         Args:
-            n: the index of the permutation.
+            n: (int)
+                the index of the permutation.
 
         Returns: the Bit-reversal permutation of index n as a list.
         """
@@ -1531,15 +1604,18 @@ class ParamsHierarchicalWHT(ParamsHierarchical):
     This type of parameters is typically used for a Hadamard matrix
     factorization.
 
-    <b/> See also pyfaust.fact.hierarchical, pyfaust.demo.hadamard
+    \see :py:func:`pyfaust.fact.hierarchical`, pyfaust.demo.hadamard,
+    :py:func:`.ParamsHierarchicalWHT.__init__`
     """
     def __init__(self, n, proj_name='splincol'):
         """
-        args:
-            n: the number of output factors (the input matrix to factorize must
-            be of shape (2**n, 2**n)) .
-            proj_name: the type of projector used, must be either
-            'splincol' (default value) or 'skperm'.
+        Args:
+            n: (int)
+                the number of output factors (the input matrix to factorize must
+                be of shape (2**n, 2**n)).
+            proj_name: (str)
+                the type of projector used, must be either
+                'splincol' (default value) or 'skperm'.
         """
         if proj_name not in ['skperm', 'splincol']:
             raise ValueError('cons_name must be either splincol'
@@ -1571,19 +1647,22 @@ class ParamsHierarchicalWHTNoResCons(ParamsHierarchicalNoResCons):
     The simplified parameterization class for factorizing a Hadamard matrix with the hierarchical factorization algorithm.
 
     This type of parameters is typically used for a Hadamard matrix factorization.
-    This is a variant of ParamsHierarchicalWHT. Here the intermediate residual
+    This is a variant of :py:class:`.ParamsHierarchicalWHT`. Here the intermediate residual
     factors are not constrained at all, the other factors are constrained with
     pyfaust.proj.skperm.
 
-    <b/> See also pyfaust.fact.hierarchical, pyfaust.demo.hadamard
+    \see :py:func:`pyfaust.fact.hierarchical`, :py:func:`pyfaust.demo.hadamard`,
+    :py:func:`.ParamsHierarchicalWHTNoResCons.__init__`
     """
     def __init__(self, n):
         """
         args:
-            n: the number of output factors (the input matrix to factorize must
-            be of shape (2**n, 2**n)) .
-            proj_name: the type of projector used, must be either
-            'splincol' (default value) or 'skperm'.
+            n: (int)
+                the number of output factors (the input matrix to factorize must
+                be of shape (2**n, 2**n)).
+            proj_name: (str)
+                the type of projector used, must be either
+                'splincol' (default value) or 'skperm'.
         """
         proj_name = 'skperm' # when proj_id is used to constraint intermediate
         # residual factors the splincol prox doesn't work well (bad
@@ -1610,12 +1689,14 @@ class ParamsHierarchicalWHTNoResCons(ParamsHierarchicalNoResCons):
         return ParamsHierarchicalWHTNoResCons(pot)
 
 
-# this is left here for descendant compatibility but it will be removed in a
+# this is left here for descending compatibility but it will be removed in a
 # next version
 class ParamsHierarchicalSquareMat(ParamsHierarchicalWHT):
     """
     This class is deprecated, please use ParamsHierarchicalWHT instead.
     This class will be removed in a few minor versions of pyfaust.
+
+    \see :py:func:`.ParamsHierarchicalWHT.__init__`
     """
     @staticmethod
     def _warn():
@@ -1638,34 +1719,42 @@ class ParamsHierarchicalRectMat(ParamsHierarchical):
 
     The parameters m and n are the dimensions of the input matrix.
 
-    <b/> See also pyfaust.fact.hierarchical, pyfaust.demo.bsl
+    \see :py:func:`pyfaust.fact.hierarchical`, pyfaust.demo.bsl,
+    :py:func:`.ParamsHierarchicalRectMat.__init__`
     """
 
     def __init__(self, m, n, j, k, s, rho=0.8, P=1.4):
-        """
+        r"""
         Constructor for the specialized parameterization used for example in the pyfaust.demo.bsl (brain souce localization).
 
         For a better understanding you might refer to [1].
 
         The figure below describes the sparsity of each factor of the Faust
-        you'll obtain using pyfaust.fact.hierarchical with a
+        you'll obtain using :py:func:`pyfaust.fact.hierarchical` with a
         ParamsHierarchicalRectMat instance.
 
         <img src="https://faust.inria.fr/files/2022/03/ParamsHierarchicalRectMat_nnz_figure.png" width="512" height="264" style="display:block;margin-left:auto;margin-right:auto"/>
 
-        The resulting Faust.nnz_sum is: \f$ \lceil P m^2 \rho^{j-2} \rceil + (j-2) s m + k n \f$
+        The resulting Faust.nnz_sum is: \f$\lceil P m^2 \rho^{j-2} \rceil + (j-2) s m + k n\f$
 
         Args:
-            m: the number of rows of the input matrix.
-            n: the number of columns of the input matrix.
-            j: the total number of factors.
-            k: the integer sparsity per column (SPCOL, pyfaust.proj.spcol) applied to the
-            rightmost factor (index j-1) of shape (m, n).
-            s: s*m is the integer sparsity targeted (SP, pyfaust.proj.sp) for all the factors from the
-            second (index 1) to index j-2. These factors are square of order n.
-            rho: defines the integer sparsity (SP, pyfaust.proj.sp) of the i-th residual (i=0:j-2): ceil(P*m**2*rho**i).
-            P: defines the integer
-            sparsity of the i-th residual (i=0:j-2): ceil(P*m**2*rho**i).
+            m: (int)
+                the number of rows of the input matrix.
+            n: (int)
+                the number of columns of the input matrix.
+            j: (int)
+                the total number of factors.
+            k: (int)
+                the integer sparsity per column (SPCOL, pyfaust.proj.spcol) applied to the
+                rightmost factor (index j-1) of shape (m, n).
+            s: (int)
+                s*m is the integer sparsity targeted (SP, pyfaust.proj.sp) for all the factors from the
+                second (index 1) to index j-2. These factors are square of order n.
+            rho: (float)
+                defines the integer sparsity (SP, pyfaust.proj.sp) of the i-th residual (i=0:j-2): ceil(P*m**2*rho**i).
+            P: (float)
+                defines the integer
+                sparsity of the i-th residual (i=0:j-2): ceil(P*m**2*rho**i).
 
         Example:
             >>> from pyfaust.factparams import ParamsHierarchicalRectMat
@@ -1762,7 +1851,10 @@ class ParamsHierarchicalRectMatNoResCons(ParamsHierarchicalRectMat):
     """
     This parameter class is the same as ParamsHierarchicalRectMat except that there is no residual factor constraints (see ParamsHierachicalNoResCons).
 
-    <b/> See also pyfaust.fact.hierarchical, pyfaust.demo.bsl, pyfaust.factparams.ParamsHierarchicalRectMat, pyfaust.factparams.ParamsHierarchicalNoResCons
+    \see :py:func:`pyfaust.fact.hierarchical`, :py:func:`pyfaust.demo.bsl`,
+    :py:class:`.ParamsHierarchicalRectMat`,
+    :py:func:`.ParamsHierarchicalNoResCons`,
+    :py:func:`.ParamsHierarchicalRectMatNoResCons.__init__`
     """
 
     def __init__(self, m, n, j, k, s, rho=0.8, P=None, **kwargs):
@@ -1770,13 +1862,20 @@ class ParamsHierarchicalRectMatNoResCons(ParamsHierarchicalRectMat):
         This class defines the same parameterization as ParamsHierarchicalRectMat except that there is no constraint on the residual factors (cf.  pyfaust.proj.proj_id).
 
         Args:
-            m: cf. ParamsHierarchicalRectMat.__init__
-            n: cf. ParamsHierarchicalRectMat.__init__
-            j: cf. ParamsHierarchicalRectMat.__init__
-            k: cf. ParamsHierarchicalRectMat.__init__
-            s: cf. ParamsHierarchicalRectMat.__init__
-            rho: cf. ParamsHierarchicalRectMat.__init__
-            P: cf. ParamsHierarchicalRectMat.__init__
+            m: (int)
+                cf. :py:func:`.ParamsHierarchicalRectMat.__init__`
+            n: (int)
+                cf. :py:func:`.ParamsHierarchicalRectMat.__init__`
+            j: (int)
+                cf. :py:func:`.ParamsHierarchicalRectMat.__init__`
+            k: (int)
+                cf. :py:func:`.ParamsHierarchicalRectMat.__init__`
+            s: (float)
+                cf. :py:func:`.ParamsHierarchicalRectMat.__init__`
+            rho: (float)
+                cf. :py:func:`.ParamsHierarchicalRectMat.__init__`
+            P: (float)
+                cf. :py:func:`.ParamsHierarchicalRectMat.__init__`
         """
         from pyfaust.proj import proj_id
         if P is not None:
@@ -1823,7 +1922,7 @@ class ParamsPalm4MSA(ParamsFact):
     """
         The class intents to set input parameters for the Palm4MSA algorithm.
 
-        <b/> See also pyfaust.fact.palm4msa
+        \see :py:func:`.ParamsPalm4MSA.__init__`, :py:class:`pyfaust.fact.palm4msa`
     """
 
     def __init__(self, constraints, stop_crit, init_facts=None,
@@ -1839,44 +1938,54 @@ class ParamsPalm4MSA(ParamsFact):
             Constructor.
 
             Args:
-                constraints: a pyfaust.factparams.ConstraintList
-                or a Python list of pyfaust.proj.proj_gen. The number of items
-                determines the number of matrix factors.
-                stop_crit: a pyfaust.factparams.StoppingCriterion instance
-                which defines the algorithm stopping criterion.
-                init_facts: if defined, pyfaust.fact.palm4msa will initialize the factors
-                with init_facts (by default, None, implies that the first
-                factor to be updated is initialized to zero and the others to
-                identity. Note that the so called first factor can be the
-                rightmost or the leftmost depending on the is_update_way_R2L argument).
-                Note also that the matrices must be np.ndarray if the backend
-                argument of pyfaust.fact.palm4msa is equal to 2016, otherwise (backend==2020)
-                it is possible to use np.ndarray or scipy.sparse.csr_matrix
-                (depending of the ParamsPalm4MSA.factor_format attribute).
-                is_update_way_R2L: if True pyfaust.fact.palm4msa will update factors from
-                the right to the left, otherwise it's done in reverse order.
-                init_lambda: the scale scalar initial value (by default the
-                value is one).
-                step_size: the initial step of the PALM descent.
-                constant_step_size: if True the step_size keeps constant along
-                the algorithm iterations otherwise it is updated before every
-                factor update.
-                is_verbose: True to enable the verbose mode.
-                norm2_max_iter: maximum number of iterations of power iteration
-                algorithm. Used for computing 2-norm.
-                norm2_threshold: power iteration algorithm threshold (default to
-                1e-6). Used for computing 2-norm.
-                grad_calc_opt_mode: the mode used for computing the PALM gradient.
-                It can be one value among pyfaust.factparams.ParamsFact.EXTERNAL_OPT,
-                pyfaust.factparams.ParamsFact.INTERNAL_OPT or pyfaust.factparams.ParamsFact.DISABLED_OPT. This
-                parameter is experimental, its value shouldn't be changed.
-                no_normalization: False (by default), if True it disables the
-                normalization of prox output matrix in PALM4MSA algorithm. Note
-                that this option is experimental.
-                no_lambda: False (by default), if True it disables the lambda
-                scalar factor in the PALM4MSA algorithm which consists
-                basically to set it always to one (it lowers also the algorithm
-                cost).
+                constraints: (:py:class:`.ConstraintList` or list[:py:class:`pyfaust.proj.proj_gen`]).
+                    The number of items determines the number of matrix factors.
+                stop_crit: (:py:class:`pyfaust.factparams.StoppingCriterion`)
+                    defines the algorithm stopping criterion.
+                init_facts: (`list`[`np.ndarray` or `scipy.sparse.csr_matrix`])
+                    if defined, :py:func:`pyfaust.fact.palm4msa` will initialize the factors
+                    with init_facts (by default, None, implies that the first
+                    factor to be updated is initialized to zero and the others to
+                    identity. Note that the so called first factor can be the
+                    rightmost or the leftmost depending on the is_update_way_R2L argument).
+                    Note also that the matrices must be np.ndarray if the backend
+                    argument of :py:func:`pyfaust.fact.palm4msa` is equal to 2016, otherwise (backend==2020)
+                    it is possible to use np.ndarray or scipy.sparse.csr_matrix
+                    (depending of the ParamsPalm4MSA.factor_format attribute).
+                is_update_way_R2L: (`bool`)
+                    if True :py:func:`pyfaust.fact.palm4msa` will update factors from
+                    the right to the left, otherwise it's done in reverse order.
+                init_lambda: (`float`)
+                    the scale scalar initial value (by default the value is one).
+                step_size: (`float`)
+                    the initial step of the PALM descent.
+                constant_step_size: (`bool`)
+                    if True the step_size keeps constant along
+                    the algorithm iterations otherwise it is updated before every
+                    factor update.
+                is_verbose: (`bool`)
+                    True to enable the verbose mode.
+                norm2_max_iter: (`float`)
+                    maximum number of iterations of power iteration
+                    algorithm. Used for computing 2-norm.
+                norm2_threshold: (`float`)
+                    power iteration algorithm threshold (default to
+                    1e-6). Used for computing 2-norm.
+                grad_calc_opt_mode: (`float`)
+                    the mode used for computing the PALM gradient.
+                    It can be one value among `pyfaust.factparams.ParamsFact.EXTERNAL_OPT`,
+                    `pyfaust.factparams.ParamsFact.INTERNAL_OPT` or
+                    `pyfaust.factparams.ParamsFact.DISABLED_OPT`. This
+                    parameter is experimental, its value shouldn't be changed.
+                no_normalization: (`bool`)
+                    False (by default), if True it disables the
+                    normalization of prox output matrix in PALM4MSA algorithm. Note
+                    that this option is experimental.
+                no_lambda: (`bool`)
+                    False (by default), if True it disables the lambda
+                    scalar factor in the PALM4MSA algorithm which consists
+                    basically to set it always to one (it lowers also the algorithm
+                    cost).
 
         """
         if not isinstance(constraints, (list, tuple, ConstraintList)):
@@ -1903,6 +2012,9 @@ class ParamsPalm4MSA(ParamsFact):
         self.stop_crit = stop_crit
 
     def is_mat_consistent(self, M):
+        """
+        \see :py:func:`.ParamsFact.is_mat_consistent`
+        """
         return super(ParamsPalm4MSA, self).is_mat_consistent(M)
 
     def are_constraints_consistent(self, M):
@@ -1952,6 +2064,7 @@ class ParamsPalm4MSA(ParamsFact):
 
 class ParamsPalm4MSAFGFT(ParamsPalm4MSA):
     """
+    \see :py:func:`.ParamsPalm4MSAFGFT.__init__`
     """
     def __init__(self, constraints, stop_crit, init_facts=None,
                  init_D=None,
@@ -2009,7 +2122,8 @@ class ParamsPalm4msaWHT(ParamsPalm4MSA):
         Conference on Acoustics, Speech and Signal Processing, Jun 2021, Toronto,
         Ontario, Canada. pp.1-5 <a href="https://hal.inria.fr/hal-03132013/document">hal-03132013</a>.
 
-    See also pyfaust.fact.palm4msa
+    \see :py:func:`pyfaust.fact.palm4msa`,
+    :py:func:`.ParamsPalm4msaWHT.__init__`
 	"""
 	def __init__(self, matrix_size):
 		from pyfaust.proj import skperm
@@ -2035,7 +2149,8 @@ class ParamsFactFactory:
 
         Note: this factory is not related to ParamsPalm4MSA, it only creates ParamsHierarchical instances.
 
-        <b/> See also  ParamsHierarchicalRectMat, ParamsHierarchicalWHT, pyfaust.fact.hierarchical()
+        \see :py:class:`.ParamsHierarchicalRectMat`,
+        :py:class:`.ParamsHierarchicalWHT`, :py:func:`pyfaust.fact.hierarchical`
     """
     SIMPLIFIED_PARAM_NAMES = [
         [ "squaremat", "hadamard"], #TODO: delete squaremat

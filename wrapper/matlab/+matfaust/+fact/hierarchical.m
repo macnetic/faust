@@ -11,7 +11,7 @@
 %> @param 'gpu', bool (optional) set to true to execute the algorithm using the GPU implementation. This option is only available when backend==2020.
 %>
 %>
-%> @note - If backend parameter is 2020 and independently to the StoppingCriterion-s defined in p,
+%> @note - If backend parameter is 2020 and regardless to the StoppingCriterion-s defined in p,
 %> it is possible to stop any internal call to PALM4MSA manually at any iteration
 %> by the key combination CTRL-C.
 %> The last Faust computed in the PALM4MSA instance will be used to continue

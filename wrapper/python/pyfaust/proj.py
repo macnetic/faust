@@ -29,16 +29,21 @@ class proj_id(proj_gen):
     constraint on a factor.
 
     Example:
-    >>> from pyfaust.proj import proj_id
-    >>> from numpy import allclose
-    >>> from numpy.random import rand
-    >>> M = rand(5,5)
-    >>> p = proj_id(M.shape)
-    >>> allclose(p(M), M)
-    True
+        >>> from pyfaust.proj import proj_id
+        >>> from numpy import allclose
+        >>> from numpy.random import rand
+        >>> M = rand(5,5)
+        >>> p = proj_id(M.shape)
+        >>> allclose(p(M), M)
+        True
     """
 
     def __init__(self, shape):
+        """
+        Args:
+            shape: (tuple(int,int))
+                the size of the input matrix.
+        """
         super(proj_id, self).__init__(shape)
         self.constraint = ConstraintMat('id', shape=shape)
         self.constraint._num_rows = shape[0]
@@ -72,9 +77,12 @@ class toeplitz(proj_gen):
     def __init__(self, shape, normalized=True, pos=False):
         """
         Args:
-            shape: the size of the input matrix.
-            normalized: True to normalize the projection image according to its Frobenius norm.
-            pos: True to skip negative values (replaced by zero) of the matrix to project.
+            shape: (tuple(int,int))
+                the size of the input matrix.
+            normalized: (bool)
+                True to normalize the projection image according to its Frobenius norm.
+            pos: (bool)
+                True to skip negative values (replaced by zero) of the matrix to project.
         """
         super(toeplitz, self).__init__(shape)
         self.constraint = ConstraintMat('toeplitz', shape=shape,
@@ -110,9 +118,12 @@ class circ(proj_gen):
     def __init__(self, shape, normalized=True, pos=False):
         """
         Args:
-            shape: the size of the input matrix.
-            normalized: True to normalize the projection image according to its Frobenius norm.
-            pos: True to skip negative values (replaced by zero) of the matrix to project.
+            shape: (tuple(int,int))
+                the size of the input matrix.
+            normalized: (bool)
+                True to normalize the projection image according to its Frobenius norm.
+            pos: (bool)
+                True to skip negative values (replaced by zero) of the matrix to project.
 
 
         """
@@ -151,9 +162,12 @@ class anticirc(proj_gen):
     def __init__(self, shape, normalized=True, pos=False):
         """
         Args:
-            shape: the size of the input matrix.
-            normalized: True to normalize the projection image according to its Frobenius norm.
-            pos: True to skip negative values (replaced by zero) of the matrix to project.
+            shape: (tuple(int,int))
+                the size of the input matrix.
+            normalized: (bool)
+                True to normalize the projection image according to its Frobenius norm.
+            pos: (bool)
+                True to skip negative values (replaced by zero) of the matrix to project.
 
 
         """
@@ -190,9 +204,12 @@ class hankel(proj_gen):
     def __init__(self, shape, normalized=True, pos=False):
         """
         Args:
-            shape: the size of the input matrix.
-            normalized: True to normalize the projection image according to its Frobenius norm.
-            pos: True to skip negative values (replaced by zero) of the matrix to project.
+            shape: (tuple(int,int))
+                the size of the input matrix.
+            normalized: (bool)
+                True to normalize the projection image according to its Frobenius norm.
+            pos: (bool)
+                True to skip negative values (replaced by zero) of the matrix to project.
         """
         super(hankel, self).__init__(shape)
         self.constraint = ConstraintMat('hankel', shape=shape,
@@ -231,22 +248,26 @@ class sp(proj_gen):
         """
 
         Args:
-            shape: shape of the input array.
-            k: the number of nonzeros of the projection image.
-            normalized: True to normalize the projection image according to its Frobenius norm.
-            pos: True to skip negative values (replaced by zero) of the matrix to project.
+            shape: (tuple(int,int))
+                the size of the input matrix.
+            k: (int)
+                the number of nonzeros of the projection image.
+            normalized: (bool)
+                True to normalize the projection image according to its Frobenius norm.
+            pos: (bool)
+                True to skip negative values (replaced by zero) of the matrix to project.
 
         """
         super(sp, self).__init__(shape)
         self.constraint = ConstraintInt('sp', shape[0], shape[1], k, normalized, pos)
 
 class splin(proj_gen):
-    """
+    r"""
     Functor for the SPLIN projector.
 
-    A, the image matrix, is defined by \f$
-    \forall i \in \{0,...,shape[0]-1\} \| \f$ the i-th row \f$ A_{i,*}\f$ is
-    such that \f$ \| A_{i,*}\|_0 = k,  \| A\|_F = 1\f$ (if normalized == True).
+    A, the image matrix, is defined by \f$\forall i \in \{0, \ldots,shape[0]-1\}\f$
+    the i-th row \f$A_{i,*}\f$ is such that \f$\| A_{i,*}\|_0 = k,  \| A\|_F = 1\f$
+    (if normalized == True).
 
 
     Example:
@@ -273,22 +294,26 @@ class splin(proj_gen):
     def __init__(self, shape, k, normalized=True, pos=False):
         """
         Args:
-            shape: shape of the input array.
-            k: the number of nonzeros of the projection image.
-            normalized: True to normalize the projection image according to its Frobenius norm.
-            pos: True to skip negative values (replaced by zero) of the matrix to project.
+            shape: (tuple(int,int))
+                shape of the input array.
+            k: (int)
+                the number of nonzeros of the projection image.
+            normalized: (bool)
+                True to normalize the projection image according to its Frobenius norm.
+            pos: (bool)
+                True to skip negative values (replaced by zero) of the matrix to project.
 
         """
         super(splin, self).__init__(shape)
         self.constraint = ConstraintInt('splin', shape[0], shape[1], k, normalized, pos)
 
 class spcol(proj_gen):
-    """
+    r"""
     Functor for the SPCOL projector.
 
-    A, the image matrix, is defined by \f$
-    \forall j \in \{0,...,shape[1]-1\} \f$ the j-th column \f$ A_{*,j}\f$ is
-    such that \f$ \| A_{*,j}\|_0 = k,  \| A\|_F = 1\f$ (if normalized == True)
+    A, the image matrix, is defined by \f$\forall j \in \{0,...,shape[1]-1\}\f$
+    the j-th column \f$A_{\star,j}\f$ is such that
+    \f$\| A_{\star,j}\|_0 = k,  \| A\|_F = 1\f$ (if normalized == True)
 
     Example:
         >>> from numpy.random import rand, seed
@@ -315,17 +340,21 @@ class spcol(proj_gen):
         """
 
         Args:
-            shape: shape of the input array.
-            S: the support matrix.
-            normalized: True to normalize the projection image according to its Frobenius norm.
-            pos: True to skip negative values (replaced by zero) of the matrix to project.
+            shape: (tuple(int, int))
+                shape of the input array.
+            S: (np.ndarray)
+                the support matrix.
+            normalized: (bool)
+                True to normalize the projection image according to its Frobenius norm.
+            pos: (bool)
+                True to skip negative values (replaced by zero) of the matrix to project.
 
         """
         super(spcol, self).__init__(shape)
         self.constraint = ConstraintInt('spcol', shape[0], shape[1], k, normalized, pos)
 
 class splincol(proj_gen):
-    """
+    r"""
     Functor for the SPLINCOL projector.
 
     It's the union of SPLIN and SPCOL projectors.
@@ -380,11 +409,15 @@ class splincol(proj_gen):
         """
 
         Args:
-            shape: shape of the input array.
-            k: the integer sparsity (number of nonzeros) targeted per-row and
-            per-column.
-            normalized: True to normalize the projection image according to its Frobenius norm.
-            pos: True to skip negative values (replaced by zero) of the matrix to project.
+            shape: (tuple(int,int))
+                shape of the input array.
+            k: (int)
+                the integer sparsity (number of nonzeros) targeted per-row and
+                per-column.
+            normalized: (bool)
+                True to normalize the projection image according to its Frobenius norm.
+            pos: (bool)
+                True to skip negative values (replaced by zero) of the matrix to project.
 
         """
         super(splincol, self).__init__(shape)
@@ -422,9 +455,12 @@ class supp(proj_gen):
         """
 
         Args:
-            S: the support matrix.
-            normalized: True to normalize the projection image according to its Frobenius norm.
-            pos: True to skip negative values (replaced by zero) of the matrix to project.
+            S: (np.ndarray)
+                the support matrix.
+            normalized: (bool)
+                True to normalize the projection image according to its Frobenius norm.
+            pos: (bool)
+                True to skip negative values (replaced by zero) of the matrix to project.
         """
         super(supp, self).__init__(S.shape)
         self.constraint = ConstraintMat('supp', cons_value=S,
@@ -466,17 +502,20 @@ class const(proj_gen):
         """
 
         Args:
-            C: the constant matrix.
-            normalized: True to normalize the projection image according to its Frobenius norm.
-            pos: True to skip negative values (replaced by zero) of the matrix to project.
+            C: (np.ndarray)
+                the constant matrix.
+            normalized: (bool)
+                True to normalize the projection image according to its Frobenius norm.
+            pos: (bool)
+                True to skip negative values (replaced by zero) of the matrix to project.
 
         """
         super(const, self).__init__(C.shape)
         self.constraint = ConstraintMat('const', cons_value=C, normalized=normalized, pos=False)
 
 class normcol(proj_gen):
-    """
-        Functor for the NORMCOL projector. A, the image matrix, is defined by \f$ \forall j \in \{0,...,shape[1]-1\} \f$ the j-th column \f$ A_{*,j} \f$ is such that \f$\| A_{*,j}\|_2 = s  \f$.
+    r"""
+        Functor for the NORMCOL projector. A, the image matrix, is defined by \f$\forall j \in \{0,...,shape[1]-1\}\f$ the j-th column \f$A_{*,j}\f$ is such that \f$\| A_{*,j}\|_2 = s\f$.
 
         Example:
             >>> from pyfaust.proj import normcol
@@ -499,8 +538,10 @@ class normcol(proj_gen):
     def __init__(self, shape, s=1):
         """
         Args:
-            shape: the input matrix shape.
-            s: the column 2-norm (default to 1).
+            shape: (tuple(int,int))
+                the input matrix shape.
+            s: (float)
+                the column 2-norm (default to 1).
 
         """
         super(normcol, self).__init__(shape)
@@ -511,8 +552,8 @@ class normcol(proj_gen):
         self.constraint = ConstraintReal('normcol', shape[0], shape[1], s, normalized, pos)
 
 class normlin(proj_gen):
-    """
-        Functor for the NORMLIN projector. A, the image matrix, is defined by \f$ \forall i \in \{0,...,shape[0]-1\}\f$ the i-th row \f$ A_{i,*} \f$ is such that \f$ \| A_{i,*} \|_2 = s \f$.
+    r"""
+        Functor for the NORMLIN projector. A, the image matrix, is defined by \f$\forall i \in \{0,...,shape[0]-1\}\f$ the i-th row \f$A_{i,*}\f$ is such that \f$\| A_{i,*} \|_2 = s\f$.
 
         Example:
             >>> from pyfaust.proj import normlin
@@ -540,8 +581,10 @@ class normlin(proj_gen):
     def __init__(self, shape, s=1):
         """
         Args:
-            shape: the input matrix shape.
-            s: the row 2-norm (default to 1).
+            shape: (tuple(int,int))
+                the input matrix shape.
+            s: (float)
+                the row 2-norm (default to 1).
 
         """
         super(normlin, self).__init__(shape)
@@ -583,11 +626,15 @@ class blockdiag(proj_gen):
         Constructor.
 
         Args:
-            shape: the size of the input matrix.
-            block_shapes: the list of tuples defining the lower right corner of
-            successive diagonal blocks (see class description and example).
-            normalized: True to normalize the projection image matrix.
-            pos: True to ignore negative values (replaced by 0).
+            shape: (tuple(int,int))
+                the size of the input matrix.
+            block_shapes: (list[tuple])
+                the list of tuples defining the lower right corner of
+                successive diagonal blocks (see class description and example).
+            normalized: (bool)
+                True to normalize the projection image matrix.
+            pos: (bool)
+                True to ignore negative values (replaced by 0).
         """
         super(blockdiag, self).__init__(shape)
         self._m_vec = [ sh[0] for sh in block_shapes ]
@@ -674,11 +721,14 @@ class skperm(proj_gen):
         Projector constructor.
 
         Args:
-            shape: shape of the input array.
-            k: the integer sparsity (number of nonzeros) targeted per-row and
-            per-column.
-            normalized: True to normalize the projection image according to its Frobenius norm.
-            pos: True to skip negative values (replaced by zero) of the matrix to project.
+            shape: (tuple(int,int))
+                the size of the input matrix.
+            k: (int)
+                the integer sparsity (number of nonzeros) targeted per-row and
+                per-column.
+            normalized: (bool)
+                True to normalize the projection image according to its Frobenius norm.
+            pos: (bool) True to skip negative values (replaced by zero) of the matrix to project.
 
         """
         super(skperm, self).__init__(shape)
@@ -688,7 +738,8 @@ class sptriu(proj_gen):
     """
     Functor for the SPTRIU projector.
 
-    A, the image matrix, is such that the lower triangular part is 0 and \f$ \| A \|_0 = k,  \| A\|_F = 1 \f$ (if normalized == True).
+    A, the image matrix, is such that the lower triangular part is 0 and
+    \f$\| A \|_0 = k,  \| A\|_F = 1\f$ (if normalized == True).
 
 
     Example:
@@ -716,17 +767,21 @@ class sptriu(proj_gen):
         True
 
 
-    <b>See also:</b> pyfaust.proj.sptril
+    \see :py:class:`.sptril`
     """
 
     def __init__(self, shape, k, normalized=True, pos=False):
         """
 
         Args:
-            shape: shape of the input array.
-            k: the number of nonzeros of the projection image.
-            normalized: True to normalize the projection image according to its Frobenius norm.
-            pos: True to skip negative values (replaced by zero) of the matrix to project.
+            shape: (tuple(int, int))
+                shape of the input array.
+            k: (int)
+                the number of nonzeros of the projection image.
+            normalized: (bool)
+                True to normalize the projection image according to its Frobenius norm.
+            pos: (bool)
+                True to skip negative values (replaced by zero) of the matrix to project.
 
         """
         super(sptriu, self).__init__(shape)
@@ -736,7 +791,8 @@ class sptril(proj_gen):
     """
     Functor for the SPTRIL projector.
 
-    A, the image matrix, is such that the upper triangular part is 0 and \f$ \| A \|_0 = k,  \| A\|_F = 1 \f$ (if normalized == True).
+    A, the image matrix, is such that the upper triangular part is 0 and
+    \f$\| A \|_0 = k,  \| A\|_F = 1\f$ (if normalized == True).
 
 
     Example:
@@ -764,17 +820,21 @@ class sptril(proj_gen):
         True
 
 
-    <b>See also:</b> pyfaust.proj.sptriu
+    \see :py:class:`.sptriu`
     """
 
     def __init__(self, shape, k, normalized=True, pos=False):
         """
 
         Args:
-            shape: shape of the input array.
-            k: the number of nonzeros of the projection image.
-            normalized: True to normalize the projection image according to its Frobenius norm.
-            pos: True to skip negative values (replaced by zero) of the matrix to project.
+            shape: (tuple(int,int))
+                the size of the input matrix.
+            k: (int)
+                the number of nonzeros of the projection image.
+            normalized: (bool)
+                True to normalize the projection image according to its Frobenius norm.
+            pos: (bool)
+                True to skip negative values (replaced by zero) of the matrix to project.
 
         """
         super(sptril, self).__init__(shape)
@@ -784,8 +844,8 @@ class spsymm(proj_gen):
     """
     Functor for the SYMM SP projector.
 
-    A, the image matrix of M, is such that A is symmetric and \f$ k \le \| A \|_0
-    \le k + 1,  \| A\|_F = 1 \f$ (if normalized == True), assuming that \f$\| M \|_0 >= k\f$.
+    A, the image matrix of M, is such that A is symmetric and \f$k \le \| A \|_0 \le k + 1,  \| A\|_F = 1 \f$
+    (if normalized == True), assuming that \f$\| M \|_0 >= k\f$.
 
 
     Example:
@@ -818,11 +878,15 @@ class spsymm(proj_gen):
         """
 
         Args:
-            shape: shape of the input array.
-            k: the number of nonzeros of the projection image. The result might
-            be k+1 nonzeros in case of an odd number of nonzeros on the diagonal.
-            normalized: True to normalize the projection image according to its Frobenius norm.
-            pos: True to skip negative values (replaced by zero) of the matrix to project.
+            shape: (tuple(int,int))
+                the size of the input matrix.
+            k: (int)
+                the number of nonzeros of the projection image. The result might
+                be k+1 nonzeros in case of an odd number of nonzeros on the diagonal.
+            normalized: (bool)
+                True to normalize the projection image according to its Frobenius norm.
+            pos: (bool)
+                True to skip negative values (replaced by zero) of the matrix to project.
 
         """
         super(spsymm, self).__init__(shape)

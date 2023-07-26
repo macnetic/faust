@@ -246,6 +246,7 @@ option(MATLAB_2017_API "if ON the deprecated Matlab API will be used to build --
 option(VCOMPLIB_PATH "Set the library path of OpenMP which comes from the Visual Studio environment, e.g. C:/Program Files (x86)/Microsoft Visual Studio/*/vcomp140.dll")
 option(NO_MATIO "Avoid using MAT-IO library to implement reading/writing of FAµST matrices." OFF)
 option(LINUX_DEFAULT_COMPILER_FOR_PYTHON "Avoid using automatically clang for Linux and use most likely gcc." OFF)
+option(GEN_SPHINX_DOC "Enable Sphinx doc generation for pyfaust (cf. sphinx in projet root directory)." OFF)
 
 if (BUILD_USE_SINGLEPRECISION)
 	message(STATUS "**********SINGLEPRECISION ACTIF************")

@@ -24,12 +24,18 @@ def Chebyshev(L, K, dev='cpu', T0=None, impl='native'):
     Builds the Faust of the Chebyshev polynomial basis defined on the sparse matrix L.
 
     Args:
-        L: the sparse scipy square matrix in CSR format (scipy.sparse.csr_matrix).
-           L can aslo be a Faust if impl is "py".
-        K: the degree of the last polynomial, i.e. the K+1 first polynomials are built.
-        dev (optional): the device to instantiate the returned Faust ('cpu' or 'gpu').
-        T0 (optional): to define the 0-degree polynomial as something else than the identity.
-        impl (optional): 'native' (by default) for the C++ impl., "py" for the Python impl.
+        L: (scipy.sparse.csr_matrix or L)
+            the sparse square matrix or square Faust (in this case impl must be
+            'py')
+        K: (int)
+            the degree of the last polynomial, i.e. the K+1 first polynomials are built.
+        dev: (str)
+            the device to instantiate the returned Faust ('cpu' or 'gpu').
+        T0: (Faust or scipy.sparse.csr_matrix)
+            to define the 0-degree polynomial as something else than the identity.
+            If a Faust only the first factor is take into account.
+        impl: (str)
+            'native' (by default) for the C++ impl., "py" for the Python impl.
 
     Returns:
         The Faust of the K+1 Chebyshev polynomials.
@@ -85,12 +91,18 @@ def basis(L, K, basis_name, dev='cpu', T0=None, **kwargs):
     """Builds the Faust of the polynomial basis defined on the sparse matrix L.
 
     Args:
-        L: the sparse scipy square matrix in CSR format (scipy.sparse.csr_matrix).
-        The dtype must be float32, float64 or complex128 (the dtype might have a large impact on performance).
-        K: the degree of the last polynomial, i.e. the K+1 first polynomials are built.
-        basis_name: 'chebyshev', and others yet to come.
-        dev (optional): the device to instantiate the returned Faust ('cpu' or 'gpu').
-        T0 (optional): a sparse matrix to replace the identity as a 0-degree polynomial of the basis.
+        L: (scipy.sparse.csr_matrix)
+            the sparse square matrix.
+            The dtype must be float32, float64 or complex128 (the dtype might have a large impact on performance).
+        K: (int)
+            the degree of the last polynomial, i.e. the K+1 first polynomials are built.
+        basis_name:
+            'chebyshev', and others yet to come.
+        dev: (str)
+            the device to instantiate the returned Faust ('cpu' or 'gpu').
+        T0: (Faust or scipy.sparse.csr_matrix)
+            to define the 0-degree polynomial as something else than the identity.
+            If a Faust only the first factor is take into account.
 
     Returns:
         The Faust G of the basis composed of the K+1 orthogonal polynomials.
@@ -164,22 +176,28 @@ def poly(coeffs, basis='chebyshev', L=None, X=None, dev='cpu', out=None,
         Computes the linear combination of the polynomials defined by basis.
 
         Args:
-            coeffs: the linear combination coefficients (vector as a
-            numpy.ndarray). Must be in the same dtype as L and X if they are set.
-            basis: either the name of the polynomial basis to build on L or the
-            basis if already built externally (as a FaustPoly or an equivalent
-            np.ndarray -- if X is not None, basis can only be a FaustPoly).
-            L: the sparse scipy square matrix in CSR format
-            (scipy.sparse.csr_matrix) on which the polynomial basis is built if basis is not already a Faust or a numpy.ndarray. The dtype must be float32, float64 or complex128 (the dtype might have a large impact on performance).
-
-            It can't be None if basis is not a FaustPoly or a numpy.ndarray.
-            X: (np.darray) if X is not None, the linear combination of basis@X
-            is computed (note that the memory space is optimized compared to
-            the manual way of doing first B = basis@X and then calling poly on
-            B with X at None).
-            dev: the computing device ('cpu' or 'gpu').
-            out: (np.ndarray) if not None the function result is put into this
-            np.ndarray. Note that out.flags['F_CONTINUOUS'] must be True. Note that this can't work if the function returns a Faust.
+            coeffs: (np.ndarray)
+                the linear combination coefficients (vector).
+                Must be in the same dtype as L and X if they are set.
+            basis: (FaustPoly or np.ndarray)
+                either the name of the polynomial basis to build on L or the
+                basis if already built externally (as a FaustPoly or an equivalent
+                np.ndarray -- if X is not None, basis can only be a FaustPoly).
+            L: (scipy.sparse.csr_matrix)
+                The square matrix on which the polynomial basis is built if basis is not already a Faust or a numpy.ndarray.
+                The dtype must be float32, float64 or complex128 (the dtype might have a large impact on performance).
+                It can't be None if basis is not a FaustPoly or a numpy.ndarray.
+            X: (np.darray)
+                if X is not None, the linear combination of basis@X
+                is computed (note that the memory space is optimized compared to
+                the manual way of doing first B = basis@X and then calling poly on
+                B with X at None).
+            dev: (str)
+                the computing device ('cpu' or 'gpu').
+            out: (np.ndarray)
+                if not None the function result is put into this
+                np.ndarray. Note that out.flags['F_CONTINUOUS'] must be True.
+                Note that this can't work if the function returns a Faust.
 
         Returns:
             The linear combination Faust or np.ndarray depending on if basis is
@@ -535,26 +553,35 @@ def expm_multiply(A, B, t, K=10, tradeoff='time', dev='cpu', **kwargs):
 
     NOTE: This function is very similar to scipy.sparse.linalg.expm_multiply
     with three major differences though:
-        1. A must be symmetric positive definite.
-        2. The time points are directly passed to the function rather to be
-        defined as a numpy.linspace.
-        3. The time values must be negative.
+
+    1. A must be symmetric positive definite.
+
+    2. The time points are directly passed to the function rather to be
+    defined as a numpy.linspace.
+
+    3. The time values must be negative.
 
 
     Args:
-        A: the operator whose exponential is of interest (must be a
-        symmetric positive definite csr_matrix).
-        B: (ndarray) the matrix or vector to be multiplied by the matrix exponential of A.
-        t: (list) the time points.
-        dev: (str, optional) the device ('cpu' or 'gpu') on which to compute (currently only cpu is supported).
-        K: the greatest polynomial degree of the Chebyshev polynomial basis.
-        The greater it is, the better is the approximate accuracy but note that
-        a larger K increases the computational cost.
-        tradeoff: 'memory' or 'time' to specify what matters the most: a small
-        memory footprint or a small time of execution. It changes the
-        implementation of pyfaust.poly.poly used behind. It can help when
-        the memory size is limited relatively to the value of K or the size
-        of A and B.
+        A: (scipy.sparse.csr_matrix)
+            the operator whose exponential is of interest (must be a
+            symmetric positive definite matrix).
+        B: (np.ndarray)
+            the matrix or vector to be multiplied by the matrix exponential of A.
+        t: (list[float])
+            the time points.
+        dev: (str)
+            the device ('cpu' or 'gpu') on which to compute (currently only cpu is supported).
+        K: (int)
+            the greatest polynomial degree of the Chebyshev polynomial basis.
+            The greater it is, the better is the approximate accuracy but note that
+            a larger K increases the computational cost.
+        tradeoff: (str)
+            'memory' or 'time' to specify what matters the most: a small
+            memory footprint or a small time of execution. It changes the
+            implementation of pyfaust.poly.poly used behind. It can help when
+            the memory size is limited relatively to the value of K or the size
+            of A and B.
 
     Returns:
         expm_A_B the result of \f$e^{t_k A} B\f$.
@@ -657,18 +684,24 @@ def invm_multiply(A, B, rel_err=1e-6, tradeoff='time', max_K=np.inf, dev='cpu', 
     Computes an approximate of the action of the matrix inverse of A on B using Chebyshev polynomials.
 
     Args:
-        A: the operator whose inverse is of interest (must be a symmetric
-        positive definite csr_matrix).
-        B: the matrix or vector to be multiplied by the matrix inverse of A
-        (ndarray).
-        rel_err: the targeted relative error between the approximate of the action and the action itself (if you were to compute it with np.inv(A)@x).
-        max_K: (int, optional) the maximum degree of Chebyshev polynomial to use (useful to limit memory consumption).
-        dev: (optional) 'cpu' or 'gpu',  selects the device to use.
-        tradeoff: 'memory' or 'time' to specify what matters the most: a small
-        memory footprint or a small time of execution. It changes the
-        implementation of pyfaust.poly.poly used behind. It can help when
-        the memory size is limited relatively to the value of rel_err or the size
-        of A and B.
+        A: (scipy.sparse.csr_matrix)
+            the operator whose inverse is of interest (must be a symmetric
+            positive definite csr_matrix).
+        B: (np.ndarray)
+            the matrix or vector to be multiplied by the matrix inverse of A.
+        rel_err: (float)
+            the targeted relative error between the approximate of the action
+            and the action itself (if you were to compute it with np.inv(A)@x).
+        max_K: (int)
+            the maximum degree of Chebyshev polynomial to use (useful to limit memory consumption).
+        dev: (str)
+            'cpu' or 'gpu',  selects the device to use.
+        tradeoff: (str)
+            'memory' or 'time' to specify what matters the most: a small
+            memory footprint or a small time of execution. It changes the
+            implementation of pyfaust.poly.poly used behind. It can help when
+            the memory size is limited relatively to the value of rel_err or the size
+            of A and B.
 
     Returns:
         The np.ndarray which is the approximate action of matrix inverse  of A on B.

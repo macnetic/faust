@@ -390,6 +390,10 @@ foreach(PYFAUST_FILE ${PYFAUST_FILES})
 	endif()
 endforeach()
 
+if(GEN_SPHINX_DOC)
+	file(COPY "${FAUST_PYTHON_BIN_DIR}/pyfaust" DESTINATION "${FAUST_PYTHON_BIN_DIR}_sphinx")
+endif()
+
 set(PY_CPP_TARGET python_cpp)
 file(GLOB PY_CPP_FILES "${FAUST_PYTHON_BIN_DIR}/F*cpp")
 add_library(${PY_CPP_TARGET} STATIC ${PY_CPP_FILES})

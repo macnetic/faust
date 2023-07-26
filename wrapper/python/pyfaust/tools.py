@@ -16,15 +16,21 @@ def omp(y, D, maxiter=None, tol=0, relerr=True, verbose=False):
     Runs the greedy OMP algorithm optimized by Cholesky decomposition.
 
     Args:
-        y: the vector to approximate by D@x.
-        D: the dictionary as a numpy array or a Faust.
-        maxiter: the maximum number of iterations of the algorithm.
-        By default (None) it's y's dimension: max(y.shape).
-        tol: the tolerance error to reach for the algorithm to stop. By default,
-        it's zero for not stopping on error criterion.
-        relerr: the type of error stopping criterion. Default to
-        True to use relative error, otherwise (False) the absolute error is used.
-        verbose: to enable the verbosity (value to True).
+        y: (np.ndarray)
+            the vector to approximate by D@x.
+        D: (np.ndarray or a Faust)
+            the dictionary as a numpy array or a Faust.
+        maxiter: (int or NoneType)
+            the maximum number of iterations of the algorithm.
+            By default (None) it's y's dimension: max(y.shape).
+        tol: (float)
+            the tolerance error to reach for the algorithm to stop. By default,
+            it's zero for not stopping on error criterion.
+        relerr: (bool)
+            the type of error stopping criterion. Default to
+            True to use relative error, otherwise (False) the absolute error is used.
+        verbose: (bool)
+            to enable the verbosity (True).
 
     Returns:
         x: the solution of y = D@x (according to the error).
@@ -145,11 +151,16 @@ def omp(y, D, maxiter=None, tol=0, relerr=True, verbose=False):
 def UpdateCholesky(R,P,Pt,index,m):
     """
     Args:
-        R: must be a csr_matrix or a numpy.matrix
-        P: a function
-        Pt: a function
-        index: a list of all non-zero indices of length R.shape[1]+1
-        m: dimension of space from which P maps.
+        R: (scipy.sparse.csr_matrix or a np.ndarray)
+            A triangular matrix
+        P: (callable)
+            A function to implement the matrix product.
+        Pt: (callable)
+            A function to implement the matrix transpose product.
+        index: (list[int])
+            a list of all non-zero indices of length R.shape[1]+1
+        m: (int)
+            dimension of space from which P maps.
 
     Returns:
         R is a triangular matrix such that R'*R = Pt(index)*P(index)
@@ -162,15 +173,7 @@ def UpdateCholesky(R,P,Pt,index,m):
 
 def UpdateCholeskyFull(R,P,Pt,index,m):
     """
-    Args:
-        R: must be a numpy.matrix
-        P: a function returning a numpy.matrix
-        Pt: a function returning a numpy.matrix
-        index: a list of all non-zero indices of length R.shape[1]+1
-        m: dimension of space from which P maps.
-
-    Returns:
-        R is a triangular matrix such that R'*R = Pt(index)*P(index)
+    Same as :py:func:`.UpdateCholesky` but R is a np.ndarray.
     """
     li = len(index)
 
@@ -205,15 +208,7 @@ def UpdateCholeskyFull(R,P,Pt,index,m):
 
 def UpdateCholeskySparse(R,P,Pt,index,m):
     """
-    Args:
-        R: must be a csr_matrix.
-        P: a function
-        Pt: a function
-        index: a list of all non-zero indices of length R.shape[1]+1
-        m: dimension of space from which P maps.
-
-    Returns:
-        R is a triangular matrix such that R'*R = Pt(index)*P(index)
+    Same as :py:func:`.UpdateCholesky` but R is a scipy.sparse.csr_matrix.
     """
 
     li = len(index)

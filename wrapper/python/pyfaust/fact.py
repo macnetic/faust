@@ -40,26 +40,33 @@ from pyfaust.tools import _sanitize_dtype
 # experimental block start
 def svdtj2(M, nGivens, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
           enable_large_Faust=False):
-    """
+    r"""
         Performs an approximate singular value decomposition and returns the left and right singular vectors as Faust transforms.
 
         NOTE: this function is based on fact.eigtj which relies on the
         truncated Jacobi algorithm, hence the 'tj' in the name.
 
         Args:
-            M: a real or complex, dense or sparse (csr) matrix.
-            nGivens: see fact.eigtj
-            tol: see fact.eigtj
-            relerr: see fact.eigtj
-            nGivens_per_fac: see fact.eigtj
-            verbosity: see fact.eigtj
+            M: (np.ndarray or scipy.sparse.csr_matrix)
+                a real or complex, dense or sparse (csr) matrix.
+            nGivens: (int)
+                see :py:func:`.eigtj`
+            tol: (float)
+                see :py:func:`.eigtj`
+            relerr: (float)
+                see :py:func:`.eigtj`
+            nGivens_per_fac: (int)
+                see :py:func:`.eigtj`
+            verbosity: (bool)
+                see :py:func:`.eigtj`
 
         Returns:
             The tuple U,S,V: U*S.toarray()@V' being the approximation of M.
-                - (sparse diagonal matrix) S the singular values in
-                descending order.
-                - (Faust object) U the left-singular transform.
-                - (Faust object) V the right-singular transform.
+                * (sparse diagonal matrix) S the singular values in descending order.
+
+                * (Faust object) U the left-singular transform.
+
+                * (Faust object) V the right-singular transform.
 
         Example:
             >>> from pyfaust.fact import svdtj
@@ -67,8 +74,8 @@ def svdtj2(M, nGivens, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
             >>> M = rand(128,128)
             >>> U,S,V = svdtj(M, 1024, nGivens_per_fac=64)
 
-     See also:
-        eigtj
+     \see
+     :py:func:`.eigtj`
     """
     from scipy.sparse import spdiags
     from scipy import diag
@@ -106,7 +113,7 @@ def svdtj2(M, nGivens, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
 
 def svdtj(M, nGivens=None, tol=0, err_period=100, relerr=True,
           nGivens_per_fac=None, enable_large_Faust=False, **kwargs):
-    """
+    r"""
         Performs a singular value decomposition and returns the left and right singular vectors as Faust transforms.
 
         NOTE: this function is based on fact.eigtj which relies on the
@@ -119,32 +126,38 @@ def svdtj(M, nGivens=None, tol=0, err_period=100, relerr=True,
         dense.
 
         Args:
-            M: a real or complex matrix (np.ndarray or scipy.sparse.csr_matrix). The dtype must be float32, float64
-            or complex128 (the dtype might have a large impact on performance).
-            nGivens: (int or tuple(int, int)) defines the number of Givens rotations
-            that will be used at most to compute U and V.
-            If it is an integer, it will apply both to U and V.
-            If it is a tuple of two integers as nGivens = (JU, JV), JU
-            will be the limit number of rotations for U and JV the same for V.
-            nGivens argument is optional if tol is set but becomes mandatory otherwise.
-            tol: (float) this is the error target on U S V' against M.
-            if error <= tol, the algorithm stops. See relerr below for the error formula.
-            This argument is optional if nGivens is set, otherwise it becomes mandatory.
-            err_period: (int) it defines the period, in number of factors of U
-            or V, the error is compared to tol (reducing the period spares
-            some factors but increases slightly the computational cost because the error
-            is computed more often).
-            relerr: (bool) defines the type of error used to evaluate the stopping
-            criterion defined by tol. true for a relative error (\f$\| U' S V -
-            M\|_F \over \| M \|_F\f$) otherwise this is an absolute error (\f$\| U' S V - M\|_F\f$).
-            nGivens_per_fac: (int or tuple(int, int)) this argument is the number of Givens
-            rotations to set at most by factor of U and V.
-            If this is an integer it will be the same number of U and V.
-            Otherwise, if it is a tuple of integers (tU, tV), tU will be the number
-            of Givens rotations per factor for U and tV the same for V.
-            By default, this parameter is maximized for U and V,
-            i.e. tU = M.shape[0] / 2, tV = M.shape[1] / 2.
-            enable_large_Faust: see eigtj.
+            M: (np.ndarray or scipy.sparse.csr_matrix)
+                a real or complex matrix . The dtype must be float32, float64
+                or complex128 (the dtype might have a large impact on performance).
+            nGivens: (int or tuple(int, int))
+                defines the number of Givens rotations
+                that will be used at most to compute U and V.
+                If it is an integer, it will apply both to U and V.
+                If it is a tuple of two integers as nGivens = (JU, JV), JU
+                will be the limit number of rotations for U and JV the same for V.
+                nGivens argument is optional if tol is set but becomes mandatory otherwise.
+            tol: (float)
+                this is the error target on U S V' against M.
+                if error <= tol, the algorithm stops. See relerr below for the error formula.
+                This argument is optional if nGivens is set, otherwise it becomes mandatory.
+            err_period: (int)
+                it defines the period, in number of factors of U
+                or V, the error is compared to tol (reducing the period spares
+                some factors but increases slightly the computational cost because the error
+                is computed more often).
+            relerr: (bool)
+                defines the type of error used to evaluate the stopping
+                criterion defined by tol. true for a relative error (\f$\| U' S V - M\|_F \over \| M \|_F\f$)
+                otherwise this is an absolute error (\f$\| U' S V - M\|_F\f$).
+            nGivens_per_fac: (int or tuple(int, int))
+                this argument is the number of Givens
+                rotations to set at most by factor of U and V.
+                If this is an integer it will be the same number of U and V.
+                Otherwise, if it is a tuple of integers (tU, tV), tU will be the number
+                of Givens rotations per factor for U and tV the same for V.
+                By default, this parameter is maximized for U and V,
+                i.e. tU = M.shape[0] / 2, tV = M.shape[1] / 2.
+                enable_large_Faust: see eigtj.
 
             NOTE: In order to speed up the error computation of the approximate Faust, the
             algorithm follows a two-times strategy:
@@ -231,23 +244,19 @@ def svdtj(M, nGivens=None, tol=0, err_period=100, relerr=True,
         2.  D2, W2 = eigtj(M.H.dot(M), next_args...)
 
         It gives the following equalities (ignoring the fact that eigtj computes approximations):
-        \f[
-            W_1 D_1 W_1^* = M M^*
-        \f]
-        \f[
-                W_2 D_2 W_2^* = M^* M
-        \f]
+        \f[W_1 D_1 W_1^* = M M^*\f]
+        \f[W_2 D_2 W_2^* = M^* M\f]
         But because of the SVD \f$ M = USV^* \f$ we also have:
         \f[MM^* = U S V^* V S U^* = U S^2 U^* = W_1 D_1 W_1^*\f]
         \f[M^* M = V S U^* U S V^* = V S^2 V^* = W_2 D_2  W_2^*\f]
         It allows to identify the left singular vectors of M to W1,
         and likewise the right singular vectors to W2.
 
-        To compute a consistent approximation of S we observe that U and V are orthogonal hence \f$ S  = U^* M V \f$ so we ignore the off-diagonal coefficients of the approximation and take \f$ S = diag(U^* M V)  \approx diag(W_1^* M W_2)\f$
+        To compute a consistent approximation of S we observe that U and V are orthogonal hence \f$S  = U^* M V\f$ so we ignore the off-diagonal coefficients of the approximation and take \f$S = diag(U^* M V)  \approx diag(W_1^* M W_2)\f$
 
 
-     See also:
-        eigtj
+     \see
+        :py:func:`.eigtj`
     """
 
     # for nGivens_per_fac and nGivens checking
@@ -327,21 +336,28 @@ def pinvtj(M, nGivens=None, tol=0, err_period=100, relerr=True,
     Computes the pseudoinverse of M using svdtj.
 
     Args:
-        M: the matrix to compute the pseudoinverse.
-        nGivens: cf. svdtj
-        tol:  cf. svdtj (here the error is computed on U.H S^+ V).
-        err_period: cf. svdtj
-        relerr: cf. svdtj
-        nGivens_per_fac: cf. svdtj
-        enable_large_Faust: see svdtj.
+        M: (np.ndarray)
+            the matrix to compute the pseudoinverse.
+        nGivens: (int or tuple(int,int))
+            see :py:func:`.svdtj`
+        tol:  (float)
+            see :py:func:`.svdtj` (here the error is computed on U.H S^+ V).
+        err_period: (int)
+            see :py:func:`.svdtj`.
+        relerr: (bool)
+            see :py:func:`.svdtj`.
+        nGivens_per_fac: (int or tuple(int,int))
+            see :py:func:`.svdtj`.
+        enable_large_Faust: (bool)
+            see :py:func:`.svdtj`.
 
     Returns:
         The tuple V,Sp,Uh: such that V*numpy.diag(Sp)*Uh is the approximate of M^+.
-        - (np.array vector) Sp the inverses of the min(m, n) nonzero singular values
+        * (np.array vector) Sp the inverses of the min(m, n) nonzero singular values
         in ascending order. Note however that zeros might occur if M is rank r < min(*M.shape).
-        - (Faust objects) V, Uh orthonormal Fausts.
+        * (Faust objects) V, Uh orthonormal Fausts.
 
-
+<br/>
     Example:
         >>> from pyfaust.fact import pinvtj
         >>> from scipy.sparse import spdiags
@@ -355,8 +371,8 @@ def pinvtj(M, nGivens=None, tol=0, err_period=100, relerr=True,
         >>> print(np.round(err, decimals=6))
         0.00012
 
-    See also:
-        svdtj
+    \see
+    :py:func:`.svdtj`
     """
     from os import environ
     environ['PINVTJ_ERR'] = '1'
@@ -381,54 +397,66 @@ def eigtj(M, nGivens=None, tol=0, err_period=100, order='ascend', relerr=True,
     and targeted error.
 
     Args:
-        M: (numpy.ndarray or csr_matrix) the matrix to diagonalize. Must be
-        real and symmetric, or complex hermitian. Can be in dense or sparse
-        format. The dtype must be float32, float64
-        or complex128 (the dtype might have a large impact on performance).
-        nGivens: (int) targeted number of Givens rotations (this argument is optional
-        only if tol is set).
-        tol: (float) the tolerance error at which the algorithm stops. The
-        default value is zero so that stopping is based on reaching the
-        targeted nGivens (this argument is optional only if nGivens is set).
-        err_period: (int) it defines the period, in number of factors of V
-        the error is compared to tol (reducing the period spares
-        some factors but increases slightly the computational cost because the error
-        is computed more often).
-        order: order of eigenvalues, possible choices are ‘ascend,
-        'descend' or 'undef' (to avoid a sorting operation and save some time).
-        nGivens_per_fac: (int) targeted number of Givens rotations per factor
-        of V. Must be an integer between 1 to floor(M.shape[0]/2) (the default
-        value).
-        relErr: (bool) the type of error used as stopping criterion.  True
-        for the relative error norm(V*D*V'-M, 'fro')/norm(M, 'fro'), False
-        for the absolute error norm(V*D*V'-M, 'fro').
-        verbosity: (int) the level of verbosity. The greater the value the more
-        info is displayed. It can be helpful to understand for example why the
-        algorithm stopped before reaching the tol error or the number of Givens
-        (nGivens).
-        enable_large_Faust: (bool)  if true, it allows to compute a transform
-        that doesn't worth it regarding its complexity compared to the matrix
-        M. Otherwise by default, an exception is raised before the algorithm starts.
+        M: (numpy.ndarray or csr_matrix)
+            the matrix to diagonalize. Must be
+            real and symmetric, or complex hermitian. Can be in dense or sparse
+            format. The dtype must be float32, float64
+            or complex128 (the dtype might have a large impact on performance).
+        nGivens: (int)
+            targeted number of Givens rotations (this argument is optional
+            only if tol is set).
+        tol: (float)
+            the tolerance error at which the algorithm stops. The
+            default value is zero so that stopping is based on reaching the
+            targeted nGivens (this argument is optional only if nGivens is set).
+        err_period: (int)
+            it defines the period, in number of factors of V
+            the error is compared to tol (reducing the period spares
+            some factors but increases slightly the computational cost because the error
+            is computed more often).
+        order: (str)
+            order of eigenvalues, possible choices are ‘ascend,
+            'descend' or 'undef' (to avoid a sorting operation and save some time).
+        nGivens_per_fac: (int)
+            targeted number of Givens rotations per factor
+            of V. Must be an integer between 1 to floor(M.shape[0]/2) (the default
+            value).
+        relErr: (bool)
+            the type of error used as stopping criterion.  True
+            for the relative error norm(V*D*V'-M, 'fro')/norm(M, 'fro'), False
+            for the absolute error norm(V*D*V'-M, 'fro').
+        verbosity: (int)
+            the level of verbosity. The greater the value the more
+            info is displayed. It can be helpful to understand for example why the
+            algorithm stopped before reaching the tol error or the number of Givens
+            (nGivens).
+        enable_large_Faust: (bool)
+            if true, it allows to compute a transform
+            that doesn't worth it regarding its complexity compared to the matrix
+            M. Otherwise by default, an exception is raised before the algorithm starts.
+
+
+    Remarks:
+        * When ‘nGivens’ and ‘tol’ are used simultaneously, the number of
+        Givens rotations in V may be smaller than specified by ‘nGivens’ if
+        the error criterion is met first, and the achieved error may be
+        larger than specified if ‘nGivens’ is reached first during the
+        iterations of the truncated Jacobi algorithm.
+
+        * When nGivens_per_fac > 1, all factors have exactly nGivens_per_fac
+        except the leftmost one which may have fewer if the total number of
+        Givens rotations is not a multiple of nGivens_per_fact
 
 
     Returns:
-        The tuple (W,V):
-           - W (numpy.ndarray) the vector of the approximate eigenvalues of M
-           (in ascending order by default).
-           - V the Faust object representing the approximate eigenvector
+        * W: (numpy.ndarray)
+            the vector of the approximate eigenvalues of M
+            (in ascending order by default).
+        * V: (Faust)
+            the Faust object representing the approximate eigenvector
             transform. The column V[:, i] is the eigenvector
-            corresponding to the eigenvalue W[i].<br/>
+            corresponding to the eigenvalue W[i].
 
-    Remarks:
-        - When  ‘nGivens’ and ‘tol’ are used simultaneously, the number of Givens
-        rotations in V may be smaller than specified by ‘nGivens’ if the error
-        criterion is met first, and the achieved error may be larger than specified
-        if ‘nGivens’ is reached first during the iterations of the truncated Jacobi
-        algorithm.
-        - When nGivens_per_fac > 1, all factors have exactly
-        nGivens_per_fac except the leftmost one which may have fewer if the
-        total number of Givens rotations is not a multiple of
-        nGivens_per_fact
 
     References:
     [1]   Le Magoarou L., Gribonval R. and Tremblay N., "Approximate fast
@@ -466,8 +494,8 @@ def eigtj(M, nGivens=None, tol=0, err_period=100, order='ascend', relerr=True,
         >>> Dhat5, Uhat5 = eigtj(Lap, tol=0.01, order='undef')
         >>> assert((np.sort(Dhat5) == Dhat2).all())
 
-    See also:
-        svdtj
+    \see
+        :py:func:`.svdtj`
     """
     if not isinstance(M, scipy.sparse.csr_matrix):
         M = _check_fact_mat('eigtj()', M)
@@ -522,21 +550,35 @@ def hierarchical_py(A, J, N, res_proxs, fac_proxs, is_update_way_R2L=False,
     PALM4MSA-hierarchical factorization.
 
     Args:
-        A: (np.ndarray) the matrix to factorize. The dtype can be float32 or float64 (it might change the performance).
-        J: number of factors.
-        N: number of iterations of PALM4MSA calls.
-        res_proxs: the residual factor proximity operators.
-        fac_proxs: the main factor proximity operators.
-        is_update_way_R2L: True to update factors from the right to left in PALM4MSA, False for the inverse order.
-        is_fact_side_left: True to slit the left-most factor in the hierarchical factorization, False to split right-most factor.
-        compute_2norm_on_arrays: True to compute left/right factors of the current one updated as arrays instead of computing the Faust norms.
-        norm2_max_iter: the maximum number of iterations of the 2-norm computation algorithm.
-        norm2_threshold: the threshold stopping criterion of the 2-norm computation algorithm.
-        use_csr: True to update factors as CSR matrix in PALM4MSA.
-        dev: 'cpu' or 'gpu', to use CPU or GPU Faust in the algorithm.
+        A: (np.ndarray)
+            the matrix to factorize. The dtype can be float32 or float64 (it might change the performance).
+        J: (int)
+            number of factors.
+        N: (int)
+            number of iterations of PALM4MSA calls.
+        res_proxs: (list[pyfaust.proj.proj_gen])
+            the residual factor proximity operators.
+        fac_proxs: (list[pyfaust.proj.proj_gen])
+            the main factor proximity operators.
+        is_update_way_R2L: (bool)
+            True to update factors from the right to left in PALM4MSA, False for the inverse order.
+        is_fact_side_left: (bool)
+             True to slit the left-most factor in the hierarchical factorization, False to split right-most factor.
+        compute_2norm_on_arrays: (bool)
+             True to compute left/right factors of the current one updated as arrays instead of computing the Faust norms.
+        norm2_max_iter: (int)
+             the maximum number of iterations of the 2-norm computation algorithm.
+        norm2_threshold: (float)
+             the threshold stopping criterion of the 2-norm computation algorithm.
+        use_csr: (bool)
+             True to update factors as CSR matrix in PALM4MSA.
+        dev: (str)
+             'cpu' or 'gpu', to use CPU or GPU Faust in the algorithm.
 
     Returns:
         the Faust resulting from the factorization of A.
+
+    :py:func:`.palm4mspalm4msa_py`
     """
     S = Faust([A], dev=dev, dtype=A.dtype)
     l2_ = 1
@@ -596,24 +638,38 @@ def palm4msa_py(A, J, N, proxs, is_update_way_R2L=False, S=None, _lambda=1,
     PALM4MSA factorization.
 
     Args:
-        A: (np.ndarray) the matrix to factorize. The dtype can be float32 or float64 (it might change the performance).
-        J: number of factors.
-        N: number of iterations of PALM4MSA.
-        proxs: the factor proximity operators.
-        is_update_way_R2L: True to update factors from the right to left in PALM4MSA, False for the inverse order.
-        S: The Faust (sequence of factors) to initialize the PALM4MSA. By
-        default, the first factor to be updated is zero, the other are the
-        identity/eye matrix.
-        compute_2norm_on_arrays: True to compute left/right factors of the current one updated as arrays instead of computing the Faust norms.
-        norm2_max_iter: the maximum number of iterations of the 2-norm computation algorithm.
-        norm2_threshold: the threshold stopping criterion of the 2-norm computation algorithm.
-        use_csr: True to update factors as CSR matrix in PALM4MSA.
-        dev: 'cpu' or 'gpu', to use CPU or GPU Faust in the algorithm.
+        A: (np.ndarray)
+                the matrix to factorize. The dtype can be float32 or float64 (it might change the performance).
+        J: (int)
+            number of factors.
+        N: (int)
+             number of iterations of PALM4MSA.
+        proxs: (list[pyfaust.proj.proj_gen])
+             the factor proximity operators.
+        is_update_way_R2L: (bool)
+             True to update factors from the right to left in PALM4MSA, False for the inverse order.
+        S: (:py:class:`pyfaust.Faust`)
+             The Faust (sequence of factors) to initialize the PALM4MSA. By
+             default, the first factor to be updated is zero, the other are the
+             identity/eye matrix.
+        compute_2norm_on_arrays: (bool)
+             True to compute left/right factors of the current one updated as arrays instead of computing the Faust norms.
+        norm2_max_iter: (int)
+             the maximum number of iterations of the 2-norm computation algorithm.
+        norm2_threshold: (float)
+             the threshold stopping criterion of the 2-norm computation algorithm.
+        use_csr: (bool)
+             True to update factors as CSR matrix in PALM4MSA.
+        dev: (str)
+             'cpu' or 'gpu', to use CPU or GPU Faust in the algorithm.
 
     Returns:
         the Faust resulting from the factorization of A and its scale factor
         lambda (note that lambda is already applied to the output Faust. It is
         returned only for information, which is useful in hierarchical_py).
+
+    \see
+    :py:func:`.hierarchical_py`
     """
 
     dims = [(prox.constraint._num_rows, prox.constraint._num_cols) for prox in
@@ -711,15 +767,20 @@ def palm4msa(M, p, ret_lambda=False, backend=2016, on_gpu=False):
     Factorizes the matrix M with Palm4MSA algorithm using the parameters set in p.
 
     Args:
-        M: the numpy array to factorize. The dtype must be float32, float64
-        or complex128 (the dtype might have a large impact on performance).
-        p: the The pyfaust.factparams.ParamsPalm4MSA instance to define the algorithm parameters.
-        ret_lambda: set to True to ask the function to return the scale factor (False by default).
-        backend: the C++ implementation to use (default to 2016, 2020 backend
-        should be faster for most of the factorizations).
-        on_gpu: if True the GPU implementation is executed (this option applies only to 2020 backend).
+        M: (np.ndarray)
+            the numpy array to factorize. The dtype must be float32, float64
+            or complex128 (the dtype might have a large impact on performance).
+        p: (:py:class:`pyfaust.factparams.ParamsPalm4MSA`)
+            parameters instance to define the algorithm parameters.
+        ret_lambda: (bool)
+            set to True to ask the function to return the scale factor (False by default).
+        backend: (str)
+            the C++ implementation to use (default to 2016, 2020 backend
+            should be faster for most of the factorizations).
+        on_gpu: (bool)
+            if True the GPU implementation is executed (this option applies only to 2020 backend).
 
-    NOTE: If backend=2020 and independently to the StoppingCriterion defined in p,
+    NOTE: If backend==2020 and independently to the StoppingCriterion defined in p,
     it is possible to stop the algorithm manually at any iteration by the key
     combination CTRL-C.
     The last Faust computed in the factorization process will be returned.
@@ -747,7 +808,8 @@ def palm4msa(M, p, ret_lambda=False, backend=2016, on_gpu=False):
         - FACTOR 0 (double) SPARSE, size 500x32, density 0.15625, nnz 2500
         - FACTOR 1 (double) DENSE, size 32x32, density 1, nnz 1024
 
-    See also pyfaust.factparams.ParamsPalm4msaWHT to factorize a Hadamard matrix using the SKPERM projector.
+    \see :py:class:`pyfaust.factparams.ParamsPalm4msaWHT` to factorize a
+    Hadamard matrix using the :py:func:`pyfaust.proj.skperm` projector.
     """
     if(not isinstance(p, pyfaust.factparams.ParamsPalm4MSA)):
         raise TypeError("p must be a ParamsPalm4MSA object.")
@@ -799,18 +861,23 @@ def palm4msa_mhtp(M, palm4msa_p, mhtp_p, ret_lambda=False, on_gpu=False):
 
 
     Args:
-        M: the numpy array to factorize. The dtype must be float32, float64
-        or complex128 (the dtype might have a large impact on performance).
-        palm4msa_p: the The pyfaust.factparams.ParamsPalm4MSA instance to
-        define the PALM4MSA algorithm parameters.
-        mhtp_p: the pyfaust.factparams.MHTPParams instance to define the MHTP algorithm parameters.
-        ret_lambda: set to True to ask the function to return the scale factor (False by default).
-        on_gpu: if True the GPU implementation is executed.
+        M: (np.ndarray)
+            the numpy array to factorize. The dtype must be float32, float64
+            or complex128 (the dtype might have a large impact on performance).
+        palm4msa_p: (:py:class:`pyfaust.factparams.ParamsPalm4MSA`)
+            instance of parameters to define the PALM4MSA algorithm parameters.
+        mhtp_p: (:py:class:`pyfaust.factparams.MHTPParams`)
+            instance of parameters to define the MHTP algorithm parameters.
+        ret_lambda: (bool)
+            set to True to ask the function to return the scale factor (False by default).
+        on_gpu: (bool)
+            if True the GPU implementation is executed.
 
     Returns:
-        The Faust object resulting of the factorization.
-        if ret_lambda == True then the function returns a tuple (Faust, lambda).
+        * The Faust object resulting of the factorization.
+        * if ret_lambda == True then the function returns a tuple (Faust, lambda).
 
+    <br/>
     Example:
 		>>> from pyfaust.fact import palm4msa_mhtp
 		>>> from pyfaust.factparams import ParamsPalm4MSA, StoppingCriterion, MHTPParams
@@ -829,9 +896,8 @@ def palm4msa_mhtp(M, palm4msa_p, mhtp_p, ret_lambda=False, on_gpu=False):
         - FACTOR 0 (double) SPARSE, size 500x32, density 0.15625, nnz 2500
         - FACTOR 1 (double) DENSE, size 32x32, density 1, nnz 1024
 
-    <b/> See also pyfaust.factparams.MHTPParams
-    <b/> See also pyfaust.fact.palm4msa
-    <b/> See also pyfaust.fact.hierarchical_mhtp
+    \see  :py:class:`pyfaust.factparams.MHTPParams`,
+    :py:func:`.palm4msa`, :py:func:`pyfaust.fact.hierarchical_mhtp`
     """
     palm4msa_p.use_MHTP = mhtp_p
     return palm4msa(M, palm4msa_p, ret_lambda=ret_lambda, backend=2020, on_gpu=on_gpu)
@@ -845,14 +911,24 @@ def hierarchical_mhtp(M, hierar_p, mhtp_p, ret_lambda=False, ret_params=False,
     pyfaust.fact.hierarchical.
 
     Args:
-        M: the numpy array to factorize. The dtype must be float32, float64
-        or complex128 (the dtype might have a large impact on performance).
-        p: is a set of hierarchical factorization parameters. See pyfaust.fact.hierarchical.
-        mhtp_p: the pyfaust.factparams.MHTPParams instance to define the MHTP algorithm parameters.
-        on_gpu: if True the GPU implementation is executed.
-        ret_lambda: set to True to ask the function to return the scale factor (False by default).
-        ret_params: set to True to ask the function to return the
-        ParamsHierarchical instance used (False by default).
+        M: (np.ndarray)
+            the numpy array to factorize. The dtype must be float32, float64
+            or complex128 (the dtype might have a large impact on performance).
+        p: (:py:class:`pyfaust.factparams.ParamsHierarchical`)
+            is a set of hierarchical factorization parameters. See
+            :py:func:`.hierarchical`.
+        mhtp_p: (py:class:`pyfaust.factparams.MHTPParams`)
+             the instance to define the MHTP algorithm parameters.
+        on_gpu: (bool)
+             if True the GPU implementation is executed.
+        ret_lambda: (bool)
+             set to True to ask the function to return the scale factor (False by default).
+        ret_params: (bool)
+             set to True to ask the function to return the
+             :py:class:`pyfaust.factparams.ParamsHierarchical` instance used (False by default).
+
+    Returns:
+        See :py:func:`.hierarchical`
 
 
     Example:
@@ -872,7 +948,8 @@ def hierarchical_mhtp(M, hierar_p, mhtp_p, ret_lambda=False, ret_params=False,
 		>>> param.is_verbose = True
 		>>> F = hierarchical_mhtp(M, param, mhtp_param)
 
-    <b/> See also pyfaust.fact.hierarchical, pyfaust.fact.palm4msa_mhtp
+    \see :py:func:`.hierarchical`,
+    :py:func:`.palm4msa_mhtp`
     """
     hierar_p.use_MHTP = mhtp_p
     return hierarchical(M, hierar_p, ret_lambda=False, ret_params=False, backend=2020,
@@ -909,15 +986,10 @@ def _palm4msa_fgft(Lap, p, ret_lambda=False):
 
 def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
                  on_gpu=False):
-    """
+    r"""
     Factorizes the matrix M using the hierarchical PALM4MSA algorithm according to the parameters set in p.
 
-    @note This function has its shorthand pyfaust.faust_fact(). For
-    convenience you might use it like this:<br/>
-            <code>
-            from pyfaust import *;
-            F = faust_fact(M, p) # equiv. to hierarchical(M, p)
-            </code>
+    NOTE: :py:func:`pyfaust.faust_fact()` is an alias of this function.
 
     Basically, the hierarchical factorization works in a sequence of splits in two of the
     last factor.
@@ -928,38 +1000,48 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
     We call \f$S_1\f$ the main factor and \f$R_1\f$ the residual factor.
     On step 2, \f$R_1\f$ is split in two such as \f$R_1 \approx S_2 R_2\f$, which gives:
         \f[M \approx S_1 S_2 R_2 \f]
-    And so on until the algorithm reaches the targeted number of factors:
+    And so on until the algorithm reaches the targeted number
+    of factors:
         \f[M \approx S_1 S_2 ... S_{N-1} R_N \f]
-    If p.is_fact_side_left is False, the residual is factorized toward left, so
+    If `p.is_fact_side_left` is False, the residual is factorized toward left, so
     it gives rather :
-        \f[M \approx R_1 S_1 \\ \vdots \\ M \approx R_2 S_2 S_1 \\ \vdots \\ M \approx R_N S_{N-1}  S_2 S_1 ... \f]
+        \f[M \approx R_1 S_1 \\ \\ M \approx R_2 S_2 S_1 \\ \vdots \\ M \approx R_N S_{N-1}  ... S_2 S_1 \f]
 
     Args:
-        M: the numpy array to factorize. The dtype must be float32, float64
-        or complex128 (the dtype might have a large impact on performance).
-        p: is a set of hierarchical factorization parameters. It might be a fully defined instance of parameters (pyfaust.factparams.ParamsHierarchical) or a simplified expression which designates a pre-defined parametrization:
-            - 'hadamard' to use pre-defined parameters typically used to factorize a Hadamard matrix of order a power of two (see pyfaust.demo.hadamard).
-            - ['rectmat', j, k, s] to use pre-defined parameters used for
-            instance in factorization of the MEG matrix which is a rectangular
-            matrix of size m*n such that m < n (see pyfaust.demo.bsl); j is the
-            number of factors, k the sparsity of the main factor's columns, and
-            s the sparsity of rows for all other factors except the residual factor
-            (that is the first factor here because the factorization is made
-            toward the left -- is_side_fact_left == true, cf.
-            pyfaust.factparams.ParamsHierarchical and pyfaust.factparams.ParamsHierarchicalRectMat).
-            <br/>The residual factor has a sparsity of P*rho^(num_facts-1). <br/> By default, rho == .8 and P = 1.4. It's possible to set custom values with for example p == ( ['rectmat', j, k, s], {'rho':.4, 'P':.7 }). <br/>The sparsity is here the number of non-zero elements.
-        backend: the C++ implementation to use (default to 2016, 2020 backend
-        should be faster for most of the factorizations).
-        on_gpu: if True the GPU implementation is executed (this option applies only to 2020 backend).
+        M: (numpy array)
+            the array to factorize. The dtype must be float32, float64
+            or complex128 (the dtype might have a large impact on performance).
+        p: (:py:class:`pyfaust.factparams.ParamsHierarchical`, list or str)
+            is a set of hierarchical factorization parameters. It might be a fully defined instance of parameters
+            (:py:class:`pyfaust.factparams.ParamsHierarchical`) or a simplified
+            expression which designates a pre-defined parameterization:
+                * 'hadamard' to use pre-defined parameters typically used to
+                    factorize a Hadamard matrix of order a power of two (see
+                    :py:class:`pyfaust.demo.hadamard`).
+                * ['rectmat', j, k, s] to use pre-defined parameters used for
+                    instance in factorization of the MEG matrix which is a rectangular
+                    matrix of size m*n such that m < n (see :py:class:`pyfaust.demo.bsl`); j is the
+                    number of factors, k the sparsity of the main factor's columns, and
+                    s the sparsity of rows for all other factors except the residual factor
+                    (that is the first factor here because the factorization is made
+                    toward the left -- is_side_fact_left == True, cf.
+                    :py:class:`pyfaust.factparams.ParamsHierarchical` and
+                    :py:class:`pyfaust.factparams.ParamsHierarchicalRectMat`).
+                    <br/>The residual factor has a sparsity of P*rho^(num_facts-1). <br/> By default, rho == .8 and P = 1.4. It's possible to set custom values with for example p == ( ['rectmat', j, k, s], {'rho':.4, 'P':.7 }). <br/>The sparsity is here the number of nonzero elements.
+        backend: (int)
+            the C++ implementation to use (default to 2016, 2020 backend
+            should be faster for most of the factorizations).
+        on_gpu: (bool)
+            if True the GPU implementation is executed (this option applies only to 2020 backend).
+        ret_lambda: (bool)
+            set to True to ask the function to return the scale factor (False by default).
+        ret_params: (bool)
+            set to True to ask the function to return the ParamsHierarchical instance used (False by default).
+            It is useful for consulting what precisely means the
+            simplified parameterizations used to generate a
+            :py:class:`pyfaust.factparams.ParamsHierarchical` instance and possibly adjust its attributes to factorize again.
 
-        ret_lambda: set to True to ask the function to return the scale factor (False by default).
-        ret_params: set to True to ask the function to return the
-        ParamsHierarchical instance used (False by default).
-        It is useful for consulting what precisely means the
-        simplified parametrizations used to generate a
-        ParamsHierarchical instance and possibly adjust its attributes to factorize again.
-
-    NOTE: If backend=2020 and independently to the StoppingCriterion-s defined in p,
+    NOTE: If backend==2020 and regardless to the StoppingCriterion-s defined in p,
     it is possible to stop any internal call to PALM4MSA manually at any iteration
     by the key combination CTRL-C.
     The last Faust computed in the PALM4MSA instance will be used to continue
@@ -968,22 +1050,22 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
     doesn't change anymore or only slightly, you might stop iterations by typing CTRL-C.
 
     Returns:
-        F the Faust object result of the factorization: Faust\f$([S_1, S_2, ...
-        ,S_{N-1}, R_N]])\f$
-        if p.is_fact_side_left == False, Faust\f$([R_N, S_{N-1}, ... , S_2,
-        S_1])\f$
-        otherwise.<br/>
-        if ret_lambda == True (and ret_params == False), then the function
-        returns the tuple (F,_lambda) (_lambda is the scale factor at the
-        end of factorization).<br/>
-        if ret_params == True (and ret_lambda == False), then the function
-        returns the tuple (F, p) (p being the ParamsHierarchical
-        instance really used by the algorithm).<br/>
-        if ret_lambda == True and ret_params == True, then the function
-        returns the tuple (F, _lambda, p).
+        * F the Faust object result of the factorization:
+            Faust\f$([S_1, S_2, ...  ,S_{N-1}, R_N]])\f$ if p.is_fact_side_left == False,
+            Faust\f$([R_N, S_{N-1}, ... , S_2, S_1])\f$ otherwise.<br/>
+        * if ret_lambda == True (and ret_params == False), then the function
+            returns the tuple (F,_lambda) (_lambda is the scale factor at the
+            end of factorization).<br/>
+        * if ret_params == True (and ret_lambda == False), then the function
+            returns the tuple (F, p) (p being the ParamsHierarchical
+            instance really used by the algorithm).<br/>
+        * if ret_lambda == True and ret_params == True, then the function
+            returns the tuple (F, _lambda, p).
 
+    <br/>
     Examples:
-        <b> 1. Fully Defined Parameters for a Random Matrix Factorization </b>
+
+            <b>1. Fully Defined Parameters for a Random Matrix Factorization</b>
         >>> from pyfaust.fact import hierarchical
         >>> from pyfaust.factparams import ParamsHierarchical, ConstraintList, StoppingCriterion
         >>> import numpy as np
@@ -1004,7 +1086,7 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
         - FACTOR 2 (double) SPARSE, size 32x32, density 0.09375, nnz 96
         - FACTOR 3 (double) SPARSE, size 32x32, density 0.325195, nnz 333
 
-        <b>2. Simplified Parameters for Hadamard Factorization</b>
+            <b>2. Simplified Parameters for Hadamard Factorization</b>
         >>> from pyfaust import wht
         >>> from pyfaust.fact import hierarchical
         >>> from numpy.linalg import norm
@@ -1023,6 +1105,7 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
         - FACTOR 2 (double) SPARSE, size 32x32, density 0.0625, nnz 64
         - FACTOR 3 (double) SPARSE, size 32x32, density 0.0625, nnz 64
         - FACTOR 4 (double) SPARSE, size 32x32, density 0.0625, nnz 64
+
         >>> FH2
         Faust size 32x32, density 0.3125, nnz_sum 320, 5 factor(s):
         - FACTOR 0 (double) SPARSE, size 32x32, density 0.0625, nnz 64
@@ -1033,11 +1116,10 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
 
 
        <br/>
-       See also pyfaust.factparams.ParamsHierarchicalWHT
+       \see  :py:class:`pyfaust.factparams.ParamsHierarchicalWHT`
        <br/>
 
-       <b> 3. Simplified Parameters for a Rectangular Matrix Factorization
-       (the BSL demo MEG matrix)</b>
+           <b>3. Simplified Parameters for a Rectangular Matrix Factorization (the BSL demo MEG matrix)</b>
        >>> from pyfaust import *
        >>> from pyfaust.fact import hierarchical
        >>> from scipy.io import loadmat
@@ -1060,6 +1142,7 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
        - FACTOR 6 (double) SPARSE, size 204x204, density 0.0392157, nnz 1632
        - FACTOR 7 (double) SPARSE, size 204x204, density 0.0392157, nnz 1632
        - FACTOR 8 (double) SPARSE, size 204x8193, density 0.0490196, nnz 81930
+
        >>> # verify the constraint k == 10, on column 4
        >>> np.count_nonzero(MEG16.factors(8)[:,4].toarray())
        10
@@ -1068,11 +1151,10 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
        8.0
 
 
-       <br/>
-       See also pyfaust.factparams.ParamsHierarchicalRectMat
+       \see :py:class:`pyfaust.factparams.ParamsHierarchicalRectMat`
        <br/>
 
-       <b>4. Simplified Parameters for the Discrete Fourier Transform Factorization</b>
+        <b>4. Simplified Parameters for the Discrete Fourier Transform Factorization</b>
        >>> from pyfaust import dft
        >>> from pyfaust.fact import hierarchical
        >>> from numpy.linalg import norm
@@ -1092,6 +1174,7 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
        - FACTOR 3 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
        - FACTOR 4 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
        - FACTOR 5 (complex) SPARSE, size 32x32, density 0.03125, nnz 32
+
        >>> FDFT2
        Faust size 32x32, density 0.34375, nnz_sum 352, 6 factor(s):
        - FACTOR 0 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
@@ -1101,7 +1184,7 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
        - FACTOR 4 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
        - FACTOR 5 (complex) SPARSE, size 32x32, density 0.03125, nnz 32
 
-       See also pyfaust.factparams.ParamsHierarchicalDFT
+       \see :py:class:`pyfaust.factparams.ParamsHierarchicalDFT`
        <br/>
 
         <b>5. Simplified Parameters for Hadamard Factorization without residual
@@ -1109,8 +1192,8 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
 
         This factorization parameterization is the same as the one shown in 2.
         except that there is no constraints at all on residual factors. See
-        pyfaust.factparams.ParamsHierarchicalNoResCons and
-        pyfaust.factparams.ParamsHierarchicalWHTNoResCons for more details.
+        :py:class:`pyfaust.factparams.ParamsHierarchicalNoResCons` and
+        :py:class:`pyfaust.factparams.ParamsHierarchicalWHTNoResCons` for more details.
 
         >>> from pyfaust import wht
         >>> from pyfaust.fact import hierarchical
@@ -1132,16 +1215,16 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
         - FACTOR 4 (double) SPARSE, size 32x32, density 0.0625, nnz 64
 
        <br/>
-       See also pyfaust.factparams.ParamsHierarchicalWHTNoResCons
+       \see :py:class:`pyfaust.factparams.ParamsHierarchicalWHTNoResCons`
        <br/>
 
-       <b> 6. Simplified Parameters for a Rectangular Matrix Factorization (the
+       <b>6. Simplified Parameters for a Rectangular Matrix Factorization (the
        BSL demo MEG matrix) without residual constraints</b>
 
        The factorization parameterization shown here is the same as in 3.
        except that there is no constraint at all on residual factors. See
-       pyfaust.factparams.ParamsHierarchicalNoResCons and
-       pyfaust.factparams.ParamsHierarchicalRectMatNoResCons for more details.
+       :py:class:`pyfaust.factparams.ParamsHierarchicalNoResCons` and
+       :py:class:`pyfaust.factparams.ParamsHierarchicalRectMatNoResCons` for more details.
        In the example below the MEG matrix is factorized according to the
        parameterization shown in 3. (aka "MEG") and on the other hand with
        the parameterization of interest here (aka "MEG_SIMPLE", with no
@@ -1164,11 +1247,14 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
         0.12601709513741005
 
        <br/>
-       <b>See also</b>  pyfaust.factparams.ParamsHierarchicalRectMatNoResCons
+       \see :py:class:`pyfaust.factparams.ParamsHierarchicalRectMatNoResCons`
        <br/>
 
-    <b/> See also pyfaust.factparams.ParamsHierarchicalRectMat, pyfaust.factparams.ParamsHierarchicalSquareMat, pyfaust.factparams.ParamsHierarchicalDFT
-    <b/> See also pyfaust.factparams.ParamsHierarchicalRectMatNoResCons, pyfaust.factparams.ParamsHierarchicalWHTNoResCons
+    \see :py:class:`pyfaust.factparams.ParamsHierarchicalRectMat`,
+    :py:class:`pyfaust.factparams.ParamsHierarchicalSquareMat`,
+    :py:class:`pyfaust.factparams.ParamsHierarchicalDFT`,
+    :py:class:`pyfaust.factparams.ParamsHierarchicalRectMatNoResCons`,
+    :py:class:`pyfaust.factparams.ParamsHierarchicalWHTNoResCons`
 
     [1] <a href="https://hal.archives-ouvertes.fr/hal-01167948">Le Magoarou L. and Gribonval R., “Flexible multi-layer
     sparse approximations of matrices and applications”, Journal of Selected
@@ -1239,35 +1325,29 @@ def _prepare_hierarchical_fact(M, p, callee_name, ret_lambda, ret_params,
 # experimental block start
 def hierarchical_constends(M, p, A, B, ret_lambda=False, ret_params=False):
     """
-    Tries to approximate M by \f$ A \prod_j S_j B \f$ using the hierarchical.
+    Tries to approximate M by \f$A \prod_j S_j B\f$ using the hierarchical.
 
     It needs to add one additional residual constraint and also one factor
     constraint into p relatively to the number of constraints you would
-    have defined if you just factorized M into prod \f$ \prod_j S_j \f$.
+    have defined if you just factorized M into prod \f$\prod_j S_j\f$.
 
     Examples:
-        from pyfaust import rand
-        from pyfaust import hierarchical
-        import numpy as np
-        from numpy.random import rand
-        from pyfaust.factparams import (ParamsHierarchical, ConstraintList,
-                                        StoppingCriterion)
-        M = rand(32,32)
-        A = rand(32,32)
-        B = rand(32,32)
-        stop_crit1 = StoppingCriterion(num_its=200)
-        stop_crit2 = StoppingCriterion(num_its=200)
-        fact_cons = ConstraintList('splin', 5, 32, 32, 'sp', 96, 32, 32, 'sp', 96,
-                                   32, 32,
-                                   'sp', 225, 32, 32)
-        res_cons = ConstraintList('normcol', 1, 32, 32,
-                                  'normcol', 1, 32, 32, 'sp', 666, 32, 32, 'sp',
-                                  333, 32, 32)
-        param = ParamsHierarchical(fact_cons, res_cons, stop_crit1, stop_crit2)
-        F, _lambda = hierarchical_constends(M, param, A, B, ret_lambda=True)
-
-        assert(np.allclose(F.factors(0).toarray(), A))
-        assert(np.allclose(F.factors(5).toarray(), B))
+        >>> from pyfaust import rand
+        >>> from pyfaust import hierarchical
+        >>> import numpy as np
+        >>> from numpy.random import rand
+        >>> from pyfaust.factparams import (ParamsHierarchical, ConstraintList, StoppingCriterion)
+        >>> M = rand(32,32)
+        >>> A = rand(32,32)
+        >>> B = rand(32,32)
+        >>> stop_crit1 = StoppingCriterion(num_its=200)
+        >>> stop_crit2 = StoppingCriterion(num_its=200)
+        >>> fact_cons = ConstraintList('splin', 5, 32, 32, 'sp', 96, 32, 32, 'sp', 96, 32, 32, 'sp', 225, 32, 32)
+        >>> res_cons = ConstraintList('normcol', 1, 32, 32, 'normcol', 1, 32, 32, 'sp', 666, 32, 32, 'sp', 333, 32, 32)
+        >>> param = ParamsHierarchical(fact_cons, res_cons, stop_crit1, stop_crit2)
+        >>> F, _lambda = hierarchical_constends(M, param, A, B, ret_lambda=True)
+        >>> assert(np.allclose(F.factors(0).toarray(), A))
+        >>> assert(np.allclose(F.factors(5).toarray(), B))
 
     """
     from pyfaust.factparams import ConstraintList
@@ -1323,30 +1403,27 @@ def hierarchical_constends(M, p, A, B, ret_lambda=False, ret_params=False):
 # experimental block start
 def palm4msa_constends(M, p, A, B=None, ret_lambda=False):
     """
-    Tries to approximate M by \f$ A \prod_j S_j B\f$ using palm4msa (B being optional).
+    Tries to approximate M by \f$A \prod_j S_j B\f$ using palm4msa (B being optional).
 
 
     Example:
-        from pyfaust import rand
-        from pyfaust.fact import palm4msa_constends
-        from pyfaust.factparams import (ParamsPalm4MSA, ConstraintList,
-                                        StoppingCriterion)
-        import numpy as np
-        from numpy.random import rand
-        from random import randint
-        n = 32
-        k = 16
-        M = rand(n, n)
-        A = rand(n, k)
-        B = rand(k, n)
-        stop_crit = StoppingCriterion(num_its=100)
-        consts = ConstraintList('spcol', randint(1, A.shape[1]), A.shape[1],
-                                                 B.shape[0])
-        param = ParamsPalm4MSA(consts, stop_crit)
-        F = palm4msa_constends(M, param, A, B)
-
-        assert(np.allclose(F.factors(0).toarray(), A))
-        assert(np.allclose(F.factors(2).toarray(), B))
+        >>> from pyfaust import rand
+        >>> from pyfaust.fact import palm4msa_constends
+        >>> from pyfaust.factparams import (ParamsPalm4MSA, ConstraintList, StoppingCriterion)
+        >>> import numpy as np
+        >>> from numpy.random import rand
+        >>> from random import randint
+        >>> n = 32
+        >>> k = 16
+        >>> M = rand(n, n)
+        >>> A = rand(n, k)
+        >>> B = rand(k, n)
+        >>> stop_crit = StoppingCriterion(num_its=100)
+        >>> consts = ConstraintList('spcol', randint(1, A.shape[1]), A.shape[1], B.shape[0])
+        >>> param = ParamsPalm4MSA(consts, stop_crit)
+        >>> F = palm4msa_constends(M, param, A, B)
+        >>> assert(np.allclose(F.factors(0).toarray(), A))
+        >>> assert(np.allclose(F.factors(2).toarray(), B))
 
     """
     from pyfaust.factparams import ConstraintList
@@ -1446,7 +1523,7 @@ def fgft_palm(U, Lap, p, init_D=None, ret_lambda=False, ret_params=False):
         print("err_Lap:", err_Lap)
 
 
-        #end of output:
+        #output:
         #	eig(Lap), U error: 1.36688422173e-13
         #	Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 1/3
         #	Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 2/3
@@ -1456,25 +1533,31 @@ def fgft_palm(U, Lap, p, init_D=None, ret_lambda=False, ret_params=False):
 
 
     Args:
-        Lap: (numpy.ndarray) The Laplacian matrix.
-        U: (numpy.ndarray) The Fourier matrix.
-        init_D: (numpy.ndarray) The initial diagonal vector. if None it will be the ones() vector by default.
-        p: (ParamsHierarchical) The PALM hierarchical algorithm parameters.
-        ret_lambda: (bool) True to return the lambda scale factor used in PALM algorithm.
-        ret_params: (bool) True to return the parameters used by the hierarchical PALM algorithm (normally it's p except if p is a simplifed form of parameters -- not instance of ParamsHierarchical).
+        Lap: (numpy.ndarray)
+            The Laplacian matrix.
+        U: (numpy.ndarray)
+            The Fourier matrix.
+        init_D: (numpy.ndarray)
+            The initial diagonal vector. if None it will be the ones() vector by default.
+        p: (ParamsHierarchical)
+            The PALM hierarchical algorithm parameters.
+        ret_lambda: (bool)
+            True to return the lambda scale factor used in PALM algorithm.
+        ret_params: (bool)
+            True to return the parameters used by the hierarchical PALM algorithm (normally it's p except if p is a simplifed form of parameters -- not instance of ParamsHierarchical).
 
     Returns:
         FGFT: (Faust object) The Fourier transform.
-        - if ret_lambda == True (and ret_params == False), then the function returns the
-        tuple (FGFT,_lambda) (_lambda is the scale factor at the end of
-        factorization).
-        - if ret_params == True (and ret_lambda == False), then the function returns the
-        tuple (FGFT, p) (p being the ParamsHierarchical instance really used by the
-        algorithm).
-        - if ret_lambda == True and ret_params == True, then the function returns the
-        tuple (FGFT, _lambda, p).
+            * if ret_lambda == True (and ret_params == False), then the function returns the
+                tuple (FGFT,_lambda) (_lambda is the scale factor at the end of
+                factorization).
+            * if ret_params == True (and ret_lambda == False), then the function returns the
+                tuple (FGFT, p) (p being the ParamsHierarchical instance really used by the
+                algorithm).
+            * if ret_lambda == True and ret_params == True, then the function returns the
+                tuple (FGFT, _lambda, p).
 
-    See also:
+    \see
         hierarchical, eigtj
 
     References:
@@ -1521,38 +1604,48 @@ def butterfly(M, type="bbtree", perm=None, diag_opt=False, mul_perm=None):
     and P is a permutation matrix determined by the optional parameter perm.
 
     Args:
-        M: the numpy ndarray. The dtype must be float32, float64
-        or complex128 (the dtype might have a large impact on performance). M
-        must be square and its dimension must be a power of two.
-        type: (str) the type of factorization 'right'ward, 'left'ward or
-        'bbtree'. More precisely: if 'left' (resp. 'right') is used then at each stage of the
-        factorization the most left factor (resp. the most right factor) is split in two.
-        If 'bbtree' is used then the matrix is factorized according to a Balanced
-        Binary Tree (which is faster as it allows parallelization).
+        M: (numpy ndarray)
+            The dtype must be float32, float64
+            or complex128 (the dtype might have a large impact on performance). M
+            must be square and its dimension must be a power of two.
+        type: (str)
+            the type of factorization 'right'ward, 'left'ward or
+            'bbtree'. More precisely: if 'left' (resp. 'right') is used then at each stage of the
+            factorization the most left factor (resp. the most right factor) is split in two.
+            If 'bbtree' is used then the matrix is factorized according to a Balanced
+            Binary Tree (which is faster as it allows parallelization).
         perm: five kinds of values are possible for this argument.
             1. perm is a list of column indices of the permutation matrix P which is such that
             the returned Faust is F = B@P where B is the Faust butterfly
-            approximation of M@P.T.
+            approximation of M @ P.T.
             If the list of indices is not a valid permutation the behaviour
             is undefined (however an invalid size or an out of bound index raise
             an exception).
+
             2. perm is a list of lists of permutation column indices as defined
             in 1. In that case, all permutations passed to the function are
             used as explained in 1, each one producing a Faust, the best one
             (that is the best approximation of M in the Frobenius norm) is kept and returned by butterfly.
+
             3. perm is 'default_8', this is a particular case of 2. Eight
             default permutations are used. For the definition of those
             permutations please refer to [2].
+
             4. perm is 'bitrev': in that case the permutation is the
             bit-reversal permutation (cf. pyfaust.bitrev_perm).
+
             5. By default this argument is None, no permutation is used (this
             is equivalent to using the identity permutation matrix in 1).
-        diag_opt: if True then the returned Faust is optimized using pyfaust.opt_butterfly_faust.
-        mul_perm: decides if the permutation is multiplied into the rightest
-        butterfly factor (mul_perm=True) or if this permutation is left apart as the rightest
-        factor of the Faust (mul_perm=False). It can't be True if diag_opt is True (an error is
-        raised otherwise). Defaultly, mul_perm=None which implies that mul_perm
-        is True iff diag_opt is False.
+
+        diag_opt: (bool)
+            if True then the returned Faust is optimized using pyfaust.opt_butterfly_faust.
+
+        mul_perm: (bool)
+            decides if the permutation is multiplied into the rightest butterfly factor (mul_perm=True)
+            or if this permutation is left apart as the rightest
+            factor of the Faust (mul_perm=False). It can't be True if diag_opt is True (an error is
+            raised otherwise). Defaultly, mul_perm=None which implies that mul_perm
+            is True iff diag_opt is False.
 
     Note: Below is an example of how to create a permutation scipy CSR matrix from a permutation list
     of indices (as defined by the perm argument) and conversely how to convert
@@ -1607,7 +1700,7 @@ def butterfly(M, type="bbtree", perm=None, diag_opt=False, mul_perm=None):
         1.1427230601405052e-15
 
 
-        Use simple permutations:
+    Use simple permutations:
         >>> import numpy as np
         >>> from random import randint
         >>> from pyfaust.fact import butterfly
@@ -1624,7 +1717,7 @@ def butterfly(M, type="bbtree", perm=None, diag_opt=False, mul_perm=None):
         >>> p2 = [1, 0, 3, 2]
         >>> F3 = butterfly(M, type='bbtree', perm=p2)
 
-        Use butterfly with a permutation defined by a list of indices J:
+    Use butterfly with a permutation defined by a list of indices J:
         >>> import numpy as np
         >>> from pyfaust.fact import butterfly
         >>> from pyfaust import Faust, wht, dft
@@ -1647,14 +1740,15 @@ def butterfly(M, type="bbtree", perm=None, diag_opt=False, mul_perm=None):
         learning of fast transforms, with guarantees. ICASSP, IEEE
         International Conference on Acoustics, Speech and Signal Processing,
         May 2022, Singapore, Singapore. (<a href="https://hal.inria.fr/hal-03438881">hal-03438881</a>) <br/>
-		[2] T. Dao, A. Gu, M. Eichhorn, A. Rudra, and C. Re,
-		“Learning Fast Algorithms for Linear Transforms Using
-		Butterfly Factorizations,” in Proceedings of the 36th
-		International Conference on Machine Learning. June
-		2019, pp. 1517–1527, PMLR
+        [2] T. Dao, A. Gu, M. Eichhorn, A. Rudra, and C. Re,
+        “Learning Fast Algorithms for Linear Transforms Using
+        Butterfly Factorizations,” in Proceedings of the 36th
+        International Conference on Machine Learning. June
+        2019, pp. 1517–1527, PMLR
 
-     See also:
-         pyfaust.wht, pyfaust.dft, pyfaust.rand_butterfly
+    \see
+        :py:func:`pyfaust.wht`, :py:func:`pyfaust.dft`,
+        :py:func:`pyfaust.rand_butterfly`
     """
     if mul_perm is None:
         mul_perm = not diag_opt

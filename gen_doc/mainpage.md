@@ -14,7 +14,7 @@ The FAµST toolbox is organized in several parts:
 
 - The FAµST core library, a C++ backend implementing FAµST-related data structures and algorithms,
 - [matfaust](./namespacematfaust.html), a Matlab frontend to the FAµST library,
-- [pyfaust](./namespacepyfaust.html), a Python frontend to the FAµST library.
+- [pyfaust](./namespacepyfaust.html), a Python frontend to the FAµST library. A [sphinx](./sphinx/index.html) doc is also available for pyfaust.
 
 
 @INCLUDE_SPECIFIC_DOC@
