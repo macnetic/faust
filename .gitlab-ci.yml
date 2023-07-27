@@ -491,6 +491,8 @@ pages:
         artifacts: true
       - job: test_linux_pkg_release
       - job: test_macos_pkg_release
+      - job: pkg_linux_purepy_release_extra_pyver
+        artifacts: true
     artifacts:
         paths:
             - public/
