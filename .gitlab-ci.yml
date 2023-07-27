@@ -465,6 +465,7 @@ pages:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
         - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_FILE_NAME=faust-$CI_COMMIT_TAG -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DEXCLUDE_FAUST_LIB_INSTALL=ON  -DINCLUDE_ALL_SYS_INSTALL_INSTRUCS=ON -DGEN_SPHINX_DOC=ON ..'
         - sed -i "s/project = '\(.*\)'/project = '\1 "${CI_COMMIT_TAG}"'/" ../sphinx/conf.py # put version of FAµST in sphinx doc
+        - export PYTHONPATH=$PWD/wrapper/python # sphinx need to import pyfaust to generate its doc
         - make doc
         - make doc_exclu_class_filtering
         - make zip_data_archive # generate the FAµST data archive
