@@ -2594,7 +2594,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         if F.dtype != 'complex':
             # return Faust(csr_matrix(F.shape)) # TODO: debug pyx code
             return Faust(csr_matrix((np.array([0.]).astype(F.dtype),
-                                     ([0],[0])), (F.shape)))
+                                     ([0],[0])), (F.shape)), dev=F.device)
         else:
             # return 1/2j * (F + F.conj())
             I = _cplx2real_op(F)[F.shape[0]:2*F.shape[0],
@@ -4741,7 +4741,8 @@ def check_dev(dev):
 
 def _cplx2real_op(op):
     if pyfaust.isFaust(op):
-        return Faust([_cplx2real_op(op.factors(i)) for i in range(op.numfactors())])
+        return Faust([_cplx2real_op(op.factors(i)) for i in
+                      range(op.numfactors())], dev=op.device)
     else:
         rop = np.real(op) # doesn't change type for scipy matrix if it is one
         iop = np.imag(op)

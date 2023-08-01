@@ -725,7 +725,7 @@ namespace Faust
 		//TODO: take optional arguments into account
 		GPUModHandler::get_singleton()->check_gpu_mod_loaded();
 		for(auto m: factors)
-			push_back(m);
+			push_back(m, cloning_fact);
 	}
 
 	template<typename FPP>
