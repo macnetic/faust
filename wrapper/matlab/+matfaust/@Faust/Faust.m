@@ -999,7 +999,7 @@ classdef Faust < handle % subclass of handle for Faust.delete to be called on cl
         function iF = imag(F)
             import matfaust.Faust
             if isreal(F)
-                iF = matfaust.Faust(sparse([], [], [], size(F, 1), size(F, 2))); % zero
+                iF = matfaust.Faust(sparse([], [], [], size(F, 1), size(F, 2)), 'dev', device(F)); % zero
             else
                 % iF = 1 / 2j * (F - conj(F));
                 iF = cplx2real_op(F);
@@ -1048,7 +1048,15 @@ classdef Faust < handle % subclass of handle for Faust.delete to be called on cl
 		%> <p/>@b See @b also Faust.class, Faust.double
 		%======================================================================
 		function sF = single(F)
-			sF = matfaust.Faust(call_mex(F, 'single'), true, F.dev, 'float');
+			if ~ isreal(F)
+				dF = real(F);
+			elseif strcmp(class(F), 'single')
+				sF = F;
+				return;
+			else
+				dF = F;
+			end
+			sF = matfaust.Faust(call_mex(dF, 'single'), true, F.dev, 'float');
 			% 2nd argument (true) is for is_real attribute
 		end
 
@@ -1088,8 +1096,16 @@ classdef Faust < handle % subclass of handle for Faust.delete to be called on cl
 		%> <p/>@b See @b also Faust.class, Faust.single
 		%======================================================================
 		function dF = double(F)
-			dF = matfaust.Faust(call_mex(F, 'double'), true, F.dev, 'double');
-			% 2nd argument (true) is for is_real attribute
+			if ~ isreal(F)
+				% complex F
+				dF = real(F);
+			elseif strcmp('single', F)
+				dF = matfaust.Faust(call_mex(F, 'double'), true, F.dev, 'double');
+				% 2nd argument (true) is for is_real attribute
+			else
+				% already real and double
+				dF = F;
+			end
 		end
 
 		%======================================================================
@@ -3757,7 +3773,7 @@ function real_op = cplx2real_op(op)
 		for i=1:numfactors(op)
 			facts{1, i} = cplx2real_op(factors(op, i));
 		end
-		real_op = matfaust.Faust(facts);
+		real_op = matfaust.Faust(facts, 'dev', device(op));
 	else
 		rop = real(op);
 		iop = imag(op);
