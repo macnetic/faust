@@ -292,13 +292,12 @@ void test_set_zeros()
 	cout << "OK" << endl;
 }
 
-void test_resize()
+void test_resize_set()
 {
 	cout << "test MatSparse<FPP,GPU2>::resize" << endl;
 	auto nrows = 5;
 	auto ncols = 8;
 	auto cpu_sp_mat = Faust::MatSparse<double, Cpu>::randMat(nrows, ncols, .2);
-	Faust::MatSparse<double, Cpu> cpu_sp_mat2;
 	Faust::MatSparse<double, GPU2> gpu_sp_mat(
 			nrows,
 			ncols,
@@ -306,16 +305,25 @@ void test_resize()
 			cpu_sp_mat->getValuePtr(),
 			cpu_sp_mat->getRowPtr(),
 			cpu_sp_mat->getColInd());
-	auto nnz = 33;
 	auto nnrows = 50;
 	auto nncols = 123;
+	auto cpu_sp_mat2 = Faust::MatSparse<double, Cpu>::randMat(nnrows, nncols, .2);
+	MatSparse<double, Cpu> cpu_sp_mat2_csc(*cpu_sp_mat2);
+	auto nnz = cpu_sp_mat2->getNonZeros();
+	cpu_sp_mat2_csc.transpose(); // equiv to making a CSR to CSC conversion (because set() works from CSC matrix)
 	gpu_sp_mat.resize(nnz, nnrows, nncols);
-	gpu_sp_mat.tocpu(cpu_sp_mat2);
-	assert(cpu_sp_mat2.getNbRow() == nnrows);
-	assert(cpu_sp_mat2.getNbCol() == nncols);
-	assert(cpu_sp_mat2.getNonZeros() == nnz);
+	// set() doesn't change size of buffers if it is already adjusted properly (so it allows to test if resize worked)
+	// int32_t nnz, int32_t nrows, int32_t ncols, @FAUST_SCALAR_FOR_GM@* values, int32_t* rowids, int32_t* colptr
+	gpu_sp_mat.set(nnz, nnrows, nncols, cpu_sp_mat2_csc.getValuePtr(), cpu_sp_mat2_csc.getColInd(), cpu_sp_mat2_csc.getRowPtr());
+	assert(gpu_sp_mat.getNbRow() == nnrows);
+	assert(gpu_sp_mat.getNbCol() == nncols);
+	assert(gpu_sp_mat.getNonZeros() == nnz);
+	MatDense<double, GPU2> gpu_ds_mat(gpu_sp_mat);
+	MatDense<double, Cpu> cpu_ds_mat2(*cpu_sp_mat2);
+	test_ds_mat_eq(gpu_ds_mat, cpu_ds_mat2);
 	cout << "OK" << endl;
 	delete cpu_sp_mat;
+	delete cpu_sp_mat2;
 }
 
 void test_scal_mul()
@@ -429,13 +437,13 @@ int main()
 	Faust::enable_gpu_mod();
 	test_gpu_norm();
 	test_gpu_ctor_and_tocpu();
-	test_gpu_ctor_and_tocpu2();
+	test_gpu_ctor_and_tocpu();
 	test_spgemm();
 	test_eq_operator_rhs_cpu();
 	test_transpose();
 	test_adjoint();
 	test_conjugate();
-	test_resize();
+	test_resize_set();
 	test_set_zeros();
 	test_set_eyes();
 	test_clone();
