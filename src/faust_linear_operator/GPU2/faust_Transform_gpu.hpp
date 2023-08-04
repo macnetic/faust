@@ -349,17 +349,22 @@ namespace Faust
 			auto gen_mat = get_fact(id, /*cloning*/ false);
 			auto smat = dynamic_cast<MatSparse<FPP,GPU2>*>(gen_mat);
 			MatSparse<FPP,Cpu> cpu_smat;
+			// warning: arguments are of type faust_unsigned_int in this function but tocpu below uses int32_t
+			int32_t nr, nc, nz;
 			if(transpose)
 			{
 				auto t_smat = smat->clone();
 				t_smat->transpose();
-				t_smat->tocpu(d_outer_count_ptr, d_inner_ptr, d_elts, (int32_t*) num_rows, (int32_t*) num_cols, (int32_t*) nnz);
+				t_smat->tocpu(d_outer_count_ptr, d_inner_ptr, d_elts, &nr, &nc, &nz);
 				delete t_smat;
 			}
 			else
 			{
-				smat->tocpu(d_outer_count_ptr, d_inner_ptr, d_elts, (int32_t*) num_rows, (int32_t*) num_cols, (int32_t*) nnz);
+				smat->tocpu(d_outer_count_ptr, d_inner_ptr, d_elts, &nr, &nc, &nz);
 			}
+			*num_rows =  nr;
+			*num_cols =  nc;
+			*nnz = nz;
 		}
 
 

@@ -191,12 +191,6 @@ namespace Faust
 				sp_mat.resize(nnz, nrows, ncols);
 			}
 			tocpu(sp_mat.getRowPtr(), sp_mat.getColInd(), sp_mat.getValuePtr());
-			// although the above tocpu copy works perfectly if sp_mat is copied later with the MatSparse Cpu copy ctor
-			// then there is a segfault on the underlying SparseMatrix eigen object (why?)
-			// workaround: copy the buffer in a clean new MatSparse to avoid later issues
-			// mitigations: normally the copy to cpu is just to verify what's on the GPU memory so the performance is not so important
-			//TOFIX
-			sp_mat = MatSparse<@FAUST_SCALAR_FOR_GM@,Cpu>(nnz, nrows, ncols, sp_mat.getValuePtr(), sp_mat.getRowPtr(), sp_mat.getColInd());
 		}
 
 
@@ -212,7 +206,7 @@ namespace Faust
 		void Faust::MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::transpose()
 		{
 			auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
-		    spm_funcs->transpose(gpu_mat);
+			spm_funcs->transpose(gpu_mat);
 		}
 
 	template<>
@@ -262,34 +256,38 @@ namespace Faust
 		}
 
 	template<>
-		void Faust::MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::set(int32_t nnz, int32_t nrows, int32_t ncols, @FAUST_SCALAR_FOR_GM@* values, int32_t* rowptr, int32_t* colids)
+		void Faust::MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::set(int32_t nnz, int32_t nrows, int32_t ncols, @FAUST_SCALAR_FOR_GM@* values, int32_t* rowids, int32_t* colptr)
 		{
 			auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 			if(gpu_mat != nullptr)
-				spm_funcs->cpu_set(gpu_mat, nnz, nrows, ncols, (@GM_SCALAR@*) reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(values), rowptr, colids);
+				// the resizing is made in gpu_mod if needed
+				// we set a CSR matrix with the buffers of a CSC matrix, so nrows and ncols are swapped
+				spm_funcs->cpu_set(gpu_mat, nnz, ncols, nrows, (@GM_SCALAR@*) reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(values), colptr, rowids);
+			// convert to CSR matrix
+			this->transpose();
 		}
 
 	template<>
-		void Faust::MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::set(int32_t nnz, int32_t nrows, int32_t ncols, @FAUST_SCALAR_FOR_GM@* values, size_t* rowptr, size_t* colids)
+		void Faust::MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::set(int32_t nnz, int32_t nrows, int32_t ncols, @FAUST_SCALAR_FOR_GM@* values, size_t* rowids, size_t* colptr)
 		{
-			int32_t* rowptr2 = new int32_t[nrows+1];
-			int32_t* colids2 = new int32_t[nnz];
+			int32_t* rowids2 = new int32_t[nnz];
+			int32_t* colptr2 = new int32_t[ncols+1];
 			
-			for(int32_t i=0;i < nrows+1; i++)
-			{
-				//TODO: verify if rowptr[i] is not larger than int32_t capability
-				// if not raise an exception
-				rowptr2[i] = (int32_t) rowptr[i];
-			}
-
 			for(int32_t i=0;i < nnz; i++)
 			{
-				//TODO: verify if colids[i] is not larger than int32_t capability
-				colids2[i] = (int32_t) colids[i];
+				//TODO: verify if rowids[i] is not larger than int32_t capability
+				// if not raise an exception
+				rowids2[i] = (int32_t) rowids[i];
 			}
-			set(nnz, nrows, ncols, values, rowptr2, colids2);
-			delete [] rowptr2;
-			delete [] colids2;
+
+			for(int32_t i=0;i < ncols+1; i++)
+			{
+				//TODO: verify if colptr[i] is not larger than int32_t capability
+				colptr2[i] = (int32_t) colptr[i];
+			}
+			set(nnz, nrows, ncols, values, rowids2, colptr2);
+			delete [] rowids2;
+			delete [] colptr2;
 		}
 
 	template<>

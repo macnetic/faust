@@ -84,8 +84,12 @@ namespace Faust
 				void setEyes();
 				void setIdentity(int32_t dim);
 				void setZeros();
-				void set(int32_t nnz, int32_t nrows, int32_t ncols, FPP* values, int32_t* rowptr, int32_t* colids);
-				void set(int32_t nnz, int32_t nrows, int32_t ncols, FPP* values, size_t* rowptr, size_t* colids);
+				/**
+				 * Set this from CSC matrix buffers.
+				 * TODO: this function should be called set_from_csc (and a function set_from_csr added), the same things must be done in CPU counterpart
+				 */
+				void set(int32_t nnz, int32_t nrows, int32_t ncols, FPP* values, int32_t* rowids, int32_t* colptr);
+				void set(int32_t nnz, int32_t nrows, int32_t ncols, FPP* values, size_t* rowids, size_t* colptr);
 				MatSparse<FPP, GPU2>* clone(const int32_t dev_id=-1, const void* stream=nullptr) const;
 				MatGeneric<FPP,GPU2>* Clone(const bool isOptimize=false) const;
 				void real(MatSparse<Real<FPP>, GPU2>& real_mat) const;
