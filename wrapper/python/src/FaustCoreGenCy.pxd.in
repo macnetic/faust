@@ -154,4 +154,6 @@ cdef extern from "FaustCoreCpp.h":
 
     cdef cppclass @CPP_CORE_CLASS@2[FPP, FPP2]:
         @staticmethod
-        @CPP_CORE_CLASS@[FPP2]* real(@CPP_CORE_CLASS@[FPP]*)
+        @CPP_CORE_CLASS@[FPP2]* to_double(@CPP_CORE_CLASS@[FPP]*)
+        @staticmethod
+        @CPP_CORE_CLASS@[FPP2]* to_float(@CPP_CORE_CLASS@[FPP]*)

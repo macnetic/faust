@@ -1049,15 +1049,14 @@ classdef Faust < handle % subclass of handle for Faust.delete to be called on cl
 		%======================================================================
 		function sF = single(F)
 			if ~ isreal(F)
-				dF = real(F);
+				error('complex single is not supported in matfaust, only complex double is')
 			elseif strcmp(class(F), 'single')
 				sF = F;
 				return;
 			else
-				dF = F;
+				sF = matfaust.Faust(call_mex(F, 'single'), true, F.dev, 'float');
+				% 2nd argument (true) is for is_real attribute
 			end
-			sF = matfaust.Faust(call_mex(dF, 'single'), true, F.dev, 'float');
-			% 2nd argument (true) is for is_real attribute
 		end
 
 		%======================================================================
@@ -1066,7 +1065,7 @@ classdef Faust < handle % subclass of handle for Faust.delete to be called on cl
 		%>
 		%> @b Usage
 		%>
-		%> &nbsp;&nbsp;&nbsp; @b sF = double(F)
+		%> &nbsp;&nbsp;&nbsp; @b dF = double(F)
 		%>
 		%> @retval sF the double class/precision Faust.
 		%>
@@ -1082,28 +1081,25 @@ classdef Faust < handle % subclass of handle for Faust.delete to be called on cl
 		%> - FACTOR 3 (float) SPARSE, size 5x5, density 1, nnz 25
 		%> - FACTOR 4 (float) SPARSE, size 5x5, density 1, nnz 25
 		%>
-		%> >> dF = single(sF)
+		%> >> dF = double(sF)
 		%>dF =
 		%>
 		%>Faust size 5x5, density 5, nnz_sum 125, 5 factor(s):
-		%>- FACTOR 0 (float) SPARSE, size 5x5, density 1, nnz 25
-		%>- FACTOR 1 (float) SPARSE, size 5x5, density 1, nnz 25
-		%>- FACTOR 2 (float) SPARSE, size 5x5, density 1, nnz 25
-		%>- FACTOR 3 (float) SPARSE, size 5x5, density 1, nnz 25
-		%>- FACTOR 4 (float) SPARSE, size 5x5, density 1, nnz 25
+		%>- FACTOR 0 (double) SPARSE, size 5x5, density 1, nnz 25
+		%>- FACTOR 1 (double) SPARSE, size 5x5, density 1, nnz 25
+		%>- FACTOR 2 (double) SPARSE, size 5x5, density 1, nnz 25
+		%>- FACTOR 3 (double) SPARSE, size 5x5, density 1, nnz 25
+		%>- FACTOR 4 (double) SPARSE, size 5x5, density 1, nnz 25
 		%>
 		%> @endcode
 		%> <p/>@b See @b also Faust.class, Faust.single
 		%======================================================================
 		function dF = double(F)
-			if ~ isreal(F)
-				% complex F
-				dF = real(F);
-			elseif strcmp('single', F)
+			if strcmp('single', class(F))
 				dF = matfaust.Faust(call_mex(F, 'double'), true, F.dev, 'double');
 				% 2nd argument (true) is for is_real attribute
 			else
-				% already real and double
+				% already double or complex double
 				dF = F;
 			end
 		end

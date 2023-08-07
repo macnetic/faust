@@ -1827,23 +1827,25 @@ namespace Faust
 
 template<typename FPP>
 	template<typename FPP2>
-Faust::TransformHelper<Real<FPP2>, Cpu>* Faust::TransformHelper<FPP, Cpu>::real()
+Faust::TransformHelper<FPP2, Cpu>* Faust::TransformHelper<FPP, Cpu>::cast()
 {
-	std::vector<MatGeneric<Real<FPP2>,Cpu>*> real_data;
+	this->eval_sliced_Transform();
+	this->eval_fancy_idx_Transform();
+	std::vector<MatGeneric<FPP2,Cpu>*> real_data;
 	MatSparse<FPP, Cpu> *curfac_sp;
 	MatDense<FPP, Cpu> *curfac_ds;
 	for(auto curfac: this->transform->data)
 	{
 		if(curfac_ds = dynamic_cast<MatDense<FPP, Cpu>*>(curfac))
 		{
-			auto real_fac = new MatDense<Real<FPP2>,Cpu>(curfac->getNbRow(), curfac->getNbCol());
-			*real_fac = curfac_ds->template to_real<Real<FPP2>>();
+			auto real_fac = new MatDense<FPP2,Cpu>(curfac->getNbRow(), curfac->getNbCol());
+			*real_fac = curfac_ds->template to_real<FPP2>();
 			real_data.push_back(real_fac);
 		}
 		else if(curfac_sp = dynamic_cast<MatSparse<FPP, Cpu>*>(curfac))
 		{
-			auto real_fac = new MatSparse<Real<FPP2>,Cpu>(curfac->getNbRow(), curfac->getNbCol());
-			*real_fac = curfac_sp->template to_real<Real<FPP2>>();
+			auto real_fac = new MatSparse<FPP2,Cpu>(curfac->getNbRow(), curfac->getNbCol());
+			*real_fac = curfac_sp->template to_real<FPP2>();
 			real_data.push_back(real_fac);
 		}
 		else
@@ -1851,7 +1853,7 @@ Faust::TransformHelper<Real<FPP2>, Cpu>* Faust::TransformHelper<FPP, Cpu>::real(
 			throw std::runtime_error("real() failed because a factor is neither a MatDense or a MatSparse");
 		}
 	}
-	auto th = new TransformHelper<Real<FPP2>, Cpu>(real_data, 1.0, false, false, true);
+	auto th = new TransformHelper<FPP2, Cpu>(real_data, 1.0, false, false, true);
 	return th;
 }
 

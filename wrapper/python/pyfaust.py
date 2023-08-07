@@ -2550,7 +2550,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             - FACTOR 3 (float) SPARSE, size 10x10, density 0.5, nnz 50
             - FACTOR 4 (float) SPARSE, size 10x10, density 0.5, nnz 50
 
-            >>> F.astype("complex")
+            >>> F.astype('complex')
             Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s):
             - FACTOR 0 (complex) SPARSE, size 10x10, density 0.5, nnz 50
             - FACTOR 1 (complex) SPARSE, size 10x10, density 0.5, nnz 50
@@ -2565,10 +2565,10 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             return F.clone(dev=F.device)
         if F.dtype == 'complex':
             if dtype == 'float32':
-                return F.real.astype('float32')
-            else:
-                # dtype is float64
-                return F.real
+                return Faust(core_obj=F.real.m_faust.to_float())
+            else:  # dtype in ['float64', 'double']:
+                   # (dtype sanitized and != complex)
+                return Faust(core_obj=F.real.m_faust.to_double())
         else:
             return Faust([F.factors(i).astype(dtype) for i in
                           range(F.numfactors())], dev=F.device)

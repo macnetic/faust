@@ -1,3 +1,5 @@
+DEF BUILD_FLOAT_PYX = '@BUILD_FLOAT_PYX@'
+
 def type2dtype(type):
     """
     Returns dtype('float32'), dtype('float64') or dtype('complex128')
@@ -820,12 +822,21 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
         core.@CORE_OBJ@ = self.@CORE_OBJ@.adjoint()
         return core
 
-    def real(self):
-        core = @CORE_CLASS_REAL@(core=True)
-        (<@CORE_CLASS_REAL@>core).@CORE_OBJ_REAL@ = \
-        <FaustCoreCy.@CPP_CORE_CLASS@[@REAL_TYPE@]*>FaustCoreCy.@CPP_CORE_CLASS@2[@TYPE@,
-                                                                                 @REAL_TYPE@].real((<@CORE_CLASS@?>self).@CORE_OBJ@)
+    def to_double(self):
+        core = FaustCoreGenDbl@PROC@(core=True)
+        (<FaustCoreGenDbl@PROC@>core).core_faust_dbl = \
+        <FaustCoreCy.@CPP_CORE_CLASS@[double]*>FaustCoreCy.@CPP_CORE_CLASS@2[@TYPE@, double].to_double((<@CORE_CLASS@?>self).@CORE_OBJ@)
         return core
+
+    def to_float(self):
+        IF BUILD_FLOAT_PYX == 'ON':
+            core = FaustCoreGenFlt@PROC@(core=True)
+            (<FaustCoreGenFlt@PROC@>core).core_faust_flt = \
+                    <FaustCoreCy.@CPP_CORE_CLASS@[float]*>FaustCoreCy.@CPP_CORE_CLASS@2[@TYPE@, float].to_float((<@CORE_CLASS@?>self).@CORE_OBJ@)
+            return core
+        ELSE:
+            raise Exception("Float support has been disabled at build time")
+        END
 
     def dtype(self):
         return type2dtype('@TYPE@')

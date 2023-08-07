@@ -661,6 +661,7 @@ classdef FaustTest < matlab.unittest.TestCase
 			for i=1:length(fausts)
 				F = fausts{i};
 				rF = real(F);
+				this.verifyTrue(isreal(rF))
 				this.verifyTrue(norm(full(rF)-real(full(F)))/norm(full(F)) < 1e-6)
 			end
 		end
@@ -673,8 +674,38 @@ classdef FaustTest < matlab.unittest.TestCase
 			for i=1:length(fausts)
 				F = fausts{i};
 				iF = imag(F);
+				this.verifyTrue(isreal(iF))
 				this.verifyTrue(norm(full(iF)-imag(full(F)))/norm(full(F)) < 1e-6)
 			end
+		end
+
+		function testDouble(this)
+			disp('Test Faust.double')
+			rF = matfaust.rand(15, 22);
+			cF = matfaust.rand(32, 12, 'field', 'complex');
+			sF = matfaust.rand(15, 22, 'class', 'single');
+			this.verifyEqual(full(double(rF)), full(rF), 'AbsTol', 1e-5)
+			this.verifyEqual(class(double(rF)), 'double')
+			this.verifyEqual(full(double(cF)), full(cF), 'AbsTol', 1e-5)
+			this.verifyEqual(class(double(rF)), 'double')
+			this.verifyEqual(full(double(sF)), double(full(sF)), 'AbsTol', 1e-5)
+			this.verifyEqual(class(double(sF)), 'double')
+		end
+
+		function testSingle(this)
+			disp('Test Faust.single')
+			rF = matfaust.rand(15, 22);
+			cF = matfaust.rand(32, 12, 'field', 'complex');
+			sF = matfaust.rand(15, 22, 'class', 'single');
+			this.verifyTrue(norm(full(single(rF)) - single(full(rF))) < 1e-4)
+			this.verifyEqual(class(single(rF)), 'single')
+			this.verifyError(@() full(single(cF)), '')
+			this.verifyEqual(full(single(sF)), single(full(sF)), 'RelTol', 1e-4)
+			this.verifyEqual(class(single(sF)), 'single')
+		end
+
+		function testComplex(this)
+			disp('Test Faust.double')
 		end
 
 	end

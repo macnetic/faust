@@ -249,7 +249,7 @@ namespace Faust
 			bool containsOnlyButterflySparse();
 			FPP get_item(faust_unsigned_int i, faust_unsigned_int j);
 			template<typename FPP2>
-			TransformHelper<Real<FPP2>, Cpu>* real();
+			TransformHelper<FPP2, Cpu>* cast();
 		};
 
 }

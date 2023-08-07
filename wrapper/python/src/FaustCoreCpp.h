@@ -63,6 +63,9 @@ template<typename FPP>
 FaustCoreCpp<FPP, GPU2>* clone_cpu2gpu(FaustCoreCpp<FPP, Cpu>* cpu_t);
 #endif
 
+template<typename FPP, typename FPP2, FDevice DEV>
+struct FaustCoreCpp2;
+
 template<typename FPP, FDevice DEV=Cpu>
 class FaustCoreCpp
 {
@@ -228,6 +231,10 @@ friend FaustCoreCpp<FPP, Cpu>* clone_gpu2cpu<>(FaustCoreCpp<FPP, GPU2>* gpu_t);
 friend FaustCoreCpp<FPP, GPU2>* clone_cpu2gpu<>(FaustCoreCpp<FPP, Cpu>* cpu_t);
 
 #endif
+friend struct FaustCoreCpp2<FPP, double, DEV>;
+friend struct FaustCoreCpp2<FPP, float, DEV>;
+friend struct FaustCoreCpp2<FPP, std::complex<double>, DEV>;
+
 
 };
 
@@ -250,7 +257,8 @@ bool _is_gpu_mod_enabled();
 template<typename FPP, typename FPP2, FDevice DEV=Cpu>
 struct FaustCoreCpp2
 {
-    static FaustCoreCpp<FPP2,DEV>* real(FaustCoreCpp<FPP,DEV>* core);
+    static FaustCoreCpp<FPP2,DEV>* to_double(FaustCoreCpp<FPP,DEV>* core);
+    static FaustCoreCpp<FPP2,DEV>* to_float(FaustCoreCpp<FPP,DEV>* core);
 };
 
 template<typename FPP, typename FPP2>

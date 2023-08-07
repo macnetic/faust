@@ -66,7 +66,7 @@ ctest_python:
       - export LD_PRELOAD=/usr/lib64/libomp.so
     variables: {BUILD_WRAPPER_PYTHON: "ON", SLOW_TESTS: "OFF", DONT_PYPLOT_FAUST_TIME: "ON", NOCPPTESTS: "ON", NOPY2: "ON", BUILD_MULTITHREAD: "ON", BUILD_FLOAT_PYX: "ON"} #, GIT_STRATEGY: none}
     script:
-      - ctest -O ctest.log -S ./CDashConfScript.cmake -j4 --output-junit junit_output.xml
+      - ctest -O ctest.log -S ./CDashConfScript.cmake -j4 --output-junit junit_output.xml || echo "forcing job to continue"
       - misc/continuous_integration/jobs/junit_html_report.sh python_pyfaust_test_output
         # fail the ci job if any ctest test (or unit test) have failed
       - echo "Failed tests:"
@@ -684,6 +684,7 @@ pkg_linux_purepy_release_openblaso:
         - cd build
         - 'cmake -G "Visual Studio 16 2019" -DBUILD_WRAPPER_MATLAB=OFF -DBUILD_WRAPPER_PYTHON=ON -DSLOW_TESTS=OFF -DCPACK_PACKAGE_VERSION=%VERSION% -DCMAKE_INSTALL_PREFIX=win_pkg_build -DBUILD_TESTING=OFF -DMATIO_LIB_FILE=C:/faust_libs/libmatio_standalone.lib -DREMOTE_DATA_URL="%DURL%" -DREMOTE_DATA_FILE="%DFILE%" -DEXPERIMENTAL_PKG=%EXPERIMENTAL_PKG% -DUSE_GPU_MOD=ON  -DCMAKE_PREFIX_PATH=../gpu_mod -DBUILD_MULTITHREAD=ON -DBUILD_FLOAT_PYX=ON -DCMAKE_BUILD_TYPE=%BUILD_CONFIG% -DVCOMPLIB_PATH=C:\faust_libs\vcomp140.dll ..'
         - cmake --build . --target FAUST --config %BUILD_CONFIG%
+        - cmake --build . --target python_cpp --config %BUILD_CONFIG%
         - cd wrapper/python
           # only python3 for windows
           #- 'start %PYTHON2_PATH% setup.py bdist_wheel'
@@ -713,6 +714,7 @@ pkg_win_purepy_rev:
         - tags
     needs:
         - job: ctest_python
+          artifacts: true
 
 pkg_win_purepy_release:
     extends: .pkg_win_purepy

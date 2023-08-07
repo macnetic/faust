@@ -913,34 +913,33 @@ namespace Faust
 
 	template<typename FPP>
 		template<typename FPP2>
-		TransformHelper<Real<FPP2>,GPU2>* TransformHelper<FPP,GPU2>::real()
+		TransformHelper<FPP2,GPU2>* TransformHelper<FPP,GPU2>::cast()
 		{
 			this->eval_sliced_Transform();
 			this->eval_fancy_idx_Transform();
-			std::vector<MatGeneric<Real<FPP2>,GPU2>*> real_data;
+			std::vector<MatGeneric<FPP2,GPU2>*> cast_data;
 			MatSparse<FPP, GPU2> *curfac_sp;
 			MatDense<FPP, GPU2> *curfac_ds;
 			for(auto curfac: this->transform->data)
 			{
 				if(curfac_ds = dynamic_cast<MatDense<FPP, GPU2>*>(curfac))
 				{
-					auto real_fac = new MatDense<Real<FPP2>,GPU2>(curfac->getNbRow(), curfac->getNbCol(), /* cpu_data*/ nullptr, /* no_alloc*/ false, /* dev_id*/ -1, /* stream*/ nullptr);
-					*real_fac = curfac_ds->template to_real<Real<FPP2>>();
-					real_data.push_back(real_fac);
+					auto cast_fac = new MatDense<FPP2,GPU2>(curfac->getNbRow(), curfac->getNbCol(), /* cpu_data*/ nullptr, /* no_alloc*/ false, /* dev_id*/ -1, /* stream*/ nullptr);
+					*cast_fac = curfac_ds->template cast<FPP2>();
+					cast_data.push_back(cast_fac);
 				}
 				else if(curfac_sp = dynamic_cast<MatSparse<FPP, GPU2>*>(curfac))
 				{
-					auto real_fac = new MatSparse<Real<FPP2>,GPU2>(curfac->getNbRow(), curfac->getNbCol(), /* nnz*/ 0, /* values */ nullptr, /* rowptr*/ nullptr, /* colinds*/ nullptr);
-					*real_fac = curfac_sp->template to_real<Real<FPP2>>();
-					real_data.push_back(real_fac);
+					auto cast_fac = new MatSparse<FPP2,GPU2>(curfac->getNbRow(), curfac->getNbCol(), /* nnz*/ 0, /* values */ nullptr, /* rowptr*/ nullptr, /* colinds*/ nullptr);
+					*cast_fac = curfac_sp->template cast<FPP2>();
+					cast_data.push_back(cast_fac);
 				}
 				else
 				{
 					throw std::runtime_error("real() failed because a factor is neither a MatDense nor a MatSparse");
 				}
 			}
-			return new TransformHelper<Real<FPP2>, GPU2>(real_data, 1.0, false, false, true);
-
+			return new TransformHelper<FPP2, GPU2>(cast_data, 1.0, false, false, true);
 		}
 
 	template<typename FPP>

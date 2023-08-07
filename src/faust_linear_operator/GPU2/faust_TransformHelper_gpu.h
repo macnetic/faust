@@ -68,7 +68,7 @@ namespace Faust
 				void convertToSparse();
 				void convertToDense();
 				template<typename FPP2>
-				TransformHelper<Real<FPP2>, GPU2>* real();
+				TransformHelper<FPP2, GPU2>* cast();
 
 
 				void operator=(TransformHelper<FPP,GPU2>& th);

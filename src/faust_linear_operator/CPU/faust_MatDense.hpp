@@ -454,11 +454,21 @@ namespace Faust
 
 	template<typename FPP>
 		template<typename FPP2>
-		MatDense<FPP2, Cpu> MatDense<FPP, Cpu>::to_real() const
+		MatDense<Real<FPP2>, Cpu> MatDense<FPP, Cpu>::to_real() const
 		{
 			Faust::MatDense<FPP2, Cpu> ddmat;
 			ddmat.resize(this->getNbRow(), this->getNbCol());
 			ddmat.mat = mat.real().eval().template cast<Real<FPP2>>();
+			return ddmat;
+		}
+
+	template<typename FPP>
+		template<typename FPP2>
+		MatDense<FPP2, Cpu> MatDense<FPP, Cpu>::cast() const
+		{
+			Faust::MatDense<FPP2, Cpu> ddmat;
+			ddmat.resize(this->getNbRow(), this->getNbCol());
+			ddmat.mat = mat.eval().template cast<FPP2>();
 			return ddmat;
 		}
 

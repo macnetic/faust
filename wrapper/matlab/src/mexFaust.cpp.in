@@ -16,7 +16,7 @@
 /*  of the project : <http://faust.inria.fr>                         */
 /*                                                                          */
 /*                              License:                                    */
-/*  Copyright (2021):  	Hakim HADJ-DJILANI                                  */
+/*  Copyright (2023):  	Hakim HADJ-DJILANI                                  */
 /*  			Nicolas Bellot, Adrien Leman, Thomas Gautrais,      */
 /*                      Luc Le Magoarou, Remi Gribonval                     */
 /*                      INRIA Rennes, FRANCE                                */
@@ -119,6 +119,44 @@ typedef @FAUST_SCALAR@ SCALAR;
 typedef @FAUST_FPP@ FPP;
 
 using namespace Faust;
+
+// TODO: the faust_single/double functions below should be in faust_single/double.cpp
+using CPLX = std::complex<Real<SCALAR>>;
+using CPLX_DBL = std::complex<double>;
+
+template<>
+void faust_single<CPLX, DEV>(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs)
+{
+	throw std::runtime_error("Faust in complex single precision are not supported (yet).");
+}
+
+template <>
+void faust_single<Real<SCALAR>, DEV>(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs)
+{
+	TransformHelper<Real<SCALAR>,DEV>* core_ptr = convertMat2Ptr<TransformHelper<Real<SCALAR>,DEV> >(prhs[1]);
+	// Real<SCALAR> can be double or float
+
+	TransformHelper<float, DEV>* th = core_ptr->template cast<float>();
+	plhs[0] = convertPtr2Mat<TransformHelper<float, DEV> >(th);
+}
+
+
+template <>
+void faust_double<CPLX, DEV>(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs)
+{
+	// the Faust is complex<double>, it stays this type
+	plhs[0] = const_cast<mxArray*>(prhs[1]); // harmless
+}
+
+template <>
+void faust_double<Real<SCALAR>, DEV>(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs)
+{
+	TransformHelper<Real<SCALAR>, DEV>* core_ptr = convertMat2Ptr<TransformHelper<Real<SCALAR>, DEV> >(prhs[1]);
+	// the Faust is float or double, convert to double
+
+	TransformHelper<double, DEV>* th = core_ptr->template cast<double>();
+	plhs[0] = convertPtr2Mat<TransformHelper<double, DEV> >(th);
+}
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {

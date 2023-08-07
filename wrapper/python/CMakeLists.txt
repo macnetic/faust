@@ -25,7 +25,7 @@ if(BUILD_READ_MAT_FILE AND NOT NO_MATIO)
 			set(PYTHON_EXT_EXTRA_OBJECTS "[ '${MATIO_STATIC_LIB_PATH}', '${HDF5_STATIC_LIB_PATH}', '${Z_STATIC_LIB_PATH}',  '${SZIP_STATIC_LIB_PATH}']") # the order matters for compilation
 		else() # WIN32 (tested on Visual Studio)
 			# compile the pyx and all faust .cpp needed (instead to link to faust.lib)
-			set(PY_EXT_SOURCES "${PY_EXT_SOURCES}+glob('${FAUST_PYTHON_SRC_SRC_DIR}/*.cpp')")
+			#set(PY_EXT_SOURCES "${PY_EXT_SOURCES}+glob('${FAUST_PYTHON_SRC_SRC_DIR}/*.cpp')")
 			# extract the name (without .lib suffix) and the path of each lib
 			# 1/ matio
 			get_filename_component(MATIO_LIB_DIR ${MATIO_STATIC_LIB_PATH} DIRECTORY)
@@ -43,11 +43,11 @@ if(BUILD_READ_MAT_FILE AND NOT NO_MATIO)
 			get_filename_component(HDF5_LIB_NAME ${HDF5_STATIC_LIB_PATH} NAME_WE)
 			set(FAUST_PYTHON_LIBS "${FAUST_PYTHON_LIBS},'${HDF5_LIB_NAME}'")
 			set(FAUST_PYTHON_LIB_DIR "${FAUST_PYTHON_LIB_DIR},'${HDF5_LIB_DIR}'")
-			set(PYTHON_EXT_EXTRA_OBJECTS "None")
+			set(PYTHON_EXT_EXTRA_OBJECTS "[]")
 		endif()
 	else()
 		# Build using matio dynamic library or static standalone library (including defs for zlib, hdf5 and szip -- which is normally in hdf5 static lib)
-		set(PYTHON_EXT_EXTRA_OBJECTS "None")
+		set(PYTHON_EXT_EXTRA_OBJECTS "[]")
 		get_filename_component(MATIO_LIB_DIR ${MATIO_LIB_FILE} DIRECTORY)
 		get_filename_component(MATIO_LIB_NAME ${MATIO_LIB_FILE} NAME_WE)
 		if((NOT WIN32 OR ${CMAKE_GENERATOR} MATCHES "MinGW Makefiles") AND NOT ${MATIO_LIB_FILE} MATCHES ".*\\.a")
@@ -58,7 +58,7 @@ if(BUILD_READ_MAT_FILE AND NOT NO_MATIO)
 	endif()
 else()
 
-	set(PYTHON_EXT_EXTRA_OBJECTS "None")
+	set(PYTHON_EXT_EXTRA_OBJECTS "[]")
 endif()
 
 set(PROC_LIST CPU)
@@ -104,11 +104,11 @@ if(BUILD_FLOAT_PYX)
 endif()
 
 
-set(PY_EXT_SOURCES "${PY_EXT_SOURCES}+glob('${FAUST_PYTHON_BIN_DIR}/FaustCoreCppCPU*.cpp')+['${FAUST_PYTHON_SRC_SRC_DIR}/FaustCoreCpp.cpp']")
+#set(PY_EXT_SOURCES "${PY_EXT_SOURCES}+glob('${FAUST_PYTHON_BIN_DIR}/FaustCoreCppCPU*.cpp')+['${FAUST_PYTHON_SRC_SRC_DIR}/FaustCoreCpp.cpp']")
 
-if(USE_GPU_MOD)
-	set(PY_EXT_SOURCES "${PY_EXT_SOURCES}+glob('${FAUST_PYTHON_BIN_DIR}/FaustCoreCppGPU*.cpp')")
-endif()
+#if(USE_GPU_MOD)
+#	set(PY_EXT_SOURCES "${PY_EXT_SOURCES}+glob('${FAUST_PYTHON_BIN_DIR}/FaustCoreCppGPU*.cpp')")
+#endif()
 
 set(FAUST_PYTHON_INCLUDE_DIR "'${EIGEN_INC_DIR}',
 '${FAUST_SRC_LINEAR_OPERATOR_DIR}',
@@ -191,6 +191,10 @@ if(NO_MATIO)
 	set(FAUST_SETUP_PY_CFLAGS "${FAUST_SETUP_PY_CFLAGS}, '-DNO_MATIO'")
 endif()
 
+if(BUILD_FLOAT_PYX)
+	set(FAUST_SETUP_PY_CFLAGS "${FAUST_SETUP_PY_CFLAGS}, '-DBUILD_FLOAT_PYX'")
+endif()
+
 if(USE_GPU_MOD)
 	set(FAUST_PYTHON_INCLUDE_DIR "${FAUST_PYTHON_INCLUDE_DIR}, '${GPU_MOD_INCLUDE_DIR}', '${GPU_MOD_INCLUDE_DIR}/../build-cu11.4/', '${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR}'")
 	set(FAUST_SETUP_PY_CFLAGS "${FAUST_SETUP_PY_CFLAGS}, '-DUSE_GPU_MOD'")
@@ -240,7 +244,6 @@ endif()
 #endif()
 
 # configure the setup.py.in into setup.py (equivalent of Makefile for Python)
-configure_file(${FAUST_PYTHON_SRC_DIR}/setup.py.in ${FAUST_PYTHON_BIN_DIR}/setup.py @ONLY)
 configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/_FaustCorePy.pyx ${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.pyx @ONLY)
 
 
@@ -395,15 +398,19 @@ if(GEN_SPHINX_DOC)
 endif()
 
 set(PY_CPP_TARGET python_cpp)
-file(GLOB PY_CPP_FILES "${FAUST_PYTHON_BIN_DIR}/F*cpp")
+file(GLOB PY_CPP_FILES "${FAUST_PYTHON_BIN_DIR}/F*cpp") # generated from cpp.in
+file(GLOB PY_CPP_FILES2 "${FAUST_PYTHON_SRC_SRC_DIR}/*.cpp") # directly in sources
+set(PY_CPP_FILES ${PY_CPP_FILES};${PY_CPP_FILES2})
 add_library(${PY_CPP_TARGET} STATIC ${PY_CPP_FILES})
+set(FAUST_PYTHON_LIBS "${FAUST_PYTHON_LIBS},'${PY_CPP_TARGET}'")
 target_include_directories(${PY_CPP_TARGET} PRIVATE ${FAUST_PYTHON_SRC_SRC_DIR}) # py include dir is set later
 if(USE_GPU_MOD)
 	target_include_directories(${PY_CPP_TARGET} PRIVATE ${GPU_MOD_INCLUDE_DIR} PRIVATE ${GPU_MOD_INCLUDE_DIR}/../build-cu11.4/ PRIVATE ${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR})
 	target_compile_definitions(${PY_CPP_TARGET} PRIVATE -DUSE_GPU_MOD)
 endif()
-string(REGEX REPLACE "\\.cpp" ".o" PY_CPP_OBJS ${PY_EXT_SOURCES})
-set(PYTHON_EXT_EXTRA_OBJECTS ${PYTHON_EXT_EXTRA_OBJECTS}"+${PY_CPP_OBJS}") # TODO: it should be the static library not the objects but who cares?
+if(BUILD_FLOAT_PYX)
+	target_compile_definitions(${PY_CPP_TARGET} PRIVATE -DBUILD_FLOAT_PYX)
+endif()
 set(PY_EXT_SOURCES "['${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.pyx']") # reset src without cpp objs # TODO: add an option to do one way or another
 
 add_custom_target(${FAUST_PYTHON_TARGET} ALL DEPENDS ${FAUST_TARGET} ${PY_CPP_TARGET})
@@ -428,7 +435,7 @@ if(UNIX)
 		add_custom_command(TARGET ${FAUST_PYTHON_TARGET}
 			DEPENDS faust ${FAUST_PYTHON_SRC_DIR}/_FaustCorePy.pyx.in
 			COMMAND   ${PYTHON_EXE}
-			ARGS "${FAUST_PYTHON_BIN_DIR}/setup.py"  "build_ext" "--inplace" 
+			ARGS "${FAUST_PYTHON_BIN_DIR}/setup.py"  "build_ext" "--inplace"
 			COMMENT   "Creating pyfaust${PY_VER}")
 		if(APPLE)
 			set(LIBEXT dylib)
@@ -472,14 +479,19 @@ elseif(WIN32)
 				# we do not use embed_sys_libomp_into_pyfaust because it doesn't indicate full paths for all libraries on Windows with VS
 				configure_file(${VCOMPLIB_PATH} ${FAUST_PYTHON_BIN_DIR}/pyfaust/lib COPYONLY)
 			endif()
-
-			exec_program("${PYTHON_EXE}" ARGS "-c '\r\nfrom sysconfig import get_paths;print\(get_paths\(\)[\"include\"]\)'" OUTPUT_VARIABLE PY_C_INC_DIR RETURN_VALUE PY_RES)
-		include_directories(${PY_CPP_TARGET} ${PY_C_INC_DIR})
+			file(WRITE ${FAUST_PYTHON_BIN_DIR}/get_py_inc_dir.py "from sysconfig import get_paths;print(get_paths()['include'])")
+			exec_program("${PYTHON_EXE}"
+				ARGS "${FAUST_PYTHON_BIN_DIR}/get_py_inc_dir.py"
+				OUTPUT_VARIABLE PY_C_INC_DIR RETURN_VALUE PY_RES)
+			file(REMOVE ${FAUST_PYTHON_BIN_DIR}/get_py_inc_dir.py)
+			include_directories(${PY_C_INC_DIR} $ENV{MATIO_INC_DIR})
 		endforeach()
 	endif()
 else()
 	message(FATAL_ERROR "Not handled system.")
 endif()
+
+configure_file(${FAUST_PYTHON_SRC_DIR}/setup.py.in ${FAUST_PYTHON_BIN_DIR}/setup.py @ONLY)
 
 #install the python wrapper
 install(DIRECTORY ${FAUST_PYTHON_BIN_DIR}/ DESTINATION

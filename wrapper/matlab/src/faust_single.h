@@ -42,7 +42,5 @@
 /*  Topics in Signal Processing, 2016.                                      */
 /*  <https://hal.archives-ouvertes.fr/hal-01167948v1>                       */
 
-template <typename SCALAR, FDevice DEV>
+template <typename T, FDevice DEV>
 void faust_single(const mxArray **prhs, const int nrhs, mxArray **plhs, const int nlhs);
-
-#include "faust_single.hpp"

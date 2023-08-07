@@ -415,7 +415,9 @@ namespace Faust
 			 * Contrary to real() functions it returns a new MatDense of type Real<FPP2> but left this one untouched.
 			 */
 			template<typename FPP2>
-				MatDense<FPP2, Cpu> to_real() const;
+				MatDense<Real<FPP2>, Cpu> to_real() const;
+			template<typename FPP2>
+				MatDense<FPP2, Cpu> cast() const;
 			Real<FPP> normL1(const bool transpose=false) const;
 			Real<FPP> normL1(faust_unsigned_int&, const bool transpose=false) const;
 			Real<FPP> normInf(const bool transpose=false) const;

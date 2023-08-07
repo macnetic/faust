@@ -860,7 +860,7 @@ class TestFaustPy(unittest.TestCase):
         print("test Faust.imag")
         iF = self.F.imag
         iF_ref = self.mulFactors().imag
-        self.assertTrue(np.allclose(iF.toarray(), iF_ref))
+        self.assertTrue(np.allclose(iF.toarray(), iF_ref)) 
 
     def test_left(self):
         print("Test Faust.left()")

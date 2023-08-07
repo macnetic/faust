@@ -7,6 +7,7 @@ cmake --build . --config %BUILD_CONFIG%
 :: now build pyfaust too
 :: specifying a consistent python version with pkg_win_purepy_rev
 cmake -DBUILD_WRAPPER_PYTHON=ON -DMATIO_LIB_FILE=C:/faust_libs/libmatio_standalone.lib ..
+cmake --build . --target python_cpp --config %BUILD_CONFIG%
 cd wrapper\python
 :: it costs no time of building if pkg_win_purepy_* already compiled the .pyd lib
 py -%WIN_PY_VER% setup.py build_ext --inplace

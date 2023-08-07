@@ -424,7 +424,11 @@ namespace Faust
 			void real(MatSparse<Real<FPP>, Cpu> & real_mat) const;
 
 			template<typename FPP2>
-				MatSparse<FPP2, Cpu> to_real() const;
+				MatSparse<Real<FPP2>, Cpu> to_real() const;
+
+
+			template<typename FPP2>
+				MatSparse<FPP2, Cpu> cast() const;
 			/**
 			 * \brief index this(row_ids, col_ids) Eigen matrix and mutliplies the result by in_mat into out_mat (two Eigen dense matrices of respective types MatType1, MatTyp2)
 			 *

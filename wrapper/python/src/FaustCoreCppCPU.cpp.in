@@ -112,12 +112,6 @@ void  FaustCoreCpp<@TYPE@,Cpu>::device(char* dev) const
 }
 
 template<>
-FaustCoreCpp<Real<@TYPE@>,Cpu>* FaustCoreCpp2<@TYPE@, Real<@TYPE@>, Cpu>::real(FaustCoreCpp<@TYPE@,Cpu>* core)
-{
-    return core->real();
-}
-
-template<>
 FaustCoreCpp<@TYPE@,Cpu>* FaustCoreCpp<@TYPE@,Cpu>::read_from_mat_file(const char* filepath)
 {
     FaustCoreCpp<@TYPE@, Cpu>* core = nullptr;

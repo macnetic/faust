@@ -736,15 +736,6 @@ bool FaustCoreCpp<FPP,DEV>::is_all_dense() const
 }
 
 template<typename FPP, FDevice DEV>
-FaustCoreCpp<Real<FPP>,DEV>* FaustCoreCpp<FPP,DEV>::real()
-{
-//    auto th = this->transform->template real<Real<FPP>>();
-    auto th = this->transform->template real<Real<FPP>>();
-    auto core = new FaustCoreCpp<Real<FPP>,DEV>(th);
-    return core;
-}
-
-template<typename FPP, FDevice DEV>
 FPP FaustCoreCpp<FPP,DEV>::get_item(unsigned long int i, unsigned long int j)
 {
     return transform->get_item(i, j);

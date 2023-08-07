@@ -2,11 +2,7 @@
 
 namespace Faust
 {
-	template<>
-		template<>
-		TransformHelper<float, Cpu>* TransformHelper<std::complex<float>, Cpu>::real<float>()
-		{
-			throw std::runtime_error("real conversion from complex double to float is not yet supported.");
-		}
+
+	//TODO: maybe casting functions (to_double/to_float) made in python wrapper should be here wrapper/python/src/FaustCoreCppCast.cpp (warning: make no confusion with faust_double/faust_single functions from matlab for which a complex Faust keeps complex)
 
 }

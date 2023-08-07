@@ -313,7 +313,7 @@ template<>
 void butterfly_faust(TransformHelper<double, Cpu>*& F, int log2size)
 {
 	auto cF = TransformHelper<complex<double>, Cpu>::fourierFaust(log2size, false);
-	F = cF->real<double>();
+	F = cF->cast<double>();
 	delete cF;
 }
 
@@ -321,7 +321,7 @@ template<>
 void butterfly_faust(TransformHelper<float, Cpu>*& F, int log2size)
 {
 	auto cF = TransformHelper<complex<float>, Cpu>::fourierFaust(log2size, false);
-	F = cF->real<float>();
+	F = cF->cast<float>();
 	delete cF;
 }
 

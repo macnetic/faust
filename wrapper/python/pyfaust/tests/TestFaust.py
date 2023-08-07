@@ -389,3 +389,13 @@ class TestFaust(unittest.TestCase):
         self._assertAlmostEqual(eye(self.nrows, self.ncols),
                                 np.eye(self.nrows,
                                        self.ncols))
+
+    def test_astype2(self):
+        print("test Faust.astype2")
+        import pyfaust as pf
+        dtypes = ['float32', 'float64', 'complex']
+        for src_dt in dtypes:
+            for dst_dt in dtypes:
+                sF = pf.rand(10, 10, dtype=src_dt, dev=self.dev)
+                dF = sF.astype(dst_dt)
+                self.assertTrue(np.allclose(sF.toarray().astype(dst_dt), dF.toarray()))
