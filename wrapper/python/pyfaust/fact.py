@@ -1346,8 +1346,8 @@ def hierarchical_constends(M, p, A, B, ret_lambda=False, ret_params=False):
         >>> res_cons = ConstraintList('normcol', 1, 32, 32, 'normcol', 1, 32, 32, 'sp', 666, 32, 32, 'sp', 333, 32, 32)
         >>> param = ParamsHierarchical(fact_cons, res_cons, stop_crit1, stop_crit2)
         >>> F, _lambda = hierarchical_constends(M, param, A, B, ret_lambda=True)
-        >>> assert(np.allclose(F.factors(0).toarray(), A))
-        >>> assert(np.allclose(F.factors(5).toarray(), B))
+        >>> assert(np.allclose(F.factors(0, as_faust=True).toarray(), A))
+        >>> assert(np.allclose(F.factors(5, as_faust=True).toarray(), B))
 
     """
     from pyfaust.factparams import ConstraintList
@@ -1422,8 +1422,8 @@ def palm4msa_constends(M, p, A, B=None, ret_lambda=False):
         >>> consts = ConstraintList('spcol', randint(1, A.shape[1]), A.shape[1], B.shape[0])
         >>> param = ParamsPalm4MSA(consts, stop_crit)
         >>> F = palm4msa_constends(M, param, A, B)
-        >>> assert(np.allclose(F.factors(0).toarray(), A))
-        >>> assert(np.allclose(F.factors(2).toarray(), B))
+        >>> assert(np.allclose(F.factors(0, as_faust=True).toarray(), A))
+        >>> assert(np.allclose(F.factors(2, as_faust=True).toarray(), B))
 
     """
     from pyfaust.factparams import ConstraintList
