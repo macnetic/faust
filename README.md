@@ -4,8 +4,20 @@
 # FAuST Toolbox -- Flexible Approximate Multi-Layer Sparse Transform
 
 
-General purpose
-===============
+### Summary
+1. [General purpose and features](#gen_intro)  
+2. [Dependencies](#deps)  
+3. [Build on UNIX](#build_unix)
+4. [Quick Build of pyfaust](#quick_build_pyfaust)
+5. [Using Docker for a quick build pyfaust](#docker_quick_build_pyfaust)
+6. [Quickest install without building](#prebuilt_pkgs)
+7. [Contributing to FAµST](#contributing)
+8. [Credits -- Contacts -- References](#refs)
+
+
+<a name="gen_intro"/>
+1. General purpose
+==================
 
 The FAuST toolbox contains a C++ code implementing a general framework
 designed to factorize matrices of interest into multiple sparse factors.
@@ -18,8 +30,10 @@ project: [FAµST website](http://faust.inria.fr)
 
 ---
 
-Dependencies
-============
+<a name="deps"/>
+2. Dependencies
+===============
+
 - cuda (preferably cuda 12 latest version but 9 and 11 are also supported).
 There is a known bug on cuda 11.4 (issue #305). CUDA is optional, only used if cmake option ``USE_GPU_MOD`` is ON.
 The ``gpu_mod`` submodule must be checked out in order to enable this function.
@@ -37,7 +51,8 @@ the CMake script indicate if the match is not appropriate).
 
 ---
 
-Build on UNIX
+<a name="build_unix"/>
+3. Build on UNIX
 =====================
 
 	Unpack the directory.
@@ -56,8 +71,9 @@ For more information, please refer to the [Mathworks website](http://fr.mathwork
 Many CMake build options are available (cf. [CMakeLists.txt](./CMakeLists.txt)). It might be quite complicated to deal with them at start (refer to gitlab ci building scripts in [./misc/continuous\_integration/jobs/](./misc/continuous_integration/jobs/) or the [.gitlab-ci.yml](.gitlab-ci.yml) root script to get some insight).
 
 ---
-Quick Build of the python wrappers (pyfaust) on UNIX (without MATLAB and MATIO)
-=========================================================
+<a name="quick_build_pyfaust"/>
+4. Quick Build of the python wrappers (pyfaust) on UNIX (without MATLAB and MATIO)
+==================================================================================
 
 (With Eigen, Python3 with Cython, numpy and scipy installed)
 
@@ -72,8 +88,9 @@ Quick Build of the python wrappers (pyfaust) on UNIX (without MATLAB and MATIO)
 ---
 
 
-Using Docker for a quick build of the python wrappers (pyfaust) on Linux without any dependency burden
-==================================================================================================
+<a name="docker_quick_build_pyfaust"/>
+5. Using Docker for a quick build of the python wrappers (pyfaust) on Linux without any dependency burden
+=========================================================================================================
 
 First you need to install [docker](https://docs.docker.com/engine/install/) or ``podman-docker``.
 Then follow the next commands:
@@ -106,6 +123,7 @@ Thanks to the docker directory mapping you can do it outside of the docker conta
 
 ---
 
+<a name="prebuilt_pkgs"/>
 Quickest Install on Linux, Windows and macOS (pre-built pakages)
 ============================================
 
@@ -122,8 +140,16 @@ Pre-compiled packages from Gitlab Continuous Integration are also available. Exc
 - [Linux (.rpm, .deb) packages](https://gitlab.inria.fr/faustgrp/faust/-/jobs/artifacts/master/download?job=package_linux_release)  
 - [Linux (.rpm, .deb) packages with embedded static matio library](https://gitlab.inria.fr/faustgrp/faust/-/jobs/artifacts/master/download?job=package_linux_release)  
 - Python PIP (pre-compiled) packages: for [Linux](https://gitlab.inria.fr/faustgrp/faust/-/jobs/artifacts/master/download?job=package_linux_purepy_release), [macOS](https://gitlab.inria.fr/faustgrp/faust/-/jobs/artifacts/master/download?job=package_macos_purepy_release) and [Windows 10](https://gitlab.inria.fr/faustgrp/faust/-/jobs/artifacts/master/download?job=package_win_purepy_release). Or preferably, refer to [pypi pyfaust](https://pypi.org/project/pyfaust) or [anaconda pyfaust](https://anaconda.org/pyfaust/pyfaust).
-
 ---
+
+<a name="contributing"/>
+7. Contributing to FAµST
+========================
+
+Please consult the guide [here](CONTRIBUTING.md) and the [README for developers](README.developer.md).
+---
+<a name="refs"/>
+
 License
 ========
 
