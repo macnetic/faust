@@ -118,4 +118,6 @@ endif (WITH_COVERAGE AND CTEST_COVERAGE_COMMAND)
 if (WITH_MEMCHECK AND CTEST_MEMORYCHECK_COMMAND)
   ctest_memcheck()
 endif (WITH_MEMCHECK AND CTEST_MEMORYCHECK_COMMAND)
-# CTEST_SUBMIT() # 2023-05-26: disable test submission because cdash-ci.inria.fr seems defective (we rather use junit report, cf. gitlab-ci.yml)
+CTEST_SUBMIT(HTTPHEADER "Authorization: Bearer $ENV{CDASH_TOKEN}")
+# doc about auth submission by token:
+# https://www.kitware.com/cdash-authenticated-submissions/
