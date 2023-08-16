@@ -201,6 +201,7 @@ doctest_nightly_matfaust:
 
 matfaust_test_code_coverage:
   stage: code_cov
+  coverage: '/Coverage: \d+\.\d+\%/'
   script:
     - rm -Rf ~gitlab-runner/matlab # avoid interference with rpm installed faust
     - if [ $(rpm -qa faust | wc -l) -gt 0 ]; then sudo rpm -e faust;fi
@@ -212,6 +213,8 @@ matfaust_test_code_coverage:
     - cd ..
     - cmake -P misc/download_unzip_faust_misc_data.cmake # tests need data
     - matlab -nojvm -nodisplay -r "addpath misc/test/src/Matlab;matfaust_test_coverage; exit" | tee /tmp/matfaust_test_cov_output
+    # echo total coverage for gitlab
+    - 'echo Coverage: $(head -5 coverage_html/index.html | grep -E -o "[[:digit:]]+(\.[[:digit:]]+)?%")'
   after_script:
     - if [ $(rpm -qa faust | wc -l) -gt 0 ]; then sudo rpm -e faust;fi
   artifacts:
@@ -226,6 +229,7 @@ matfaust_test_code_coverage:
 
 pyfaust_test_code_coverage:
   stage: code_cov
+  coverage: '/Coverage:.*\%/'
   script:
     # use conda rather than venv because python built on VM has not been
     # built with --enable-loadable-sqlite-extensions (and sqlite-devel)
@@ -244,7 +248,8 @@ pyfaust_test_code_coverage:
     # take doctest into account
     - for MOD in factparams proj poly tools fact demo;do PY=$(python -c "import doctest;import pyfaust as pf;from os.path import dirname;fn = dirname(pf.__file__)+'/${MOD}.py';print(fn)"); echo -e '\nif __name__ == "__main__":\n    import doctest;\n    doctest.testmod()' >> $PY;done
     - for MOD in factparams proj poly tools fact demo;do coverage run -a --source $PYFAUST_DIR $PYFAUST_DIR/$MOD.py;done
-    - coverage report $(find $PYFAUST_DIR -name "*.py" | grep -v -w tests)
+    - coverage report $(find $PYFAUST_DIR -name "*.py" | grep -v -w tests) | tee /tmp/pyfaust_cov_report
+    - 'echo Coverage: $(tail -1 /tmp/pyfaust_cov_report | awk "{print \$4}")'
     - coverage html $(find $PYFAUST_DIR -name "*.py" | grep -v -w tests)
     - conda deactivate
   after_script:
