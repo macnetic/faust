@@ -30,11 +30,14 @@ about:
   license_file: @LICENSE_FILEPATH@
   summary: 'FAµST python toolbox'
   description: |
+    .. image:: https://faust.inria.fr/files/2016/11/cropped-FAUST.jpeg
+    .. image:: https://gitlab.inria.fr/faustgrp/faust/badges/hakim_branch/pipeline.svg
+    .. image:: https://gitlab.inria.fr/faustgrp/faust/badges/hakim_branch/coverage.svg?job=pyfaust_test_code_coverage&key_text=coverage
+
     The FAµST toolbox provides algorithms and data structures to decompose a given dense matrix into a product of sparse matrices in order to reduce its computational complexity (both for storage and manipulation).
 
     FaµST can be used to:
         - speedup / reduce the memory footprint of iterative algorithms commonly used for solving high dimensional linear inverse problems,
         - learn dictionaries with an intrinsically efficient implementation,
         - compute (approximate) fast Fourier transforms on graphs.
-
 
