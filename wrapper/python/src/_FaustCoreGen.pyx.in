@@ -836,7 +836,6 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
             return core
         ELSE:
             raise Exception("Float support has been disabled at build time")
-        END
 
     def dtype(self):
         return type2dtype('@TYPE@')
