@@ -1,5 +1,5 @@
 ![FAµST Logo](./gen_doc/images/logo.png)  
-[![pipeline status](https://gitlab.inria.fr/faustgrp/faust/badges/hakim_branch/pipeline.svg)](https://gitlab.inria.fr/faustgrp/faust/commits/hakim_branch)
+[![pipeline status](https://gitlab.inria.fr/faustgrp/faust/badges/hakim_branch/pipeline.svg?ignore_skipped=true)](https://gitlab.inria.fr/faustgrp/faust/commits/hakim_branch)
 ![pyfaust test coverage](https://gitlab.inria.fr/faustgrp/faust/badges/hakim_branch/coverage.svg?job=pyfaust_test_code_coverage&key_text=pyfaustcov)
 ![matfaust test coverage](https://gitlab.inria.fr/faustgrp/faust/badges/hakim_branch/coverage.svg?job=matfaust_test_code_coverage&key_text=matfaustcov)
 
