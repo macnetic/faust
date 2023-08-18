@@ -27,11 +27,12 @@
 ##  If not, see <http://www.gnu.org/licenses/>.                             ##
 ##                                                                          ##
 ##                             Contacts:                                    ##
+##      Remi Gribonval  : remi.gribonval@inria.fr                           ##
+##      Hakim Hadj-Djilani: hakim.hadj-djilani@inria.fr                     ##
 ##      Nicolas Bellot  : nicolas.bellot@inria.fr                           ##
 ##      Adrien Leman    : adrien.leman@inria.fr                             ##
 ##      Thomas Gautrais : thomas.gautrais@inria.fr                          ##
 ##      Luc Le Magoarou : luc.le-magoarou@inria.fr                          ##
-##      Remi Gribonval  : remi.gribonval@inria.fr                           ##
 ##############################################################################
 
 
@@ -51,4 +52,6 @@ set(CTEST_CUSTOM_MAXIMUM_PASSED_TEST_OUTPUT_SIZE TRUE)
 set(CTEST_CUSTOM_MAXIMUM_FAILED_TEST_OUTPUT_SIZE TRUE)
 set(CTEST_CURL_OPTIONS "CURLOPT_SSL_VERIFYPEER_OFF")
 
-
+if(DEFINED ENV{CI_COMMIT_SHA}) # it doesn't work without DEFINED for env. var.
+	set(CTEST_BUILD_NAME ${CTEST_BUILD_NAME}-$ENV{CI_COMMIT_SHA})
+endif()
