@@ -1,10 +1,11 @@
 # How to contribute
 
+[[_TOC_]]
+
 Below we describe the processes to follow for any contribution to the FAµST
 project.
 
-1. Posting issues on Gitlab
-========================
+### Posting issues on Gitlab
 
 Please specify these elements on any issue which might need it:
 
@@ -17,8 +18,7 @@ Please specify these elements on any issue which might need it:
 - Explain clearly the problem you ran into or the feature you're intersting in
   and preferably give a snippet of code to reproduce easily.
 
-2. Code contribution
-====================
+### Code contribution
 
 Any contribution to the development is of course welcome. It might be a bug
 fix, a feature or an algorithm implementation.
@@ -40,5 +40,5 @@ Before sending us your patches or merge requests, please ensure as much as
 possible that the project is still able to build and that related tests pass
 (but we'll help you in that process if you find it too complicated).
 For any further information about building please consult the main
-(README)[README.md] (an easy Docker way is provided to build pyfaust wrappers)
-and (README-tests-ci-release.md) about tests.
+[README](README.md) (an easy Docker way is provided to build pyfaust wrappers)
+and [tests README](README-tests-ci-release.md).

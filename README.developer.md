@@ -1,18 +1,9 @@
 # Readme for developers
 
 
-### Summary
-1. [General purpose and features](#gen_intro)  
-2. [Installation](#install)  
-3. [Project structure](#struct)
-4. [API Documentation: Doxygen](#api_doc)
-5. [Continuous Integration](#ci)
-6. [Contributing to FAµST](#contributing)
-7. [References](#refs)
+[[_TOC_]]
 
-<a name="gen_intro"/>
-1. General purpose and features
-============================
+### General purpose and features
 
 The FAuST toolbox contains a C++ code implementing a general framework
 designed to factorize matrices of interest into multiple sparse factors.
@@ -22,15 +13,12 @@ For more information on the FAuST Project, please visit the website of the
 project: [https://faust.inria.fr](https://faust.inria.fr)
 
 
-<a name="install"/>
-2. Installation
-===============
+### Installation
 
 [https://faust.inria.fr](https://faust.inria.fr) (for pre-built packages) and README.md (for building)
 
-<a name="struct"/>
-3. FAuST structure directory
-============================
+
+### FAuST structure directory
 
 - ``./CMake/``
 	 contains ".cmake" files used to execute some internal cmake
@@ -54,9 +42,8 @@ project: [https://faust.inria.fr](https://faust.inria.fr)
 
 
 
-<a name="api_doc"/>
-4. API Documentation: Doxygen
-==========================
+
+### API Documentation: Doxygen
 
 The Doxygen documentation is available in the following directory:
 ``./gen_doc/``
@@ -76,9 +63,8 @@ The online Doxygen doc is available
 
 
 
-<a name="ci"/>
-5. Continuous Integration
-=========================
+
+### Continuous Integration
 
 The Continuous Integration for the project FAUST is based on the CDash tool
 (see. http://www.cdash.org/). The building and test are available on the
@@ -89,15 +75,13 @@ CDash is not so used anymore, the test reports are directly uploaded on gitlab (
 For more details concerning CI (Virtual Machines, etc.), refer to ci.inria.fr and cloud stack.
 https://ci.inria.fr project faust2
 
-<a name="contributing"/>
-6. Contributing to FAµST
-========================
+
+### Contributing to FAµST
 
 Please consult the guide [here](CONTRIBUTING.md)
 
-<a name="refs"/>
-7. References
-=============
+
+### References
 
 [1]	Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse
 	approximations of matrices and applications", Journal of Selected
