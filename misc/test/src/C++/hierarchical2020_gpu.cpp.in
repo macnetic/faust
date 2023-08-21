@@ -64,6 +64,7 @@
 typedef @TEST_FPP@ FPP;
 typedef @TEST_FPP2@ FPP2;
 
+using namespace Faust;
 
 void create_matrix(Faust::MatDense<complex<FPP2>,Cpu>& data, Faust::MatDense<complex<FPP2>,Cpu>& idata)
 {
