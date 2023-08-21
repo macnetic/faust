@@ -7,12 +7,76 @@
 using namespace std;
 using namespace Faust;
 
+typedef @TEST_FPP@ FPP;
+
+void test_sum()
+{
+	cout << "test Vect<double, GPU2>::sum" << endl;
+	Vect<FPP, GPU2> u(10);
+	u.setValues(2);
+	auto s = u.sum();
+	assert(s == 2 * 10);
+	cout << "OK" << endl;
+}
+
+void test_eltwise_mul()
+{
+	cout << "test Vect<double, GPU2>::operator*=" << endl;
+	Vect<FPP, GPU2> u(10);
+	Vect<FPP, GPU2> v(10);
+	u.setValues(2);
+	v.setValues(3);
+	u *= v;
+	assert(u.sum() == 2 * 3 * 10);
+	cout << "OK" << endl;
+}
+
+
+void test_eltwise_div()
+{
+	cout << "test Vect<double, GPU2>::operator/=" << endl;
+	Vect<FPP, GPU2> u(10);
+	Vect<FPP, GPU2> v(10);
+	u.setValues(6);
+	v.setValues(3);
+	u /= v;
+	assert(u.sum() == 6 / 3 * 10);
+	cout << "OK" << endl;
+}
+
+void test_set_vals()
+{
+	cout << "test Vect<double, GPU2>::setValues(double)" << endl;
+	Vect<FPP, Cpu> cpu_u(10);
+	Vect<FPP, GPU2> gpu_u(10);
+	for(int i=0;i<10;i++)
+		cpu_u.set_coeff(i, 18);
+	gpu_u.setValues(18);
+	auto cpu_u_t = gpu_u.tocpu();
+	assert(cpu_u.equality(cpu_u_t, 1e-16));
+	cout << "OK" << endl;
+}
+
+void test_mean_relerr()
+{
+	cout << "test Vect<double, GPU2>::mean_relative_error()" << endl;
+	Vect<FPP, Cpu> cu(12), cv(12);
+	cu.setRand();
+	cv.setRand();
+	Vect<FPP, GPU2> gu(cu);
+	Vect<FPP, GPU2> gv(cv);
+	auto cerr = cu.mean_relative_error(cv);
+	auto gerr = gu.mean_relative_error(gv);
+	assert(std::abs(gerr - cerr) < 1e-6);
+	cout << "OK" << endl;
+}
+
 int main()
 {
-	Faust::Vect<double, GPU2> v;
-	//TODO: test Vect<double, GPU2>::sum
-	//TODO: test Vect<double, GPU2>::operator*= (elt-wise mul.)
-	//TODO: test Vect<double, GPU2>::operator/= (elt-wise div.)
-	//TODO: test Vect<double, GPU2>::setValues(double)
-	//TODO: test Vect<double, GPU2>::mean_relerr
+	enable_gpu_mod();
+	test_set_vals();
+	test_sum();
+	test_eltwise_mul();
+	test_eltwise_div();
+	test_mean_relerr();
 }
