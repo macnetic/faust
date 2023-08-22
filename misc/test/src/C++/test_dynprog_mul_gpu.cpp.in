@@ -17,7 +17,7 @@ int main()
 	float density = .5f;
 	bool per_row = true;
 	auto F = TransformHelper<FPP, GPU2>::randFaust(MIXED, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
-	auto bF = TransformHelper<FPP, GPU2>::randBSRFaust(/*faust_nrows*/max_dim_size, /*faust_ncols*/max_dim_size, min_num_factors, max_num_factors, /*bnrows*/ min_dim_size/2, /*bncols*/ min_dim_size/2);
+	auto bF = TransformHelper<FPP, GPU2>::randBSRFaust(/*faust_nrows*/max_dim_size, /*faust_ncols*/max_dim_size, min_num_factors, max_num_factors, /*bnrows*/ max_dim_size/32, /*bncols*/ max_dim_size/32);
 	auto vF = {F, bF};
 	for(auto F: vF)
 	{
