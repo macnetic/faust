@@ -75,7 +75,7 @@ Faust::Vect<FPP,Cpu>::Vect(Faust::Vect<FPP,Cpu>&& v)
 }
 
 template<typename FPP>
-bool Faust::Vect<FPP,Cpu>::equality(Faust::Vect<FPP,Cpu> const &x, FPP precision) const
+bool Faust::Vect<FPP,Cpu>::equality(Faust::Vect<FPP,Cpu> const &x, const Real<FPP> precision) const
 {
   if (size() != x.size())
 	handleError(m_className," equality : different dimension");

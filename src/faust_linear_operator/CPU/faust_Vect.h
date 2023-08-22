@@ -191,7 +191,7 @@ namespace Faust
 		void set_coeff(faust_unsigned_int i, const FPP& val) { (*this)[i] = val;};
 
         const FPP& operator()(faust_unsigned_int i)const{return vec(i);}
-        bool equality(Vect<FPP,Cpu> const &x, FPP precision) const;
+        bool equality(Vect<FPP,Cpu> const &x, const Real<FPP> precision) const;
 		FPP mean();
 
 		static Vect<FPP, Cpu>* rand(faust_unsigned_int size);
