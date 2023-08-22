@@ -92,7 +92,7 @@ std::string Faust::MatGeneric<FPP,GPU2>::to_string(int32_t nrows, int32_t ncols,
 		str << dynamic_cast<const MatBSR<FPP, GPU2>*>(this)->to_string_blocks(transpose);
 	str << ", density "<< density <<", nnz "<< nnz; 
 	if(type == BSR)
-		str <<  " (nnz blocks: " << dynamic_cast<const MatBSR<FPP, Cpu>*>(this)->getNBlocks() << ")";
+		str <<  " (nnz blocks: " << dynamic_cast<const MatBSR<FPP, GPU2>*>(this)->getNBlocks() << ")";
 	str << ", addr: " << this;
 	//TODO: add gpu_mod data addr
 	str <<std::endl;
