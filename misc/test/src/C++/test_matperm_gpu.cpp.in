@@ -245,6 +245,44 @@ void test_display(MatPerm<FPP, GPU2> &gpu_bm)
 	cout << "OK" << endl;
 }
 
+
+
+//  TODO: butterfly_faust function should be factored with faust_matperm_mat
+template<typename T>
+void butterfly_faust(TransformHelper<T, Cpu>*& F, int log2size);
+
+
+
+template<>
+void butterfly_faust(TransformHelper<complex<double>, Cpu>*& F, int log2size)
+{
+	F = TransformHelper<complex<double>, Cpu>::fourierFaust(log2size, false);
+}
+
+
+template<>
+void butterfly_faust(TransformHelper<complex<float>, Cpu>*& F, int log2size)
+{
+	F = TransformHelper<complex<float>, Cpu>::fourierFaust(log2size, false);
+}
+
+
+template<>
+void butterfly_faust(TransformHelper<double, Cpu>*& F, int log2size)
+{
+	auto cF = TransformHelper<complex<double>, Cpu>::fourierFaust(log2size, false);
+	F = cF->cast<double>();
+	delete cF;
+}
+
+template<>
+void butterfly_faust(TransformHelper<float, Cpu>*& F, int log2size)
+{
+	auto cF = TransformHelper<complex<float>, Cpu>::fourierFaust(log2size, false);
+	F = cF->cast<float>();
+	delete cF;
+}
+
 int main(int argc, char** argv)
 {
 	Faust::enable_gpu_mod();
@@ -255,7 +293,8 @@ int main(int argc, char** argv)
 	std::cout << "log2size: " << log2size << std::endl;
 
 	int size = 1 << log2size;
-	auto F = TransformHelper<FPP, Cpu>::fourierFaust(log2size, false);
+	TransformHelper<FPP, Cpu> *F;
+	butterfly_faust(F, log2size);
 	auto dsPermMat = F->get_fact(log2size); // bitrev perm
 	MatSparse<FPP, Cpu> spPermMat(dsPermMat);
 	MatPerm<FPP, Cpu> cpu_bm(spPermMat);
