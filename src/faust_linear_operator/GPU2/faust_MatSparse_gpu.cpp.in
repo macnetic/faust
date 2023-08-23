@@ -190,6 +190,8 @@ namespace Faust
 			{
 				sp_mat.resize(nnz, nrows, ncols);
 			}
+			if(! sp_mat.getNonZeros())
+				return;
 			tocpu(sp_mat.getRowPtr(), sp_mat.getColInd(), sp_mat.getValuePtr());
 		}
 
