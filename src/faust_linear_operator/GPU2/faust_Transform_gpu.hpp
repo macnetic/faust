@@ -481,20 +481,20 @@ namespace Faust
 				{
 					auto cpu_mdense = new MatDense<FPP,Cpu>(gpu_mdense->getNbRow(), gpu_mdense->getNbCol());
 					gpu_mdense->tocpu(*cpu_mdense);
-					cpu_transf.push_back(cpu_mdense, false, false);
+					cpu_transf.push_back(cpu_mdense, false, false, false, false);
 				}
 				else if(gpu_msparse = dynamic_cast<MatSparse<FPP, GPU2>*>(gpu_mat))
 				{
 					auto cpu_msparse = new MatSparse<FPP,Cpu>();
 					cpu_msparse->resize(gpu_msparse->getNonZeros(), gpu_msparse->getNbRow(), gpu_msparse->getNbCol());
 					gpu_msparse->tocpu(*cpu_msparse);
-					cpu_transf.push_back(cpu_msparse, false, false, false);
+					cpu_transf.push_back(cpu_msparse, false, false, false, false);
 				}
 				else if(gpu_mbsr = dynamic_cast<MatBSR<FPP, GPU2>*>(gpu_mat))
 				{
 					auto cpu_mbsr = new MatBSR<FPP,Cpu>();
 					gpu_mbsr->tocpu(*cpu_mbsr);
-					cpu_transf.push_back(cpu_mbsr, false, false, false);
+					cpu_transf.push_back(cpu_mbsr, false, false, false, false);
 				}
 				else
 					throw std::runtime_error("Invalid matrix pointer");
