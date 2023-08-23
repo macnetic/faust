@@ -15,7 +15,7 @@ void test_sum()
 	Vect<FPP, GPU2> u(10);
 	u.setValues(2);
 	auto s = u.sum();
-	assert(s == 2 * 10);
+	assert(s == FPP(2 * 10));
 	cout << "OK" << endl;
 }
 
@@ -27,7 +27,7 @@ void test_eltwise_mul()
 	u.setValues(2);
 	v.setValues(3);
 	u *= v;
-	assert(u.sum() == 2 * 3 * 10);
+	assert(u.sum() == FPP(2 * 3 * 10));
 	cout << "OK" << endl;
 }
 
@@ -40,7 +40,7 @@ void test_eltwise_div()
 	u.setValues(6);
 	v.setValues(3);
 	u /= v;
-	assert(u.sum() == 6 / 3 * 10);
+	assert(u.sum() == FPP(6 / 3 * 10));
 	cout << "OK" << endl;
 }
 
