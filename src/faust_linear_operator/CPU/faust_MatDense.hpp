@@ -891,17 +891,25 @@ void MatDense<FPP,Cpu>::operator=(MatSparse<FPP,Cpu> const& S)
 	try {
 		resize(S.getNbRow(),S.getNbCol());
 		setZeros();
+
+		if(! S.getNonZeros())
+		{
+			isZeros = true;
+			this->is_identity = false;
+			this->is_ortho = false;
+			return;
+		}
+
 		FPP*const ptr_data = getData();
-
-
 
 		for(int i=0 ; i< S.mat.outerSize() ; i++)
 		{
-			for(typename Eigen::SparseMatrix<FPP,Eigen::RowMajor>::InnerIterator it(S.mat,i); it; ++it)
-			{
-				ptr_data[it.col() * this->dim1 + it.row()] = it.value();
+			if(S.mat.outerIndexPtr()[i+1] - S.mat.outerIndexPtr()[i] > 0)
+				for(typename Eigen::SparseMatrix<FPP,Eigen::RowMajor>::InnerIterator it(S.mat,i); it; ++it)
+				{
+					ptr_data[it.col() * this->dim1 + it.row()] = it.value();
 
-			}
+				}
 		}		
 	}
 	catch(std::bad_alloc e){
