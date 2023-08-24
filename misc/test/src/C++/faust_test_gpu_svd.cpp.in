@@ -41,7 +41,7 @@ void test_batched_full_svd()
 			SD.getData()[j * m + j] = (*S)(j);
 		auto E = *A;
 		auto P = *U;
-		P.multiplyRight(SD);
+		P.multiplyRight(SD.cast<FPP>());
 		V->adjoint();
 		P.multiplyRight(*V);
 		E -= P;
