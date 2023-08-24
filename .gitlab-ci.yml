@@ -483,6 +483,7 @@ pages:
         - mkdir -p ../public/packages
         - ../gen_doc/gen_pkg_dl_page.sh $CI_COMMIT_TAG # download.html generated
         - mv download.html ../public/packages/
+        - ../misc/changelog.sh && mv CHANGELOG.html ../public/
           #- mv *.pkg *.rpm *.deb *.exe ../public/packages/
           #- mv *.pkg *.rpm *.deb  ../public/packages/
     needs:
