@@ -87,7 +87,7 @@ void test_mul_gpu_dense()
 	Faust::Vect<FPP, Cpu> vec_copy(*vec);
 	cout << vec->norm() << endl;
 	cout << vec_copy.norm() << endl;
-	gpu_mat1.multiply(*vec);
+	*vec = gpu_mat1.multiply(*vec);
 	vec_copy = cpu_mat1->multiply(vec_copy);
 //	cout << vec->size() << endl;
 //	cout << vec_copy.size() << endl;
@@ -594,7 +594,7 @@ int main(int argc, char** argv)
 	test_add();
 	test_sub();
 	test_mul_eq_op();
-//	test_mul_spm(); //TODO: TOFIX
+	test_mul_spm();
 	test_get_device();
 	test_move();
 	test_mul_vec();
