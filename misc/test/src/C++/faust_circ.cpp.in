@@ -18,9 +18,6 @@ int main(int argc, char* argv[])
 
 
 
-	/* initilisation of the factors of the Faust */
-
-	// factor 1
 	MatDense<FPP,Cpu>* M;
 	MatDense<FPP,Cpu> M_copy;
 	M = MatDense<FPP,Cpu>::randMat(dim1,dim2);

@@ -491,6 +491,12 @@ else()
 	message(STATUS "Failed to determine the compiler ${CMAKE_CXX_COMPILER} C++11 flag.")
 endif()
 
+if(BUILD_TESTING)
+	# coverage flags (for gcov and gcovr)
+	# we don't disable optimization because many tests would be too slow
+	# unfortunately the coverage measure should be less precise
+       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage" CACHE STRING "compile flags" FORCE)
+endif()
 
 
 if(BUILD_MULTITHREAD)
