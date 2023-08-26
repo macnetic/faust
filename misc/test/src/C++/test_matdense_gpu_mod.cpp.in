@@ -17,6 +17,10 @@
 #include <random>
 #include <vector>
 
+/**
+ * \brief Unit tests for Faust::MatDense<FPP, GPU2>.
+ */
+
 typedef @TEST_FPP@ FPP;
 
 using namespace std;
