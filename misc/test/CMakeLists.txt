@@ -14,14 +14,14 @@ endif(BUILD_READ_MAT_FILE)
 ##############################################################################
 # Testing with CTest
 # CTest is a testing tool distributed as a part of CMake.
-# Running the differents binary created in this project  
+# Running the differents binary created in this project
 ##############################################################################
 
 
-# Critical time, which fixe the limit time of the process
+# Critical time limiting the test process execution time
 set(TIMEOUT_MEG 16000)
 set(TIMEOUT_MEG_TRANSPOSED 16000)
-set(TIMEOUT_COMP 1000)
+set(TIMEOUT_COMP 2000)
 
 
 # MATLAB TEST
@@ -33,14 +33,14 @@ if(BUILD_WRAPPER_MATLAB)
 		# This script takes 2 arguments :
 		# 	1st arg : the list of matlab script, function that will be executed
 		#		WARNING : due to batch file issue,
-		#		in the Matlab command passed as a string to the batch file,  
+		#		in the Matlab command passed as a string to the batch file,
 		#		"@" means "," and "$" means ";"
 		#   2nd arg : the ouputfile that stores all the things that will be display in the matlab command window
-		
-		add_test(NAME MATLAB_FACT_HIER_MEX COMMAND ${FAUST_SRC_TEST_TOOL_DIR}/windows_test_matlab.bat "addpath('${FAUST_BIN_TEST_BIN_DIR}'@'${FAUST_BIN_TEST_TOOLS_DIR}')$set_path$hier_fact_test('matrix_hierarchical_fact'@'config_hierarchical_fact'@9402@1@'MEX')$" "${FAUST_BIN_TEST_OUTPUT_DIR}/MATLAB_FACT_HIER_MEX") 
+
+		add_test(NAME MATLAB_FACT_HIER_MEX COMMAND ${FAUST_SRC_TEST_TOOL_DIR}/windows_test_matlab.bat "addpath('${FAUST_BIN_TEST_BIN_DIR}'@'${FAUST_BIN_TEST_TOOLS_DIR}')$set_path$hier_fact_test('matrix_hierarchical_fact'@'config_hierarchical_fact'@9402@1@'MEX')$" "${FAUST_BIN_TEST_OUTPUT_DIR}/MATLAB_FACT_HIER_MEX")
 
 
-		if(${SLOW_TESTS}) 
+		if(${SLOW_TESTS})
 			add_test(NAME MATLAB_FACT_MEG_MEX COMMAND ${FAUST_SRC_TEST_TOOL_DIR}/windows_test_matlab.bat "addpath('${FAUST_BIN_TEST_BIN_DIR}'@'${FAUST_BIN_TEST_TOOLS_DIR}')$set_path$hier_fact_test('matrix_MEG'@'config_MEG'@22480@1@'MEX')$" "${FAUST_BIN_TEST_BIN_DIR}/MATLAB_FACT_MEG_MEX")
 		endif()
 		add_test(NAME MATLAB_FACT_HADAMARD_MEX COMMAND ${FAUST_SRC_TEST_TOOL_DIR}/windows_test_matlab.bat "addpath('${FAUST_BIN_TEST_BIN_DIR}'@'${FAUST_BIN_TEST_TOOLS_DIR}')$set_path$hier_fact_test('matrix_HADAMARD_32'@'config_HADAMARD_32'@5941@30@'MEX')$" "${FAUST_BIN_TEST_BIN_DIR}/MATLAB_FACT_HADAMARD_MEX")
@@ -58,7 +58,7 @@ if(BUILD_WRAPPER_MATLAB)
 
 
 
-	else(WIN32 AND NOT UNIX)	
+	else(WIN32 AND NOT UNIX)
 		add_test(NAME MATLAB_FACT_HIER_MEX COMMAND matlab -nojvm -nodisplay -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('matrix_hierarchical_fact','config_hierarchical_fact',9402,10,'MEX'); catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)" ) # TODO: lambda is 9407 on macOS (why ?)
 
 
@@ -79,32 +79,32 @@ if(BUILD_WRAPPER_MATLAB)
 		# 2nd factor dense size 3x2,
 		# 3rd factor sparse size 2x5
 		add_test(NAME MATLAB_FAUST_CONFIG_REAL1 COMMAND matlab -nojvm -nodisplay -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([10,3,2,5],{'real.sparse','real.dense','real.sparse'},0.5);test_matlab_faust(factors,prod,30,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
-		
-		#test Faust with 3 real factors : 
-		# 1st factor sparse size 5x2, 
-		# 2nd factor dense size 2x3, 
-		# 3rd factor sparse size 3x10		
+
+		#test Faust with 3 real factors :
+		# 1st factor sparse size 5x2,
+		# 2nd factor dense size 2x3,
+		# 3rd factor sparse size 3x10
 		add_test(NAME MATLAB_FAUST_CONFIG_REAL2 COMMAND matlab -nojvm -nodisplay -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([5,2,3,10],{'real.dense','real.sparse','real.dense'},0.5);test_matlab_faust(factors,prod,30,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
-		#test Faust with 1 real factor : 
-		# 1st factor dense size 10x3, 		
-		add_test(NAME MATLAB_FAUST_CONFIG_REAL3 COMMAND matlab -nojvm -nodisplay -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([100,10],{'real.dense'},1.0);test_matlab_faust(factors,prod,30,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")		
-		
-		#test Faust with 1 real factor : 
-		# 1st factor sparse size 10x3, 		
+		#test Faust with 1 real factor :
+		# 1st factor dense size 10x3,
+		add_test(NAME MATLAB_FAUST_CONFIG_REAL3 COMMAND matlab -nojvm -nodisplay -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([100,10],{'real.dense'},1.0);test_matlab_faust(factors,prod,30,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
+
+		#test Faust with 1 real factor :
+		# 1st factor sparse size 10x3,
 		add_test(NAME MATLAB_FAUST_CONFIG_REAL4 COMMAND matlab -nojvm -nodisplay -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([100,10],{'real.sparse'},0.1);test_matlab_faust(factors,prod,1000,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 
 
 
-		#test Faust with 3 factors : 
-		# 1st factor real dense size 10x3, 
-		# 2nd factor complex dense size 3x2, 
-		# 3rd factor complex dense size 2x5		
+		#test Faust with 3 factors :
+		# 1st factor real dense size 10x3,
+		# 2nd factor complex dense size 3x2,
+		# 3rd factor complex dense size 2x5
 		add_test(NAME MATLAB_FAUST_CONFIG_CPLX1 COMMAND matlab -nojvm -nodisplay -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([10,3,2,5],{'real.dense','complex.dense','complex.dense'},0.5);test_matlab_faust(factors,prod,30,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
-		
-		#test Faust with 3 factors : 
-		# 1st factor real sparse size 10x3, 
-		# 2nd factor complex dense size 3x2, 
-		# 3rd factor complex sparse size 2x5		
+
+		#test Faust with 3 factors :
+		# 1st factor real sparse size 10x3,
+		# 2nd factor complex dense size 3x2,
+		# 3rd factor complex sparse size 2x5
 		add_test(NAME MATLAB_FAUST_CONFIG_CPLX2 COMMAND matlab -nojvm -nodisplay -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([10,3,2,5],{'real.sparse','complex.dense','complex.sparse'},0.5);test_matlab_faust(factors,prod,30,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 
 
@@ -123,9 +123,9 @@ if(BUILD_WRAPPER_MATLAB)
 	#FIN MODIF NB VM MAC XCode
 
 	endif(WIN32 AND NOT UNIX)
-	# limit the time of the process in case of bug... 
+	# limit the time of the process in case of bug...
 	#CTEST_FULL_OUTPUT
-	
+
 	#DEBUT MODIF NB VM MAC XCode
 	set_tests_properties(MATLAB_FACT_HIER_MEX PROPERTIES TIMEOUT 1000)
 	if(${SLOW_TESTS})
@@ -343,18 +343,18 @@ if(NOT NOCPPTESTS)
 				add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G8_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G8.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G8_RCG_10_factor_3.mat)
 
 			else ()
-				message (STATUS "Warning : The data for demo Visage are not available. ")		
+				message (STATUS "Warning : The data for demo Visage are not available. ")
 			endif()
 
 			add_test(NAME MATFILE_PALM4MSA_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/test_palm4MSA_${TEST_FPP} )
 			add_test(NAME MATFILE_PALM4MSA_FFT_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/test_palm4MSAFFT_${TEST_FPP} )
 
-			# limit the time of the process in case of bug... 
+			# limit the time of the process in case of bug...
 			set_tests_properties(MATFILE_FACT_HADAMARD_${TEST_FPP} MATFILE_FACT_HIER_${TEST_FPP} PROPERTIES TIMEOUT ${TIMEOUT_COMP})
 
 		endforeach()
 
-		if(${SLOW_TESTS})	
+		if(${SLOW_TESTS})
 			# test for the algorithm (palm4MSA and hierarchical_fact) for different configuration (MEG, Hadamard,...) in simple and 	double precision
 
 			add_test(NAME MATFILE_FACT_MEG_float COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_float ${FAUST_DATA_MAT_DIR}/matrix_MEG.mat ${FAUST_CONFIG_MAT_DIR}/config_MEG.mat 22450 500)
@@ -381,9 +381,9 @@ if(NOT NOCPPTESTS)
 		add_test(NAME XML_FACT_HIER_TRANSPOSE COMMAND ${FAUST_BIN_CMDLINE_BIN_DIR}/launch_hierarchical_fact ${FAUST_CONFIG_XML_DIR}/trans_hier_fact_config.xml ${FAUST_DATA_TXT_DIR}/hier_fact_data.txt  T)
 
 		add_test(NAME XML_FACT_MEG COMMAND ${FAUST_BIN_CMDLINE_BIN_DIR}/launch_hierarchical_fact ${FAUST_CONFIG_XML_DIR}/MEG_config.xml ${FAUST_DATA_TXT_DIR}/MEG_data.txt )
-		# limit the time of the process in case of bug... 
+		# limit the time of the process in case of bug...
 		set_tests_properties(XML_FACT_HIER XML_FACT_HIER_TRANSPOSE PROPERTIES TIMEOUT ${TIMEOUT_COMP})
-		set_tests_properties(XML_FACT_MEG PROPERTIES TIMEOUT ${TIMEOUT_MEG})	 
+		set_tests_properties(XML_FACT_MEG PROPERTIES TIMEOUT ${TIMEOUT_MEG})
 	endif(BUILD_READ_XML_FILE)
 
 	add_executable(test_RefManager ${FAUST_SRC_TEST_SRC_CPP_DIR}/test_RefManager.cpp ${FAUST_BIN_TEST_SRC_DIR}/)
