@@ -1333,7 +1333,7 @@ def hierarchical_constends(M, p, A, B, ret_lambda=False, ret_params=False):
 
     Examples:
         >>> from pyfaust import rand
-        >>> from pyfaust import hierarchical
+        >>> from pyfaust.fact import hierarchical
         >>> import numpy as np
         >>> from numpy.random import rand
         >>> from pyfaust.factparams import (ParamsHierarchical, ConstraintList, StoppingCriterion)
