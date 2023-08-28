@@ -24,6 +24,7 @@
 /*      Thomas Gautrais : thomas.gautrais@inria.fr                          */
 /*      Luc Le Magoarou : luc.le-magoarou@inria.fr                          */
 /*      Remi Gribonval  : remi.gribonval@inria.fr                           */
+/*      Hakim Hadj-Djilani: hakim.hadj-djilani@inria.fr                     */
 /*                                                                          */
 /*                              References:                                 */
 /*  [1] Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse       */
@@ -57,15 +58,9 @@ using namespace Faust;
 void test_prod(RandFaustType mat_type)
 {
 	TransformHelper<FPP,Cpu>* th = TransformHelper<FPP,Cpu>::randFaust(mat_type, 12, 12, 1024, 1024, .05);
-//	th->save_mat_file("test_faust.mat");
-//	TransformHelper<FPP,Cpu>* th  = new TransformHelper<FPP, Cpu>();
-//	th->read_from_mat_file("test_faust.mat");
 	th->display();
 	cout << "F norm:" << th->normFro() << endl;
 	MatDense<FPP,Cpu>* M = MatDense<FPP,Cpu>::randMat(1024,1024);
-//	MatDense<FPP, Cpu>* M = new MatDense<FPP, Cpu>(6, 6);
-//	M->setOnes();
-//	*M *= 2;
 	auto start = std::chrono::system_clock::now();
 	auto FM = th->multiply(*M);
 	auto end = std::chrono::system_clock::now();
