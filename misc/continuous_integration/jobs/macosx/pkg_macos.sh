@@ -2,6 +2,8 @@
 
 # Needed environment variables: FAUST_VERSION, MACOS_PY_VER, DURL, DFILE, EXPERIMENTAL_PKG, MACOS_PKG_STORE_PATH (optional)
 
+set -euo pipefail
+
 export PYTHON_PATH=$(which python$MACOS_PY_VER)
 if [[ ! -d 'build' ]]
 then
