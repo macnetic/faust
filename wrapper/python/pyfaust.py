@@ -2385,6 +2385,71 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             return lF.factors(0)
         return lF
 
+    def replace(F, i, new_factor):
+        """
+        Replaces factor of index i by new_factor in a new Faust copy of F.
+
+        NOTE: this is not a true copy, only references to pre-existed factors
+        are copied.
+
+        Args:
+            i: (int)
+                The factor index to replace.
+            new_factor: (a numpy array or a scipy matrix)
+                The factor replacing the i-th factor of F.
+
+        Returns:
+            a copy of F with the i-th factor replaced by new_factor.
+
+        Example:
+            >>> import numpy as np
+            >>> import pyfaust as pf
+            >>> from scipy.sparse import random
+            >>> F = pf.rand(10, 10, num_factors=5)
+            >>> S = random(10, 10, .2)
+            >>> G = F.replace(2, S)
+            >>> np.allclose((F.left(1) @ pf.Faust(S) @ F.right(3)).toarray(), G.toarray())
+            True
+
+
+        \see :py:func:`Faust.factors`, :py:func:`Faust.left`, :py:func:`Faust.right`, :py:func:`Faust.insert`
+        """
+        F._check_factor_idx(i)
+        return F.left(i-1, as_faust=True) @ Faust(new_factor) @ F.right(i+1,
+                                                                        as_faust=True)
+
+    def insert(F, i, new_factor):
+        """
+        Inserts new_factor at index i in a new Faust copy of F.
+
+        NOTE: this is not a true copy, only references to pre-existed factors
+        are copied.
+
+        Args:
+            i: (int)
+                The index of insertion.
+            new_factor: (a numpy array or a scipy matrix)
+                The factor to insert as the i-th factor of F.
+
+        Returns:
+            a copy of F with the i-th factor being new_factor.
+
+        Example:
+            >>> import numpy as np
+            >>> import pyfaust as pf
+            >>> from scipy.sparse import random
+            >>> F = pf.rand(10, 10, num_factors=5)
+            >>> S = random(10, 10, .2)
+            >>> G = F.insert(2, S)
+            >>> np.allclose((F.left(1) @ pf.Faust(S) @ F.right(2)).toarray(), G.toarray())
+            True
+
+
+        \see :py:func:`Faust.factors`, :py:func:`Faust.left`, :py:func:`Faust.right`, :py:func:`Faust.replace`
+        """
+        F._check_factor_idx(i)
+        return F.left(i-1, as_faust=True) @ Faust(new_factor) @ F.right(i,
+                                                                        as_faust=True)
     def _check_factor_idx(F, i):
         if not np.isscalar(i) or not np.isreal(i):
             raise TypeError('i must be an integer.')
