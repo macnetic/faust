@@ -39,6 +39,6 @@ productbuild --synthesize --package ./matio-bin-1.5.12.pkg --package libomp-3670
 sed -e 's/\(.*pkg-ref id=.fr.inria.faust".*\)/\1<title>FAµST '$FAUST_VERSION'<\/title><license file="licenses.html"\/><readme file="installer_readme.html"\/>/' distribution.plist > tmp.plist; mv tmp.plist distribution.plist
 productbuild --distribution ./distribution.plist --package-path matio-bin-1.5.12.pkg --package-path libomp-367070.pkg --package-path faust-$FAUST_VERSION.pkg --resources doc ./faust-matio-omp-$FAUST_VERSION.pkg
 mv -f ./faust-matio-omp-$FAUST_VERSION.pkg ./faust-$FAUST_VERSION.pkg
-#- if [[ -d $MACOS_PKG_STORE_PATH ]]; then sudo cp faust-$FAUST_VERSION.dmg faust-$FAUST_VERSION.pkg $MACOS_PKG_STORE_PATH; fi
-if [[ -d "$MACOS_PKG_STORE_PATH" ]]; then sudo cp faust-$FAUST_VERSION.pkg $MACOS_PKG_STORE_PATH; fi
+#if [[ -d $MACOS_PKG_STORE_PATH ]]; then sudo cp faust-$FAUST_VERSION.dmg faust-$FAUST_VERSION.pkg $MACOS_PKG_STORE_PATH; fi
+#if [[ -d "$MACOS_PKG_STORE_PATH" ]]; then sudo cp faust-$FAUST_VERSION.pkg $MACOS_PKG_STORE_PATH; fi
 
