@@ -42,8 +42,7 @@ ctest:
     coverage: '/Coverage: \d+\.\d+\%/'
     script:
         - ctest -O ctest.log -S ./CDashConfScript.cmake -j4 --output-junit junit_output.xml
-        - mkdir ctest_coverage && gcovr -r ./src/ ./build_* --html-details ctest_coverage/ctest_coverage.html
-        - 'echo Coverage: $(grep -A 3 Lines: ctest_coverage/ctest_coverage.html | tail -1 | sed -e "s/[^[:digit:]]\+//;s/[^%]\+$//")'
+        - misc/continuous_integration/jobs/gcovr_report.sh
         - misc/continuous_integration/jobs/junit_html_report.sh cpp_test_report
         - if grep -B 1 'Outcome:.*Failed' $(ls build*/cpp_test_report.html | tail -1) | sed -ne 's%.*Test case:.*<b>\(.*\)</b>.*%\1%p'; then exit 1; else echo "all tests passed"; exit 0; fi
     except:
