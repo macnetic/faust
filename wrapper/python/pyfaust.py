@@ -2387,7 +2387,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
     def replace(F, i, new_factor):
         """
-        Replaces factor of index i by new_factor in a new Faust copy of F.
+        Replaces the factor of index i by new_factor in a new Faust copy of F.
 
         NOTE: this is not a true copy, only references to pre-existed factors
         are copied.
@@ -2432,7 +2432,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                 The factor to insert as the i-th factor of F.
 
         Returns:
-            a copy of F with the i-th factor being new_factor.
+            a copy of F with new_factor inserted at index i.
 
         Example:
             >>> import numpy as np

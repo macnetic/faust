@@ -1919,6 +1919,70 @@ classdef Faust < handle % subclass of handle for Faust.delete to be called on cl
 		end
 
 		%==========================================================================================
+		%> @brief Replaces the factor of index i by new_factor in a new Faust copy of F.
+		%>
+		%> @note this is not a true copy, only references to pre-existed factors are copied.
+		%>
+		%> @param i, int the factor index to replace.
+		%> @param new_factor, matrix the factor replacing the i-th factor of F.
+		%>
+		%> @retval G a copy of F with the i-th factor replaced by new_factor.
+		%>
+		%> @b Example
+		%> @code
+		%> >> F = matfaust.rand(10, 10, 'num_factors', 5);
+		%> >> S = sprand(10, 10, .2);
+		%> >> G = replace(F, 3, S);
+		%> >> all(all(full(left(F, 2) * matfaust.Faust(S) * right(F, 4)) == full(G)))
+		%>
+		%> ans =
+		%>
+		%>  logical
+		%>
+		%>   1
+		%>
+		%> @endcode
+		%>
+		%> <p>@b See @b also Faust.factors, Faust.left, Faust.right, Faust.insert
+		%==========================================================================================
+		function G = replace(F, i, new_factor)
+			i = check_factor_idx(F, i);
+			G = left(F, i-1, 'as_faust', true) * matfaust.Faust(new_factor) * right(F, i+1, 'as_faust', true);
+		end
+
+		%==========================================================================================
+		%> @brief Inserts new_factor at index i in a new Faust copy of F.
+		%>
+		%> @note this is not a true copy, only references to pre-existed factors are copied.
+		%>
+		%> @param i, int the index of insertion.
+		%> @param new_factor, matrix the factor to insert as the i-th factor of F.
+		%>
+		%> @retval G a copy of F with new_factor inserted at index i.
+		%>
+		%> @b Example
+		%> @code
+		%> >> F = matfaust.rand(10, 10, 'num_factors', 5);
+		%> >> S = sprand(10, 10, .2);
+		%> >> G = insert(F, 3, S);
+		%> >> all(all(full(left(F, 2) * matfaust.Faust(S) * right(F, 3)) == full(G)))
+		%>
+		%> ans =
+		%>
+		%>  logical
+		%>
+		%>   1
+		%>
+		%> @endcode
+		%>
+		%> <p>@b See @b also Faust.factors, Faust.left, Faust.right, Faust.replace
+		%==========================================================================================
+		function G = insert(F, i, new_factor)
+			i = check_factor_idx(F, i);
+			G = left(F, i-1, 'as_faust', true) * matfaust.Faust(new_factor) * right(F, i, 'as_faust', true);
+		end
+
+		%==========================================================================================
 		%> @brief Returns true if F factors are all sparse matrices false otherwise.
 		%>
 		%> What a sparse factor is, depends on csr and bsr arguments. Defaultly,
