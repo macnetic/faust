@@ -2,6 +2,10 @@
 #include "faust_MatButterfly.h"
 #include <cstdio>
 
+/**
+ * Unit tests for Faust::MatButterfly<FPP, Cpu>.
+ */
+
 typedef @TEST_FPP@ FPP;
 
 using namespace Faust;

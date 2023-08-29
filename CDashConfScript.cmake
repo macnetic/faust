@@ -87,6 +87,10 @@ else() #WIN32
 	set(CONF_OPTIONS "${CONF_OPTIONS} -DCMAKE_INSTALL_PREFIX=C:/Users/$ENV{USERNAME}")
 endif()
 
+if((UNIX OR WIN32) AND DEFINED ENV{USE_GPU_MOD})
+	set(CONF_OPTIONS "${CONF_OPTIONS} -DUSE_GPU_MOD=$ENV{USE_GPU_MOD}")
+endif()
+
 set(CONF_OPTIONS "${CONF_OPTIONS} -DEXPERIMENTAL_PKG=ON -DBUILD_TESTING=ON")
 
 #ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY}) # no need to empty build dir. because
@@ -102,7 +106,7 @@ set(CTEST_CONFIGURE_COMMAND "${CMAKE_COMMAND} ${CONF_OPTIONS} ${CTEST_SOURCE_DIR
 message(STATUS "CONFIGURE COMMAND: ${CTEST_CONFIGURE_COMMAND}")
 CTEST_CONFIGURE() #OPTIONS ${CONF_OPTIONS} doesn't work (even with a list()) so we set the ctest_configure_command above
 # no OPTIONS (arg)
-CTEST_BUILD(TARGET install) #need to install for python tests (quickstart.py)
+CTEST_BUILD(TARGET install FLAGS -j4) #need to install for python tests (quickstart.py)
 #CTEST_BUILD()
 
 #IF(UNIX)
