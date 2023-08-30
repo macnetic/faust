@@ -17,10 +17,6 @@
 #include <random>
 #include <vector>
 
-/**
- * \brief Unit tests for Faust::MatDense<FPP, GPU2>.
- */
-
 typedef @TEST_FPP@ FPP;
 
 using namespace std;
@@ -526,7 +522,7 @@ void test_eltwise_mul_ids_vec()
 		for(int j=0; j < cpu_mat->getNbCol(); j++)
 		{
 			auto test_elt = cpu_mat_out.getData()[j*cpu_mat_out.getNbRow()+i];
-			auto ref_elt = cpu_mat->getData()[j*cpu_mat->getNbRow()+i] * v_cpu[ids[i]];
+			auto ref_elt = cpu_mat->getData()[j*cpu_mat->getNbRow()+ids[i]] * v_cpu[i];
 			assert(std::abs(test_elt - ref_elt) < 1e-6);
 		}
 	delete cpu_mat;

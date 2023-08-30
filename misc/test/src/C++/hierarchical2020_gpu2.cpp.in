@@ -95,12 +95,10 @@ int main(int argc, char* argv[])
         cout<<"floating point precision == float"<<endl;
     }
 
-	Faust::enable_gpu_mod();
+    Faust::enable_gpu_mod();
     //default value
-//    string configFilename = "@FAUST_CONFIG_MAT_DIR@/config_hierarchical_fact.mat";
-//    string MatrixFilename = "@FAUST_DATA_MAT_DIR@/matrix_hierarchical_fact.mat";
-	string configFilename = "config_hierarchical_fact.mat";
-	string MatrixFilename = "matrix_hierarchical_fact.mat";
+    string configFilename = "@FAUST_CONFIG_MAT_DIR@/config_hierarchical_fact.mat";
+    string MatrixFilename = "@FAUST_DATA_MAT_DIR@/matrix_hierarchical_fact.mat";
 
     if (argc >= 3)
     {

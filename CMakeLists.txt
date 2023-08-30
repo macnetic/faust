@@ -685,23 +685,27 @@ if(BUILD_MULTITHREAD)
 endif()
 
 if(USE_GPU_MOD)
-	# TODO: test existence of build-cu9.2 # TODO: it must be a cmake variable
+	if (DEFINED ENV{CUDA_VERSIONS})
+		set(CUDA_VERSIONS $ENV{CUDA_VERSIONS})
+	else()
+		# default versions
+		set(CUDA_VERSIONS cu11.4)
+		set(CUDA_VERSIONS cu12.1;cu11.4)
+	endif()
+	# TODO: test existence of build-cuX.X # TODO: it must be a cmake variable
 	# the headers for gpu_mod are the same for any version of cuda
-	include_directories(${FAUST_TARGET} ${GPU_MOD_INCLUDE_DIR} ${GPU_MOD_INCLUDE_DIR}/../build-cu11.4)
+	file(GLOB GPU_MOD_BUILD_DIR "${GPU_MOD_INCLUDE_DIR}/../build*")
+	list(GET GPU_MOD_BUILD_DIR 0 GPU_MOD_BUILD_DIR)
+	include_directories(${FAUST_TARGET} ${GPU_MOD_INCLUDE_DIR} ${GPU_MOD_BUILD_DIR})
 	include_directories(${FAUST_TARGET} ${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR})
-	target_include_directories(${FAUST_TARGET} PUBLIC  ${GPU_MOD_INCLUDE_DIR} ${GPU_MOD_INCLUDE_DIR}/../build-cu11.4)
+	target_include_directories(${FAUST_TARGET} PUBLIC  ${GPU_MOD_INCLUDE_DIR} ${GPU_MOD_BUILD_DIR})
 	target_link_libraries(${FAUST_TARGET} ${GPU_MOD_LIBS})
 	if(UNIX)
 		target_link_libraries(${FAUST_TARGET} dl)
 	endif(UNIX)
 	# TODO: used versions of CUDA and include dir should be CMake variables
 	# do not support CUDA 9.2 on Windows (require too old version VS <= 2017)
-	if (DEFINED ENV{CUDA_VERSIONS})
-		set(CUDA_VERSIONS $ENV{CUDA_VERSIONS})
-	else()
-		set(CUDA_VERSIONS cu11.4)
-		set(CUDA_VERSIONS cu12.1;cu11.4)
-	endif()
+
 	foreach(CUDA_CONF IN LISTS CUDA_VERSIONS)
 		string(REGEX REPLACE "\\." "-${CUDA_CONF}." GPU_MOD_LIB_CUDA_CONF ${GPU_MOD_LIB})
 		# if ${GPU_MOD_LIB} is already a symlink, then we've already gone through it, skip

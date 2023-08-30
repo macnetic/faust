@@ -45,8 +45,7 @@ int main(int argc, const char** argv)
 	}
 	// CONSTRAINT_NAME_SPLINCOL
 	// CONSTRAINT_NAME_SP
-	//	const string MatrixFilename = "@FAUST_DATA_MAT_DIR@/matrix_MEG.mat";
-	const string MatrixFilename = "matrix_MEG.mat";
+	const string MatrixFilename = "@FAUST_DATA_MAT_DIR@/matrix_MEG.mat";
 	Faust::MatDense<double,Cpu> MEG;
 #if(!defined(ON_CPU) && defined(USE_GPU_MOD))
 	Faust::MatDense<double,GPU2> gpu_MEG;
