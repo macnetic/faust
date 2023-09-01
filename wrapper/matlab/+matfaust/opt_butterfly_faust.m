@@ -1,5 +1,5 @@
 %=================================
-%> See matfaust.Faust.opt_butterfly alias.
+%> @brief See matfaust.Faust.opt_butterfly alias.
 %>
 %=================================
 function G = opt_butterfly_faust(F)

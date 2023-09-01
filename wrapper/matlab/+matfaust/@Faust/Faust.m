@@ -3632,33 +3632,33 @@ classdef Faust < handle % subclass of handle for Faust.delete to be called on cl
 		%> @code
 		%> % in a matlab terminal
 		%>
-		%>>> F = matfaust.dft(32)
+		%> >> F = matfaust.dft(32)
 		%>
-		%>F =
+		%> F =
 		%>
-		%>Faust size 32x32, density 0.34375, nnz_sum 352, 6 factor(s):
-		%>- FACTOR 0 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
-		%>- FACTOR 1 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
-		%>- FACTOR 2 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
-		%>- FACTOR 3 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
-		%>- FACTOR 4 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
-		%>- FACTOR 5 (complex) SPARSE, size 32x32, density 0.03125, nnz 32
+		%> Faust size 32x32, density 0.34375, nnz_sum 352, 6 factor(s):
+		%> - FACTOR 0 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+		%> - FACTOR 1 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+		%> - FACTOR 2 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+		%> - FACTOR 3 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+		%> - FACTOR 4 (complex) SPARSE, size 32x32, density 0.0625, nnz 64
+		%> - FACTOR 5 (complex) SPARSE, size 32x32, density 0.03125, nnz 32
 		%>
-		%>>> oF = matfaust.Faust.opt_butterfly(F)
+		%> >> oF = matfaust.Faust.opt_butterfly(F)
 		%>
-		%>oF =
+		%> oF =
 		%>
-		%>Faust size 32x32, density 0.34375, nnz_sum 352, 6 factor(s):
-		%>- FACTOR 0 (complex) Butterfly, size 32x32, density 0.0625, nnz 64
-		%>- FACTOR 1 (complex) Butterfly, size 32x32, density 0.0625, nnz 64
-		%>- FACTOR 2 (complex) Butterfly, size 32x32, density 0.0625, nnz 64
-		%>- FACTOR 3 (complex) Butterfly, size 32x32, density 0.0625, nnz 64
-		%>- FACTOR 4 (complex) Butterfly, size 32x32, density 0.0625, nnz 64
-		%>- FACTOR 5 (complex) PERM, size 32x32, density 0.03125, nnz 32
+		%> Faust size 32x32, density 0.34375, nnz_sum 352, 6 factor(s):
+		%> - FACTOR 0 (complex) Butterfly, size 32x32, density 0.0625, nnz 64
+		%> - FACTOR 1 (complex) Butterfly, size 32x32, density 0.0625, nnz 64
+		%> - FACTOR 2 (complex) Butterfly, size 32x32, density 0.0625, nnz 64
+		%> - FACTOR 3 (complex) Butterfly, size 32x32, density 0.0625, nnz 64
+		%> - FACTOR 4 (complex) Butterfly, size 32x32, density 0.0625, nnz 64
+		%> - FACTOR 5 (complex) PERM, size 32x32, density 0.03125, nnz 32
 		%>
 		%> @endcode
 		%>
-		%>   @b See @b also: matfaust.fact.butterfly, matfaust.dft, matfaust.rand_butterfly.
+		%> @b See @b also: matfaust.fact.butterfly, matfaust.dft, matfaust.rand_butterfly.
 		%>
 		%================================================================
 		function G = opt_butterfly(F)
