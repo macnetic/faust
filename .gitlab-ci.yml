@@ -243,27 +243,7 @@ pyfaust_test_code_coverage:
   stage: code_cov
   coverage: '/Coverage:.*\%/'
   script:
-    # use conda rather than venv because python built on VM has not been
-    # built with --enable-loadable-sqlite-extensions (and sqlite-devel)
-    # but it is a need of coverave python package
-    # so we use py3.10 from conda
-    - cmake -P misc/download_unzip_faust_misc_data.cmake # tests need data
-    - conda create -n test_coverage_pyfaust python==3.10
-    - conda activate test_coverage_pyfaust
-      # install pyfaust with pip
-    - pip install $(find ./ -name "*pyfaust*whl")
-    - conda install -c conda-forge -y coverage
-    - coverage erase # just in case
-    - 'PYFAUST_DIR=$(dirname $(python -c "import pyfaust as pf; print(pf.__file__)"))'
-    - coverage run --source $PYFAUST_DIR misc/test/src/Python/test_FaustPy.py
-    - coverage run -a --source $PYFAUST_DIR $PYFAUST_DIR/tests/run.py
-    # take doctest into account
-    - for MOD in factparams proj poly tools fact demo;do PY=$(python -c "import doctest;import pyfaust as pf;from os.path import dirname;fn = dirname(pf.__file__)+'/${MOD}.py';print(fn)"); echo -e '\nif __name__ == "__main__":\n    import doctest;\n    doctest.testmod()' >> $PY;done
-    - for MOD in factparams proj poly tools fact demo;do coverage run -a --source $PYFAUST_DIR $PYFAUST_DIR/$MOD.py;done
-    - coverage report $(find $PYFAUST_DIR -name "*.py" | grep -v -w tests) | tee /tmp/pyfaust_cov_report
-    - 'echo Coverage: $(tail -1 /tmp/pyfaust_cov_report | awk "{print \$4}")'
-    - coverage html $(find $PYFAUST_DIR -name "*.py" | grep -v -w tests)
-    - conda deactivate
+    - misc/continuous_integration/jobs/linux/pyfaust_coverage.sh
   after_script:
     - conda-env remove -n test_coverage_pyfaust
   except:
