@@ -551,7 +551,7 @@ pkg_macos_purepy_rev:
 
 pkg_linux_purepy_rev:
     extends: .pkg_purepy_rev
-    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: $LINUX_MATIO_SLIB_PATH, Z_STATIC_LIB_PATH: $LINUX_ZLIB_SLIB_PATH, HDF5_STATIC_LIB_PATH: $LINUX_HDF5_SLIB_PATH, BUILD_MULTITHREAD: "ON", NOPY2: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "../gpu_mod", EXPERIMENTAL_PKG: "ON", CMAKE_CXX_COMPILER: "clang++"} #, PYTHON_PATH: '/usr/local/bin/python3.10', JOB_PYTHON: 'python3.10'}
+    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: $LINUX_MATIO_SLIB_PATH, Z_STATIC_LIB_PATH: $LINUX_ZLIB_SLIB_PATH, HDF5_STATIC_LIB_PATH: $LINUX_HDF5_SLIB_PATH, BUILD_MULTITHREAD: "ON", NOPY2: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "../gpu_mod", EXPERIMENTAL_PKG: "ON", CMAKE_CXX_COMPILER: "clang++", PYTHON_PATH: '/usr/local/bin/python3.11', JOB_PYTHON: 'python3.11'} # py version should be the same as NUX_PY_VER (unfortunately can't concat as 'python'$NUX_PY_VER with var expansion)
     tags:
         - linux
         - tux_packager

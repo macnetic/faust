@@ -4,17 +4,16 @@
 
 #set -euo pipefail
 
-#[[ -z "$NUX_PY_VER" ]] && echo "I need NUX_PY_VER variable to be set" && exit 1
+[[ -z "$NUX_PY_VER" ]] && echo "I need NUX_PY_VER variable to be set" && exit 1
 
 cmake -P $(dirname $0)/../../../../misc/download_unzip_faust_misc_data.cmake # tests need data
 
 
-# use conda rather than venv because python built on VM has not been
+# use conda rather than venv because python built on linux VM has not been
 # built with --enable-loadable-sqlite-extensions (and sqlite-devel)
 # but it is a need of coverave python package
-# so we use py3.10 from conda
 CONDA_ENV=test_coverage_pyfaust
-conda create -y -n $CONDA_ENV python==3.10 # using py3.10 and not 3.11 because pkg_linux_purepy_rev generates py3.10 whl pkg (cf. .gitlab-ci.yml)
+conda create -y -n $CONDA_ENV python==$NUX_PY_VER
 #conda activate test_coverage_pyfaust
 
 shopt -s expand_aliases
