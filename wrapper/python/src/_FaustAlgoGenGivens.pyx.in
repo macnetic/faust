@@ -16,8 +16,10 @@ cdef class FaustAlgoGenGivens@TYPE_NAME@:
         if(order == 'ascend'): order = 1
         elif(order == 'descend'): order = -1
         elif(order == 'undef'): order = 0
-        else: raise ValueError('order argument must be something among'
-                               '\'ascend\', \'descend\' or \'undef\'')
+
+        if order not in [-1, 0, 1]:
+            raise ValueError('order argument must be something among'
+                             '\'ascend\' (1), \'descend\'(-1) or \'undef\' (0)')
 
         cdef unsigned int Lap_num_rows=Lap.shape[0]
         cdef unsigned int Lap_num_cols=Lap.shape[1]

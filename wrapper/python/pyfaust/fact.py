@@ -69,10 +69,14 @@ def svdtj2(M, nGivens, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
                 * (Faust object) V the right-singular transform.
 
         Example:
-            >>> from pyfaust.fact import svdtj
+            >>> from pyfaust.fact import svdtj2
             >>> from numpy.random import rand
-            >>> M = rand(128,128)
-            >>> U,S,V = svdtj(M, 1024, nGivens_per_fac=64)
+            >>> import numpy as np
+            >>> from scipy.sparse import spdiags
+            >>> M = rand(128, 64)
+            >>> U,S,V = svdtj2(M, 12000, nGivens_per_fac=64, enable_large_Faust=True)
+            >>> np.allclose(U @ S @ V.H, M, atol=1e-1)
+            True
 
      \see
      :py:func:`.eigtj`
@@ -85,10 +89,10 @@ def svdtj2(M, nGivens, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
         print("input eigtj nGivens, tol, order, relerr, "
               "nGivens_per_fac, verbosity, enable_large_Faust:" , nGivens, tol,
               'descend', relerr, nGivens_per_fac, verbosity, enable_large_Faust)
-    D1, W1 = eigtj(M.dot(M.T.conj()), nGivens, tol, 'descend', relerr,
-                   nGivens_per_fac, verbosity, enable_large_Faust)
-    D2, W2 = eigtj(M.T.conj().dot(M), nGivens, tol, 'descend', relerr,
-                   nGivens_per_fac, verbosity, enable_large_Faust)
+    D1, W1 = eigtj(M.dot(M.T.conj()), nGivens, tol, order='descend', relerr=relerr,
+                   nGivens_per_fac=nGivens_per_fac, verbosity=verbosity, enable_large_Faust=enable_large_Faust)
+    D2, W2 = eigtj(M.T.conj().dot(M), nGivens, tol, order='descend', relerr=relerr,
+                   nGivens_per_fac=nGivens_per_fac, verbosity=verbosity, enable_large_Faust=enable_large_Faust)
     S = diag(W1.T.conj() @ M @ W2)
     I = argsort(abs(S))[::-1]
     sign_S = spdiags(sign(S[I]), [0], W1.shape[1], W1.shape[1])
