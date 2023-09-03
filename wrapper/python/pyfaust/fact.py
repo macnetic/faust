@@ -582,6 +582,35 @@ def hierarchical_py(A, J, N, res_proxs, fac_proxs, is_update_way_R2L=False,
     Returns:
         the Faust resulting from the factorization of A.
 
+    Example:
+        >>> from pyfaust.fact import hierarchical_py
+        >>> from pyfaust.proj import splincol
+        >>> from pyfaust import wht
+		>>> import numpy as np
+		>>> from numpy.linalg import norm
+        >>> d = 32
+        >>> dtype='float32'
+        >>> H = wht(d,normed=False)
+        >>> H = H.toarray().astype(dtype)
+        >>> n = int(np.log2(d))
+        >>> fac_projs = []
+        >>> res_projs = []
+        >>> for i in range(n-1): res_projs += [splincol((d,d), int(d/2**(i+1)), normalized=True)]; fac_projs += [splincol((d,d), 2, normalized=True)]
+        >>> HF = hierarchical_py(H.astype(dtype), n, 30, res_projs, fac_projs, is_fact_side_left=False, is_update_way_R2L=True)
+        hierarchical_py factor 1
+        hierarchical_py factor 2
+        hierarchical_py factor 3
+        hierarchical_py factor 4
+        >>> print(HF)
+        Faust size 32x32, density 0.3125, nnz_sum 320, 5 factor(s):
+        - FACTOR 0 (float) SPARSE, size 32x32, density 0.0625, nnz 64
+        - FACTOR 1 (float) SPARSE, size 32x32, density 0.0625, nnz 64
+        - FACTOR 2 (float) SPARSE, size 32x32, density 0.0625, nnz 64
+        - FACTOR 3 (float) SPARSE, size 32x32, density 0.0625, nnz 64
+        - FACTOR 4 (float) SPARSE, size 32x32, density 0.0625, nnz 64
+        >>> print((HF-H).norm()/norm(H) < 1e-6)
+        True
+
     :py:func:`.palm4mspalm4msa_py`
     """
     S = Faust([A], dev=dev, dtype=A.dtype)
