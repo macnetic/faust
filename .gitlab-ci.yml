@@ -1,5 +1,5 @@
 variables:
-    # variables defining where to find the FAµST external data
+    # variables DURL and DFILE define where to find the FAµST external data
     # used by package build scripts
     # Warning: DURL is the base url without the filename
     # DURL: "https://gitlab.inria.fr/faustgrp/gforge_files/-/raw/master/"
@@ -62,11 +62,12 @@ ctest:
             - ctest_coverage
         when:  always
         expire_in: '6 months'
-    only:
+    #only: # disabled because it let a coverage badge to "unknown" if not executed in the latest pipeline (it doesn't slow down the pipeline so much because we have multiple VMs)
+      #
       # C++ tests are executed only if something was modified in C++ lib or C++ tests
-      changes:
-        - src/**/*
-        - misc/test/src/C++/**/*
+      #changes:
+      #  - src/**/*
+      #  - misc/test/src/C++/**/*
 
 ctest_python:
     before_script:
