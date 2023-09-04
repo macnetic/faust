@@ -63,7 +63,7 @@ ctest:
             - ctest_coverage
         when:  always
         expire_in: '6 months'
-    #only: # disabled because it let a coverage badge to "unknown" if not executed in the latest pipeline (it doesn't slow down the pipeline so much because we have multiple VMs)
+    #only: # disabled because it lets a coverage badge to "unknown" if not executed in the latest pipeline (it doesn't slow down the pipeline so much because we have multiple VMs)
       #
       # C++ tests are executed only if something was modified in C++ lib or C++ tests
       #changes:
@@ -754,6 +754,7 @@ test_linux_pkg_release:
     - job: pkg_linux_release_static
       artifacts: true
   script:
+    # TODO: externalize in a script
     - if [[ -d "$HOME/matlab" ]];then rm -Rf $HOME/matlab;fi
     - sudo rpm -i --nodeps build/faust-$CI_COMMIT_TAG-x86_64.rpm
     - matlab -nojvm -nodisplay -r "disp(matfaust.version());disp(full(matfaust.rand(5,5))); exit;" | tee /tmp/faust && grep $CI_COMMIT_TAG /tmp/faust
@@ -761,6 +762,11 @@ test_linux_pkg_release:
     - python$NUX_PY_VER -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'real')"
     - python$NUX_PY_VER -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'complex')"
     - python$NUX_PY_VER -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'float32')"
+    - if echo $CI_RUNNER_TAGS | grep -w cuda; then matlab -nojvm -nodisplay -r "disp(matfaust.version());disp(full(matfaust.rand(5,5, 'dev', 'gpu'))); exit;" | tee -a /tmp/faust && grep $CI_COMMIT_TAG /tmp/faust;fi
+    - if echo $CI_RUNNER_TAGS | grep -w cuda; then python$NUX_PY_VER -c "import pyfaust; print(pyfaust.version()); print(pyfaust.rand(5,5, dev='gpu').toarray());";fi
+    - if echo $CI_RUNNER_TAGS | grep -w cuda; then python$NUX_PY_VER -c "import pyfaust.tests; pyfaust.tests.run_tests('gpu', 'real')";fi
+    - if echo $CI_RUNNER_TAGS | grep -w cuda; then python$NUX_PY_VER -c "import pyfaust.tests; pyfaust.tests.run_tests('gpu', 'complex')";fi
+    - if echo $CI_RUNNER_TAGS | grep -w cuda; then python$NUX_PY_VER -c "import pyfaust.tests; pyfaust.tests.run_tests('gpu', 'float32')";fi
     - sudo rpm -e faust
     - sudo rpm -i --nodeps build/faust-$CI_COMMIT_TAG-static-x86_64.rpm
     - matlab -nojvm -nodisplay -r "disp(matfaust.version());disp(full(matfaust.rand(5,5))); exit;" | tee /tmp/faust && grep $CI_COMMIT_TAG /tmp/faust
@@ -768,6 +774,13 @@ test_linux_pkg_release:
     - python$NUX_PY_VER -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'real')"
     - python$NUX_PY_VER -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'complex')"
     - python$NUX_PY_VER -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'float32')"
+    - if echo $CI_RUNNER_TAGS | grep -w cuda; then matlab -nojvm -nodisplay -r "disp(matfaust.version());disp(full(matfaust.rand(5,5, 'dev', 'gpu'))); exit;" | tee -a /tmp/faust && grep $CI_COMMIT_TAG /tmp/faust;fi
+    - if echo $CI_RUNNER_TAGS | grep -w cuda; then python$NUX_PY_VER -c "import pyfaust; print(pyfaust.version()); print(pyfaust.rand(5,5, dev='gpu').toarray());";fi
+    - if echo $CI_RUNNER_TAGS | grep -w cuda; then python$NUX_PY_VER -c "import pyfaust.tests; pyfaust.tests.run_tests('gpu', 'real')";fi
+    - if echo $CI_RUNNER_TAGS | grep -w cuda; then python$NUX_PY_VER -c "import pyfaust.tests; pyfaust.tests.run_tests('gpu', 'complex')";fi
+    - if echo $CI_RUNNER_TAGS | grep -w cuda; then python$NUX_PY_VER -c "import pyfaust.tests; pyfaust.tests.run_tests('gpu', 'float32')";fi
+    - sudo rpm -e faust
+  after_script:
     - sudo rpm -e faust
   only:
     - tags
@@ -779,6 +792,7 @@ test_linux_pkg_release:
 .test_win_pkg_release:
   stage: pkg_test
   needs:
+    # TODO: externalize in a script
     - job: pkg_win_release
       artifacts: true
   script:
@@ -786,6 +800,7 @@ test_linux_pkg_release:
     - dir
       #- call 'build\faust-%CI_COMMIT_TAG%-amd64.exe' /S
     - python -c "import os; os.system(\"faust-%CI_COMMIT_TAG%-amd64.exe /S\")"
+      # wait some time
     - timeout 20
     - dir 'C:\Program Files\Faust\'
       # the matlab test is disabled because the Windows VMs are not able to access the license server (VPN issue)
@@ -795,6 +810,11 @@ test_linux_pkg_release:
     - python -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'real')"
     - python -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'complex')"
     - python -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'float32')"
+      # execute GPU tests if the gitlab runner is tagged cuda
+    - if NOT "%CI_RUNNER_TAGS:cuda=%"=="%CI_RUNNER_TAGS%" (python -c "import pyfaust; print(pyfaust.version()); print(pyfaust.rand(5,5, dev='gpu').toarray());")
+    - if NOT "%CI_RUNNER_TAGS:cuda=%"=="%CI_RUNNER_TAGS%" (python -c "import pyfaust.tests; pyfaust.tests.run_tests(\"gpu\", \"double\")")
+    - if NOT "%CI_RUNNER_TAGS:cuda=%"=="%CI_RUNNER_TAGS%" (python -c "import pyfaust.tests; pyfaust.tests.run_tests(\"gpu\", \"float32\")")
+    - if NOT "%CI_RUNNER_TAGS:cuda=%"=="%CI_RUNNER_TAGS%" (python -c "import pyfaust.tests; pyfaust.tests.run_tests(\"gpu\", \"complex\")")
     - cd "C:\Program Files\Faust"
       #- call 'uninstall.exe' /S
     - python -c "import os; os.system('uninstall.exe /S')"
@@ -820,6 +840,10 @@ test_linux_pkg_release:
     - $JOB_PYTHON -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'double')"
     - $JOB_PYTHON -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'float32')"
     - $JOB_PYTHON -c "import pyfaust.tests; pyfaust.tests.run_tests('cpu', 'complex')"
+    - if echo $CI_RUNNER_TAGS | grep -w cuda; then $JOB_PYTHON -c "import pyfaust; print(pyfaust.version()); print(pyfaust.rand(5,5, dev='gpu').toarray());";fi
+    - if echo $CI_RUNNER_TAGS | grep -w cuda; then $JOB_PYTHON -c "import pyfaust.tests; pyfaust.tests.run_tests('gpu', 'real')";fi
+    - if echo $CI_RUNNER_TAGS | grep -w cuda; then $JOB_PYTHON -c "import pyfaust.tests; pyfaust.tests.run_tests('gpu', 'complex')";fi
+    - if echo $CI_RUNNER_TAGS | grep -w cuda; then $JOB_PYTHON -c "import pyfaust.tests; pyfaust.tests.run_tests('gpu', 'float32')";fi
   only:
     - tags
 
@@ -872,6 +896,7 @@ test_win_purepy_pkg:
   variables: {JOB_PYTHON: 'py', WIN_PY_VER: '3.10'}
   stage: pkg_test
   script:
+    # TODO: externalize in a script
     - 'cd build\wrapper\python\dist'
     - 'dir /B pyfaust*.whl > pkg_name.txt'
     - 'set /p PKG_NAME=<pkg_name.txt'
@@ -882,6 +907,11 @@ test_win_purepy_pkg:
     - python -c "import pyfaust.tests; pyfaust.tests.run_tests(\"cpu\", \"double\")"
     - python -c "import pyfaust.tests; pyfaust.tests.run_tests(\"cpu\", \"float32\")"
     - python -c "import pyfaust.tests; pyfaust.tests.run_tests(\"cpu\", \"complex\")"
+      # execute GPU tests if the gitlab runner is tagged cuda
+    - if NOT "%CI_RUNNER_TAGS:cuda=%"=="%CI_RUNNER_TAGS%" (python -c "import pyfaust; print(pyfaust.version()); print(pyfaust.rand(5,5, dev='gpu').toarray());")
+    - if NOT "%CI_RUNNER_TAGS:cuda=%"=="%CI_RUNNER_TAGS%" (python -c "import pyfaust.tests; pyfaust.tests.run_tests(\"gpu\", \"double\")")
+    - if NOT "%CI_RUNNER_TAGS:cuda=%"=="%CI_RUNNER_TAGS%" (python -c "import pyfaust.tests; pyfaust.tests.run_tests(\"gpu\", \"float32\")")
+    - if NOT "%CI_RUNNER_TAGS:cuda=%"=="%CI_RUNNER_TAGS%" (python -c "import pyfaust.tests; pyfaust.tests.run_tests(\"gpu\", \"complex\")")
   needs:
     - job: pkg_win_purepy_release
       artifacts: true
