@@ -38,7 +38,8 @@ stages:
     - conda_pkgs
 
 ctest:
-    variables: {SLOW_TESTS: "OFF", BUILD_MULTITHREAD: "ON", GCOV_FLAGS: "ON", GIT_SUBMODULE_STRATEGY: recursive} # the CDashConfScript is able to retrieve OpenMP_gomp_LIBRARY and OpenMP_INC_DIR from environment (it's necessary on macOS, so the runner's env. must be configured)
+    variables: {SLOW_TESTS: "OFF", BUILD_MULTITHREAD: "ON", GCOV_FLAGS: "ON", GIT_SUBMODULE_STRATEGY: recursive, NJOBS: 2} # the CDashConfScript is able to retrieve OpenMP_gomp_LIBRARY and OpenMP_INC_DIR from environment (it's necessary on macOS, so the runner's env. must be configured)
+    # about NJOBS: more than 3 parallel jobs for building tests is too heavy for the linux VMs
     coverage: '/Coverage: \d+\.\d+\%/'
     script:
         - if echo $CI_RUNNER_TAGS | grep -w cuda; then export USE_GPU_MOD=ON; ./misc/continuous_integration/jobs/linux/build_gpu_mod.sh 11.6; export LD_LIBRARY_PATH=$PWD/gpu_mod/build-cu11.6; export CUDA_VERSIONS=cu11.6;fi # enable GPU tests if the runner is capable of
@@ -73,7 +74,7 @@ ctest_python:
     before_script:
       # fix strange libomp deadlock happening on pyfaust.hierarchical unit test (because of an env. config. related error)
       - export LD_PRELOAD=/usr/lib64/libomp.so
-    variables: {BUILD_WRAPPER_PYTHON: "ON", SLOW_TESTS: "OFF", DONT_PYPLOT_FAUST_TIME: "ON", NOCPPTESTS: "ON", NOPY2: "ON", BUILD_MULTITHREAD: "ON", BUILD_FLOAT_PYX: "ON"} #, GIT_STRATEGY: none}
+    variables: {BUILD_WRAPPER_PYTHON: "ON", SLOW_TESTS: "OFF", DONT_PYPLOT_FAUST_TIME: "ON", NOCPPTESTS: "ON", NOPY2: "ON", BUILD_MULTITHREAD: "ON", BUILD_FLOAT_PYX: "ON", NJOBS: 4} #, GIT_STRATEGY: none}
     script:
       - ctest -O ctest.log -S ./CDashConfScript.cmake -j4 --output-junit junit_output.xml || echo "forcing job to continue"
       - if [[ ! -r build_FaustLinuxPython/junit_output.xml ]]; then exit 1;fi
@@ -96,7 +97,8 @@ ctest_python:
         expire_in: '6 months'
 
 ctest_matlab:
-    variables: {BUILD_WRAPPER_MATLAB: "ON", SLOW_TESTS: "OFF", NOCPPTESTS: "ON", BUILD_MULTITHREAD: "OFF", BUILD_FLOAT_MEX: "ON"} # MT OFF because of macOS complicated way to enable OpenMP (but packages are OMP enabled)
+    variables: {BUILD_WRAPPER_MATLAB: "ON", SLOW_TESTS: "OFF", NOCPPTESTS: "ON", BUILD_MULTITHREAD: "OFF", BUILD_FLOAT_MEX: "ON", NJOBS: 1} # MT OFF because of macOS complicated way to enable OpenMP (but packages are OMP enabled)
+    # about NJOBS: more than 1 parallel job for building mex is too heavy for the linux VMs
     script:
       # TODO: refactor with ctest_python script
       - ctest -O ctest.log -S ./CDashConfScript.cmake -j4 --output-junit junit_output.xml || echo "forcing job to continue"
