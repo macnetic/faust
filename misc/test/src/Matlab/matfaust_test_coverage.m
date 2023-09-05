@@ -57,6 +57,9 @@ addpath([ pwd 'misc/test/src/Matlab/'])
 cd misc/test/src/Matlab;
 FaustTest '../../../../misc/test/src/'
 FaustFactoryTest '../../../../misc/test/src/'
+if any(strcmp(split(getenv('CI_RUNNER_TAGS'), ':'), 'cuda'))
+    matfaust.rand(10, 10, 'dev', 'gpu')
+end
 % compute coverage
 %mocov('-cover','/opt/local/faust/matlab/+matfaust',...
 cd '../../../..'
