@@ -50,7 +50,7 @@ Within Anaconda you can also create a virtual environment and install pyfaust th
 
 Create the virtual environment:
 
-    conda create -n pyfaust_venv python==3.9
+    conda create -n pyfaust_venv python==@PY3_VER@
 
 Add conda-forge channel (it is necessary for the pyfaust dependencies):
 
