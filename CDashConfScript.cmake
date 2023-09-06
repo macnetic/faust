@@ -8,7 +8,7 @@ set(CTEST_BUILD_NAME "${CMAKE_SYSTEM}_${CMAKE_HOST_SYSTEM_PROCESSOR}")
 
 if(WIN32)
 	set(CTEST_SITE "FaustWin")
-	set(CTEST_CMAKE_GENERATOR "Visual Studio 14 Win64")
+	set(CTEST_CMAKE_GENERATOR "Visual Studio 16 2019")
 	# set above seems to be ignored
 	set(CONF_OPTIONS "${CONF_OPTIONS} -G  'Visual Studio 16 2019' -DMATIO_INC_DIR=$ENV{MATIO_INC_DIR} -DMATIO_LIB_FILE=$ENV{MATIO_LIB_FILE}")
 elseif(APPLE AND UNIX)
@@ -106,14 +106,16 @@ set(CTEST_CONFIGURE_COMMAND "${CMAKE_COMMAND} ${CONF_OPTIONS} ${CTEST_SOURCE_DIR
 message(STATUS "CONFIGURE COMMAND: ${CTEST_CONFIGURE_COMMAND}")
 CTEST_CONFIGURE() #OPTIONS ${CONF_OPTIONS} doesn't work (even with a list()) so we set the ctest_configure_command above
 # no OPTIONS (arg)
-
-if(DEFINED ENV{NJOBS})
-	set(NJOBS $ENV{NJOBS})
+if(NOT WIN32)
+	if(DEFINED ENV{NJOBS})
+		set(NJOBS $ENV{NJOBS})
+	else()
+		set(NJOBS 1)
+	endif()
+	CTEST_BUILD(TARGET install FLAGS -j${NJOBS}) #need to install for python tests (quickstart.py)
 else()
-	set(NJOBS 1)
+	CTEST_BUILD(TARGET install)
 endif()
-CTEST_BUILD(TARGET install FLAGS -j${NJOBS}) #need to install for python tests (quickstart.py)
-#CTEST_BUILD()
 
 #IF(UNIX)
 #	set(ENV{LD_LIBRARY_PATH} "$ENV{LD_LIBRARY_PATH}:${CTEST_INSTALL_DIR}/lib")
