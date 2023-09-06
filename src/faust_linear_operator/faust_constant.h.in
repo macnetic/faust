@@ -88,16 +88,19 @@ using Real = typename Eigen::NumTraits<FPP>::Real; //TODO: should be in a hpp
 
 // WARNING only useful for the getType method of the class getType
 // must be deleted in future release
-enum MatType
+namespace Faust
 {
-   Dense, 
-   Sparse, 
-   Diag,
-   BSR,
-   Butterfly,
-   Perm,
-   None
-};
+	enum MatType
+	{
+		Dense,
+		Sparse,
+		Diag,
+		BSR,
+		Butterfly,
+		Perm,
+		None
+	};
+}
 
 
 
