@@ -162,6 +162,10 @@ if(NOT NOCPPTESTS)
 				target_compile_options(${TEST_BIN_FILE} PRIVATE "${OMP_CXX_FLAGS}")
 				target_link_options(${TEST_BIN_FILE} PRIVATE "-fopenmp") # might work only for linux
 			endif()
+			if(${CMAKE_GENERATOR} MATCHES "Visual")
+				target_compile_definitions(${TEST_BIN_FILE} PRIVATE NOMINMAX)
+				target_compile_options(${TEST_BIN_FILE} PRIVATE /bigobj)
+			endif()
 			target_link_libraries(${TEST_BIN_FILE} ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
 			add_test(NAME UNIT_${TEST_BIN_FILE} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/${TEST_BIN_FILE})
 		endforeach(FILE)
@@ -195,7 +199,12 @@ if(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE AND NOT NOCPPTESTS) 
 	# faust_multiplication : time comparison between Faust-vector product and Dense matrix-vector product
 
 
-	list(APPEND tests hierarchicalFactorization hierarchicalFactorizationFFT test_palm4MSA test_palm4MSAFFT faust_multiplication  faust_matdense_conjugate EigTJ EigTJSparse EigTJParallel EigTJParallelSparse test_MatDiag faust_matsparse_mul faust_matsparse_index_op EigTJComplex EigTJComplexSparse EigTJParallelComplex faust_toeplitz faust_circ faust_hankel faust_sparse_prox_sp palm4msa_2020 hierarchical2020 hierarchical2020Hadamard hierarchicalFactorizationHadamard hierarchicalFactorizationButterfly hierarchicalFactorizationButterflyBalanced test_MatBSR test_dynprog_mul_cpu faust_butterfly_transform faust_butterfly_transform2 faust_butterfly_mat faust_perm_mat test_svdtj)
+	list(APPEND tests hierarchicalFactorization hierarchicalFactorizationFFT test_palm4MSA test_palm4MSAFFT faust_multiplication  faust_matdense_conjugate EigTJ EigTJSparse EigTJParallel EigTJParallelSparse test_MatDiag faust_matsparse_mul faust_matsparse_index_op EigTJComplex EigTJComplexSparse EigTJParallelComplex faust_toeplitz faust_circ faust_hankel faust_sparse_prox_sp palm4msa_2020 hierarchical2020 hierarchical2020Hadamard hierarchicalFactorizationHadamard hierarchicalFactorizationButterfly hierarchicalFactorizationButterflyBalanced test_MatBSR test_dynprog_mul_cpu faust_butterfly_transform faust_butterfly_transform2 faust_butterfly_mat faust_perm_mat)
+
+	if(NOT WIN32)
+		# this test use getopt (unistd.h) which is not defaultly available with WIN32 Visual Studio
+		list(APPEND tests test_svdtj)
+	endif()
 
 	if(FAUST_TORCH)
 		list(APPEND tests faust_torch)
@@ -250,6 +259,11 @@ if(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE AND NOT NOCPPTESTS) 
 				list(APPEND TEST_LIBS ${TORCH_LIBRARY};${Torch_DIR}/../../../lib/libc10.so)
 			endif()
 			target_link_libraries(${TEST_CPP_NAME} ${TEST_LIBS})
+			if(${CMAKE_GENERATOR} MATCHES "Visual")
+				target_compile_definitions(${TEST_CPP_NAME} PRIVATE NOMINMAX)
+				target_compile_options(${TEST_CPP_NAME} PRIVATE /bigobj)
+			endif()
+
 
 
 			if(USE_GPU_MOD)
