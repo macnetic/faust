@@ -7,12 +7,14 @@
 #include "faust_ParamsFGFT.h"
 #include <string>
 #include <sstream>
+#include <vector>
 
 
 #include <iostream>
 #include <iomanip>
 
 using namespace Faust;
+using namespace std;
 
 typedef @TEST_FPP@ FPP;
 typedef @TEST_FPP2@ FPP2;
@@ -111,15 +113,15 @@ int main(int argc, char* argv[])
 	params.Display();
 
 	Faust::MatDense<FPP,Cpu> tmp;
-	char mat_names[params.m_nbFact][7];
+	vector<string> mat_names(params.m_nbFact);
 	for(int i = 0; i < params.m_nbFact; i++)
 	{
-		sprintf(mat_names[i], "ref_f%d", i+1);
-		printf("%s\n", mat_names[i]); 
+		mat_names[i] = "ref_f"+to_string(i+1);
+		cout << mat_names[i] << endl;
 	}
 	for(int i = 0; i < params.m_nbFact; i++)
 	{
-		init_faust_mat_from_matio(tmp, configFilename.c_str(),mat_names[i]);
+		init_faust_mat_from_matio(tmp, configFilename.c_str(),mat_names[i].c_str());
 		ref_facts.push_back(tmp);
 	}
 
