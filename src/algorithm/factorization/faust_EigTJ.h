@@ -8,10 +8,6 @@
 #include "faust_EigTJGen.h"
 #include <cfloat>
 #include <vector>
-#include <cmath>
-#ifndef M_PI
-#define M_PI acos(-1)
-#endif
 
 namespace Faust
 {

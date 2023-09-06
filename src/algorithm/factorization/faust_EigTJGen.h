@@ -6,6 +6,10 @@
 #include "faust_MatDense.h"
 #include "faust_Transform.h"
 #include <cfloat>
+#include <cmath>
+#ifndef M_PI
+#define M_PI acos(-1)
+#endif
 #include <vector>
 
 namespace Faust
