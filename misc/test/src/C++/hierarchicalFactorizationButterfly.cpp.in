@@ -125,7 +125,7 @@ int main(int argc, char** argv)
 	std::cout << "err=" << err << std::endl;
 	delete wht;
 	delete th;
-	if(err > 1e-6)
+	if(err > 1e-5) // 1e-6 is enough for double type but float might lead to larger error
 		exit(1);
 }
 
