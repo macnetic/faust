@@ -25,13 +25,7 @@ int main()
 	init_faust_mat_from_matio(Lap,configFilename.c_str(),"Lap");
 
 	sLap = Lap;
-	int J = 5472; //TODO: should be retrieved from .mat file (not be a hard-coded value)
-	EigTJParallel<FPP,Cpu, FPP> algo(sLap,J,/*t=*/ Lap.getNbRow()/2,
-			/*verbosity */ 0, /* stoppingError */ 0.0, /* errIsRel */ true, /* enable_large_Faust */ true);
 
-	algo.compute_facts();
-
-	vector<pair<int,int>> coord_choices = algo.get_coord_choices();
 
 	mat_t *matfp;
 
@@ -40,17 +34,26 @@ int main()
 		fprintf(stderr,"Error opening MAT file %s", configFilename.c_str());
 		return EXIT_FAILURE;
 	}
+	auto mv_info = Mat_VarReadInfo(matfp, "choices");
 	matvar_t* cell_choices = Mat_VarRead(matfp, "choices");
+//	Mat_VarPrint(cell_choices, 0);
+	int J = cell_choices->dims[1]; 
+	EigTJParallel<FPP,Cpu, FPP> algo(sLap,J,/*t=*/ Lap.getNbRow()/2,
+			/*verbosity */ 0, /* stoppingError */ 0.0, /* errIsRel */ true, /* enable_large_Faust */ true);
+
+	algo.compute_facts();
+
+	vector<pair<int,int>> coord_choices = algo.get_coord_choices();
 	int* p_choices = new int[J];
 	int* q_choices = new int[J];
 	cout << "=======================================" << endl;
-    if ( NULL != cell_choices) {
-        for (int i = 0; i < J*2; i+=2 )
+	if ( NULL != cell_choices) {
+		for (int i = 0; i < J*2; i+=2 )
 		{
-				p_choices[i/2] = (int)((double*) (cell_choices->data))[i];
-				q_choices[i/2] = (int)((double*) (cell_choices->data))[i+1];
+			p_choices[i/2] = (int)((double*) (cell_choices->data))[i];
+			q_choices[i/2] = (int)((double*) (cell_choices->data))[i+1];
 		}
-        free(cell_choices);
+		Mat_VarFree(cell_choices);
 	}
 	Mat_Close(matfp);
 
