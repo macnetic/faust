@@ -381,7 +381,9 @@ if(EXPERIMENTAL_PKG)
 	configure_file(${FAUST_PYTHON_SRC_DIR}/pyfaust.py ${FAUST_PYTHON_BIN_DIR}/pyfaust/__init__.py @ONLY)
 else()
 	# filter experimental code out of pyfaust modules
-	filter_experimental_code("${FAUST_PYTHON_SRC_DIR}/pyfaust.py" "${FAUST_PYTHON_BIN_DIR}/pyfaust/__init__.py")
+	configure_file(${FAUST_PYTHON_SRC_DIR}/pyfaust.py ${FAUST_PYTHON_BIN_DIR}/pyfaust/__init__tmp.py @ONLY)
+	filter_experimental_code("${FAUST_PYTHON_BIN_DIR}/pyfaust/__init__tmp.py" "${FAUST_PYTHON_BIN_DIR}/pyfaust/__init__.py")
+    file(REMOVE ${FAUST_PYTHON_BIN_DIR}/pyfaust/__init__tmp.py)
 endif()
 
 FILE(GLOB_RECURSE PYFAUST_FILES RELATIVE ${FAUST_PYTHON_SRC_DIR} ${FAUST_PYTHON_SRC_DIR}/pyfaust/*py)
