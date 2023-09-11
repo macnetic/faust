@@ -148,6 +148,7 @@ ctest_nightly_linux:
 
 ctest_nightly_win10:
     <<: *ctest_script
+    variables: {BUILD_MULTITHREAD: "ON"}
     only:
         - schedules
     tags:
