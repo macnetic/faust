@@ -372,10 +372,10 @@ if(BUILD_TESTING)
 				# test for the algorithm (palm4MSA and hierarchical_fact) for different configuration (MEG, Hadamard,...) in simple and 	double precision
 
 				add_test(NAME MATFILE_FACT_MEG_float COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_float ${FAUST_DATA_MAT_DIR}/matrix_MEG.mat ${FAUST_CONFIG_MAT_DIR}/config_MEG.mat 22450 500)
-				add_test(NAME MATFILE_FACT_MEG_double COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_double ${FAUST_DATA_MAT_DIR}/matrix_MEG.mat ${FAUST_CONFIG_MAT_DIR}/config_MEG.mat 22550 50)
+				add_test(NAME MATFILE_FACT_MEG_double COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_double ${FAUST_DATA_MAT_DIR}/matrix_MEG.mat ${FAUST_CONFIG_MAT_DIR}/config_MEG.mat 22550 1000)
 
 				add_test(NAME MATFILE_FACT_MEG_TRANSPOSED_float COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_float ${FAUST_DATA_MAT_DIR}/matrix_MEG.mat ${FAUST_CONFIG_MAT_DIR}/config_MEG_transposed.mat 22450 400 T)
-				add_test(NAME MATFILE_FACT_MEG_TRANSPOSED_double COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_double ${FAUST_DATA_MAT_DIR}/matrix_MEG.mat ${FAUST_CONFIG_MAT_DIR}/config_MEG_transposed.mat 22460 100 T)
+				add_test(NAME MATFILE_FACT_MEG_TRANSPOSED_double COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_double ${FAUST_DATA_MAT_DIR}/matrix_MEG.mat ${FAUST_CONFIG_MAT_DIR}/config_MEG_transposed.mat 22460 500 T)
 
 				set_tests_properties(MATFILE_FACT_MEG_float MATFILE_FACT_MEG_double PROPERTIES TIMEOUT ${TIMEOUT_MEG})
 				set_tests_properties(MATFILE_FACT_MEG_TRANSPOSED_float MATFILE_FACT_MEG_TRANSPOSED_double PROPERTIES TIMEOUT ${TIMEOUT_MEG_TRANSPOSED})
