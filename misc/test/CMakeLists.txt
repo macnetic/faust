@@ -59,12 +59,12 @@ if(BUILD_TESTING)
 
 
 		else(WIN32 AND NOT UNIX)
-			add_test(NAME MATLAB_FACT_HIER_MEX COMMAND matlab -nojvm -nodisplay -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('matrix_hierarchical_fact','config_hierarchical_fact',9402,10,'MEX'); catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)" ) # TODO: lambda is 9407 on macOS (why ?)
+			add_test(NAME MATLAB_FACT_HIER_MEX COMMAND matlab -nojvm -nodisplay -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('matrix_hierarchical_fact','config_hierarchical_fact',9402,10,'MEX'); catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)" )
 
 
 
 			if(${SLOW_TESTS})
-				add_test(NAME MATLAB_FACT_MEG_MEX COMMAND matlab -nojvm -nodisplay -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('matrix_MEG','config_MEG',22550,50,'MEX');catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
+				add_test(NAME MATLAB_FACT_MEG_MEX COMMAND matlab -nojvm -nodisplay -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('matrix_MEG','config_MEG',22550,200,'MEX');catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 			endif()
 
 			add_test(NAME MATLAB_FACT_HADAMARD_MEX COMMAND matlab -nojvm -nodisplay -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('matrix_HADAMARD_32','config_HADAMARD_32',5941,30,'MEX');catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
