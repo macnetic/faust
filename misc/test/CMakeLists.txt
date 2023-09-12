@@ -116,9 +116,9 @@ if(BUILD_TESTING)
 			add_test(NAME MATLAB_FAUST_SPEED COMMAND matlab -nojvm -nodisplay -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;test_matlab_faust_time;catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 
 
-			add_test(NAME MATLAB_FAUST_UNIT_TESTS COMMAND matlab -nodisplay -nojvm -r "try;testpass=0;addpath('${PROJECT_BINARY_DIR}/wrapper/matlab:${PROJECT_BINARY_DIR}/run_test/tools:${PROJECT_BINARY_DIR}/run_test/bin');set_path;cd ${FAUST_SRC_TEST_SRC_MATLAB_DIR};FaustTest ${PROJECT_BINARY_DIR}/wrapper/matlab/ ${PROJECT_BINARY_DIR}/run_test/bin ${PROJECT_BINARY_DIR}/run_test/tools;catch ME;testpass=-1;displ(getReport(ME));end;exit(testpass)")
+			add_test(NAME MATLAB_FAUST_UNIT_TESTS COMMAND matlab -nodisplay -nojvm -r "try;testpass=0;addpath('${PROJECT_BINARY_DIR}/wrapper/matlab:${PROJECT_BINARY_DIR}/run_test/tools:${PROJECT_BINARY_DIR}/run_test/bin');set_path;cd ${FAUST_SRC_TEST_SRC_MATLAB_DIR};FaustTest ${PROJECT_BINARY_DIR}/wrapper/matlab/ ${PROJECT_BINARY_DIR}/run_test/bin ${PROJECT_BINARY_DIR}/run_test/tools;catch ME;testpass=-1;disp(getReport(ME));end;exit(testpass)")
 
-			add_test(NAME MATLAB_FAUST_FACTORY_UNIT_TESTS COMMAND matlab -nodisplay -nojvm -r "try;testpass=0;addpath('${PROJECT_BINARY_DIR}/wrapper/matlab:${PROJECT_BINARY_DIR}/run_test/tools:${PROJECT_BINARY_DIR}/run_test/bin');set_path;cd ${FAUST_SRC_TEST_SRC_MATLAB_DIR};FaustFactoryTest ${PROJECT_BINARY_DIR}/wrapper/matlab/ ${PROJECT_BINARY_DIR}/run_test/bin ${PROJECT_BINARY_DIR}/run_test/tools;catch ME;testpass=-1;displ(getReport(ME));end;exit(testpass)")
+			add_test(NAME MATLAB_FAUST_FACTORY_UNIT_TESTS COMMAND matlab -nodisplay -nojvm -r "try;testpass=0;addpath('${PROJECT_BINARY_DIR}/wrapper/matlab:${PROJECT_BINARY_DIR}/run_test/tools:${PROJECT_BINARY_DIR}/run_test/bin');set_path;cd ${FAUST_SRC_TEST_SRC_MATLAB_DIR};FaustFactoryTest ${PROJECT_BINARY_DIR}/wrapper/matlab/ ${PROJECT_BINARY_DIR}/run_test/bin ${PROJECT_BINARY_DIR}/run_test/tools;catch ME;testpass=-1;disp(getReport(ME));end;exit(testpass)")
 
 
 			#FIN MODIF NB VM MAC XCode
@@ -130,6 +130,9 @@ if(BUILD_TESTING)
 		set_tests_properties(MATLAB_FACT_HIER_MEX PROPERTIES TIMEOUT 1000)
 		if(${SLOW_TESTS})
 			set_tests_properties(MATLAB_DEMO_BUILD PROPERTIES TIMEOUT 6000)
+			if(NOT WIN32)
+				set_tests_properties(MATLAB_FAUST_FACTORY_UNIT_TESTS  PROPERTIES TIMEOUT 2400)
+			endif()
 		endif()
 		if(NOT WIN32)
 			set_tests_properties(MATLAB_FAUST_CONFIG_REAL1 MATLAB_FAUST_CONFIG_REAL2 MATLAB_FAUST_CONFIG_REAL3 MATLAB_FAUST_CONFIG_REAL4 MATLAB_FAUST_CONFIG_CPLX1 MATLAB_FAUST_CONFIG_CPLX2 MATLAB_FAUST_2  PROPERTIES TIMEOUT 90)
@@ -137,7 +140,6 @@ if(BUILD_TESTING)
 		if(${SLOW_TESTS})
 			set_tests_properties(MATLAB_FACT_MEG_MEX PROPERTIES TIMEOUT ${TIMEOUT_MEG})
 		endif()
-		set(NAME MATLAB_FAUST_FACTORY_UNIT_TESTS  PROPERTIES TIMEOUT 1200)
 	endif()
 
 
