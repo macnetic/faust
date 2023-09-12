@@ -126,7 +126,6 @@ if(BUILD_TESTING)
 		# limit the time of the process in case of bug...
 		#CTEST_FULL_OUTPUT
 
-		#DEBUT MODIF NB VM MAC XCode
 		set_tests_properties(MATLAB_FACT_HIER_MEX PROPERTIES TIMEOUT 1000)
 		if(${SLOW_TESTS})
 			set_tests_properties(MATLAB_DEMO_INSTALL MATLAB_DEMO_BUILD PROPERTIES TIMEOUT 6000)
@@ -137,7 +136,7 @@ if(BUILD_TESTING)
 		if(${SLOW_TESTS})
 			set_tests_properties(MATLAB_FACT_MEG_MEX PROPERTIES TIMEOUT ${TIMEOUT_MEG})
 		endif()
-		#FIN MODIF NB VM MAC XCode
+		set(NAME MATLAB_FAUST_FACTORY_UNIT_TESTS  PROPERTIES TIMEOUT 1200)
 	endif()
 
 
