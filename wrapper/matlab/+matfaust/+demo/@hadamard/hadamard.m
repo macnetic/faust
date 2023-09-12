@@ -158,8 +158,8 @@ classdef hadamard
 			params_hadamard.cons = cell(2,M-1);
 
 			for j=1:M-1
-				params_hadamard.cons{1,j} = {'splincol',2,n,n};
-				params_hadamard.cons{2,j} = {'splincol',n/2^j,n,n};
+				params_hadamard.cons{1,j} = {'splincol',2,n,n, true, false}; % bools: normalized, positive
+				params_hadamard.cons{2,j} = {'splincol',n/2^j,n,n, true, false};
 			end
 
 			params_hadamard.niter1 = 30;
