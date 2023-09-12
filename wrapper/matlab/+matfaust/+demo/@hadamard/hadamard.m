@@ -278,7 +278,9 @@ classdef hadamard
 			threshold=10^(-10);
 
 
-			h = waitbar(0,'speed up hadamard : Generation of the data ...');
+			if usejava('jvm')
+				h = waitbar(0,'speed up hadamard : Generation of the data ...');
+			end
 			Hadamard_matrices=cell(1,nb_dim);
 			Hadamard_facts=cell(1,nb_dim);
 
@@ -287,7 +289,9 @@ classdef hadamard
 
 
 			for k=1:nb_dim
-				waitbar(k/nb_dim);
+				if usejava('jvm')
+					waitbar(k/nb_dim);
+				end
 				M=Ms(k);
 				n=ns(k);
 				% generation of the hadamard factorisation
@@ -295,7 +299,9 @@ classdef hadamard
 				Hadamard_matrices{k}=H;
 				Hadamard_facts{k}=facts;
 			end
-			close(h);
+			if usejava('jvm')
+				close(h);
+			end
 
 
 
@@ -307,9 +313,13 @@ classdef hadamard
 			%RCGs=ns./(Ms*2);
 			RCGs=zeros(1,nb_dim);
 
-			h = waitbar(0,'2-norm hadamard : multiplication time comparison ...');
+			if usejava('jvm')
+				h = waitbar(0,'2-norm hadamard : multiplication time comparison ...');
+			end
 			for i=1:nb_mult
-				waitbar(i/nb_mult);
+				if usejava('jvm')
+					waitbar(i/nb_mult);
+				end
 				for k=1:nb_dim
 					n=ns(k);
 					hadamard_dense=Hadamard_matrices{k};
@@ -335,7 +345,9 @@ classdef hadamard
 
 				end
 			end
-			close(h);
+			if usejava('jvm')
+				close(h);
+			end
 
 			mean_dense_t = mean(dense_times);
 			mean_faust_t = mean(faust_times);
@@ -438,13 +450,15 @@ classdef hadamard
 			import matfaust.Faust
 
 			nb_mult=500;
-			Ms=6:14;
+			Ms=6:12;
 			ns=2.^Ms;
 			nb_dim=length(Ms);
 			threshold=10^(-10);
 
 
-			h = waitbar(0,'speed up hadamard : Generation of the data ...');
+			if usejava('jvm')
+				h = waitbar(0,'speed up hadamard : Generation of the data ...');
+			end
 			Hadamard_matrices=cell(1,nb_dim);
 			Hadamard_facts=cell(1,nb_dim);
 
@@ -453,7 +467,9 @@ classdef hadamard
 
 
 			for k=1:nb_dim
-				waitbar(k/nb_dim);
+				if usejava('jvm')
+					waitbar(k/nb_dim);
+				end
 				M=Ms(k);
 				n=ns(k);
 				% generation of the hadamard factorisation
@@ -461,7 +477,9 @@ classdef hadamard
 				Hadamard_matrices{k}=H;
 				Hadamard_facts{k}=facts;
 			end
-			close(h);
+			if usejava('jvm')
+				close(h);
+			end
 
 
 
@@ -473,9 +491,13 @@ classdef hadamard
 			faust_mtimes_trans_times=zeros(nb_mult,nb_dim);
 
 
-			h = waitbar(0,'speed up hadamard : multiplication time comparison ...');
+			if usejava('jvm')
+				h = waitbar(0,'speed up hadamard : multiplication time comparison ...');
+			end
 			for i=1:nb_mult
-				waitbar(i/nb_mult);
+				if usejava('jvm')
+					waitbar(i/nb_mult);
+				end
 				for k=1:nb_dim
 					n=ns(k);
 					hadamard_dense=Hadamard_matrices{k};
@@ -530,7 +552,9 @@ classdef hadamard
 					faust_mtimes_trans_times(i,k)=t5;
 				end
 			end
-			close(h);
+			if usejava('jvm')
+				close(h);
+			end
 
 			mean_dense_t = mean(dense_times);
 			mean_faust_t = mean(faust_times);
