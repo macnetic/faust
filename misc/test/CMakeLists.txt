@@ -71,7 +71,7 @@ if(BUILD_TESTING)
 
 			if(${SLOW_TESTS})
 				add_test(NAME MATLAB_DEMO_INSTALL COMMAND matlab -nodesktop -r "try;testpass=0;addpath('${CMAKE_INSTALL_MATLAB_PREFIX}');setup_FAUST;import matfaust.demo.runall;runall;catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
-				add_test(NAME MATLAB_DEMO_BUILD COMMAND matlab -nodesktop -r "try;testpass=0;addpath('${FAUST_MATLAB_BIN_DIR}');setup_FAUST;import matfaust.demo.runall;runall;catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
+				add_test(NAME MATLAB_DEMO_BUILD COMMAND matlab -nodesktop -r "cd('${FAUST_MATLAB_BIN_DIR}')try;testpass=0;addpath('${FAUST_MATLAB_BIN_DIR}');setup_FAUST;import matfaust.demo.runall;runall;catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 			endif(${SLOW_TESTS})
 
 			#test Faust with 3 real factors :
