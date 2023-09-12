@@ -24,9 +24,7 @@ variables:
 
 .ctest_template: &ctest_script
     script:
-        - ctest -O ctest.log -S ./CDashConfScript.cmake -j4 --output-junit junit_output.xml -C Release
-          # Release config is set because of Visual Studio cmake generator that wants absolutely one
-          # but it shouldn't cause any trouble for other envs
+        - ctest -O ctest.log -S ./CDashConfScript.cmake -j4 --output-junit junit_output.xml
           # junit output needs cmake/ctest >= 3.21
 
 stages:
@@ -147,8 +145,10 @@ ctest_nightly_linux:
         - macos
 
 ctest_nightly_win10:
-    <<: *ctest_script
-    variables: {BUILD_MULTITHREAD: "ON"}
+    variables: {BUILD_MULTITHREAD: "ON"} # only cpp tests
+    script:
+      - ctest -O ctest.log -S ./CDashConfScript.cmake -j2 --output-junit junit_output.xml -C Release # only two tests ran at a time
+      # Release config is set because of Visual Studio cmake generator that wants absolutely one
     only:
         - schedules
     tags:
