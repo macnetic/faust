@@ -139,6 +139,7 @@ if(BUILD_TESTING)
 		endif()
 		if(${SLOW_TESTS})
 			set_tests_properties(MATLAB_FACT_MEG_MEX PROPERTIES TIMEOUT ${TIMEOUT_MEG})
+			set_tests_properties(MATLAB_FACT_MEG_MEX PROPERTIES RUN_SERIAL ON)
 		endif()
 	endif()
 
@@ -380,7 +381,9 @@ if(BUILD_TESTING)
 				add_test(NAME MATFILE_FACT_MEG_TRANSPOSED_double COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_double ${FAUST_DATA_MAT_DIR}/matrix_MEG.mat ${FAUST_CONFIG_MAT_DIR}/config_MEG_transposed.mat 22460 500 T)
 
 				set_tests_properties(MATFILE_FACT_MEG_float MATFILE_FACT_MEG_double PROPERTIES TIMEOUT ${TIMEOUT_MEG})
+				set_tests_properties(MATFILE_FACT_MEG_float MATFILE_FACT_MEG_double PROPERTIES RUN_SERIAL ON)
 				set_tests_properties(MATFILE_FACT_MEG_TRANSPOSED_float MATFILE_FACT_MEG_TRANSPOSED_double PROPERTIES TIMEOUT ${TIMEOUT_MEG_TRANSPOSED})
+				set_tests_properties(MATFILE_FACT_MEG_TRANSPOSED_float MATFILE_FACT_MEG_TRANSPOSED_double PROPERTIES RUN_SERIAL ON )
 
 			endif(${SLOW_TESTS})
 
@@ -400,6 +403,7 @@ if(BUILD_TESTING)
 			# limit the time of the process in case of bug...
 			set_tests_properties(XML_FACT_HIER XML_FACT_HIER_TRANSPOSE PROPERTIES TIMEOUT ${TIMEOUT_COMP})
 			set_tests_properties(XML_FACT_MEG PROPERTIES TIMEOUT ${TIMEOUT_MEG})
+			set_tests_properties(XML_FACT_MEG PROPERTIES RUN_SERIAL ON)
 		endif(BUILD_READ_XML_FILE)
 
 		add_executable(test_RefManager ${FAUST_SRC_TEST_SRC_CPP_DIR}/test_RefManager.cpp ${FAUST_BIN_TEST_SRC_DIR}/)
