@@ -128,7 +128,7 @@ It really matters to keep a metric of how much code is covered by the tests in t
   but there is no reason to think it would fail more often than the code for double which is tested.
   However it would be advisable to pursue for a larger coverage.
 
-![matfaust test coverage](https://gitlab.inria.fr/faustgrp/faust/badges/hakim_branch/coverage.svg?job=matfaust_test_code_coverage&key_text=matfaustcov)
+![matfaust test coverage](https://gitlab.inria.fr/faustgrp/faust/badges/hakim_branch/coverage.svg?job=matfaust_test_code_coverage&key_text=matfaustcov&key_width=90)
 
 - C++ test coverage: the calculation of the coverage for C++ tests is
   integrated directly in the ``ctest`` CI job (see the badge in the next to know
