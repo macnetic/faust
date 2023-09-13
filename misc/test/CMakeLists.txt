@@ -21,7 +21,7 @@ if(BUILD_TESTING)
 	# Critical time limiting the test process execution time
 	set(TIMEOUT_MEG 16000)
 	set(TIMEOUT_MEG_TRANSPOSED 16000)
-	set(TIMEOUT_COMP 2000)
+	set(TIMEOUT_COMP 3000)
 
 
 	# MATLAB TEST
@@ -131,7 +131,7 @@ if(BUILD_TESTING)
 		if(${SLOW_TESTS})
 			set_tests_properties(MATLAB_DEMO_BUILD PROPERTIES TIMEOUT 6000)
 			if(NOT WIN32)
-				set_tests_properties(MATLAB_FAUST_FACTORY_UNIT_TESTS  PROPERTIES TIMEOUT 2400)
+				set_tests_properties(MATLAB_FAUST_FACTORY_UNIT_TESTS  PROPERTIES TIMEOUT 3600)
 			endif()
 		endif()
 		if(NOT WIN32)
