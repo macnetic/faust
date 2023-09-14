@@ -168,7 +168,7 @@ option(BUILD_READ_MAT_FILE "Using matio library to read mat files" ON)
 #set(BUILD_READ_XML_FILE OFF)
 #set(BUILD_READ_MAT_FILE OFF)
 
-option(BUILD_WRAPPER_PYTHON "Enable building PyFaust (Python librairie)." OFF)
+option(BUILD_WRAPPER_PYTHON "Enable building pyfaust (Python wrappers)." OFF)
 #set(BUILD_WRAPPER_PYTHON OFF)
 option(USE_MATIO_STATIC_LIBS OFF) # if ON the script waits several variables to
 # be set: MATIO_STATIC_LIB_PATH, Z_STATIC_LIB_PATH, HDF5_STATIC_LIB_PATH, (and optionally SZIP_STATIC_LIB_PATH)
