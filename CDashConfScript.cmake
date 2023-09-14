@@ -91,6 +91,15 @@ if((UNIX OR WIN32) AND DEFINED ENV{USE_GPU_MOD})
 	set(CONF_OPTIONS "${CONF_OPTIONS} -DUSE_GPU_MOD=$ENV{USE_GPU_MOD}")
 endif()
 
+if(APPLE AND DEFINED ENV{OpenMP_gomp_LIBRARY})
+	# macos helper to find clang OpenMP shared library
+	set(CONF_OPTIONS "${CONF_OPTIONS} -DOpenMP_gomp_LIBRARY=$ENV{OpenMP_gomp_LIBRARY}")
+endif()
+
+if(DEFINED ENV{CMAKE_CXX_COMPILER})
+	set(CONF_OPTIONS "${CONF_OPTIONS} -DCMAKE_CXX_COMPILER=$ENV{CMAKE_CXX_COMPILER}")
+endif()
+
 set(CONF_OPTIONS "${CONF_OPTIONS} -DEXPERIMENTAL_PKG=ON -DBUILD_TESTING=ON")
 
 #ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY}) # no need to empty build dir. because

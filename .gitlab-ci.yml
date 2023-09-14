@@ -139,9 +139,9 @@ ctest_nightly_linux:
         - linux
         - matlab
 
-.ctest_nightly_macos:
+ctest_nightly_macos:
     <<: *ctest_nightly_script
-    variables: {BUILD_WRAPPER_MATLAB: "ON", BUILD_WRAPPER_PYTHON: "ON", SLOW_TESTS: "ON", DONT_PYPLOT_FAUST_TIME: "ON", NOPY2: "ON", BUILD_MULTITHREAD: "OFF"} # set mt to OFF because MacOS is kind of tricky to configure with OpenMP
+    variables: {BUILD_WRAPPER_MATLAB: "ON", BUILD_WRAPPER_PYTHON: "ON", SLOW_TESTS: "ON", DONT_PYPLOT_FAUST_TIME: "ON", NOPY2: "ON", BUILD_MULTITHREAD: "ON", OpenMP_gomp_LIBRARY: "/opt/local/lib/libomp/libgomp.dylib"}
     tags:
         - macos
 
