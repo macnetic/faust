@@ -672,10 +672,11 @@ pkg_linux_purepy_release_openblaso:
 .pkg_win_purepy: &pkg_win_purepy
     stage: pkg_purepy
     script:
-#TODO: factorize in a script with pkg_win
         - call misc\continuous_integration\jobs\win\build_gpu_mod.bat
         - if NOT EXIST build (mkdir build) else (rmdir /S /Q build & mkdir build)
         - cd build
+          # make PYTHON_PATH env variable used in cmake findPython consistent with WIN_PY_VER version used after to build the wheel package
+        - FOR /F "tokens=*" %%O IN ('py -%WIN_PY_VER% -c "import sys;print(sys.executable)"') do (SET PYTHON_PATH=%%O)
         - 'cmake -G "Visual Studio 16 2019" -DBUILD_WRAPPER_MATLAB=OFF -DBUILD_WRAPPER_PYTHON=ON -DSLOW_TESTS=OFF -DCPACK_PACKAGE_VERSION=%VERSION% -DCMAKE_INSTALL_PREFIX=win_pkg_build -DBUILD_TESTING=OFF -DMATIO_LIB_FILE=C:/faust_libs/libmatio_standalone.lib -DREMOTE_DATA_URL="%DURL%" -DREMOTE_DATA_FILE="%DFILE%" -DEXPERIMENTAL_PKG=%EXPERIMENTAL_PKG% -DUSE_GPU_MOD=ON  -DCMAKE_PREFIX_PATH=../gpu_mod -DBUILD_MULTITHREAD=ON -DBUILD_FLOAT_PYX=ON -DCMAKE_BUILD_TYPE=%BUILD_CONFIG% -DVCOMPLIB_PATH=C:\faust_libs\vcomp140.dll ..'
         - cmake --build . --target FAUST --config %BUILD_CONFIG%
         - cmake --build . --target python_cpp --config %BUILD_CONFIG%
