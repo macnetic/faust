@@ -141,7 +141,7 @@ ctest_nightly_linux:
 
 ctest_nightly_macos:
     <<: *ctest_nightly_script
-    variables: {BUILD_WRAPPER_MATLAB: "ON", BUILD_WRAPPER_PYTHON: "ON", SLOW_TESTS: "ON", DONT_PYPLOT_FAUST_TIME: "ON", NOPY2: "ON", BUILD_MULTITHREAD: "ON", OpenMP_gomp_LIBRARY: "/opt/local/lib/libomp/libgomp.dylib"}
+    variables: {BUILD_WRAPPER_MATLAB: "ON", BUILD_WRAPPER_PYTHON: "ON", SLOW_TESTS: "ON", DONT_PYPLOT_FAUST_TIME: "ON", NOPY2: "ON", BUILD_MULTITHREAD: "ON", OpenMP_gomp_LIBRARY: "/opt/local/lib/libomp/libgomp.dylib", CMAKE_CXX_COMPILER: "/opt/local/bin/clang++-mp-9.0"}
     tags:
         - macos
 
