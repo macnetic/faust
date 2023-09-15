@@ -68,31 +68,49 @@ setup(
     ext_modules = cythonize(PyFaust, compiler_directives={'language_level': sys.version_info.major }),
     packages = [ 'pyfaust', 'pyfaust.tests' ],
     url = 'https://faust.inria.fr',
-    author = 'INRIA',
+    project_urls={
+        "Bug Tracker": "https://gitlab.inria.fr/faustgrp/faust/-/issues",
+        "Documentation": "https://faust.inria.fr/api-doc/",
+        "Source Code": "https://gitlab.inria.fr/faustgrp/faust",
+    },
+    author = 'Inria, Rémi Gribonval et al.',
     author_email = 'remi.gribonval@inria.fr',
+    maintainer_email = 'hakim.hadj-djilani@inria.fr',
     description = 'FAµST python toolbox',
     long_description = """![FAµST logo](https://faust.inria.fr/files/2016/11/cropped-FAUST.jpeg)
-    ![pipeline status](https://gitlab.inria.fr/faustgrp/faust/badges/main/pipeline.svg?ignore_skipped=true)
-    ![coverage](https://gitlab.inria.fr/faustgrp/faust/badges/hakim_branch/coverage.svg?job=pyfaust_test_code_coverage&key_text=coverage)
+![pipeline status](https://gitlab.inria.fr/faustgrp/faust/badges/main/pipeline.svg?ignore_skipped=true)
+![coverage](https://gitlab.inria.fr/faustgrp/faust/badges/hakim_branch/coverage.svg?job=pyfaust_test_code_coverage&key_text=coverage)
+![python3](https://img.shields.io/pypi/pyversions/pyfaust)
 
-    The FAµST toolbox provides algorithms and data structures to decompose a given dense matrix into a product of sparse matrices in order to reduce its computational complexity (both for storage and manipulation).  FaµST can be used to:
+The FAµST toolbox provides algorithms and data structures to decompose a given dense matrix into a product of sparse matrices in order to reduce its computational complexity (both for storage and manipulation).
 
-    - speedup / reduce the memory footprint of iterative algorithms commonly used for solving high dimensional linear inverse problems,
+FaµST can be used to:
 
-    - learn dictionaries with an intrinsically efficient implementation,
-
-    - compute (approximate) fast Fourier transforms on graphs.
+- speed up / reduce the memory footprint of iterative algorithms commonly used for solving high dimensional linear inverse problems,
+- learn dictionaries with an intrinsically efficient implementation,
+- compute (approximate) fast Fourier transforms on graphs.
 
     """,
     long_description_content_type='text/markdown',
     classifiers = [ 'License :: OSI Approved :: BSD License',
-                   'Programming Language :: Python :: @PY_VER_WITH_POINTS@',
-                  @GPU_CUDA_VERSION_PYPI_CLASSIFIER@],
+                   @PYTHON_VERSION_CLASSIFIERS@
+                   @GPU_CUDA_VERSION_PYPI_CLASSIFIER@
+                   'Development Status :: 5 - Production/Stable',
+                   'Intended Audience :: Science/Research',
+                   'Intended Audience :: Developers',
+                   'License :: OSI Approved :: BSD License',
+                   'Programming Language :: C',
+                   'Programming Language :: C++',
+                   'Topic :: Software Development',
+                   'Topic :: Scientific/Engineering',
+                   'Operating System :: Microsoft :: Windows',
+                   'Operating System :: POSIX',
+                   'Operating System :: Unix',
+                   'Operating System :: MacOS'],
+    platforms = ["Windows", "Linux", "Mac OS-X"],
     install_requires = [@PYFAUST_PYTHON_REQUIREMENTS_AS_PYLIST@],
-    license = "3-clause BSD 2.0",
+    license = "BSD-3-clause",
     package_data = {
         'pyfaust': [ 'data/*.mat', 'license*.txt', 'lib/*.'+lib_ext]
     }
 )
-
-

@@ -21,6 +21,7 @@ variables:
     MACOS_ZLIB_SLIB_PATH: '/opt/local/lib/libz.a'
     MACOS_MATIO_SLIB_PATH: '/usr/local/lib/libmatio.a'
     MACOS_SZIP_SLIB_PATH: '/opt/local/lib/libsz.a'
+    WHEEL_PY_VERSIONS: '3.10;3.11' # used in setup.py (via cmake) for python language classifiers
 
 .ctest_template: &ctest_script
     script:

@@ -495,6 +495,16 @@ else()
 	message(FATAL_ERROR "Not handled system.")
 endif()
 
+if(DEFINED ENV{WHEEL_PY_VERSIONS})
+	set(WHEEL_PY_VERSIONS $ENV{WHEEL_PY_VERSIONS})
+else()
+	set(WHEEL_PY_VERSIONS 3.8;3.9;3.10;3.11)
+endif()
+
+foreach(WHEEL_PY_VER IN LISTS WHEEL_PY_VERSIONS)
+	set(PYTHON_VERSION_CLASSIFIERS "${PYTHON_VERSION_CLASSIFIERS} 'Programming Language :: Python :: ${WHEEL_PY_VER}',")
+endforeach()
+
 configure_file(${FAUST_PYTHON_SRC_DIR}/setup.py.in ${FAUST_PYTHON_BIN_DIR}/setup.py @ONLY)
 
 #install the python wrapper
