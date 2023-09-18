@@ -1,4 +1,3 @@
-
 #include "faust_TransformHelper.h"
 #include "faust_EigTJGen.h"
 #include "faust_SVDTJ.h"
@@ -133,7 +132,7 @@ void auto_tests()
 	delete S_
 
 	cout << string(20, '=') << " test 1: J limit" << endl;
-	auto norm_err = svdtj_and_error(A, J1, J2, t1, t2, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
+	auto err = svdtj_and_error(A, J1, J2, t1, t2, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
 	assert(U->size() == 16); // auto-computed t1 = t2 = 64 for U, 64 * 16 == 1024 == J
 
 	delUSV();
@@ -142,8 +141,8 @@ void auto_tests()
 	J1 = J2 = 0;
 //	tol = 1e-3;
 	tol = 1e-1;
-	norm_err = svdtj_and_error(A, J1, J2, t1, t2, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
-	assert(norm_err <= tol);
+	err = svdtj_and_error(A, J1, J2, t1, t2, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
+	assert(err <= tol);
 
 	delUSV();
 
@@ -152,8 +151,8 @@ void auto_tests()
 	J1 = J2 = 0;
 	tol = 1e-2;
 	relErr = false;
-	norm_err = svdtj_and_error(A, J1, J2, t1, t2, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
-	assert(norm_err <= tol);
+	err = svdtj_and_error(A, J1, J2, t1, t2, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
+	assert(err <= tol);
 
 	delUSV();
 
@@ -162,14 +161,14 @@ void auto_tests()
 	J1 = J2 = 128;
 	tol = 1e-3;
 	relErr = true;
-	norm_err = svdtj_and_error(A, J1, J2, t1, t2, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
-	assert(norm_err <= tol || U->size() * m / 2  <= J1); //automatic t1 = m / 2 for U
-	assert(norm_err <= tol || V->size() * n / 2  <= J2); //automatic t2 = n / 2 for V
+	err = svdtj_and_error(A, J1, J2, t1, t2, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
+	assert(err <= tol || U->size() * m / 2  <= J1); //automatic t1 = m / 2 for U
+	assert(err <= tol || V->size() * n / 2  <= J2); //automatic t2 = n / 2 for V
 
 	cout << string(20, '=') << " test 5: J limit, t=1" << endl;
 	t1 = t2 = 1;
 	J1 = J2 = 100;
-	norm_err = svdtj_and_error(A, J1, J2, t1, t2, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
+	err = svdtj_and_error(A, J1, J2, t1, t2, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
 	assert(U->size() == J1); // auto-computed t1 = t2 = 1
 	t1 = t2 = -1;
 
@@ -180,8 +179,8 @@ void auto_tests()
 	tol = 1e-3;
 	relErr = true;
 	enable_large_Faust = true; //otherwise it doesn't work
-	norm_err = svdtj_and_error(A, J1, J2, t1, t2, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
-	assert(norm_err <= tol);
+	err = svdtj_and_error(A, J1, J2, t1, t2, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
+	assert(err <= tol);
 
 	delUSV();
 
@@ -193,8 +192,8 @@ void auto_tests()
 		tol = 1e-2;
 	relErr = false;
 	enable_large_Faust = true; //otherwise it doesn't work
-	norm_err = svdtj_and_error(A, J1, J2, t1, t2, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
-	assert(norm_err <= tol);
+	err = svdtj_and_error(A, J1, J2, t1, t2, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
+	assert(err <= tol);
 
 	delUSV();
 
@@ -203,8 +202,8 @@ void auto_tests()
 	J1 = J2 = 128;
 	tol = 1e-3;
 	relErr = true;
-	norm_err = svdtj_and_error(A, J1, J2, t1, t2, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
-	assert(norm_err <= tol || U->size() == J1); //automatic t1 = t2 = m (or n) / 2 for U (resp V)
+	err = svdtj_and_error(A, J1, J2, t1, t2, tol, relErr, order, enable_large_Faust, verb, &U, &V, &S_, false);
+	assert(err <= tol || U->size() == J1); //automatic t1 = t2 = m (or n) / 2 for U (resp V)
 	delete sA;
 	delete A;
 
@@ -215,6 +214,15 @@ void auto_tests()
  */
 int main(int argc, char **argv)
 {
+
+#ifdef __APPLE__
+	if(is_same<FPP, complex<float>>::value)
+		cerr << "Warning: macOS detected, complex<float> doesn't work well for these tests if SVDTJ error heuristic is used (compute true error)." << endl;
+	setenv("SVDTJ_ALL_TRUE_ERR", "1", true);
+	// TODO: why is it working well on Linux and Windows but not with macOS clang compiled svdtj (is it unstable?)
+	// no pb with complex<double>, float and double
+#endif
+
 	// default input
 	int m, n, min_mn;
 	m = 128;
