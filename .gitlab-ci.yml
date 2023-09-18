@@ -154,8 +154,8 @@ ctest_nightly_win10:
     tags:
         - win10
 
-doctest_nightly_pyfaust:
-  stage: test
+doctest_pyfaust:
+  stage: pkg_test
   script:
     - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
     - cmake -DBUILD_WRAPPER_PYTHON=ON -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" ..
@@ -180,24 +180,24 @@ doctest_nightly_pyfaust:
     - python -m doctest -v $PF_DIR/demo.py
     - deactivate
     - rm -Rf doctest_pyfaust-latest
-  only:
-    - schedules
   tags:
     - linux
   except:
     - tags
+    - schedules
 
-doctest_nightly_matfaust:
-  stage: test
+doctest_matfaust:
+  stage: pkg_test
   script:
     # get latest successful ci job pkg_linux
-    - 'JOB_ID=$(curl -s --header "PRIVATE-TOKEN: $GITLAB_API_READ_TOKEN" "https://gitlab.inria.fr/api/v4/projects/6960/jobs?scope=success&per_page=10000" 2>&1 | tee -a /tmp/log_curl_doctest_matfaust | sed -e "s/}/}\n/g" | grep "\"pkg_linux\"" | head -1 | sed -ne "s/.*{\"id\":\([[:digit:]]\+\).*pkg_linux.*/\1/p") || echo JOB_ID=$JOB_ID'
-     # download artifact archive
-    - 'curl --header "PRIVATE-TOKEN: $GITLAB_API_READ_TOKEN" https://gitlab.inria.fr/api/v4/projects/6960/jobs/$JOB_ID/artifacts > artifacts.zip'
-    # what's in this?
-    - zip -Tv artifacts.zip
-    - unzip artifacts.zip
-    - rm artifacts.zip
+# NOTE: this code is needed to download the package to install, which is useful only if pkg_linux is on a different pipeline
+#    - 'JOB_ID=$(curl -s --header "PRIVATE-TOKEN: $GITLAB_API_READ_TOKEN" "https://gitlab.inria.fr/api/v4/projects/6960/jobs?scope=success&per_page=10000" 2>&1 | tee -a /tmp/log_curl_doctest_matfaust | sed -e "s/}/}\n/g" | grep "\"pkg_linux\"" | head -1 | sed -ne "s/.*{\"id\":\([[:digit:]]\+\).*pkg_linux.*/\1/p") || echo JOB_ID=$JOB_ID'
+#     # download artifact archive
+#    - 'curl --header "PRIVATE-TOKEN: $GITLAB_API_READ_TOKEN" https://gitlab.inria.fr/api/v4/projects/6960/jobs/$JOB_ID/artifacts > artifacts.zip'
+#    # what's in this?
+#    - zip -Tv artifacts.zip
+#    - unzip artifacts.zip
+#    - rm artifacts.zip
     # what's in this pkg?
     - rpm -ql -p build/faust*rpm
     # install the pkg but first remove poential older one
@@ -209,13 +209,15 @@ doctest_nightly_matfaust:
     - 'for S in Faust proj.sp proj.splin proj.spcol proj.splincol proj.const proj.supp proj.normlin proj.normcol proj.blockdiag proj.anticirc proj.circ proj.hankel proj.skperm proj.sptriu proj.sptril proj.spsymm proj.toeplitz proj.proj_id poly.poly poly.expm_multiply poly.next poly.basis poly.expm_inv_multiply factparams.ParamsHierarchicalWHTNoResCons factparams.ParamsHierarchicalRectMatNoResCons factparams.ParamsHierarchicalNoResCons factparams.ParamsHierarchicalRectMat fact.butterfly fact.check_fact_mat fact.eigtj fact.fact fact.fgft_palm fact.hierarchical_constends fact.hierarchical fact.hierarchical_mhtp fact.palm4msa_constends fact.palm4msa fact.palm4msa_mhtp fact.pinvtj fact.svdtj tools.omp demo.runall; do if matlab -nodisplay -r "addpath /usr/share/octave/packages/doctest-0.7.0/; setup_FAUST; doctest matfaust.$S; exit;" | tee /tmp/matlab_doctest_$S | grep FAIL; then exit 1; fi; done'
   after_script:
     - if [ $(rpm -qa faust | wc -l) -gt 0 ]; then sudo rpm -e faust;fi
-  only:
-    - schedules
+  needs:
+    - job: pkg_linux
+      artifacts: true
   tags:
     - linux
     - matlab
   except:
     - tags
+    - schedules
 
 matfaust_test_code_coverage:
   stage: code_cov

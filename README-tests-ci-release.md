@@ -98,7 +98,7 @@ recent FAµST API is needed).
 #### Doctest
 
 The pyfaust/matfaust API comes with many examples integrated in the [documentation](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/index.html).
- They are all fully tested in the ``doctest_nightly_pyfaust``/``doctest_nightly_matfaust``
+ They are all fully tested in the ``doctest_pyfaust``/``doctest_matfaust``
 ci job (cf. ``gitlab-ci.yml``) and comply with the job passing policy exposed in [1.](#gitlab_pol_test)
 (any doctest failure means normally that the CI pipeline fails). These CI jobs are [scheduled](https://gitlab.inria.fr/faustgrp/faust/-/pipeline_schedules)
 to run by night (cf. Gitlab schedule interface).  If any of the tested pyfaust/matfaust submodules or functions
@@ -111,7 +111,7 @@ It really matters to keep a metric of how much code is covered by the tests in t
 
 - The CI job ``pyfaust_test_code_coverage`` measures the test coverage for
   pyfaust (using the same tests as ``ctest_python`` and
-  ``doctest_nightly_pyfaust``). Look at the badge below to know what is the
+  ``doctest_pyfaust``). Look at the badge below to know what is the
   current coverage of pyfaust tests. The same CI job produces a report available on gitlab-pages
   too as job's artifact (e.g.: [report](https://faustgrp.gitlabpages.inria.fr/-/faust/-/jobs/3169837/artifacts/htmlcov/index.html)
   -- note: this link won't last forever). The report is also available directly as text in the CI job output.
@@ -122,7 +122,7 @@ It really matters to keep a metric of how much code is covered by the tests in t
   produce a coverage report as this [one](https://faustgrp.gitlabpages.inria.fr/-/faust/-/jobs/3186956/artifacts/coverage_html/index.html)
   (this link might be deleted in the future, in which case you might look at artifacts of recent ci
   [jobs](https://gitlab.inria.fr/faustgrp/faust/-/jobs)). The tests used for coverage calculation
-  are pretty much the same as the ones in ``ctest_matlab`` and ``doctest_nightly_matfaust``.
+  are pretty much the same as the ones in ``ctest_matlab`` and ``doctest_matfaust``.
   Look at the badge below to know what is the current coverage of matfaust tests. If it is not so good
   it is partially due to the fact that the code for mex float (single in matlab) is not auto-tested
   but there is no reason to think it would fail more often than the code for double which is tested.
