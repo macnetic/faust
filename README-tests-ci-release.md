@@ -131,8 +131,8 @@ It really matters to keep a metric of how much code is covered by the tests in t
 ![matfaust test coverage](https://gitlab.inria.fr/faustgrp/faust/badges/hakim_branch/coverage.svg?job=matfaust_test_code_coverage&key_text=matfaustcov&key_width=90)
 
 - C++ test coverage: the calculation of the coverage for C++ tests is
-  integrated directly in the ``ctest`` CI job (see the badge in the next to know
-  the coverage rate).
+  integrated directly in the ``ctest``/``ctest_nightly_linux`` CI job
+ (see the badge in the next to know the coverage rate).
 
 - About GPU code: GPU code is tested mainly in C++ tests but ``pyfaust.tests``
   submodule provides the same tests on GPU and CPU (except for the CPU only API).
