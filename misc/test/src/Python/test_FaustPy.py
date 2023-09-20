@@ -945,6 +945,93 @@ class TestFaustPy(unittest.TestCase):
             bf2  = G.factors(0)
             self.assertTrue(allclose(bf.toarray(), bf2.toarray()))
 
+    def test_replace(self):
+        print("Faust.replace")
+        import pyfaust as pf
+        # particular case: single factor Faust
+        F = pf.rand(10, 20, num_factors=1)
+        M = np.random.rand(F.shape[0], F.shape[1])
+        G = F.replace(0, M)
+        H = F.replace(len(F) - 1, M)
+        self.assertTrue(len(G) == 1 and np.allclose(G.toarray(), M))
+        self.assertTrue(len(H) == 1 and np.allclose(H.toarray(), M))
+        self.assertFalse(np.allclose(F.toarray(), M))
+
+        # particular case: replace factor in first/last pos on a non-single factor F
+        F = pf.rand(10, 20)
+        MG = np.random.rand(F.shape[0], F.factors(0).shape[1])
+        G = F.replace(0, MG)
+        ref_G = Faust(MG) @ F.right(1, as_faust=True)
+        self.assertTrue(len(G) == len(ref_G) and np.allclose(G.toarray(),
+                                                         ref_G.toarray()))
+        MH = np.random.rand(F.factors(len(F) -1).shape[0], F.shape[1])
+        H = F.replace(len(F) - 1, MH)
+        ref_H = F.left(len(F) - 2, as_faust=True) @ Faust(MH)
+        self.assertTrue(len(H) == len(ref_H) and np.allclose(H.toarray(),
+                                                         ref_H.toarray()))
+        # particular case: replace factor in "middle" pos on a non-single factor F
+        i = int(len(F)/2)
+        M = np.random.rand(F.factors(i).shape[0], F.factors(i).shape[1])
+        G = F.replace(i, M)
+        ref_G = F.left(i-1, as_faust=True) @ M @ F.right(i+1, as_faust=True)
+        self.assertTrue(len(G) == len(F) and np.allclose(G.toarray(), ref_G))
+        # particular case: test that invalid dimensions are handled
+        err_msg = "Dimensions must agree"
+        self.assertRaisesRegex(ValueError, err_msg, F.replace, i,
+                               np.random.rand(32, 33))
+        self.assertRaisesRegex(ValueError, err_msg, F.replace, i,
+                               np.random.rand(M.shape[0], 33))
+        self.assertRaisesRegex(ValueError, err_msg, F.replace, i,
+                               np.random.rand(32, M.shape[1]))
+        # particular case: test that invalid index is handled
+        err_msg = "i is out of range."
+        self.assertRaisesRegex(ValueError, err_msg, F.replace, len(F), M)
+        err_msg = "i must be an integer."
+        self.assertRaisesRegex(TypeError, err_msg, F.replace, "wrong_index", M)
+
+    def test_insert(self):
+        print("Faust.insert")
+        import pyfaust as pf
+        # particular case: single factor Faust
+        F = pf.rand(10, 20, num_factors=1)
+        M = np.random.rand(10, F.shape[0])
+        G = F.insert(0, M)
+        H = F.insert(len(F) - 1, M)
+        self.assertTrue(len(G) == 2 and np.allclose(G.toarray(), M @ F))
+        self.assertTrue(len(H) == 2 and np.allclose(H.toarray(), M @ F))
+
+        # particular case: insert factor in first/last pos on a non-single factor F
+        F = pf.rand(10, 20)
+        MG = np.random.rand(30, F.shape[0])
+        G = F.insert(0, MG)
+        ref_G = Faust(MG) @ F
+        self.assertTrue(len(G) == len(ref_G) and np.allclose(G.toarray(),
+                                                         ref_G.toarray()))
+        MH = np.random.rand(F.factors(len(F) - 2).shape[1], F.factors(len(F) -1).shape[0])
+        H = F.insert(len(F) - 1, MH)
+        ref_H = F.left(len(F) - 2, as_faust=True) @ Faust(MH) @ F.right(len(F) - 1, as_faust=True)
+        self.assertTrue(len(H) == len(ref_H) and np.allclose(H.toarray(),
+                                                         ref_H.toarray()))
+        # particular case: insert factor in "middle" pos on a non-single factor F
+        i = int(len(F)/2)
+        M = np.random.rand(F.factors(i-1).shape[1], F.factors(i).shape[0])
+        G = F.insert(i, M)
+        ref_G = F.left(i-1, as_faust=True) @ M @ F.right(i, as_faust=True)
+        self.assertTrue(len(G) == len(F)+1 and np.allclose(G.toarray(), ref_G))
+        # particular case: test that invalid dimensions are handled
+        err_msg = "Dimensions must agree"
+        self.assertRaisesRegex(ValueError, err_msg, F.insert, i,
+                               np.random.rand(32, 33))
+        self.assertRaisesRegex(ValueError, err_msg, F.insert, i,
+                               np.random.rand(M.shape[0], 33))
+        self.assertRaisesRegex(ValueError, err_msg, F.insert, i,
+                               np.random.rand(32, M.shape[1]))
+        # particular case: test that invalid index is handled
+        err_msg = "i is out of range."
+        self.assertRaisesRegex(ValueError, err_msg, F.insert, len(F), M)
+        err_msg = "i must be an integer."
+        self.assertRaisesRegex(TypeError, err_msg, F.insert, "wrong_index", M)
+
     def test_palm4msa_constraints_consistency_checking(self):
         print("Test ParamsPalm4MSA.are_constraints_consistent")
         from pyfaust.factparams import ParamsPalm4MSA, ConstraintList, StoppingCriterion

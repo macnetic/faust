@@ -2401,6 +2401,13 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Returns:
             a copy of F with the i-th factor replaced by new_factor.
 
+        Raises:
+            ValueError: in case new_factor has invalid dimensions.
+
+            ValueError: if i is out of range.
+
+            TypeError: if i is not an integer.
+
         Example:
             >>> import numpy as np
             >>> import pyfaust as pf
@@ -2415,8 +2422,17 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         \see :py:func:`Faust.factors`, :py:func:`Faust.left`, :py:func:`Faust.right`, :py:func:`Faust.insert`
         """
         F._check_factor_idx(i)
-        return F.left(i-1, as_faust=True) @ Faust(new_factor) @ F.right(i+1,
-                                                                        as_faust=True)
+        cur_fac_shape = F.m_faust.get_fact_shape(i)
+
+        if cur_fac_shape != new_factor.shape:
+            raise ValueError('Dimensions must agree')
+        if i > 0:
+            out_F = F.left(i - 1, as_faust=True) @ Faust(new_factor)
+        else:
+            out_F = Faust(new_factor)
+        if i < len(F) - 1:
+            out_F = out_F @ F.right(i + 1, as_faust=True)
+        return out_F
 
     def insert(F, i, new_factor):
         """
@@ -2434,6 +2450,13 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Returns:
             a copy of F with new_factor inserted at index i.
 
+        Raises:
+            ValueError: in case new_factor has invalid dimensions.
+
+            ValueError: if i is out of range.
+
+            TypeError: if i is not an integer.
+
         Example:
             >>> import numpy as np
             >>> import pyfaust as pf
@@ -2448,8 +2471,26 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         \see :py:func:`Faust.factors`, :py:func:`Faust.left`, :py:func:`Faust.right`, :py:func:`Faust.replace`
         """
         F._check_factor_idx(i)
-        return F.left(i-1, as_faust=True) @ Faust(new_factor) @ F.right(i,
-                                                                        as_faust=True)
+        if i == 0:
+            expected_shape = (new_factor.shape[0],
+                              F.m_faust.get_fact_shape(0)[0])
+        elif i == len(F) - 1:
+            # i > 0, hence fact i-1 exists
+            expected_shape = (F.m_faust.get_fact_shape(i-1)[1],
+                              new_factor.shape[1])
+        else:
+            expected_shape = (F.m_faust.get_fact_shape(i-1)[1],
+                             F.m_faust.get_fact_shape(i)[0])
+        if expected_shape != new_factor.shape:
+            raise ValueError('Dimensions must agree')
+        out_F = None
+        if i > 0:
+            out_F = F.left(i-1, as_faust=True) @ Faust(new_factor)
+        else:
+            out_F = Faust(new_factor)
+        out_F = out_F @  F.right(i, as_faust=True)
+        return out_F
+
     def _check_factor_idx(F, i):
         if not np.isscalar(i) or not np.isreal(i):
             raise TypeError('i must be an integer.')

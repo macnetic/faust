@@ -456,6 +456,12 @@ cdef class FaustCoreGen@TYPE_NAME@@PROC@:
     def is_all_dense(self):
         return self.@CORE_OBJ@.is_all_dense()
 
+    def get_fact_shape(self, i):
+        # index i must be checked before
+        # it is not checked in in C++ code either
+        return (self.@CORE_OBJ@.get_fact_nb_rows(i),
+                          self.@CORE_OBJ@.get_fact_nb_cols(i))
+
     def get_fact(self,i):
         if(i >=  self.get_nb_factors() or i < 0):
             raise ValueError("factor index must be greater or equal 0 and "
