@@ -357,6 +357,7 @@ if(BUILD_TESTING)
 
 					add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G7_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G7.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G7_RCG_10_factor_3.mat)
 
+					set_tests_properties(MATFILE_MULTIPLICATION_VISAGE_G7_${TEST_FPP}  PROPERTIES TIMEOUT ${TIMEOUT_MEG}) # a bit excessive but Windows VM is slow (tenth less should be enough though)
 					add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G8_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G8.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G8_RCG_10_factor_3.mat)
 
 				else ()
