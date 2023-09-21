@@ -17,9 +17,9 @@
 # The PROJECT_NAME tag is a single word (or a sequence of words surrounded 
 # by quotes) that should identify the project.
 
-PROJECT_NAME           = "FAµST (Flexible Approximate MUlti-layer Sparse Transforms)"
+PROJECT_NAME           = "-" #"FAµST (Flexible Approximate MUlti-layer Sparse Transforms)"
 
-PROJECT_LOGO           = @FAUST_DOC_SRC_DIR@/images/logo.png
+PROJECT_LOGO           = @FAUST_DOC_SRC_DIR@/images/faust_logo-tight.svg
 DOXYFILE_ENCODING      = UTF-8
 SHOW_FILES             = YES
 SHOW_NAMESPACES        = YES

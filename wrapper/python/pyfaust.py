@@ -4888,6 +4888,29 @@ def seed(s):
     """
     _FaustCorePy.FaustCoreGenDblCPU.set_seed(s)
 
+def faust_logo():
+    """
+    Generates the FAµST logo and returns it as a Faust.
+
+    Example:
+        >>> import pyfaust as pf
+        >>> pf.seed(42)
+        >>> logo = pf.faust_logo()
+        >>> logo
+        Faust size 50x50, density 1.3412, nnz_sum 3353, 5 factor(s):
+        - FACTOR 0 (double) DENSE, size 50x50, density 0.2372, nnz 593
+        - FACTOR 1 (double) DENSE, size 50x50, density 0.3228, nnz 807
+        - FACTOR 2 (double) DENSE, size 50x50, density 0.2432, nnz 608
+        - FACTOR 3 (double) DENSE, size 50x50, density 0.3564, nnz 891
+        - FACTOR 4 (double) DENSE, size 50x50, density 0.1816, nnz 454
+
+        >>> # logo.imshow()
+        >>> # import matplotlib.pyplot as plt
+        >>> # plot.show()
+    """
+    from pyfaust.logo import gen_faust_logo
+    return gen_faust_logo()
+
 # experimental block start
 # @PYTORCH_EXP_CODE@
 # experimental block end

@@ -1,4 +1,4 @@
-\mainpage FAµST Toolbox API Documentation
+\mainpage FAµST's Documentation
 
 \section intro_sec What is the FAµST Toolbox ?
 
@@ -6,15 +6,15 @@ The FAµST toolbox provides algorithms and data structures to decompose a given 
 
 FaµST can be used to:
 
-- speedup / reduce the memory footprint of iterative algorithms commonly used for solving high dimensional linear inverse problems,
+- speed up / reduce the memory footprint of iterative algorithms commonly used for solving high dimensional linear inverse problems,
 - learn dictionaries with an intrinsically efficient implementation,
 - compute (approximate) fast Fourier transforms on graphs.
 
 The FAµST toolbox is organized in several parts:
 
 - The FAµST core library, a C++ backend implementing FAµST-related data structures and algorithms,
-- [matfaust](./namespacematfaust.html), a Matlab frontend to the FAµST library,
-- [pyfaust](./namespacepyfaust.html), a Python frontend to the FAµST library. A [sphinx](./sphinx/index.html) doc is also available for pyfaust.
+- [matfaust](./namespacematfaust.html), a Matlab frontend / API to use the FAµST library,
+- [pyfaust](./namespacepyfaust.html), a Python frontend / API to use the FAµST library. A [sphinx](./sphinx/index.html) API doc is also available for pyfaust.
 
 
 @INCLUDE_SPECIFIC_DOC@
@@ -37,7 +37,7 @@ The FAµST toolbox was initially released as a Matlab implementation ([versions 
 
 \section Credits
 
-FAµST has been developed in [PANAMA](https://team.inria.fr/panama/), [DANTE](https://team.inria.fr/dante/) and [OCKHAM](https://team.inria.fr/ockham). <br>
+FAµST has been developed in several Inria teams: [PANAMA](https://team.inria.fr/panama/), [DANTE](https://team.inria.fr/dante/) and [OCKHAM](https://team.inria.fr/ockham). <br>
 For further information on the FAµST Project, please visit the website [faust.inria.fr](https://faust.inria.fr). <br>
 
 Researchers: Luc Le Magoarou, Rémi Gribonval, Le Quoc Tung, Amélie Barbe, Léon Zheng, Elisa Riccietti, Mathurin Massias  
