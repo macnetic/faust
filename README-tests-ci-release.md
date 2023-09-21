@@ -41,12 +41,14 @@ Because these scripts are old there is no guaranty they still work (maybe an upd
 recent FAµST API is needed).
 
 - Unit tests:
-    * ``test_FaustPy.py`` (124 unit tests at the time of writing for
+    * ``test_FaustPy.py`` (128 unit tests at the time of writing for
       ``pyfaust.Faust`` class and all algorithms/functions),
-    * ``FaustTest.m`` (31 unit tests for the ``matfaust.Faust`` class), ``FaustFactoryTest.m``
+    * ``FaustTest.m`` (34 unit tests for the ``matfaust.Faust`` class), ``FaustFactoryTest.m``
       (39 unit tests for factorizations and other algorithms).
     *  For C++ code ``misc/test/src/C++/unit`` (but note that it's a bit misnamed
-       because unit tests are also available in the parent directory).
+       because unit tests are also available in the parent directory). Up to 167 tests
+       are available (accounting for demultiplied tests based on different scalar
+       types available -- float, double, complex float, complex double).
 
 #### Gitlab continuous integration (CI) jobs
 
@@ -62,32 +64,34 @@ recent FAµST API is needed).
 -  Note that for a matter of pipeline speed the CI job named ``ctest_nightly`` is
   made to run the tests that are very slow/long.  They are enabled through the cmake
   option ``SLOW_TESTS`` (which is defaultly set to ``OFF``). There is one job version
-  for each supported OS (``ctest_nightly_linux``, ``ctest_nightly_macos``, ``ctest_nightly_win10``),
-  for the moment the macos' is disabled mainly because the macos' runs in monothread
-  (see ``.gitlab-ci.yml``). These tests are scheduled on Gitlab to run periodically by
-  night.
+  for each supported OS (``ctest_nightly_linux``, ``ctest_nightly_macos``, ``ctest_nightly_win10``).
+  On Linux and Mac OS all the tests are performed (pyfaust, matfaust, C++ core) while
+  on Windows on C++ tests are launched.  These tests are scheduled on Gitlab to run
+  periodically by night. Note that also test coverage CI jobs run at night, it allows
+  to ensure that we keep track of the coverage rates for pyfaust, matfaust and C++
+  core (see [Test Coverage](#test-coverage).
 
 #### Test reports on Gitlab pages
 
 - On the end of ``ctest_python``/``ctest_matlab`` execution a test report in HTML
-  is automatically uploaded to the project Gitlab pages (as a hidden page).
+  is automatically uploaded to the project Gitlab pages.
   The link is displayed in the CI job output (the finished jobs are listed
   [here](https://gitlab.inria.fr/faustgrp/faust/-/jobs)).
   Here is [an example of report for pyfaust](https://faustgrp.gitlabpages.inria.fr/-/faust/-/jobs/3163959/artifacts/build_FaustLinuxPython/python_pyfaust_test_output.html)
   (if this link doesn't work, the associated pipeline has been deleted on Gitlab,
   please look [here](https://gitlab.inria.fr/faustgrp/faust/-/jobs) for a recent ``ctest_python``/``ctest_matlab``
-  output).
+  output). You can also simply browse the job directory of artifacts to find the report.
 
-- On the end of ``ctest`` CI job execution a test report in HTML for the C++ tests too.
-  It is automatically uploaded to the project Gitlab pages (as a hidden page).
+- On the end of ``ctest`` CI job execution, a test report in HTML is produced for
+  the C++ tests too.  It is automatically uploaded to the project Gitlab pages.
   The link is displayed in the CI job output (the finished jobs are listed
-  [here](https://gitlab.inria.fr/faustgrp/faust/-/jobs)).
-  Here is [an example of report for C++ tests](https://faustgrp.gitlabpages.inria.fr/-/faust/-/jobs/3193880/artifacts/build_FaustLinux/cpp_test_report.html)
-  (if this link doesn't work, the associated pipeline has been deleted on Gitlab,
-  please look [here](https://gitlab.inria.fr/faustgrp/faust/-/jobs) for a recent ``ctest``
-  output).
-  At the time of writing a group of 167 C++ tests are ran by the ctest CI job. It includes
-  many unit tests and all these tests passed the latest pipeline.
+  [here](https://gitlab.inria.fr/faustgrp/faust/-/jobs)).  Here is
+  [an example of report for C++ tests](https://faustgrp.gitlabpages.inria.fr/-/faust/-/jobs/3193880/artifacts/build_FaustLinux/cpp_test_report.html)
+  (if this link doesn't work, the associated pipeline has been deleted on Gitlab, please
+  look [here](https://gitlab.inria.fr/faustgrp/faust/-/jobs) for a recent ``ctest``
+  output).  At the time of writing a group of 167 C++ tests are ran by the ctest CI
+  job. It includes many unit tests and all these tests passed the latest pipeline.
+  You can also simply browse the job directory of artifacts to find the report.
 
 - Alternative test reports are available here: [FAµST CDash](https://cdash-ci.inria.fr/index.php?project=faust),
  they are uploaded by ctest/cdash (CDash configuration is available in ``CDashConfScript.cmake``
@@ -97,24 +101,26 @@ recent FAµST API is needed).
 
 #### Doctest
 
-The pyfaust/matfaust API comes with many examples integrated in the [documentation](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/index.html).
- They are all fully tested in the ``doctest_pyfaust``/``doctest_matfaust``
-ci job (cf. ``gitlab-ci.yml``) and comply with the job passing policy exposed in [1.](#gitlab_pol_test)
-(any doctest failure means normally that the CI pipeline fails). These CI jobs are [scheduled](https://gitlab.inria.fr/faustgrp/faust/-/pipeline_schedules)
-to run by night (cf. Gitlab schedule interface).  If any of the tested pyfaust/matfaust submodules or functions
-fails (and they are all tested at the time of writing), the erroneous tests will be
-displayed in the CI job output.
+The pyfaust/matfaust API comes with many examples integrated in the
+[documentation](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/index.html).
+They are all fully tested in the ``doctest_pyfaust``/``doctest_matfaust``
+ci jobs (cf. ``gitlab-ci.yml``) and comply with the job passing policy exposed in [1.](#gitlab_pol_test)
+(any doctest failure means normally that the CI pipeline fails).
+If any of the tested pyfaust/matfaust submodules or functions fails (and they are
+all tested at the time of writing), the erroneous tests will be displayed in the CI
+job output.
 
 #### Test Coverage
 
 It really matters to keep a metric of how much code is covered by the tests in the project.
 
 - The CI job ``pyfaust_test_code_coverage`` measures the test coverage for
-  pyfaust (using the same tests as ``ctest_python`` and
-  ``doctest_pyfaust``). Look at the badge below to know what is the
-  current coverage of pyfaust tests. The same CI job produces a report available on gitlab-pages
-  too as job's artifact (e.g.: [report](https://faustgrp.gitlabpages.inria.fr/-/faust/-/jobs/3169837/artifacts/htmlcov/index.html)
-  -- note: this link won't last forever). The report is also available directly as text in the CI job output.
+  pyfaust (using the same tests as ``ctest_python`` and ``doctest_pyfaust``).
+  Look at the badge below to know what is the current coverage of pyfaust tests. The
+  same CI job produces a report available on gitlab-pages too as job's artifact
+  (e.g.: [report](https://faustgrp.gitlabpages.inria.fr/-/faust/-/jobs/3169837/artifacts/htmlcov/index.html)
+  -- note: this link won't last forever). The report is also available directly as
+  text in the CI job output.
 
 ![pyfaust test coverage](https://gitlab.inria.fr/faustgrp/faust/badges/hakim_branch/coverage.svg?job=pyfaust_test_code_coverage&key_text=pyfaustcov)  
 
@@ -125,26 +131,27 @@ It really matters to keep a metric of how much code is covered by the tests in t
   are pretty much the same as the ones in ``ctest_matlab`` and ``doctest_matfaust``.
   Look at the badge below to know what is the current coverage of matfaust tests. If it is not so good
   it is partially due to the fact that the code for mex float (single in matlab) is not auto-tested
-  but there is no reason to think it would fail more often than the code for double which is tested.
-  However it would be advisable to pursue for a larger coverage.
+  but there is no reason to think it would fail more often than the code for double which is tested
+  (except for tests based on a strong accuracy of the results obtained for approximation algorithms).
+  However it would be advisable to pursue adding tests for a larger coverage.
 
 ![matfaust test coverage](https://gitlab.inria.fr/faustgrp/faust/badges/hakim_branch/coverage.svg?job=matfaust_test_code_coverage&key_text=matfaustcov&key_width=90)
 
 - C++ test coverage: the calculation of the coverage for C++ tests is
-  integrated directly in the ``ctest``/``ctest_nightly_linux`` CI job
- (see the badge in the next to know the coverage rate).
+  integrated directly in the ``ctest`` CI job
+ (the badge below indicates the coverage rate).
 
-- About GPU code: GPU code is tested mainly in C++ tests but ``pyfaust.tests``
-  submodule provides the same tests on GPU and CPU (except for the CPU only API).
-  matfaust is not so well tested on GPU code, another reason for its poor coverage rate.
-  Not all VMs are capable to run GPU tests (cf. [README](README.md) for requirements), the gitlab-runners
-  must be tagged 'cuda' if they are capable of running the GPU code (this condition is
-  verified dynamically in the concerned CI jobs).
+- About GPU code: GPU code is tested mainly in C++ tests but ``pyfaust.tests`` submodule
+  provides the same tests on GPU and CPU (except for the CPU only API). matfaust is
+  not so well tested on GPU code, another reason for its poor coverage rate.  Not all
+  VMs are capable to run GPU tests (cf. [README](README.md) for requirements), the gitlab-runners
+  must be tagged 'cuda' if they are capable of running the GPU code (this condition
+  is verified dynamically in the concerned CI jobs).
 
-- Gitlab badges: Gitlab provides the badge feature for indicating clearly the test coverage rate. The
+- Gitlab badges: Gitlab provides a badge feature for indicating clearly the test coverage rate. The
   pyfaust/matfaust/C++ core coverage badges are displayed above and below.
 
-![C++ test coverage](https://gitlab.inria.fr/faustgrp/faust/badges/hakim_branch/coverage.svg?job=ctest&key_text=cppcov)  
+![C++ test coverage](https://gitlab.inria.fr/faustgrp/faust/badges/hakim_branch/coverage.svg?job=ctest&key_text=c++cov)  
 
 ### Package tests and automatic releases
 
@@ -166,8 +173,8 @@ avoid to find out too late (at release time) that one package doesn't build.
 
 - Jobs for wheel PIP packages for pyfaust only (one per system type):
     * ``pkg_linux_purepy_rev``,
-    *  ``pkg_win_purepy_rev``,
-    *  ``pkg_macos_purepy_rev``.
+    * ``pkg_win_purepy_rev``,
+    * ``pkg_macos_purepy_rev``.
 
 #### Jobs for release packages
 
@@ -195,22 +202,23 @@ The jobs are listed below. See description of equivalent jobs for revision packa
 
 - Jobs for extra feature packages.
 
-     * Another version of Python is used to build the wrappers in these jobs:
-     ``pkg_linux_purepy_release_extra_pyver``, ``pkg_win_purepy_release_extra_pyver``,
-     ``pkg_macos_purepy_release_extra_pyver``.
+    * Another version of Python is used to build the wrappers in these jobs:
+      ``pkg_linux_purepy_release_extra_pyver``, ``pkg_win_purepy_release_extra_pyver``,
+      ``pkg_macos_purepy_release_extra_pyver``. We maintain two versions of Python.
 
-     * ``pkg_macos_purepy_release_torch_linked``,
-       ``pkg_linux_purepy_release_torch_linked``,
-       ``pkg_linux_purepy_release_openblaso`` build packages that provide features
-       associated with tierce scientific libraries.
+    * ``pkg_macos_purepy_release_torch_linked``,
+      ``pkg_linux_purepy_release_torch_linked``,
+      ``pkg_linux_purepy_release_openblaso`` build packages that provide features
+      associated with tierce scientific libraries.
 
-To avoid release a non-workable package as far as possible there are several CI
-jobs to tests the package after building. There are all ``test_`` prefixed and
-their names directly refer to previous jobs described.
+In order to avoid a non-workable package release there are several CI
+jobs to tests the package after building and before uploading to package
+ repositories. There are all ``test_`` prefixed and their names (suffixes)
+ directly refer to previous jobs described.
 
 The packages are then automatically uploaded on the Gitlab project package registry
-(CI job ``upload_pkgs_to_registry``), on pypi for wheel package (CI job ``pypi_pub``)
-and on anaconda ``conda_*_pub``).
+(CI job ``upload_pkgs_to_registry``), on PyPI for wheel package (CI job ``pypi_pub``)
+and on Anaconda (``conda_*_pub``).
 
 ### Documentation CI job
 

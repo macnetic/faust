@@ -1,7 +1,7 @@
 [![pipeline status](https://gitlab.inria.fr/faustgrp/faust/badges/hakim_branch/pipeline.svg?ignore_skipped=true)](https://gitlab.inria.fr/faustgrp/faust/commits/hakim_branch)
-![pyfaust test coverage](https://gitlab.inria.fr/faustgrp/faust/badges/hakim_branch/coverage.svg?job=pyfaust_test_code_coverage&key_text=pyfaustcov)
-![matfaust test coverage](https://gitlab.inria.fr/faustgrp/faust/badges/hakim_branch/coverage.svg?job=matfaust_test_code_coverage&key_text=matfaustcov)
-![C++ test coverage](https://gitlab.inria.fr/faustgrp/faust/badges/hakim_branch/coverage.svg?job=ctest&key_text=cppcov)  
+![pyfaust test coverage](https://gitlab.inria.fr/faustgrp/faust/badges/hakim_branch/coverage.svg?job=pyfaust_test_code_coverage&key_text=pyfaustcov&key_width=90)
+![matfaust test coverage](https://gitlab.inria.fr/faustgrp/faust/badges/hakim_branch/coverage.svg?job=matfaust_test_code_coverage&key_text=matfaustcov&key_width=90)
+![C++ test coverage](https://gitlab.inria.fr/faustgrp/faust/badges/hakim_branch/coverage.svg?job=ctest&key_text=c++cov)  
 
 # ![FAµST](./gen_doc/images/logo.png) Toolbox -- Flexible Approximate Multi-Layer Sparse Transform
 

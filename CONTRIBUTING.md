@@ -15,8 +15,8 @@ Please specify these elements on any issue which might need it:
   .rpm, .deb, .pkg).
 - The version of FAµST: check ``pyfaust.__version__`` on a Python terminal for
   pyfaust or ``matfaust.version()`` on a Matlab terminal for matfaust.
-- Explain clearly the problem you ran into or the feature you're interesting in
-  and preferably give a snippet of code to reproduce easily.
+- Explain clearly the problem you ran into or the feature you're interesting in.
+  For any bug please give a snippet of code to reproduce easily.
 
 ### Code contribution
 
@@ -26,7 +26,7 @@ fix, a feature or an algorithm implementation.
 In order to contribute there are two alternatives:
 
 1. If you have an Inria account or are a member for the FAµST Gitlab project
-   please fork the project (a button is provided on the Gitlab frontpage of the
+   please fork the project (a button is provided on the Gitlab front-page of the
    project). Then do a Merge Request. If you are member of the project you might
    also directly push your branch (giving a meaningful name) and do your merge
    request for this branch.
@@ -44,3 +44,9 @@ possible that the project is still able to build and that related tests pass
 For any further information about building please consult the main
 [README](README.md) (an easy Docker way is provided to build pyfaust wrappers)
 and [tests README](README-tests-ci-release.md).
+
+### Documentation / tutorials
+
+You might also be interested in contributing with a tutorial. So far we have used Jupyter
+Notebook for pyfaust tutorials and Matlab Live Scripts for matfaust. You can send
+us your tutorial, if we find it useful we will add it on the [website](https://faust.inria.fr).
