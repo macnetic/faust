@@ -2767,7 +2767,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         ncols = min(nf,max_cols)
         nrows = int(nf/ncols)+1
         plt.subplot(nrows,ncols,nrows*ncols)
-        plt.title(name+'.toarray()')
+        plt.title(name+'.toarray()', fontweight='bold')
         if F.dtype == 'complex':
             plt.imshow(abs(F.toarray()), aspect='equal')
         else:
@@ -2780,7 +2780,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             if(not isinstance(fac, np.ndarray)):
                 fac = fac.toarray()
             plt.xticks([]); plt.yticks([])
-            plt.suptitle('Factors of the Faust '+ name)
+            plt.suptitle('Factors of the Faust '+ name, fontweight='bold')
             if fac.dtype == 'complex':
                 plt.imshow(abs(fac),aspect='equal')
             else:
