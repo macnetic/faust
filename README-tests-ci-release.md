@@ -151,7 +151,7 @@ It really matters to keep a metric of how much code is covered by the tests in t
 - Gitlab badges: Gitlab provides a badge feature for indicating clearly the test coverage rate. The
   pyfaust/matfaust/C++ core coverage badges are displayed above and below.
 
-![C++ test coverage](https://gitlab.inria.fr/faustgrp/faust/badges/hakim_branch/coverage.svg?job=ctest&key_text=c++cov)  
+![C++ test coverage](https://gitlab.inria.fr/faustgrp/faust/badges/hakim_branch/coverage.svg?job=ctest&key_text=C%2B%2Bcov)  
 
 ### Package tests and automatic releases
 
