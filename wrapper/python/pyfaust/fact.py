@@ -1356,6 +1356,32 @@ def _prepare_hierarchical_fact(M, p, callee_name, ret_lambda, ret_params,
     return p, M
 
 # experimental block start
+def _unmul_lambda_on_AB(F):
+    """
+    Utility function.
+    See; :py:func:`.hierarchical_constends`, :py:func:`.palm4msa_constends`.
+    """
+    # correct F in case lambda multiplied A or B (which must be constants)
+    fac_nbytes = [F.factors(i, as_faust=True).nbytes for i in range(len(F))]
+    # the factor multiplied is assumed to be the smallest one in memory
+    # because (Hierarchical) PALM4MSA backend 2020 was used
+    min_id = np.argmin(fac_nbytes)
+    if min_id == 0:
+        F = F.factors(min_id, as_faust=True)/_lambda @ \
+                F.factors(1, as_faust=True)*_lambda @ \
+                F.right(2, as_faust=True)
+    elif min_id == len(F) - 1:
+        _F = F.factors(0, as_faust=True)
+        if len(F) == 3:
+                F = _F @ F.factors(1, as_faust=True) * _lambda @ \
+                        F.factors(min_id, as_faust=True) / _lambda
+        else: #len(F) > 3
+                F = _F @  F.factors(1, as_faust=True) * _lambda @ \
+                        F.factors(range(2, min_id), as_faust=True) @ \
+                        F.factors(min_id, as_faust=True) / _lambda
+    return F
+
+
 def hierarchical_constends(M, p, A, B, ret_lambda=False, ret_params=False):
     """
     Tries to approximate M by \f$A \prod_j S_j B\f$ using the hierarchical.
@@ -1366,7 +1392,7 @@ def hierarchical_constends(M, p, A, B, ret_lambda=False, ret_params=False):
 
     Examples:
         >>> from pyfaust import rand
-        >>> from pyfaust.fact import hierarchical
+        >>> from pyfaust.fact import hierarchical_constends
         >>> import numpy as np
         >>> from numpy.random import rand
         >>> from pyfaust.factparams import (ParamsHierarchical, ConstraintList, StoppingCriterion)
@@ -1411,17 +1437,8 @@ def hierarchical_constends(M, p, A, B, ret_lambda=False, ret_params=False):
                                p.step_size, p.constant_step_size,
                                p.is_fact_side_left,
                                p.is_verbose)
-    F, _lambda = hierarchical(M, p, ret_lambda=True,
-                                          ret_params=False)
-    FA_lambda = F.factors(0)
-    FA = FA_lambda/_lambda
-    new_F_factors = [ FA ]
-    F_without_A = F.factors(range(1,F.numfactors()))
-    F_without_A = F_without_A * _lambda
-    new_F_factors += [ F_without_A.factors(i) for i in
-                      range(0,F_without_A.numfactors()) ]
-    new_F = Faust(new_F_factors)
-    F = new_F
+    F, _lambda = hierarchical(M, p, ret_lambda=True, backend=2020)
+    F = _unmul_lambda_on_AB(F)
     ret_list = [F]
     if(ret_lambda):
         ret_list += [ _lambda ]
@@ -1474,19 +1491,12 @@ def palm4msa_constends(M, p, A, B=None, ret_lambda=False):
                        init_lambda=p.init_lambda, step_size=p.step_size,
                        constant_step_size = p.constant_step_size,
                        is_verbose = p.is_verbose)
-    F, _lambda = palm4msa(M, p, ret_lambda=True)
-    F = \
-    Faust([F.factors(0)/_lambda]+[F.factors(1)*_lambda]+
-          [F.factors(i)
-           for i in
-           range(2,F.numfactors())])
+    F, _lambda = palm4msa(M, p, ret_lambda=True, backend=2020)
+    F = _unmul_lambda_on_AB(F)
     if(ret_lambda):
         return F, _lambda
     else:
         return F
-
-
-
 # experimental block end
 
 # experimental block start
