@@ -36,7 +36,9 @@ In order to contribute there are two alternatives:
   with the command ``git diff > my.patch``. Please send to all email addresses
   listed in [contact section of the official web site](https://faust.inria.fr/contact/).
   If you ask us we might fork the project for you and add your account as
-  project member so that you can proceed as in first alternative.
+  a project member (it needs first that an Inria sponsor set your account in the
+  [external account portal](https://external-account.inria.fr)). Once your account
+  is set you can proceed as in first alternative.
 
 Before sending us your patches or merge requests, please ensure as much as
 possible that the project is still able to build and that related tests pass
