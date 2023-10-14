@@ -77,9 +77,9 @@ setup(
     author_email = 'remi.gribonval@inria.fr',
     maintainer_email = 'hakim.hadj-djilani@inria.fr',
     description = 'FAµST python toolbox',
-    long_description = """![FAµST logo](https://faust.inria.fr/files/2016/11/cropped-FAUST.jpeg)
+    long_description = """[![FAµST logo](https://faust.inria.fr/files/2023/10/faust_logo-tight-e1697291652682.png)](https://faust.inria.fr)
 ![pipeline status](https://gitlab.inria.fr/faustgrp/faust/badges/main/pipeline.svg?ignore_skipped=true)
-![coverage](https://gitlab.inria.fr/faustgrp/faust/badges/hakim_branch/coverage.svg?job=pyfaust_test_code_coverage&key_text=coverage)
+[![coverage](https://gitlab.inria.fr/faustgrp/faust/badges/hakim_branch/coverage.svg?job=pyfaust_test_code_coverage&key_text=coverage)](https://gitlab.inria.fr/faustgrp/faust/-/jobs/artifacts/hakim_branch/browse/htmlcov?job=pyfaust_test_code_coverage)
 ![python3](https://img.shields.io/pypi/pyversions/pyfaust)
 
 The FAµST toolbox provides algorithms and data structures to decompose a given dense matrix into a product of sparse matrices in order to reduce its computational complexity (both for storage and manipulation).
