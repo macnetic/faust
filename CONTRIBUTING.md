@@ -21,7 +21,7 @@ Please specify these elements on any issue which might need it:
 ### Code contribution
 
 Any contribution to the development is of course welcome. It might be a bug
-fix, a feature or an algorithm implementation.
+fix, a new test, a feature or an algorithm implementation.
 
 In order to contribute there are two alternatives:
 
