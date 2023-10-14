@@ -33,6 +33,8 @@ CE conda install -c conda-forge -y coverage
 CE coverage erase # just in case
 PYFAUST_DIR=$(dirname $(CE python -c "import pyfaust as pf; print(pf.__file__)"))
 CE coverage run --source $PYFAUST_DIR misc/test/src/Python/test_FaustPy.py
+CE coverage run --source $PYFAUST_DIR $PYFAUST_DIR/datadl.py /tmp/myfaustdata
+rm -Rf /tmp/myfaustdata
 #coverage run -a --source $PYFAUST_DIR $PYFAUST_DIR/tests/run.py # only real and cpu, all tests are ran below
 # take doctest into account
 for MOD in factparams proj poly tools fact demo;do PY=$(CE python -c "import doctest;import pyfaust as pf;from os.path import dirname;fn = dirname(pf.__file__)+'/${MOD}.py';print(fn)"); echo -e '\nif __name__ == "__main__":\n    import doctest;\n    doctest.testmod()' >> $PY;done
