@@ -1341,8 +1341,8 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                         p += [Pipe()]
                         o = col_offset
                         t.append(Process(target=out_col_proc,
-                                         args=(F[o:o+n].toarray(),
-                                               A[o:o+n].toarray(),
+                                         args=(F[:, o:o+n].toarray(),
+                                               A[:, o:o+n].toarray(),
                                                p[-1])))
                         os += [o]
                     t[-1].start()
@@ -1350,10 +1350,10 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
                 for j in range(nthreads):
                     if not thread_or_proc:
-                        if j < nthreads -1:
-                            out[os[j]:os[j+1]] = p[j][1].recv()
+                        if j < nthreads - 1:
+                            out[:, os[j]:os[j+1]] = p[j][1].recv()
                         else:
-                            out[os[j]:] = p[j][1].recv()
+                            out[:, os[j]:] = p[j][1].recv()
                     t[j].join()
             else:
                 for j in range(F.shape[1]):

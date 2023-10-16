@@ -701,6 +701,39 @@ class TestFaustPy(unittest.TestCase):
         print("test mul Faust-complex csr_matrix")
         self.assertTrue(np.allclose(F@Mc, F.toarray().dot(Mc.toarray())))
 
+    def testEltWiseMul(self):
+        """
+        A part of the code is hidden feature but test it anyway.
+        """
+        print("test Faust.__mul__ (elementwise)")
+        from os import environ
+        from pyfaust import rand
+        if 'PYFAUST_ELT_WISE_MUL_BY_COL' in environ:
+            del environ['PYFAUST_ELT_WISE_MUL_BY_COL']
+        # 1. test the toarray version
+        # 1.1 arrays of same size
+        F = rand(10, 12)
+        G = rand(10, 12)
+        M = np.random.rand(10, 12)
+        self.assertTrue(np.allclose(F*G, F.toarray()*
+                                    G.toarray()))
+
+        self.assertTrue(np.allclose(F*M, F.toarray()*
+                                    M))
+        # 1.2 with broadcasting
+        v = np.random.rand(12)
+        self.assertTrue(np.allclose((F*v).toarray(), F.toarray()*
+                                    v))
+        # 2. test the Faust version
+        environ['PYFAUST_ELT_WISE_MUL_BY_COL'] = '1'
+        # 2.1 sequential calc
+        self.assertTrue(np.allclose(F*G, F.toarray()*
+                                    G.toarray()))
+        # 2.2 parallel calc
+        environ['PYFAUST_ELT_WISE_MUL_BY_COL'] = 'parallel'
+        self.assertTrue(np.allclose(F*G, F.toarray()*
+                                    G.toarray()))
+
     def testConcatenate(self):
         print("testConcatenate()")
         from pyfaust import rand
