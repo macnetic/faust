@@ -59,10 +59,11 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
     certain functions (e.g. with the `inplace` argument of the
     functions Faust.swap_rows, Faust.swap_cols, Faust.optimize_time).
 
-    Other noticeable limitations are that one cannot:
-        - perform elementwise operations between two Fausts (e.g. elementwise
-        multiplication), the addition and subtraction are available though,
-        - reshape a Faust.
+    Other noticeable limitations:
+        - Although elementwise multiplication, addition and subtraction are available,
+          performing elementwise operations between two Fausts is discouraged,
+
+        - One cannot reshape a Faust.
 
     A last but not least caveat is that Faust doesn't support the numpy universal
     functions (ufuncs) except if the contrary is specified in the API doc. for
@@ -1308,7 +1309,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             out = np.empty(F.shape, dtype='complex' if F.dtype == 'complex'
                           or A.dtype == 'complex' else 'double')
             parallel = environ[k].startswith('parallel')
-            thread_or_proc = environ[k].endswith('thread')
+            use_thread = environ[k].endswith('thread')
             def out_col(j, ncols=1):
                 for i in range(ncols):
                     F_col = F[:,j+i].toarray()
@@ -1335,7 +1336,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                 while len(t) < nthreads:
                     n = cols_per_thread + (1 if len(t) < rem_cols
                                                     else 0)
-                    if thread_or_proc:
+                    if use_thread:
                         t.append(Thread(target=out_col, args=(col_offset, n)))
                     else:
                         p += [Pipe()]
@@ -1349,7 +1350,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                     col_offset += n
 
                 for j in range(nthreads):
-                    if not thread_or_proc:
+                    if not use_thread:
                         if j < nthreads - 1:
                             out[:, os[j]:os[j+1]] = p[j][1].recv()
                         else:

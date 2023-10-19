@@ -730,7 +730,12 @@ class TestFaustPy(unittest.TestCase):
         self.assertTrue(np.allclose(F*G, F.toarray()*
                                     G.toarray()))
         # 2.2 parallel calc
+        # use multiprocessing
         environ['PYFAUST_ELT_WISE_MUL_BY_COL'] = 'parallel'
+        self.assertTrue(np.allclose(F*G, F.toarray()*
+                                    G.toarray()))
+        # use multithreading
+        environ['PYFAUST_ELT_WISE_MUL_BY_COL'] = 'parallel_thread'
         self.assertTrue(np.allclose(F*G, F.toarray()*
                                     G.toarray()))
 
