@@ -1555,11 +1555,15 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             return C
 
         # use recursive meth.
-        C=F
+        C = F
         for G in args:
-           if axis == 0:
+            if not isFaust(G):
+                G = Faust(G)
+            if C.dtype != G.dtype:
+                G = G.astype(C.dtype)
+            if axis == 0:
                 C = Faust(core_obj=C.m_faust.vertcat(G.m_faust))
-           elif axis == 1:
+            elif axis == 1:
                 C = Faust(core_obj=C.m_faust.horzcat(G.m_faust))
 
         return C
@@ -3567,9 +3571,9 @@ def concatenate(_tuple, *args, axis=0, **kwargs):
     if not isinstance(_tuple, tuple):
         raise TypeError("first arg must be a tuple")
     if isFaust(_tuple[0]):
-        return _tuple[0].concatenate(*_tuple[1:], axis=axis)
+        return _tuple[0].concatenate(*_tuple[1:], axis=axis, **kwargs)
     elif np.array([isFaust(_tuple[i]) for i in range(len(_tuple))]).any():
-        return Faust(_tuple[0]).concatenate(*_tuple[1:], axis=axis)
+        return Faust(_tuple[0]).concatenate(*_tuple[1:], axis=axis, **kwargs)
     elif np.array([issparse(_tuple[i]) for i in range(len(_tuple))]).all():
         if axis == 0:
             return svstack(_tuple)
