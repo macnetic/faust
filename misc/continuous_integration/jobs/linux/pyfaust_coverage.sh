@@ -33,7 +33,7 @@ CE conda install -c conda-forge -y coverage
 CE coverage erase # just in case
 PYFAUST_DIR=$(dirname $(CE python -c "import pyfaust as pf; print(pf.__file__)"))
 CE coverage run --source $PYFAUST_DIR misc/test/src/Python/test_FaustPy.py
-CE coverage run --source $PYFAUST_DIR $PYFAUST_DIR/datadl.py /tmp/myfaustdata
+CE coverage run -a --source $PYFAUST_DIR $PYFAUST_DIR/datadl.py /tmp/myfaustdata
 rm -Rf /tmp/myfaustdata
 #coverage run -a --source $PYFAUST_DIR $PYFAUST_DIR/tests/run.py # only real and cpu, all tests are ran below
 # take doctest into account
