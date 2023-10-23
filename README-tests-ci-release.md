@@ -99,6 +99,10 @@ recent FAµST API is needed).
  building part of tests (which is important in case of errors, that's where you might look up
  to understand why a C++ test or a wrapper failed to build).
 
+- ``ctest_nightly*`` don't produce any HTML report. Only a ctest report is uploaded to CDash and ctest logs
+  are also uploaded to gitlab as job artifacts. It can be convenient to look at these logs on Gitlab as
+  it avoids to connect to the VMs.
+
 #### Doctest
 
 The pyfaust/matfaust API comes with many examples integrated in the

@@ -141,12 +141,18 @@ ctest_nightly_linux:
   tags:
     - linux
     - matlab
+  artifacts:
+    paths:
+      - build_FaustLinuxPythonMatlab/Testing # cmake configure, build, ctest logs
 
 ctest_nightly_macos:
     <<: *ctest_nightly_script
     variables: {BUILD_WRAPPER_MATLAB: "ON", BUILD_WRAPPER_PYTHON: "ON", SLOW_TESTS: "ON", DONT_PYPLOT_FAUST_TIME: "ON", NOPY2: "ON", BUILD_MULTITHREAD: "ON", OpenMP_gomp_LIBRARY: "/opt/local/lib/libomp/libgomp.dylib", CMAKE_CXX_COMPILER: "/opt/local/bin/clang++-mp-9.0"}
     tags:
         - macos
+    artifacts:
+      paths:
+        - build_FaustMacOSPythonMatlab/Testing # cmake configure, build, ctest logs
 
 ctest_nightly_win10:
     <<: *ctest_nightly_script
@@ -155,6 +161,9 @@ ctest_nightly_win10:
         - schedules
     tags:
         - win10
+    artifacts:
+      paths:
+        - build_FaustWin/Testing # cmake configure, build, ctest logs
 
 doctest_pyfaust:
   stage: pkg_test
