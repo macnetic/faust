@@ -8,6 +8,9 @@ from scipy.sparse.linalg import aslinearoperator
 import tempfile
 import os
 import random
+from os.path import exists, join
+from os import unlink
+from tempfile import gettempdir
 
 
 class TestFaust(unittest.TestCase):
@@ -399,3 +402,21 @@ class TestFaust(unittest.TestCase):
                 sF = pf.rand(10, 10, dtype=src_dt, dev=self.dev)
                 dF = sF.astype(dst_dt)
                 self.assertTrue(np.allclose(sF.toarray().astype(dst_dt), dF.toarray()))
+
+    def test_logo(self):
+        print("Test pyfaust.logo")
+        from pyfaust import faust_logo
+        F = faust_logo()
+        self.assertEqual(F.shape, (50, 50))
+        self.assertEqual(len(F), 5)
+        self.assertTrue(isFaust(F))
+        from pyfaust.logo import draw_faust
+        file1 = join(gettempdir(),'faust_logo.svg')
+        file2 = join(gettempdir(),'faust_logo-tight.svg')
+        if exists(file1):
+            unlink(file1)
+        if exists(file2):
+            unlink(file2)
+        draw_faust()
+        self.assertTrue(exists(file1))
+        self.assertTrue(exists(file2))
