@@ -85,6 +85,8 @@ def omp(y, D, maxiter=None, tol=0, relerr=True, verbose=False):
         tolerr = tol**2
 
     # try if enough memory
+    # TODO: maybe it should be done directly on empty()
+    # below
     try:
         R = zeros(maxiter)
     except:
@@ -96,6 +98,8 @@ def omp(y, D, maxiter=None, tol=0, relerr=True, verbose=False):
     residual = y
     s = s_initial
     R = empty((maxiter+1,maxiter+1)).astype(np.complex128)
+    # TODO: why do we use complex, we should do in function of D, y
+    # likewise H should be T in real case
     oldErr = y.T.conj()@y
     # err_mse = []
 
@@ -114,9 +118,9 @@ def omp(y, D, maxiter=None, tol=0, relerr=True, verbose=False):
         I = argmax(abs(DR))
         IN += [I]
         # update R
-        R[0:r_count+1, 0:r_count+1] = UpdateCholeskyFull(R[0:r_count,
-                                                           0:r_count], P, Pt,
-                                                         IN, m)
+        R[0:r_count+1, 0:r_count+1] = UpdateCholesky(R[0:r_count,
+                                                       0:r_count], P, Pt,
+                                                     IN, m)
 
         r_count+=1
 
