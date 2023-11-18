@@ -1,6 +1,7 @@
 import unittest
 from pyfaust.tests.TestFaust import TestFaust
 from pyfaust.tests.TestPoly import TestPoly
+from pyfaust.tests.TestFactParams import TestFactParams
 
 
 def run_tests(dev, dtype):
@@ -10,7 +11,7 @@ def run_tests(dev, dtype):
     """
     runner = unittest.TextTestRunner()
     suite = unittest.TestSuite()
-    for class_name in ['TestFaust', 'TestPoly']:
+    for class_name in ['TestFaust', 'TestPoly', 'TestFactParams']:
         testloader = unittest.TestLoader()
         test_names = eval("testloader.getTestCaseNames("+class_name+")")
         for meth_name in test_names:
