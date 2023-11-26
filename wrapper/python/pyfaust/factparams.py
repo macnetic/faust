@@ -1035,26 +1035,31 @@ class ParamsFact(ABC):
         map = {'dense': 0, 'sparse': 1, 'dynamic': 2}
         if isinstance(factor_format, str):
             if factor_format not in map.keys():
-                raise ValueError("factor_format as str must be in "+repr(map.keys()))
+                raise ValueError("factor_format as str must be in "
+                                 + repr(list(map.keys())))
             return map[factor_format]
         elif isinstance(factor_format, int):
             if factor_format not in map.values():
-                raise ValueError("factor_format as int must be in"
-                                 +repr(map.values()))
+                raise ValueError("factor_format as int must be in "
+                                 + repr(list((map.values()))))
             return factor_format
+        else:
+            raise TypeError('factor_format must be int or str')
 
     @staticmethod
     def factor_format_int2str(factor_format):
         a = ['dense', 'sparse', 'dynamic']
         if isinstance(factor_format, str):
             if factor_format not in a:
-                raise ValueError("factor_format as str must be in "+a)
+                raise ValueError("factor_format as str must be in " + repr(a))
             return factor_format
         elif isinstance(factor_format, int):
             if factor_format not in range(len(a)):
-                raise ValueError("factor_format as int must be in"
-                                 +repr(range(len(a))))
-            return factor_format
+                raise ValueError("factor_format as int must be in "
+                                 + repr(list(range(len(a)))))
+            return a[factor_format]
+        else:
+            raise TypeError('factor_format must be int or str')
 
     @staticmethod
     def get_constraints(projs):
