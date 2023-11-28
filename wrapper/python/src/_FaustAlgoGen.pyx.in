@@ -46,9 +46,9 @@ cdef class FaustAlgoGen@TYPE_NAME@:
         cpp_stop_crit.max_num_its = p.stop_crit.maxiter
         cpp_stop_crit.erreps = p.stop_crit.erreps
 
-        calling_fft_algo = isinstance(init_D, np.ndarray)
+        calling_fgft_algo = isinstance(init_D, np.ndarray)
 
-        if(not p.init_facts):
+        if not p.init_facts:
             p.init_facts = [ None for i in range(p.num_facts) ]
             if(p.is_update_way_R2L):
                 zeros_id = p.num_facts-1
@@ -62,7 +62,7 @@ cdef class FaustAlgoGen@TYPE_NAME@:
                                         p.constraints[i]._num_cols, order='F',
                                         dtype=M.dtype)
 
-        if(calling_fft_algo):
+        if calling_fgft_algo:
             # FFT/FGFT case, we store lambda in first position and the diagonal
             # of D in the next
             _out_buf = np.empty(init_D.shape[0]+1, dtype=M.dtype)
@@ -70,7 +70,7 @@ cdef class FaustAlgoGen@TYPE_NAME@:
             # store only lambda as a return from Palm4MSA algo
             _out_buf = np.array([0], dtype=M.dtype)
 
-        if(calling_fft_algo):
+        if calling_fgft_algo:
             cpp_params = new \
             FaustCoreCy.PyxParamsFactPalm4MSAFFT[@TYPE@,double]()
             init_D_view = init_D
@@ -144,7 +144,7 @@ cdef class FaustAlgoGen@TYPE_NAME@:
 
         core = @CORE_CLASS@(core=True)
 
-        if(calling_fft_algo):
+        if calling_fgft_algo:
             core.@CORE_OBJ@ = \
             FaustCoreCy.fact_palm4MSAFFT[@TYPE@,double](&Mview[0,0],
                                                         M_num_rows,
@@ -165,7 +165,7 @@ cdef class FaustAlgoGen@TYPE_NAME@:
 
         del cpp_params
 
-        if(calling_fft_algo):
+        if calling_fgft_algo:
             return core, np.real(_out_buf[0]), _out_buf[1:]
         else:
             return core, np.real(_out_buf[0])
@@ -217,9 +217,9 @@ cdef class FaustAlgoGen@TYPE_NAME@:
         cpp_stop_crits[1].erreps = p.stop_crits[1].erreps
 
 
-        calling_fft_algo = isinstance(init_D, np.ndarray)
+        calling_fgft_algo = isinstance(init_D, np.ndarray)
 
-        if(calling_fft_algo):
+        if calling_fgft_algo:
             # FFT/FGFT case, we store lambda in first position and the diagonal
             # of D in the next
             _out_buf = np.empty(init_D.shape[0]+1, dtype=M.dtype)
@@ -227,7 +227,7 @@ cdef class FaustAlgoGen@TYPE_NAME@:
             # store only lambda as a return from Palm4MSA algo
             _out_buf = np.array([0], dtype=M.dtype)
 
-        if(calling_fft_algo):
+        if calling_fgft_algo:
             cpp_params = new \
             FaustCoreCy.PyxParamsHierarchicalFactFFT[@TYPE@,double]()
             init_D_view = init_D
@@ -292,7 +292,7 @@ cdef class FaustAlgoGen@TYPE_NAME@:
         cpp_params.num_constraints = len(p.constraints)
 
         core = @CORE_CLASS@(core=True)
-        if(calling_fft_algo):
+        if calling_fgft_algo:
             core.@CORE_OBJ@ = \
                     FaustCoreCy.fact_hierarchical_fft[@TYPE@,
                                                       double](&Mview[0,0],
@@ -314,7 +314,7 @@ cdef class FaustAlgoGen@TYPE_NAME@:
         if(core.@CORE_OBJ@ == NULL): raise Exception("fact_hierarchical"
                                                           " has failed.");
 
-        if(calling_fft_algo):
+        if calling_fgft_algo:
             return core, np.real(_out_buf[0]), _out_buf[1:]
         else:
             return core, np.real(_out_buf[0])

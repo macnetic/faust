@@ -1581,7 +1581,7 @@ def fgft_palm(U, Lap, p, init_D=None, ret_lambda=False, ret_params=False):
         U: (numpy.ndarray)
             The Fourier matrix.
         init_D: (numpy.ndarray)
-            The initial diagonal vector. if None it will be the ones() vector by default.
+            The initial diagonal vector. if None it will be vector ones() by default.
         p: (ParamsHierarchical)
             The PALM hierarchical algorithm parameters.
         ret_lambda: (bool)

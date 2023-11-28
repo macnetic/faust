@@ -2085,23 +2085,22 @@ class ParamsPalm4MSAFGFT(ParamsPalm4MSA):
     @staticmethod
     def _set_init_D(init_D, dim_sz):
         """
-        Utility function for ParamsHierarchicalFGFT, ParamsPalm4MSAFGFT
+        Utility function for ParamsHierarchicalFGFT, ParamsPalm4MSAFGFT.
         """
         def _check_init_D_is_consistent(init_D):
-            if(not isinstance(init_D, np.ndarray)):
-                raise ValueError("init_D must be a numpy ndarray")
-            if(init_D.ndim != 1):
+            if not isinstance(init_D, np.ndarray):
+                raise TypeError("init_D must be a numpy ndarray")
+            if init_D.ndim != 1:
                 raise ValueError("init_D must be a vector.")
-            if(init_D.shape[0] != dim_sz):
+            if init_D.shape[0] != dim_sz:
                 raise ValueError("init_D must have the same size as first "
-                        "constraint's number of rows")
+                                 "constraint number of rows")
 
-        if not isinstance(init_D, np.ndarray):
+        if init_D is None:
+            # default init_D (ones)
             init_D = np.ones(dim_sz)
-            _check_init_D_is_consistent(init_D)
-            return init_D
-        else:
-            return init_D
+        _check_init_D_is_consistent(init_D)
+        return init_D
 
 class ParamsPalm4msaWHT(ParamsPalm4MSA):
 	"""
