@@ -3,7 +3,7 @@ from pyfaust.poly import basis, poly, expm_multiply
 from pyfaust import isFaust
 import numpy as np
 from numpy.linalg import norm
-from scipy.sparse import csr_matrix, random
+from scipy.sparse import csr_matrix, random, vstack as spvstack, eye as speye
 from scipy.sparse.linalg import expm_multiply as scipy_expm_multiply
 
 
@@ -178,6 +178,41 @@ class TestPoly(unittest.TestCase):
         y = expm_multiply(L, X, t, tradeoff='memory')
         y_ref = scipy_expm_multiply(L, X, **pts_args)
         self.assertTrue(norm(y-y_ref)/norm(y_ref) < 1e-2)
+        # test expm_multiply with (non-default) group_coeffs=False, poly_meth=2
+        X = np.random.rand(L.shape[1], 32).astype(L.dtype)
+        pts_args = {'start': -.5, 'stop': -0.1, 'num': 3, 'endpoint': True}
+        t = np.linspace(**pts_args)
+        y = expm_multiply(L, X, t, group_coeffs=False, poly_meth=2)
+        y_ref = scipy_expm_multiply(L, X, **pts_args)
+        self.assertTrue(norm(y-y_ref)/norm(y_ref) < 1e-2)
+        # error cases
+        self.assertRaisesRegex(TypeError, 'A must be a csr_matrix',
+                               expm_multiply, L.toarray(), X, t)
+        self.assertRaisesRegex(ValueError, 'A must be symmetric '
+                               'positive definite.',
+                               expm_multiply,
+                               spvstack((L,
+                                         speye(1, L.shape[1]))).tocsr(),
+                               X, t)
+        self.assertRaisesRegex(ValueError,
+                               "tradeoff must be 'memory' or 'time'",
+                               expm_multiply, L, X, t,
+                               tradeoff='anything')
+        self.assertRaisesRegex(ValueError, 'poly_meth must be 1 or 2',
+                               expm_multiply, L, X, t, poly_meth=3)
+        self.assertRaisesRegex(ValueError, 'group_coeffs must be a bool',
+                               expm_multiply, L, X, t, group_coeffs='anything')
+        self.assertRaisesRegex(ValueError,
+                               "group_coeffs can't be True if poly_meth == 1.",
+                               expm_multiply, L, X, t, poly_meth=1,
+                               group_coeffs=True)
+        t_non_neg_err = 'pyfaust.poly.expm_multiply handles only negative '
+        'time points.'
+        self.assertRaisesRegex(ValueError, t_non_neg_err,
+                               expm_multiply, L, X, - t, poly_meth=2,
+                               group_coeffs=True)
+        self.assertRaisesRegex(ValueError, t_non_neg_err,
+                               expm_multiply, L, X, - t)
 
     def test_poly_cat(self):
         print("Test poly._cat")
