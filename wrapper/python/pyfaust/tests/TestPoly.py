@@ -241,3 +241,34 @@ class TestPoly(unittest.TestCase):
         self.assertRaisesRegex(ValueError, axis_err, _cat, (F1,
                                                             S1.toarray()),
                                2)
+
+    def test_invm_multiply(self):
+        print("Test invm_multiply()")
+        from scipy.sparse import random
+        try:
+            from pyfaust.poly import invm_multiply
+            from numpy.linalg import inv
+            np.random.seed(42)  # for reproducibility
+            A = random(64, 64, .1, format='csr')
+            A = A@A.T
+            B = np.random.rand(A.shape[1], 2)
+            # tradeoff=='time' is already tested in docstrings
+            A_inv_B = invm_multiply(A, B, rel_err=1e-2, max_K=2048,
+                                    tradeoff='memory')
+            A_inv_B_ref = inv(A.toarray())@B
+            self.assertTrue(norm(A_inv_B-A_inv_B_ref)/norm(A_inv_B) <= 0.0273)
+            # test error cases
+            self.assertRaisesRegex(ValueError, 'poly_meth must be 1 or 2',
+                                   invm_multiply, A, B, poly_meth=3)
+            self.assertRaisesRegex(ValueError,
+                                   "tradeoff must be 'memory' or 'time'",
+                                   invm_multiply, A, B, tradeoff='anything')
+            # test singular A error case
+            sA = csr_matrix(A)
+            sA[-2:, :] = 0
+            self.assertRaisesRegex(Exception,
+                                   "a <= 0 error: A is a singular matrix or its"
+                                   " spectrum contains negative values.",
+                                   invm_multiply, A, B)
+        except ImportError:
+            print("invm_multiply is only avaiable in experimental packages.")

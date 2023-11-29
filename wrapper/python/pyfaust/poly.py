@@ -709,19 +709,19 @@ def invm_multiply(A, B, rel_err=1e-6, tradeoff='time', max_K=np.inf, dev='cpu', 
             of A and B.
 
     Returns:
-        The np.ndarray which is the approximate action of matrix inverse  of A on B.
+        The np.ndarray which is the approximate action of matrix inverse of A on B.
 
     Example:
-		>>> import numpy as np
-		>>> from scipy.sparse import random
-		>>> from pyfaust.poly import invm_multiply
-		>>> from numpy.linalg import norm, inv
+        >>> import numpy as np
+        >>> from scipy.sparse import random
+        >>> from pyfaust.poly import invm_multiply
+        >>> from numpy.linalg import norm, inv
         >>> np.random.seed(42) # for reproducibility
-		>>> A = random(64, 64, .1, format='csr')
-		>>> A = A@A.T
-		>>> B = np.random.rand(A.shape[1],2)
-		>>> A_inv_B = invm_multiply(A, B, rel_err=1e-2, max_K=2048)
-		>>> A_inv_B_ref = inv(A.toarray())@B
+        >>> A = random(64, 64, .1, format='csr')
+        >>> A = A@A.T
+        >>> B = np.random.rand(A.shape[1],2)
+        >>> A_inv_B = invm_multiply(A, B, rel_err=1e-2, max_K=2048)
+        >>> A_inv_B_ref = inv(A.toarray())@B
         >>> print("err:", norm(A_inv_B-A_inv_B_ref)/norm(A_inv_B))
         err: 0.027283169722939017
 
