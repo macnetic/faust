@@ -439,39 +439,41 @@ def _eyes_like(M, shape=None):
 
 
 def _vstack(arrays):
-    if isFaust(arrays[0]):
-        # all arrays are of type Faust
-        return fvstack(arrays)
-    else:
-        # all arrays are of type csr_matrix
-        return sp.vstack(arrays, format='csr')
+    """
+    Vertically concatenates an homogeneous tuple/list of Faust-s or csr_matrix-s.
+    """
+    return _cat(arrays, 0)
 
 
 def _hstack(arrays):
+    """
+    Horizontally concatenates an homogeneous tuple/list of Faust-s or csr_matrix-s.
+    """
+    return _cat(arrays, 1)
+
+
+def _cat(arrays, axis=0):
+    """
+    Concatenates an homogeneous tuple/list of Faust-s or csr_matrix-s.
+    """
+    if axis not in [0, 1]:
+        raise ValueError('axis must be 0 or 1')
     if isFaust(arrays[0]):
+        if np.any([not isFaust(a) for a in arrays[1:]]):
+            raise TypeError('Inconsistent cat')
         # all arrays are of type Faust
-        return fhstack(arrays)
+        if axis == 1:
+            return fhstack(arrays)
+        else:
+            return fvstack(arrays)
     else:
+        if np.any([not isinstance(a, csr_matrix) for a in arrays]):
+            raise TypeError('Inconsistent cat')
         # all arrays are of type csr_matrix
-        return sp.hstack(arrays, format='csr')
-
-
-def _build_consistent_tuple(arrays):
-    contains_a_Faust = False
-    for a in arrays:
-        if isFaust(a):
-            contains_a_Faust = True
-            break
-    if contains_a_Faust:
-        _arrays = []
-        for a in arrays:
-            if not isFaust(a):
-                a = Faust(a)
-            _arrays.append(a)
-        return tuple(_arrays)
-    else:
-        return arrays
-
+        if axis == 1:
+            return sp.hstack(arrays, format='csr')
+        else:
+            return sp.vstack(arrays, format='csr')
 
 class FaustPoly(Faust):
     """

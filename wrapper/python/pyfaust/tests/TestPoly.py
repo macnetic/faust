@@ -1,20 +1,18 @@
 import unittest
 from pyfaust.poly import basis, poly, expm_multiply
 from pyfaust import isFaust
-from numpy.random import randint
 import numpy as np
 from numpy.linalg import norm
 from scipy.sparse import csr_matrix, random
 from scipy.sparse.linalg import expm_multiply as scipy_expm_multiply
-import tempfile
-import os
+
 
 class TestPoly(unittest.TestCase):
 
     def __init__(self, methodName='runTest', dev='cpu', dtype='double'):
         super(TestPoly, self).__init__(methodName)
         self.dev = dev
-        if dtype == 'real': # backward compat
+        if dtype == 'real':  # backward compat
             dtype = 'double'
         self.dtype = dtype
 
@@ -39,7 +37,8 @@ class TestPoly(unittest.TestCase):
             self.assertTrue(np.allclose(deg1_fac[:d, :], Id))
             self.assertTrue(np.allclose(deg1_fac[d:2*d, :], L.toarray()))
             if K >= 2:
-                # assert the 2-degree polynomial matrix is in the form [Id ; [-Id, L]]
+                # assert the 2-degree polynomial matrix is
+                # in the form [Id ; [-Id, L]]
                 I2d = np.eye(2*d)
                 deg2_fac = F.factors(F.numfactors()-3).toarray()
                 self.assertTrue(np.allclose(deg2_fac[:2*d, :], I2d))
@@ -52,7 +51,8 @@ class TestPoly(unittest.TestCase):
                         Ind = np.eye(n*d)
                         degn_fac = F.factors(F.numfactors()-n-1).toarray()
                         self.assertTrue(np.allclose(degn_fac[:n*d, :], Ind))
-                        self.assertTrue(np.allclose(degn_fac[n*d:, -2*d:-d], -Id))
+                        self.assertTrue(np.allclose(degn_fac[n*d:, -2*d:-d],
+                                                    -Id))
                         self.assertTrue(np.allclose(degn_fac[n*d:, -d:],
                                                     2*L.toarray()))
                         zero_part = degn_fac[n*d:, :-2*d]
@@ -63,7 +63,6 @@ class TestPoly(unittest.TestCase):
         d = self.d
         L = self.L
         K = self.K
-        density = self.density
         F = basis(L, K, 'chebyshev', dev=self.dev, impl='py')
         self.verif_basis(d, F, K, L)
 
@@ -72,7 +71,6 @@ class TestPoly(unittest.TestCase):
         d = self.d
         L = self.L
         K = self.K
-        density = self.density
         F = basis(L, K, 'chebyshev', dev=self.dev, impl='native')
         self.verif_basis(d, F, K, L)
 
@@ -105,19 +103,20 @@ class TestPoly(unittest.TestCase):
         d = self.d
         L = self.L
         K = self.K
-        density = self.density
         for L in [self.L, Faust(self.L)]:
             if impl == 'native' and isFaust(L):
                 # native impl doesn't handle Faust L
-                self.assertRaises(TypeError, basis, L, K, 'chebyshev', dev=self.dev, impl=impl)
+                self.assertRaises(TypeError, basis, L, K, 'chebyshev',
+                                  dev=self.dev, impl=impl)
                 continue
-            F = basis(L, K, 'chebyshev', dev=self.dev, impl=impl).astype(self.dtype)
+            F = basis(L, K, 'chebyshev',
+                      dev=self.dev, impl=impl).astype(self.dtype)
             self.assertEqual(F.shape[0], (K+1) * L.shape[0])
             coeffs = np.random.rand(K+1).astype(self.dtype)
             G = poly(coeffs, F, impl=impl)
             # Test polynomial as Faust
-            poly_ref = np.zeros((d,d))
-            for i,c in enumerate(coeffs[:]):
+            poly_ref = np.zeros((d, d))
+            for i, c in enumerate(coeffs[:]):
                 poly_ref += c * F[d*i:(i+1)*d, :]
             self.assertAlmostEqual((G-poly_ref).norm(), 0)
             # Test polynomial as array
@@ -149,7 +148,8 @@ class TestPoly(unittest.TestCase):
             err = norm(FX1-GX)/norm(FX1)
             self.assertLessEqual(err, 1e-6)
             # Test polynomial-matrix product with arbitrary T0
-            F_ = basis(L, K, 'chebyshev', dev=self.dev, T0=csr_matrix(X), impl=impl)
+            F_ = basis(L, K, 'chebyshev', dev=self.dev, T0=csr_matrix(X),
+                       impl=impl)
             GT0eqX = poly(coeffs, F_, dev=self.dev, impl=impl).toarray()
             self.assertTrue(np.allclose(GT0eqX, FX1))
 
@@ -159,22 +159,50 @@ class TestPoly(unittest.TestCase):
         L = L@L.T
         # test expm_multiply on a vector
         x = np.random.rand(L.shape[1]).astype(L.dtype)
-        pts_args = {'start':-.5, 'stop':-0.1, 'num':3, 'endpoint':True}
+        pts_args = {'start': -.5, 'stop': -0.1, 'num': 3, 'endpoint': True}
         t = np.linspace(**pts_args).astype(L.dtype)
         y = expm_multiply(L, x, t)
         y_ref = scipy_expm_multiply(L, x, **pts_args)
         self.assertTrue(norm(y-y_ref)/norm(y_ref) < 1e-2)
         # test expm_multiply on a matrix
         X = np.random.rand(L.shape[1], 32).astype(L.dtype)
-        pts_args = {'start':-.5, 'stop':-0.1, 'num':3, 'endpoint':True}
+        pts_args = {'start': -.5, 'stop': -0.1, 'num': 3, 'endpoint': True}
         t = np.linspace(**pts_args)
         y = expm_multiply(L, X, t)
         y_ref = scipy_expm_multiply(L, X, **pts_args)
         self.assertTrue(norm(y-y_ref)/norm(y_ref) < 1e-2)
         # test expm_multiply with (non-default) tradeoff=='memory'
         X = np.random.rand(L.shape[1], 32).astype(L.dtype)
-        pts_args = {'start':-.5, 'stop':-0.1, 'num':3, 'endpoint':True}
+        pts_args = {'start': -.5, 'stop': -0.1, 'num': 3, 'endpoint': True}
         t = np.linspace(**pts_args)
         y = expm_multiply(L, X, t, tradeoff='memory')
         y_ref = scipy_expm_multiply(L, X, **pts_args)
         self.assertTrue(norm(y-y_ref)/norm(y_ref) < 1e-2)
+
+    def test_poly_cat(self):
+        print("Test poly._cat")
+        from pyfaust.poly import _cat
+        from pyfaust import rand as frand
+        from scipy.sparse import random as srand
+        type_err = "Inconsistent cat"
+        axis_err = "axis must be 0 or 1"
+        # only test errors because, functional cases
+        # are tested indirectly in other tests
+        # errors related to dimensions are not tested
+        # but it depends on pyfaust/scipy core cat (assumed already tested)
+        F1 = frand(10, 10, dtype=self.dtype)
+        S1 = srand(10, 10, density=.5, dtype=self.dtype)
+        for axis in [0, 1]:
+            # 1. try to cat a csr_matrix/Faust
+            self.assertRaisesRegex(TypeError, type_err, _cat, (F1, S1), axis)
+            # 2. try to cat a csr_matrix/np.ndarray
+            self.assertRaisesRegex(TypeError, type_err, _cat, (F1.toarray(),
+                                                               S1), axis)
+            # 3. try to cat a Faust/np.ndarray
+            self.assertRaisesRegex(TypeError, type_err, _cat, (F1,
+                                                               S1.toarray()),
+                                   axis)
+        # 4. test bad axis (2)
+        self.assertRaisesRegex(ValueError, axis_err, _cat, (F1,
+                                                            S1.toarray()),
+                               2)
