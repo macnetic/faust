@@ -3,7 +3,7 @@ from pyfaust import (rand as frand, Faust, vstack, hstack, isFaust, dot,
                      concatenate, pinv, eye, dft, wht, is_gpu_mod_enabled)
 from numpy.random import randint
 import numpy as np
-from scipy.sparse import csr_matrix
+from scipy.sparse import csr_matrix, issparse
 from scipy.sparse.linalg import aslinearoperator
 import tempfile
 import os
@@ -124,6 +124,32 @@ class TestFaust(unittest.TestCase):
                                     self.F.toarray()+G.toarray()))
         self.assertTrue(np.allclose((self.F+G.toarray()).toarray(),
                                     self.F.toarray()+G.toarray()))
+        # test broadcasting
+        M = np.random.rand(5, 10).astype(self.dtype)
+        for M in [M, csr_matrix(M)]:
+            F = frand(5, 1, dtype=self.dtype)
+            self.assertTrue(np.allclose((F + M).toarray(), F.toarray() + M))
+            F2 = frand(1, M.shape[1], dtype=self.dtype)
+            self.assertTrue(np.allclose((F2 + M).toarray(), F2.toarray() + M))
+        F3 = frand(*M.shape, dtype=self.dtype)
+        M = np.random.rand(5, 10).astype(self.dtype)
+        self.assertTrue(np.allclose((F3 + M[0, :]).toarray(),
+                                    F3.toarray() + M[0, :]))
+        # test F + 1x1 matrix
+        M = np.random.rand(1, 1).astype(self.dtype)
+        for M_ in [M, Faust(M), csr_matrix(M)]:
+            self.assertTrue(np.allclose((F + M_).toarray(),
+                                        F.toarray() + (M_.toarray() if
+                                                       isFaust(M_) or
+                                                       issparse(M_) else M_)))
+        # test error case in broadcasting
+        F = frand(5, 5, dtype=self.dtype)
+        G = frand(4, 1, dtype=self.dtype)
+        err = 'operands could not be broadcast together.*'
+        err2 = 'Dimensions must agree, argument i=0'
+        self.assertRaisesRegex(ValueError, err, F.__add__, G)
+        G = frand(4, 4, dtype=self.dtype)
+        self.assertRaisesRegex(Exception, err2, F.__add__, G)
 
     def test_sub(self):
         print("Faust.__sub__, __rsub__")

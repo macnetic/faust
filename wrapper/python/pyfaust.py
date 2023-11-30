@@ -704,10 +704,10 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             the sum as a Faust object.
 
         Example:
-			>>> import pyfaust as pf
-			>>> from numpy.linalg import norm
+            >>> import pyfaust as pf
+            >>> from numpy.linalg import norm
             >>> pf.seed(42) # just for reproducibility
-			>>> F = pf.rand(10, 12)
+            >>> F = pf.rand(10, 12)
             >>> F
             Faust size 10x12, density 2.04167, nnz_sum 245, 5 factor(s):
             - FACTOR 0 (double) SPARSE, size 10x12, density 0.333333, nnz 40
@@ -716,7 +716,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             - FACTOR 3 (double) SPARSE, size 11x10, density 0.5, nnz 55
             - FACTOR 4 (double) SPARSE, size 10x12, density 0.333333, nnz 40
 
-			>>> G = pf.rand(10, 12)
+            >>> G = pf.rand(10, 12)
             >>> G
             Faust size 10x12, density 2.025, nnz_sum 243, 5 factor(s):
             - FACTOR 0 (double) SPARSE, size 10x11, density 0.454545, nnz 50
@@ -762,7 +762,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             - FACTOR 8 (double) SPARSE, size 24x12, density 0.0833333, nnz 24
 
 
-			>>> norm((F+G+2).toarray() - F.toarray() - G.toarray() - 2)
+            >>> norm((F+G+2).toarray() - F.toarray() - G.toarray() - 2)
 			7.115828086306871e-15
             >>> F+G+F+2+F
             Faust size 10x12, density 11.05, nnz_sum 1326, 13 factor(s):
@@ -794,16 +794,18 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                    " together with shapes ")
         # handle possible broadcasting of F
         # if dimensions are inconsistent it'll fail later
-        if(F.shape[1] == 1):
-            max_ncols = np.max([a.shape[1] for a in args if isinstance(a,
-                                                                       (Faust,
-                                                                        *array_types))])
-            F = F@Faust(np.ones(1, max_ncols, dtype=F.dtype), dev=F.device)
-            if(F.shape[0] == 1):
-                max_nrows = np.max([a.shape[0] for a in args if isinstance(a,
-                                                                           (Faust,
-                                                                            *array_types))])
-            F = Faust(np.ones(max_nrows, 1, dtype=F.dtype), dev=F.device)@F
+        if F.shape[1] == 1:
+            max_ncols = np.max(
+                [a.shape[1] for a in args if (
+                    isinstance(a, (Faust, *array_types)) and a.ndim == 2
+                )])
+            F = F @ Faust(np.ones((1, max_ncols), dtype=F.dtype), dev=F.device)
+        if F.shape[0] == 1:
+            max_nrows = np.max(
+                [a.shape[0] for a in args if isinstance(a,
+                                                        (Faust,
+                                                         *array_types))])
+            F = Faust(np.ones((max_nrows, 1), dtype=F.dtype), dev=F.device) @ F
         def scalar2Faust(G):
             if not np.isscalar(G):
                 raise TypeError("scalar must be int, float or complex")
@@ -831,18 +833,20 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         largs = []
         for i in range(0,len(args)):
             G = args[i]
-            if isinstance(G,Faust):
-                ve = ValueError(brd_err, F.shape,
-                                G.shape, " argument i=", i)
+            if isinstance(G, Faust):
+                ve = ValueError(brd_err +
+                                str(F.shape) + " " +
+                                str(G.shape) +
+                                ", argument i=" +str(i))
                 G = broadcast_to_F(G)
                 if F.shape != G.shape:
-                    raise Exception('Dimensions must agree, argument i=', i)
+                    raise Exception('Dimensions must agree, argument i='+str(i))
             elif isinstance(G,
                             array_types):
-                if(G.size == 1):
-                    G = scalar2Faust(G.reshape(1,)[0])
                 if G.ndim == 1:
                     G = Faust([np.ones((F.shape[0], 1), dtype=F.dtype), G.reshape(1, G.size)], dev=F.device)
+                elif G.size == 1:
+                    G = scalar2Faust(G[0,0])
                 else:
                     G = broadcast_to_F(Faust(G, dev=F.device))
             elif np.isscalar(G):
