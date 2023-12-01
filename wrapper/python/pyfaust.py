@@ -3364,7 +3364,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             d1_ids = d1_ids if isinstance(d1_ids, np.ndarray) else np.array(d1_ids)
         return F.m_faust.indexMultiply(d0_ids, d1_ids, x)
 
-    def average(F, axis=None, weights=None, returned=False):
+    def average(F, axis=None, weights=None, sw_returned=False):
         """
         Computes the weighted average of F along the specified axis.
 
@@ -3380,18 +3380,21 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                     avg = sum(F @ weights) / sum(weights)
 
                     The only constraint on weights is that sum(weights) must not be 0.
+            returned: (bool)
+                True to return the sum of weights in addition to average (as a pair
+                (avg,sum(weights))), False otherwise (default).
 
         Returns:
             The Faust average.
 
         Example:
-			>>> from pyfaust import Faust
-			>>> import numpy as np
-			>>> data = np.arange(1, 5).astype('double')
-			>>> data
-			array([1., 2., 3., 4.])
-			>>> F = Faust(data.reshape(1,data.shape[0]))
-			>>> FA = F.average()
+            >>> from pyfaust import Faust
+            >>> import numpy as np
+            >>> data = np.arange(1, 5).astype('double')
+            >>> data
+            array([1., 2., 3., 4.])
+            >>> F = Faust(data.reshape(1,data.shape[0]))
+            >>> FA = F.average()
             >>> FA
             Faust size 1x1, density 9, nnz_sum 9, 3 factor(s):
             - FACTOR 0 (double) DENSE, size 1x1, density 1, nnz 1
@@ -3429,39 +3432,48 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                 if 0 in axis:
                     F = F.average(axis=0,
                                  weights=def_rweights,
-                                 returned=returned)
+                                 sw_returned=sw_returned)
                 if 1 in axis:
                     F = F.average(axis=1,
                                   weights=def_cweights,
-                                  returned=returned)
+                                  sw_returned=sw_returned)
                 return F
 
         if not isinstance(weights, np.ndarray):
             weights = np.array(weights)
         if weights.shape != F.shape and weights.ndim != 1:
-            raise TypeError("1D weights expected when shapes of a and weights"
+            raise TypeError("1D weights expected when shapes of F and weights"
                             " differ.")
 
         weights = weights.astype(F.dtype)
-        if weights.shape == F.shape:
-            aF = Faust([(weights[:,0].T).reshape(1,F.shape[0])], dev=F.device)@F[:,0]
-            for i in range(1,F.shape[1]):
-                aF = pyfaust.hstack((aF, Faust([(weights[:,i].T).reshape(1,
-                                                                         F.shape[0])], dev=F.device)@F[:,i]))
-            sum_weights = 1/np.sum(weights, axis=axis)
-            aFw =  aF[:,0]@Faust([sum_weights[0].reshape(1,1)], dev=F.device)
-            for i in range(1, sum_weights.shape[0]):
-                aFw = pyfaust.hstack((aFw,
-                                      aF[:,i]@Faust([sum_weights[i].reshape(1,1)], dev=F.device)))
-            if(returned):
-                return (aFw, sum_weights)
+        zw_err = decimal.DivisionByZero("Weights sum to zero, can't be normalized")
+        if weights.ndim == 2 and weights.shape == F.shape:
+            # form the vector:
+            # aF.toarray() = [
+            #     sum(F[:, i] * weights[:, i]) for i in range(F.shape[1])
+            # ]
+            aF = pyfaust.hstack(tuple([pyfaust.Faust(weights[:, i].T.reshape(1, F.shape[0])) @
+                             F[:,i] for i in range(F.shape[1])]))
+            # multiply each vector element by 1/sum(weights)
+            sum_weights = np.sum(weights, axis=(0,1))
+            print("sum_weights ============================", sum_weights)
+            if sum_weights == 0:
+                raise zw_err
+            sum_weights = 1 / sum_weights
+            swF = Faust(np.array([sum_weights for i in
+                                  range(aF.shape[1])]).reshape(aF.shape[1], 1),
+                        dev=F.device)
+            aFw = aF @ swF
+
+            if sw_returned:
+                return (aFw, 1 / sum_weights)
             return aFw
 
         if axis == 1 or isinstance(axis, tuple) and 1 in axis:
             if weights.shape[0] == F.shape[1]:
                 aF = F@Faust(weights.reshape(weights.size, 1), dev=F.device)
             else:
-                raise ValueError("ValueError: Length of weights not compatible"
+                raise ValueError("Length of weights not compatible"
                                  " with specified axis 1.")
             sum_weights = np.sum(weights.reshape(weights.size, 1), axis=0)[0]
 
@@ -3472,7 +3484,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             if weightsM.shape[1] == F.shape[0]:
                 aF = Faust(weightsM, dev=F.device)@F
             else:
-                raise ValueError("ValueError: Length of weights not compatible"
+                raise ValueError("Length of weights not compatible"
                                  " with axis 0.")
             sum_weights = np.sum(weightsM.reshape(1, weights.size),
                                  axis=1)[0]
@@ -3480,8 +3492,8 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         if sum_weights != 0:
             aF = aF * (1/sum_weights)
         else:
-            raise decimal.DivisionByZero("Weights sum to zero, can't be normalized")
-        if(returned):
+            raise zw_err
+        if sw_returned:
             return (aF, sum_weights)
         return aF
 

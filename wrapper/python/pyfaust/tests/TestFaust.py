@@ -400,10 +400,63 @@ class TestFaust(unittest.TestCase):
             self._assertAlmostEqual(self.F.average(axis=i).toarray().reshape(1, self.F.shape[(i+1)%2]),
                                     np.average(self.F.toarray(), axis=i))
             self._assertAlmostEqual(self.F.average(axis=i,
-                                                   weights=
-                                                   weights[i]).toarray().reshape(1, self.F.shape[(i+1) % 2]),
+                                                   weights= weights[i]
+                                                  ).toarray().reshape(1, self.F.shape[(i+1) % 2]),
                                     np.average(self.F.toarray(), axis=i,
                                                weights=weights[i]))
+            # try with returned sum of weights
+            avg, sw = self.F.average(axis=i, weights=weights[i], sw_returned=True)
+            self._assertAlmostEqual(avg.toarray().reshape(1, self.F.shape[(i+1) % 2]),
+                                   np.average(self.F.toarray(), axis=i,
+                                              weights=weights[i]))
+            self.assertAlmostEqual(sw, np.sum(weights[i]))
+
+        # test average on both axes
+        self.assertAlmostEqual(self.F.average(axis=(0, 1))[0,0],
+                               np.average(self.F.toarray(), axis=(0, 1)))
+        # and implicitly using axis=None
+        self.assertAlmostEqual(self.F.average()[0,0],
+                               np.average(self.F.toarray(), axis=(0, 1)))
+        weights = np.random.rand(*self.F.shape)
+        self.assertAlmostEqual(self.F.average(axis=(0, 1), weights=weights)[0,0],
+                               np.average(self.F.toarray(), axis=(0, 1), weights=weights))
+        # try weights as list
+        self.assertAlmostEqual(self.F.average(axis=(0, 1),
+                                              weights=weights.tolist())[0,0],
+                               np.average(self.F.toarray(), axis=(0, 1), weights=weights))
+        # try with returned sum of weights
+        avg, sw = self.F.average(axis=(0, 1), weights=weights, sw_returned=True)
+        self.assertAlmostEqual(avg[0,0],
+                               np.average(self.F.toarray(), axis=(0, 1),
+                                          weights=weights))
+        self.assertAlmostEqual(sw, np.sum(weights.ravel()))
+        # error cases
+        self.assertRaisesRegex(TypeError, "axis must be int or tuple of ints",
+                               self.F.average, axis="anything")
+        self.assertRaisesRegex(TypeError,"1D weights expected when shapes of F"
+                               " and weights differ", self.F.average, axis=0,
+                               weights=[[12,12]])
+        err_weights_axis1 = "Length of weights not compatible"
+        " with specified axis 1."
+        err_weights_axis0 = "Length of weights not compatible"
+        " with specified axis 0."
+        self.assertRaisesRegex(ValueError, err_weights_axis1, self.F.average, axis=1,
+                               weights=[12,12])
+        self.assertRaisesRegex(ValueError, err_weights_axis0, self.F.average, axis=0,
+                               weights=[12,12])
+        err_zero_sum = "Weights sum to zero, can't be normalized"
+        zw = weights.astype(int)
+        zw[0, 0] -= np.sum(zw, axis=(0, 1))
+        self.assertAlmostEqual(np.sum(zw, axis=(0, 1)), 0)
+        from decimal import DivisionByZero
+        self.assertRaisesRegex(DivisionByZero, err_zero_sum,
+                               self.F.average,
+                               axis=(0,1),
+                               weights=zw)
+        # zero sum error in 1d case
+        self.assertRaisesRegex(DivisionByZero, err_zero_sum, self.F.average,
+                               axis=1,
+                               weights=np.zeros((self.F.shape[1])))
 
     def test_wht(self):
         print("test pyfaust.wht")
