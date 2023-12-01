@@ -658,6 +658,8 @@ namespace Faust
 		{
 			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_sliced_Transform();
 			const_cast<Faust::TransformHelper<FPP, Cpu>*>(this)->eval_fancy_idx_Transform();
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(th_right)->eval_sliced_Transform();
+			const_cast<Faust::TransformHelper<FPP, Cpu>*>(th_right)->eval_fancy_idx_Transform();
 			return new TransformHelper<FPP,Cpu>(this, th_right);
 		}
 
