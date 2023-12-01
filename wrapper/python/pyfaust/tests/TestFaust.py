@@ -461,3 +461,13 @@ class TestFaust(unittest.TestCase):
         draw_faust()
         self.assertTrue(exists(file1))
         self.assertTrue(exists(file2))
+
+    def test_neg(self):
+        print("Test pyfaust.Faust.__neg__")
+        nF = - self.F
+        self.assertTrue(np.allclose(nF.toarray(), - self.F.toarray()))
+
+    def test_pos(self):
+        print("Test pyfaust.Faust.__pos__")
+        pF = + self.F
+        self.assertTrue(np.allclose(pF.toarray(), + self.F.toarray()))
