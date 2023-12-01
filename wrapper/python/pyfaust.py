@@ -824,10 +824,15 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                 if G.shape[1] != F.shape[1]:
                     raise ve
                 G = Faust(np.ones((F.shape[0], 1), dtype=F.dtype), dev=F.device) @ G
-            elif G.shape[1] == 1:
-                if G.shape[0] != F.shape[0]:
-                    raise ve
-                G = G @ Faust(np.ones((1, F.shape[1]), dtype=F.dtype), dev=F.device)
+            # the next (commented) case never serves because we follow numpy broadcasting
+            # i.e. only a scalar, a vector of size F.shape[1] or a 2d-array of size
+            # (1, F.shape[1]) can be broadcast to F
+            # according to numpy, there is no broadcasting of
+            # G of shape (F.shape[0], 1) to F
+#            elif G.shape[1] == 1:
+#                if G.shape[0] != F.shape[0]:
+#                    raise ve
+#                G = G @ Faust(np.ones((1, F.shape[1]), dtype=F.dtype), dev=F.device)
             return G
         # prepare the list of Fausts
         largs = []

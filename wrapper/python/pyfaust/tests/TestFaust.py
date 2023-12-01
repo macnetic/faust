@@ -125,6 +125,9 @@ class TestFaust(unittest.TestCase):
         self.assertTrue(np.allclose((self.F+G.toarray()).toarray(),
                                     self.F.toarray()+G.toarray()))
         # test broadcasting
+        # NOTE: according to numpy only a scalar, a vector of size F.shape[1]
+        # or a 2d-array of size (1, F.shape[1]) can be broadcast to F
+        # there is no such a broadcasting of G of shape (F.shape[0], 1) to F
         M = np.random.rand(5, 10).astype(self.dtype)
         for M in [M, csr_matrix(M)]:
             F = frand(5, 1, dtype=self.dtype)
@@ -135,6 +138,9 @@ class TestFaust(unittest.TestCase):
         M = np.random.rand(5, 10).astype(self.dtype)
         self.assertTrue(np.allclose((F3 + M[0, :]).toarray(),
                                     F3.toarray() + M[0, :]))
+        M = np.random.rand(5, 10).astype(self.dtype)
+        self.assertTrue(np.allclose((F3.T + M[:, 0]).toarray(),
+                                    F3.toarray().T + M[:, 0]))
         # test F + 1x1 matrix
         M = np.random.rand(1, 1).astype(self.dtype)
         for M_ in [M, Faust(M), csr_matrix(M)]:
@@ -145,11 +151,10 @@ class TestFaust(unittest.TestCase):
         # test error case in broadcasting
         F = frand(5, 5, dtype=self.dtype)
         G = frand(4, 1, dtype=self.dtype)
-        err = 'operands could not be broadcast together.*'
-        err2 = 'Dimensions must agree, argument i=0'
-        self.assertRaisesRegex(ValueError, err, F.__add__, G)
+        err = 'Dimensions must agree, argument i=0'
+        self.assertRaisesRegex(Exception, err, F.__add__, G)
         G = frand(4, 4, dtype=self.dtype)
-        self.assertRaisesRegex(Exception, err2, F.__add__, G)
+        self.assertRaisesRegex(Exception, err, F.__add__, G)
 
     def test_sub(self):
         print("Faust.__sub__, __rsub__")
