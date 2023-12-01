@@ -116,6 +116,16 @@ class TestFaust(unittest.TestCase):
         self.assertLessEqual(self.F.pruneout().nbytes, self.F.nbytes)
         self.assertTrue(np.allclose(self.F.pruneout().toarray(),
                                     self.F.toarray()))
+        # error cases
+        err_npasses_int = 'npasses must be a int.*'
+        err_thres_int = 'thres must be a int.*'
+        err_onlyforward_bool = 'only_forward must be a bool.*'
+        self.assertRaisesRegex(TypeError, err_npasses_int, self.F.pruneout,
+                               npasses='anything')
+        self.assertRaisesRegex(TypeError, err_thres_int, self.F.pruneout,
+                               thres='anything')
+        self.assertRaisesRegex(TypeError, err_onlyforward_bool, self.F.pruneout,
+                               only_forward='anything')
 
     def test_add(self):
         print("Faust.__add__, __radd__")

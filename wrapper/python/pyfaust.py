@@ -540,17 +540,17 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             F: (Faust)
                 the Faust to optimize.
             thres: (int)
-                the threshold of number of nonzeros under what the
+                the threshold in number of nonzeros under what the
                 rows/columns are removed.
 
         Returns:
             The optimized Faust.
 
         Example:
-			>>> from pyfaust import rand, seed
+            >>> from pyfaust import rand, seed
             >>> seed(42) # just for reproducibility
-			>>> F = rand(1024, 1024, dim_sizes=[1, 1024], num_factors=64, fac_type='mixed')
-			>>> pF = F.pruneout()
+            >>> F = rand(1024, 1024, dim_sizes=[1, 1024], num_factors=64, fac_type='mixed')
+            >>> pF = F.pruneout()
             >>> F.nbytes
             49109760
             >>> pF.nbytes
@@ -564,19 +564,19 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         #            optimal Faust is obtained.
         npasses = 'auto'
         only_forward = False
-        if('npasses' in kwargs):
+        if 'npasses' in kwargs:
             npasses = kwargs['npasses']
-        if('only_forward' in kwargs):
+        if 'only_forward' in kwargs:
             only_forward = kwargs['only_forward']
-        if(npasses == 'auto'):
+        if npasses == 'auto':
             npasses = -1
-        elif(not isinstance(npasses, int)):
+        elif not isinstance(npasses, int):
             raise TypeError('npasses must be a int'
                             ' or \'auto\'')
-        if(not isinstance(only_forward, bool)):
+        if not isinstance(only_forward, bool):
             raise TypeError('only_forward '
                             'must be a bool.')
-        if(not isinstance(thres, int)):
+        if not isinstance(thres, int):
             raise TypeError('thres '
                             'must be a int.')
         #print("only_forward=", only_forward, "npasses=", npasses)
