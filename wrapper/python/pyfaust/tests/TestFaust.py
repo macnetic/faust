@@ -9,7 +9,7 @@ import tempfile
 import os
 import random
 from os.path import exists, join
-from os import unlink
+from os import unlink, stat
 from tempfile import gettempdir
 
 
@@ -463,11 +463,22 @@ class TestFaust(unittest.TestCase):
         self.assertTrue(exists(file2))
 
     def test_neg(self):
-        print("Test pyfaust.Faust.__neg__")
+        print("Test Faust.__neg__")
         nF = - self.F
         self.assertTrue(np.allclose(nF.toarray(), - self.F.toarray()))
 
     def test_pos(self):
-        print("Test pyfaust.Faust.__pos__")
+        print("Test Faust.__pos__")
         pF = + self.F
         self.assertTrue(np.allclose(pF.toarray(), + self.F.toarray()))
+
+    def test_imshow(self):
+        print("Test Faust.imshow()")
+        import matplotlib.pyplot as plt
+        for F in [self.F, self.F.astype('complex')]:
+            F.imshow()
+            fp = "F.png"
+            plt.savefig(fp)
+            self.assertTrue(exists(fp))
+            self.assertGreaterEqual(stat(fp).st_size, 200)
+            unlink(fp)

@@ -2775,7 +2775,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         \see :py:func:`Faust.display`
         """
         import matplotlib.pyplot as plt
-        if(not isinstance(name, str)): raise TypeError('name must be a str.')
+        if not isinstance(name, str): raise TypeError('name must be a str.')
         nf = F.numfactors()
         max_cols = 5
         ncols = min(nf,max_cols)
@@ -2796,7 +2796,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             plt.xticks([]); plt.yticks([])
             plt.suptitle('Factors of the Faust '+ name, fontweight='bold')
             if fac.dtype == 'complex':
-                plt.imshow(abs(fac),aspect='equal')
+                plt.imshow(abs(fac), aspect='equal')
             else:
                 plt.imshow(fac, aspect='equal')
 
