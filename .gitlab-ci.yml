@@ -78,7 +78,7 @@ ctest_python:
       - export LD_PRELOAD=/usr/lib64/libomp.so
     variables: {BUILD_WRAPPER_PYTHON: "ON", SLOW_TESTS: "OFF", DONT_PYPLOT_FAUST_TIME: "ON", NOCPPTESTS: "ON", NOPY2: "ON", BUILD_MULTITHREAD: "ON", BUILD_FLOAT_PYX: "ON", NJOBS: 4} #, GIT_STRATEGY: none}
     script:
-      - ctest -O ctest.log -S ./CDashConfScript.cmake -j4 --output-junit junit_output.xml #|| echo "forcing job to continue"
+      - ctest -O ctest.log -S ./CDashConfScript.cmake -j4 --output-junit junit_output.xml || echo "forcing job to continue"
       - if [[ ! -r build_FaustLinuxPython/junit_output.xml ]]; then exit 1;fi
       - misc/continuous_integration/jobs/junit_html_report.sh python_pyfaust_test_output
         # fail the ci job if any ctest test (or unit test) have failed
