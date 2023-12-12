@@ -331,7 +331,7 @@ pkg_win:
     variables: {BUILD_CONFIG: "Release", GIT_SUBMODULE_STRATEGY: recursive, EXPERIMENTAL_PKG: 'ON'} # Not using Debug config to handle a compiliation issue (#279)
     <<: *win_build_gpu_mod
     script:
-        - 'set FAUST_VERSION=%CI_COMMIT_SHA:~0,8%'
+        - 'set FAUST_VERSION=0.0.0+%CI_COMMIT_SHA:~0,8%'
         - call misc/continuous_integration/jobs/win/build_nsis_pkg.bat
     artifacts:
         paths:
@@ -556,7 +556,7 @@ pages:
     extends: .pkg_purepy
     stage: pkg_purepy
     before_script:
-        - VERSION=$(echo $CI_COMMIT_SHA | sed -e 's/^\(.\{8\}\).*/\1/')
+        - VERSION=0.0.0+$(echo $CI_COMMIT_SHA | sed -e 's/^\(.\{8\}\).*/\1/')
         - if [[ -n "$USE_GPU_MOD" ]]; then GPU_MOD_SHA=$(git submodule foreach git log --oneline -n1 | sed -e 's/ .*//' | tail -1); fi
         - echo GPU_MOD_SHA=$GPU_MOD_SHA
           # TODO: loop on CUDA VERSIONS instead of duplicating the commands
@@ -578,7 +578,7 @@ pkg_macos_purepy_rev:
     extends: .pkg_purepy_rev
     variables: {MATIO_STATIC_LIB_PATH: $MACOS_MATIO_SLIB_PATH, Z_STATIC_LIB_PATH: $MACOS_ZLIB_SLIB_PATH, HDF5_STATIC_LIB_PATH: $MACOS_HDF5_SLIB_PATH, SZIP_STATIC_LIB_PATH: $MACOS_SZIP_SLIB_PATH, EXPERIMENTAL_PKG: "ON", BUILD_MULTITHREAD: "ON", NOPY2: "ON", CMAKE_CXX_COMPILER: "/opt/local/bin/clang++-mp-9.0"}
     before_script:
-      - VERSION=$(echo $CI_COMMIT_SHA | sed -e 's/^\(.\{8\}\).*/\1/')
+      - VERSION=0.0.0+$(echo $CI_COMMIT_SHA | sed -e 's/^\(.\{8\}\).*/\1/')
       - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
       - cmake -DCMAKE_CXX_COMPILER=$CMAKE_CXX_COMPILER ..
       - cd ..
@@ -734,7 +734,7 @@ pkg_win_purepy_rev:
     extends: .pkg_win_purepy
     variables: {BUILD_CONFIG: "Release", GIT_SUBMODULE_STRATEGY: recursive}
     before_script:
-        - 'set VERSION=%CI_COMMIT_SHA:~0,8%'
+        - 'set VERSION=0.0.0+%CI_COMMIT_SHA:~0,8%'
         - 'set EXPERIMENTAL_PKG=ON'
     artifacts:
         expire_in: '1 week'
