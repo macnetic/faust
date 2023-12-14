@@ -335,7 +335,7 @@ pkg_win:
         - call misc/continuous_integration/jobs/win/build_nsis_pkg.bat
     artifacts:
         paths:
-            - build/faust-%CI_COMMIT_SHA:~0,8%-amd64.exe
+            - build/faust-*-amd64.exe
         expire_in: '1 week'
     tags:
         - win10
@@ -411,7 +411,7 @@ pkg_win_release:
         - call misc/continuous_integration/jobs/win/build_nsis_pkg.bat
     artifacts:
         paths:
-            - build/faust-%CI_COMMIT_TAG%-amd64.exe
+            - build/faust-*-amd64.exe
         expire_in: '1 yrs'
     tags:
         - win10
