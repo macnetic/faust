@@ -365,7 +365,7 @@ pkg_linux:
         paths:
             - build/faust-${CI_COMMIT_SHA:0:8}-x86_64.deb
             - build/faust-${CI_COMMIT_SHA:0:8}-x86_64.rpm
-        expire_in: '1 week'
+        expire_in: '1 month' # needed to ease maintaining matfaust_test_code_coverage
     tags:
         - linux
         - matlab
@@ -596,6 +596,8 @@ pkg_linux_purepy_rev:
         - tux_packager
     needs:
         - job: ctest_python
+    artifacts:
+        expire_in: '1 month' # needed to ease maintaining pyfaust_test_code_coverage
 
 .pkg_purepy_release:
     stage: pkg_purepy
