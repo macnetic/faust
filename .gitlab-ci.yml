@@ -167,6 +167,7 @@ ctest_nightly_win10:
 
 doctest_pyfaust:
   stage: pkg_test
+  variables: {JOB_PYTHON: 'python3.12'}
   script:
     - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
     - cmake -DBUILD_WRAPPER_PYTHON=ON -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" ..
