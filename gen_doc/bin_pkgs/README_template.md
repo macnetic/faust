@@ -13,7 +13,7 @@
 
 ### 1.1 For Python
 
-@note  This section treats only of system packages/installers but note that some PIP and Anaconda packages are also available. Installing those PIP packages is recommended, in particular because of the easier weak dependency management. You might install them in virtual environments:
+@note  This section treats only of system packages/installers but note that some PIP and Anaconda packages are also available. Installing those packages is recommended, in particular because of the easier weak dependency management. You might install them in virtual environments:
 \ref install_pyfaust_in_venv.<br/> 
 
 FAµST is designed for the Python ecosystem which as usual relies on the numpy and scipy packages.
