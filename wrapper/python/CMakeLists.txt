@@ -332,7 +332,7 @@ endif()
 if(NOT REMOTE_DATA_URL OR NOT REMOTE_DATA_FILE)
 	# install data files used by pyfaust.demo
 	# they will be included only in pip/easyinstall packages (see install cmake function/rule in the end of file)
-	FILE(GLOB DEMO_MAT_FILES RELATIVE ${FAUST_DATA_MAT_DIR} ${FAUST_DATA_MAT_DIR}/*MEG*.mat ${FAUST_DATA_MAT_DIR}/*quick_start*.mat ${FAUST_DATA_MAT_DIR}/Laplacian*.mat)
+	FILE(GLOB DEMO_MAT_FILES RELATIVE ${FAUST_DATA_MAT_DIR} ${FAUST_DATA_MAT_DIR}/*MEG*.mat ${FAUST_DATA_MAT_DIR}/*quick_start*.mat ${FAUST_DATA_MAT_DIR}/Laplacian*.mat ${FAUST_DATA_MAT_DIR}/F_*.mat ${FAUST_DATA_MAT_DIR}/M_*.mat)
 	foreach(MAT_FILE ${DEMO_MAT_FILES})
 		message(STATUS "Copying demo mat files into ${FAUST_PYTHON_BIN_DIR}/data")
 		configure_file(${FAUST_DATA_MAT_DIR}/${MAT_FILE} ${FAUST_PYTHON_BIN_DIR}/pyfaust/data/${MAT_FILE} COPYONLY)
