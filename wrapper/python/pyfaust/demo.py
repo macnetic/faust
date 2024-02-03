@@ -20,14 +20,25 @@ DEFT_FIG_DIR = 'pyfaust_demo_figures'
 
 def get_data_dirpath(silent=True):
     """
-        Returns the data directory path which varies according to the way pyfaust was installed.
+    Returns the data directory path which varies according to the way pyfaust was installed.
     """
-    from pkg_resources import resource_filename
+    # from pkg_resources import resource_filename  # deprecated
+    from importlib.resources import files, as_file
+    import atexit
+    from contextlib import ExitStack
     from os.path import exists, join, expanduser, isfile
     from os import sep, listdir, mkdir
     from pyfaust.datadl import download_uncompress
-    path = resource_filename(__name__, 'data')
-    if (sys.platform == 'win32' and not os.path.exists(path)):
+    # followed migration guide from pkg_resources to importlib_resources:
+    # https://importlib-resources.readthedocs.io/en/latest/migration.html
+    # path = resource_filename(__name__, 'data')
+    ref = files('pyfaust') / 'data'
+    file_manager = ExitStack()
+    # dispose cache at exit time
+    atexit.register(file_manager.close)
+    # need path as str not PosixPath
+    path = str(file_manager.enter_context(as_file(ref)))
+    if sys.platform == 'win32' and not os.path.exists(path):
         try:
             from pyfaust import _NSI_INSTALL_PATH
         except:
@@ -38,19 +49,19 @@ def get_data_dirpath(silent=True):
         # at installation stage
         # in this case, matlab is inst so point to its data dir
         path = _NSI_INSTALL_PATH+sep+'matlab'+sep+'data'
-    if(not exists(path)):
+    if not exists(path):
         # fallback to matlab wrapper data
         # it will not help if we are from pip pkg
         # but it shouldn't happen
         path = '@FAUST_MATFAUST_DEMO_DATA_BIN_DIR@'
-    if(exists(path)):
+    if exists(path):
         loc_files = [f for f in listdir(path) if isfile(join(path, f))]
     else:
         loc_files = []
-    if(len(loc_files) == 0):
+    if len(loc_files) == 0:
         # download data in user folder
         path = join(expanduser('~'), "pyfaust_data")
-        if(not exists(path)):
+        if not exists(path):
             mkdir(path)
         download_uncompress(path, already_downloaded_msg=not silent)
     return path
