@@ -1,6 +1,6 @@
 if(NOT EXISTS faust_misc_data.zip)
 	message(STATUS "Downloading FAµST misc data archive (needed for tests).")
-	file(DOWNLOAD https://zenodo.org/records/10301339/files/faust_misc_data-2023-07-11.zip faust_misc_data.zip SHOW_PROGRESS)
+	file(DOWNLOAD https://zenodo.org/records/10613337/files/faust_misc_data-2024-02-03.zip faust_misc_data.zip SHOW_PROGRESS)
 endif()
 if(NOT EXISTS data)
 	if(NOT FAUST_MISC_DIR)
