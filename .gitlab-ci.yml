@@ -165,17 +165,17 @@ ctest_nightly_win10:
       paths:
         - build_FaustWin/Testing # cmake configure, build, ctest logs
 
-doctest_pyfaust:
-  stage: pkg_test
+.install_pyfaust_release_and_update:
   variables: {JOB_PYTHON: 'python3.12'}
-  script:
+  before_script:
     - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
     - cmake -DBUILD_WRAPPER_PYTHON=ON -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" ..
     - if [[ ! -d "doctest_pyfaust_latest" ]]; then $JOB_PYTHON -m venv doctest_pyfaust-latest;fi
     - source doctest_pyfaust-latest/bin/activate
     - python -m pip install --upgrade pip
-    - python -m pip install pyfaust
+    - python -m pip install --upgrade pyfaust nbconvert ipython ipykernel
     - if [ -r "/tmp/faust_data.zip" ]; then sudo rm /tmp/faust_data.zip; fi # avoid permission error if pre-exists
+    - $JOB_PYTHON -c "from pyfaust.demo import get_data_dirpath; get_data_dirpath()" # download data if needed and before pkg override
     - PF_DIR=`dirname $(python -c "import pyfaust as pf; print(pf.__file__)")`
     - ls wrapper/python/pyfaust/*py
     - md5sum wrapper/python/pyfaust/*py
@@ -183,6 +183,16 @@ doctest_pyfaust:
     - md5sum $PF_DIR/*py
     - cp -f wrapper/python/pyfaust/*py $PF_DIR/
     - md5sum $PF_DIR/*py
+    - export PF_DIR=$PF_DIR # just in case
+  after_script:
+    - deactivate
+    - rm -Rf doctest_pyfaust-latest
+
+
+doctest_pyfaust:
+  extends: .install_pyfaust_release_and_update
+  stage: pkg_test
+  script:
       #- python -m doctest -v $PF_DIR/__init__.py # already tested before pkg release
     - python -m doctest -v $PF_DIR/factparams.py
     - python -m doctest -v $PF_DIR/proj.py
@@ -190,8 +200,25 @@ doctest_pyfaust:
     - python -m doctest -v $PF_DIR/tools.py
     - python -m doctest -v $PF_DIR/fact.py
     - python -m doctest -v $PF_DIR/demo.py
-    - deactivate
-    - rm -Rf doctest_pyfaust-latest
+  tags:
+    - linux
+  except:
+    - tags
+    - schedules
+
+nbtest_pyfaust: # notebook tests
+  extends: .install_pyfaust_release_and_update
+  stage: pkg_test
+  script:
+    - python -m nbconvert ../gen_doc/pyfaust_poly.ipynb --to script --execute
+    - python -m nbconvert ../gen_doc/Faust_creation.ipynb --to script --execute
+    - python -m nbconvert ../gen_doc/Faust_factorization.ipynb --to script --execute
+    - python -m nbconvert ../gen_doc/Faust_manipulation.ipynb --to script --execute
+    - python -m nbconvert ../gen_doc/Use_of_Faust_objects_in_algorithms.ipynb --to script --execute
+    - python -m nbconvert ../gen_doc/Faust_optimizations.ipynb --to script --execute
+    - python -m nbconvert ../gen_doc/faust_projectors.ipynb --to script --execute
+    - python -m nbconvert ../gen_doc/MHTP_algorithms.ipynb  --to script #--execute  # too long to execute
+    - if echo $CI_RUNNER_TAGS | grep -w cuda; then python -m nbconvert ../gen_doc/using_gpu_pyfaust.ipynb; fi
   tags:
     - linux
   except:
@@ -212,7 +239,7 @@ doctest_matfaust:
 #    - rm artifacts.zip
     # what's in this pkg?
     - rpm -ql -p build/faust*rpm
-    # install the pkg but first remove poential older one
+    # install the pkg but first remove potential previous one (older or not)
     - if [ $(rpm -qa faust | wc -l) -gt 0 ]; then sudo rpm -e faust;fi
     - sudo rpm -i --nodeps build/faust*rpm
     - rm -Rf build
@@ -656,7 +683,7 @@ pkg_linux_purepy_release:
         # verify the pyfaust root with doctest (no go on failure)
         - if [[ ! $(basename $PWD) = 'build' ]]; then  cd build;fi
         - cd wrapper/python
-        - if ! python3 -m doctest -v pyfaust/__init__.py; then echo "error with doctest verification of pyfaust doc" 2>&1 && exit 1;fi # TODO: remove manual exit/code + msg (useless)
+        - if ! $JOB_PYTHON -m doctest -v pyfaust/__init__.py; then echo "error with doctest verification of pyfaust doc" 2>&1 && exit 1;fi # TODO: remove manual exit/code + msg (useless)
         - cd ../..
     tags:
         - linux
