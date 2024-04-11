@@ -82,7 +82,7 @@ def svdtj2(M, nGivens, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
      :py:func:`.eigtj`
     """
     from scipy.sparse import spdiags
-    from scipy import diag
+    from numpy import diag
     from pyfaust import Faust
     from numpy import argsort,sign,eye, sort
     if verbosity > 1:
@@ -1801,6 +1801,11 @@ def butterfly(M, type="bbtree", perm=None, diag_opt=False, mul_perm=None):
             return P.T.nonzero()[1]
     is_real = np.empty((1,))
     M = _check_fact_mat('butterfly()', M, is_real)
+    m, n = M.shape
+    l2_m, l2_n = np.log2([m, n])
+    if l2_m != np.floor(l2_m) or l2_n != np.floor(l2_n) or m != n:
+        raise ValueError("M must be square and its dimensions must be a power"
+                         " of two.")
     if isinstance(perm, str):
         if perm == 'bitrev':
             P = bitrev_perm(M.shape[1])
