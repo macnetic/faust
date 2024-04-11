@@ -22,6 +22,7 @@ from os import environ
 from pyfaust.tools import _sanitize_dtype
 
 HANDLED_FUNCTIONS = {}
+WARNING_ON_C_CONTIGUOUS_MATMUL = True
 
 class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
     """<b>FAuST Python wrapper main class</b> for using multi-layer sparse transforms.
@@ -1103,6 +1104,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             <br/>N.B.: you could have an elementwise non-significant absolute
             difference between the two members.
 
+
         Args:
             F: (Faust)
                 the Faust object.
@@ -1110,6 +1112,9 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                 In the latter case, A must be Fortran contiguous (i.e. Column-major order;
                 `order' argument passed to np.ndararray() must be equal to str
                 'F').
+                Warning: if A is a numpy array then A.flags['F_CONTIGUOUS']
+                must be True (that is, in column-major order) or a on-the-fly
+                conversion will take place (with a little overhead).
 
             Note that performing a Faust-csr_matrix product is often
             slower than converting first the csr_matrix to a dense
@@ -1167,6 +1172,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             raise ValueError("Scalar operands are not allowed, use '*'"
                              " instead")
         elif isinstance(A, np.ndarray):
+            global WARNING_ON_C_CONTIGUOUS_MATMUL
             w = lambda: warnings.warn("The numpy array to multiply is not "
                                       "F_CONTIGUOUS, costly conversion on the "
                                       "fly. Please use np.asfortranarray by "
@@ -1182,7 +1188,10 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                 return G
             else:
                 if not A.flags['F_CONTIGUOUS']:
-                    w()
+                    if WARNING_ON_C_CONTIGUOUS_MATMUL:
+                        WARNING_ON_C_CONTIGUOUS_MATMUL = False
+                        # a warning filter should be the same
+                        w()
                     A = np.asfortranarray(A)
                 if F.dtype == 'complex' and A.dtype != 'complex':
                     A = A.astype('complex')
