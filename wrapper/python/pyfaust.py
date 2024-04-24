@@ -1945,7 +1945,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         return F.m_faust.nnz()
 
     def density(F):
-        """ Calculates the density of F such that F.nnz_sum() == F.density()/F.size.
+        """ Calculates the density of F such that ``F.nnz_sum() == F.density() * F.size``.
 
         NOTE: A value of density below one indicates potential memory savings
         compared to storing the corresponding dense matrix F.toarray(), as well
@@ -1961,9 +1961,9 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             the density value (float).
 
         Examples:
-        >>> from pyfaust import rand
-        >>> F = rand(5, 50, density=.5)
-        >>> dens = F.density()
+            >>> from pyfaust import rand
+            >>> F = rand(5, 50, density=.5)
+            >>> dens = F.density()
 
         \see :py:func:`Faust.nnz_sum`, :py:func:`Faust.rcg`, :py:func:`Faust.size`, :py:func:`Faust.toarray`
         """
