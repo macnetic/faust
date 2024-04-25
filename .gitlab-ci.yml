@@ -1060,9 +1060,11 @@ conda_linux_pub:
   stage: conda_pkgs
   script:
     - misc/continuous_integration/conda_pkg/conda_build_upload_pyfaust.sh linux 3.11 misc/continuous_integration/conda_pkg/meta.yaml.in
-    - conda env remove -n build_upload_pyfaust_venv_311
     - misc/continuous_integration/conda_pkg/conda_build_upload_pyfaust.sh linux 3.12 misc/continuous_integration/conda_pkg/meta.yaml.in
-    - conda env remove -n build_upload_pyfaust_venv_312
+  after_script:
+    # if something went wrong in script envs might not have been deleted
+    - conda env remove -y -n build_upload_pyfaust_venv_311
+    - conda env remove -y -n build_upload_pyfaust_venv_312
   only:
     - tags
   tags:
@@ -1088,9 +1090,11 @@ conda_macosx_pub:
   stage: conda_pkgs
   script:
     - misc/continuous_integration/conda_pkg/conda_build_upload_pyfaust.sh macosx 3.11 misc/continuous_integration/conda_pkg/meta.yaml.in
-    - conda env remove -n build_upload_pyfaust_venv_311
     - misc/continuous_integration/conda_pkg/conda_build_upload_pyfaust.sh macosx 3.12 misc/continuous_integration/conda_pkg/meta.yaml.in
-    - conda env remove -n build_upload_pyfaust_venv_312
+  after_script:
+    # if something went wrong in script envs might not have been deleted
+    - conda env remove -y -n build_upload_pyfaust_venv_311
+    - conda env remove -y -n build_upload_pyfaust_venv_312
   only:
     - tags
   tags:
