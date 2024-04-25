@@ -112,21 +112,35 @@ Thanks to the docker directory mapping you can do it outside of the docker conta
 ---
 
 
-### Quickest Install on Linux, Windows and macOS (pre-built pakages)
+### Quickest Install on Linux, Windows and macOS (pre-built packages)
 
 Please refer to the document [Installation guides](https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/md_README.html)
 to install the FAUST toolbox.
 The FAUST toolbox has been tested on the following environments:
-- LINUX (fedora 35 - 37 / centos 7, 8 / Ubuntu)
+
+- LINUX (fedora 35 - 38 / Centos 7, 8 / RHEL / Ubuntu)
 - MACOS X
 - WINDOWS (windows 10)
 
-Pre-compiled packages from Gitlab Continuous Integration are also available. Except of course PIP packages, all packages include matlab and python wrappers, below are the latest release links.  
-- [macOS (.pkg) installer](https://gitlab.inria.fr/faustgrp/faust/-/jobs/artifacts/master/download?job=package_macos_release)  
-- [Windows (.exe) NSI installer](https://gitlab.inria.fr/faustgrp/faust/-/jobs/artifacts/master/download?job=package_win_release)  
-- [Linux (.rpm, .deb) packages](https://gitlab.inria.fr/faustgrp/faust/-/jobs/artifacts/master/download?job=package_linux_release)  
-- [Linux (.rpm, .deb) packages with embedded static matio library](https://gitlab.inria.fr/faustgrp/faust/-/jobs/artifacts/master/download?job=package_linux_release)  
-- Python PIP (pre-compiled) packages: for [Linux](https://gitlab.inria.fr/faustgrp/faust/-/jobs/artifacts/master/download?job=package_linux_purepy_release), [macOS](https://gitlab.inria.fr/faustgrp/faust/-/jobs/artifacts/master/download?job=package_macos_purepy_release) and [Windows 10](https://gitlab.inria.fr/faustgrp/faust/-/jobs/artifacts/master/download?job=package_win_purepy_release). Or preferably, refer to [pypi pyfaust](https://pypi.org/project/pyfaust) or [anaconda pyfaust](https://anaconda.org/pyfaust/pyfaust).
+
+**Latest pre-compiled release packages** from Gitlab Continuous Integration are also available.
+ The links for the latest release are available on the main website
+ [install page](https://faust.inria.fr/download/faust-3-x/).  
+(All system packages include Matlab and Python wrappers. Of course, PIP
+ packages include only Python wrappers)  
+You might also refer directly to [PyPI pyfaust](https://pypi.org/project/pyfaust)
+ or [Anaconda pyfaust](https://anaconda.org/pyfaust/pyfaust) projects.
+
+**Latest pre-built revision/development packages** (not release ones!) are also available as
+ artifacts of the Gitlab pipelines:
+
+- [Revision Linux packages](https://gitlab.inria.fr/faustgrp/faust/-/jobs/artifacts/main/browse/build?job=pkg_linux)  
+- [Revision Mac OS X](https://gitlab.inria.fr/faustgrp/faust/-/jobs/artifacts/main/browse/build?job=pkg_macos)  
+- [Revision Windows package](https://gitlab.inria.fr/faustgrp/faust/-/jobs/artifacts/main/browse/build?job=pkg_win)  
+- [Revision Linux PIP package](https://gitlab.inria.fr/faustgrp/faust/-/jobs/artifacts/main/browse/build/wrapper/python/dist?job=pkg_linux_purepy_rev)  
+- [Revision Mac OS X PIP package](https://gitlab.inria.fr/faustgrp/faust/-/jobs/artifacts/main/browse/build/wrapper/python/dist?job=pkg_macos_purepy_rev)  
+- [Revision Windows PIP package](https://gitlab.inria.fr/faustgrp/faust/-/jobs/artifacts/main/browse/build/wrapper/python/dist?job=pkg_win_purepy_rev)  
+
 ---
 
 
