@@ -166,7 +166,7 @@ ctest_nightly_win10:
         - build_FaustWin/Testing # cmake configure, build, ctest logs
 
 .install_pyfaust_release_and_update:
-  variables: {JOB_PYTHON: 'python3.12'}
+  variables: {JOB_PYTHON: 'python3.12'} # see #332, why not python3.12
   before_script:
     - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
     - cmake -DBUILD_WRAPPER_PYTHON=ON -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" ..

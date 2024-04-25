@@ -121,10 +121,10 @@ def basis(L, K, basis_name, dev='cpu', T0=None, **kwargs):
         >>> K = 3
         >>> F = basis(L, K, 'chebyshev')
         >>> F
-        Faust size 200x50, density 0.0672, nnz_sum 672, 4 factor(s):
-        - FACTOR 0 (double) SPARSE, size 200x150, density 0.00913333, nnz 274
-        - FACTOR 1 (double) SPARSE, size 150x100, density 0.0149333, nnz 224
-        - FACTOR 2 (double) SPARSE, size 100x50, density 0.0248, nnz 124
+        Faust size 200x50, density 0.0699, nnz_sum 699, 4 factor(s):
+        - FACTOR 0 (double) SPARSE, size 200x150, density 0.00943333, nnz 283
+        - FACTOR 1 (double) SPARSE, size 150x100, density 0.0155333, nnz 233
+        - FACTOR 2 (double) SPARSE, size 100x50, density 0.0266, nnz 133
         - FACTOR 3 (double) SPARSE, size 50x50, density 0.02, nnz 50
          identity matrix flag
 
@@ -133,11 +133,11 @@ def basis(L, K, basis_name, dev='cpu', T0=None, **kwargs):
 
         >>> G = next(F)
         >>> G
-        Faust size 250x50, density 0.07968, nnz_sum 996, 5 factor(s):
-        - FACTOR 0 (double) SPARSE, size 250x200, density 0.00648, nnz 324
-        - FACTOR 1 (double) SPARSE, size 200x150, density 0.00913333, nnz 274
-        - FACTOR 2 (double) SPARSE, size 150x100, density 0.0149333, nnz 224
-        - FACTOR 3 (double) SPARSE, size 100x50, density 0.0248, nnz 124
+        Faust size 250x50, density 0.08256, nnz_sum 1032, 5 factor(s):
+        - FACTOR 0 (double) SPARSE, size 250x200, density 0.00666, nnz 333
+        - FACTOR 1 (double) SPARSE, size 200x150, density 0.00943333, nnz 283
+        - FACTOR 2 (double) SPARSE, size 150x100, density 0.0155333, nnz 233
+        - FACTOR 3 (double) SPARSE, size 100x50, density 0.0266, nnz 133
         - FACTOR 4 (double) SPARSE, size 50x50, density 0.02, nnz 50
          identity matrix flag
 
@@ -150,10 +150,10 @@ def basis(L, K, basis_name, dev='cpu', T0=None, **kwargs):
 
         >>> F2 = basis(L, K, 'chebyshev', T0=random(50,2, .3, format='csr'))
         >>> F2
-        Faust size 200x2, density 1.68, nnz_sum 672, 4 factor(s):
-        - FACTOR 0 (double) SPARSE, size 200x150, density 0.00913333, nnz 274
-        - FACTOR 1 (double) SPARSE, size 150x100, density 0.0149333, nnz 224
-        - FACTOR 2 (double) SPARSE, size 100x50, density 0.0248, nnz 124
+        Faust size 200x2, density 1.7475, nnz_sum 699, 4 factor(s):
+        - FACTOR 0 (double) SPARSE, size 200x150, density 0.00943333, nnz 283
+        - FACTOR 1 (double) SPARSE, size 150x100, density 0.0155333, nnz 233
+        - FACTOR 2 (double) SPARSE, size 100x50, density 0.0266, nnz 133
         - FACTOR 3 (double) SPARSE, size 50x2, density 0.5, nnz 50
 
     """
@@ -216,11 +216,11 @@ def poly(coeffs, basis='chebyshev', L=None, X=None, dev='cpu', out=None,
             >>> coeffs = np.array([.5, 1, 2, 3])
             >>> G = poly(coeffs, 'chebyshev', L)
             >>> G
-            Faust size 50x50, density 0.3488, nnz_sum 872, 5 factor(s):
+            Faust size 50x50, density 0.3596, nnz_sum 899, 5 factor(s):
             - FACTOR 0 (double) SPARSE, size 50x200, density 0.02, nnz 200
-            - FACTOR 1 (double) SPARSE, size 200x150, density 0.00913333, nnz 274
-            - FACTOR 2 (double) SPARSE, size 150x100, density 0.0149333, nnz 224
-            - FACTOR 3 (double) SPARSE, size 100x50, density 0.0248, nnz 124
+            - FACTOR 1 (double) SPARSE, size 200x150, density 0.00943333, nnz 283
+            - FACTOR 2 (double) SPARSE, size 150x100, density 0.0155333, nnz 233
+            - FACTOR 3 (double) SPARSE, size 100x50, density 0.0266, nnz 133
             - FACTOR 4 (double) SPARSE, size 50x50, density 0.02, nnz 50
              identity matrix flag
 
@@ -231,11 +231,11 @@ def poly(coeffs, basis='chebyshev', L=None, X=None, dev='cpu', out=None,
             >>> coeffs = np.array([.5, 1, 2, 3])
             >>> G = poly(coeffs, F)
             >>> G
-            Faust size 50x50, density 0.3488, nnz_sum 872, 5 factor(s):
+            Faust size 50x50, density 0.3596, nnz_sum 899, 5 factor(s):
             - FACTOR 0 (double) SPARSE, size 50x200, density 0.02, nnz 200
-            - FACTOR 1 (double) SPARSE, size 200x150, density 0.00913333, nnz 274
-            - FACTOR 2 (double) SPARSE, size 150x100, density 0.0149333, nnz 224
-            - FACTOR 3 (double) SPARSE, size 100x50, density 0.0248, nnz 124
+            - FACTOR 1 (double) SPARSE, size 200x150, density 0.00943333, nnz 283
+            - FACTOR 2 (double) SPARSE, size 150x100, density 0.0155333, nnz 233
+            - FACTOR 3 (double) SPARSE, size 100x50, density 0.0266, nnz 133
             - FACTOR 4 (double) SPARSE, size 50x50, density 0.02, nnz 50
              identity matrix flag
 
@@ -601,9 +601,9 @@ def expm_multiply(A, B, t, K=10, tradeoff='time', dev='cpu', **kwargs):
         >>> t = np.linspace(start=-.5, stop=-0.1, num=3, endpoint=True)
         >>> y = fexpm_multiply(L, x, t)
         >>> y
-        array([[0.12706927, 0.24591891, 0.24529726, 0.35223879, 0.7409274 ],
-               [0.13190047, 0.26391877, 0.2890644 , 0.38977573, 0.75815737],
-               [0.13691536, 0.28256865, 0.33890501, 0.43252159, 0.77600955]])
+        array([[0.12706927, 0.21111065, 0.36636184, 0.41736344, 0.78517596],
+               [0.13190047, 0.24040598, 0.36636184, 0.4324354 , 0.78517596],
+               [0.13691536, 0.27376655, 0.36636184, 0.44805164, 0.78517596]])
 
    """
     if not isinstance(A, csr_matrix):
