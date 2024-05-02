@@ -749,7 +749,9 @@ ENUM_VALUES_PER_LINE   = 4
 # Netscape 6.0+, Internet explorer 5.0+, or Konqueror). Windows users are 
 # probably better off using the HTML help feature.
 
-GENERATE_TREEVIEW      = NO
+GENERATE_TREEVIEW      = YES
+
+FULL_SIDEBAR = YES
 
 # If the treeview is enabled (see GENERATE_TREEVIEW) then this tag can be 
 # used to set the initial width (in pixels) of the frame in which the tree 
@@ -1640,6 +1642,3 @@ EXTENSION_MAPPING      = .m=C++ #without that option-value, matlab inheritance i
 #DOT_MULTI_TARGETS      = NO
 #GENERATE_LEGEND        = YES
 #DOT_CLEANUP            = YES
-
-
-
