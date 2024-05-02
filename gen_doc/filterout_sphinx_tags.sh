@@ -12,4 +12,6 @@ do
 	#sed -i 's/\(:py:func:\|:py:class:\)`\(\.\)\?\([^`]\{1,\}\)`/\3/g' $F # certain sed versions on macOS don't handle \?, \| and -i flag
 	sed -e 's/\(:py:func:\)`\(\.\)\{0,1\}\([^`]\{1,\}\)`/\3/g;s/\(:py:class:\)`\(\.\)\{0,1\}\([^`]\{1,\}\)`/\3/g' < $F > /tmp/$(basename $F)
 	mv /tmp/$(basename $F) $F
+	sed -e 's/\(:func:\)`\(\.\)\{0,1\}\([^`]\{1,\}\)`/\3/g;s/\(:class:\)`\(\.\)\{0,1\}\([^`]\{1,\}\)`/\3/g' < $F > /tmp/$(basename $F)
+	mv /tmp/$(basename $F) $F
 done

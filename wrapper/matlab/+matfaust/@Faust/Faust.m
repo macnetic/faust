@@ -44,7 +44,7 @@
 % ======================================================================
 %> @brief <b>FAuST Matlab wrapper main class</b> for using multi-layer sparse transforms.
 %>
-%> This class provides a Matlab array-like interface for operations with FAuST data structures, which correspond to matrices that can be written exactly as the product of sparse matrices.
+%> This class provides a Matlab array-like interface for operations with FAuST data structures, which correspond ideally to matrices that can be written exactly as the product of sparse matrices.
 %>
 %> The Faust class is designed to allow fast matrix-vector multiplications together with reduced memory storage compared to what would be obtained by manipulating directly the corresponding (dense) Matlab array.
 %>
@@ -59,7 +59,7 @@
 %>
 %> The main exception is that contrary to a Matlab native array a Faust is immutable.
 %> It means that you cannot modify elements of a Faust using
-%> the assignment operator `=' like you do with a Matlab matrix (e.g. `M(i,j) =
+%> the assignment operator `=' as made with a Matlab matrix (e.g. `M(i,j) =
 %> 2').
 %> That limitation is the reason why the Matlab built-in `SUBSASGN()' is not
 %> implemented in this class.
@@ -75,9 +75,6 @@
 %> Mainly for convenience and test purposes, a Faust can be converted into
 %> the corresponding full matrix using the function Faust.full.
 %>
-%> @note it could be wiser to encapsulate a Faust in a
-%> <a href="https://gitlab.inria.fr/faustgrp/matlazylinop/-/blob/main/src/%2Blazylinop/aslazylinearoperator.m">lazylinop.LazyLinearOp</a>
-%> for a totally lazy paradigm on all available operations.
 %>
 %> @warning using Faust.full is discouraged except for test purposes, as it
 %> loses the main potential interests of the FAuST structure: compressed
@@ -94,8 +91,11 @@
 %> - element indexing (F(i,j), but note that slicing
 %>   is memory efficient through memory views).
 %>
+%> @note it could be wiser to encapsulate a Faust in a
+%> <a href="https://gitlab.inria.fr/faustgrp/matlazylinop/-/blob/main/src/%2Blazylinop/aslazylinearoperator.m">lazylinop.LazyLinearOp</a>
+%> for a totally lazy paradigm on all available operations.
 %>
-%> For more information about FAuST take a look at http://faust.inria.fr.
+%> For more information about FAuST take a look at https://faust.inria.fr.
 %>
 % ======================================================================
 
@@ -642,7 +642,7 @@ classdef Faust < handle % subclass of handle for Faust.delete to be called on cl
 		%> @code
 		%> full(F*A) == full(F)*full(A)
 		%> @endcode
-		%> @note you could have an elementwise non-significant absolute difference between the two members (not more than eps(1.0)).
+		%> @note an elementwise non-significant absolute difference between the two members is possible (not more than eps(1.0)).
 		%>
 		%> - If A is a scalar, F*A is also a Faust such that:
 		%> @code
