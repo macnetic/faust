@@ -102,6 +102,7 @@
 %> @b See also matfaust.circ, matfaust.anticirc
 %=========================================
 function T = toeplitz(c, varargin)
+    import matfaust.Faust
 	dev = 'cpu';
     diag_opt = false;
     argc = length(varargin);
@@ -166,7 +167,12 @@ function T = toeplitz(c, varargin)
     N = 2 ^ ceil(log2(max(m, n)));
     c_ = [c, zeros(1, N-m+1+N-n), r(end:-1:2)];
     C = matfaust.circ(c_, 'diag_opt', diag_opt);
-    T = C(1:m, 1:n);
+    if diag_opt
+        % see issue #335
+        T = Faust(speye(m, size(C, 1))) * C * Faust(speye(size(C, 2), n))
+    else
+        T = C(1:m, 1:n);
+    end
     if startsWith(dev, 'gpu')
 	    T = clone(T, 'dev', 'gpu');
     end

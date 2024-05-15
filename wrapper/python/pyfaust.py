@@ -4406,7 +4406,11 @@ def toeplitz(c, r=None, dev='cpu', diag_opt=False):
     c_ = np.hstack((c, np.zeros(N-m+1+N-n), r[:0:-1]))
     #TODO: handle cases len(c) == 1, 2
     C = circ(c_, diag_opt=diag_opt)
-    T = C[:m, :n]
+    if diag_opt:
+        # see issue #335
+        T = Faust(seye(m, C.shape[0], format='csr')) @ C @ Faust(seye(C.shape[1], n, format='csr'))
+    else:
+        T = C[:m, :n]
     if dev.startswith('gpu'):
         return T.clone('gpu')
     return T
